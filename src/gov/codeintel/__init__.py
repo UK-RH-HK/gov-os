@@ -375,11 +375,13 @@ def _number(value, query: str) -> int:
     return int(text)
 
 
-def _one(session: _Session, query: str) -> int:
+def _one(session: _Session, query: str) -> int | None:
+    """The one count ``query`` asks; None where the tool answers it with no single count (a tool, or a stand-in,
+    that does not count: the part is then read whole as before, unchecked; an error of the tool still raises)."""
     rows = _rows(session, query)
-    if len(rows) != 1 or not isinstance(rows[0], list) or len(rows[0]) != 1:
-        raise RuntimeError(f"{TOOL} query_graph answered {query!r} with {len(rows)} rows, not one count")
-    return _number(rows[0][0], query)
+    if len(rows) != 1 or not isinstance(rows[0], list) or len(rows[0]) != 1 or not str(rows[0][0]).strip().isdigit():
+        return None
+    return int(str(rows[0][0]).strip())
 
 
 def _counts(session: _Session, query: str) -> dict[str, int]:
@@ -394,13 +396,16 @@ def _counts(session: _Session, query: str) -> dict[str, int]:
     return found
 
 
-def _read(session: _Session, whole: str, group: str, each: str, what: str, total: int, nodes: int,
-          edges: int) -> list[list]:
+def _read(session: _Session, whole: str, group: str, each: str, what: str, total: int | None, nodes: int | None,
+          edges: int | None) -> list[list]:
     """Every row of the graph's nodes or edges (``what``): in one query (``whole``) where the tool's ``total`` is
     under its cap, else one query of each edge type or node label (``each``), counted first (``group``), so no
     query's answer is over the cap. The rows read equal each count, and the counts the total; else it refuses
     (``GraphShort``); a type or label over the cap, or a typed query the tool still refuses over it, refuses by name
-    (``GraphTooLarge``). Never a partial read taken for the whole."""
+    (``GraphTooLarge``). Never a partial read taken for the whole. No ``total`` (the tool gave no count): read
+    whole as before, where a query over the cap is the tool's own refusal."""
+    if total is None:
+        return _rows(session, whole)
     if total <= CAP:
         rows = _rows(session, whole)
         if len(rows) != total:
@@ -447,7 +452,8 @@ def _graph(root: Path) -> tuple[dict, dict]:
                       total_nodes, total_edges)
         edges = _read(session, _EDGES, "MATCH (a)-[r]->(b) RETURN type(r), count(r)", _TYPED, "edge type",
                       total_edges, total_nodes, total_edges)
-    _counted[root] = (total_nodes, total_edges)
+    if total_nodes is not None and total_edges is not None:
+        _counted[root] = (total_nodes, total_edges)
     nodes = {key: {"path": path, "name": name, "label": label} for key, name, label, path in found
              if label not in _PLACES and (root / BASE_REL / "files" / path).is_file()}
     users = defaultdict(list)

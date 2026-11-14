@@ -578,7 +578,8 @@ cases that pass on the old code are the ones that state what must stay the same)
 
 - **Built:** byte-for-byte copies (`cp -p`, never re-typed) of `governance/project/retrieval.yaml`, every file of
   `governance/project/indep-walls/` and the MEMORY-AUDIT-1 briefs (`auditor.md`, `checker.md`, `writer.md`) under
-  `src/gov/_shipped/`, each at its path in the Gov OS repository; `pyproject.toml` declares them package data of `gov`.
+  `src/gov/_shipped/`, each at its path in the Gov OS repository; `pyproject.toml` declares them package data of `gov`,
+  each file by its name (`tests/unit/retrieval/test_w2_59_project_root.py` reads each pattern as one path).
   `fabric.PACKAGED` names the three once; `fabric._package_copy()` is `<the gov package's folder>/_shipped`.
   `fabric.shipped(rel, root)` now looks (1) in the source tree, (2) in the package's copy `<package>/_shipped/<rel>`,
   (3) for a `rel` under `template/`, in the project's copier copy; found nowhere, `SHIPPED_FILE_MISSING` names `rel` and
@@ -608,7 +609,10 @@ cases that pass on the old code are the ones that state what must stay the same)
   the rows of each match equal its count, a whole read equals its count; else `GraphShort` (the type or label, both
   figures). A type or label over the cap, or a typed match the tool still refuses with its over-cap words, raises
   `GraphTooLarge` (`what`, `kind`, `count`, `nodes`, `edges`, `cap`, `refused`). A name that cannot stand in a match, or
-  a count that is no number, refuses. `counted(root)` gives the tool's `(nodes, edges)` of the graph `_graph` read.
+  a count by type or label that is no number, refuses. A whole count (`count(n)`, `count(r)`) the tool answers with no
+  single number (a tool or a stand-in that does not count; the stand-ins of `tests/unit/codeintel/test_codeintel.py`
+  answer every query with graph rows) reads that part whole, as before, unchecked, and gives no count; an error of the
+  tool on a count still raises. `counted(root)` gives the tool's `(nodes, edges)` of the graph `_graph` read.
   `_Session.tool` keeps the tool's error text in its `RuntimeError` (message and `.text`), so an over-cap refusal is
   told from other failures.
 - **Built (`src/gov/adopt/fabric.py`):** A9 records the code graph's `nodes` and `edges` as the tool counted them

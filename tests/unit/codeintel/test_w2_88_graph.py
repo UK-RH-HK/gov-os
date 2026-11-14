@@ -211,6 +211,19 @@ def test_a_graph_under_the_cap_is_read_whole_as_today(graph):
     assert "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name" in asked()
 
 
+def test_a_tool_that_answers_no_count_is_read_whole_as_before_and_gives_no_count(tmp_path, monkeypatch):
+    nodes = [["m.f", "f", "Function", "m.py"]]
+    edges = [["m.f", "CALLS", "m.f"]]
+    asked = []
+    monkeypatch.setattr(codeintel, "_rows", lambda _s, query: asked.append(query) or (edges if "type(r)" in query else nodes))
+    codeintel._graph.cache_clear()
+    root = tmp_path / "plain"
+    codeintel._graph(root)
+    assert codeintel.counted(root) is None
+    assert asked[-2:] == [codeintel._NODES, codeintel._EDGES]
+    codeintel._graph.cache_clear()
+
+
 def test_a_tool_error_keeps_the_tools_text(graph):
     root, plant = graph
     plant(refuse=["CALLS"])

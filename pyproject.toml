@@ -19,5 +19,13 @@ where = ["src"]
 "gov.retrieval" = ["retrieve_baseline.yaml"]
 # The files A9 needs that are not under template/, byte for byte at their paths in the Gov OS repository
 # (gov.adopt.fabric.PACKAGED, read through fabric.shipped's step (2)).
-"gov" = ["_shipped/governance/project/retrieval.yaml", "_shipped/governance/project/indep-walls/*",
-         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/*"]
+"gov" = ["_shipped/governance/project/retrieval.yaml",
+         "_shipped/governance/project/indep-walls/CLAUDE.md.tmpl",
+         "_shipped/governance/project/indep-walls/README.md",
+         "_shipped/governance/project/indep-walls/kinds.yaml",
+         "_shipped/governance/project/indep-walls/settings.json.tmpl",
+         "_shipped/governance/project/indep-walls/tree-exclude.txt",
+         "_shipped/governance/project/indep-walls/wall_hook.py",
+         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/auditor.md",
+         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/checker.md",
+         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/writer.md"]
