@@ -47,6 +47,9 @@ result = {"stopping_reason": "SATURATED", "evidence": evidence,
           "facets": {"lexical": {"available": spec.get("lexical", True), "reason": None},
                      "semantic": {"available": spec.get("semantic", True), "reason": None}},
           "rerank": {"by": spec.get("rerank_by", "service")}, "gaps": [], "continuation": None}
+store_commit = spec.get("store_commit", plan.get("store_commit"))
+if store_commit is not None:  # W2-138's field: the commit the store a search answered from was built at
+    result["store"] = {"commit": store_commit, "root": here}
 if spec.get("pool_fallback"):
     result["pool"] = {"fallback": True}
 print(json.dumps({"ok": True, "result": result}))

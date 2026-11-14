@@ -13,6 +13,9 @@ from pathlib import Path
 from gov.memaudit.common import UsageError
 
 AUDIT_RE = re.compile(r"memory-audit-[0-9]{8}")
+SET_RE = re.compile(r"memory-(audit|standing)-[0-9]{8}")  # a fresh audit's set, a Wave 0 verdict set or a standing set
+STANDING_RE = re.compile(r"memory-standing-[0-9]{8}")
+WEEK_RE = re.compile(r"[0-9]{4}-W[0-9]{2}")  # the ISO year and week of a standing run (W2-187 I1)
 QFILE_RE = re.compile(r"q[0-9]{2}\.yaml")
 NOTES_RE = re.compile(r"XCHECK-r([0-9]+)\.md")
 EVALUATION = "fixtures/evaluation"
@@ -32,9 +35,18 @@ def root_of(sets_root) -> Path:
 
 
 def check_audit(audit) -> str:
-    if not isinstance(audit, str) or not AUDIT_RE.fullmatch(audit):
+    if not isinstance(audit, str) or not SET_RE.fullmatch(audit):
         raise UsageError("audit")
     return audit
+
+
+def check_week(week) -> str | None:
+    """``week`` as given (``YYYY-Www``), ``None`` for none; anything else is a usage error."""
+    if week is None:
+        return None
+    if not isinstance(week, str) or not WEEK_RE.fullmatch(week):
+        raise UsageError("week")
+    return week
 
 
 def inside(path, root) -> bool:
@@ -47,12 +59,15 @@ def inside(path, root) -> bool:
     return False
 
 
-def paths(sets_root, audit) -> dict:
-    """Every path of section 2 for ``audit``, each checked to resolve inside the sets root."""
+def paths(sets_root, audit, week=None) -> dict:
+    """Every path of section 2 for ``audit``, each checked to resolve inside the sets root. With ``week`` (a standing
+    run, W2-187 I2) ``run`` is ``<sets root>/runs/<set>/<week>/``; ``preflight``, ``declaration``, ``used`` and ``ledger``
+    lie in it; ``set``, ``hidden`` and ``map`` are as without it."""
     root = root_of(sets_root)
     audit = check_audit(audit)
+    week = check_week(week)
     set_dir = root / EVALUATION / audit
-    run = root / "runs" / audit
+    run = root / "runs" / audit / week if week else root / "runs" / audit
     p = {
         "root": root,
         "map": root / "governance/project/path-map.yaml",
@@ -71,12 +86,13 @@ def paths(sets_root, audit) -> dict:
     for key, value in p.items():
         if key != "root" and not os.path.realpath(value).startswith(str(root) + "/"):
             raise UsageError("layout")
+    p["week"] = week
     return p
 
 
-def is_used(sets_root, audit) -> bool:
-    """Whether the audit's ``USED`` marker exists (a set is measured once)."""
-    return os.path.lexists(paths(sets_root, audit)["used"])
+def is_used(sets_root, audit, week=None) -> bool:
+    """Whether the audit's ``USED`` marker exists (a set is measured once; a standing set once a week)."""
+    return os.path.lexists(paths(sets_root, audit, week)["used"])
 
 
 def notes(p: dict) -> tuple[Path | None, int | None]:
@@ -110,10 +126,14 @@ def entries(hidden: Path) -> tuple[list[Path], int]:
 
 
 def make_run(p: dict) -> Path:
-    """The run folder, made with mode 700 when absent."""
+    """The run folder, made with mode 700 when absent. A week folder's parent, ``runs/<set>/``, is the standing set's
+    own run folder and is made with mode 700 too."""
     run = p["run"]
     if not run.is_dir():
-        os.makedirs(run.parent, exist_ok=True)
+        os.makedirs(run.parent.parent if p.get("week") else run.parent, exist_ok=True)
+        if p.get("week") and not run.parent.is_dir():
+            os.mkdir(run.parent, 0o700)
+            os.chmod(run.parent, 0o700)
         os.mkdir(run, 0o700)
         os.chmod(run, 0o700)
     return run

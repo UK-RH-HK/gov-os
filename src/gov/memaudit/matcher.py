@@ -22,15 +22,20 @@ class MatcherError(Exception):
     """The set cannot be loaded as the measure loads it. The message names no question, path or text (F1)."""
 
 
-def questions(sets_root, set_name: str, part: str, repo) -> list[dict]:
+def questions(sets_root, set_name: str, part: str, repo, only: str | None = None, default=None) -> list[dict]:
     """The questions of ``<sets root>/fixtures/evaluation/<set>/<part>/*.yaml`` in file-name order, each as
     ``gov.retrieval.measure._load`` returns it (``id``, ``question``, ``sources`` as matchable entries, ``unresolved``)
-    with the YAML's own ``gold`` (the gold answer), ``category``, ``keyword``, ``raw_sources`` and ``apart`` added."""
+    with the YAML's own ``gold`` (the gold answer), ``category``, ``keyword``, ``raw_sources`` and ``apart`` added.
+    ``only`` is a file's stem: the one-file form (W2-187 I6), which loads that question alone (none when it has no
+    file). ``default`` is the set's entry when the sets root's path map holds none yet."""
     root, repo = Path(sets_root).resolve(), Path(repo).resolve()
     try:
         entry = M.evaluation_sets(str(root)).get(set_name)
     except M.PolicyError:
-        raise MatcherError("set") from None
+        if default is None:
+            raise MatcherError("set") from None
+        entry = None
+    entry = default if entry is None else entry
     if not isinstance(entry, dict) or M.set_fault(entry):
         raise MatcherError("set")
     if part == "hidden" and M._measured(entry, root):  # a session the set measures never opens its hidden part
@@ -39,7 +44,9 @@ def questions(sets_root, set_name: str, part: str, repo) -> list[dict]:
     declared = M.families(root, repo)
     folder = root / M.EVALUATION / set_name / part
     cache, out = {}, []
-    for file in sorted(folder.glob("*.yaml")) if folder.is_dir() else []:
+    files = ([folder / f"{only}.yaml"] if only is not None and (folder / f"{only}.yaml").is_file()
+             else [] if only is not None else sorted(folder.glob("*.yaml")) if folder.is_dir() else [])
+    for file in files:
         q = M._load(file, part, repo, quoting, declared, cache)
         raw = yaml.safe_load(file.read_text(encoding="utf-8"))
         q.update(gold=raw.get("gold_answer"), category=raw.get("category"), keyword=raw.get("keyword") is True,

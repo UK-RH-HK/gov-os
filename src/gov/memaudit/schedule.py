@@ -8,9 +8,10 @@ the sets root (F1). Counts, codes and repository paths only.
 from __future__ import annotations
 
 import fnmatch
+import hashlib
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from gov.memaudit.common import GitError, UsageError, blob_at, git, git_code, resolve_commit, toplevel, z_list
@@ -51,8 +52,19 @@ def runs_dir() -> Path:
     return Path(os.path.abspath(os.path.expanduser(given or "~/gov-os-runs")))
 
 
-def folder(runs: Path) -> Path:
-    return runs / "indep" / "memaudit"
+def state_dir(runs, repo) -> Path:
+    """The audit's state of one repository: ``<runs>/indep/memaudit/<key>/`` (W2-187 I2), ``<key>`` the repository's
+    directory name, a hyphen and the first 8 hex of the sha256 of its real path, so two repositories on one machine
+    keep separate ``HISTORY.jsonl``, ``STARTS.log``, ``STANDING.jsonl`` and (under ``indep/``) ``AUDITS.log``."""
+    real = os.path.realpath(str(repo))
+    return Path(runs) / "indep" / "memaudit" / f"{os.path.basename(real)}-{hashlib.sha256(real.encode()).hexdigest()[:8]}"
+
+
+def state_of(repo) -> Path:
+    """The state folder a child of the driver finds (the driver names it in ``GOV_MEMAUDIT_STATE``), else the one this
+    repository's own key gives."""
+    given = os.environ.get("GOV_MEMAUDIT_STATE")
+    return Path(given) if given else state_dir(runs_dir(), repo_of(repo))
 
 
 def repo_of(repo) -> Path:
@@ -134,15 +146,33 @@ def churn_at(repo, commit) -> tuple[float, bool]:
     return round(share, 4), any(matches(p, RETRIEVAL_GLOBS) for p in changed)
 
 
-def retrieval_changed(repo, since, until) -> list[str]:
-    """The retrieval paths in ``git diff --name-only <since> <until>`` (none when there is no earlier audit)."""
-    if not since:
-        return []
-    try:
-        names = z_list(git(repo, "diff", "-z", "--name-only", since, until))
-    except GitError:  # a commit the repository does not hold: nothing to name
-        return []
-    return [p for p in names if matches(p, RETRIEVAL_GLOBS)]
+def _changed(repo, since, until, gov, last_pin) -> list[str]:
+    paths = []
+    if since:
+        try:
+            names = z_list(git(repo, "diff", "-z", "--name-only", since, until))
+        except GitError:  # a commit the repository does not hold: nothing to name
+            names = []
+        paths = [p for p in names if matches(p, RETRIEVAL_GLOBS)]
+    if isinstance(last_pin, str):  # a line without the field (W2-172's planted lines) is no trigger
+        from gov.memaudit import declare
+        pin = declare.gov_pin(gov or "~/.local/bin/gov")
+        if pin is not None and pin != last_pin:
+            paths.append("gov-pin")
+    return paths
+
+
+def last_line(lines, key):
+    """The value of ``key`` of the last of ``lines`` that has it."""
+    return next((x[key] for x in reversed(lines) if key in x), None)
+
+
+def retrieval_changed(repo, since, until, gov=None) -> list[str]:
+    """The retrieval paths in ``git diff --name-only <since> <until>`` over the six globs, for every repository (none
+    when there is no earlier audit), and ``gov-pin`` when the gov pin differs from the last ``HISTORY.jsonl`` line's
+    (W2-187 I9)."""
+    state = state_of(repo)
+    return _changed(repo, since, until, gov, last_line(read_lines(state / "HISTORY.jsonl"), "gov_pin"))
 
 
 def read_lines(path: Path) -> list[dict]:
@@ -162,19 +192,28 @@ def read_lines(path: Path) -> list[dict]:
     return out
 
 
-def last_audit_commit(runs: Path) -> str | None:
+def last_audit_commit(state: Path) -> str | None:
     """The commit "since the last audit" starts from: the last ``HISTORY.jsonl`` line's, else ``AUDITS.log``'s."""
-    for source in (folder(runs) / "HISTORY.jsonl", runs / "indep" / "AUDITS.log"):
+    for source in (state / "HISTORY.jsonl", state / "indep" / "AUDITS.log"):
         lines = [x for x in read_lines(source) if isinstance(x.get("commit"), str)]
         if lines:
             return lines[-1]["commit"]
     return None
 
 
-def decide(repo, runs: Path, head: str, at: datetime) -> dict:
+def kind_of(line: dict) -> str:
+    """``standing`` or ``fresh``: a line without ``kind`` is a fresh audit's (W2-172's)."""
+    return "standing" if line.get("kind") == "standing" else "fresh"
+
+
+def decide(repo, state: Path, head: str, at: datetime, lines=None, *, standing: bool = False, gov=None) -> dict:
     """The active-and-stable rule, computed and never chosen (item 9): ``mode``, ``reason``, ``due``, ``next`` (a date),
-    and the churn at ``head`` the rule used."""
-    measured = [x for x in read_lines(folder(runs) / "HISTORY.jsonl") if x.get("measured") is True]
+    and the churn at ``head`` the rule used. ``lines`` are the ``HISTORY.jsonl`` lines it reads (default: the fresh
+    audits' own, or with ``standing`` the standing lines); with ``standing`` it reads the standing ``STARTS.log`` lines."""
+    history = read_lines(state / "HISTORY.jsonl")
+    if lines is None:
+        lines = [x for x in history if (kind_of(x) == "standing") == standing]
+    measured = [x for x in lines if x.get("measured") is True]
     churn, _ = churn_at(repo, head)
     last = measured[-1] if measured else None
     if len(measured) < 3:
@@ -183,7 +222,7 @@ def decide(repo, runs: Path, head: str, at: datetime) -> dict:
         trigger = None
         if churn >= BUSY:
             trigger = "churn"
-        elif retrieval_changed(repo, last_audit_commit(runs), head):
+        elif _changed(repo, last_audit_commit(state), head, gov, last_line(history, "gov_pin")):
             trigger = "retrieval"
         elif last.get("passes") is False:
             trigger = "verdict"
@@ -193,7 +232,7 @@ def decide(repo, runs: Path, head: str, at: datetime) -> dict:
                    and x.get("passes") is True and x.get("pool_regression") is False for x in measured[-3:])
         mode, reason = ("weekly", trigger) if trigger else (("monthly", "stable") if calm else ("weekly", "active"))
     days = MONTHLY_DAYS if mode == "monthly" else WEEKLY_DAYS
-    starts = read_lines(folder(runs) / "STARTS.log")
+    starts = [x for x in read_lines(state / "STARTS.log") if (kind_of(x) == "standing") == standing]
     if not starts:
         return {"mode": mode, "reason": reason, "due": True, "next": at.strftime("%Y-%m-%d"), "churn": churn}
     try:
@@ -205,9 +244,59 @@ def decide(repo, runs: Path, head: str, at: datetime) -> dict:
             "churn": churn}
 
 
-def due(sets_root, repo, link, emit) -> str:
+def monday_on_or_after(day: date) -> date:
+    return day + timedelta(days=-day.weekday() % 7)
+
+
+def fresh_due(starts: list[dict], standing_last: dict | None, at: datetime) -> dict:
+    """The fresh set's cadence (W2-187 I8): ``first`` (no fresh start), ``miss`` (the live set's last standing
+    measured line missed and no fresh start in the current ISO week), ``28d`` (today is on or after the first Monday on
+    or after the last fresh start's date + 28 days) or ``wait``."""
+    today = at.date()
+    if not starts:
+        return {"due": True, "reason": "first", "next": today.isoformat()}
+    try:
+        last = parse_time(starts[-1].get("at"))
+    except UsageError:
+        last = at
+    week = at.isocalendar()[:2]
+    started = False
+    for x in starts:
+        try:
+            started = started or parse_time(x.get("at")).isocalendar()[:2] == week
+        except UsageError:
+            continue
+    from gov.memaudit import standing
+    missed = bool(standing_last) and standing.verdict_of(standing_last) == "miss"
+    if missed and not started:
+        return {"due": True, "reason": "miss", "next": today.isoformat()}
+    ripe = monday_on_or_after((last + timedelta(days=WINDOW_DAYS)).date())
+    if today >= ripe:
+        return {"due": True, "reason": "28d", "next": today.isoformat()}
+    nxt = today + timedelta(days=7 - today.weekday()) if missed else ripe
+    return {"due": False, "reason": "wait", "next": nxt.isoformat()}
+
+
+def due(sets_root, repo, link, emit, fresh: bool = False) -> str:
+    from gov.memaudit import standing
     repo = repo_of(repo)
-    verdict = decide(repo, runs_dir(), due_head(repo, link), now())
+    state = state_of(repo)
+    head = due_head(repo, link)
+    live = standing.live(state)
+    if fresh and live:
+        history = read_lines(state / "HISTORY.jsonl")
+        mine = [x for x in history if x.get("kind") == "standing" and x.get("set") == live["set"]
+                and x.get("measured") is True]
+        starts = [x for x in read_lines(state / "STARTS.log") if kind_of(x) == "fresh"]
+        verdict = fresh_due(starts, mine[-1] if mine else None, now())
+        emit("MODE fresh")
+        emit(f"DUE {'yes' if verdict['due'] else 'no'} next {verdict['next']}")
+        emit(f"REASON {verdict['reason']}")
+        return "ok" if verdict["due"] else "refused"
+    if live:
+        verdict = decide(repo, state, head, now(), standing.lines_of(state, live["set"]), standing=True)
+    else:
+        verdict = decide(repo, state, head, now())
     emit(f"MODE {verdict['mode']}")
     emit(f"DUE {'yes' if verdict['due'] else 'no'} next {verdict['next']}")
     emit(f"REASON {verdict['reason']}")
@@ -215,16 +304,22 @@ def due(sets_root, repo, link, emit) -> str:
 
 
 def status(sets_root, repo, since, link, emit) -> str:
+    from gov.memaudit import standing
     repo = repo_of(repo)
     since = resolve_commit(repo, since)
     last = git(repo, "log", "-1", "--format=%H", f"{since}..{mainline(repo)}", "--", *RETRIEVAL_SPECS).decode().strip()
-    runs = runs_dir()
+    state = state_of(repo)
     if last:
         audited = any(git_code(repo, "merge-base", "--is-ancestor", last, x["commit"]) == 0
-                      for x in read_lines(folder(runs) / "HISTORY.jsonl")
+                      for x in read_lines(state / "HISTORY.jsonl")
                       if x.get("measured") is True and isinstance(x.get("commit"), str))
         if not audited:
-            verdict = decide(repo, runs, due_head(repo, link), now())
+            live = standing.live(state)
+            if live:
+                verdict = decide(repo, state, due_head(repo, link), now(), standing.lines_of(state, live["set"]),
+                                 standing=True)
+            else:
+                verdict = decide(repo, state, due_head(repo, link), now())
             emit(f"not audited, next due {verdict['next']}")
             return "refused"
     emit("audited")
@@ -238,7 +333,7 @@ def baseline(sets_root, repo, commit, emit) -> str:
     except UsageError:
         emit("BL-COMMIT")
         return "refused"
-    log = runs_dir() / "indep" / "AUDITS.log"
+    log = state_dir(runs_dir(), repo) / "indep" / "AUDITS.log"
     try:
         held = any(x.strip() for x in log.read_text(encoding="utf-8").splitlines())
     except OSError:

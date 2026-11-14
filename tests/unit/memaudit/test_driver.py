@@ -64,8 +64,12 @@ def test_a_change_older_than_28_days_does_not_count_and_a_retrieval_path_does(re
     assert schedule.retrieval_changed(repo, None, x) == []
 
 
-def _history(runs, rows):
-    folder = schedule.folder(runs)
+def _sd(runs, repo):
+    return schedule.state_dir(runs, repo)
+
+
+def _history(state, rows):
+    folder = state
     folder.mkdir(parents=True)
     (folder / "HISTORY.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
 
@@ -76,26 +80,26 @@ def _line(commit, **kw):
 
 
 def test_the_mode_is_weekly_until_three_measured_audits_and_monthly_when_they_were_calm(repo, tmp_path):
-    runs = tmp_path / "runs"
+    runs = _sd(tmp_path / "runs", repo)
     head = _git(repo, "rev-parse", "HEAD")
     _history(runs, [_line(head), _line(head)])
     assert schedule.decide(repo, runs, head, T0)["reason"] == "start"
     _history_more = [_line(head)] * 3
-    (schedule.folder(runs) / "HISTORY.jsonl").write_text("".join(json.dumps(r) + "\n" for r in _history_more))
+    (runs / "HISTORY.jsonl").write_text("".join(json.dumps(r) + "\n" for r in _history_more))
     got = schedule.decide(repo, runs, head, T0)
     assert (got["mode"], got["reason"]) == ("monthly", "stable")
 
 
 @pytest.mark.parametrize("change,reason", [({"passes": False}, "verdict"), ({"pool_regression": True}, "pool")])
 def test_a_last_verdict_below_the_bar_or_a_pool_regression_sends_it_back_to_weekly(repo, tmp_path, change, reason):
-    runs, head = tmp_path / "runs", _git(repo, "rev-parse", "HEAD")
+    runs, head = _sd(tmp_path / "runs", repo), _git(repo, "rev-parse", "HEAD")
     _history(runs, [_line(head), _line(head), _line(head, **change)])
     got = schedule.decide(repo, runs, head, T0)
     assert (got["mode"], got["reason"]) == ("weekly", reason)
 
 
 def test_a_retrieval_change_since_the_last_audit_sends_it_back_to_weekly(repo, tmp_path):
-    runs, audited = tmp_path / "runs", _git(repo, "rev-parse", "HEAD")
+    runs, audited = _sd(tmp_path / "runs", repo), _git(repo, "rev-parse", "HEAD")
     _history(runs, [_line(audited)] * 3)
     head = _commit(repo, {"src/gov/codeintel/z.py": "y"}, "2026-11-10T00:00:00+00:00")
     got = schedule.decide(repo, runs, head, T0)
@@ -103,8 +107,8 @@ def test_a_retrieval_change_since_the_last_audit_sends_it_back_to_weekly(repo, t
 
 
 def test_due_is_six_days_when_weekly_and_twenty_eight_when_monthly(repo, tmp_path):
-    runs, head = tmp_path / "runs", _git(repo, "rev-parse", "HEAD")
-    folder = schedule.folder(runs)
+    runs, head = _sd(tmp_path / "runs", repo), _git(repo, "rev-parse", "HEAD")
+    folder = runs
     folder.mkdir(parents=True)
 
     def due_after(days):

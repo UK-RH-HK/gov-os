@@ -44,7 +44,7 @@ def test_the_verdict_lines_show_the_planted_right_wrong_interval_and_the_bar(pla
     verdict = [line for line in out if line.startswith(("VERDICT", "BAR", "BESIDE"))]
     assert verdict[0] == ("VERDICT right end to end 34 of 40 (85.0 %; exact 95 % interval 70.2 to 94.3 %); "
                           "wrong claims 2 of 40 (5.0 %)")
-    assert verdict[1] == ("BAR at least 34 right (met) and at most 2 wrong claims (met): PASSES; "
+    assert verdict[1] == ("BAR at least 38 right (not met) and at most 2 wrong claims (met): MISSES; "
                           "target at least 38: not reached")
     n_hit5 = sum(1 for qid, r in ranks.items() if qid != "q40" and r is not None and r <= 5)
     in_bundle = sum(1 for qid, r in ranks.items() if qid != "q40" and r is not None)
@@ -99,8 +99,8 @@ def test_figures_json_holds_exactly_item_10s_keys_and_counts(plant):
     assert run_judge(plant, claude).returncode == 0
     f = json.loads((plant.run_dir / "FIGURES.json").read_text())
     assert set(f) == FIGURE_KEYS and f["audit"] == AUDIT and f["n"] == 40 and f["n_gold"] == 39
-    assert f["bar"] == {"need_right": 34, "max_wrong": 2, "target_right": 38}
-    assert f["verdict"] == {"right": 34, "wrong": 2, "passes": True, "right_ok": True, "wrong_ok": True,
+    assert f["bar"] == {"need_right": 38, "max_wrong": 2, "target_right": 38}
+    assert f["verdict"] == {"right": 34, "wrong": 2, "passes": False, "right_ok": False, "wrong_ok": True,
                             "target_ok": False, "interval_exact": [0.7016, 0.9429], "not_run": 0}
     b = f["beside"]
     assert set(b) == {"hit5", "hit10", "hit20", "mrr", "in_bundle", "full_evidence", "correct_citation_aside",
