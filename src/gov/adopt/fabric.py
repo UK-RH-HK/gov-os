@@ -489,6 +489,42 @@ def _memory_class(config: dict, space: str | None) -> str | None:
     return value.get("memory_class") if isinstance(value, dict) else None
 
 
+GRAPH_CAP = 100_000  # rows one query of the code graph tool answers at most; over it the tool refuses, before its paging
+
+
+def graph_counts(root: Path) -> tuple[int, int] | None:
+    """The code graph's ``(nodes, edges)`` as the tool counts them, each by a count query of one row; None where the tool
+    does not answer them (nothing is guessed)."""
+    from gov import codeintel
+
+    try:
+        with codeintel._Session(root) as session:
+            found = [session.tool("query_graph", project=codeintel.PROJECT, format="json", query=query, max_rows=10,
+                                  max_output_tokens=codeintel._BUDGET)["rows"][0][0]
+                     for query in ("MATCH (n) RETURN count(n)", "MATCH (a)-[r]->(b) RETURN count(r)")]
+        return int(found[0]), int(found[1])
+    except Exception:  # noqa: BLE001 - whatever stops the count: the caller keeps the read's own error
+        return None
+
+
+def refuse_too_large(root: Path) -> None:
+    """``CODEGRAPH_TOO_LARGE`` (``details``: ``nodes``, ``edges``, ``cap``, ``tool``) where the graph the read could not take
+    has more nodes or more edges than ``GRAPH_CAP``: the tool refuses a query whose answer is longer, and ``gov.codeintel``
+    reads the whole graph in one query of each kind (its fix is outside W2-88's paths). Returns where the counts are
+    under the cap or cannot be had: the read's own failure then stands."""
+    from gov import codeintel
+
+    counts = graph_counts(root)
+    if counts is None or max(counts) <= GRAPH_CAP:
+        return
+    nodes, edges = counts
+    raise GovError("CODEGRAPH_TOO_LARGE", f"the code graph has {nodes} nodes and {edges} edges, and {codeintel.TOOL} refuses a "
+                   f"query whose answer is over its cap of {GRAPH_CAP} rows ({GRAPH_CAP:,}): gov's code-graph read "
+                   "(gov.codeintel, outside W2-88's paths) takes the whole graph in one query, so the graph of this "
+                   "repository cannot be read until that read is paged under the cap; nothing is recorded",
+                   {"nodes": nodes, "edges": edges, "cap": GRAPH_CAP, "tool": codeintel.TOOL})
+
+
 def _stores(run, result: dict) -> dict:
     """Per store ``{judged, indexed[], refused[{path, reason}], chunks, vectors, nodes, edges, seconds,
     peak_rss_bytes}``. The peak is the stage's whole process (one rebuild, not one per store)."""
@@ -562,6 +598,7 @@ def _stores(run, result: dict) -> dict:
             nodes, edges = len(graph), sum(len(each) for each in users.values())
         except Exception as exc:  # noqa: BLE001 - a graph that cannot be read is named, never shown as 0 nodes and edges
             unreadable = f"{type(exc).__name__}: {' '.join(str(exc).split())}"
+            refuse_too_large(run.root)  # a graph over the tool's cap is named as that (S25), before the store is judged
     held = sorted(records & set(paths))  # the record store judges the files that carry records (a plain file is none)
     return {
         "record": {**base, "judged": len(held), "indexed": held, "nodes": n_records, "edges": n_edges, "refused": [],
