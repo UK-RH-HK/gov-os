@@ -5,6 +5,8 @@ Code: `src/gov/launch/launcher.py` (call sites and argument checks), `src/gov/la
 `src/gov/launch/environ.py` (new), `src/gov/codeintel/__init__.py` (the daemon's folder only), `tests/conftest.py`
 (S1's two lines), `template/governance/kernel/settings.json` (S14).
 
+> Note 2026-11-14 (DEC-1128 (4)): set-up B is dropped entirely, not a Wave 3 row, and the leads are not sandboxed. Where this record says set-up B, a write list made from the path map, or `gov rebuild` inside the sandbox "is Wave 3's" or is "deferred to Wave 3 with set-up B" (section 1 and section 7), no Wave 3 row follows: the script-write gap of section 1 stays a named, accepted gap (S2/F1), and the path-map guard is the control. The workers' launcher sandbox stays. The text below is as written.
+
 ## 1. How each allowed-path form is held (S3)
 
 No sandbox entry is made from any allowed path (DEC-1112 (1)): the sandbox's write list is the session's temp folder,
