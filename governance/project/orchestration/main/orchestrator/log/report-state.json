@@ -17,8 +17,8 @@
     "EXAMIN CTO: clone, kit, A0 by your operator, then the start (~1 h after the re-pin); W2-81 on the release alongside",
     "W2-187 (DAEO-0cd2) and W2-188 (DAEO-zlog) CLAIMED 5336a6fca with the interface; ready lines in (FULL; CIT-P route)"
   ],
-  "owner_action": "q02: one line, (a), (c) or (d) when you are back (the (a) ACT drafted meanwhile); W2-61h's walled re-run by your operator once I say the land is in; the evening sitting (re-pin) then the EXAMIN CTO's start, tonight when you are back",
-  "last_report": "2026-11-14 13:40:29",
+  "owner_action": "now: your operator removes the stale empty .git/config.lock (one command, the guard refuses it to me); your yes line and your operator's q02 commands when W2-94's fix flow is built, reviewed and landed (~17:30); W2-61h's walled run once more when its N2 revision lands (~15:45), then it closes; the evening sitting (release + re-pin), then the EXAMIN CTO tonight",
+  "last_report": "2026-11-14 14:48:30",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],

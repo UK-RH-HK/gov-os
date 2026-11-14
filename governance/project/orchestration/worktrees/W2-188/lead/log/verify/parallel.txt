@@ -1,9 +1,9 @@
-heavy_slot: all 3 slots taken; waiting (2026-11-14 13:47:23)
+heavy_slot: all 3 slots taken; waiting (2026-11-14 14:39:42)
 bringing up nodes...
 bringing up nodes...
 
 ........................................................................ [  1%]
-.............F..F....F.................................................. [  2%]
+....................................F..........F........................ [  2%]
 ........................................................................ [  3%]
 ........................................................................ [  4%]
 ........................................................................ [  5%]
@@ -56,8 +56,8 @@ bringing up nodes...
 ........................................................................ [ 57%]
 ........................................................................ [ 58%]
 ........................................................................ [ 59%]
-.........sss............................................................ [ 60%]
-........................................................................ [ 61%]
+........................................................................ [ 60%]
+........................sss............................................. [ 61%]
 ........................................................................ [ 62%]
 ........................................................................ [ 63%]
 ........................................................................ [ 64%]
@@ -66,7 +66,7 @@ bringing up nodes...
 ........................................................................ [ 68%]
 ........................................................................ [ 69%]
 ........................................................................ [ 70%]
-...............sss...................................................... [ 71%]
+........................................................................ [ 71%]
 ........................................................................ [ 72%]
 ........................................................................ [ 73%]
 ........................................................................ [ 74%]
@@ -77,19 +77,75 @@ bringing up nodes...
 ........................................................................ [ 80%]
 ........................................................................ [ 81%]
 ........................................................................ [ 82%]
-........................................................................ [ 83%]
+.............................................sss........................ [ 83%]
 ........................................................................ [ 84%]
 ........................................................................ [ 85%]
 ........................................................................ [ 86%]
-......................F........F........................................ [ 87%]
+........................................................................ [ 87%]
 ........................................................................ [ 88%]
 ........................................................................ [ 90%]
 ........................................................................ [ 91%]
-........................................................................ [ 92%]
-......................................s................................. [ 93%]
+.........................................s.............................. [ 92%]
+........................................................................ [ 93%]
 ........................................................................ [ 94%]
 ........................................................................ [ 95%]
 ........................................................................ [ 96%]
 ........................................................................ [ 97%]
 ........................................................................ [ 98%]
-.............................................................
+........................................................................ [ 99%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged():
+        rows = [line for line in _record().splitlines() if line.lstrip().startswith("|")]
+        flat_rows = [support.flat(row) for row in rows]
+        problems = []
+        if not any(support.flat(W2_11_CASE) in row and "red" in row for row in flat_rows):
+            problems.append(f"no table row names `{W2_11_CASE}` with `red`")
+        if not any("w2-88a" in row and "unchanged" in row for row in flat_rows):
+            problems.append("no table row names W2-88a's cases with `unchanged`")
+>       assert not problems, f"{support.CITP_REL}'s impact table: {'; '.join(problems)}"
+E       AssertionError: docs/changes/W2-188-CIT-P.md's impact table: no table row names `test_every_copy_carries_the_kernel_skills_body[adopt]` with `red`
+E       assert not ['no table row names `test_every_copy_carries_the_kernel_skills_body[adopt]` with `red`']
+
+tests/acceptance/W2-188/test_w2_188_citp.py:104: AssertionError
+____________ test_s5_the_owner_approval_line_names_the_after_sha256 ____________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s5_the_owner_approval_line_names_the_after_sha256():
+        """Red until the owner's approval, by design: the owner writes it after the review, before the merge; the line reads
+        `pending` (or has no hash) until then."""
+        text = _record()
+        after, _ = _after_or_fail()
+        lines = [m.group(1) for m in re.finditer(r"(?mi)^\s*owner_approval:\s*(.*)$", text)]
+        assert lines, f"{support.CITP_REL} has no `owner_approval:` line"
+        value = lines[-1].strip().strip("'\"")
+>       assert after in value.lower(), f"the `owner_approval:` line does not name the after sha256 {after[:12]}...: {value[:80]!r}"
+E       AssertionError: the `owner_approval:` line does not name the after sha256 6a884cf1639f...: 'pending'
+E       assert '6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489' in 'pending'
+E        +  where 'pending' = <built-in method lower of str object at 0x78cea32aa010>()
+E        +    where <built-in method lower of str object at 0x78cea32aa010> = 'pending'.lower
+
+tests/acceptance/W2-188/test_w2_188_citp.py:124: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-188/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=1139760) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+2 failed, 6549 passed, 7 skipped, 6 warnings in 983.95s (0:16:23)

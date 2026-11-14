@@ -1,0 +1,71 @@
+======== rehearsal of the re-pin from release 0.1.0 (neg-manifest), 2026-11-14 14:19:19
+======== the live paths before
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at 494d5c9335fa
+store halves: a at c1cb5285c03c, b at 494d5c9335fa
+w2/integrate: 494d5c9335fa
+the stand-in C: 494d5c9335fa (the main tree's w2/integrate head now)
+======== the scratch release 0.1.0 at the stand-in C (a scratch clone only)
+record: /tmp/gov-os-rel-repin/neg-manifest/release/docs/releases/0.1.0
+manifest.json: OK
+scratch status: ?? docs/releases/0.1.0/ 
+scratch tag: v0.1.0 -> cde887e1d635 (parent 494d5c9335fa), tag
+scratch record: version 0.1.0 commit 494d5c9335fa cli 0.1.0 wheel gov-0.1.0-py3-none-any.whl 4376c78ba335 files 278
+======== fill_release.sh from the scratch release
+C=494d5c9335fa (tag v0.1.0 on cde887e1d635)
+EPOCH=1794665234
+SHA=4376c78ba33586384f72d24130d5093d4058bbe6e7ab44739ee168633de3837f (the record's wheel sha256)
+RECORD=7bc9ffa65197a1fbe2dcc055aa2651f477dfb59d6119e9e20cead64f070e7dfa (manifest.json's sha256)
+filled: /tmp/gov-os-rel-repin/neg-manifest/REPIN-COMMANDS-REL-0.1.0.sh sha256 16093e69b7e021a7709608d4f19170a8d4826c3cb4dd214ae64d45ad00cf886c
+hash list: /tmp/gov-os-rel-repin/neg-manifest/REPIN-REL-0.1.0.sha256 (13 files) sha256 5c8dba796d90bf42c1296a0c7364b2cc3b728e57620facae2a80964e15127642
+the filled script differs from the template in the four value lines only
+half a: c1cb5285c03c, store 580M
+half b: 494d5c9335fa, store 581M
+registry clone at 494d5c9335fa on w2/integrate
+scratch hook: 099de326c45b (a copy of the live one)
+mirror ready: gov -> /tmp/gov-os-rel-repin/neg-manifest/home/.local/share/gov-os/pin-797495bdfc70/bin/gov; store -> /tmp/gov-os-rel-repin/neg-manifest/home/gov-os-worktrees/W2-00-store-b
+neg-manifest: the scratch tag now on 893a3b252b05 (parent 494d5c9335fa), manifest.json edited after its hash
+manifest.json: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
+REFUSED, nothing written: manifest.json does not match manifest.sha256 at v0.1.0
+fill_release.sh refuses the tampered release, writing nothing
+======== the operator's script (filled from the scratch release), against the mirror
+the hash list: 13 files OK (the operator's first check)
+== 0. preconditions
+ok (gov -> pin-797495bdfc70; store -> W2-00-store-b at 494d5c9335fa; w2/integrate at 494d5c9335fa, 494d5c9335fa and it the same wheel inputs; the hook is only read)
+== R. release 0.1.0: the tag v0.1.0 and its record, checked against the values filled in (RL-1)
+manifest.json: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
+
+STOP: the record's manifest.json does not match its manifest.sha256
+Nothing was switched: /tmp/gov-os-rel-repin/neg-manifest/home/.local/bin/gov is still pin-797495bdfc70. Tell the CTO.
+======== the script ended: exit 1, 1 s
+======== the live paths after
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at 494d5c9335fa
+store halves: a at c1cb5285c03c, b at 494d5c9335fa
+w2/integrate: 494d5c9335fa
+the live gov link, script, pins, wheels, hook, registry file, reranker pid, main-tree tags and docs/releases: UNCHANGED (every line equal before and after)
+the live store link, its halves and w2/integrate: UNCHANGED
+the scratch hook after: 099de326c45b (the script only reads it)
+NEGATIVE RUN OK (neg-manifest): STOP at part R before anything was built or switched; fill_release.sh refused it too

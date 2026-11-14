@@ -1,0 +1,2 @@
+semantic: 1 file(s) hold a chunk over 10000 characters, embedded from its first 10000: deps/jemalloc/doc_internal/jemalloc.svg
+gov adopt: CODEGRAPH_TOO_LARGE: the code graph has 41086 nodes and 142983 edges, and codebase-memory-mcp refuses a query whose answer is over its cap of 100000 rows (100,000): gov's code-graph read (gov.codeintel, outside W2-88's paths) takes the whole graph in one query, so the graph of this repository cannot be read until that read is paged under the cap; nothing is recorded

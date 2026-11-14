@@ -1,0 +1,6 @@
+Merge w2/W2-61h-c39-tests (td-5): W2-61h's N2 (b), a rewritten heading-cited section is listed, and an entry is listed once (DEC-1180 (1), (4))
+
+Task: DAEO-h2k3
+Role: orchestrator
+Implements: DEC-828, DEC-820, DEC-1084, DEC-1178
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

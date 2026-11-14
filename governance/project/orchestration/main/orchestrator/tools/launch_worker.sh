@@ -2,7 +2,10 @@
 # Starts one worker through `gov launch` (TPL-3b: R3-TEMPLATES D, TPL-3 S5; R2-6, R2-9; DEC-1052, DEC-1079), with the
 # checks every launch needs, so no lead or CTO writes the line by hand (LEAD-w2-common, DEC-789, DEC-799, DEC-898).
 #   [LAUNCH_MODEL=<model>] launch_worker.sh [--fg] [--model <model>] --class C0|C1|C2|C3 [--promoted "<reason>"]
-#                                           [--projection-usd <N>] <role> <effort> <brief>
+#                                           [--projection-usd <N>] [--owner-named DEC-n] [--reason "<text>"]
+#                                           [--trial <id>] <role> <effort> <brief>
+# --owner-named, --reason and --trial (P-W2-184-4 (a), the CTO, 2026-11-14) go to `gov launch` before `--`, only when
+# given (W2-184's launcher: a review round past two needs --owner-named; effort max chosen by the launch needs --reason).
 # RUBRIC-2 (DEC-1120 (3), 2026-11-10): every spawn names its model and effort, and the spend log records the tier, the
 # class and any promotion. So: --class is required (the ticket's criticality class: C3 critical, C2 significant, C1
 # routine, C0 mechanical); the model is named by --model or LAUNCH_MODEL and there is no default (--model wins); --promoted
@@ -51,10 +54,15 @@ cli() {  # the CLI arguments after `--` (LEAD-w2-common's form; the reviewer get
 }
 if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, tripwire, sandbox check, summary, exit
   shift; tree=$1 ID=$2 role=$3 effort=$4 copy=$5 base=$6 proj=${7:-} W2=${8:-} MODEL=${9:-} cls=${10:-} promoted=${11:-}
+  owner_named=${12:-} reason=${13:-} trial=${14:-}
   [ -n "$MODEL" ] || { say "the session was started without a model"; exit 2; }
   echo "$$" > "$base.pid"; cd "$tree" || exit 2
   cli "$role" "$effort"
-  PYTHONPATH="${LAUNCH_CODE_ROOT:-$tree}/src" python3 -m gov.cli.main launch "$role" "$ID" -- "${CLI[@]}" < "$copy" > "$base.json" 2>&1
+  GOVOPTS=()  # P-W2-184-4 (a): gov launch's own options, before `--`, only when given
+  [ -n "$owner_named" ] && GOVOPTS+=(--owner-named "$owner_named")
+  [ -n "$reason" ] && GOVOPTS+=(--reason "$reason")
+  [ -n "$trial" ] && GOVOPTS+=(--trial "$trial")
+  PYTHONPATH="${LAUNCH_CODE_ROOT:-$tree}/src" python3 -m gov.cli.main launch "$role" "$ID" "${GOVOPTS[@]}" -- "${CLI[@]}" < "$copy" > "$base.json" 2>&1
   rc=$?
   python3 "$TRIP" compare "$base.tripwire-before.json" > "$base.tripwire.json" 2>&1; trc=$?
   tw="tripwire clean"; [ $trc = 0 ] || tw="tripwire CHANGED (exit $trc; $base.tripwire.json: attribute each change)"
@@ -69,9 +77,15 @@ if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, t
   echo "launch_worker $role $ID: session exit $rc; $tw; $sb; log $base.json; $sp" | tee "$base.summary"
   echo "$rc" > "$base.exit.tmp" && mv "$base.exit.tmp" "$base.exit"; exit "$rc"
 fi
-fg="" proj="" cls="" promoted=""
+fg="" proj="" cls="" promoted="" owner_named="" reason="" trial=""
 while :; do case "${1:-}" in
   --fg) fg=1; shift;;
+  --owner-named) [ $# -ge 2 ] || { say "--owner-named needs a decision id (DEC-n)"; exit 2; }; owner_named=$2; shift 2
+    [[ "$owner_named" =~ ^DEC-[0-9]+$ ]] || { say "not a decision id: $owner_named (DEC-n)"; exit 2; };;
+  --reason) [ $# -ge 2 ] || { say "--reason needs the text"; exit 2; }; reason=$2; shift 2
+    [ -n "${reason//[[:space:]]/}" ] || { say "--reason needs a reason, not an empty one"; exit 2; };;
+  --trial) [ $# -ge 2 ] || { say "--trial needs the trial id"; exit 2; }; trial=$2; shift 2
+    [[ "$trial" =~ ^[A-Za-z0-9._-]+$ ]] || { say "not a trial id: $trial"; exit 2; };;
   --class) [ $# -ge 2 ] || { say "--class needs a value: C0, C1, C2 or C3"; exit 2; }; cls=$2; shift 2;;
   --model) [ $# -ge 2 ] || { say "--model needs a value"; exit 2; }; MODEL=$2; shift 2;;
   --promoted) [ $# -ge 2 ] || { say "--promoted needs the reason"; exit 2; }; promoted=$2; shift 2
@@ -183,8 +197,8 @@ PY
 ) || refuse 4 "the launcher's dry run refuses: $(tail -n 3 <<< "$dry" | tr '\n' ' ')"
 python3 "$TRIP" snapshot > "$base.tripwire-before.json" 2>> "$base.json" || refuse 4 "the tripwire snapshot failed"
 say "$role $ID in $tree: $dry; disk gate open; brief $copy; projection ${proj:-none}; model $MODEL; class $cls${promoted:+; promoted: $promoted}"
-if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" "$MODEL" "$cls" "$promoted"; exit $?; fi
-setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" "$MODEL" "$cls" "$promoted" < /dev/null > /dev/null 2>&1 &
+if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" "$MODEL" "$cls" "$promoted" "$owner_named" "$reason" "$trial"; exit $?; fi
+setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" "$MODEL" "$cls" "$promoted" "$owner_named" "$reason" "$trial" < /dev/null > /dev/null 2>&1 &
 echo "$!" > "$base.pid"
 echo "launch_worker: started pid $! (its own process group) for $role $ID; log $base.json"
 echo "launch_worker: wait with: bash $HERE/wait_for.sh $base.exit"

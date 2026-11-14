@@ -362,8 +362,12 @@
 # W2-130 DAEO-q8cl W2-130-A5-pin.md W2-130-A5-pin.json  # PACKAGES 08:46: PIN-S4 (a) + F1 confirmed + F4 tool pinned -> pin2
 # W2-130 DAEO-q8cl W2-130-A5-pin2.md W2-130-A5-pin2.json  # DONE 09:11 aafaf6259d10; PIN2-HEAD (a) + F1 -> pin3, land once
 # W2-130 DAEO-q8cl W2-130-A5-pin3.md W2-130-A5-pin3.json  # DONE 09:53 6f8158a0eed5 -> LAND; PIN3-WT (a) rows F1 F2
-W2-184 DAEO-6f0s W2-184-A5-f1.md W2-184-A5-f1.json
+# W2-184 DAEO-6f0s W2-184-A5-f1.md W2-184-A5-f1.json  # PACKAGES 14:43: P-W2-184-4 (a) by the CTO (launch_worker.sh --owner-named); config.lock to the operator
 W2-88 DAEO-2bdu W2-88-A5-p1.md W2-88-A5-p1.json
 # W2-61h-c39 DAEO-h2k3 W2-61h-A5-f3.md W2-61h-A5-f3.json  # DONE 13:25 40f997704f53 -> LAND; then the operator walled run (expect 7 passed, h03 listed)
 W2-187 DAEO-0cd2 W2-187-A5-run1.md W2-187-A5-run1.json
 W2-188 DAEO-zlog W2-188-A5-run1.md W2-188-A5-run1.json
+W2-94-fix DAEO-g87r W2-94-A5-fix1.md W2-94-A5-fix1.json
+W2-61h-c39 DAEO-h2k3 W2-61h-A5-n2.md W2-61h-A5-n2.json
+# 14:48 W2-184 f2: narrow check rv-f1 with --owner-named DEC-1177 (P-W2-184-4 (a))
+W2-184 DAEO-6f0s W2-184-A5-f2.md W2-184-A5-f2.json

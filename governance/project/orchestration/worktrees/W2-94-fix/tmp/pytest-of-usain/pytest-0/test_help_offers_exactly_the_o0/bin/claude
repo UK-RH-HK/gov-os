@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+import json, os, subprocess, sys, time
+HERE = os.path.dirname(os.path.abspath(__file__))
+cfg = json.load(open(os.path.join(HERE, "stub.json")))
+argv = sys.argv[1:]
+VALUED = ("--setting-sources", "--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format",
+          "--session-id")
+flags, adds, i = {}, [], 0
+while i < len(argv) - 1:
+    a = argv[i]
+    if a == "--add-dir":
+        adds.append(argv[i + 1]); i += 2
+    elif a in VALUED:
+        flags[a] = argv[i + 1]; i += 2
+    else:
+        flags[a] = True; i += 1
+prompt = argv[-1] if argv else ""
+paths = [w.rstrip(".,;:") for w in prompt.split() if w.startswith("/")]
+paths = [p for p in paths if os.path.isfile(p)]
+try:
+    parent = open("/proc/%d/cmdline" % os.getppid(), "rb").read().split(b"\0")[0].decode()
+except OSError:
+    parent = ""
+inp = os.path.join(os.getcwd(), "input")
+rec = {"argv": argv, "flags": flags, "adds": adds, "prompt": prompt, "cwd": os.getcwd(), "env": dict(os.environ),
+       "pid": os.getpid(), "pgid": os.getpgid(0), "ppid": os.getppid(), "parent": parent,
+       "stdin_null": os.path.realpath("/proc/self/fd/0") == "/dev/null", "canary": bool(paths),
+       "input": sorted(os.listdir(inp)) if os.path.isdir(inp) else None}
+with open(os.path.join(HERE, "calls.jsonl"), "a") as f:
+    f.write(json.dumps(rec) + "\n")
+
+def emit(denials=(), is_error=False, subtype="success", text="done"):
+    sid = flags.get("--session-id") if cfg.get("report_drawn") else cfg.get("sid")
+    print(json.dumps({"type": "result", "subtype": subtype, "is_error": is_error, "session_id": sid,
+                      "num_turns": 3, "total_cost_usd": 0.004, "duration_ms": 1500,
+                      "permission_denials": list(denials), "result": text}))
+
+def trace_drawn(base):  # a trace named by the id the script passed with --session-id
+    d = os.path.join(os.environ["HOME"], ".claude", base)
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, flags["--session-id"] + ".json"), "w").write("x")
+
+if paths:
+    mode = cfg.get("canary", "model")
+    target = paths[0]
+    if cfg.get("canary_trace"):
+        trace_drawn("todos")
+    if mode == "garbage":
+        print("not json at all"); sys.exit(0)
+    if mode == "sleep":
+        time.sleep(300); sys.exit(0)
+    if mode == "other":
+        emit([{"tool_name": "Bash", "tool_use_id": "t1", "tool_input": {"command": "ls"}}]); sys.exit(0)
+    if mode == "error":
+        sys.exit(1)
+    read = [{"tool_name": "Read", "tool_use_id": "t1", "tool_input": {"file_path": target}}]
+    if not any(target.startswith(r.rstrip("/") + "/") for r in [os.getcwd()] + adds):
+        emit(read); sys.exit(0)  # restricted mode alone refuses it
+    settings = None
+    try:
+        s = json.load(open(flags.get("--settings", "")))
+        if (isinstance(s, dict) and isinstance(s.get("permissions", {}), dict)
+                and isinstance(s.get("hooks", {}), dict) and isinstance(s.get("model", ""), str)
+                and isinstance(s.get("cleanupPeriodDays", 1), int)):
+            settings = s
+    except Exception:
+        settings = None
+    denied = False
+    if settings:
+        ev = json.dumps({"tool_name": "Read", "tool_input": {"file_path": target}, "cwd": os.getcwd(),
+                         "hook_event_name": "PreToolUse"})
+        for entry in settings.get("hooks", {}).get("PreToolUse", []):
+            for h in entry.get("hooks", []):
+                p = subprocess.run(["sh", "-c", h["command"]], input=ev, capture_output=True, text=True)
+                if p.returncode == 2:
+                    denied = True
+                elif p.stdout.strip():
+                    try:
+                        denied |= json.loads(p.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
+                    except Exception:
+                        pass
+    emit(read if denied else [])
+    sys.exit(0)
+mode = cfg.get("session")
+if mode is None:
+    sys.exit(97)
+for rel, text in cfg.get("out", {}).items():
+    p = os.path.join(os.getcwd(), rel)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    open(p, "w").write(text)
+for rel, spec in cfg.get("per_id", {}).items():  # one line per id of an input file (set-up A's labeller 2)
+    ids = [json.loads(x)["id"] for x in open(os.path.join(os.getcwd(), spec["src"])) if x.strip()]
+    ids = ids[spec.get("drop", 0):] + spec.get("extra", []) + ids[:1] * spec.get("repeat", 0)
+    p = os.path.join(os.getcwd(), rel)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    open(p, "w").write("".join(json.dumps(dict(spec["line"], id=i)) + "\n" for i in ids))
+if cfg.get("trace_drawn"):
+    trace_drawn("session-env")
+if mode == "child":
+    subprocess.Popen(["sleep", "300"])
+    time.sleep(300)
+if mode == "sleep":
+    time.sleep(300)
+if mode == "budget":
+    emit(is_error=True, subtype="error_max_budget_usd"); sys.exit(1)
+if mode == "trace":
+    d = os.path.join(os.environ["HOME"], ".claude", "projects", "p1")
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, cfg["sid"] + ".jsonl"), "w").write("x")
+emit([{"tool_name": "Read", "tool_use_id": "t2", "tool_input": {"file_path": "/etc/hostname"}},
+      {"tool_name": "ZzTool", "tool_use_id": "t3", "tool_input": {}}], text=cfg.get("marker", "done"))

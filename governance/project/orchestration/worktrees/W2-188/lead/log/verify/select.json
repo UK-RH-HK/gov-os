@@ -4,8 +4,9 @@
  "core_changed": [],
  "unplaced": [],
  "base": "5336a6fca337015ffa4b3c1333d14d5356d9ca53",
- "head": "b75472d4825cece64936451f21b259787b5ecf97",
+ "head": "07d7361e7e2737890ebc62b24d6cc931dba37519",
  "governance_left_out": [
+  "docs/probes/DAEO-zlog/PR-DAEO-zlog.md",
   "docs/probes/DAEO-zlog/checks.md"
  ],
  "changed": [

@@ -1,0 +1,229 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 13:47:23)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+.............F..F....F.................................................. [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+.........sss............................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+...............sss...................................................... [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+......................F........F........................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+......................................s................................. [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged():
+        rows = [line for line in _record().splitlines() if line.lstrip().startswith("|")]
+        flat_rows = [support.flat(row) for row in rows]
+        problems = []
+        if not any(support.flat(W2_11_CASE) in row and "red" in row for row in flat_rows):
+            problems.append(f"no table row names `{W2_11_CASE}` with `red`")
+        if not any("w2-88a" in row and "unchanged" in row for row in flat_rows):
+            problems.append("no table row names W2-88a's cases with `unchanged`")
+>       assert not problems, f"{support.CITP_REL}'s impact table: {'; '.join(problems)}"
+E       AssertionError: docs/changes/W2-188-CIT-P.md's impact table: no table row names `test_every_copy_carries_the_kernel_skills_body[adopt]` with `red`
+E       assert not ['no table row names `test_every_copy_carries_the_kernel_skills_body[adopt]` with `red`']
+
+tests/acceptance/W2-188/test_w2_188_citp.py:104: AssertionError
+_________ test_s5_the_last_verdict_is_pass_after_an_independent_review _________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s5_the_last_verdict_is_pass_after_an_independent_review():
+        text = _record()
+        low = text.lower()
+        assert "independent" in low and re.search(r"review|auditor", low), f"{support.CITP_REL} does not record an independent review"
+        stated = support.verdicts(text)
+>       assert stated, f"{support.CITP_REL} records no verdict (`verdict: PASS` or `FAIL`)"
+E       AssertionError: docs/changes/W2-188-CIT-P.md records no verdict (`verdict: PASS` or `FAIL`)
+E       assert []
+
+tests/acceptance/W2-188/test_w2_188_citp.py:112: AssertionError
+____________ test_s5_the_owner_approval_line_names_the_after_sha256 ____________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s5_the_owner_approval_line_names_the_after_sha256():
+        """Red until the owner's approval, by design: the owner writes it after the review, before the merge; the line reads
+        `pending` (or has no hash) until then."""
+        text = _record()
+        after, _ = _after_or_fail()
+        lines = [m.group(1) for m in re.finditer(r"(?mi)^\s*owner_approval:\s*(.*)$", text)]
+        assert lines, f"{support.CITP_REL} has no `owner_approval:` line"
+        value = lines[-1].strip().strip("'\"")
+>       assert after in value.lower(), f"the `owner_approval:` line does not name the after sha256 {after[:12]}...: {value[:80]!r}"
+E       AssertionError: the `owner_approval:` line does not name the after sha256 6a884cf1639f...: 'pending'
+E       assert '6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489' in 'pending'
+E        +  where 'pending' = <built-in method lower of str object at 0x7eeca17abf00>()
+E        +    where <built-in method lower of str object at 0x7eeca17abf00> = 'pending'.lower
+
+tests/acceptance/W2-188/test_w2_188_citp.py:124: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x76e3f733c200>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+>       documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-08/test_w1_08_probe.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-08/w1_08_support.py:173: in load_record
+    document = load_yaml(frontmatter_text(path), Path(path).name)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-188/docs/probes/DAEO-zlog/checks.md')
+
+    def frontmatter_text(path):
+        """The YAML frontmatter of a record file, or the whole text of a ``.yaml``/``.yml``/``.json`` file."""
+        path = Path(path)
+        text = path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+        if lines and lines[0].strip() == "---":
+            for index in range(1, len(lines)):
+                if lines[index].strip() == "---":
+                    return "\n".join(lines[1:index]) + "\n"
+            raise AssertionError(f"{path.name}: the frontmatter that opens with '---' is never closed")
+        if path.suffix in (".yaml", ".yml", ".json"):
+            return text
+>       raise AssertionError(f"{path.name}: no YAML frontmatter (the file does not open with a '---' line) "
+                             f"and it is not a .yaml, .yml or .json file")
+E       AssertionError: checks.md: no YAML frontmatter (the file does not open with a '---' line) and it is not a .yaml, .yml or .json file
+
+tests/acceptance/W1-08/w1_08_support.py:167: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x76e3f668be00>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+>           raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+                                   ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-188/docs/probes/DAEO-zlog/checks.md')
+
+    def _frontmatter(path):
+        lines = path.read_text(encoding="utf-8").split("\n")
+>       assert lines[0].strip() == "---", f"{path.name} has no frontmatter"
+E       AssertionError: checks.md has no frontmatter
+E       assert '# DAEO-zlog ...phrase checks' == '---'
+E         
+E         - ---
+E         + # DAEO-zlog (W2-188): the I5 checks and the literal-phrase checks
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:276: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-188/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=158097) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+5 failed, 6546 passed, 7 skipped, 6 warnings in 1083.04s (0:18:03)

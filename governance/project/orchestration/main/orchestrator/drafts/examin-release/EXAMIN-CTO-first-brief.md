@@ -1,6 +1,6 @@
 # EXAMIN CTO: your fixed first message
 
-Approved by the owner on `<date>` (DEC-`<n>`). Under P-EXAMIN-CTO-1 §3-§6 as amended by DEC-1174 (2). Release:
+Approved by the owner on 2026-11-14 (DEC-1178 (3)). Under P-EXAMIN-CTO-1 §3-§6 as amended by DEC-1174 (2). Release:
 Gov OS 0.1.0.
 
 ## 1. Who you are and where

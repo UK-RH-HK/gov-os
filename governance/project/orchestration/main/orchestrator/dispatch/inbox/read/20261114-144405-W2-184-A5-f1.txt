@@ -1,0 +1,9 @@
+log: W2-184-A5-f1.json
+W2: W2-184
+status: PACKAGES. Both decided changes are built and verified, but the narrow independent check (DEC-1154, DEC-1177 (1)) has not been launched. No allowed launch form can carry the `--owner-named` that this branch's own launcher requires for it (P-W2-184-4 below).
+
+task: DAEO-6f0s (W2-184), build run after review round 2's F1. The owner's P-W2-184-1 (a)+(c) is DEC-1177; the CTO's P-W2-184-2 (a) adds `command.py`.
+status: PACKAGES. Both decided changes are built and verified, but the narrow independent check (DEC-1154, DEC-1177 (1)) has not been launched. No allowed launch form can carry the `--owner-named` that this branch's own launcher requires for it (P-W2-184-4 below).
+work_completed:
+- (1) Merged `w2/integrate` into the branch with `--no-ff` (e99c8059c). No conflicts.
+- (2) Stop-gap (c) held: the tests branch was made from e99c8059c, which already c

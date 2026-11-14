@@ -236,6 +236,15 @@ check "spend line: a haiku launch -> tier haiku, class C0" '[ "$(lastline "(d[\"
 STUB_COST=0.4 lw engineer high "$W/briefs/W2-99-eng.md"
 ex=$(sed -n 's/^launch_worker: wait with: bash .*wait_for.sh //p' "$W/stdout"); WAIT_FOR_EVERY=1 bash "$HERE/wait_for.sh" "$ex" 60 > /dev/null
 check "spend line: a detached launch carries the same fields" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C3'"'"', '"'"'opus'"'"')" ]'
+# P-W2-184-4 (a): --owner-named, --reason and --trial go before `--`, only when given
+lw --fg --class C2 --model claude-opus-5-5 --owner-named DEC-1177 independent-auditor high "$W/briefs/W2-99-review.md"
+check "gov options: --owner-named DEC-1177 is passed before --" 'grep -q -- "launch independent-auditor T-eng --owner-named DEC-1177 -- -p" "$W/rec/argv"'
+lw --fg --class C2 --model claude-opus-5-5 --reason "the round's own choice" --trial tr-1 independent-auditor max "$W/briefs/W2-99-review.md"
+check "gov options: --reason and --trial are passed before --" 'grep -q -- "--reason the round.s own choice --trial tr-1 -- -p" "$W/rec/argv"'
+lw --fg --class C2 --model claude-opus-5-5 independent-auditor high "$W/briefs/W2-99-review.md"
+check "gov options: none given, none passed" 'grep -q -- "launch independent-auditor T-eng -- -p" "$W/rec/argv"'
+lw --fg --class C2 --model claude-opus-5-5 --owner-named 1177 independent-auditor high "$W/briefs/W2-99-review.md"; rc=$?
+check "gov options: a malformed decision id exits 2" '[ $rc = 2 ]'
 # old lines still parse: a 17-key line, a free-form one and an old-style summary, beside the new ones
 ORCHD=$W/main/.gov-runtime/scratch/orchestrator
 printf '%s\n' '{"at": "2026-11-09 10:00", "what": "old normal line", "kind": "launched", "ticket": "T-o", "wbs": "W2-97", "role": "engineer", "cost_usd": 1.0, "cost_source": "x", "input_tokens": null, "output_tokens": 5, "cache_read_tokens": null, "cache_creation_tokens": null, "projection_usd": 4.0, "note": null, "orig_tokens": null, "orig_cost": null, "extra": {"effort": "high"}}' '{"at": "2026-11-09 11:00", "what": "free form", "kind": "agent", "tokens": 5, "cost": "2.00 USD (x)"}' >> "$SP"
