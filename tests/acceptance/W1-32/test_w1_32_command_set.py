@@ -103,9 +103,12 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite by a fresh test designer, DEC-491):
     W1-07's lines record ``impact`` (``gov impact``, approved and built), so the first assert's set gains it; nothing
     else in the case changes, and ``RECORDED_HERE`` stays as it is.
+
+    Revised for DEC-747 (W2-104): ``skilleval`` is recorded, so the recorded ``gov`` commands are ten.
     """
     assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) - set(RECORDED_HERE) == {
-        "accept", "brief", "ci", "impact", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
+        "accept", "brief", "ci", "impact", "launch", "links", "plan", "resources", "skilleval",
+        "telemetry"}, RECORDED
     assert tuple(NO_GOV_COMMAND) == ("lock",)
     recorded = set(RECORDED) | set(RECORDED_HERE)
     run = support.gov(empty_project, sandbox, "--help")

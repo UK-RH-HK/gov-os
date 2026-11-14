@@ -1,6 +1,6 @@
 ---
 id: DAEO-h2k3
-status: in_progress
+status: closed
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-29T15:55:50Z
