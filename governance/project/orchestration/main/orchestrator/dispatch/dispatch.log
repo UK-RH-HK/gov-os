@@ -1438,3 +1438,7 @@
 2026-11-14 22:04:01 started W2-88 (DAEO-2bdu) W2-88-A5-r8b.md -> W2-88-A5-r8b.json (launcher exit 0)
 2026-11-14 22:16:03 land finished: {'W2-187=a9842b15ad9f': 'CLOSED'}
 2026-11-14 22:18:02 interim result: W2-88 1e74a47b7 W2-88 (DAEO-2bdu) package 1 (a): the pool, the walls template and the MEMORY-AUD
+2026-11-14 22:26:03 interim result: W2-88 d42608093 W2-88 (DAEO-2bdu) package 2 (a): the code graph is read by edge type and node la
+2026-11-14 22:43:03 interim result: W2-88 e504e50c6 W2-88 (DAEO-2bdu): run 8 acceptance cases for DEC-1183 (S27 skips, package 1 shi
+2026-11-14 22:45:02 interim result: W2-88 ad8ba50b1 W2-88 (DAEO-2bdu) packages 1 and 2, fix: the shipped files declared one by one (
+2026-11-14 23:07:02 started W2-188 (DAEO-zlog) W2-188-A5-map.md -> W2-188-A5-map.json (launcher exit 0)

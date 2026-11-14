@@ -4,6 +4,7 @@
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
 
+- **22:20 (HANDOVER WINDOW OPEN; stamped 22:21 first, ahead = STALE 8; stand-by written log/cto-standby.txt):** W2-187 LANDED + CLOSED 22:16 (270c50da1; structural NOTICE only). DEC-1183 RECORDED 706879f56 (Route X; S27 round after the land; COPIES-12 yes; trial ended = full window; lessons to memory at once; DEC-1171 (6) Changed-by). W2-88 widening c9b4347ac (paths + sources DEC-1183/1154/385) -> told the lead w2-88-b0 by SendMessage. W2-188 HAND MERGE 5f9a9dedf (Task DAEO-zlog) + CIT-P status APPROVED d21cd3342 (review F1); kernel-approved.txt +3 rows for adopt SKILL.md 6a884cf1 (backup .pre-w2188); .req ACT-CLAUDE-COPIES-12 22865f2a QUEUED 22:20 in ~/gov-os-operator/queue/. NEXT SESSION (full window, NO 300k): (1) the operator's COPIES-12 result -> W2-188 fresh accept (its guard test needs the copy landed, D1) -> close W2-188 (DND/F rows F3, F5 + R1/R3/R4 for the owner's reading); (2) W2-88 r8b (P-W2-88-L8-1 (a) by the CTO; list for the owner's reading) -> DONE -> land (keep open) -> release the S27 folder-mode round -> release ready at C -> rehearse_rel.sh 8 modes -> the sitting ~02:00-02:45 -> fill_release.sh with N1-N4 folded -> post-fill review (F4) -> the operator's EXAMIN setup -> EXAMIN CTO (brief b70ff233); (3) owner waits: q02 four commands, W2-61h walled run, Q-REFRESH-1/Q-SCAN-1/Q-SCAN-2; the owner's other decisions come to the new session. Trial final: stale 8, corrections 0, missed 9, compactions 8.
 - **22:10:** OWNER: "trial: full window. Keep the rule you proposed anyway: every new lesson goes to memory the moment it is learned. The next session starts without the 300k setting. Tell me the moment the handover window opens (after W2-187's land and W2-188's hand merge), with the stand-by line written; my other decisions go to the new session." -> RECORD WITH DEC-1183 (trial ended: full window, DEC-1171 (6) closed early; lessons-to-memory rule; Route X; S27 round; COPIES-12 yes). Memory lesson-to-memory-at-once.md saved. HANDOVER: the new panel needs NO CLAUDE_CODE_AUTO_COMPACT_WINDOW machine setting (GOV_ROLE/GOV_TICKET from .claude/settings.local.json; /add-dir x2; Remote Control auto); first check expects the window line ABSENT (count 0). On the window: write log/cto-standby.txt + tell the owner at once. W2-187 land merged 4cfa2d0ef933 at 21:51, tests running.
 - **22:03:** W2-88 r8 returned LAUNCH_BLOCKED 22:00 (branch launcher pre-W2-184 refused Opus; after merging integrate 0821e8514, W2-184's launcher refused round-1/round-2 probe records' old-form verdict blocks). P-W2-88-L8-1 (a) BY THE CTO (DEC-1156 (7)): the lead rewrites both blocks in JUDGEMENT.md's form from the records' own classification, content unchanged, diff only inside the fences; narrow check confirms. r8b RELEASED 22:03 (briefs/W2-88-A5-r8b.md). My brief's gap = MISSED 9 (memory updated). Stamp 22:04 vs clock 22:03 corrected at once = STALE 7. LIST FOR THE OWNER'S READING. Trial: stale 7, corrections 0, missed 9, compactions 8.
 - **22:00:** OWNER 21:50: Route X = `P-W2-88-S27-1 (b), package 1 (a), package 2 (a)`; S27 folder mode its own round straight after W2-88 lands; then TRIAL FIGURES (reported 22:0x; script scratchpad trial_figs.py, list prices validated vs workers' measured cost -3%/-1%); "change nothing else; other decisions next session". W2-88 r8 RELEASED 21:51 (briefs/W2-88-A5-r8.md). TO DO after W2-187's land: DAEO-2bdu widening commit (pyproject.toml, src/gov/_shipped/**, src/gov/codeintel/__init__.py, src/gov/retrieval/code_route.py, tests/unit/adopt/test_safety.py, tests/unit/codeintel/test_w2_88*), DEC-1183 (Route X + S27 round after the land + COPIES-12 yes 18:15/21:2x), W2-188 hand merge, tell the W2-88 lead the widening sha. report-state updated; standby ended. Trial: stale 6, corrections 0, missed 8, compactions 8 (21:54).
@@ -1641,10 +1642,9 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-14T21:53:03Z b64f3f70e8f97b8ec19cf2fa11c7e7dd52554dc130ee57cbdc8fc74ca16204b7
-git head: 9a304cfec0d1afd633f986adf35c8edf434cd65d
+generated: 2026-11-14T22:21:24Z 4762dae255ec3531a5f51e4712b50e7e06b3278577934db291d5068b1070e57d
+git head: d21cd3342ac91f15e80181bafef02a5ec2ae4f7e
 tickets in progress (`tk ls --status=in_progress`):
-  DAEO-0cd2 [in_progress] - W2-187 The standing hidden set, judged every week at 95 %, counts only <- [DAEO-f58b, DAEO-rmhj]
   DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
   DAEO-ar89 [in_progress] - W2-155 The warm query path profiled: W1-19's 0.5 s budget
@@ -1653,13 +1653,13 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
   DAEO-zlog [in_progress] - W2-188 The adopt skill's step 6 and the practice record: the standing set <- [DAEO-pg6i]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS        9a304cfec [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS        d21cd3342 [w2/integrate]
   /home/usain/gov-os-worktrees/D6-F-tests           2761682a2 [w2/D6-F-tests]
   /home/usain/gov-os-worktrees/EMG-queue            04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/W2-00-d10r2-records  66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record         601b63023 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a        3866f95f6 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b        9a304cfec (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record         81eeb4d0e [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a        d21cd3342 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b        5f9a9dedf (detached HEAD)
   /home/usain/gov-os-worktrees/W2-122               3fc448601 [w2/W2-122]
   /home/usain/gov-os-worktrees/W2-123               3de9bcf44 [w2/W2-123]
   /home/usain/gov-os-worktrees/W2-128-tests         eb1c4fbb8 [w2/W2-128-tests]
@@ -1685,7 +1685,8 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-61h-d10r2-tests   35396225e [w2/W2-61h-d10r2-tests]
   /home/usain/gov-os-worktrees/W2-61h-q23-tests     53affe533 [w2/W2-61h-q23-tests]
   /home/usain/gov-os-worktrees/W2-78                8e7640b96 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-88                2491c9bec [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88                1e74a47b7 [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88-tests          2c2621dfc [w2/W2-88-tests]
   /home/usain/gov-os-worktrees/W2-91-tests          3191a7948 [w2/W2-91-tests]
   /home/usain/gov-os-worktrees/W2-92-proto          e884675b4 [w2/W2-92-proto]
   /home/usain/gov-os-worktrees/W2-94                72a339b9d [w2/W2-94]

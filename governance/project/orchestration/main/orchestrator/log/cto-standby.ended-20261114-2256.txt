@@ -1,0 +1,6 @@
+2026-11-14 22:20 STAND-BY: the CTO session 6ff2ee7c waits for the owner's handover to a fresh CTO session (a VS Code panel on the full window, without the 300k setting; DEC-1183 (4)). The handover window is OPEN: W2-187 landed and closed at 22:16, W2-188 was merged by hand at 5f9a9dedf (CIT-P APPROVED d21cd3342), and no land is running.
+Still running, unaffected by the handover:
+- W2-88 r8b lead (since 22:03, Route X; the widening c9b4347ac has been sent to it).
+- ACT-CLAUDE-COPIES-12 queued for the operator at 22:20 (22865f2a).
+The new session's first jobs, in CHECKPOINT.md's NOW block (22:20): read the COPIES-12 result, then close W2-188 on a fresh accept, then follow W2-88 r8b to its land -> release ready -> the sitting ~02:00-02:45.
+This session does nothing more unless the owner writes.

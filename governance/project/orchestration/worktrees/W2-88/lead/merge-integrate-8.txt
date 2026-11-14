@@ -1,0 +1,8 @@
+Merge w2/integrate into w2/W2-88: run 8, the CTO's widened allowed_paths (c9b4347ac) and DEC-1183's record before DONE
+
+One conflict, src/gov/adopt/memory_sets.py (W2-187's step 6 cron line against this ticket's S24 removal of GOV_OS = parents[3]): both kept. walls_act takes root (this ticket: the walls through fabric.shipped) and repo (W2-187: the git top level of out by default); _toplevel, _gitleaks, CRON, PUSH_ORDER and step 6 as W2-187 wrote them. Step 6's script path is found through fabric.shipped(CRON, root), never parents[3]; where no Gov OS tree holds it (an installed release), the line names it as "<path to Gov OS>/governance/project/orchestration/tools/memaudit_cron.sh" for the operator to fill in, as step 6 already does for gitleaks. A9 never reads the script; the line is text in an ACT that is never applied.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-1178, DEC-1101, DEC-1125
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

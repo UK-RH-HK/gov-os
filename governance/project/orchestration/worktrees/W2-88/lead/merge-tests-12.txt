@@ -1,0 +1,8 @@
+Merge w2/W2-88-tests: run 8 acceptance cases for DEC-1183 (td-13, e504e50c6cba)
+
+S27's three batched-only cases skipped (P-W2-88-S27-1 (b)); package 1 (a) shipped bytes and installed-wheel cases; package 2 (a) code graph read by type and label; test_safety.py's plant revised (S26 refuses first).
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.f, CAP-20
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

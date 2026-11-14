@@ -8,12 +8,12 @@ task: DAEO-2bdu
 task_status: in_progress
 trigger: stop
 next_action: Resume after stop
-created: '2026-11-14T14:02:44Z'
+created: '2026-11-14T22:21:20Z'
 inputs:
 - id: DAEO-2bdu
-  version: a23678e27
-  hash: sha256:f6d1937c3feaf6721199bd2f22055f3bf512d8a6137a06dbbca2de4afc0fc83d
-head_commit: 0841cfb3c2838f320f2a5dee5be5197f93bfc49a
+  version: 41ab65979
+  hash: sha256:2af623a6d9e0ee85d0a8d33d02e43ac3cdf55ed13e4836dd9f1076941ad71773
+head_commit: 2c2621dfc08d0a4b8618d90291d0f1f265ff2470
 ---
 
 # CP-DAEO-2bdu-0001 — DAEO-2bdu at stop

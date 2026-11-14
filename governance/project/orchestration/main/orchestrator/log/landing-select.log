@@ -886,3 +886,7 @@
 2026-11-14 22:17:54 landing 706879f56255..c9b4347ac52a: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-14 22:18:57 landing c9b4347ac52a..5f9a9dedf7c0: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-14 22:19:32 landing 5f9a9dedf7c0..d21cd3342ac9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 22:30:46 hook: waited 30s for the operator's commit freeze to clear
+2026-11-14 22:30:47 landing d21cd3342ac9..dfe27129867b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 23:06:05 landing dfe27129867b..7527ec340dcb: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 23:06:05 landing 7527ec340dcb..10e98af9cb33: 2 commit(s); none outside a ticket on the trigger paths

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result ad8ba50b1: W2-88 (DAEO-2bdu) packages 1 and 2, fix: the shipped files declared one by one (test_w2_59's form); a whole count the tool answers with no number reads that part whole as before (test_codeintel's stan

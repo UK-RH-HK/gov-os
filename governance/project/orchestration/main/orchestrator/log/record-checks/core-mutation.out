@@ -1,6 +1,104 @@
 [
   {
     "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-170/test_w2_170_s3_declare.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-170/test_w2_170_s3_declare.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-170/w2_170_world.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-170/w2_170_world.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-171/test_w2_171_s3_judge.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/test_w2_171_s3_judge.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-171/w2_171_world.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/w2_171_world.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-171/w2_171_scenario.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/w2_171_scenario.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-172/test_w2_172_s7_digest.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-172/test_w2_172_s7_digest.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-172/w2_172_world.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-172/w2_172_world.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-0cd2.md",
+    "id": "DAEO-0cd2",
+    "pattern": "tests/acceptance/W2-172/w2_172_git.py",
+    "message": ".tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-172/w2_172_git.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-6n5k.md",
+    "id": "DAEO-6n5k",
+    "pattern": "tests/acceptance/W1-07/w1_07_support.py",
+    "message": ".tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/w1_07_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-6n5k.md",
+    "id": "DAEO-6n5k",
+    "pattern": "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+    "message": ".tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/test_w1_07_recorded_commands.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-6n5k.md",
+    "id": "DAEO-6n5k",
+    "pattern": "tests/acceptance/W1-07/README.md",
+    "message": ".tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/README.md' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-6n5k.md",
+    "id": "DAEO-6n5k",
+    "pattern": "tests/acceptance/W1-32/test_w1_32_command_set.py",
+    "message": ".tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-32/test_w1_32_command_set.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
     "path": ".tickets/DAEO-cv58.md",
     "id": "DAEO-cv58",
     "pattern": "tests/acceptance/W2-50/w2_50_support.py",
@@ -57,6 +155,69 @@
   },
   {
     "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W1-28/w1_28_launch_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W1-28/w1_28_launch_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W1-32/w1_32_launch_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W1-32/w1_32_launch_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W1-46/w1_46_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W1-46/w1_46_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W1-50/w1_50_freeze_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W1-50/w1_50_freeze_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W2-116/w2_116_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-116/w2_116_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W2-136/w2_136_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-136/w2_136_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W2-20/w2_20_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-20/w2_20_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W2-56/w2_56_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-cv58.md",
+    "id": "DAEO-cv58",
+    "pattern": "tests/acceptance/W2-56/w2_56_sandbox_support.py",
+    "message": ".tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_sandbox_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
     "path": ".tickets/DAEO-emq1.md",
     "id": "DAEO-emq1",
     "pattern": "tests/acceptance/W1-39/test_w1_39_copy.py",
@@ -99,6 +260,27 @@
   },
   {
     "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-f58b.md",
+    "id": "DAEO-f58b",
+    "pattern": "tests/acceptance/W2-131/test_w2_131_unchanged.py",
+    "message": ".tickets/DAEO-f58b.md: implementer allowed_paths pattern 'tests/acceptance/W2-131/test_w2_131_unchanged.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-f58b.md",
+    "id": "DAEO-f58b",
+    "pattern": "tests/acceptance/W2-133/test_w2_133_unchanged.py",
+    "message": ".tickets/DAEO-f58b.md: implementer allowed_paths pattern 'tests/acceptance/W2-133/test_w2_133_unchanged.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-f58b.md",
+    "id": "DAEO-f58b",
+    "pattern": "tests/acceptance/W2-135/test_w2_135_unchanged.py",
+    "message": ".tickets/DAEO-f58b.md: implementer allowed_paths pattern 'tests/acceptance/W2-135/test_w2_135_unchanged.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
     "path": ".tickets/DAEO-fd0p.md",
     "id": "DAEO-fd0p",
     "pattern": "tests/acceptance/W2-159/test_f4_scope.py",
@@ -106,10 +288,17 @@
   },
   {
     "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-g87r.md",
+    "id": "DAEO-g87r",
+    "pattern": "tests/acceptance/W2-94/**",
+    "message": ".tickets/DAEO-g87r.md: implementer allowed_paths pattern 'tests/acceptance/W2-94/**' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
     "path": ".tickets/DAEO-href.md",
     "id": "DAEO-href",
-    "pattern": "tests/acceptance/W2-183/**",
-    "message": ".tickets/DAEO-href.md: implementer allowed_paths pattern 'tests/acceptance/W2-183/**' covers tests/acceptance/"
+    "pattern": "tests/acceptance/W2-54/test_w2_54_dropped_order.py",
+    "message": ".tickets/DAEO-href.md: implementer allowed_paths pattern 'tests/acceptance/W2-54/test_w2_54_dropped_order.py' covers tests/acceptance/"
   },
   {
     "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
@@ -222,5 +411,110 @@
     "id": "DAEO-p8tv",
     "pattern": "tests/acceptance/W2-171/test_w2_171_f5_paths.py",
     "message": ".tickets/DAEO-p8tv.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/test_w2_171_f5_paths.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W1-02/test_w1_02_guard_hook.py",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W1-02/test_w1_02_guard_hook.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W1-02/README.md",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W1-02/README.md' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W1-05/test_w1_05_live_hooks.py",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W1-05/test_w1_05_live_hooks.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W1-05/README.md",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W1-05/README.md' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W2-57/test_w2_57_designer_read_p95.py",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W2-57/test_w2_57_designer_read_p95.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W2-57/README.md",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W2-57/README.md' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qvff.md",
+    "id": "DAEO-qvff",
+    "pattern": "tests/acceptance/W2-111/**",
+    "message": ".tickets/DAEO-qvff.md: implementer allowed_paths pattern 'tests/acceptance/W2-111/**' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W1-38/w1_38_support.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W1-38/w1_38_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W2-59/test_w2_59_hook_lines.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W2-59/test_w2_59_hook_lines.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W1-38/test_w1_38_hooks_source.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W1-38/test_w1_38_hooks_source.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W1-38/w1_38_hooks_support.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W1-38/w1_38_hooks_support.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W2-05/test_w2_05_hooks_source.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W2-05/test_w2_05_hooks_source.py' covers tests/acceptance/"
+  },
+  {
+    "code": "IMPLEMENTER_COVERS_ACCEPTANCE",
+    "path": ".tickets/DAEO-qyt2.md",
+    "id": "DAEO-qyt2",
+    "pattern": "tests/acceptance/W1-38/test_w1_38_hooks_command_line.py",
+    "message": ".tickets/DAEO-qyt2.md: implementer allowed_paths pattern 'tests/acceptance/W1-38/test_w1_38_hooks_command_line.py' covers tests/acceptance/"
   }
 ]

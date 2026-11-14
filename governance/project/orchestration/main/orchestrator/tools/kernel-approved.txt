@@ -208,3 +208,6 @@ d572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a template/govern
 9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e template/governance/kernel/skills/ui-ux/scenario-records.yaml DEC-1178 (2) W2-101's CIT-P 42c1cc38 (the owner, chat, 2026-11-14)
 665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b template/governance/kernel/skills/ui-ux/scenario-summaries.md DEC-1178 (2) W2-101's CIT-P 42c1cc38 (the owner, chat, 2026-11-14)
 714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9 template/governance/kernel/skills/ui-ux/scenarios.md DEC-1178 (2) W2-101's CIT-P 42c1cc38 (the owner, chat, 2026-11-14)
+6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489 template/governance/kernel/skills/adopt/SKILL.md DEC-1181 (1) W2-188's CIT-P (the owner, chat, 2026-11-14; merged by hand 5f9a9dedf)
+6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489 template/.rulesync/skills/adopt/SKILL.md DEC-1181 (1) W2-188's CIT-P (the owner, chat, 2026-11-14; merged by hand 5f9a9dedf)
+6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489 .rulesync/skills/adopt/SKILL.md DEC-1181 (1) W2-188's CIT-P (the owner, chat, 2026-11-14; merged by hand 5f9a9dedf)

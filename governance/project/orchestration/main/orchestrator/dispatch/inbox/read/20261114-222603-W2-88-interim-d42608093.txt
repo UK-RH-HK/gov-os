@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result d42608093: W2-88 (DAEO-2bdu) package 2 (a): the code graph is read by edge type and node label under the tool's cap, each count checked; A9 records the tool's counts, names a type or label over the cap CODEGRAPH

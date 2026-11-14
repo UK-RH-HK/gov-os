@@ -393,3 +393,5 @@
 # 22:03 returned LAUNCH_BLOCKED P-W2-88-L8-1 (a) by the CTO: W2-88 DAEO-2bdu W2-88-A5-r8.md W2-88-A5-r8.json
 # 22:03 W2-88 r8b: P-W2-88-L8-1 (a) by the CTO (old-form verdict blocks rewritten, content unchanged), then run 8 as briefed (Route X)
 W2-88 DAEO-2bdu W2-88-A5-r8b.md W2-88-A5-r8b.json
+# 23:06 23:06 W2-188 map round: the README's self-check row out of the map so gov accept reads it (DEC-1184, DEC-1156 (7)); then land, the queue closes it
+W2-188 DAEO-zlog W2-188-A5-map.md W2-188-A5-map.json
