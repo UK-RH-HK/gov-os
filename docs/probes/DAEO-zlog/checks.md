@@ -1,3 +1,17 @@
+---
+type: probe
+task: DAEO-zlog
+ticket: W2-188
+reviewer_session: "none: this is not a review; it is the product-spec session's own I5 check record, run by the author of the change"
+implementer_session: "product-spec ps-3 7eb0249a-85dc-48a5-8121-b3bdf82c22ac (be8b99ccb, 8c2e5d7ff, b75472d48)"
+reviewer_wrote_nothing: false
+commissioned_by: "product-spec (the ticket's I5 asks the author for these checks); not the orchestrator"
+judged_by: "no one: the author's own checks, not judged by the orchestrator, so not a probe the close gate may count"
+judgement: pass
+probed_commit: b75472d4825cece64936451f21b259787b5ecf97
+base: 5336a6fca
+---
+
 # DAEO-zlog (W2-188): the I5 checks and the literal-phrase checks
 
 Base `5336a6fca`. Run by one script that imports `w2_88a_support` from `tests/acceptance/W2-88a/`; no test suite.
