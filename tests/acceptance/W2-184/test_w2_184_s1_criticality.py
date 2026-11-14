@@ -3,7 +3,8 @@
 Interface 1: the file's form (``version`` 1, ``default``, ``opus``, ``rules``), ``ticket_criticality(root, ticket)`` (the
 highest class among the matching rules, ``default`` when none matches; a ``profile`` rule matches the ticket's profile; a
 ``paths`` rule matches when a glob and an allowed path match either way as ``fnmatchcase`` patterns, the allowed path
-having lost a trailing inline comment), ``opus_model(root)``, and when the file is read (1.3, 1.4).
+having lost a trailing inline comment), ``opus_model(root)``, and when the file is read (1.3, 1.4 as amended: a file
+that is present is read on every launch; with none the launch is as before W2-184).
 """
 
 from __future__ import annotations
@@ -145,10 +146,13 @@ def test_s1_a_malformed_file_refuses_even_a_role_with_only_a_default_line(projec
     s.refused(launch(ENG, tk), s.CRITICALITY_REL)
 
 
-def test_s1_a_missing_criticality_file_refuses_a_role_with_a_table_line(project, launch):
+def test_s1_a_missing_criticality_file_launches_a_role_with_a_table_line_on_its_default_line(project, launch):
+    """Interface 1.4 as amended (2026-11-14): no file, the launch as before W2-184. The table line is not applied.
+    The earlier 1.4 refused here, naming the file."""
     s.drop_criticality(project)
     tk = s.ticket(project, ENG, "C2")
-    s.refused(launch(ENG, tk), s.CRITICALITY_REL)
+    s.assert_session(launch(ENG, tk), *s.DEFAULT, criticality=None, model_source="role default",
+                     effort_source="role default")
 
 
 def test_s1_an_unreadable_criticality_file_refuses(project, launch):

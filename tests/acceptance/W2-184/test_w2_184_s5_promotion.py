@@ -137,11 +137,14 @@ def test_s5_a_ticket_already_on_opus_is_still_recorded_as_promoted(project, laun
                      promotion={"reason": "two failed reviews", "record": record}, **PROMOTED)
 
 
-def test_s5_a_promotion_needs_the_criticality_file_even_for_a_role_with_only_a_default_line(project, launch, tk):
+def test_s5_with_no_criticality_file_two_failed_reviews_promote_nothing(project, launch, tk):
+    """Interface 1.4 as amended: no file, no promotion (section 5 is off); the launch is as before W2-184. The earlier
+    1.4 refused here, naming the file."""
     s.write_role(project, ENG, table=None)
     s.drop_criticality(project)
     s.promote_two_failed(project, tk)
-    s.refused(launch(ENG, tk), s.CRITICALITY_REL)
+    s.assert_session(launch(ENG, tk), *s.DEFAULT, criticality=None, model_source="role default",
+                     effort_source="role default", promotion=None)
 
 
 # --------------------------------------------------------------------------
