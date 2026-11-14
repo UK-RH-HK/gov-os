@@ -17,8 +17,8 @@
     "EXAMIN CTO: clone, kit, A0 by your operator, then the start (~1 h after the re-pin); W2-81 on the release alongside",
     "W2-187 (DAEO-0cd2) and W2-188 (DAEO-zlog) CLAIMED 5336a6fca with the interface; ready lines in (FULL; CIT-P route)"
   ],
-  "owner_action": "now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2 (the guard's 100 ms: file tools pass after a sweep, Bash over); now: `yes ACT-CLAUDE-COPIES-12 22865f2a` (review PASS; applies at W2-188's hand merge after W2-187 lands); the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO (brief now b70ff233, DEC-1182 (2))",
-  "last_report": "2026-11-14 18:03:10",
+  "owner_action": "now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2 (the guard's 100 ms: file tools pass after a sweep, Bash over); the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO (brief now b70ff233, DEC-1182 (2))",
+  "last_report": "2026-11-14 18:32:06",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],

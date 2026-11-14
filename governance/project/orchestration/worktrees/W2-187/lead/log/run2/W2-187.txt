@@ -1,0 +1,435 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 18:16:17)
+...............F....................................F..FFFFFF.FFFF...... [ 35%]
+..F..................................................................... [ 70%]
+.............................................................            [100%]
+=================================== FAILURES ===================================
+_ test_scope_the_branch_changes_only_the_tickets_allowed_paths_and_its_acceptance_folder _
+
+    def test_scope_the_branch_changes_only_the_tickets_allowed_paths_and_its_acceptance_folder():
+        """Judges the branch ``w2/W2-187`` only (the engineer's); it skips on any other branch or where ``w2/integrate`` is absent."""
+        git = lambda *a: subprocess.run(["git", "-C", str(W.TREE), *a], capture_output=True, text=True)  # noqa: E731
+        branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+        if branch != "w2/W2-187" or git("rev-parse", "--verify", "--quiet", "w2/integrate").returncode != 0:
+            pytest.skip(f"judges the branch w2/W2-187 only (this is {branch})")
+        base = git("merge-base", "HEAD", "w2/integrate").stdout.strip()
+        changed = [p for p in git("diff", "--name-only", f"{base}...HEAD").stdout.splitlines() if p]
+        stray = [p for p in changed if not any(fnmatch.fnmatchcase(p, g) for g in ALLOWED)]
+>       assert stray == [], f"changed outside the ticket's allowed paths: {stray}"
+E       AssertionError: changed outside the ticket's allowed paths: ['tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py', 'tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py']
+E       assert ['tests/accep...misses_f2.py'] == []
+E         
+E         Left contains 2 more items, first extra item: 'tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py'
+E         Use -v to get more diff
+
+tests/acceptance/W2-187/test_w2_187_f_guards.py:135: AssertionError
+_ test_s12_the_push_line_is_the_last_line_of_the_latest_digest_and_cron_log_gains_one_push_line _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6f4a2690>
+
+    def test_s12_the_push_line_is_the_last_line_of_the_latest_digest_and_cron_log_gains_one_push_line(pw):
+        run = pw.push(declared=pw.declare())
+        assert run.code == 0, run
+>       check_logged(pw, line_of(run), 0)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6f4a2690>
+line = 'PUSH pushed /tmp/gov-w2-187-lead/pytest-of-usain/pytest-3/test_s12_the_push_line_is_the_0/pw/remote.git main 6177c3c8f5de'
+code = 0
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_scan_with_findings_blocks_the_push_names_the_count_and_never_the_secret[1] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6f480a70>, k = 1
+
+    @pytest.mark.parametrize("k", [1, 3])
+    def test_s12_a_scan_with_findings_blocks_the_push_names_the_count_and_never_the_secret(pw, k):
+        """Exit 1 and ``k`` report entries each holding the planted secret (the fake also prints it on its stdout and stderr)."""
+        pw.fake.plan(entries=k, exit=1)
+        run = pw.push(declared=pw.declare())
+        assert run.code == 1, run
+        assert line_of(run) == f"PUSH blocked: findings {k}", run
+        assert pw.remote_head() == pw.first, "the remote is unchanged"
+        (call,) = pw.fake.calls()
+        assert not os.path.exists(call["path"]), "the report is deleted"
+        assert P.no_stray_files(pw.tmp) == []
+        nothing_leaked(pw, run)
+>       check_logged(pw, f"PUSH blocked: findings {k}", 1)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6f480a70>
+line = 'PUSH blocked: findings 1', code = 1
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_scan_with_findings_blocks_the_push_names_the_count_and_never_the_secret[3] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6f4837a0>, k = 3
+
+    @pytest.mark.parametrize("k", [1, 3])
+    def test_s12_a_scan_with_findings_blocks_the_push_names_the_count_and_never_the_secret(pw, k):
+        """Exit 1 and ``k`` report entries each holding the planted secret (the fake also prints it on its stdout and stderr)."""
+        pw.fake.plan(entries=k, exit=1)
+        run = pw.push(declared=pw.declare())
+        assert run.code == 1, run
+        assert line_of(run) == f"PUSH blocked: findings {k}", run
+        assert pw.remote_head() == pw.first, "the remote is unchanged"
+        (call,) = pw.fake.calls()
+        assert not os.path.exists(call["path"]), "the report is deleted"
+        assert P.no_stray_files(pw.tmp) == []
+        nothing_leaked(pw, run)
+>       check_logged(pw, f"PUSH blocked: findings {k}", 1)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6f4837a0>
+line = 'PUSH blocked: findings 3', code = 1
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[exit-2] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6ef80680>
+how = <function exit_two at 0x79dc6f351800>
+
+    @pytest.mark.parametrize("how", [exit_two, no_binary_by_flag, no_binary_on_path, too_slow],
+                             ids=["exit-2", "missing-by-flag", "missing-on-path", "timeout"])
+    def test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word(pw, how):
+        run, seconds = how(pw)
+        assert run.code == 1, run
+        assert re.fullmatch(r"PUSH blocked: scan failed \S+", line_of(run)), run
+        assert pw.remote_head() == pw.first, "the remote is unchanged"
+        if seconds is not None:
+            assert seconds < 60, f"a scan past GOV_MEMAUDIT_SCAN_TIMEOUT_S=2 was waited for {seconds:.0f} s"
+        nothing_leaked(pw, run)
+>       check_logged(pw, line_of(run), 1)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6ef80680>
+line = 'PUSH blocked: scan failed exit', code = 1
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[missing-by-flag] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6f482180>
+how = <function no_binary_by_flag at 0x79dc6f3518a0>
+
+    @pytest.mark.parametrize("how", [exit_two, no_binary_by_flag, no_binary_on_path, too_slow],
+                             ids=["exit-2", "missing-by-flag", "missing-on-path", "timeout"])
+    def test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word(pw, how):
+        run, seconds = how(pw)
+        assert run.code == 1, run
+        assert re.fullmatch(r"PUSH blocked: scan failed \S+", line_of(run)), run
+        assert pw.remote_head() == pw.first, "the remote is unchanged"
+        if seconds is not None:
+            assert seconds < 60, f"a scan past GOV_MEMAUDIT_SCAN_TIMEOUT_S=2 was waited for {seconds:.0f} s"
+        nothing_leaked(pw, run)
+>       check_logged(pw, line_of(run), 1)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6f482180>
+line = 'PUSH blocked: scan failed missing', code = 1
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[missing-on-path] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6f4a0b60>
+how = <function no_binary_on_path at 0x79dc6f351940>
+
+    @pytest.mark.parametrize("how", [exit_two, no_binary_by_flag, no_binary_on_path, too_slow],
+                             ids=["exit-2", "missing-by-flag", "missing-on-path", "timeout"])
+    def test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word(pw, how):
+        run, seconds = how(pw)
+        assert run.code == 1, run
+        assert re.fullmatch(r"PUSH blocked: scan failed \S+", line_of(run)), run
+        assert pw.remote_head() == pw.first, "the remote is unchanged"
+        if seconds is not None:
+            assert seconds < 60, f"a scan past GOV_MEMAUDIT_SCAN_TIMEOUT_S=2 was waited for {seconds:.0f} s"
+        nothing_leaked(pw, run)
+>       check_logged(pw, line_of(run), 1)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6f4a0b60>
+line = 'PUSH blocked: scan failed missing', code = 1
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[timeout] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6efa51f0>
+how = <function too_slow at 0x79dc6f3519e0>
+
+    @pytest.mark.parametrize("how", [exit_two, no_binary_by_flag, no_binary_on_path, too_slow],
+                             ids=["exit-2", "missing-by-flag", "missing-on-path", "timeout"])
+    def test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word(pw, how):
+        run, seconds = how(pw)
+        assert run.code == 1, run
+        assert re.fullmatch(r"PUSH blocked: scan failed \S+", line_of(run)), run
+        assert pw.remote_head() == pw.first, "the remote is unchanged"
+        if seconds is not None:
+            assert seconds < 60, f"a scan past GOV_MEMAUDIT_SCAN_TIMEOUT_S=2 was waited for {seconds:.0f} s"
+        nothing_leaked(pw, run)
+>       check_logged(pw, line_of(run), 1)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6efa51f0>
+line = 'PUSH blocked: scan failed timeout', code = 1
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so[unset] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6ef813d0>, declared = None
+
+    @pytest.mark.parametrize("declared", [None, ""], ids=["unset", "empty"])
+    def test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so(pw, declared):
+        run = pw.push(declared=declared)
+        assert run.code == 0, run
+        assert line_of(run) == "PUSH none: no declaration", run
+        assert pw.fake.calls() == [], "gitleaks is not called"
+        assert pw.remote_head() == pw.first, "nothing is pushed"
+>       check_logged(pw, "PUSH none: no declaration", 0)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6ef813d0>
+line = 'PUSH none: no declaration', code = 0
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so[empty] _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6ef81d90>, declared = ''
+
+    @pytest.mark.parametrize("declared", [None, ""], ids=["unset", "empty"])
+    def test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so(pw, declared):
+        run = pw.push(declared=declared)
+        assert run.code == 0, run
+        assert line_of(run) == "PUSH none: no declaration", run
+        assert pw.fake.calls() == [], "gitleaks is not called"
+        assert pw.remote_head() == pw.first, "nothing is pushed"
+>       check_logged(pw, "PUSH none: no declaration", 0)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6ef81d90>
+line = 'PUSH none: no declaration', code = 0
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_remote_that_refuses_the_push_is_exit_2_and_gits_output_is_kept_in_a_0600_file_never_printed _
+
+pw = <w2_187_push.PushWorld object at 0x79dc6ef82f90>
+
+    def test_s12_a_remote_that_refuses_the_push_is_exit_2_and_gits_output_is_kept_in_a_0600_file_never_printed(pw):
+        P.reject_pushes(pw.remote)
+        before = pw.key_files()
+        run = pw.push(declared=pw.declare())
+        assert run.code == 2, run
+        assert line_of(run) == "PUSH failed: git push exit 1", run
+        assert len(pw.fake.calls()) == 1, "the scan was clean and ran once"
+        assert pw.remote_head() == pw.first
+        for text in (run.out, run.err):
+            assert P.HOOK not in text and "remote:" not in text and "error:" not in text and "hint:" not in text, text
+        kept = [Path(p) for p in pw.key_files() - before if P.HOOK in Path(p).read_text(errors="replace")]
+        assert len(kept) == 1, "git's own output is in one new file of the key folder"
+        assert (kept[0].stat().st_mode & 0o777) == 0o600
+>       check_logged(pw, "PUSH failed: git push exit 1", 2)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:197: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6ef82f90>
+line = 'PUSH failed: git push exit 1', code = 2
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_a_declared_remote_that_does_not_exist_is_a_failed_push_not_a_crash __
+
+pw = <w2_187_push.PushWorld object at 0x79dc6f1c0080>
+
+    def test_s12_a_declared_remote_that_does_not_exist_is_a_failed_push_not_a_crash(pw):
+        before = pw.key_files()
+        run = pw.push(declared=pw.declare(pw.base / "no-such-remote.git"))
+        assert run.code == 2, run
+        assert line_of(run) == "PUSH failed: git push exit 128", run
+        assert "fatal" not in run.err and "does not appear" not in run.err and "does not appear" not in run.out
+        new = [Path(p) for p in pw.key_files() - before if (Path(p).stat().st_mode & 0o777) == 0o600 and Path(p).stat().st_size]
+        assert new, "git's output is kept in a 0600 file of the key folder"
+>       check_logged(pw, "PUSH failed: git push exit 128", 2)
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = <w2_187_push.PushWorld object at 0x79dc6f1c0080>
+line = 'PUSH failed: git push exit 128', code = 2
+
+    def check_logged(world, line: str, code: int, *, before_cron: int = 1) -> None:
+        """The line is the last of the latest digest (an older digest, and the lines before it, are untouched) and one more
+        ``cron.log`` line carries the six keys and the step ``push``."""
+        lines = world.digest_lines()
+        assert lines[-1] == line and lines[:-1] == P.WEEK_DIGEST, lines
+        assert world.digest_lines("2026-W45") == P.OLD_DIGEST, "an older digest is not the cycle's"
+        cron = world.cron_lines()
+>       assert len(cron) == before_cron + 1, cron
+E       AssertionError: [{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}]
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([{'at': '2026-11-16T21:00:00Z', 'due': True, 'exit': 0, 'mode': 'weekly', ...}])
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:52: AssertionError
+_ test_s12_with_no_live_set_todays_path_also_ends_with_the_push_after_its_run __
+
+make_world = <function make_world.<locals>.make at 0x79dc6ef86020>
+
+    def test_s12_with_no_live_set_todays_path_also_ends_with_the_push_after_its_run(make_world):
+        world, done, _ = cycle(make_world, plan(live=False, standing=True))
+>       assert keys(world) == ["standing live", "due", "run", "push"], (keys(world), done.stderr)
+E       AssertionError: (['standing live', 'due', 'run'], '')
+E       assert ['standing li... 'due', 'run'] == ['standing li...'run', 'push']
+E         
+E         Right contains one more item: 'push'
+E         Use -v to get more diff
+
+tests/acceptance/W2-187/test_w2_187_s12_push.py:297: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-187/test_w2_187_f_guards.py::test_scope_the_branch_changes_only_the_tickets_allowed_paths_and_its_acceptance_folder
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_the_push_line_is_the_last_line_of_the_latest_digest_and_cron_log_gains_one_push_line
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_scan_with_findings_blocks_the_push_names_the_count_and_never_the_secret[1]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_scan_with_findings_blocks_the_push_names_the_count_and_never_the_secret[3]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[exit-2]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[missing-by-flag]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[missing-on-path]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_scan_that_fails_or_cannot_run_blocks_the_push_and_is_named_by_one_reason_word[timeout]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so[unset]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so[empty]
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_remote_that_refuses_the_push_is_exit_2_and_gits_output_is_kept_in_a_0600_file_never_printed
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_a_declared_remote_that_does_not_exist_is_a_failed_push_not_a_crash
+FAILED tests/acceptance/W2-187/test_w2_187_s12_push.py::test_s12_with_no_live_set_todays_path_also_ends_with_the_push_after_its_run
+13 failed, 192 passed in 272.84s (0:04:32)

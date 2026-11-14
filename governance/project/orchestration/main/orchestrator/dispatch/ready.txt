@@ -384,7 +384,7 @@ W2-187 DAEO-0cd2 W2-187-A5-run1.md W2-187-A5-run1.json
 # 16:20 16:24 W2-94 S13 (rv P4, the counts schema's fix object), C3
 # 18:02 returned PACKAGES f192e50da (P-W2-94-S13-1 (a) path case): W2-94 DAEO-g87r W2-94-A5-s13.md W2-94-A5-s13.json
 # 18:02 W2-42a r4b: narrow check with --owner-named DEC-1154, then DONE
-W2-42a DAEO-03ub W2-42a-A5-r4b.md W2-42a-A5-r4b.json
+# 18:31 returned DONE 2376e2a33485 (narrow PASS PR-DAEO-03ub-r4.md, 0 blocking, F1-F6 rows) -> LAND: W2-42a DAEO-03ub W2-42a-A5-r4b.md W2-42a-A5-r4b.json
 # 18:02 W2-94 s13b: the W2-149 pin path case (DEC-1156 (7)), narrow check, verify
 # 18:09 returned PACKAGES P-W2-94-S13-2 (engineer model; my brief named Sonnet, missed 7): W2-94 DAEO-g87r W2-94-A5-s13b.md W2-94-A5-s13b.json
 # 18:09 W2-94 s13c: P-W2-94-S13-2 (a) en-5 on Opus C3, then steps 3-5

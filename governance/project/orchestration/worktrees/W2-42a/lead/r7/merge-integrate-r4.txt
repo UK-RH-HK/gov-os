@@ -1,0 +1,8 @@
+Merge w2/integrate (6ae3f8562cdd) into w2/W2-42a before the R4 narrow check's record
+
+35 commits of integration since d9e7dc859; none touches src/gov/guard/, tests/acceptance/W2-42a/ or tests/unit/guard/ (merge-tree clean). DEC-1157 (12), W2-42a R4 R5.
+
+Task: DAEO-03ub
+Role: orchestrator
+Implements: DEC-1157, DEC-1180
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

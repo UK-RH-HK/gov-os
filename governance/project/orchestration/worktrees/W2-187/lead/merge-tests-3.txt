@@ -1,0 +1,6 @@
+W2-187 (DAEO-0cd2): merge the test designer's fix batch td-3 (7d8c2aedf the README map's scope row in prose; 856913d95 W2-171's two cases at the 95 % bar, path case W2-187-P1 (a); 5708b4385 N2 (b) in S10 (6); 74834a6cd S12 and F7 from I13)
+
+Task: DAEO-0cd2
+Role: orchestrator
+Implements: DEC-1182, DEC-1179, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

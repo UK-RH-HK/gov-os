@@ -1,0 +1,120 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "02f08dac142e",
+   "after": "6ae3f8562cdd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "87bc633e9b6f",
+   "after": "0b2845c59dfb"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "02f08dac142e",
+   "after": "6ae3f8562cdd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "41ab6597992d",
+   "after": "6ae3f8562cdd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "head",
+   "before": "f4fdc7fa16b4",
+   "after": "e2ea9b0dfe74"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M docs/changes/W2-187-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/tools/memaudit_cron.sh"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M src/gov/adopt/memory_sets.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M src/gov/memaudit/__main__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M src/gov/memaudit/maintain.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M src/gov/memaudit/matcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M tests/unit/adopt/test_w2_187_walls_act.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M tests/unit/memaudit/test_cron.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": " M tests/unit/memaudit/test_maintain.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": "?? src/gov/memaudit/push.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line gone",
+   "line": "?? tests/unit/memaudit/test_push.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "acceptance folder",
+   "folder": "W2-171"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "acceptance folder",
+   "folder": "W2-187"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "head",
+   "before": "f192e50da6d0",
+   "after": "900035fdd51c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  }
+ ]
+}
