@@ -46,6 +46,7 @@ def _evidence(bundle):
 
 
 STORE_COMMIT_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
+FOLDER_KEY = "f"  # R2-F3 / Q3 (a), DEC-1157 (12): the token also carries `f`, the folder (store half) it was made on
 
 
 def _token(token):
@@ -58,7 +59,7 @@ def _token(token):
     except (TypeError, ValueError, binascii.Error) as error:
         raise AssertionError(f"the continuation token {token!r} is not base64 of JSON: {error}") from error
     assert isinstance(payload, dict), f"the continuation token decodes to {payload!r}, not an object"
-    return {key: value for key, value in payload.items() if key != STORE_COMMIT_KEY}
+    return {key: value for key, value in payload.items() if key not in (STORE_COMMIT_KEY, FOLDER_KEY)}
 
 
 def _comparable(bundle):

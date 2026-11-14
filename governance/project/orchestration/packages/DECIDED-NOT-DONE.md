@@ -341,4 +341,6 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 186 | DEC-1167 (7) SANDBOX-1 (b): B1 briefs/facts $TMPDIR + R4; B2 cache ACT withdrawn + the reranker log fix; B3 the loopback probe; B5 W3-P29 + config.lock sweep; B4 on B3's evidence; CLAUDE.md's guard sentence by its route | NOT STARTED: next: helpers for B1, B3, B5; the log fix's route |
 | 187 | DEC-1167 (3): W2-60b to after the copy starts | WAITS: W2-27's start |
 | 188 | DEC-1172 (1): W2-88 NC-1 (a), run 6 (A9's own record commit in fabric.py, its narrow undo, no reset) | IN PROGRESS: run 6 released 17:38 |
+| 190 | DEC-1174 (1): GUARD-FIX-5 (b): W2-42a's parser fixed for an apostrophe in a heredoc comment (the CTO's P2 under DEC-1164 (18), listed for the owner's reading), then one ACT bringing the live hook to the product parser | IN PROGRESS: W2-42a reopened 2026-11-13, a fix run released |
+| 191 | DEC-1174 (2): P-EXAMIN-CTO-1 with two conditions (hooks loaded after A0 with the held-out refusal checked in session; the write rule `_path_allowed` and precondition probes) | WAITS: W2-60a's merge, the release cut and re-pin, the fixed first brief |
 | 189 | DEC-1172 (2): W2-23 `project.commit`'s reset for A1-A8, the CTO's P2 under DEC-1164 (18), listed for the owner's reading | WAITS: W2-27's start; before any adoption of EXAMIN's real repository |

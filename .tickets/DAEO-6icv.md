@@ -1,6 +1,6 @@
 ---
 id: DAEO-6icv
-status: open
+status: in_progress
 deps: [DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z
@@ -63,3 +63,7 @@ list_rows: []
 Card: ROLES-RESEARCH-1 §5.3 item 10, approved (DEC-959 item 4): **after ACT 2, still in Wave 2.**
 
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.
+
+## Interface (the CTO at claim, P-W2-100-IF-1 (a), DEC-1157 (3)/(12), as W2-98's DEC-1156 (5); condensed 2026-11-14, CTX-1 (a))
+- I1: each skill folder's own byte-equal `check_domain_skill.py` (`python3 <skill>/check_domain_skill.py <SKILL.md>`: `PASS` exit 0, else `REFUSED <skill>: …` exit 1): the eight template sections in order, the five labelled parts, the area's named points, no permission-granting line.
+- Readings: S1/F1/F3 "named by I1" (the validator keeps its front-matter and size halves); S4 a hand-written `scenario-summaries.md` beside `scenario-records.yaml` (the harness leaves it out of the session, W2-104's reopen); F4 commit order by `git log` plus `gov skilleval` exit 3; S2's launch-record half after the copies ACT; S6/F6 `DRIFT` = `SOURCE_DIFFERS`/`GENERATED_DIFFERS`; F2 a planted P2 copy through the real `gov skilleval`. No product code.

@@ -48,9 +48,11 @@ import w1_46_support as support
 
 ENGINEER, RESEARCH = support.ENGINEER, support.RESEARCH
 
-# What a ticket lead gives a headless worker (DEC-183, DEC-232). The prompt names two arguments as words.
+# What a ticket lead gives a headless worker (DEC-183, DEC-232). The prompt names two arguments as words. Since
+# W2-60a a model after -- must be the role's (DEC-839 item 1).
 HEADLESS = ("-p", "Do the ticket's work. Do not use --bare or --add-dir.", "--output-format", "json",
-            "--permission-mode", "acceptEdits", "--allowedTools", "Bash,Write", "--model", "haiku", "--max-turns", "8")
+            "--permission-mode", "acceptEdits", "--allowedTools", "Bash,Write", "--model", "claude-opus-5-5",
+            "--max-turns", "8")
 
 
 # --------------------------------------------------------------------------

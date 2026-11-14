@@ -351,6 +351,13 @@ TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-desi
                   "role-reviewer", "role-lead", "role-cto")
 TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-116 fixture template copy {stem}\n"
                   for stem in TEMPLATE_STEMS}
+# W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): gov launch refuses a worker launch without the role's role file, its
+# version line and its default line; the project plants one per worker role (no skills line, so no skill copy is
+# needed), so that check is never what refuses a launch here. Like the templates, they hold none of the cases' words.
+WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research")
+ROLE_FILES = {f"template/governance/kernel/roles/{role}.md": (
+    f"# {role} role (W2-116 fixture)\n\n- **Version:** 1.0.0\n"
+    "- **Launch default:** model claude-opus-5-5, effort high\n") for role in WORKER_ROLES}
 
 
 def make_project(box, name="project"):
@@ -365,7 +372,7 @@ def make_project(box, name="project"):
     write(project / "governance/project/path-map.yaml", path_map_text())
     write(project / SETTINGS_REL, settings_text(box))
     write(project / ".claude/settings.json", json.dumps(GUARD_SETTINGS, indent=2) + "\n")
-    for rel, text in TEMPLATE_FILES.items():
+    for rel, text in {**TEMPLATE_FILES, **ROLE_FILES}.items():
         write(project / rel, text)
     write(project / f".tickets/{ENGINEER_TICKET}.md", ticket_text(ENGINEER_TICKET, "W2-901", "engineer", "docs/**"))
     write(project / f".tickets/{PRODUCT_SPEC_TICKET}.md",

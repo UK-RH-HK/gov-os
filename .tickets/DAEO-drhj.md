@@ -48,3 +48,5 @@ Card: ROLES-RESEARCH-1 §5.3 item 13, approved (DEC-959 items 5 and 8): with or 
 
 - **Paths:** a new command module `src/gov/skilleval/` (`gov skilleval`), and the import record `governance/project/skill-imports.yaml` (new). No overlap.
 - **Re-listed (CTO, 2026-11-13):** run 3 parked by the emergency's freeze on 11-02 and never re-listed; now run 3 merges integrate (W1-07, W1-32 and commands.py conflicts), builds the two gitleaks literals from parts, a narrow check, the land.
+
+**Reopened 2026-11-14 by the CTO under DEC-1164 (18) (a P2 listed for the owner's reading):** the harness copies a skill's folder into the session's `.claude/skills/` leaving out `scenarios.md` and `scenario-records.yaml` (`src/gov/skilleval/harness.py:167-168`), but not a hand-written `scenario-summaries.md` beside them (W2-100's and W2-101's interface, P-W2-100-IF-1 (a)), so the session under test could read its own runs' summaries (W2-101's review F1, fails open). The fix: the harness also leaves out `scenario-summaries.md`; one unit case plants it and checks the session's folder lacks it; a narrow independent check.

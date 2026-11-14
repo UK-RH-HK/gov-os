@@ -244,6 +244,14 @@ PROJECT_FILES = {
     "docs/audit/earlier.md": "audit\n",
     "experiments/spikes/exp-901/README.md": "# Experiment 901\n",
 }
+# W2-60a (DEC-826 Q1): gov launch reads the role file of the tree it starts in, with its version line and its
+# default line (DEC-839 items 1 and 5), and refuses a tree without one. One fixture role file per worker role.
+ROLE_EFFORT = {ENGINEER: "high", TEST_DESIGNER: "high", AUDITOR: "max", PRODUCT_SPEC: "high", RESEARCH: "high"}
+PROJECT_FILES.update({
+    f"template/governance/kernel/roles/{role}.md": (f"# {role} role (W2-50 fixture)\n\n- **Version:** 1.0.0\n"
+                                                    f"- **Launch default:** model claude-opus-5-5, effort {effort}\n")
+    for role, effort in ROLE_EFFORT.items()
+})
 # W2-153 (DEC-1050, DEC-1116): ``gov launch`` refuses a session without ``.claude/templates/<stem>.md`` for its role
 # (LAUNCH_NO_TEMPLATE), so the fixture project holds the eight copies, byte for byte the kernel's own
 # ``template/governance/kernel/templates/<stem>.md`` (what the ACT installs, W2-153 S4). The cases that launch a

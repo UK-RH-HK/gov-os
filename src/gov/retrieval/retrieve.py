@@ -183,9 +183,11 @@ def _short(commit) -> str:
 _UNCHECKED = object()
 
 
-def _same_store(payload: dict, commit) -> None:
+def _same_store(payload: dict, commit, folder=None) -> None:
     """W2-138 S3: refuses a token that names no store commit (made before W2-138) or another commit than ``commit``,
-    the store's now, naming both."""
+    the store's now, naming both. With ``folder`` (W2-116 R2-F3), the store's resolved root: a token made on another
+    folder is refused even at the same commit (two halves of the integration store at one head), naming both folders,
+    and a token with no mark of its folder (made before R2-F3) is refused."""
     if "s" not in payload:
         raise GovError("CONTINUATION_INVALID", "the continuation was made before W2-138 and names no store commit: "
                        "ask the first page again", {"store_commit": commit}) from None
@@ -194,18 +196,28 @@ def _same_store(payload: dict, commit) -> None:
                        f"the continuation was made on the store at commit {_short(payload['s'])}, and the store is "
                        f"now at commit {_short(commit)}: ask the first page again",
                        {"token_commit": payload["s"], "store_commit": commit}) from None
+    if folder is None:
+        return
+    if "f" not in payload:
+        raise GovError("CONTINUATION_INVALID", "the continuation was made before it carried the store's folder and "
+                       "names none: ask the first page again", {"store_root": str(folder)}) from None
+    if payload["f"] != str(folder):
+        raise GovError("CONTINUATION_INVALID",
+                       f"the continuation was made on another store, the folder {payload['f']}, and this search "
+                       f"answers from the folder {folder}: ask the first page again",
+                       {"token_root": payload["f"], "store_root": str(folder)}) from None
 
 
 def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=(), alone=(),
-                         pooled=None, commit=None):
+                         pooled=None, commit=None, folder=None):
     """The stateless token of the next call; ``x`` carries the parents already expanded and ``c`` the spans already
     sent as a child on its own (``[path, first, last]``), so a later call sends neither again (W2-32 S7, DEC-1067).
     ``p`` (W2-32 S11, only when the pool reranked: ``pool.carried``) is the first call's pool order, so a later call
     cuts its page from it without a rerank request and without writing anything (DEC-782). ``s`` (W2-138 S3) is the
-    store's commit."""
+    store's commit and ``f`` (W2-116 R2-F3) the store's folder as resolved once (``resolved``)."""
     payload = json.dumps({"q": query, "i": sorted(ids), "t": ticket, "r": radius,
                           "bs": batch_size, "bb": bundle_budget, "o": offset, "x": sorted(expanded),
-                          "c": sorted([list(item) for item in alone]), "s": commit,
+                          "c": sorted([list(item) for item in alone]), "s": commit, "f": folder,
                           **({"p": pooled} if pooled is not None else {})},
                          separators=(",", ":"), sort_keys=True)
     return base64.urlsafe_b64encode(payload.encode()).decode()
@@ -257,11 +269,12 @@ def _without(first: int, last: int, sent: list[tuple[int, int]]) -> list[tuple[i
 
 
 def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None,
-                         carried=None, commit=_UNCHECKED):
+                         carried=None, commit=_UNCHECKED, folder=None):
     """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added, with
     ``alone`` (a set), the spans they sent as a child on its own, and with ``carried`` (a dict), the first call's pool
     (``carried["pool"]``, None when the token holds none; W2-32 S11). With ``commit``, the store's commit now, a token
-    made on another store commit is refused (W2-138 S3)."""
+    made on another store commit is refused (W2-138 S3); with ``folder``, one made on another folder too (W2-116
+    R2-F3)."""
     try:
         payload = json.loads(base64.urlsafe_b64decode(token))
     except Exception:
@@ -269,7 +282,7 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
     if not isinstance(payload, dict):
         raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
     if commit is not _UNCHECKED:
-        _same_store(payload, commit)
+        _same_store(payload, commit, folder)
     expected = {"q": query, "i": sorted(ids), "t": ticket, "r": radius, "bs": batch_size, "bb": bundle_budget}
     for key in expected:
         if payload.get(key) != expected[key]:
@@ -342,7 +355,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     carried = {"pool": None}  # W2-32 S11: the first call's pool order, from the token
     if continuation is not None:
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget,
-                                      earlier, alone, carried, commit=store["commit"])
+                                      earlier, alone, carried, commit=store["commit"], folder=store["root"])
     sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
@@ -724,7 +737,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     new_offset = offset + len(gathering)
     if remaining:
         token = _encode_continuation(query, tuple(ids), ticket, radius, batch_size, bundle_budget, new_offset,
-                                     expanded, sent_alone, pool_token, commit=store["commit"])
+                                     expanded, sent_alone, pool_token, commit=store["commit"],
+                                     folder=store["root"])
     else:
         token = None
 

@@ -324,11 +324,12 @@ def _before(monkeypatch, seen):
 
 
 def _without_s(token):
-    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3)."""
+    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3) and its ``f`` key (the folder, R2-F3)."""
     if token is None:
         return None
     payload = json.loads(base64.urlsafe_b64decode(token))
     payload.pop("s", None)
+    payload.pop("f", None)  # R2-F3 / Q3 (a), DEC-1157 (12): the folder (store half) the token was made on
     return payload
 
 

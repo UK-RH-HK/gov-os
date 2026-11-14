@@ -7,6 +7,9 @@ record of the stage before it. ``gov adopt`` without ``--lite`` stays reserved: 
 W2-88: ``MA --out <folder>`` is the memory assessment and the refactoring plan (files under ``<folder>`` outside the
 project, none in it); A3 takes ``--assessment <folder>`` and cites that assessment; ``A9 --out <folder> [--decision
 DEC-n]... [--questions <file>] [--budget-ms N]`` builds the memory fabric (A9 lite) after A8.
+
+W2-174: ``--verify-list``, ``--verify-apply <answers-file>`` (with the global ``--session``) and ``--facts`` need no
+``--lite``: the Verify pass of an adopted repository's tickets (``verify_pass``) and its facts file (``facts``).
 """
 
 from __future__ import annotations
@@ -35,9 +38,37 @@ def add_arguments(parser) -> None:
     parser.add_argument("--questions", metavar="<file>", help="A9: the questions to run end to end (w2-88-questions/1)")
     parser.add_argument("--budget-ms", type=int, metavar="<N>", help="A9: the vector scan's budget in milliseconds "
                                                                       "(default: fabric.RETRIEVE_BUDGET_MS)")
+    parser.add_argument("--verify-list", action="store_true", help="W2-174: the open tickets' KPI lines with no verify")
+    parser.add_argument("--verify-apply", metavar="<answers-file>", help="W2-174: append the answers file's Verify "
+                                                                         "clauses (needs --session)")
+    parser.add_argument("--facts", action="store_true", help="W2-174: write governance/project/facts.yaml if absent")
+
+
+def _steps(root: Path, args) -> dict:
+    """W2-174: ``--verify-list``, ``--verify-apply <answers-file>`` (the Verify pass) and ``--facts`` (the facts file)."""
+    import datetime
+
+    chosen = [flag for flag, on in (("--verify-list", args.verify_list), ("--verify-apply", args.verify_apply),
+                                    ("--facts", args.facts)) if on]
+    if len(chosen) > 1 or args.lite:
+        _parser.error(f"{chosen[0]} goes alone: not with " + (" or ".join(chosen[1:]) if len(chosen) > 1 else "--lite"))
+    today = datetime.datetime.now(datetime.timezone.utc).date()
+    if args.facts:
+        from gov.adopt import facts
+        return facts.write_default(root, today)
+    from gov.adopt import verify_pass
+    if args.verify_list:
+        found = verify_pass.missing(root)
+        return {"missing": found, "text": "\n".join(f"{item['ticket']} {' '.join(item['labels'])}" for item in found)
+                or "none"}
+    if not args.session:
+        _parser.error("--verify-apply needs --session <id>: the marker line carries it")
+    return {"changed": verify_pass.apply(root, args.verify_apply, args.session, today)}
 
 
 def run(root: Path, args, config: dict) -> dict:
+    if args.verify_list or args.verify_apply or args.facts:
+        return _steps(Path(root).resolve(), args)
     if not args.lite:
         from gov.cli.errors import not_implemented
         raise not_implemented("adopt")

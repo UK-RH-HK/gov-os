@@ -32,6 +32,7 @@ APART = ("text", "cut")
 
 
 STORE_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
+FOLDER_KEY = "f"  # R2-F3 / Q3 (a), DEC-1157 (12): the token also carries `f`, the folder (store half) it was made on
 
 
 def _payload(token):
@@ -45,11 +46,11 @@ def _payload(token):
 
 
 def _without_store(bundle):
-    """The bundle with its token decoded, without ``s`` (a bundle without a token stays as it is)."""
+    """The bundle with its token decoded, without ``s`` and ``f`` (a bundle without a token stays as it is)."""
     if not bundle.get("continuation"):
         return bundle
     return {**bundle, "continuation": {key: value for key, value in _payload(bundle["continuation"]).items()
-                                       if key != STORE_KEY}}
+                                       if key not in (STORE_KEY, FOLDER_KEY)}}
 
 
 def _commit_of(bundle):

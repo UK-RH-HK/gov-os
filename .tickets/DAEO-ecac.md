@@ -62,6 +62,7 @@ sources:
 - DEC-963
 - DEC-982
 - DEC-1120
+- DEC-1156
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/

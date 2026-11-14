@@ -11,6 +11,14 @@ A commit is outside a ticket as the landing selection reads it (ACT-SELECT-HOOK-
 (against its first parent) touches a (b) or (O) control path of the rule table (class-rules.yaml's rows marked
 `control: true`; the (O) catch-all and the "none" rows are not control paths, N-5), unless it carries `Role: owner`,
 or `Role: operator` together with an `Act:` trailer. Each flagged commit is one inbox P1 item for the trigger to file.
+
+The CTO's route (ACT-LANDING-CTO-ROUTE-1, DEC-1167 (5)): a commit with `Role: orchestrator`, one `Act: <ACT id>` and one
+`Act-sha: <manifest sha256>` trailer also passes, when and only when all three hold, and anything else stays the P1 it
+is. (1) The CTO's approvals log (APPROVALS) holds a line for that ACT with that manifest whose `route` begins "the CTO"
+(the applier; a route that only mentions the CTO, such as the operator agent's queue, is not it). (2) The ACT is class
+(b): the manifest, found under the CTO's acts folder (ACTS_DIR) by the sha256 of its bytes, names that ACT, claims (b),
+and the classifier's own vote on its bundle is (b); and the class of the commit's paths by the rule table is (b), never
+(O). (3) The commit's paths are exactly the manifest's `touched` list (every entry of root repo).
 """
 import json
 import os
@@ -26,6 +34,13 @@ if HERE not in sys.path:
 import act_class  # noqa: E402
 
 CTO_TASK = "DAEO-sdxk"
+# The CTO route's two inputs (the CTO's own scratch folder). Fixed here and never read from the environment or the
+# command line: the CTO's session starts this check, so a seam it could set would let it name its own approvals.
+CTO_ORCH = "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator"
+APPROVALS = os.path.join(CTO_ORCH, "log", "act-approvals.jsonl")
+ACTS_DIR = os.path.join(CTO_ORCH, "acts")
+ACT_ID_RE = re.compile(r"^ACT-[A-Za-z0-9][A-Za-z0-9._-]*$")
+SHA_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def git(repo, *args):
@@ -56,7 +71,92 @@ def control_paths(rules, paths):
     return hits
 
 
-def check(repo, rev_range, rules=None):
+def path_class(rules, path):
+    """The class a path alone gives (the highest the rule table allows it): a fixed row its class, a list-shaped row the
+    higher of its `else` and `ratchet_class` (its content-dependent (a) is not counted on); a path no row names is (O)."""
+    row = act_class.row_for(rules, "repo", path)
+    if row is None:
+        return "O"
+    if "list" in row:
+        return act_class.top(row.get("else", "O"), row.get("ratchet_class", "a"))
+    return act_class.top(row.get("class", "O"))
+
+
+def cto_approved(approvals, act, sha):
+    """Condition 1: a line of the approvals log for this ACT and this manifest whose route begins "the CTO"."""
+    try:
+        with open(approvals, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return False
+    for ln in lines:
+        try:
+            e = json.loads(ln)
+        except ValueError:
+            continue
+        if not isinstance(e, dict) or e.get("act") != act:
+            continue
+        if sha not in (e.get("manifest"), e.get("manifest_sha256")):
+            continue
+        route = e.get("route")
+        if isinstance(route, str) and route.strip().lower().startswith("the cto"):
+            return True
+    return False
+
+
+def find_manifest(acts_dir, act, sha):
+    """The bundle folder under acts_dir (<ACT> or <ACT>.<anything>) whose manifest.json hashes as sha, with the manifest."""
+    import hashlib
+    try:
+        names = sorted(os.listdir(acts_dir))
+    except OSError:
+        return None, None
+    for name in names:
+        if name != act and not name.startswith(act + "."):
+            continue
+        d = os.path.join(acts_dir, name)
+        m = os.path.join(d, "manifest.json")
+        if os.path.islink(d) or os.path.islink(m) or not os.path.isfile(m):
+            continue
+        try:
+            raw = open(m, "rb").read()
+            if hashlib.sha256(raw).hexdigest() != sha:
+                continue
+            return d, json.loads(raw.decode("utf-8"))
+        except (OSError, ValueError):
+            continue
+    return None, None
+
+
+def cto_route(rules, roles, acts, shas, paths, approvals, acts_dir):
+    """(passes, why not). The route's three conditions, on a commit that carries Role: orchestrator, Act: and Act-sha:."""
+    if [r.replace(" ", "") for r in roles] != ["orchestrator"] or len(acts) != 1 or len(shas) != 1:
+        return False, "it needs exactly one Role: orchestrator, one Act: and one Act-sha: trailer"
+    act, sha = acts[0].replace(" ", ""), shas[0].replace(" ", "")
+    if not ACT_ID_RE.match(act) or not SHA_RE.match(sha):
+        return False, "its Act: or Act-sha: is not an ACT id and a sha256"
+    if not cto_approved(approvals, act, sha):
+        return False, f"no line of the CTO's approvals log names {act} with that manifest and a CTO route"
+    bundle, manifest = find_manifest(acts_dir, act, sha)
+    if manifest is None or not isinstance(manifest, dict) or manifest.get("act") != act:
+        return False, f"no manifest of {act} hashes as its Act-sha"
+    if manifest.get("claimed_class") != "b":
+        return False, f"the manifest claims class ({manifest.get('claimed_class')}), not (b)"
+    if act_class.classify(bundle, rules)["class"] != "b":
+        return False, "the classifier's vote on the ACT's bundle is not (b)"
+    classes = {p: path_class(rules, p) for p in paths}
+    if not classes or act_class.top(*classes.values()) != "b":
+        return False, "the class of the commit's paths is not (b)"
+    touched = manifest.get("touched")
+    if not isinstance(touched, list) or not touched or any(not isinstance(t, dict) or t.get("root") != "repo"
+                                                          for t in touched):
+        return False, "the manifest's touched list is not a list of repository paths"
+    if sorted(t.get("path") for t in touched) != sorted(paths):
+        return False, "the commit's paths are not the manifest's touched list"
+    return True, ""
+
+
+def check(repo, rev_range, rules=None, approvals=None, acts_dir=None):
     rules = rules or act_class.load_rules()
     items = []
     commits = [c for c in git(repo, "rev-list", "--first-parent", rev_range).split() if c]
@@ -78,9 +178,17 @@ def check(repo, rev_range, rules=None):
         hits = control_paths(rules, paths)
         if not hits:
             continue
+        shas = trailer_values(repo, c, "Act-sha")
+        route = ""
+        if any(r.replace(" ", "") == "orchestrator" for r in roles) and acts and shas:
+            ok, route = cto_route(rules, roles, acts, shas, paths, APPROVALS if approvals is None else approvals,
+                                  ACTS_DIR if acts_dir is None else acts_dir)
+            if ok:
+                continue
+            route = f"; the CTO's route refuses: {route}"
         subject = git(repo, "log", "-1", "--format=%s", c).strip()
         why = ("Role: operator without an Act: trailer" if any(r.replace(" ", "") == "operator" for r in roles)
-               else "neither Role: owner nor Role: operator with Act:")
+               else "neither Role: owner nor Role: operator with Act:") + route
         items.append({"commit": c, "priority": "P1", "paths": [p for p, _ in hits],
                       "rows": sorted({r for _, r in hits}), "subject": subject[:200],
                       "reason": f"a commit outside a ticket touches a (b) or (O) control path, {why}"})

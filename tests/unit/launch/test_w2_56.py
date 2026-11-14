@@ -51,6 +51,16 @@ def _plant_templates(root: Path) -> None:
         path.write_text(f"# {stem}\n", encoding="utf-8")
 
 
+def _plant_role_files(root: Path, roles=("engineer",)) -> None:
+    """W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): a worker launch refuses a project without its role's role file (version
+    and default line); these projects are in the adopted layout (no ``template/``): ``governance/kernel/roles/``."""
+    for role in roles:
+        path = root / "governance" / "kernel" / "roles" / f"{role}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {role} role (W2-56 fixture)\n\n- **Version:** 1.0.0\n"
+                        "- **Launch default:** model claude-opus-5-5, effort high\n", encoding="utf-8")
+
+
 # --- S5: the cleaned environment -------------------------------------------------------------------------------------
 
 PARENT = {"PATH": "/a:/b", "HOME": "/home/x", "LANG": "C.UTF-8", "LC_ALL": "C", "USER": "x", "LOGNAME": "x",
@@ -350,6 +360,7 @@ def launched(tmp_path, monkeypatch):
     (project / ".tickets/TST-a001.md").write_text(
         "---\nid: TST-a001\nwbs_id: W2-90\nstatus: in_progress\nrole: engineer\n---\n", encoding="utf-8")
     _plant_templates(project)
+    _plant_role_files(project)
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
     for name, value in (("GOV_DEV_TIERS", "1"), ("PYTHONPATH", "/x"), ("CLAUDE_CODE_SESSION_ID", "s"),
@@ -432,6 +443,7 @@ def test_a_worktree_sessions_settings_name_no_path_under_a_git_folder(tmp_path, 
     subprocess.run(["git", "-C", str(main), "worktree", "add", "-q", str(worktree)], check=True, env=git)
     (worktree / ".gov-runtime/scratch").mkdir(parents=True)
     _plant_templates(worktree)
+    _plant_role_files(worktree, ("engineer", "independent-test-designer"))
     for lock in ("config.lock", "index.lock", "HEAD.lock"):  # a git command in another worktree holds its locks now
         (main / ".git" / lock).write_text("", encoding="utf-8")
     out = tmp_path / "out.json"

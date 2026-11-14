@@ -6,7 +6,7 @@ type: task
 class: implementation
 role: engineer
 profile: STANDARD
-status: open
+status: closed
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-11 15:21:33+00:00
@@ -60,7 +60,7 @@ non_goals:
 - no change to the ticket template or schema; the marker is one extra front-matter line the schema already allows
 - no change to W2-88's refactoring-plan text (the CTO's one-line note, below)
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh]
+sources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh, DEC-1147, DEC-1148]
 acceptance_tests: {path: tests/acceptance/W2-174/}
 ---
 

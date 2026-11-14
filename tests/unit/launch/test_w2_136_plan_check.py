@@ -50,8 +50,19 @@ def _ready(root: Path, *lines: str) -> Path:
     return path
 
 
+def _plant_role_file(root: Path, role: str = "engineer") -> None:
+    """W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): a worker launch refuses a project without its role's role file (version
+    and default line); the store is in the adopted layout (no ``template/``), so the file is
+    ``governance/kernel/roles/<role>.md``."""
+    path = root / "governance" / "kernel" / "roles" / f"{role}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"# {role} role (W2-136 fixture)\n\n- **Version:** 1.0.0\n"
+                    "- **Launch default:** model claude-opus-5-5, effort high\n", encoding="utf-8")
+
+
 @pytest.fixture
 def store(tmp_path):
+    _plant_role_file(tmp_path)
     return _plant(tmp_path, {"id": "T-1", "wbs_id": "W9-1", "allowed_paths": ["src/a/**"]},
                   {"id": "T-2", "wbs_id": "W9-2", "depends_on": ["T-1"], "deps": ["T-1"]},
                   {"id": "T-3", "wbs_id": "W9-3", "needs": ["src/a/x.py"]},

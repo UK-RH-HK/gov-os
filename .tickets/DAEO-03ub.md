@@ -66,3 +66,14 @@ module); the test designer works from the KPIs and may take the package's plante
 fixtures (no secrets in them). W2-42 (`DAEO-fau3`) keeps its other rows in Wave 3. W2-09 and W2-10 hold
 `src/gov/guard/**`: start beside W2-09 only with the files split, or after it. Once it lands, the five-rule hook can
 call the product's parser and `bash_writes.py` slims away (a later ACT).
+
+**Reopened 2026-11-13 by the CTO under DEC-1164 (18) (DEC-1174 (1), a P2 listed for the owner's reading).** A defect
+inside this ticket's scope: a Bash call whose heredoc body (to a shell) holds a comment with an apostrophe
+(`bash <<'EOF'` / `# it's fine` / `ls` / `EOF`) is refused whole, "the command cannot be read", although it writes
+nothing; the same body without the comment is allowed. It fails closed (the four F1 reversal calls of ACT-GUARD-FIX-5's
+round-2 review stay refused), but it refuses ordinary work, and the live hook is to copy this parser (DEC-1174 (1)).
+The fix: comment text in a shell body is dropped before the body is tokenised (a `#` that starts a word, outside
+quotes, to the end of its line), so an apostrophe there is no unclosed quote; a body still unreadable after that stays
+refused. A test designer adds the cases (the harmless forms allowed; the F1 reversal calls and a body that writes into
+`tests/acceptance/` after such a comment still refused), the engineer fixes `bash_writes.py`, then a narrow independent
+check of that change only.

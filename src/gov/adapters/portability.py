@@ -15,9 +15,10 @@ DEC-1112 (3)), so the agent carries the role file's labelled fields.
 The generated template copies under ``.claude/templates/`` are compared byte for byte with the kernel's templates;
 ``--write-templates <dir>`` writes those copies into ``<dir>`` (the copies' folder itself), the ACT's step.
 And, where the kernel is the template's, the template's hooks source with the repository's, by hook events
-and matchers with the paths normalised (DEC-805), except that postToolUse and postToolUseFailure, which ACT 1
-lifted from the repository's source only, are no drift while the template alone has them (DEC-971 item 3; it
-ends with W2-08, when they return).
+and matchers with the paths normalised (DEC-805), except that the hook ACT 1 lifted from the repository's source
+only (posttooluse.py, in postToolUse and postToolUseFailure) is left out of the comparison, per hook, while the
+repository's source does not run it in that event: the rest of those events compares as any other (DEC-971 item 3,
+W2-185 S2; it ends with W2-08, when the hook returns).
 
 Prints ``{"findings": [...], "compared": {...}}`` and exits 0 only without findings.
 """
@@ -42,10 +43,13 @@ REGISTRY = "governance/project/tool-registry.yaml"
 KERNEL_ROOTS = ("governance/kernel", "template/governance/kernel")  # adopted project, this repository
 SOURCES = ".rulesync"
 HOOKS_SOURCE = "hooks.jsonc"
-# The two hook events ACT 1 lifted from the repository's hooks source and not the template's (DEC-953 item 2):
-# no drift while only the template has them (DEC-971 item 3). It ends with W2-08: once they are back in both
-# sources they are compared as any other event, and this constant goes.
+# The one hook ACT 1 lifted from the repository's hooks source and not the template's (DEC-953 item 2), in the two
+# events that held it: per hook, the template's entries of these events whose command runs LIFTED_HOOK are left out
+# of the comparison while the repository's source does not run it in that event (DEC-971 item 3; W2-185 S2); the
+# rest of each event compares as any other. It ends with W2-08: once the hook is back in both sources it is
+# compared as any other, and these two constants go.
 LIFTED_HOOK_EVENTS = frozenset({"postToolUse", "postToolUseFailure"})
+LIFTED_HOOK = "posttooluse.py"
 GENERATE = ("generate", "--targets", "claudecode,agentsmd",
             "--features", "rules,hooks,permissions,subagents,commands,skills", "--input-roots")
 GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")  # rulesync alone writes here (DEC-471)
@@ -320,20 +324,39 @@ def _jsonc(text: str) -> object:
     return json.loads("".join(out))
 
 
-def _hook_matchers(path: Path) -> dict[str, list[str]]:
-    """Each hook event of a rulesync hooks source with the sorted matchers of its hooks (``""`` for none)."""
+def _hook_entries(path: Path) -> dict[str, list]:
+    """Each hook event of a rulesync hooks source with its entries as written."""
     hooks = _jsonc(path.read_text(encoding="utf-8")).get("hooks")
     if not isinstance(hooks, dict):
         raise ValueError("no hooks object")
-    return {event: sorted(str(entry.get("matcher") or "") if isinstance(entry, dict) else "" for entry in entries)
-            for event, entries in hooks.items() if isinstance(entries, list)}
+    return {event: entries for event, entries in hooks.items() if isinstance(entries, list)}
+
+
+def _runs_lifted(entry: object) -> bool:
+    """True for an entry whose command runs the hook ACT 1 lifted (``LIFTED_HOOK``)."""
+    return isinstance(entry, dict) and LIFTED_HOOK in str(entry.get("command") or "")
+
+
+def _hook_matchers(entries: dict[str, list], leave_out: frozenset[str] = frozenset()) -> dict[str, list[str]]:
+    """Each hook event with the sorted matchers of its hooks (``""`` for none). In the events of ``leave_out`` the
+    entries running the lifted hook are not counted, and an event left with no entry is left out whole."""
+    found = {}
+    for event, listed in entries.items():
+        kept = [entry for entry in listed if not (event in leave_out and _runs_lifted(entry))]
+        if listed and not kept:
+            continue
+        found[event] = sorted(str(entry.get("matcher") or "") if isinstance(entry, dict) else "" for entry in kept)
+    return found
 
 
 def _hooks_findings(root: Path) -> list[dict]:
     """The template's hooks source against the repository's, where the kernel is the template's (DEC-805): by
     hook events and matchers, so that the hooks' paths, their order and the command around them are no drift.
-    One finding per drifted event, naming it, but none for a lifted event only the template has (DEC-971 item 3);
-    none where the template has no hooks source."""
+    One finding per drifted event, naming it. The lift is per hook (DEC-971 item 3; W2-185 S2): in a lifted event
+    the repository's source does not run, the template's entries running ``LIFTED_HOOK`` are left out of the
+    comparison and the rest of the event is compared as any other, so a lifted event left with no entry and absent
+    from the repository's source is no finding; where the repository's source runs the hook in that event again,
+    nothing is left out. None where the template has no hooks source."""
     template = root / "template" / SOURCES / HOOKS_SOURCE
     if not (root / KERNEL_ROOTS[1]).is_dir() or not template.is_file():
         return []
@@ -341,15 +364,16 @@ def _hooks_findings(root: Path) -> list[dict]:
     read = []
     for rel in (kept_rel, ours_rel):
         try:
-            read.append(_hook_matchers(root / rel))
+            read.append(_hook_entries(root / rel))
         except (OSError, UnicodeDecodeError, ValueError, AttributeError) as exc:
             return [_finding("HOOKS_UNREADABLE", f"cannot be read as a hooks source ({type(exc).__name__}); "
                              "the hooks sources were not compared", rel)]
-    kept, ours = read
+    template_entries, ours_entries = read
+    lifted = frozenset(event for event in LIFTED_HOOK_EVENTS
+                       if not any(_runs_lifted(entry) for entry in ours_entries.get(event, [])))
+    kept, ours = _hook_matchers(template_entries, lifted), _hook_matchers(ours_entries)
     findings = []
     for event in sorted(set(kept) | set(ours)):
-        if event in LIFTED_HOOK_EVENTS and event in kept and event not in ours:
-            continue
         if event not in ours or event not in kept:
             where = kept_rel if event in kept else ours_rel
             findings.append(_finding("HOOKS_EVENT_DIFFERS", f"hook event {event} is only in {where}", ours_rel))

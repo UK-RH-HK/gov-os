@@ -19,6 +19,15 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.cli.errors import GovError  # noqa: E402
 from gov.launch import launcher  # noqa: E402
 
+# The engineer's role file each launch reads (W2-60a, DEC-826 Q1): its version and default lines, nothing else.
+ROLE = "# engineer\n\n- **Version:** 1.0.0\n- **Launch default:** model claude-opus-5-5, effort high\n"
+
+
+def _role_file(project):
+    path = project / "template" / "governance" / "kernel" / "roles" / "engineer.md"
+    path.parent.mkdir(parents=True)
+    path.write_text(ROLE, encoding="utf-8")
+
 
 def _open_gate(home: Path, monkeypatch) -> None:
     """An open resource gate under this HOME (W2-20 S19: every launch runs the start check): the gate file and its
@@ -45,6 +54,7 @@ def session(tmp_path, monkeypatch):
     for folder in (home / ".local" / "bin", temp, project):
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    _role_file(project)
     template = project / launcher.TEMPLATES_REL / f"{launcher.ROLE_TEMPLATES['engineer']}.md"  # W2-153 S1
     template.parent.mkdir(parents=True)
     template.write_text("# engineer\n", encoding="utf-8")
