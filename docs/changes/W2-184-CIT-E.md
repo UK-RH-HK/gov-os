@@ -110,3 +110,18 @@ named root for both reasons and under each name and role, missing and file roots
 another root refused, a non-JSON launch record refusing a STANDARD launch and not a launch with no file, a path under two
 roots counted once from the launch root's or the first sorted root's copy, and a root named only by another ticket's record
 not read; the earlier case that let a non-JSON record through on a STANDARD ticket now expects the refusal.
+
+## 8. The CLI options (batch eng-6, the CTO's P-W2-184-2 (a); interface 7.2 is now 7.2a)
+
+Interface 7.2 left `src/gov/launch/command.py` outside the ticket's paths, so `--reason`, `--trial` and `--owner-named`
+reached the launcher only as `launcher.launch`'s keywords, and section 3's package waited for the lead. The CTO chose
+P-W2-184-2 (a): `command.py` is in the ticket's paths and the options are wired here (interface 7.2a). `command.py` now
+declares the three options before `--` (`--reason <text>`, `--trial <id>`, `--owner-named <DEC-id>`), names them in the usage
+line, and passes each one given to `launcher.launch` as `reason`, `trial` or `owner_named` (an empty value too, so the launcher
+refuses it as for the keyword cases; an absent one is not passed, so the launcher's default `None` holds and W2-20's case of
+the two existing keywords is unchanged). The launcher judges them as before: the same refusals (exit 1, no record, no
+session) and the same records. `--plan` does not read them, a lead launch is unchanged, and the same word after `--` stays a
+CLI argument for W2-60a's passthrough checks. Section 3's package (`.gov-runtime/scratch/eng/command.py.diff`) is superseded.
+Builder cases: `tests/unit/launch/test_w2_184_command.py` (the keywords alone and together, empty values passed on, no new
+keyword when absent, `--plan` not reading them, the usage line, and through `gov` the options before `--` taken and after it
+passed through).
