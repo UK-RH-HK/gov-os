@@ -54,7 +54,9 @@ read as the Interface says: they are called, never copied.
 | failure-4 | `test_w2_187_s3_method.py::test_f4_the_pinned_prompts_schemas_and_cut_have_one_definition_and_the_reader_one_module`, `test_w2_187_s3_method.py::test_f4_the_pinned_prompt_test_is_unchanged_and_passes` | guards; the function-spy case needs the standing judge |
 | failure-5 | `test_w2_187_f_guards.py::test_f5_a_measured_fresh_set_stays_used_declare_is_exit_3_and_writes_nothing` | the keyed state makes the fresh run refuse RN-NOBASE on the base |
 | failure-6 | `test_w2_187_s10_maintain.py::test_f6_a_pass_changes_no_setting_applies_no_act_and_calls_no_crontab`, `test_w2_187_s10_maintain.py::test_f6_the_maintenance_module_imports_no_crontab_writer_and_names_none` | no `maintain` subcommand (exit 4) and no `maintain.py` to scan |
-| scope | `test_w2_187_f_guards.py::test_scope_the_branch_changes_only_the_tickets_allowed_paths_and_its_acceptance_folder` | judges branch w2/W2-187 only; skips elsewhere |
+An unmapped case, which guards no KPI line and so has no row above (it still runs, and counts as a failure if red):
+`test_w2_187_f_guards.py::test_scope_the_branch_changes_only_the_tickets_allowed_paths_and_its_acceptance_folder` judges that the
+branch w2/W2-187 changes only the ticket's `allowed_paths` and its acceptance folder; it skips on any other branch.
 
 Guards green on the base (they hold a behaviour that must stay): `test_f4_the_pinned_prompt_test_is_unchanged_and_passes`, `test_f4_the_pinned_prompts_schemas_and_cut_have_one_definition_and_the_reader_one_module`, `test_s11_the_wrapper_names_no_crontab_and_calls_none`, `test_s5_the_revised_w2_170_helper_returns_the_interfaces_dict_key_for_key`, `test_s9_pool_import_with_no_sets_is_todays_and_refuses_a_world_without_the_79_and_the_138`.
 
