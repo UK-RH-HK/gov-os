@@ -41,8 +41,10 @@ at `<test HOME>/.local/bin/claude` records its arguments, `--settings` and the r
   a line present with a class missing.
 - An empty `--reason` and a malformed `--owner-named` refuse on any launch (section 9), not only where they are needed.
 - A resumed review does not count and is not compared (6.1, 6.3): `test_s4_a_resumed_review_is_not_a_second_review`.
-- `--effort max` after `--` on a table that itself says max is not tested (3.2 does not say whether it is the launch's
-  own choice).
+- `--effort max` after `--` on a table that itself says max: td-1 left it untested (3.2 did not say whether it is the
+  launch's own choice). The lead settled it in interface **3.2a** (2026-11-14): td-2 tests it, see the section "Interface
+  3.2a" below. No td-1 case contradicts 3.2a (every td-1 case that expects a refusal of a max after `--` has a resolved
+  effort below max), so none was revised.
 
 ## Green on the base (compatibility guards, interface 1.4, 3.2, DEC-1167 (2))
 
@@ -168,3 +170,41 @@ takes no `reason`, `trial` or `owner_named`: the child ends 97).
 | failure-1 | `test_w2_184_f1_failures.py::test_f1_a_model_below_its_tier_with_no_trial_is_refused` (5) | no refusal: the base's default line is Sonnet, so Sonnet is accepted; the refusals that name the resolved model do not name it |
 | failure-1 | `test_w2_184_f1_failures.py::test_f1_a_promotion_is_recorded_and_applied` | no promotion |
 | failure-1 | `test_w2_184_f1_failures.py::test_f1_an_effort_below_high_for_a_judgement_role_is_refused` (6) | no refusal |
+
+## Interface 3.2a (batch td-2): a max after `--` that equals the resolved effort needs no `--reason`
+
+File: `test_w2_184_s1_max_equal.py` (25 cases). Written from interface 3.2, 3.2a, 4.1, section 8's `effort_source` and
+`model_source` precedence, and 6.1-6.3; the engineer's work was not read. **Red on the base** `875039257`: the base has no
+table (the launch line carries the default line's Sonnet, medium), no record keys, and no `reason` option (the child
+ends 97), so each case fails for those reasons, not for 3.2a. **Red on a launcher that applies 3.2 without 3.2a** (the
+head you cannot see): each "accepted" case fails because the launch is refused, `LAUNCH_REFUSED` naming max and
+`--reason`, where the case expects one session started (`gov launch did not start exactly one session`); the probe
+cases fail at round 2 for that reason (round 1 passes there). The `still_refused` cases are guards: green on a
+3.2-only launcher, red on the base (no table / no refusal), and red on a launcher that reads 3.2a wider than it is.
+
+| KPI | Test | Red because (base; and on a 3.2-only launcher) |
+|---|---|---|
+| success-1 | `test_w2_184_s1_max_equal.py::test_s1_a_max_after_the_double_dash_equal_to_the_table_s_max_needs_no_reason` (2: spaced, joined) | no table; 3.2-only: refused for want of a reason |
+| success-1 | `test_w2_184_s1_max_equal.py::test_s1_a_max_after_the_double_dash_equal_to_the_table_s_max_with_the_model_too` | the base refuses the resolved Opus as not its default; 3.2-only: refused for want of a reason |
+| success-1 | `test_w2_184_s1_max_equal.py::test_s1_any_table_entry_of_max_makes_a_max_after_the_double_dash_free_of_a_reason` (3: engineer C2, auditor C2 not FULL, engineer C0) | no table; 3.2-only: refused |
+| success-1 | `test_w2_184_s1_max_equal.py::test_s1_the_full_form_s_first_pair_of_max_is_a_table_max_on_a_full_ticket` | no table; 3.2-only: refused (the STANDARD ticket's refusal at its end holds) |
+| success-1 | `test_w2_184_s1_max_equal.py::test_s1_a_max_after_the_double_dash_equal_to_a_role_default_of_max_needs_no_reason` | no keys; 3.2-only: refused |
+| success-1 | `test_w2_184_s1_max_equal.py::test_s1_a_reason_given_beside_an_equal_max_is_accepted_and_recorded` | no option; 3.2-only: green (a reason is given), a guard that an equal max does not forbid one |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_the_probe_launched_with_the_model_and_max_after_the_double_dash_needs_no_reason` | no table at round 1; 3.2-only: round 2 refused |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_the_probe_s_model_given_equal_to_the_resolved_one_is_recorded_as_after_the_double_dash` | as above (pins `model_source` `after --`: a reading of section 8, see discoveries) |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_the_probe_launched_with_max_alone_after_the_double_dash_needs_no_reason` | as above |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_the_probe_launched_in_the_joined_spelling_needs_no_reason` | as above |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_the_probe_that_changes_the_model_is_recorded_as_the_probe_when_given_after_the_double_dash` | no table at round 1; 3.2-only: round 2 refused |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_a_reason_beside_the_probe_s_max_after_the_double_dash_is_recorded` | no table at round 1 (and no option); 3.2-only: green at round 2 |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_a_third_review_given_the_probe_s_max_after_the_double_dash_is_still_the_same_setting` | no table at round 1; 3.2-only: round 2 refused |
+| success-4 | `test_w2_184_s1_max_equal.py::test_s4_a_third_review_the_owner_named_is_admitted_with_the_probe_s_max_after_the_double_dash` | no table at round 1; 3.2-only: round 2 refused |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_a_max_after_the_double_dash_on_a_first_review_of_a_full_ticket` | no refusal (the base accepts max); 3.2-only: green |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_a_max_after_the_double_dash_on_a_ticket_that_is_not_full` (2: STANDARD, LITE; auditor and engineer) | no refusal; 3.2-only: green |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_a_max_after_the_double_dash_for_an_engineer_on_a_high_table` | no refusal; 3.2-only: green |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_the_probe_applies_to_the_auditor_alone` | no table; 3.2-only: green |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_a_max_that_differs_from_a_table_of_xhigh` | no refusal; 3.2-only: green |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_a_trial_s_max_after_the_double_dash_needs_a_reason` | no option; 3.2-only: green |
+| failure-1 | `test_w2_184_s1_max_equal.py::test_s1_still_refused_3_2a_an_empty_reason_beside_a_max_that_differs_from_the_resolved_effort` | no option; 3.2-only: green |
+
+`w2_184_support.py` gained one name, `ANY`: `assert_session(..., model_source=ANY)` leaves `model_source` unpinned, used by
+the probe cases that do not turn on it.
