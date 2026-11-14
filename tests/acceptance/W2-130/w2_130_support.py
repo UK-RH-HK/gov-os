@@ -46,7 +46,11 @@ EIGHT = [("DEC-853", "DEC-884"), ("DEC-1050", "DEC-1057"), ("DEC-120", "DEC-173"
          ("DEC-056", "DEC-017"), ("DEC-072", "DEC-064"), ("DEC-162", "DEC-156"), ("DEC-1053", "DEC-880")]
 BLOCKS = ["commits", "ids-87", "census", "archive-13", "judged-wrong", "audits", "comparison", "patch-a0",
           "patch-a1", "patch-a2", "patch-b1", "patch-sources-2", "patch-marks-3", "trailer-residuals", "recount",
-          "drift", "drift-run", "counts-before", "counts-after", "closed-missing", "no-record", "lessons", "left"]
+          "drift", "drift-run", "counts-before", "counts-after", "closed-missing", "no-record", "dec-1123-linked",
+          "lessons", "left"]
+LIVE_STATUSES = ("open", "in_progress")
+LINK_FORMS = ("list_rows", "wbs", "dec-798")  # DEC-1123 (2)'s three forms (P-W2-130-4 (a))
+BACKLOG_ROW = re.compile(r"^W[0-9]+-[A-Z][0-9]+$")  # W2-H021, W2-M406, W2-L047 ...
 
 PFX = "- **Status:** "
 DEC = re.compile(r"\bDEC-(\d+)(?!\d)")
@@ -351,6 +355,75 @@ def sources_added(commit: str) -> dict:
         if added:
             out[path] = added
     return out
+
+
+def ticket_field(text: str, key: str):
+    """The parsed value of one front-matter field of a ticket (None where the field is absent)."""
+    raw = split_ticket(text)[1].get(key)
+    return None if raw is None else (yaml.safe_load(raw) or {}).get(key)
+
+
+def ticket_aliases(tree: Path) -> dict:
+    """``{alias: {ticket ids}}``: each ticket's ``wbs_id`` (and ``external-ref``, the other key ``gov`` resolves a W2 id
+    by) over the ticket files of ``tree``; a ticket's id is its file's stem."""
+    out: dict = {}
+    for path in sorted((tree / ".tickets").glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        for key in ("wbs_id", "external-ref"):
+            value = ticket_field(text, key)
+            if isinstance(value, str) and value.strip():
+                out.setdefault(value.strip(), set()).add(path.stem)
+    return out
+
+
+def unlinked_on_live(findings: list[dict], tree: Path) -> dict:
+    """``{ticket id: {ids}}`` of the UNLINKED_ID findings on tickets open or in progress in ``tree`` (the ticket is
+    the finding's second id, the ids that ticket's KPI brackets or worker commits name come first)."""
+    out: dict = {}
+    for finding in findings:
+        if finding["code"] == "UNLINKED_ID" and finding["path"].startswith(".tickets/"):
+            text = (tree / finding["path"]).read_text(encoding="utf-8")
+            if ticket_status(text) in LIVE_STATUSES:
+                out.setdefault(finding["ids"][1], set()).add(finding["ids"][0])
+    return out
+
+
+def linked_form_problem(tree: Path, ticket: str, entry: dict, findings: list[dict]) -> str | None:
+    """Why ``entry`` (``{id, form, via}`` of ``ticket``) is not of its DEC-1123 (2) form in ``tree``, else None.
+
+    ``list_rows``: the id is a backlog row, held by the ticket's ``list_rows``, ``via`` the id as it stands there.
+    ``wbs``: the id is a ticket's ``wbs_id`` (or ``external-ref``), ``via`` the id of a ticket that has it, and that
+    ticket id is in the ticket's ``sources:``. ``dec-798``: the id is DEC-798, ``via`` is DEC-1033, in the ticket's
+    ``sources:``, and ``gov links`` reports DEC-1033 as no NOT_IN_FORCE_AS_RULE (so it is live)."""
+    text = (tree / ".tickets" / f"{ticket}.md").read_text(encoding="utf-8")
+    ident, form, via = entry["id"], entry["form"], entry["via"]
+    sources = ticket_sources(text)
+    if form == "list_rows":
+        rows = [str(row) for row in (ticket_field(text, "list_rows") or [])]
+        if not BACKLOG_ROW.match(ident):
+            return f"{ident} is no backlog row (W2-H.., W2-M.., W2-L..)"
+        if ident not in rows:
+            return f"{ident} is not in {ticket}'s list_rows {rows}"
+        if via != ident:
+            return f"via {via!r} is not the id as it stands in list_rows ({ident})"
+    elif form == "wbs":
+        owners = ticket_aliases(tree).get(ident, set())
+        if not owners:
+            return f"{ident} is no ticket's wbs_id"
+        if via not in owners:
+            return f"via {via} is no ticket with wbs_id {ident} (those are {sorted(owners)})"
+        if via not in sources:
+            return f"{via} is not in {ticket}'s sources:"
+    elif form == "dec-798":
+        if ident != "DEC-798" or via != "DEC-1033":
+            return f"form dec-798 is DEC-798 via DEC-1033, not {ident} via {via}"
+        if via not in sources:
+            return f"DEC-1033 is not in {ticket}'s sources:"
+        if any(f["code"] == "NOT_IN_FORCE_AS_RULE" and f["ids"][0] == "DEC-1033" for f in findings):
+            return "DEC-1033 is not live (gov links reports it NOT_IN_FORCE_AS_RULE)"
+    else:
+        return f"form {form!r} is none of {list(LINK_FORMS)}"
+    return None
 
 
 # ------------------------------------------------------------------------------------------------- unified diffs

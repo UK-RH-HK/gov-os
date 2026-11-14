@@ -2,7 +2,8 @@
 
 Ticket DAEO-q8cl (W2-130), profile STANDARD, class C2. Written by the independent test designer (MR-3) from the
 ticket's eleven KPI lines (S1 to S8 are its eight success lines, F1 to F4 its four failure lines, in the ticket's
-order), each ending `[Verify re-baselined to history, the CTO, P-W2-130-1 (a)]`, and the lead's interface text
+order), each ending `[Verify re-baselined to history, the CTO, P-W2-130-1 (a)]` (S4 also `[S4 re-baselined to
+DEC-1123 (2), the CTO, P-W2-130-4 (a)]`), and the lead's interface text
 (the layout of `docs/research/W2-130-link-cleanup.md`, its fenced blocks, the five follow-up commits). Branch base
 `09542040f`. Nothing of the implementer's tree or branch after `09542040f` was read.
 
@@ -43,7 +44,7 @@ missing fails in its own body.
 Each block opens with a line of exactly ```` ```<lang> w2-130:<name> ```` (lang `yaml`, `diff` or `python`), once per
 name: `commits`, `ids-87`, `census`, `archive-13`, `judged-wrong`, `audits`, `comparison`, `patch-a0`, `patch-a1`,
 `patch-a2`, `patch-b1`, `patch-sources-2`, `patch-marks-3`, `trailer-residuals`, `recount`, `drift`, `drift-run`,
-`counts-before`, `counts-after`, `closed-missing`, `no-record`, `lessons`, `left`, as the interface states them. A pair
+`counts-before`, `counts-after`, `closed-missing`, `no-record`, `dec-1123-linked`, `lessons`, `left`, as the interface states them. A pair
 is `{changed: DEC-a, changer: DEC-b}` (or `DEC-a<-DEC-b`); every commit a full 40-hex hash (an abbreviation in
 `audit_head` is resolved with `git rev-parse`).
 
@@ -75,6 +76,22 @@ is `{changed: DEC-a, changer: DEC-b}` (or `DEC-a<-DEC-b`); every commit a full 4
   in their first cell, groups G and H have none and are not row-checked.
 - **F2's drift check**: the drift script's pairs whose changed id is in a sitting group C, D or E (not ruled current
   by DEC-1098 (3): superseded, withdrawn, deferred, DONE) fail the case; groups A, B and F are current.
+- **S4, DEC-1123 (2)'s forms** (`w2-130:dec-1123-linked`, ticket id -> `[{id, form, via}]`; revised for P-W2-130-4 (a)):
+  an *UNLINKED_ID on an open or in-progress ticket* is a `gov links --all --json` finding of that code on a ticket file
+  whose `status:` is `open` or `in_progress` at HEAD, the pair being (its second id = the ticket, its first id). The
+  record lists exactly those pairs that a form links, and the cases read each form from the files at HEAD:
+  `list_rows` = the id matches `W<n>-<letter><digits>` and is held by the ticket's `list_rows:` field (flow or block
+  list), `via` equal to the id; `wbs` = the id is the `wbs_id` (or `external-ref`, the other key `gov` resolves a W2 id
+  by) of some ticket file, `via` is the id of one such ticket and that id is in the listed ticket's `sources:`;
+  `dec-798` = the id is `DEC-798`, `via` is `DEC-1033`, `DEC-1033` is in the ticket's `sources:` and `gov links`
+  reports it as no `NOT_IN_FORCE_AS_RULE` (its "live" test, so the register is read only through the tool). A
+  duplicate pair, an unknown form, a ticket that is not open or in progress, and an entry gov links does not report
+  are failures. The follow-up sources commit (`commits.sources[1]`): the ids it adds per ticket (tickets it does not
+  change have no entry; empty entries are dropped from every side) equal `patch-sources-2`'s ids and `gov links
+  --propose-sources --all` at its parent (open and in-progress tickets), each less the (ticket, id) pairs of
+  `dec-1123-linked`. e12f8a30c's two cases are as before (its ids equal the whole proposal at its parent and the b1
+  patch): the forms were added to `sources:` there, and nothing in the line changes that. The byte-for-byte equality of
+  the `patch-sources-2` block with the proposal's sections is not asserted (the line states ids, not bytes).
 - **`left`** (S8): D-5 is findings under `template/` and `docs/contract/`, D-6 under `src/` and `tests/`, D-9 under
   `.tickets/`; each as `{path: {role: n}}`, all codes, equal to `gov links --all` at HEAD.
 - **Tool-version sensitive**: `counts-before` for UNMARKED_CHANGE, UNLINKED_ID and STATUS_CONFLICT is compared with HEAD's
@@ -93,7 +110,18 @@ mark wrong fails `test_w2_130_audit.py::test_s3_verdicts_and_fates_agree_with_wh
 
 ## KPI lines, tests, and the outcome on the branch base `09542040f`
 
-79 tests: **56 red, 23 green** (17 s in the heavy slot). The 23 green are the history-only cases (the clean-up's two
+**Revision, run 3 batch 2 (P-W2-130-4 (a)), branch head `11c4d7a5a`:** S4's head case and its follow-up case were
+rewritten to DEC-1123 (2) and two cases added (`w2-130:dec-1123-linked`, also added to the block list S8 checks): **81
+tests, 55 red, 26 green** on `11c4d7a5a` (whole folder, 17 s; run 2's count was 26 passed, 53 failed: the same 26 pass;
+the S4 rows below are the only rows whose cases changed, and the S8 block-list case is red for the same reason as
+before). The three S4 head cases and the follow-up case were also shown green on a scratch clone with a record built
+from the real data (25 open or in-progress tickets with 97 UNLINKED_ID pairs at this base: 65 of the three forms, the
+other 32 added to `sources:` by a scratch follow-up commit), and red for two planted breaks in scratch copies (an entry
+whose form is false, a backlog row the ticket's `list_rows` does not hold: the form and the "reported by gov links"
+cases fail; a form id left out of the list: the completeness case and the follow-up case fail), all discarded.
+
+The table below was written at `09542040f` with 79 tests (**56 red, 23 green**, 17 s in the heavy slot); its green and
+red words for rows outside S4 are as of that base. The 23 green are the history-only cases (the clean-up's two
 commits as they are in git, ancestry, the sitting file, DEC-1098 (3)'s commit, the 150 sitting rows, the statuses
 c4420040f wrote). Every red fails at its first assertion for the reason in its row; where the reason is the missing
 record, the case reads the record first and fails (never skips).
@@ -124,13 +152,15 @@ record, the case reads the record first and fails (never skips).
 | S3 | `test_w2_130_audit.py::test_s3_labelled_marks_are_twenty_drawn_by_a_seed_or_every_labelled_mark_when_twenty_or_fewer` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S3 | `test_w2_130_audit.py::test_s3_verdicts_and_fates_agree_with_what_each_commit_committed` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S3 | `test_w2_130_audit.py::test_f3_the_comparison_shows_no_unchecked_and_no_wrong_mark_and_my_comparison_agrees` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
-| S4 | `test_w2_130_sources.py::test_s4_gov_links_reports_no_unlinked_id_on_an_open_or_in_progress_ticket_at_head` | red | 102 UNLINKED_ID on open tickets at HEAD (sources: ids a later commit removed, 66303c373, or new since b1) |
+| S4 | `test_w2_130_sources.py::test_s4_every_unlinked_id_on_an_open_or_in_progress_ticket_at_head_is_listed_with_its_dec_1123_2_form` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips); with a record, red until each of the 97 UNLINKED_ID pairs gov links reports on open or in-progress tickets at this base is listed or added to `sources:` |
+| S4 | `test_w2_130_sources.py::test_s4_each_dec_1123_linked_entry_is_of_its_form_at_head` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
+| S4 | `test_w2_130_sources.py::test_s4_dec_1123_linked_lists_only_unlinked_ids_gov_links_reports_at_head_on_open_or_in_progress_tickets` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S4 | `test_w2_130_sources.py::test_s4_the_record_names_e12f8a30c_and_at_most_one_follow_up_as_the_sources_commits` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S4 | `test_w2_130_sources.py::test_s4_e12f8a30c_changes_only_the_sources_field_of_tickets_open_or_in_progress_at_its_parent[e12f8a30c]` | green | green by design: history only (the commits and the sitting file as they are in git) |
 | S4 | `test_w2_130_sources.py::test_s4_the_follow_up_sources_commit_changes_only_sources_of_live_tickets_and_no_other_file` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S4 | `test_w2_130_sources.py::test_s4_the_ids_e12f8a30c_adds_equal_gov_links_propose_sources_at_its_parent[e12f8a30c]` | green | green by design: history only (the commits and the sitting file as they are in git) |
 | S4 | `test_w2_130_sources.py::test_s4_the_b1_patch_in_the_record_equals_the_ids_e12f8a30c_added` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
-| S4 | `test_w2_130_sources.py::test_s4_the_follow_up_ids_equal_patch_sources_2_and_gov_links_propose_sources_at_its_parent` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
+| S4 | `test_w2_130_sources.py::test_s4_the_follow_up_ids_equal_patch_sources_2_and_gov_links_propose_sources_at_its_parent_less_the_forms` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S4 | `test_w2_130_sources.py::test_s4_outside_the_sources_commits_a_cleanup_commit_adds_to_sources_only_dec_1098_and_dec_1088_on_this_ticket` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S4 | `test_w2_130_sources.py::test_s4_c4420040f_adds_to_sources_only_dec_1098_and_dec_1088_on_this_ticket` | green | green by design: history only (the commits and the sitting file as they are in git) |
 | S4 | `test_w2_130_sources.py::test_s4_no_closed_ticket_is_changed_by_e12f8a30c_or_c4420040f[e12f8a30c]` | green | green by design: history only (the commits and the sitting file as they are in git) |
