@@ -109,6 +109,8 @@ template/governance/kernel/skills/adopt/SKILL.md | 8 +++++---
 - section 9's '§' is UTF-8: PASS
 - section 3 holds the standing-set bullet and keeps its '3 points': PASS
 - section 5 item 6 holds the two sub-bullets: PASS
+- section 5 item 6's practice lines (after its last `The practice:`) hold 'standing set', 'every week', 'counts only', 'never chooses or judges a fix', 'fresh set', 'DEC-1179' and '§9' (re-run after the line was re-worded, practice record at sha256 `76eaaeb5487739643cef6d79d8f736331ee5396756b1f123c5236c9bcb60d312`): PASS
+- section 5 item 6's first sub-bullet and 'within 5 points' kept; section 6's `check_steps` -> [] again; section 9 still last and untouched: PASS
 - section 5 'within 5 points' kept: PASS
 - section 6 step 6 re-worded: PASS
 - section 6 step 5 keeps '5 points': PASS
