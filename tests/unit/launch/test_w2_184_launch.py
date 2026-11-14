@@ -807,7 +807,8 @@ def test_a_launch_record_that_is_not_json_refuses_a_full_auditor_launch_naming_i
     (folder / "bad.json").write_text("{", encoding="utf-8")
     full.refused("bad.json", role="independent-auditor", tid="T-a")
     full.ticket("T-s", profile="STANDARD")
-    full.launch("independent-auditor", "T-s")  # not FULL: no count
+    # not FULL: no count, but the folder is read for the probe records' roots (5.1a, P-td5-1): still refused
+    full.refused("bad.json", role="independent-auditor", tid="T-s")
 
 
 # --- refusals leave nothing; the plan and the lead are untouched ---------------------------------------------------
@@ -840,3 +841,166 @@ def test_a_lead_launch_is_untouched(project, monkeypatch):
 def test_tier_is_the_family_word_of_the_model_id():
     for model, tier in ((OPUS, "opus"), ("claude-haiku-4-5-20251001", "haiku"), (SONNET, "sonnet")):
         assert model.split("-")[1] == tier
+
+
+# --- review round 2's F1: the probe records under each root the ticket's launch records name (5.1a) --------------
+
+def _tree(project, name):
+    """Another worktree's root beside the project, as a launch record would name it (a real path)."""
+    root = project.root.parent / name
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def _probe_at(root, tid, name, judgement=None, verdict=None, front=None):
+    path = root / "docs/probes" / tid / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    meta = {"type": "probe", "task": tid, "judgement": judgement} if front is None else front
+    text = "---\n" + (meta if isinstance(meta, str) else yaml.safe_dump(meta)) + "---\n\nReport.\n"
+    if verdict is not None:
+        text += "\n```verdict\n" + (verdict if isinstance(verdict, str) else json.dumps(verdict)) + "\n```\n"
+    path.write_text(text, encoding="utf-8")
+    return path.relative_to(root).as_posix()
+
+
+def _names(project, root, tid="T-1", role="engineer", session=None, **change):
+    """A launch record in the shared record folder naming ``root`` for ticket ``tid``."""
+    folder = project.root / ".gov-runtime/launches"
+    folder.mkdir(parents=True, exist_ok=True)
+    session = session or f"{abs(hash((str(root), tid, role))):032x}"[:32]
+    data = {"record": "gov-launch", "session_id": session, "resumes": None, "root": str(root), "role": role,
+            "ticket": tid, "model": SONNET, "effort": "high", "started_at": "2026-01-01T00:00:00Z"}
+    data.update(change)
+    (folder / f"{session}.json").write_text(json.dumps(data), encoding="utf-8")
+
+
+def test_f1_a_fail_open_record_under_a_root_a_launch_record_names_promotes(project):
+    project.ticket()
+    other = _tree(project, "wt-ticket")
+    rel = _probe_at(other, "T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
+    _names(project, other, role="engineer")
+    project.launch("independent-test-designer")
+    record = project.last()
+    assert (record["model"], record["model_source"]) == (OPUS, "promotion")
+    assert record["promotion"] == {"reason": "a fail-open finding", "record": rel}  # root-relative
+
+
+def test_f1_two_failed_records_across_the_launch_root_and_another_root_promote(project):
+    project.ticket()
+    other = _tree(project, "wt-ticket")
+    project.probe("T-1", "b.md", judgement="failed")
+    _probe_at(other, "T-1", "a.md", judgement="fail")
+    _names(project, other)
+    project.launch()
+    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-1/b.md"}
+
+
+@pytest.mark.parametrize("key, role", (("wbs_id", "independent-auditor"), ("id", "product-spec")))
+def test_f1_a_root_named_under_any_name_of_the_ticket_by_any_role_is_read(project, key, role):
+    project.ticket(tid="T-1", wbs="W9-1")
+    name = "W9-1" if key == "wbs_id" else "T-1"
+    other = _tree(project, "wt-ticket")
+    _probe_at(other, name, "r.md", judgement="pass", verdict=FAIL_OPEN)
+    _names(project, other, tid=name, role=role)
+    project.launch()
+    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": f"docs/probes/{name}/r.md"}
+
+
+def test_f1_a_named_root_that_is_missing_or_a_file_is_skipped_and_the_others_count(project):
+    project.ticket()
+    gone = _tree(project, "wt-gone")
+    _probe_at(gone, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
+    _names(project, gone)
+    _remove = __import__("shutil").rmtree
+    _remove(gone)
+    afile = project.root.parent / "a-file"
+    afile.write_text("x")
+    _names(project, afile, role="product-spec")
+    _names(project, project.root.parent / "never-there", role="independent-auditor")
+    project.launch()
+    assert project.last()["promotion"] is None
+    kept = _tree(project, "wt-kept")
+    _probe_at(kept, "T-1", "k1.md", judgement="failed")
+    _probe_at(kept, "T-1", "k2.md", judgement="failed")
+    _names(project, kept, role="independent-test-designer")
+    project.launch()
+    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-1/k2.md"}
+
+
+@pytest.mark.parametrize("make", (
+    lambda root: _probe_at(root, "T-1", "a.md", front="type: probe\n  bad: [\n"),
+    lambda root: _probe_at(root, "T-1", "a.md", judgement="pass", verdict="not json"),
+))
+def test_f1_an_unreadable_probe_record_only_under_another_named_root_refuses_naming_it(project, make):
+    project.ticket()
+    other = _tree(project, "wt-ticket")
+    make(other)
+    _names(project, other)
+    project.refused("docs/probes/T-1/a.md", str(other / "docs/probes/T-1/a.md"))
+
+
+def test_f1_a_launch_record_that_is_not_json_refuses_every_launch_where_the_file_is(project):
+    project.ticket()
+    folder = project.root / ".gov-runtime/launches"
+    folder.mkdir(parents=True)
+    (folder / "bad.json").write_text("{", encoding="utf-8")
+    project.refused("bad.json")  # no probe record anywhere: still refused (P-td5-1, fail closed)
+    project.refused("bad.json", role="independent-test-designer")
+    (project.root / "governance/project/criticality.yaml").unlink()
+    project.launch()  # no criticality.yaml: nothing is read (1.4)
+
+
+def test_f1_a_path_under_two_roots_counts_once(project):
+    project.ticket()
+    other = _tree(project, "wt-ticket")
+    project.probe("T-1", "a.md", judgement="failed")
+    _probe_at(other, "T-1", "a.md", judgement="failed")
+    _names(project, other)
+    project.launch()
+    assert project.last()["promotion"] is None  # one failed record, not two
+
+
+def test_f1_a_path_under_the_launch_root_and_another_is_read_from_the_launch_root(project):
+    project.ticket()
+    other = _tree(project, "wt-ticket")
+    project.probe("T-1", "a.md", judgement="pass", verdict=CLEAN)
+    _probe_at(other, "T-1", "a.md", judgement="pass", verdict="not json")  # not read: the launch root's copy counts
+    _names(project, other)
+    project.launch()
+    assert project.last()["promotion"] is None
+
+
+def test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order(project):
+    project.ticket()
+    first, second = _tree(project, "wt-a"), _tree(project, "wt-b")
+    _probe_at(first, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
+    _probe_at(second, "T-1", "a.md", judgement="pass", verdict=CLEAN)
+    _names(project, second, role="engineer")
+    _names(project, first, role="independent-test-designer")
+    project.launch()
+    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-1/a.md"}
+    project.ticket("T-2", wbs="W9-2")
+    _probe_at(first, "T-2", "a.md", judgement="pass", verdict=CLEAN)
+    _probe_at(second, "T-2", "a.md", judgement="pass", verdict=FAIL_OPEN)
+    _names(project, second, tid="T-2", role="engineer")
+    _names(project, first, tid="T-2", role="independent-test-designer")
+    project.launch(tid="T-2")
+    assert project.last()["promotion"] is None
+
+
+def test_f1_a_root_no_launch_record_of_this_ticket_names_is_not_read(project):
+    project.ticket()
+    other = _tree(project, "wt-other")
+    _probe_at(other, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
+    _names(project, other, tid="T-other")
+    _names(project, other, tid="T-1", record="something-else")
+    project.launch()
+    assert project.last()["promotion"] is None
+
+
+def test_f1_the_launch_root_named_by_its_own_records_is_read_once(project):
+    project.ticket()
+    project.probe("T-1", "a.md", judgement="failed")
+    project.launch()  # its record names the launch root
+    project.launch()
+    assert project.last()["promotion"] is None  # a.md is one failed record, not two

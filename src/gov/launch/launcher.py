@@ -486,21 +486,58 @@ def _ticket_names(ticket_id: str, ticket: dict) -> list[str]:
     return list(dict.fromkeys(name for name in names if isinstance(name, str) and name))
 
 
-def _probe_files(root: Path, names: list[str]) -> list[Path]:
-    """The ticket's probe records (W2-184 5.1): the ``.md`` files under ``docs/probes/<ticket id>/``, at any depth, in
-    sorted path order."""
+def _launch_records(root: Path) -> list[dict]:
+    """The shared record folder's launch records (``record: gov-launch``), read once for the probe records' roots
+    (W2-184 5.1a) and the review count (6.1). A file there that cannot be read as JSON refuses: a skipped record could
+    hide a promotion or a review (P-td5-1, fail closed)."""
     found = []
-    for name in names:
-        base = root / PROBES_REL / name
-        if _PROBE_NAME.fullmatch(name) and base.is_dir():
-            found += [path for path in base.rglob("*.md") if path.is_file()]
-    return sorted(set(found), key=lambda path: path.relative_to(root).as_posix())
+    for path in sorted(record.folder(root).glob("*.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise _refuse(f"the launch record {path.name} cannot be read as JSON, so the roots of the ticket's probe "
+                          f"records cannot be found and its reviews cannot be counted") from None
+        if isinstance(data, dict) and data.get("record") == "gov-launch":
+            found.append({**data, "session_id": data.get("session_id") or path.stem})
+    return found
 
 
-def _probe_record(root: Path, path: Path) -> tuple[dict, str] | None:
+def _probe_roots(root: Path, names: list[str], launches: list[dict]) -> list[Path]:
+    """W2-184 5.1a (P-W2-184-1 (a), DEC-1010): the launch root, then, in sorted order, every other folder that a
+    launch record of this ticket (under any of its names, any role) gives as its ``root``. A named root that is not
+    there, or is not a folder, is skipped."""
+    others = set()
+    for data in launches:
+        named = data.get("root")
+        if not isinstance(data.get("ticket"), str) or data["ticket"] not in names or not isinstance(named, str) \
+                or not os.path.isabs(named) or not os.path.isdir(named):
+            continue
+        real = Path(os.path.realpath(named))
+        if real != root:
+            others.add(real)
+    return [root, *sorted(others, key=str)]
+
+
+def _probe_files(roots: list[Path], names: list[str]) -> list[tuple[str, Path, Path]]:
+    """The ticket's probe records (W2-184 5.1, 5.1a): the ``.md`` files under ``docs/probes/<ticket id>/`` of each root,
+    at any depth, as ``(root-relative path, file, root)`` in sorted path order. A path under two roots counts once: the
+    first root's copy (the launch root, then the others in sorted order; P-td5-2)."""
+    chosen: dict[str, tuple[Path, Path]] = {}
+    for base in roots:
+        for name in names:
+            folder = base / PROBES_REL / name
+            if not _PROBE_NAME.fullmatch(name) or not folder.is_dir():
+                continue
+            for path in folder.rglob("*.md"):
+                if path.is_file():
+                    chosen.setdefault(path.relative_to(base).as_posix(), (path, base))
+    return [(rel, path, base) for rel, (path, base) in sorted(chosen.items())]
+
+
+def _probe_record(rel: str, path: Path) -> tuple[dict, str] | None:
     """One probe record's front matter and the text after it; ``None`` when it has none, or it is not a map with
-    ``type: probe`` (skipped). A front matter that is not YAML, or a file that cannot be read, refuses."""
-    rel = path.relative_to(root).as_posix()
+    ``type: probe`` (skipped). A front matter that is not YAML, or a file that cannot be read, refuses, naming the
+    file as ``rel`` (its root-relative path, with the file's own path when it lies under another root)."""
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except (OSError, UnicodeDecodeError):
@@ -539,17 +576,18 @@ def _fails_open(rel: str, body: str) -> bool:
     return found
 
 
-def _promotion(root: Path, names: list[str]) -> dict | None:
-    """W2-184 5.2: ``{"reason", "record"}`` when the ticket's probe records hold a fail-open finding (checked first),
-    or two or more of them have ``judgement`` fail or failed; ``None`` when neither."""
+def _promotion(root: Path, names: list[str], launches: list[dict]) -> dict | None:
+    """W2-184 5.2: ``{"reason", "record"}`` when the ticket's probe records, under the launch root and every root the
+    ticket's launch records name (5.1a), hold a fail-open finding (checked first), or two or more of them have
+    ``judgement`` fail or failed; ``None`` when neither. The record is named by its root-relative path."""
     failed, fail_open = [], None
-    for path in _probe_files(root, names):
-        loaded = _probe_record(root, path)
+    for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
+        shown = rel if base == root else f"{rel} ({path})"
+        loaded = _probe_record(shown, path)
         if loaded is None:
             continue
         front, body = loaded
-        rel = path.relative_to(root).as_posix()
-        if _fails_open(rel, body) and fail_open is None:
+        if _fails_open(shown, body) and fail_open is None:
             fail_open = rel
         if front.get("judgement") in ("fail", "failed"):
             failed.append(rel)
@@ -560,20 +598,14 @@ def _promotion(root: Path, names: list[str]) -> dict | None:
     return None
 
 
-def _counted_reviews(root: Path, names: list[str], resume: str | None) -> list[dict]:
-    """W2-184 6.1: the launch records of the shared record folder for this ticket's auditor launches that resume
-    nothing, leaving out the record of the session being resumed; a record file that is not JSON refuses."""
+def _counted_reviews(launches: list[dict], names: list[str], resume: str | None) -> list[dict]:
+    """W2-184 6.1: of the shared record folder's launch records (``_launch_records``), this ticket's auditor launches
+    that resume nothing, leaving out the record of the session being resumed."""
     counted = []
-    for path in sorted(record.folder(root).glob("*.json")):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            raise _refuse(f"the launch record {path.name} cannot be read as JSON, so the ticket's reviews cannot be "
-                          f"counted") from None
-        if isinstance(data, dict) and data.get("record") == "gov-launch" and data.get("role") == AUDITOR \
-                and isinstance(data.get("ticket"), str) and data["ticket"] in names and data.get("resumes") is None \
-                and data.get("session_id") != resume:
-            counted.append({"session_id": data.get("session_id") or path.stem, "model": data.get("model"),
+    for data in launches:
+        if data.get("role") == AUDITOR and isinstance(data.get("ticket"), str) and data["ticket"] in names \
+                and data.get("resumes") is None and data["session_id"] != resume:
+            counted.append({"session_id": data["session_id"], "model": data.get("model"),
                             "effort": data.get("effort")})
     return counted
 
@@ -636,13 +668,14 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
     else:  # the file is read on every worker launch; one that cannot be read or is malformed refuses (1.3)
         ticket_class = crit.ticket_criticality(root, ticket)
-        promotion = _promotion(root, names)
+        launches = _launch_records(root)  # every launch reads the folder, for 5.1a's roots and 6.1's count (P-td5-1)
+        promotion = _promotion(root, names, launches)
         if promotion is not None and trial_id is not None:
             raise _refuse(f"--trial {trial_id} is refused: a promotion applies to {ticket_id} ({promotion['reason']}, "
                           f"{promotion['record']}), and a lower model is refused (DEC-1120 (3))")
         counted, review_round = [], None
         if role == AUDITOR and profile == "FULL":
-            counted = _counted_reviews(root, names, given["resume"])
+            counted = _counted_reviews(launches, names, given["resume"])
             review_round = len(counted) + 1
         probe = review_round is not None and review_round >= 2
         opus = crit.opus_model(root) if promotion is not None or probe else None

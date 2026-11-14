@@ -92,3 +92,21 @@ F4 (a trial replaces the probe), F5 (five closed tickets' legacy verdict blocks 
 rows included; this record's F2 promotes W2-184's next round), F7 (no file, a launch off the table, recorded only as
 `criticality: null`), F9 (a probe-record path lowers an unlisted-area ticket to C1) and F10 (out of scope: an adopted repository
 with no file does not route by RUBRIC-2).
+
+## 7. Review round 2's F1 (batch eng-5, the owner's P-W2-184-1 (a), DEC-1010; interface 5.1a)
+
+Review round 2's F1: a test designer launched from its tests worktree read the probe records only under its own launch root,
+so a fail-open finding or two failed reviews recorded on the ticket's branch (its own worktree) did not promote it. The owner
+chose P-W2-184-1 (a) (DEC-1010), written as interface 5.1a and settled by td-5 (P-td5-1, P-td5-2). `launcher.py` now reads
+the shared record folder once per launch where `criticality.yaml` is present (`_launch_records`), and takes the probe records
+under the launch root and under every other root that a `record: gov-launch` file of the ticket (its given id, `id` or
+`wbs_id`; any role) names (`_probe_roots`): a named root that is gone or is not a folder is skipped. The records form one set
+by root-relative path, the launch root's copy first, then the other roots in sorted order (`_probe_files`); 5.2 runs over
+that set and names its record by the root-relative path, and a refusal for a record under another root names the file by its
+root-relative path and its own path. The same read serves the review count (6.1), so a launch record that is not JSON now
+refuses every launch in a project with the file, even when no probe record exists (fail closed); with no `criticality.yaml`
+nothing is read (1.4). Builder cases (`tests/unit/launch/test_w2_184_launch.py`, the `f1` cases): a promotion from another
+named root for both reasons and under each name and role, missing and file roots skipped, an unreadable record only under
+another root refused, a non-JSON launch record refusing a STANDARD launch and not a launch with no file, a path under two
+roots counted once from the launch root's or the first sorted root's copy, and a root named only by another ticket's record
+not read; the earlier case that let a non-JSON record through on a STANDARD ticket now expects the refusal.
