@@ -146,8 +146,8 @@ def _driver(sub):
     mt = base("maintain", "the weekly maintenance pass: six counts, never a gate")
     mt.add_argument("--store-link", metavar="PATH", help="the integration store's link (default: rebuild.yaml's)")
     mt.add_argument("--gov", metavar="EXE", help="the gov executable (default: ~/.local/bin/gov)")
-    sg = sub.add_parser("standing", help="the standing hidden set: declare, run, live",
-                        description="The repository's standing hidden set: judged once a week, counts only.")
+    sg = sub.add_parser("standing", help="the standing question set: declare, run, live",
+                        description="The repository's standing set of questions: judged once a week, counts only.")
     ss = sg.add_subparsers(dest="standing_command", required=True, metavar="SUBCOMMAND", parser_class=_Parser)
     sd = ss.add_parser("declare", help="record one standing set for the repository")
     sd.add_argument("--sets-root", required=True, metavar="ROOT", help="the sets root")

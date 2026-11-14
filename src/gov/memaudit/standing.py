@@ -68,8 +68,8 @@ def history(state: Path) -> list[dict]:
 
 
 def lines_of(state: Path, name: str) -> list[dict]:
-    """The standing set's own ``HISTORY.jsonl`` lines."""
-    return [x for x in history(state) if x.get("kind") == "standing" and x.get("set") == name]
+    """The standing set's own ``HISTORY.jsonl`` lines (a standing line that names no set is the live set's)."""
+    return [x for x in history(state) if x.get("kind") == "standing" and x.get("set") in (name, None)]
 
 
 def is_standing(sets_root, name: str, repo=None, *, by_name: bool = True) -> bool:
@@ -80,8 +80,11 @@ def is_standing(sets_root, name: str, repo=None, *, by_name: bool = True) -> boo
     try:
         if any(r.get("set") == name for r in records(schedule.state_of(repo))):
             return True
-    except Exception:  # noqa: BLE001: no repository to ask (outside git): the folder says
+    except Exception:  # noqa: BLE001: no repository to ask (outside git): the other repositories' records and the folder say
         pass
+    for log in sorted(Path(schedule.runs_dir(), "indep", "memaudit").glob(f"*/{STANDING}")):
+        if any(r.get("set") == name for r in schedule.read_lines(log)):
+            return True
     try:
         folder = layout.root_of(sets_root) / "runs" / str(name)
         return any(layout.WEEK_RE.fullmatch(e.name.removesuffix(".stopped")) and e.is_dir() for e in os.scandir(folder))

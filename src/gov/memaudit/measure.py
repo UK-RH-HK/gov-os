@@ -197,13 +197,13 @@ def rescore(sets_root, audit, n: int, *, repo=None, emit, week=None) -> str:
     line; nothing is written. ``ok``, or ``refused`` with ``MS-KEPT``; ``used`` (``USED``, nothing written) for a
     standing set, whose labels and figures are never re-scored (F2)."""
     p = layout.paths(sets_root, audit)
+    from gov.memaudit import standing
+    if week or standing.is_standing(sets_root, audit, repo, by_name=False):  # before anything else: a standing set's
+        emit("USED")  # labels and figures are never re-scored, whatever directory this is run from
+        return "used"
     repo = Path(repo) if repo is not None else toplevel()
     if layout.inside(repo, p["root"]):
         raise UsageError("flag inside the sets root")
-    from gov.memaudit import standing
-    if week or standing.is_standing(sets_root, audit, repo, by_name=False):
-        emit("USED")
-        return "used"
     kept = p["run"] / f"attempt-{n}" / "kept"
     if (p["run"] / f"attempt-{n}" / "FAULT").exists() or not kept.is_dir():  # a faulted attempt's figures are never printed
         emit("MS-KEPT")

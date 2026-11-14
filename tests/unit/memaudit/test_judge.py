@@ -44,7 +44,7 @@ def test_the_verdict_lines_show_the_planted_right_wrong_interval_and_the_bar(pla
     verdict = [line for line in out if line.startswith(("VERDICT", "BAR", "BESIDE"))]
     assert verdict[0] == ("VERDICT right end to end 34 of 40 (85.0 %; exact 95 % interval 70.2 to 94.3 %); "
                           "wrong claims 2 of 40 (5.0 %)")
-    assert verdict[1] == ("BAR at least 38 right (not met) and at most 2 wrong claims (met): MISSES; "
+    assert verdict[1] == ("BAR at least 38 right (NOT met) and at most 2 wrong claims (met): MISSES; "
                           "target at least 38: not reached")
     n_hit5 = sum(1 for qid, r in ranks.items() if qid != "q40" and r is not None and r <= 5)
     in_bundle = sum(1 for qid, r in ranks.items() if qid != "q40" and r is not None)
@@ -158,7 +158,7 @@ def test_a_verdict_below_the_bar_stands_is_never_run_again_and_misses_is_byte_id
     done = run_judge(plant, claude)
     assert done.returncode == 0  # a miss is a result, not a refusal
     out = done.stdout.splitlines()
-    assert any(line.startswith("BAR at least 34 right (met) and at most 2 wrong claims (NOT met): MISSES") for line in out)
+    assert any(line.startswith("BAR at least 38 right (NOT met) and at most 2 wrong claims (NOT met): MISSES") for line in out)
     f = json.loads((plant.run_dir / "FIGURES.json").read_text())
     assert f["verdict"]["passes"] is False and f["verdict"]["wrong"] == 3
     before, calls = snapshot(plant.run_dir), len(claude.calls())

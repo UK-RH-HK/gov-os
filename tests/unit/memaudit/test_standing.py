@@ -483,3 +483,54 @@ def test_standing_live_prints_the_key_then_the_live_set_and_writes_nothing(stand
     set_live(stand)
     done = live()
     assert (done.returncode, done.stdout) == (0, f"KEY {stand.state.name}\nLIVE {SET}\n")
+
+
+# ---- S6, S8: the thin set in the digest; due and due --fresh by the command line
+
+def test_fewer_than_70_live_questions_prints_standing_thin_in_the_block_and_70_does_not():
+    from gov.memaudit import digest
+    st = {"audit": SET, "week": WEEK, "commit": "a" * 40, "figures": None, "stop": None, "next": "2026-11-23",
+          "next_mode": "weekly", "next_fresh": "2026-12-14", "repair": None}
+    thin = digest.standing_lines({**st, "live": {"n": 69, "n_set": 80, "dropped": 11}})
+    assert "QUESTIONS live 69 of 80; dropped 11" in thin and "STANDING_THIN 69" in thin
+    assert not [x for x in digest.standing_lines({**st, "live": {"n": 70, "n_set": 80, "dropped": 10}})
+                if x.startswith("STANDING_THIN")]
+    assert thin[0] == f"STANDING {SET} week {WEEK} commit aaaaaaaaaaaa" and thin[-2:] == ["STOP none", "OWNER none"]
+    assert "VERDICT not reached" in thin and "P1 none" in thin and "MAINTAIN none" in thin and "REPAIR none" in thin
+
+
+def due_cli(plant, *extra):
+    done = subprocess.run([sys.executable, "-m", "gov.memaudit", "due", "--sets-root", str(plant.root), "--repo",
+                           str(plant.repo["path"]), "--store-link", str(plant.repo["path"]), *extra],
+                          capture_output=True, text=True, cwd=plant.tmp,
+                          env=dict(plant.env(), GOV_INDEP_RUNS_DIR=str(plant.runs), GOV_MEMAUDIT_NOW=schedule.stamp(T0)))
+    return done.returncode, done.stdout.splitlines()
+
+
+def test_due_answers_for_the_live_set_and_due_fresh_for_the_fresh_one(stand):
+    assert due_cli(stand)[0] == 0  # no live set: as W2-172's due, and a first fresh start is due
+    assert due_cli(stand, "--fresh") == due_cli(stand)  # with no live set --fresh answers as due
+    set_live(stand)
+    code, out = due_cli(stand)
+    assert (code, out[0], out[2]) == (0, "MODE weekly", "REASON start")  # no standing start yet
+    code, out = due_cli(stand, "--fresh")
+    assert (code, out) == (0, ["MODE fresh", f"DUE yes next {T0:%Y-%m-%d}", "REASON first"])
+    standing.append(stand.state, "STARTS.log", {"audit": SET, "at": schedule.stamp(T0 - timedelta(hours=1)),
+                                                "kind": "standing"},
+                    {"audit": "memory-audit-20261110", "at": schedule.stamp(T0 - timedelta(days=27)), "kind": "fresh"})
+    code, out = due_cli(stand)
+    assert (code, out[1]) == (1, "DUE no next 2026-11-22")  # the standing set's weekly cadence: six days
+    code, out = due_cli(stand, "--fresh")
+    assert (code, out) == (1, ["MODE fresh", "DUE no next 2026-11-23", "REASON wait"])  # 27 days: the next Monday
+    standing.append(stand.state, "STARTS.log", {"audit": "memory-audit-20261109", "at": schedule.stamp(T0 - timedelta(days=28)),
+                                                "kind": "fresh"})
+    (stand.state / "STARTS.log").write_text("".join(json.dumps(x) + "\n" for x in (
+        {"audit": SET, "at": schedule.stamp(T0 - timedelta(hours=1)), "kind": "standing"},
+        {"audit": "memory-audit-20261109", "at": schedule.stamp(T0 - timedelta(days=28)), "kind": "fresh"})))
+    assert due_cli(stand, "--fresh")[1] == ["MODE fresh", f"DUE yes next {T0:%Y-%m-%d}", "REASON 28d"]
+    # one standing miss: the fresh set is due at once, and the P1 reason is a word in the line
+    history(stand.state, {"kind": "standing", "set": SET, "week": WEEK, "measured": True, "passes": False, "word": "miss",
+                          "n": 40, "right": 30, "pct": 75.0, "at": schedule.stamp(T0)})
+    (stand.state / "STARTS.log").write_text(json.dumps({"audit": "f", "at": schedule.stamp(T0 - timedelta(days=10)),
+                                                        "kind": "fresh"}) + "\n")
+    assert due_cli(stand, "--fresh")[1][2] == "REASON miss"
