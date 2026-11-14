@@ -147,6 +147,43 @@ def mstate(w):
     return "claimed" if status == "in_progress" else "not started"
 
 
+def ticket_moves():
+    """Tickets reopened (closed -> not closed) and tickets added since the last report, each with its commit's subject
+    as the why (owner, standing, 2026-11-14: name each reopened ticket and why, so the closed count never drops
+    unexplained; DEC-1169 (2): each new ticket with its approving decision)."""
+    stamp = time.strftime("%Y-%m-%d %H:%M:%S", since)
+    out = subprocess.run(["git", "-C", ROOT, "log", "--reverse", "--since=" + stamp, "--format=@@C %h %s", "-p",
+                          "--unified=0", "--", ".tickets/"], capture_output=True, text=True).stdout
+    reopened, added = {}, {}
+    subject, fname, minus_closed, is_new = "", None, False, False
+    for ln in out.splitlines():
+        if ln.startswith("@@C "):
+            subject = ln[4:].split(" ", 1)[1] if " " in ln[4:] else ""
+            fname = None
+        elif ln.startswith("diff --git "):
+            fname = os.path.basename(ln.split(" b/")[-1])[:-3]
+            minus_closed, is_new = False, False
+        elif ln.startswith("new file mode"):
+            is_new = True
+        elif fname and ln == "-status: closed":
+            minus_closed = True
+        elif fname and ln.startswith("+status: ") and ln != "+status: closed":
+            w = by_id.get(fname, fname)
+            why = re.sub(r"^.*?\breopened\b\s*", "", subject) if "reopen" in subject else subject
+            why = why if len(why) <= 120 else why[:120].rsplit(" ", 1)[0] + " …"
+            if minus_closed:
+                reopened[w] = why
+            elif is_new:
+                added[w] = why
+    # a ticket reopened and closed again since the report is no longer a drop in the count
+    reopened = {w: y for w, y in reopened.items() if w in tickets and tickets[w][1] != "closed"}
+    return reopened, added
+
+
+_re, _new = ticket_moves()
+lines.append("- Reopened since the last report: " + ("; ".join("%s (%s)" % (w, y) for w, y in _re.items()) or "none")
+             + ". New tickets since the last report: "
+             + ("; ".join("%s (%s)" % (w, y) for w, y in _new.items()) or "none") + ".")
 lines.append("- Memory chain: " + "; ".join(w + " " + mstate(w) for w in MEMORY) + ".")
 lines.append("- Toward EXAMIN's copy: " + st["examin"] + ".")
 if st.get("emergency"):

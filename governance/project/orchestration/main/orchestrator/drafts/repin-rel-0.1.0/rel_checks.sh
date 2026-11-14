@@ -236,8 +236,15 @@ suite() {  # $1 label, $2 output name, then the environment and the test path
   tail -1 "$out" | grep -q ' passed' && ! tail -1 "$out" | grep -q -E 'failed|error' || fail "$label ($(tail -1 "$out"))"
   ok "$label: $(tail -1 "$out" | sed 's/ in [0-9.]*s.*//')"
 }
-suite "test_guard_fix_4.py" fix4.txt GUARD_FIX4_HOOK="$HOOK" bash "$T/heavy_slot.sh" $PT \
-  .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/test_guard_fix_4.py
+# ACT-GUARD-FIX-4's suite. Since pin-797495bdfc70, W2-42a reads the shell fail-closed (decide.py, bash_writes.py), so
+# cases FIX-4 lets through by design ("want allow") may now be refused: a failure is accepted only as "want allow, got
+# deny" (stricter), never "want deny, got allow"; the cases are named.
+(cd "$R" && env GUARD_FIX4_HOOK="$HOOK" bash "$T/heavy_slot.sh" $PT -rf .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/test_guard_fix_4.py > "$S/fix4.txt" 2>&1) || true
+f4last=$(tail -1 "$S/fix4.txt")
+grep -q ' passed' <<<"$f4last" && ! grep -q ' error' <<<"$f4last" || fail "test_guard_fix_4.py ($f4last)"
+f4fail=$(grep -c '^FAILED' "$S/fix4.txt" || true); f4stricter=$(grep -cE '^E +AssertionError: .*: want allow, got deny' "$S/fix4.txt" || true)
+[ "$f4fail" = "$f4stricter" ] || fail "test_guard_fix_4.py: $f4fail failed, only $f4stricter of them a let-through now refused (a refusal lost?): $(grep -E '^E +AssertionError' "$S/fix4.txt" | grep -v 'want allow, got deny' | head -3 | cut -c1-200)"
+ok "test_guard_fix_4.py: $(sed 's/ in [0-9.]*s.*//' <<<"$f4last")$([ "$f4fail" = 0 ] || echo "; the $f4fail failed are let-throughs now refused (W2-42a, stricter): $(grep '^FAILED' "$S/fix4.txt" | sed -E 's/^FAILED .*test_planted\[//; s/\]( - .*)?$//' | tr '\n' ';')")"
 suite "tests/unit/hooks/test_live_hook.py and tests/unit/guard/test_w2_141_search.py" live.txt GOV_LIVE_HOOK_PY="$N/bin/python" bash "$T/heavy_slot.sh" $PT \
   tests/unit/hooks/test_live_hook.py tests/unit/guard/test_w2_141_search.py
 # G-14's suite (DECIDED-NOT-DONE row 88). Four engineer near-miss cases ("a search of the whole acceptance folder (from
@@ -270,9 +277,25 @@ for who in new old; do
      test_guard_fix_3.py > "$S/fix3-$who.txt" 2>&1) || true
   grep '^FAILED' "$S/fix3-$who.txt" | sed 's/ - .*//' | sort > "$S/fix3-$who.failed"
 done
-cmp -s "$S/fix3-new.failed" "$S/fix3-old.failed" && grep -q ' passed' <(tail -1 "$S/fix3-new.txt") \
-  || fail "test_guard_fix_3.py: the new pin's failures differ from the old pin's ($(tail -1 "$S/fix3-new.txt") / $(tail -1 "$S/fix3-old.txt"))"
-ok "test_guard_fix_3.py: $(tail -1 "$S/fix3-new.txt" | sed 's/ in [0-9.]*s.*//'), the same $(wc -l < "$S/fix3-new.failed") cases as the old pin (ACT-GUARD-FIX-4's LET_THROUGH)"
+grep -q ' passed' <(tail -1 "$S/fix3-new.txt") || fail "test_guard_fix_3.py under the new pin: $(tail -1 "$S/fix3-new.txt")"
+# Where the two pins differ, only in the stricter direction (W2-42a's fail-closed shell reading since pin-797495bdfc70):
+# a case failing only under the new pin must be "want allow, got deny"; a case failing only under the old pin must
+# have been "want deny, got allow" there (now refused). Anything else is a lost refusal or a new false refusal.
+comm -13 "$S/fix3-old.failed" "$S/fix3-new.failed" > "$S/fix3-newonly.txt"
+comm -23 "$S/fix3-old.failed" "$S/fix3-new.failed" > "$S/fix3-oldonly.txt"
+comm -12 "$S/fix3-old.failed" "$S/fix3-new.failed" > "$S/fix3-both.txt"
+f3why=""
+while IFS= read -r line; do
+  name=$(sed -E 's/^FAILED test_guard_fix_3\.py::test_case\[//; s/\]$//' <<<"$line")
+  grep -qF "AssertionError: $name: want allow, got deny" "$S/fix3-new.txt" || f3why="$f3why new-only, not stricter: $name;"
+done < "$S/fix3-newonly.txt"
+while IFS= read -r line; do
+  name=$(sed -E 's/^FAILED test_guard_fix_3\.py::test_case\[//; s/\]$//' <<<"$line")
+  grep -qF "AssertionError: $name: want deny, got allow" "$S/fix3-old.txt" || f3why="$f3why old-only, not now refused: $name;"
+done < "$S/fix3-oldonly.txt"
+[ -z "$f3why" ] || fail "test_guard_fix_3.py: the new pin differs from the old other than stricter:$f3why"
+f3n=$(wc -l < "$S/fix3-newonly.txt"); f3o=$(wc -l < "$S/fix3-oldonly.txt")
+ok "test_guard_fix_3.py: $(tail -1 "$S/fix3-new.txt" | sed 's/ in [0-9.]*s.*//') (old pin: $(tail -1 "$S/fix3-old.txt" | sed 's/ in [0-9.]*s.*//')); $(wc -l < "$S/fix3-both.txt") cases fail under both (ACT-GUARD-FIX-4's LET_THROUGH)$([ $((f3n + f3o)) = 0 ] || echo "; differing only stricter (W2-42a): $f3o now refused, $f3n let-throughs now refused")"
 timing=$(python3 "$T/hook_timing.py")
 python3 - "$timing" <<'EOF' || fail "hook_timing.py: $timing"
 import re, sys

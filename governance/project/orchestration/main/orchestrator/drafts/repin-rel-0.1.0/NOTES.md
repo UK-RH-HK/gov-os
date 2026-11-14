@@ -44,6 +44,16 @@ REHEARSAL-OUTCOMES
   changes a governance record (the tool registry), so `decision-record` is window 5's form.
 - **R-3, the restart of the reranker** stays unrehearsed (the live service is never restarted in a rehearsal), as in
   windows 4 and 5.
+- **R-5, the guard is stricter under the new pin (W2-42a, landed since `797495bdfc70`).** Its fail-closed shell
+  reading refuses two forms window 5's pin let through: "fix3 unterminated heredoc naming acceptance judged as before"
+  and "fix3 python heredoc reading .env (gap as today)". Window 5's checks required ACT-GUARD-FIX-4's suite to pass in
+  full and FIX-3's failures to equal the old pin's; both stopped run r3 (a correct STOP: the store link went back).
+  `rel_checks.sh` now accepts a difference only in the stricter direction: FIX-4 failures only "want allow, got deny";
+  FIX-3 cases failing only under the new pin only "want allow, got deny", and those failing only under the old pin only
+  "want deny, got allow" there. A lost refusal still fails the check. Reviewer: check this is the right bar.
+- **R-6, the heavy slots.** In every run, part S waited for a free heavy-job slot (other sessions' tests): the rebuild
+  took 695 to 1,013 s wall against window 5's 39 s, nearly all of it waiting. At the owner's sitting the CTO's hold
+  should also leave the slots free (no worker test runs from the hand-over), or the act runs long.
 - **R-4, the epoch:** the release's own build (`gov.release._wheel`, setuptools' `build_wheel` on `git archive C
   pyproject.toml src`) and the re-pin's (`pip wheel --no-build-isolation` on `git archive C`) gave the same bytes in the
   rehearsal (part A against the scratch record). This is P-RELEASE-1 §5's claim, now shown on one commit; the rehearsal

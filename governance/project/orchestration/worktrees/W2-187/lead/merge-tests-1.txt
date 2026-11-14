@@ -1,0 +1,6 @@
+W2-187 (DAEO-0cd2): merge the independent acceptance tests (tests/acceptance/W2-187/, 172 cases for S1-S11 and F1-F6) and the bar and key-folder revisions of the W2-170, W2-171 and W2-172 cases (td-1: 632f9b7ba, 0294e1118, 376d47a2b)
+
+Task: DAEO-0cd2
+Role: orchestrator
+Implements: DEC-1179, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

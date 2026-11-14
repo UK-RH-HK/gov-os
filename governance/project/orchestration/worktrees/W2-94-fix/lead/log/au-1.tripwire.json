@@ -1,0 +1,90 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "ad0b102ffd38",
+   "after": "eb63df3c349c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "032c85924db6",
+   "after": "063fb97d5e01"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "b55911153dd1",
+   "after": "eb63df3c349c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "49c91c557d2e",
+   "after": "eb63df3c349c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "b55911153dd1",
+   "after": "ad0b102ffd38"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "head",
+   "before": "0a2dde35c0cc",
+   "after": "bbe1510f899b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": "?? docs/changes/W2-187-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "head",
+   "before": "ccc5b32256a9",
+   "after": "c1c8685b8079"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "acceptance folder",
+   "folder": "W2-188"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "head",
+   "before": "ccc5b32256a9",
+   "after": "f71c82430100"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-188/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-188/test_w2_188_citp.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a-tests",
+   "change": "tree appeared"
+  }
+ ]
+}

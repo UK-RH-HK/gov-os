@@ -1,8 +1,9 @@
 task: DAEO-g87r
 decisions_applied: DEC-1180, DEC-1178, DEC-1175, DEC-957, DEC-820
-STATE: build run; td-1 stopped (cp refused by harness, twice); td-2 launched pid 617780; en-1 running | HEAD: 340cd0efb | NEXT: wait td-2 exit; merge tests when en-1.between; TESTS-READY | WAITING ON: td-2 (pid 617780), en-1 (pid 568369)
-Workers: td-1 independent-test-designer pid 565811 running (W2-94-fix-tests) · en-1 engineer pid 568369 running (W2-94-fix)
-Rounds: in progress
-Decisions taken: worktree is W2-94-fix (the ground's line), not the template's W2-94; tests worktree W2-94-fix-tests on w2/W2-94-fix-tests. Interface made exact in briefs/interface.md (sample from latest delivered r1 run's archive member <rid>/input/selection.json; replaced file at <run>/replaced-hidden/<id>.yaml; no sample: accepted in a fix run).
-Open packages: P1 counts schema closed (additionalProperties false) and outside allowed_paths: `fix` key fails indep-counts.schema.json (finish logs "schema failed"; --counts-only of a fix run refuses 17). gov context blocked: store lacks DEC-1178.
-Paths: briefs .gov-runtime/scratch/lead/briefs/, logs .gov-runtime/scratch/lead/log/ (each tree)
+STATE: DONE; verified and reviewed (pass) | HEAD: 66dd6e77abbd | NEXT: the queue lands w2/W2-94-fix at 66dd6e77abbd | WAITING ON: none
+Workers: td-1 a829686a (stopped, cp refused) · td-2 da4a1f0a done · en-1 8ad38fe1 done · en-2 ccf43198 done · au-1 3733ec73 pass
+Rounds: build converged; review converged (round 1 pass)
+Decisions taken: worktree W2-94-fix; interface made exact (briefs/interface.md); --fix/--reason SUPPRESSed from --help; --dry usage line folded into prose.
+Evidence: gov accept 551/0; lead_verify GREEN 6382/0/0 (6 skipped) at fac8d2026; probe record 66dd6e77a.
+Open packages: P1 variant cannot read fixed brief (owner: run as is or variant v2); P4 counts schema `fix`; P8 AUDITS.log last line check before the run.
+Paths: briefs .gov-runtime/scratch/lead/briefs/, logs .gov-runtime/scratch/lead/log/

@@ -1,0 +1,15 @@
+...........                                                              [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_base_pin_is_the_sha256_of_the_skill_at_5336a6fca
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_three_copies_are_byte_equal
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_copies_carry_a_kernel_skill_changed_from_the_base
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_version_is_1_1_0_in_the_front_matter_of_each_copy
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_places
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_sources_line_gains_dec_1101_dec_1125_and_dec_1179_in_numeric_order_and_keeps_every_id
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_a9_steps_1_to_5_and_7_and_the_verify_section_are_unchanged_from_the_base
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_skills_check_exits_0_on_both_layouts
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f1_no_copy_names_a_memaudit_subcommand_or_standing_declare
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests
+11 passed in 0.53s

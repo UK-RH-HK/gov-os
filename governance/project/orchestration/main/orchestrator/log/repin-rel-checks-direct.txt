@@ -1,0 +1,30 @@
+ok   gov imports from the pin (/tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-494d5c9335fa/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint, brief, links, plan, resources
+ok   gov accept --help and gov launch --help (with --gate-override)
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   rerank.py: at most 64 texts (W2-137) and 24,000 padded characters a request
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   window 4's builds: W2-112's release, gov links, gov rebuild --integration, the launcher's GOV_STORE, the line cap, the measure's families
+ok   W2-32 S11: the pool module; the new pin accepts the five pool settings, and the main tree's own retrieval.yaml (the pool is on since window 4)
+ok   W2-137, W2-145: the service's bound, no private reranker beside it, the service holds the free slots
+ok   W2-141: the guard's search rule in gov.guard.reads; W2-150: the gov.util modules, and the old names still import
+ok   W2-56, W2-20, W2-136, W2-153: the launcher's sandbox, gate, environment and plan check import; the role template flag; portability.compose
+ok   W2-96: gov accept's opt-in suites
+ok   W2-152: gov brief --run; W2-20: gov resources --slot
+ok   3d: gov adapters, wait, dispatch, impact, session-watch, skilleval and release answer --help (P-2); gov.release's build and verify import
+ok   W2-20: gov resources reads this machine's gate.json, no fault (the gate is open)
+ok   W2-56: gov launch refuses an unknown ticket by name (LAUNCH_REFUSED), starting nothing
+ok   W2-136: gov plan --json answers (read-only)
+ok   W2-129, W2-55, W2-92: gov links --since HEAD~1 answers
+ok   the store W2-00-store-b at 494d5c9335fa: embed_headers true, 30935 vectors
+ok   gov retrieve on the store: lexical and semantic available, rerank.by service, the result names the store's commit and folder (W2-138), 5.341836495 s (not a latency gate: DEC-1125 (1))
+ok   gov context DAEO-sdxk builds with a wide budget; at the default ceiling it answers CONTEXT_OVER_CEILING, as the old pin does; --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+ok   the live hooks' 8 gov imports resolve in the new pin
+ok   the staged W2-141 pair's 8 gov imports resolve in the new pin
+ok   guard4_check.py: PASS (453 cases)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are let-throughs now refused (W2-42a, stricter): fix3 unterminated heredoc naming acceptance judged as before;fix3 python heredoc reading .env (gap as today);
+ok   tests/unit/hooks/test_live_hook.py and tests/unit/guard/test_w2_141_search.py: 267 passed
+ok   test_g14.py (the live hook, before W2-141's): 151 passed, 1 skipped
+ok   test_g14.py (the staged W2-141 pair): 4 failed, 147 passed, 1 skipped, the four W2-141 near-miss cases red by name
+CHECK FAILED: test_guard_fix_3.py: the new pin's failures differ from the old pin's (49 failed, 236 passed, 1 skipped in 43.42s / 49 failed, 236 passed, 1 skipped in 44.68s)

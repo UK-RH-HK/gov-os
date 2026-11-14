@@ -32,3 +32,66 @@ ok   check 2 is red on plain integrate (the adopt sources are the old bytes ther
 ok   check changed nothing
 ok   apply.sh check refuses a moved target (exit 3): exit 3
 --- order 1, the gated runs, one folder per run through the heavy-job gate: on the merged tree (W2-188's merge alone, then with this ACT)
+merged window tests/acceptance/W2-188: exit 1; 52 passed, 2 failed
+merged window tests/acceptance/W2-88a: exit 0; 35 passed, 0 failed
+merged window tests/acceptance/W2-11: exit 0; 241 passed, 0 failed, 1 skipped
+merged window tests/unit/adapters: exit 0; 110 passed, 0 failed
+merged window tests/unit/impact: exit 0; 42 passed, 0 failed
+merged window tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+merged window tests/acceptance/W1-38: exit 0; 46 passed, 0 failed
+merged window tests/acceptance/W2-153: exit 0; 137 passed, 0 failed, 18 skipped
+merged window tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+merged window tests/acceptance/W2-52: exit 0; 65 passed, 0 failed
+FAIL merged landed tests/acceptance/W2-188: exit 1; 51 passed, 3 failed; new red: ['tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base']
+ok   merged landed tests/acceptance/W2-88a: exit 0; 35 passed, 0 failed
+ok   merged landed tests/acceptance/W2-11: exit 0; 241 passed, 0 failed, 1 skipped
+ok   merged landed tests/unit/adapters: exit 0; 110 passed, 0 failed
+ok   merged landed tests/unit/impact: exit 0; 42 passed, 0 failed
+ok   merged landed tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+ok   merged landed tests/acceptance/W1-38: exit 0; 46 passed, 0 failed
+ok   merged landed tests/acceptance/W2-153: exit 0; 137 passed, 0 failed, 18 skipped
+ok   merged landed tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+ok   merged landed tests/acceptance/W2-52: exit 0; 65 passed, 0 failed
+     merged: red after the ACT: tests/acceptance/W2-188/test_w2_188_citp.py::test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged
+     merged: red after the ACT: tests/acceptance/W2-188/test_w2_188_citp.py::test_s5_the_owner_approval_line_names_the_after_sha256
+     merged: red after the ACT: tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base
+merged: red in the window: 2; made green by the ACT: 0; red after: 3; new red brought by the ACT: ['tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base']
+--- order 1, the named cases (W2-188's copy cases, -rA)
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_f1_no_copy_names_a_memaudit_subcommand_or_standing_declare: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base: window PASSED, landed FAILED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_a9_steps_1_to_5_and_7_and_the_verify_section_are_unchanged_from_the_base: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_base_pin_is_the_sha256_of_the_skill_at_5336a6fca: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_copies_carry_a_kernel_skill_changed_from_the_base: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_places: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_skills_check_exits_0_on_both_layouts: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_sources_line_gains_dec_1101_dec_1125_and_dec_1179_in_numeric_order_and_keeps_every_id: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_three_copies_are_byte_equal: window PASSED, landed PASSED
+     tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_version_is_1_1_0_in_the_front_matter_of_each_copy: window PASSED, landed PASSED
+--- order 1, the by-hand steps literally on the merged tree
+ok   git add the touched path: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched path (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched path): exit 0
+--- order 2 (the copy first, then the merge): plain integrate, apply.sh apply despite check 2's red, commit, then w2/W2-188 merged --no-ff
+ok   apply.sh check on plain integrate: exit 0
+ok   check 2 red before the merge (the operator's G8 refuses this order): exit 1
+ok   apply.sh apply: exit 0
+ok   check 1 green after the apply: exit 0
+portability on integrate with the copy but without W2-188: exit 1; findings [('GENERATED_DIFFERS', '.claude/skills/adopt/SKILL.md')] (the copy ahead of its sources)
+ok   commit the copy: exit 0
+ok   w2/W2-188 merges clean after the copy: exit 0
+ok   the touched file equals order 1's after bytes
+ok   order 2 check 1: exit 0
+ok   order 2 check 2: exit 0
+ok   order 2 portability after the merge: exit 0; findings []
+FAIL order 2 named cases equal order 1's landed status (9 passed, 2 not)
+FAIL order 2 tests/acceptance/W2-188: exit 1; 50 passed, 4 failed; red beyond order 1's landed: ['tests/acceptance/W2-188/test_w2_188_citp.py::test_s5_the_impact_table_says_w2_11_does_not_cover_adopt_adapter_portability_differs_until_the_copies_act_and_w2_88a_unchanged', 'tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests']
+ok   the live file unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 3
+{"manifest_sha256": "d5c8c2e60ad41a47d8f4effb724a4ea4509dc2c627c84c1698935cc6b9e18892", "touched": 1, "failures": 3, "branch_head": "ccc5b32256a9"}
+rc=0

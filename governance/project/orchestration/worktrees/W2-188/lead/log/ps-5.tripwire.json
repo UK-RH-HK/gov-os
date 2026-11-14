@@ -1,0 +1,19 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": "?? docs/changes/W2-187-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "head",
+   "before": "1074c9d0481f",
+   "after": "c1c8685b8079"
+  }
+ ]
+}

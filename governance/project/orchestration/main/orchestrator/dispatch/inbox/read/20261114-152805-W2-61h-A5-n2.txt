@@ -1,0 +1,13 @@
+log: W2-61h-A5-n2.json
+W2: W2-61h
+status: DONE
+
+task: DAEO-h2k3 (W2-61h), the N2 (b) and N1 test revision (DEC-1180 (1), (4))
+status: DONE
+work_completed:
+- Merged `w2/integrate` into w2/W2-61h-c39. It was a fast-forward to 494d5c933.
+- A fresh independent test designer (td-5) revised the S4/F3 check:
+  - a heading-cited section whose text changed is now listed, even though its heading is still found at HEAD;
+  - a section that moved unchanged is not listed;
+  - an entry is listed once, however many of its alternatives changed.
+- The designer proved (e), (f) and (g) on planted data, and (a)–(d) kept their outcomes. I merged that work at dbe

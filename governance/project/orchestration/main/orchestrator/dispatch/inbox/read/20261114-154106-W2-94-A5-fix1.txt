@@ -1,0 +1,9 @@
+log: W2-94-A5-fix1.json
+W2: W2-94
+status: DONE. The head to land is `66dd6e77abbdc1d2b0a304991bf3cdb5e119d3f3` on `w2/W2-94-fix`. The code was verified at `fac8d2026`; the only later commit is the probe record. The review passed, but the owner has a choice to make before the q02 run (P1 below).
+
+task: DAEO-g87r (W2-94), the one-question fix flow for q02 (S6–S12, F4–F6), build run
+status: DONE. The head to land is `66dd6e77abbdc1d2b0a304991bf3cdb5e119d3f3` on `w2/W2-94-fix`. The code was verified at `fac8d2026`; the only later commit is the probe record. The review passed, but the owner has a choice to make before the q02 run (P1 below).
+work_completed:
+- I made the interface exact in one text that both workers received: the flags, the three staged inputs, where the round-1 sample is read from, delivery, the result check and the counts key.
+- The test designer and the engineer ran in p

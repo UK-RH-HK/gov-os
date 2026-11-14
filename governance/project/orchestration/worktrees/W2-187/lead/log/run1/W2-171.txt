@@ -1,0 +1,64 @@
+..................F...........s......................................... [ 51%]
+...........................F.........................................    [100%]
+=================================== FAILURES ===================================
+__________________ test_the_ledger_events_have_item_3s_fields __________________
+
+make_world = <function make_world.<locals>.make at 0x7c3434405120>
+
+    def test_the_ledger_events_have_item_3s_fields(make_world):
+        world = make_world("judged:five")
+        ledger = world.ledger()
+        assert [e["seq"] for e in ledger] == list(range(1, len(ledger) + 1)), "seq consecutive"
+        assert all(ISO.match(e["at"]) for e in ledger), "at is ISO UTC to the microsecond"
+        by = {}
+        for e in ledger:
+            by.setdefault(e["event"], []).append(e)
+        assert set(by) >= {"preflight", "declaration", "used", "ready", "control", "search", "attempt", "store", "counts",
+                           "spend", "figures"}, sorted(by)
+        ready = by["ready"]
+        assert len(ready) == 1 and ready[0]["ok"] is True and ready[0]["why"] is None
+        control = by["control"][0]
+        assert {"k", "hit5", "of", "last", "last_audit", "ok"} <= set(control) and control["of"] == 40
+        searches = by["search"]
+        assert {"phase", "attempt", "call", "qid", "rc", "ms", "ok"} <= set(searches[0])
+        phases = {p: [e for e in searches if e["phase"] == p] for p in ("ready", "control", "attempt", "later")}
+        assert all(phases.values()) and {e["phase"] for e in searches} == set(phases)
+        assert len(phases["ready"]) == 1 and len(phases["control"]) == 40
+        kept = len(list((world.attempt_dir(1) / "kept").glob("*.json")))
+        assert len(phases["attempt"]) == kept
+        assert sorted(e["call"] for e in phases["attempt"]) == list(range(1, kept + 1)), "call is the kept number"
+        assert all(e["qid"] is None for e in phases["attempt"]) and all(e["qid"] for e in phases["later"])
+        assert all(isinstance(e["ms"], int) and e["ms"] >= 0 for e in searches)
+        assert [(e["n"], e["state"], e["cause"]) for e in by["attempt"]] == [(1, "start", None), (1, "done", None)]
+        store = by["store"][0]
+        assert (store["n"], store["same"], store["sha256"]) == (1, True, W.sha_file(world.store))
+        assert by["counts"][0]["attempt"] == "attempt-1"
+        figures = by["figures"][0]
+>       assert {k: figures[k] for k in ("right", "wrong", "n", "passes")} == {"right": 35, "wrong": 2, "n": 40,
+                                                                              "passes": True}
+E       AssertionError: assert {'n': 40, 'pa...5, 'wrong': 2} == {'n': 40, 'pa...5, 'wrong': 2}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'passes': False} != {'passes': True}
+E         Use -v to get more diff
+
+tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py:120: AssertionError
+______ test_s5_a_verdict_below_the_bar_stands_as_recorded_and_is_a_result ______
+
+make_world = <function make_world.<locals>.make at 0x7c34345c8900>
+
+    def test_s5_a_verdict_below_the_bar_stands_as_recorded_and_is_a_result(make_world):
+        world = make_world("judged:below")
+        assert world.staged["judge"]["code"] == 0, "a miss is a result: exit 0, FIGURES.json written"
+        out = world.staged["judge"]["out"].splitlines()
+>       assert any(x.startswith("BAR at least 34 right (NOT met)") and ": MISSES;" in x for x in out), out
+E       AssertionError: ['VERDICT right end to end 33 of 40 (82.5 %; exact 95 % interval 67.2 to 92.7 %); wrong claims 2 of 40 (5.0 %)', 'BAR ...f 39; search failures 1; calls run once more 1; spent 5.77 USD (projection 6.28, brake 12.56)', 'SEARCH FAILED 1: q02']
+E       assert False
+E        +  where False = any(<generator object test_s5_a_verdict_below_the_bar_stands_as_recorded_and_is_a_result.<locals>.<genexpr> at 0x7c34345e05f0>)
+
+tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py::test_the_ledger_events_have_item_3s_fields
+FAILED tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py::test_s5_a_verdict_below_the_bar_stands_as_recorded_and_is_a_result
+2 failed, 138 passed, 1 skipped in 426.57s (0:07:06)

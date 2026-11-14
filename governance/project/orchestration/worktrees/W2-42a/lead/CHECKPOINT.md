@@ -1,10 +1,11 @@
 ---
 task: DAEO-03ub
-decisions_applied: [DEC-1164, DEC-1174, DEC-1154, DEC-1028, DEC-958, DEC-136, DEC-968, DEC-409, DEC-808]
+decisions_applied: [DEC-1157, DEC-1180, DEC-1128, DEC-1133, DEC-136, DEC-968, DEC-1156]
 ---
-STATE: R3b (the CTO's F1 (a)) done; narrow check a7 pass by code (RO, NRA, DEC409 pass); probe record committed c24a414f1d49; returned DONE | HEAD: c24a414f1d49 | NEXT: land run: confirm HEAD = c24a414f1d49 and git status --short empty, return DONE | WAITING ON: the CTO (landing)
-Workers: td-8 39ec021b-6fb2-43eb-8c8f-4c84cf8ac629 done (022846a33413); eng-5 e653e1fc-4fb7-442d-990a-93d7eb49335b done (885b0d0f63dd); td-9 1eee15f0-14c5-4531-8589-930893293879 done (1eab590aee88; one guard refusal: a $(ls) in its heredoc read as a listing, not retried); eng-6 74eb50b0-f21e-4ada-8a7d-fbbf0d615105 done (9196ce961adf); a7 3d1b1a34-54a8-45b7-84ba-b5091bd2bf12 done (pass; 4 live-hook refusals and 1 quiet-hours write refusal, none retried)
-Rounds: converged (two build iterations; the second from the lead's probe finding at 885b0d0)
-Decisions taken: the CTO's order; iteration 2 (td-9, eng-6) for read-bound variable command names and mapfile/readarray -C callbacks (fail-opens confirmed in real bash); the remaining data-run-as-code forms (copy, array, pipe to sh, trap, set --) judged rows (ordinary work no; siblings without a here-string allowed at base); READY by code per JUDGEMENT.md
+STATE: R4/R5 build run: w2/integrate merged (d9e7dc8599be); td-10 running in W2-42a-tests | HEAD: d9e7dc8599be | NEXT: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/lead/log/td-10.exit | WAITING ON: td-10
+Workers: td-10 (pid 1996608, independent-test-designer, sonnet, C3, high) running
+Rounds: in progress (R4/R5 iteration 1)
+Decisions taken: the CTO's order (merge, td, engineer from failing output, accept + scoped run, narrow check r4); gov context built with --root W2-00-store --budget 20000 (main store lacks DEC-1180; ticket 18,203 tokens over 12000)
 Open packages: none
-Paths: briefs lead/r6/td-8.md, td-9.md, eng-5.md, eng-6.md, a7.md; logs lead/log/r3b-red.log, r3b2-red.log, r3b-*/r3c-* (verify), eng-5.*, eng-6.*, a7.*; probes lead/r6/*probe*.txt, gaps*.txt; record docs/probes/DAEO-03ub/PR-DAEO-03ub-r3b.md; tests worktree removed, branch w2/W2-42a-tests deleted
+Paths: briefs lead/r7/td-10.md; merge message lead/r7/merge-integrate.txt; ctx lead/r7/ctx-*.md; td-10 log W2-42a-tests/.gov-runtime/scratch/lead/log/td-10.*
+Previous round (R3b) record: docs/probes/DAEO-03ub/PR-DAEO-03ub-r3b.md, landed 77220f814

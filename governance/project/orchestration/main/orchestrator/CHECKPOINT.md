@@ -4,8 +4,14 @@
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
 
-- **15:35:** W2-184 LANDED d79c8c939 (queue closed it) -> REOPENED ad0b102ff (R1 lead refuses the 3 options, R2 atomic record.write, R3 probe record read from every root; DEC-1180 (4)); r line RELEASED (briefs/W2-184-A5-r.md); on its return rely on the inbox. Set-up B helper drafting drafts/setup-b-sweep/apply.py (apply after review, commit; tick row 137). OWNER asked: SETUP-B-OWNER S2/S14/S18 (a), config.lock rm, yes W2-188 adopt skill 6a884cf1. Integrate now has --owner-named (W2-184), the live gov not until the re-pin.
-- **15:25:** W2-184 f2 DONE 0a2dde35c0cc (rv-f1 narrow PASS, --owner-named DEC-1177 worked; accept 507/0) -> LAND QUEUED (land.txt). NO COMMIT DURING THE LAND. After land: the queue closes W2-184 -> REOPEN at once (DEC-1180 (4), not Wave 3) for auditor F1 (lead launch takes --reason/--trial/--owner-named silently) + F2 (record.write not atomic: an empty launch record refuses every worker launch); F3 (P-td5-2 stale copy) row. DND sweep notes APPLIED 9b971e345 (rows 122,123,125,137,4,34,136,154,166) + row 154 b55911153: the peaks from the ledger — lead_mem.py now records verify_kb/rebuild_kb per heavy-slot run (backup .pre-peaks; --summary gives runs/max/p95 >=100 MB); bring figures + gate.json ACT by 11-19. W2-42a REOPENED 4ac8f7955 (R4 D1 blob-ref diffs, R5 judge never raises; DND 122/123; DEC-1157 (12)); r4 line RELEASED (briefs/W2-42a-A5-r4.md, C3; worktree ~/gov-os-worktrees/W2-42a); then the live-hook ACT (DEC-1133 (2)) copies parser+R4/R5. Row 137 (set-up B list S1-S20 apply) + owner's S14/S18 package: NEXT. Guard refused my python naming a REV:PATH text (the D1/R5 fault itself) -> write such scripts with Write.
+- **15:52:** v2 review PASS, 0 blocking, F1-F8 rows (drafts/q02-variant-v2/review.md, verdict block, reviewed sha 7aa6d88c…). Line GIVEN to the owner: `yes q02 variant v2 7aa6d88c`. W2-61h ADVANCED integrate dc67c4f6be39 at 15:46; land-inflight still present (closing) -> wait for its inbox item, then DEC-1181 apply + W2-61h sources/status + the walled-run command.
+- **15:47:** q02 v2 DRAFTED: sha 7aa6d88c3a7769c1abe34ffd54b8ced4f4110fb2208ed1f316d1a7c000b021b6 (drafts/q02-variant-v2/, NOTES.md has the scaffold-3 commands: cp into the clone, commit Task DAEO-g87r, new --commit). INDEPENDENT REVIEW running (Opus auditor -> drafts/q02-variant-v2/review.md with verdict block). On PASS: give the owner `yes q02 variant v2 7aa6d88c` (P-Q02-V2 (b)); on the yes: scaffold 3, then at W2-94's land the 4 commands with v2's sha + scaffold-3 commit. Report sent 15:46 (status marked).
+- **15:45 (real clock; compaction 4 at ~15:38):** OWNER ~15:40: `yes W2-188 adopt skill 6a884cf1`; SETUP-B-OWNER S2/S14/S18 (a), B4 (a) stands; `yes P-Q02-RUN-1 0703aebf` effective at W2-94's land after review -> send the operator's 4 commands AT THE LAND; operator removes config.lock (still there 15:44); STANDING: every status block names each reopened ticket + why (status_block.py now prints "Reopened since the last report … New tickets …" from .tickets diffs; memory saved). S18 DONE (drafts/sandbox-exp deleted 15:42). DEC-1181 DRAFT drafts/dec-1181/apply.py (dry-run ok: register entry + 0.562, DIF, W3-P28 RETIRED, SWITCHED-OFF S2/S14/S18 marks, DND 137 DONE + rows 207-209) -> APPLY + COMMIT (Task: decision-record) as soon as land-inflight.txt is gone. W2-94-fix DONE 66dd6e77abbd (review PASS P1-P8 rows) -> land.txt queued 15:43 (behind W2-61h's land, which runs since 15:29). P8 checked: no ~/gov-os-runs/indep/AUDITS.log -> clear. P1 (writer not given the fixed brief: exit-20 risk) -> package P-Q02-V2 to the owner 15:46 (rec (b)); FORK drafting v2 at drafts/q02-variant-v2/ (sha + scaffold-3 commands in NOTES.md). P4 (counts schema `fix` key; indep-schemas is NOT class O) -> add to W2-94 within purpose when re-setting it in_progress after its land. After W2-94's land: status in_progress (+ P4 KPI + path), then the 4 commands (v1 or v2 per the owner).
+- **~15:32 (stamped 15:55 AHEAD of the clock, stale 4):** COPIES-12 fork PACKAGES: bundle built (manifest d5c8c2e6 — DO NOT GIVE; rebuild needed), 1 file .claude/skills/adopt/SKILL.md -> 65d6abd9…, class b, gates pass; D1 W2-188 guard test_f2_the_claude_copy_of_the_skill_equals_the_base goes red once the copy lands; D2 test_f2_no_commit_… red if the ACT commit carries Task: DAEO-zlog. P-C12-1 (a) DECIDED by the CTO (DEC-1156 (7), DEC-1157 (12)): W2-188's TD revises both (F2-copy also passes at the ACT's after-bytes 65d6abd9…; F2-commits excuses a Role: owner commit whose subject names ACT-CLAUDE-COPIES-) -> route into W2-188's NEXT resume after s5 returns (the running lead cannot be told). Then rebuild: `python3 -I drafts/claude-copies-12/build_claude_copies_act_12.py <fresh integrate clone> acts/ACT-CLAUDE-COPIES-12 <scratch>/work` (expect failures 0, new sha), reviewer with drafts/claude-copies-12/review-prompt.md -> review.md (verdict block), package, owner line. W2-42a td-10 refused --model sonnet (promotion applies -> Opus); lead relaunches.
+- **~15:30 (stamped 15:50, ahead):** W2-61h n2 DONE 1a2bf4a16a0f (narrow PASS PR-DAEO-h2k3-n2.md; accept 22/0; verify 1 red W2-112 shared-reranker load-sensitive, passes alone) -> LAND QUEUED. NO COMMIT DURING THE LAND. After land: (1) DEC-1180 into DAEO-h2k3 sources + status in_progress if the queue closed it; (2) owner's tree-checked command: git merge-base --is-ancestor 1a2bf4a16 HEAD + grep -c GoldBlockChanged + pytest -B $PWD paths; EXPECT 7 passed 0 failed, one GoldBlockChanged warning holding h03 entry (+ possibly other heading-cited entries changed since own commit; count >= 1; ids + entry numbers only); W2-61h closes on it (close record DEC-953). Rows R1 (hidden (g) plant not separating N1), N3 (q21-q24 anchor-miss red) -> later rows.
+- **~15:25 (stamped 15:45, ahead):** Set-up B sweep APPLIED eb63df3c3 (21 edits/12 files; row 137 DONE except owner's S2/S14/S18; S12 skipped, W2-56 closed). On SETUP-B-OWNER answer: S2 retire W3-P28 row, S14 W2-40 (DAEO-6ox0) lifted lines (marked edit), S18 rm -r drafts/sandbox-exp/ (scratch), record the DEC.
+- **~15:21 (stamped 15:35, ahead):** W2-184 LANDED d79c8c939 (queue closed it) -> REOPENED ad0b102ff (R1 lead refuses the 3 options, R2 atomic record.write, R3 probe record read from every root; DEC-1180 (4)); r line RELEASED (briefs/W2-184-A5-r.md); on its return rely on the inbox. Set-up B helper drafting drafts/setup-b-sweep/apply.py (apply after review, commit; tick row 137). OWNER asked: SETUP-B-OWNER S2/S14/S18 (a), config.lock rm, yes W2-188 adopt skill 6a884cf1. Integrate now has --owner-named (W2-184), the live gov not until the re-pin.
+- **~15:18 (stamped 15:25, ahead):** W2-184 f2 DONE 0a2dde35c0cc (rv-f1 narrow PASS, --owner-named DEC-1177 worked; accept 507/0) -> LAND QUEUED (land.txt). NO COMMIT DURING THE LAND. After land: the queue closes W2-184 -> REOPEN at once (DEC-1180 (4), not Wave 3) for auditor F1 (lead launch takes --reason/--trial/--owner-named silently) + F2 (record.write not atomic: an empty launch record refuses every worker launch); F3 (P-td5-2 stale copy) row. DND sweep notes APPLIED 9b971e345 (rows 122,123,125,137,4,34,136,154,166) + row 154 b55911153: the peaks from the ledger — lead_mem.py now records verify_kb/rebuild_kb per heavy-slot run (backup .pre-peaks; --summary gives runs/max/p95 >=100 MB); bring figures + gate.json ACT by 11-19. W2-42a REOPENED 4ac8f7955 (R4 D1 blob-ref diffs, R5 judge never raises; DND 122/123; DEC-1157 (12)); r4 line RELEASED (briefs/W2-42a-A5-r4.md, C3; worktree ~/gov-os-worktrees/W2-42a); then the live-hook ACT (DEC-1133 (2)) copies parser+R4/R5. Row 137 (set-up B list S1-S20 apply) + owner's S14/S18 package: NEXT. Guard refused my python naming a REV:PATH text (the D1/R5 fault itself) -> write such scripts with Write.
 - **15:15:** W2-188's td-2 launch died exit 2: `gov: unrecognized arguments: --owner-named DEC-1157` (W2-188-tests tree's gov lacks W2-184's option; my s5 brief named it — MY DEFECT, missed 4). FIXED same flow: launch_worker.sh now refuses (exit 2, "W2-184 not merged here") before launching when the code root's src/gov/{launch,cli} lack --owner-named; test +1 case, PASS. The W2-188 lead lives (pid 1606606); watch whether it relaunches td-2 without the option. W2-61h n2 narrow check PASS at dbe123673 (interim 1a2bf4a16) -> DONE soon. Helper checking DND sweep notes 2-7 -> drafts/dnd-sweep-20261114-notes.md.
 - **15:10:** W2-188 PACKAGES 15:01 (07d7361e7; review r1 PASS; skill sha 6a884cf1…9489, CIT-P b3105bc8): P-W2-188-S5 (a) BY THE CTO (DEC-1157 (12)): S5/I6 re-baselined 063a35585 + sources 18a279055 (listed for the owner's reading); s5 run RELEASED (briefs/W2-188-A5-s5.md: TD revises one case, narrow check PR-DAEO-zlog-s5.md, verify; DONE with CIT-P sha), wait bvg725rkm; DAEO-zlog C2 in ticket-class.json. OWNER line given: `yes W2-188 adopt skill 6a884cf1` (bytes; CIT-P may change wording only). FORK building ACT-CLAUDE-COPIES-12 (adopt .claude copy) -> its owner line after review. After both yeses + W2-187 merged (waits_on): owner_approval into CIT-P, kernel-approved rows, hand merge (Task DAEO-zlog), .req COPIES-12, close on fresh accept. Inbox waiter b5e7punfy (file handled items to inbox/read/).
 - **14:55 (after compaction 3):** P-W2-184-4 (a) DONE by the CTO: launch_worker.sh passes --owner-named/--reason/--trial before `--` (backup .pre-p-w2-184-4; test_launch_worker.sh +4 cases PASS). W2-184 f2 RELEASED (briefs/W2-184-A5-f2.md: launch rv-f1 --owner-named DEC-1177, Opus high; DONE/PACKAGES); old f1 line commented; DAEO-6f0s C2 (+h2k3 C2) added to log/ticket-class.json; wait bsu83k8un. Stale empty .git/config.lock (14:08, no holder): the guard refuses my rm (catastrophic-delete rule) -> OWNER'S OPERATOR line given: `rm -f /home/usain/Dynamic-Agentic-Engineering-OS/.git/config.lock`. Inbox waiter bx6oveu6c.
@@ -1593,9 +1599,10 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-14T14:45:00Z fdf7201ceba63fd51f720359f9ed6ecff7af765f51ed680282b6dcd288b01dfc
-git head: 494d5c9335fae70ff4cbc7ca3c9eb35b764b71b1
+generated: 2026-11-14T15:39:23Z 53acf7c2ddd43d8e5334ec2527e10990fcadf9cfe957346daeb2caa34d8ebd9d
+git head: eb63df3c349ce75fa68dfd5a16918e6d117f2c79
 tickets in progress (`tk ls --status=in_progress`):
+  DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0cd2 [in_progress] - W2-187 The standing hidden set, judged every week at 95 %, counts only <- [DAEO-f58b, DAEO-rmhj]
   DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
@@ -1606,13 +1613,13 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
   DAEO-zlog [in_progress] - W2-188 The adopt skill's step 6 and the practice record: the standing set <- [DAEO-pg6i]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS        494d5c933 [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS        eb63df3c3 [w2/integrate]
   /home/usain/gov-os-worktrees/D6-F-tests           2761682a2 [w2/D6-F-tests]
   /home/usain/gov-os-worktrees/EMG-queue            04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/W2-00-d10r2-records  66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record         8503dbd28 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a        c1cb5285c (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b        494d5c933 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record         063fb97d5 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a        eb63df3c3 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b        ad0b102ff (detached HEAD)
   /home/usain/gov-os-worktrees/W2-04                c77dc358d [w2/W2-04]
   /home/usain/gov-os-worktrees/W2-05                52de591b8 [w2/W2-05]
   /home/usain/gov-os-worktrees/W2-100               20b9b7284 [w2/W2-100]
@@ -1700,12 +1707,13 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-181               499543a83 [w2/W2-181]
   /home/usain/gov-os-worktrees/W2-182               04914c869 [w2/W2-182]
   /home/usain/gov-os-worktrees/W2-183               6a82ec67a [w2/W2-183]
-  /home/usain/gov-os-worktrees/W2-184               fb2ea8460 [w2/W2-184]
+  /home/usain/gov-os-worktrees/W2-184               bbe1510f8 [w2/W2-184]
+  /home/usain/gov-os-worktrees/W2-184-tests         bbe1510f8 [w2/W2-184-tests]
   /home/usain/gov-os-worktrees/W2-185               47e708a23 [w2/W2-185]
-  /home/usain/gov-os-worktrees/W2-187               76d300571 [w2/W2-187]
+  /home/usain/gov-os-worktrees/W2-187               87d6fd835 [w2/W2-187]
   /home/usain/gov-os-worktrees/W2-187-tests         376d47a2b [w2/W2-187-tests]
-  /home/usain/gov-os-worktrees/W2-188               07d7361e7 [w2/W2-188]
-  /home/usain/gov-os-worktrees/W2-188-tests         3c5167c47 [w2/W2-188-tests]
+  /home/usain/gov-os-worktrees/W2-188               c1c8685b8 [w2/W2-188]
+  /home/usain/gov-os-worktrees/W2-188-tests         f71c82430 [w2/W2-188-tests]
   /home/usain/gov-os-worktrees/W2-20                057926aa3 [w2/W2-20]
   /home/usain/gov-os-worktrees/W2-20-1017           1a54976c7 [w2/W2-20-1017]
   /home/usain/gov-os-worktrees/W2-20-collect        a38809a33 [w2/W2-20-collect]
@@ -1716,7 +1724,8 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-33                82da49202 [w2/W2-33]
   /home/usain/gov-os-worktrees/W2-37                0ee2de2d9 [w2/W2-37]
   /home/usain/gov-os-worktrees/W2-40                29753c768 [w2/W2-40]
-  /home/usain/gov-os-worktrees/W2-42a               c24a414f1 [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-42a               d9e7dc859 [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-42a-tests         d9e7dc859 [w2/W2-42a-tests]
   /home/usain/gov-os-worktrees/W2-45                5e53394ce [w2/W2-45]
   /home/usain/gov-os-worktrees/W2-52                a77ef5f20 [w2/W2-52]
   /home/usain/gov-os-worktrees/W2-55-f2             2fe928a4c [w2/W2-55-f2]
@@ -1727,13 +1736,13 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-56-f-tests        3ea3411e1 [w2/W2-56-f-tests]
   /home/usain/gov-os-worktrees/W2-56-tests          85b28ef0f [w2/W2-56-tests]
   /home/usain/gov-os-worktrees/W2-60a               a7aa762ab [w2/W2-60a]
-  /home/usain/gov-os-worktrees/W2-61h-c39           dbe123673 [w2/W2-61h-c39]
+  /home/usain/gov-os-worktrees/W2-61h-c39           1a2bf4a16 [w2/W2-61h-c39]
   /home/usain/gov-os-worktrees/W2-61h-d10r2-tests   35396225e [w2/W2-61h-d10r2-tests]
   /home/usain/gov-os-worktrees/W2-61h-q23-tests     53affe533 [w2/W2-61h-q23-tests]
   /home/usain/gov-os-worktrees/W2-66c               400991361 [w2/W2-66c]
   /home/usain/gov-os-worktrees/W2-78                8e7640b96 [w2/W2-78]
   /home/usain/gov-os-worktrees/W2-81                6e2003ff3 [w2/W2-81]
-  /home/usain/gov-os-worktrees/W2-88                4d49108fb [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88                2da02b28e [w2/W2-88]
   /home/usain/gov-os-worktrees/W2-88-tests          0841cfb3c [w2/W2-88-tests]
   /home/usain/gov-os-worktrees/W2-88a               c79a20f1f [w2/W2-88a]
   /home/usain/gov-os-worktrees/W2-88b               266ec245e [w2/W2-88b]
@@ -1744,8 +1753,7 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-92-proto          e884675b4 [w2/W2-92-proto]
   /home/usain/gov-os-worktrees/W2-93                206d2b47d [w2/W2-93]
   /home/usain/gov-os-worktrees/W2-94                72a339b9d [w2/W2-94]
-  /home/usain/gov-os-worktrees/W2-94-fix            e48c99a67 [w2/W2-94-fix]
-  /home/usain/gov-os-worktrees/W2-94-fix-tests      340cd0efb [w2/W2-94-fix-tests]
+  /home/usain/gov-os-worktrees/W2-94-fix            66dd6e77a [w2/W2-94-fix]
   /home/usain/gov-os-worktrees/W2-96-d10b           bb71be1cf [w2/W2-96-d10b]
   /home/usain/gov-os-worktrees/research-retrieval   a5c0c34f6 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint

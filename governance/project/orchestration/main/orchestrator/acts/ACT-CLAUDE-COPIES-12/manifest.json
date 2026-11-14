@@ -1,0 +1,38 @@
+{
+ "act": "ACT-CLAUDE-COPIES-12",
+ "dec": "DEC-315, DEC-1112 (3), DEC-1166 (4), DEC-1179, CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/skills/adopt/SKILL.md",
+   "before": "77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6",
+   "after": "65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/skills/adopt/SKILL.md": "77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6",
+  "after/repo/.claude/skills/adopt/SKILL.md": "65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc",
+  "list.txt": "c4443b55edf9c3f2630bc4a9ab82a9e2935c3e8bb1ddd9ab07f2a995c7592b09",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "74ae578dc41e10a9dd3d5b0cf15a5561d8df212e1a85619f3e1442b21f7a9be3"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "74ae578dc41e10a9dd3d5b0cf15a5561d8df212e1a85619f3e1442b21f7a9be3"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc  .claude/skills/adopt/SKILL.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489  .rulesync/skills/adopt/SKILL.md\n6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489  template/.rulesync/skills/adopt/SKILL.md\n6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489  template/governance/kernel/skills/adopt/SKILL.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}
