@@ -19,6 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from datetime import timedelta
 from pathlib import Path
@@ -35,6 +36,7 @@ CATEGORIES = ("decision", "contract", "plan", "ticket", "exact-string", "callers
 NOT_DUE = "not due: no verdict set used"
 EXIT_UNAPPROVED = 10  # the exit code of a launch under a variant the owner has not approved
 REFRESH = "gov rebuild --integration <branch>"  # S11: installed through the ACT, never by the tool
+CRON = "governance/project/orchestration/tools/memaudit_cron.sh"  # W2-187 I11: the repository's weekly line
 # The audit's cost for 40 questions (MEMORY-AUDIT-1.md section 7, basis E): about $30 with round 2, 35 GPU minutes
 # (10 for the set and its control, 25 for the pool at first), the owner's 5 minutes a week. The tokens follow from the
 # dollars at an assumed blended list price; the first audit measures them all and replaces these.
@@ -127,10 +129,26 @@ def audit_record(out: Path, *, sets_root: str, audits: list[str], made: dict, to
 
 # ---- the walls' ACT (S22)
 
-def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str]) -> Path:
+def _toplevel(out: Path) -> str:
+    """The git top level of ``out`` (or of its nearest folder that exists), else that folder: A9 writes inside the
+    repository."""
+    here = Path(out).resolve()
+    while not here.exists():
+        here = here.parent
+    try:
+        done = subprocess.run(["git", "-C", str(here), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    except OSError:
+        return str(here)
+    return done.stdout.strip() if done.returncode == 0 and done.stdout.strip() else str(here)
+
+
+def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str], repo=None) -> Path:
     """Write ``<out>/memory-audit/ACT-WALLS/``: the walls' template copy, the sets root's spec (mode 0700), the
-    approved list with the three variant briefs, the path map's hidden globs and the refresh the operator installs.
-    Nothing is applied: no folder is made at the sets root, no path map and no crontab is changed."""
+    approved list with the three variant briefs, the path map's hidden globs, the refresh the operator installs and the
+    repository's weekly cron line (text for its owner's operator, W2-187 I11). ``repo`` defaults to the git top level of
+    ``out``. Nothing is applied: no folder is made at the sets root, no path map is changed and no cron table is read or
+    written."""
+    repo = str(repo) if repo is not None else _toplevel(out)
     act = Path(out) / "memory-audit" / "ACT-WALLS"
     (act / "walls").mkdir(parents=True, exist_ok=True)
     for source in sorted((GOV_OS / WALLS).glob("*")):
@@ -155,7 +173,9 @@ def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[
         f"4. Add `hidden-globs.txt`'s globs to the path map's `evaluation_sets` (`{audit}`), every role but the "
         "orchestrator refused.\n"
         f"5. Install the refresh the operator runs after each update of the integration branch: `{REFRESH}` "
-        "(W2-116), with the daily backstop.\n", encoding="utf-8")
+        "(W2-116), with the daily backstop.\n"
+        "6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by adoption): "
+        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} {GOV_OS / CRON} --repo {repo}`\n", encoding="utf-8")
     return act
 
 

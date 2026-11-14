@@ -186,3 +186,47 @@ def test_figures_gives_null_for_a_missing_file_and_exits_ok(tmp_path):
     assert digest.figures(str(tmp_path), "memory-audit-20261112", said.append) == "ok"
     line = json.loads(said[0])
     assert line["verdict"] is None and line["kept"] is None and line["pool"] is None
+
+
+# ---- W2-187: a fresh run beside a live standing set (I7, I12), and the state per repository (I2)
+
+def test_a_fresh_digest_beside_a_live_set_has_the_twelve_lines_then_drift_and_the_latest_maintain_line():
+    plain = digest.lines(_state())
+    assert len(plain) == 12  # with no live set the block is as it was
+    maintain = "MAINTAIN 1 store current aaaaaaaaaaaa 2 layout current 3 links 0 4 unindexed 0 5 not_found 0 second 0 6 reanchor 0"
+    block = digest.lines(_state(drift={"set": "s", "word": "STANDING_FITTED", "S": 96.0, "F": 90.0, "k": 4},
+                                maintain=maintain))
+    assert block[:12] == plain and len(block) == 14
+    assert block[12] == "DRIFT S 96.0 F 90.0: STANDING_FITTED" and block[13] == maintain
+    assert digest.lines(_state(drift={"word": "none", "S": 95.0, "F": 94.0, "k": 4}))[12] == "DRIFT S 95.0 F 94.0: none"
+    assert digest.lines(_state(drift={"word": None, "k": 2}))[12:] == ["DRIFT not yet (2 of 4)", "MAINTAIN none"]
+
+
+def test_the_history_line_says_fresh_only_beside_a_live_set(tmp_path):
+    st = {"audit": "memory-audit-20261116", "commit": "a" * 40, "mode": "weekly"}
+    at = T0
+    for kind in (None, "fresh"):
+        driver._history(tmp_path, st, at, 0.01, False, measured=True, fig={"verdict": {"passes": True}}, kind=kind)
+    rows = [json.loads(x) for x in (tmp_path / "HISTORY.jsonl").read_text().splitlines()]
+    assert "kind" not in rows[0] and rows[1]["kind"] == "fresh"
+    assert {k: v for k, v in rows[1].items() if k != "kind"} == rows[0]
+
+
+def test_a_refusal_for_a_fresh_run_ignores_the_standing_starts_and_a_standing_run_needs_no_baseline(repo, tmp_path):
+    head = _git(repo, "rev-parse", "HEAD")
+    at = T0.replace(year=2026, month=10, day=1, hour=1)  # an hour after the head's commit
+    state = tmp_path / "state"
+    (state / "indep").mkdir(parents=True)
+    (state / "STARTS.log").write_text(json.dumps({"audit": "s", "at": schedule.stamp(at - timedelta(days=1)),
+                                                  "kind": "standing"}) + "\n")
+    st = {"audit": "memory-audit-20261001"}
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo) == "RN-NOBASE"
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo, standing=True) is None
+    (state / "indep" / "AUDITS.log").write_text(json.dumps({"commit": head}) + "\n")
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo) is None  # the standing start is not recent
+    (state / "STARTS.log").write_text(json.dumps({"audit": "f", "at": schedule.stamp(at - timedelta(days=1)),
+                                                  "kind": "fresh"}) + "\n")
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo) == "RN-RECENT"
+    assert driver._refusal(st, state, str(tmp_path / "lock"), True, False, at, head, repo, standing=True) == "RN-LOCK"
+    late = at + timedelta(days=2)
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, True, late, head, repo, standing=True) == "RN-STALE"
