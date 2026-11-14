@@ -1,10 +1,11 @@
 """``gov status`` as a command module (W1-32, CAP-27.a, CAP-28.a). The convention is in ``gov.cli.main``.
 
-Six parts, each read from the module that owns its rule: ``tickets`` (``gov.tasks``: the READY rule and the claim
+Eight parts, each read from the module that owns its rule: ``tickets`` (``gov.tasks``: the READY rule and the claim
 lock), ``decision_packages`` (the record store), ``readiness`` (``gov.readiness``), ``governance_share``
 (``gov.telemetry.counter``), ``pause`` (the guard's reading of the freeze flag and its mirror) and ``doctor``
-(``gov doctor``); and ``reranker`` (``gov.retrieval.rerank``: the searches that fell back from the shared reranker,
-W2-112). It only reads: no store is loaded and nothing is cached.
+(``gov doctor``); ``reranker`` (``gov.retrieval.rerank``: the searches that fell back from the shared reranker,
+W2-112); and ``integration_store`` (``gov.status.integration_store``: the integration store's head, branch head,
+build time, age and whether it is stale, W2-116 S2). It only reads: no store is loaded and nothing is cached.
 
 A result is measured or it is refused (DEC-449, DEC-454). A part, a list or an entry that was not read is
 ``{"read": false, "reason": ...}`` in its place, never an empty list, a zero or "not paused", and ``not_read``
@@ -176,6 +177,13 @@ def _reranker() -> dict:
     return status()
 
 
+def _integration_store(root: Path) -> dict:
+    """W2-116 S2: the integration store's head, age and staleness (``gov.status.integration_store``)."""
+    from gov.status.integration_store import read
+
+    return read(root)
+
+
 def _unread_in(value, where: str = "") -> list[str]:
     """``<where>: <reason>`` of everything in the answer that says it was not read."""
     if isinstance(value, dict) and value.get("read") is False:
@@ -195,6 +203,7 @@ def run(root: Path, args, config: dict) -> dict:
         "pause": _part(_pause, root),
         "doctor": _part(_doctor, root, args, config),
         "reranker": _part(_reranker),
+        "integration_store": _part(_integration_store, root),
     }
     # ``root`` and ``config_files`` are W1-07's answer, kept: a builder test of the command line reads them.
     return {"root": str(root), "config_files": sorted(config), **answer, "not_read": _unread_in(answer)}

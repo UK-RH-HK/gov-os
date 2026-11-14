@@ -18,6 +18,14 @@ allowed_paths:
 - tests/unit/adapters/test_w2_185_*.py
 - tests/acceptance/W1-38/w1_38_support.py  # the fixture copies the seven kernel hooks; a test designer's revision (DEC-1156 (7))
 - docs/probes/DAEO-qyt2/**  # the probe record
+- tests/unit/gitenv/test_hooks_lifted.py
+- tests/acceptance/W2-59/test_w2_59_hook_lines.py
+- tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py
+- tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py
+- tests/acceptance/W1-38/test_w1_38_hooks_source.py
+- tests/acceptance/W1-38/w1_38_hooks_support.py
+- tests/unit/hooks/test_w2_106_template_hook_lines.py
+- tests/acceptance/W2-05/test_w2_05_hooks_source.py
 reads:
 - .tickets/DAEO-5y8d.md
 - .rulesync/hooks.jsonc
@@ -48,3 +56,5 @@ The owner's P-W2-182-E-1 (1) (DEC-1167): W2-182 lands without E; this ticket car
 alone turned four cases red (W2-182 run 3, `log/W2-182-A5-run3.json`): portability's per-event lift exemption (DEC-971
 item 3) let the root's and template's postToolUse match only by coincidence, and W1-38's fixture copies six hooks. A test
 designer writes W2-185's cases and revises W1-38's fixture; an engineer builds S1 and S2; a STANDARD review; the land.
+
+**Widened 2026-11-13 (P-W2-185-REDS-1 (a), the CTO under DEC-1156 (7)):** the eight test files holding the 18 cases that pin the behaviour before DEC-1167 (4), for one test-designer revision batch (each file one Rewrite-Reason, no case losing its point).

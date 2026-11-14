@@ -1,6 +1,6 @@
 ---
 id: DAEO-f58b
-status: in_progress
+status: closed
 deps: [DAEO-lrre]
 links: []
 created: 2026-10-31T23:52:57Z
