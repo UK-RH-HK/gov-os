@@ -44,10 +44,11 @@ SAMPLE_EVERY = 10                # the one-per-file form is timed on every 10th 
 
 @pytest.fixture(scope="module")
 def before_src(tmp_path_factory):
-    """``src`` of the base commit (the one-per-file form), exported by ``git archive`` into a temporary folder."""
+    """``src`` of the base commit (the one-per-file form), exported by ``git archive`` into a temporary folder: the named folder ``src`` only, git
+    run in it (DEC-385: never the whole tree)."""
     folder = tmp_path_factory.mktemp("s27-before")
-    data = subprocess.run(["git", "-C", str(W.REPO_ROOT), "archive", "--format=tar", BASE_REV, "src"], capture_output=True,
-                          check=True).stdout
+    data = subprocess.run(["git", "-C", str(W.REPO_ROOT / "src"), "archive", "--format=tar", "--prefix=src/", BASE_REV],
+                          capture_output=True, check=True).stdout
     with tarfile.open(fileobj=io.BytesIO(data)) as archive:
         archive.extractall(folder, filter="data")
     try:

@@ -456,6 +456,8 @@ the suite's exit 1: the lead's brief says "exits 2", 2 being argparse's usage er
 
 Revised (lead's interface correction, DEC-1052): the refusal is checked in the envelope; the stderr line only without `--json`.
 
+Revised (DEC-385): `archive` and `before_src` export named paths only.
+
 **Seams and plants.** The release form (S24): a `git archive HEAD` export is built with `python3 -m pip wheel -q --no-deps --no-build-isolation --no-index`, installed with
 `pip --python <venv> install --no-deps --no-index` into a fresh venv (`--system-site-packages --without-pip`), all in the module's tmp folder, never on the machine; the kit by
 `copier copy --trust --defaults --skip-tasks --overwrite --vcs-ref v0.0.0-s24` from a small repository holding `copier.yml` and `template/` of HEAD with that tag (a clone of the
