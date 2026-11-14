@@ -79,9 +79,14 @@ def test_s1_each_of_the_87_names_every_changer_the_census_states_on_its_own_stat
 
 
 def test_s1_the_marks_e12f8a30c_adds_equal_patches_a0_a1_a2_after_the_audits_drops_and_rewrites(record):
-    patched = set()
+    patched, touched = set(), set()
     for name in ("patch-a0", "patch-a1", "patch-a2"):
-        patched |= s.patch_register_pairs(record.block(name, "diff"), s.START)
+        patch = record.block(name, "diff")
+        patched |= s.patch_register_pairs(patch, s.START)  # a0 (the archive's lines) holds no register hunk
+        touched |= set(s.patch_sections(patch))
+    assert touched <= set(s.changed_files(s.FIRST)), (
+        f"patches a0-a2 change files e12f8a30c does not: {sorted(touched - set(s.changed_files(s.FIRST)))}")
+    assert patched, "patches a0-a2 hold no mark of a register status line"
     items = s.audits_by_commit(record).get(s.full(s.FIRST))
     assert items is not None, "audits has no item for e12f8a30c"
     judged = s.audit_marks(items, "free_text") + s.audit_marks(items, "labelled")
@@ -94,14 +99,28 @@ def test_s1_the_marks_e12f8a30c_adds_equal_patches_a0_a1_a2_after_the_audits_dro
 
 
 def test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_and_append_only(record):
+    # The line is about the clean-up's marks, the census's pairs: one of them added after e12f8a30c is in c4420040f
+    # or a follow-up marks commit, append-only. A later commit's own change of a status line of the 87 (DEC-866's
+    # marking of a new decision's change, e.g. 518772b5c's DEC-989<-DEC-1141) adds no census pair; it may stay out of
+    # a marks commit, but its line must keep the old line whole (an append), never an edit in the middle.
     ids = set(record.data("ids-87"))
+    census = record.data("census")
     allowed = set(s.marks_commits(record))
     log = s.git("log", "--reverse", "--no-merges", "--format=%H", f"{s.full(s.FIRST)}..HEAD", "--", s.REGISTER)
     bad = []
     for commit in log.split():
         for change in s.register_delta(s.parent(commit), commit)["changes"]:
-            if change["id"] in ids and (commit not in allowed or change["kind"] not in ("append", "status")):
-                bad.append((commit[:12], change["id"], change["kind"]))
+            if change["id"] not in ids:
+                continue
+            if commit in allowed:
+                if change["kind"] not in ("append", "status"):
+                    bad.append((commit[:12], change["id"], change["kind"]))
+                continue
+            tail = change["new"][len(change["old"]):]
+            if not change["new"].startswith(change["old"]):
+                bad.append((commit[:12], change["id"], "edited outside a marks commit, not an append"))
+            elif set(s.ids_in(tail)) & set(census[change["id"]]):
+                bad.append((commit[:12], change["id"], "a census pair marked outside a marks commit"))
     assert not bad, f"a register status line of the 87 changed outside a marks commit or not append-only: {bad[:5]}"
 
 
@@ -130,11 +149,11 @@ def test_s2_judged_wrong_holds_the_eight_gov_links_pairs_each_with_the_auditors_
     assert in_gov == set(s.EIGHT), "in_gov_links: true must hold exactly the 8 gov links pairs"
 
 
-@pytest.mark.parametrize("changed,changer,mark", [("DEC-1115", "DEC-1122", " · **Changed by:** DEC-1122 (4)"),
-                                                   ("DEC-026", "DEC-086", " · **Changed by:** DEC-086")],
+@pytest.mark.parametrize("changed,changer", [("DEC-1115", "DEC-1122"), ("DEC-026", "DEC-086")],
                          ids=["dec-1115-dec-1122", "dec-026-dec-086"])
-def test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict(record, head_tree, changed, changer,
-                                                                                mark):
+def test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict(record, head_tree, changed, changer):
+    # The pair is the line's; the mark's own wording (its part) is the auditor's to correct (S3), so the commit is
+    # the one follow-up marks commit that makes the entry's status line name the changer, appended to the old line.
     assert s.names_changer(_head_lines(head_tree)[changed], changer), f"HEAD's {changed} does not name {changer}"
     audits, first, second = s.audits_by_commit(record), s.full(s.FIRST), s.full(s.SECOND)
     found = []
@@ -142,9 +161,10 @@ def test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict(
         if commit in (first, second) or not (s.is_ancestor(first, commit) and s.is_ancestor(second, commit)):
             continue
         for change in s.register_delta(s.parent(commit), commit)["changes"]:
-            if change["id"] == changed and change["kind"] == "append" and change["tail"] == mark:
+            if (change["id"] == changed and change["kind"] == "append" and changer in s.ids_in(change["tail"])
+                    and s.names_changer(change["new"], changer) and not s.names_changer(change["old"], changer)):
                 found.append(commit)
-    assert len(found) == 1, f"{changed}: {len(found)} follow-up marks commits append exactly {mark.strip(' · ')!r}"
+    assert len(found) == 1, f"{changed}: {len(found)} follow-up marks commits append a mark naming {changer}"
     item = audits.get(found[0])
     assert item is not None, "no audits item for the follow-up marks commit"
     marks = [m for key in ("free_text", "labelled") for m in s.audit_marks(item, key)
@@ -162,11 +182,14 @@ def test_s2_census_has_215_keys_and_archive_13_has_13_distinct_pairs(record):
 
 
 def test_s2_each_census_id_names_every_stated_changer_unless_the_auditor_judged_the_pair_wrong(record, head_tree):
+    # "Named on its own status line" is gov links' own test (check.py's UNMARKED_CHANGE: the changer's id is on the
+    # entry's status line). The form (**Changed by:** / SUPERSEDED by) is the S1 line's, for the 87 (checked there);
+    # the other census ids name some changers in the register's older forms (**Amended by:**, **Lifted by:**, prose).
     census, judged, lines = record.data("census"), _judged(record), _head_lines(head_tree)
     missing = []
     for entry, changers in census.items():
         assert isinstance(changers, list) and changers, f"census states no changer for {entry}"
-        missing += [(entry, c) for c in changers if (entry, c) not in judged and not s.names_changer(lines[entry], c)]
+        missing += [(entry, c) for c in changers if (entry, c) not in judged and c not in s.ids_in(lines[entry])]
     assert not missing, f"{len(missing)} census pairs are not on their status line: {missing[:6]}"
 
 

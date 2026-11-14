@@ -473,11 +473,16 @@ def patch_line_changes(section: str) -> list[tuple[int, str, str]]:
 
 
 def patch_register_pairs(patch: str, base_rev: str) -> set[tuple[str, str]]:
-    """The ``(changed, changer)`` pairs a register patch appends, the entry found from the old line number in the
-    register at ``base_rev`` (the patches are append-only, so line numbers hold across batches)."""
-    section = patch_sections(patch).get(REGISTER)
+    """The ``(changed, changer)`` pairs a patch appends to register status lines, the entry found from the old line
+    number in the register at ``base_rev`` (the patches are append-only, so line numbers hold across batches). A
+    patch with no hunk of the register (a0: ARCHIVE-SUPERSEDED's one-decision-per-line change) appends none; a patch
+    that holds no diff of any file is no patch and fails."""
+    sections = patch_sections(patch)
+    if not sections:
+        pytest.fail("a patch block holds no `diff --git` section")
+    section = sections.get(REGISTER)
     if section is None:
-        pytest.fail("a patch block holds no hunk of docs/DECISION_REGISTER.md")
+        return set()
     by_line = {index + 1: entry for entry, index, _ in entries(show(base_rev, REGISTER))}
     out = set()
     for number, old, new in patch_line_changes(section):
