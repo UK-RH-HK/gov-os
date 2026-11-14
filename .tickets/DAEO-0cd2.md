@@ -23,6 +23,8 @@ allowed_paths:
 - tests/acceptance/W2-171/test_w2_171_s3_judge.py
 - tests/acceptance/W2-171/w2_171_world.py
 - tests/acceptance/W2-171/w2_171_scenario.py
+- tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py
+- tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py
 - tests/acceptance/W2-172/test_w2_172_s7_digest.py
 - tests/acceptance/W2-172/w2_172_world.py
 - tests/acceptance/W2-172/w2_172_git.py
@@ -71,7 +73,7 @@ kpis:
   - 'F2 A standing set judged twice in one week, judged without DECLARATION.json and USED first, re-scored, or its labels changed after a figure exists. Verify: S2''s planted runs; `measure --kept` on a standing run exits 3 and writes nothing; the set''s digest is checked equal at every run and a planted edit is refused before any search'
   - 'F3 The standing set used to choose, adopt or reject a fix or a configuration. Verify: the tool offers no command that compares two configurations or two commits on a standing set; the standing run refuses `--decision` and any data condition'
   - 'F4 The method drifts: the reader or grader prompt, model, cap or A2 cut changed, or the standing path diverges from the fresh path. Verify: `test_prompts.py` passes unchanged; S3''s spy'
-  - 'F5 A fresh set''s use-once behaviour changes. Verify: W2-170''s S3 and F2 cases on fresh sets pass with only their bar values revised; W2-171''s S5 case passes unchanged'
+  - 'F5 A fresh set''s use-once behaviour changes. Verify: W2-170''s S3 and F2 cases on fresh sets pass with only their bar values revised; W2-171''s S5 case passes with only its bar value revised (W2-187-P1 (a), DEC-1156 (7))'
   - 'F6 The maintenance pass changes a setting of the standard, applies an ACT, installs a cron line or stops the audit. Verify: S10''s planted runs; the module imports no crontab writer and the retrieval.yaml and path map digests are unchanged after a pass'
 non_goals:
 - 'no new measuring method: the standing run reuses the fresh 80''s judged path as W2-170 to W2-173 built it'
@@ -412,3 +414,5 @@ DEC-1179 (2): about 16 lines of values and helpers. `tests/unit/memaudit/` is th
 - **The CTO's routings at claim (DEC-1156 (7), DEC-1157 (12); listed for the owner's reading):** G1: `tests/acceptance/W2-172/w2_172_world.py` and `w2_172_git.py` are added to `allowed_paths` for the test designer (about four lines: the key, `mem`, `audits_log`; `Rewrite-Reason: DEC-1179 (5)`); every W2-172 test file stays unchanged. G2: until an ACT adds a `reanchor` input to the walls (`kinds.yaml`, `indep_launch.py`), the owner's operator carries `REANCHOR-<week>.json` to the walled writer in the Monday slot (DEC-1179 (6), DEC-1178 (1)). U1: a Wave 0 verdict set's own run's `misses.jsonl` and `miss-classes.json` do not spend it (the package's §5.3: W2-187 S1 accepts a used Wave 0 verdict set). U2: `maintain` item (6) leaves standing sets out; their stale questions drop by count (S6). G6 (a same-head refresh of a stale-layout store) is the engineer's to show in evidence.
 
 **Amended 2026-11-14 (the CTO within purpose, DEC-1157 (12); the owner's N2 (b), DEC-1180 (1)):** S10 (6) and I10 item 6 also list a heading-cited source whose section text (from its heading line to the next heading of the same or a higher level, or the end of the file) differs between the source's own commit and the head is listed too, though its heading is still found, matching W2-61h S4's list. The lead brings this in at its next merge of `w2/integrate`; the test designer's S10 cases take it with `Rewrite-Reason: DEC-1180 (1)`.
+
+**Path case 2026-11-14 by the CTO (DEC-1156 (7); listed for the owner's reading): W2-187-P1 (a).** Two more W2-171 acceptance files pin the 85 % bar (`test_w2_171_cli_layout_ledger.py:120-121`, `test_w2_171_s5_misses_f2.py:82`; `docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md`). Both are added to `allowed_paths` for the independent test designer (bar values only, `Rewrite-Reason: DEC-1179 (2)`), and F5's "W2-171's S5 case passes unchanged" now reads "with only its bar value revised", as it already did for W2-170. The behaviour guarded is unchanged; a narrow check covers it.
