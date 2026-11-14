@@ -274,3 +274,19 @@ does not read) is the unresolvable target. **Counts:** test_w2_42a_here_string_r
 on 98eff3c84); tests/acceptance/W2-42a: **988 passed, 2 xfailed**; with tests/unit/guard and tests/unit/hooks **1990
 passed, 2 xfailed, 2 failed** (test_live_hook.py `test_a_catastrophic_rm_is_refused[outside the project]` and
 `test_the_reason_is_plain`, which fail the same on 98eff3c84 under the sandbox's empty HOME).
+
+**R4 and R5: blob refs read as their paths; the judge never raises on its input (DEC-1157 (12), DEC-1180 (4)).** In
+`reads.py`, `_blob_ref` names a revision-colon-path (`<rev>:<path>`, `:<path>`, `:<n>:<path>`; not `:/<text>`, an
+empty path, a range or a negation). `_Judge.git` now judges each one in `git show`, `git cat-file` and on a side of `git diff`.
+It does so through the new `_Judge.colon`, which applies the rules the path names as a read (secrets, the parts with their base
+exemption, and the hidden part by its glob in whichever tree). With a part refused to the session, `git cat-file -t` must
+then resolve the word, and a tree on a diff's side is judged by the files it holds (`above`, and `ls-tree` against the
+hidden globs). A `git diff` whose other operands are files (blob against blob, or blob against a file) reads those paths
+alone and is not judged as a whole-tree diff. A blob ref beside a revision is still judged as revisions. A revision that git
+answers it cannot resolve, or one given at run time (a variable, a substitution, `--stdin`), is now the ruled
+`REV_REFUSAL` in `patched`, `stored` and `ask` (`ask` returns None on git's non-zero answer), where it raised
+`PolicyError` before. A message search is checked by `rev-parse`. Only git that cannot run still raises and fails
+closed. In `decide.py`, `_no_path` refuses a file tool's path field that is not text or holds a NUL byte, as
+`NO_PATH_REFUSAL`, before any rule resolves it. **Counts:** test_w2_42a_r4_blob_refs.py with test_w2_42a_r5_error_path.py
+went from 48 failed, 197 passed to **245 passed**; the builder file tests/unit/guard/test_w2_42a_blob_refs.py holds
+**56 passed** (46 red before the fix); tests/acceptance/W2-42a with tests/unit/guard: **2095 passed, 2 xfailed**.

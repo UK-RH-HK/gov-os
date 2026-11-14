@@ -124,6 +124,13 @@ _TREES_FAULT = "the repository's worktrees cannot be listed"
 _RUNS_FAULT = "the runs root cannot be read"
 _CLONE_FAULT = "the repository's trees cannot be found from this run clone"
 _REV_FAULT = "git cannot say whether a revision holds the hidden part"
+# W2-42a R4, R5: a revision git answers it does not resolve, or one the guard
+# cannot read, is a ruled refusal; only git that cannot run is a fault (DEC-1133 (2)).
+REV_REFUSAL = ("the call names a revision the guard cannot resolve: git does not resolve "
+               "it (or its <rev>:<path>) to a commit, tree or blob, or it is given at run "
+               "time (a variable, a substitution, --stdin), so what the call shows cannot "
+               "be judged against the parts refused to this session (DEC-820): refused; "
+               "name a revision and a path that exist")
 # The options of a patch route that widen or choose its sides, carried into
 # the guard's own question; a count is carried too (W2-84).
 _GIT_SIDES = frozenset("--all --branches --tags --remotes -g --walk-reflogs --reflog "
@@ -186,6 +193,21 @@ class _Runs(_Part):
                     raise PolicyError(_LONG_PART)
             self._walked[start] = found
         return self._walked[start]
+
+
+def _blob_ref(word: str) -> tuple[str, str] | None:
+    """A revision-colon-path's revision and path (``<rev>:<path>``, the
+    index's ``:<path>`` and ``:<n>:<path>``), or None: no colon, an empty
+    path (a revision's whole tree), a message search (``:/<text>``), or a
+    range or a negation before the colon (judged as revisions)."""
+    if ":" not in word or word.startswith(":/"):
+        return None
+    rev, _, path = word.partition(":")
+    if not rev and re.match(r"[0-3]:", path):
+        path = path[2:]
+    if not path or ".." in rev or rev.startswith("^"):
+        return None
+    return rev, path
 
 
 def _pathspecs(hidden: list[_Part]) -> list[str]:
@@ -1617,25 +1639,35 @@ class _Judge:
             operands = _options(before, _ARCHIVE_VALUED)[0] + specs
             return self.stored(operands[:1], False, cwd, addr, hidden) if (
                 self.covers(operands[1:], cwd, hidden)) else ""
-        shown = [o for o in operands if ":" in o] if sub in ("show", "cat-file") else []
-        for o in shown:
-            rev, _, path = o.partition(":")
-            if not path:
+        # W2-42a R4: a revision-colon-path in git show or cat-file, or on a
+        # side of git diff, is read as its path.
+        diffing = sub == "diff" and "--no-index" not in before
+        shown = []
+        for o in (operands if sub in ("show", "cat-file") or diffing else []):
+            exp = _expand_token(o)
+            ref = _blob_ref(o if exp is None else exp)
+            if ref is None:
                 continue
-            at = cwd if path.startswith(("./", "../")) else self.root
-            if sub == "show" and any(self.secret(p) for p in self.spellings(path, at)):
-                return SECRET_REFUSAL
-            for part in (self.parts if sub == "show" else []):
-                if any(part.inside(p) for p in self.spellings(path, at)) and not (
-                        part.base and self.base_version(rev, part.rel(
-                            os.path.abspath(os.path.join(at, path))))):
-                    return part.reason
-            # The hidden part's path names it in whichever tree (W2-84).
-            if any(h.inside(p) for h in hidden for p in self.spellings(path, at)) or (
-                    at == self.root and any(h.match(os.path.normpath(path)) for h in hidden)):
-                return HIDDEN_REFUSAL
+            shown.append(o)
+            why = self.colon(sub, exp, ref, cwd, addr, hidden)
+            if why:
+                return why
         if sub == "cat-file":
             return ""
+        if diffing and shown:
+            # git diff <blob> <blob>, or <blob> <file>: those paths alone, not
+            # a tree; with a revision beside them it is judged as revisions.
+            files = [o for o in operands if o not in shown]
+            if all(os.path.lexists(os.path.join(cwd, _expand_token(o) or o)) for o in files):
+                for o in files:
+                    why = self.word(o, cwd)
+                    if why:
+                        return why
+                for s in specs:
+                    why = self.spec(s, cwd, True)
+                    if why:
+                        return why
+                return ""
         quiet = (any(a in _GIT_QUIET or a.startswith("--stat=") for a in before)
                  and not any(a in ("-p", "--patch", "-u") or a.startswith("-U")
                              for a in before))
@@ -1656,6 +1688,51 @@ class _Judge:
         patch = patch or any(o.startswith(":/") for o in shown if sub == "show")
         return self.patched(sub, before, specs, cwd, addr, hidden) if (
             patch and hidden) else ""
+
+    def colon(self, sub: str, word: str | None, ref: tuple[str, str], cwd: str,
+              addr: list[str], hidden: list[_Part]) -> str:
+        """W2-42a R4: why a revision-colon-path (*word*, None when the guard
+        cannot expand it; *ref*, its revision and path) is refused: by the
+        rule its path names, as a read; then, with a part refused to this
+        session, when git does not resolve it (git show, git diff); a tree on
+        a side of git diff shows its files, judged as a folder's."""
+        rev, path = ref
+        here = os.path.realpath(cwd)
+        top = _x_top(here) or self.root
+        local = path.startswith(("./", "../"))
+        at = cwd if local else top
+        names = self.spellings(path, at)
+        if sub != "cat-file" and any(self.secret(p) for p in names):
+            return SECRET_REFUSAL
+        for part in (self.parts if sub != "cat-file" else []):
+            if any(part.inside(p) for p in names) and not (
+                    part.base and self.base_version(rev, part.rel(
+                        os.path.abspath(os.path.join(at, path))))):
+                return part.reason
+        # The hidden part's path names it in whichever tree (W2-84).
+        rel = os.path.relpath(os.path.normpath(os.path.join(here if local else top, path)), top)
+        inside = not rel.startswith("..")
+        if any(h.inside(p) for h in hidden for p in names) or (
+                inside and any(h.match(rel) for h in hidden)):
+            return HIDDEN_REFUSAL
+        if sub == "cat-file" or not self.parts:
+            return ""
+        if word is None:
+            return REV_REFUSAL
+        kind = self.ask(cwd, addr, "cat-file", "-t", "--end-of-options", word)
+        if kind is None:
+            return REV_REFUSAL
+        if sub != "diff" or kind.strip() == "blob":
+            return ""
+        why = self.above(path, at)
+        if why or not hidden:
+            return why
+        out = self.ask(cwd, addr, "ls-tree", "-r", "--full-tree", "--name-only", "-z",
+                       "--end-of-options", word)
+        if out is None or not inside:
+            return REV_REFUSAL
+        return HIDDEN_REFUSAL if any(h.match(os.path.normpath(os.path.join(rel, n)))
+                                     for h in hidden for n in out.split("\0") if n) else ""
 
     def covers(self, specs: list[str], cwd: str, hidden: list[_Part]) -> bool:
         """Whether pathspecs take the hidden part in: none, a glob or magic
@@ -1691,7 +1768,7 @@ class _Judge:
             elif a == "--not":  # what follows is taken whole: never fewer sides
                 negated = True
             elif not a.startswith("-") and not (
-                    sub == "show" and ":" in a and not a.startswith(":/")):
+                    sub == "show" and _blob_ref(_expand_token(a) or a)):
                 if os.path.lexists(os.path.join(cwd, a)):
                     paths.append(a)
                 else:
@@ -1717,15 +1794,18 @@ class _Judge:
                 revs = [revs[0] + "..HEAD"]  # <since> means <since>..HEAD
         words = [_expand_token(w) for w in sides + revs]
         if None in words or "--stdin" in before:  # a revision it cannot resolve
-            raise PolicyError(_REV_FAULT)
-        # Each revision must be a commit: git log passes over a blob or tree.
-        ends = [e for w in words[len(sides):] if not w.startswith(":/")
+            return REV_REFUSAL
+        # Each revision must be a commit: git log passes over a blob or tree;
+        # a message search (:/<text>) must name one.
+        ends = [e + "^{commit}" for w in words[len(sides):] if not w.startswith(":/")
                 for e in re.split(r"\.\.\.?", w.lstrip("^")) if e]
-        if ends:
-            self.ask(cwd, addr, "rev-parse", "--end-of-options",
-                     *(e + "^{commit}" for e in ends), "--")
+        ends += [w for w in words[len(sides):] if w.startswith(":/")]
+        if ends and self.ask(cwd, addr, "rev-parse", "--end-of-options", *ends, "--") is None:
+            return REV_REFUSAL
         out = self.ask(cwd, addr, *query, *words[:len(sides)], "--end-of-options",
                        *words[len(sides):], "--", *_pathspecs(hidden))
+        if out is None:
+            return REV_REFUSAL
         return HIDDEN_REFUSAL if out.strip() else ""
 
     def stored(self, revs: list[str], cached: bool, cwd: str, addr: list[str],
@@ -1735,33 +1815,38 @@ class _Judge:
         for rev in revs:
             word = _expand_token(rev)
             if word is None:
-                raise PolicyError(_REV_FAULT)
+                return REV_REFUSAL
             prefix = os.path.normpath(word.partition(":")[2] or ".")
             prefix = "" if prefix == "." else prefix
             out = self.ask(cwd, addr, "ls-tree", "-r", "--full-tree", "--name-only", "-z",
                            "--end-of-options", word)
+            if out is None:
+                return REV_REFUSAL
             if any(h.match(os.path.join(prefix, n) if prefix else n) for h in hidden
                    for n in out.split("\0") if n):
                 return HIDDEN_REFUSAL
-        if cached and self.ask(cwd, addr, "ls-files", "--cached", "-z", "--",
-                               *_pathspecs(hidden)):
-            return HIDDEN_REFUSAL
+        if cached:
+            out = self.ask(cwd, addr, "ls-files", "--cached", "-z", "--", *_pathspecs(hidden))
+            if out is None:
+                return REV_REFUSAL
+            if out:
+                return HIDDEN_REFUSAL
         return ""
 
     @staticmethod
-    def ask(cwd: str, addr: list[str], *args: str) -> str:
-        """git's answer in the repository the command addresses; one that
-        cannot be had refuses."""
+    def ask(cwd: str, addr: list[str], *args: str) -> str | None:
+        """git's answer in the repository the command addresses; None when
+        git answers it cannot, or the repository is named by a word the guard
+        cannot expand (a ruled refusal, W2-42a R5); git that cannot be run is
+        a fault, which refuses (fail closed)."""
         words = [_expand_token(a) for a in addr]
         if None in words:
-            raise PolicyError(_REV_FAULT)
+            return None
         try:
             out = _git(cwd, *words, *args)
         except PolicyError:
             raise PolicyError(_REV_FAULT) from None
-        if out.returncode:
-            raise PolicyError(_REV_FAULT)
-        return out.stdout
+        return None if out.returncode else out.stdout
 
     def spec(self, spec: str, cwd: str, secrets: bool) -> str:
         """A git pathspec: what it names, and the parts' files it takes in
