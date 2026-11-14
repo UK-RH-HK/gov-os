@@ -21,6 +21,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import subprocess
 import time
 from pathlib import Path
 
@@ -92,6 +93,27 @@ def test_s12_the_scan_runs_before_the_push_and_the_remote_is_untouched_while_it_
     assert run.code == 0, run
     assert (pw.fake.folder / "seen.txt").read_text().strip() == pw.first, "the remote still held the first commit during the scan"
     assert pw.remote_head() == pw.head
+
+
+def test_s12_f7_a_commit_landing_on_the_branch_during_the_scan_is_not_pushed_only_the_scanned_commit_is(pw):
+    """Review round 1's F-B (the CTO's fix of 2026-11-14): the commit the branch names when the scan starts is recorded and
+    pushed by its sha (``git push <remote> <sha>:refs/heads/<branch>``). The planted scanner, while it runs, lands on ``main`` a
+    commit holding the planted key and reports a clean scan (of what it was asked to scan). The remote's ``main`` is the scanned
+    commit, the line names its 12 hex, the landed commit is not on the remote, and the key is in no output."""
+    pw.fake.plan(entries=0, exit=0, land={"repo": str(pw.repo), "file": "landed.txt", "git": shutil.which("git"),
+                                          "home": str(pw.home)})
+    scanned = pw.head
+    run = pw.push(declared=pw.declare())
+    landed = (pw.fake.folder / "landed.txt").read_text().strip()
+    assert landed and landed != scanned, "the scanner landed a commit while it ran"
+    assert P.git(pw.repo, pw.home, "rev-parse", "refs/heads/main") == landed, "the repository's branch moved on during the scan"
+    assert run.code == 0, run
+    assert line_of(run) == f"PUSH pushed {pw.remote} main {scanned[:12]}", run
+    assert pw.remote_head() == scanned, "the remote's branch is the scanned commit, not the one that landed during the scan"
+    on_remote = subprocess.run(["git", "--git-dir", str(pw.remote), "cat-file", "-e", f"{landed}^{{commit}}"],
+                               env=P.git_env(pw.home), capture_output=True)
+    assert on_remote.returncode != 0, "the landed commit never reached the remote"
+    nothing_leaked(pw, run)
 
 
 def test_s12_the_binary_is_the_flag_else_the_environments_else_the_path(pw, tmp_path):

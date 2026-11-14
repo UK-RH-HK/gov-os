@@ -13,6 +13,7 @@ figures. The edge cases sit on the Interface's ``>= 5``: exactly 5.0 flags, 4.87
 
 from __future__ import annotations
 
+import os
 import re
 
 import pytest
@@ -89,6 +90,35 @@ def test_s7_a_stale_set_stays_live_and_a_later_standing_run_is_not_refused_for_i
     assert run.code == 0, run
     live = world.standing_live()
     assert live.code == 0 and live.lines[-1] == f"LIVE {W.STD}", live
+
+
+def test_s7_the_fresh_runs_measure_and_judge_search_the_store_links_store_though_the_repositorys_own_is_at_another_commit(
+        make_world):
+    """Review round 1's F-A (the CTO's fix of 2026-11-14): S7 compares the fresh F with the standing S, so both are measured on
+    the same store. Beside a live standing set with four weekly figures (S 96.0), the repository holds its own store built at
+    the base commit and the store link's is at the audit commit; the planted ``gov`` answers from the store of the folder it
+    runs in. The fresh run's ``measure`` and ``judge`` (and ``preflight``, should it search) search from the link's work tree:
+    every one of their logged searches ran there; the run ends with its twelve lines and the DRIFT line (F 100.0: none).
+    The ``pool`` step's searches are not judged here (the fix names the pre-flight, the measure and the judge)."""
+    world = make_world(scenario="clean", standing=True)
+    world.plant_history(*[world.std_line(f"2026-W{w}", 96.0) for w in (42, 43, 44, 45)])
+    world.plan_launch({})
+    world.plant_earlier(W.W171.EARLIER, pool={"n": 2, "hit5": 0, "full": 0})
+    assert world.link_head() == world.audit_commit != world.base_commit
+    world.plant_repo_store(world.base_commit)
+    world.write_x_plan(store_from="root")
+    run = world.go(gate=world.gate_stub)
+    assert run.code == 0, run
+    link = os.path.realpath(world.link)
+    roots = world.search_roots("preflight", "measure", "judge")
+    assert len([s for s, _ in roots if s == "measure"]) >= 40, roots[:5]
+    assert len([s for s, _ in roots if s == "judge"]) >= 2, "the two second searches (q10, q20) are the judge's"
+    outside = sorted({(s, r) for s, r in roots if r != link})
+    assert outside == [], f"the fresh run's searches ran outside the link's work tree: {outside}"
+    lines = world.digest()
+    by_word(lines[:12], strict=True)
+    m = DRIFT.fullmatch(lines[12])
+    assert m and m["word"] == "none" and abs(float(m["s"]) - 96.0) < 0.05 and abs(float(m["f"]) - 100.0) < 0.05, lines[12:]
 
 
 def test_s7_a_fresh_run_with_no_live_standing_set_keeps_its_twelve_lines_and_writes_no_drift(make_world):

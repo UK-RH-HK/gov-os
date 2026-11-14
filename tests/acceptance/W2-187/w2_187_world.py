@@ -329,6 +329,27 @@ class SW(W172.World):
         self.make_link(commit, head=commit)
         self.write_x_plan(store_commit=commit)
 
+    def plant_repo_store(self, head: str) -> Path:
+        """The repository's own ``.gov-runtime/store.db`` (the template's store, its fingerprints head set to ``head``),
+        kept out of git by ``.git/info/exclude`` as a real repository keeps ``.gov-runtime/`` out (review round 1's F-A)."""
+        folder = self.repo / ".gov-runtime"
+        folder.mkdir(exist_ok=True)
+        shutil.copy(self.store, folder / "store.db")
+        con = sqlite3.connect(folder / "store.db")
+        con.execute("UPDATE fingerprints SET head = ?", (head,))
+        con.commit()
+        con.close()
+        exclude = self.repo / ".git" / "info" / "exclude"
+        exclude.parent.mkdir(parents=True, exist_ok=True)
+        text = exclude.read_text(encoding="utf-8") if exclude.exists() else ""
+        if ".gov-runtime/" not in text.splitlines():
+            exclude.write_text(text + ".gov-runtime/\n", encoding="utf-8")
+        return folder / "store.db"
+
+    def search_roots(self, *steps: str) -> list[tuple[str | None, str]]:
+        """``(step, root)`` of each logged search, ``steps`` keeping only those steps' (all when none are given)."""
+        return [(c.get("step"), c.get("root")) for c in self.searches() if not steps or c.get("step") in steps]
+
     # -- the standing set
     def std_docs(self) -> dict:
         return {p.stem: yaml.safe_load(p.read_text(encoding="utf-8")) for p in sorted(self.std_hidden.glob("*.yaml"))}
