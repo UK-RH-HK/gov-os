@@ -15,6 +15,7 @@ Standard library, PyYAML and git; no gov import. The CTO runs it, from the repos
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/sgx1/labeller-2.md --brief-sha256 e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904 --commit 6ff398a28 --set held-out --round 2
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --brief governance/project/indep-briefs/sgx1/overlap-auditor.md --brief-sha256 b212a424062e402b0a25ee4a157ae14a0af798d0ad973aa33dacd730782be6ab --commit 6ff398a28 --set held-out --audit sgx1-overlap
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root /tmp/planted-sets --kind writer --brief governance/project/indep-briefs/writer.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set memory-recall-3 --seed 17 --dry
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/examin-sets/EXAMIN-writer-q02-fix.md --brief-sha256 0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173 --commit 6ff398a28 --set examin --round 2 --fix q02 --reason ANSWER_NOT_IN_SPANS
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --run 20261109T120000Z-memory-recall-3-r1 --counts-only
 
 The line names only --sets-root <root>: never a folder under it (the guard's line rule, DEC-1097 (2)); the script
@@ -38,6 +39,13 @@ briefs' fixed form (section 6) and the result's counts before they are delivered
 The auditor's copy of a set (W2-178; W2-170's Interface, DEC-1101 (2)): every file of the set's hidden half except
 those under its `hidden/dropped/` folder (any depth below it); the writer's round 2 and the checker's copies are
 unchanged. A link anywhere under `hidden/` still refuses 10, and a set empty after the exclusion refuses 10 as any other.
+
+The one-question fix flow (W2-94, DEC-1180 (2)): `--fix <id> --reason <code>` on the writer's round 2 (together, with
+nothing else of the writer's round 2 changed). It stages `input/<id>.yaml` (the set's hidden question), `input/verdict.txt`
+(`<id> <code>`) and `input/sample.json` (the sample list of the latest delivered round-1 run of the set, read from its
+archive), and no other file of the set. A brief's front matter need not name `sample:`. At delivery only
+`hidden/<id>.yaml` is replaced, by `out/<id>.yaml`, the old file packed into the run's tar; the result adds `action`
+(`corrected` or `replaced`) and its counts must sum to 1. The counts carry `fix` {id, code, action}.
 
 Exit codes: 0 delivered or dry; 10 brief; 11 template; 12 wall or tree exists; 13 seed not first; 14 commit; 15 file
 budget; 16 canary; 17 argument; 18 the rule script; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is
@@ -80,6 +88,10 @@ PATH_MAP = "governance/project/path-map.yaml"
 SCHEMAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "indep-schemas")
 COUNTS_SCHEMA = "indep-counts.schema.json"
 NAME_RX = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
+FIX_RX = re.compile(r"q[0-9]{2}")  # the one-question fix flow's id and its reason codes (W2-94)
+FIX_CODES = ("SOURCE_IS_SCAFFOLD", "SOURCE_PATH_ABSENT", "SOURCE_NOT_TEXT", "SPAN_OUT_OF_FILE", "HEADING_NOT_FOUND",
+             "ANSWER_NOT_IN_SPANS", "NONEXISTENT_NAME_FOUND", "NONEXISTENT_NO_NAME")
+FIX_ACTIONS = ("corrected", "replaced")
 RUN_RX = re.compile(r"[0-9]{8}T[0-9]{6}Z-[a-z0-9][a-z0-9-]*-r[12]")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
@@ -522,6 +534,8 @@ def parse_args(argv):
     p.add_argument("--dry", action="store_true", help="build the wall and stop (planted sets roots only)")
     p.add_argument("--counts-only", action="store_true", help="print a run's counts.json; build nothing")
     p.add_argument("--run", help="with --counts-only: the run id")
+    p.add_argument("--fix", help="the writer's round 2 only, with --reason: the one question's id (q00 to q99)")
+    p.add_argument("--reason", help="with --fix: the check's reason code")
     return p.parse_args(argv)
 
 
@@ -542,7 +556,8 @@ def check_args(o, st, cwd, home):
     if regular(approved):  # every result line carries it, an argument refusal's too (reading is no check)
         st.counts["approved_sha256"] = sha_file(approved)
     if o.counts_only:
-        if any(v is not None for v in (o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed)) or o.dry:
+        if any(v is not None for v in (o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed, o.fix,
+                                       o.reason)) or o.dry:
             raise Refuse(17, "counts_only")
         if not full(RUN_RX, o.run):
             raise Refuse(17, "run")
@@ -563,6 +578,10 @@ def check_args(o, st, cwd, home):
                 raise Refuse(17, "seed")
             if not o.dry:
                 raise Refuse(17, "seed")
+        if o.fix is not None or o.reason is not None:  # W2-94 S6: both, the writer's round 2 only
+            if (o.kind != "writer" or o.round != "2" or not full(FIX_RX, o.fix) or o.reason not in FIX_CODES):
+                raise Refuse(17, "fix")
+            st.counts["fix"] = {"id": o.fix, "code": o.reason, "action": None}
     for v in (o.kind, o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed, o.run):
         if v is None:
             continue
@@ -668,7 +687,7 @@ def load_briefs(data):
     return briefs
 
 
-def resolve_brief(fm, kind, spec, briefs):
+def resolve_brief(fm, kind, spec, briefs, fix=False):
     """S22, stage 10: (model, result schema name, sample, brief id, entry or None). Each value from the front matter,
     else from the `briefs:` entry its `brief:` id names (whose kind must be the brief's), else (the model only) from
     the kind's; a value found nowhere, a bad entry, or a labeller brief without an entry: 10."""
@@ -693,6 +712,10 @@ def resolve_brief(fm, kind, spec, briefs):
         return None
 
     model, schema_name, sample_n = pick("model", True), pick("result_schema"), pick("sample")
+    if fix and (entry or bid is not None):
+        raise Refuse(10, "entry")  # W2-94: the fix flow runs a plain writer brief only
+    if fix and sample_n is None:
+        sample_n = 0  # W2-94 S10: the approved variant names no `sample:`; its selection.json then holds none
     if not is_count(sample_n) or not full(MODEL_RX, model) or not full(SCHEMA_NAME_RX, schema_name):
         raise Refuse(10, "front_matter")
     return model, schema_name, sample_n, bid, entry
@@ -795,6 +818,62 @@ def plan_inputs(kind, rnd, root, set_name, audit):
     else:
         raise Refuse(10, "entry")  # the labeller kind runs set-up A's flows only
     return plan
+
+
+def round1_sample(root, walls, runs_indep, set_name):
+    """W2-94 S7: the `sample` list of input/selection.json as staged in the latest delivered round-1 writer run of the
+    set, read from that run's archive; anything missing or malformed: 10."""
+    rx = re.compile(r"[0-9]{8}T[0-9]{6}Z-" + re.escape(set_name) + "-r1")
+    base = os.path.join(runs_indep, "writer")
+    found = []
+    try:
+        names = os.listdir(base)
+    except OSError:
+        names = []
+    for rid in names:
+        if not full(rx, rid):
+            continue
+        path = os.path.join(base, rid, "counts.json")
+        try:
+            if not real_inside(path, runs_indep) or not regular(path) or os.path.getsize(path) > MOST_RESULT_BYTES:
+                continue
+            with open(path, "rb") as f:
+                obj = load_json_strict(f.read().decode("utf-8"))
+        except (OSError, ValueError, UnicodeDecodeError, RecursionError):
+            continue
+        if (isinstance(obj, dict) and obj.get("status") == "delivered" and obj.get("round") == 1
+                and not isinstance(obj.get("round"), bool) and obj.get("set") == set_name):
+            found.append(rid)
+    if not found:
+        raise Refuse(10, "round1")
+    rid = max(found)
+    tar_path = os.path.join(walls, "writer", rid + ".tar")
+    if not real_inside(tar_path, root) or not regular(tar_path):
+        raise Refuse(10, "round1")
+    try:
+        with tarfile.open(tar_path, "r:") as t:
+            m = t.getmember(f"{rid}/input/selection.json")
+            if not m.isreg() or m.size > MOST_RESULT_BYTES:
+                raise Refuse(10, "round1")
+            obj = load_json_strict(t.extractfile(m).read().decode("utf-8"))
+    except (OSError, KeyError, tarfile.TarError, ValueError, UnicodeDecodeError, RecursionError, AttributeError):
+        raise Refuse(10, "round1")
+    sample = obj.get("sample") if isinstance(obj, dict) else None
+    if not isinstance(sample, list) or not all(isinstance(x, str) for x in sample):
+        raise Refuse(10, "round1")
+    return sample
+
+
+def plan_fix(root, walls, runs_indep, set_name, fix_id, code):
+    """W2-94 S7: the one-question fix flow's three inputs, read and checked before anything is written:
+    (plan, staged): the hidden question's byte copy, and verdict.txt and sample.json as bytes."""
+    src = os.path.join(root, "fixtures", "evaluation", set_name, "hidden", f"{fix_id}.yaml")
+    if not real_inside(src, root) or not os.path.isfile(src) or os.path.islink(src):
+        raise Refuse(10, "input")
+    sample = round1_sample(root, walls, runs_indep, set_name)
+    staged = {"input/verdict.txt": f"{fix_id} {code}\n".encode("utf-8"),
+              "input/sample.json": (json.dumps({"sample": sample}, indent=1) + "\n").encode("utf-8")}
+    return [(src, f"input/{fix_id}.yaml")], staged
 
 
 # -- set-up A's inputs (S20, S24, S27): read and checked before anything is written ---------------------------------
@@ -1766,6 +1845,46 @@ def deliver(st, ctx):
                                 "audit": ctx["audit"]}) + "\n")
 
 
+def deliver_fix(st, ctx):
+    """W2-94 S8: the one-question fix flow's delivery. out/ holds only out/<id>.yaml and out/result.json; the YAML is a
+    mapping whose `id` is <id>; every check first, then only hidden/<id>.yaml is replaced (the old file kept for the
+    run's tar as replaced-hidden/<id>.yaml). Any refusal leaves the set unchanged: 20."""
+    fix_id, out = ctx["fix"][0], os.path.join(st.wall, "out")
+    hidden = os.path.join(ctx["root"], "fixtures", "evaluation", ctx["set"], "hidden")
+    name, dst = f"{fix_id}.yaml", os.path.join(hidden, f"{fix_id}.yaml")
+    try:
+        entries = sorted(os.listdir(out))
+    except OSError:
+        raise Refuse(20, "missing")
+    if entries != sorted((name, "result.json")):
+        raise Refuse(20, "entries")
+    data = read_plain(os.path.join(out, name), out)
+    if data is None or len(data) > MOST_RESULT_BYTES:
+        raise Refuse(20, "missing")
+    try:
+        q = yaml.safe_load(data.decode("utf-8"))
+    except (UnicodeDecodeError, yaml.YAMLError, RecursionError):
+        raise Refuse(20, "yaml")
+    if not isinstance(q, dict) or q.get("id") != fix_id:
+        raise Refuse(20, "yaml")
+    if not real_inside(dst, ctx["root"]) or not regular(dst):
+        raise Refuse(20, "destination")
+    old = read_plain(dst, hidden)
+    if old is None:
+        raise Refuse(20, "destination")
+    kept = st.wall + ".replaced"
+    os.mkdir(kept, 0o700)
+    st.replaced = kept
+    try:
+        write_new(os.path.join(kept, name), old, 0o400)
+        h = deliver_file(os.path.join(out, name), dst)
+    except BaseException:
+        remove_tree(kept)
+        st.replaced = None
+        raise
+    st.counts["delivered"].update(files=1, sha256=h, to="set")
+
+
 # -- set-up A's deliveries (S16, S26, S27): every check first, then a temporary name, hashed, renamed; all or nothing --
 class Landing:
     """New files (an existing one refuses 20) and replaced files (the auditor's labels.jsonl and owner.jsonl), each
@@ -2053,6 +2172,11 @@ def check_result(st, ctx):
         except (KeyError, AttributeError, TypeError):
             raise Refuse(20, "schema")
         ctx["result"] = res  # the checker's and the auditor's delivery check their file against its counts (S3, S4)
+        if ctx.get("fix"):  # W2-94 S9: one question, the action's word, each object's numbers summing to 1
+            if (res.get("action") not in FIX_ACTIONS or res["questions"] != 1
+                    or sum(res["by_kind"].values()) != 1 or sum(res["by_area"].values()) != 1):
+                raise Refuse(20, "fix_result")
+            st.counts["fix"]["action"] = res["action"]
     st.counts["out"]["schema_ok"] = True
     st.log("result", "schema", "ok")
 
@@ -2266,7 +2390,8 @@ def build_and_run(st, o, root, over, cwd, home):
     fm = front_matter(brief)
     if fm is None or fm.get("kind") != kind:
         raise Refuse(10, "front_matter")
-    model, schema_name, sample_n, brief_id, entry = resolve_brief(fm, kind, spec, briefs)
+    fix = (o.fix, o.reason) if o.fix is not None else None  # W2-94: validated by check_args (17)
+    model, schema_name, sample_n, brief_id, entry = resolve_brief(fm, kind, spec, briefs, fix is not None)
     effort = fm.get("effort")
     if "effort" in fm and not (isinstance(effort, str) and effort in EFFORTS):
         raise Refuse(10, "effort")  # (W2-173 S1) one of the five, or no line at all
@@ -2290,6 +2415,9 @@ def build_and_run(st, o, root, over, cwd, home):
         sgx = plan_sgx(flow, rnd, set_name, root, runs, runs_indep, brief_id, want, repo, commit)
         plan = []
         tree_ex = excluded_by(ex_globs + list(entry.get("tree_exclude", [])))  # S23: the entry's globs too
+    elif fix:
+        plan, fix_staged = plan_fix(root, walls, runs_indep, set_name, *fix)
+        tree_ex = excluded
     else:
         plan = plan_inputs(kind, rnd, root, set_name, o.audit)
         tree_ex = excluded
@@ -2315,7 +2443,8 @@ def build_and_run(st, o, root, over, cwd, home):
     globs = hidden_globs(pm) if pm is not None else None
     if globs is None:
         raise Refuse(15, "path_map")
-    expected = WALL_FIXED + len(plan) + RUN_EXTRA if not sgx else sgx_expected(sgx, rnd)
+    expected = (WALL_FIXED + len(plan) + RUN_EXTRA + (len(fix_staged) if fix else 0)) if not sgx \
+        else sgx_expected(sgx, rnd)
     if hidden_count(root, globs) + expected > FILE_BUDGET:
         raise Refuse(15, "budget")
 
@@ -2396,7 +2525,7 @@ def build_and_run(st, o, root, over, cwd, home):
     selection = {"commit": commit, "last_audit": last, "seed_sha256": seed_sha, "changed": changed,
                  "sample": sample}
     sel_counts = {"changed": len(changed), "sample": len(sample), "overlap": 0}
-    staged = {}  # set-up A's files: wall-relative path -> bytes
+    staged = dict(fix_staged) if fix else {}  # set-up A's files (or the fix flow's): wall-relative path -> bytes
     if sgx:
         staged = stage_sgx(sgx, rnd, seed, commit)
         if kind == "writer":
@@ -2476,7 +2605,7 @@ def build_and_run(st, o, root, over, cwd, home):
     ctx = {"root": root, "trees": trees, "runs": runs, "runs_indep": runs_indep, "repo": repo, "home": home,
            "tools": list(spec["tools"]), "model": model, "effort": effort, "budget": budget, "timeout": timeout_s,
            "result_schema": result_schema, "set": set_name, "round": rnd, "audit": o.audit, "commit": commit,
-           "sgx": sgx, "brief_id": brief_id}
+           "sgx": sgx, "brief_id": brief_id, "fix": fix}
     # the canary, then the session
     st.stage = 16
     hook(st, "before_canary")
@@ -2499,6 +2628,8 @@ def build_and_run(st, o, root, over, cwd, home):
             check_result(st, ctx)
             if sgx:
                 deliver_sgx(st, ctx)
+            elif fix:
+                deliver_fix(st, ctx)
             else:
                 deliver(st, ctx)
             c["status"] = "delivered"
