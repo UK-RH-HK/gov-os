@@ -91,7 +91,7 @@ New:
 New:
 
 >      - a set used to choose or judge a fix is a tuning set from then on;
->      - a verdict comes only from a set nothing was tuned on: a fresh blind set, used once, or the standing set behind its walls, judged every week with counts only, never used to choose or judge a fix, and checked each month against a fresh set (§9; DEC-1179);
+>      - a verdict comes only from a set nothing was tuned on: a fresh blind set, used once, or the standing set, which sits behind its walls, is judged every week with counts only, never chooses or judges a fix, and is checked each month against a fresh set (§9; DEC-1179);
 
 **§6 step 6, line 221.** Old:
 
@@ -122,12 +122,18 @@ closing `.` (463 characters, 464 bytes: the `§` is UTF-8); the check records it
 
 Before is at the base `5336a6fca`. After is the committed bytes (the skill at `d782640dee6b0ff547ea7254498c482f416a4e69`).
 
+The kernel skill's sha256 before: `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0`
+
+The kernel skill's sha256 after: `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489`
+
+The practice record's sha256 after: `76eaaeb5487739643cef6d79d8f736331ee5396756b1f123c5236c9bcb60d312` (the first sub-bullet of §5 item 6's practice lines is unchanged; the standing-set line was re-worded once, after the independent test designer's acceptance run).
+
 | File | Before (sha256) | After (sha256) | Lines before / after | Added / removed (`git diff --numstat`) |
 |---|---|---|---|---|
 | `template/governance/kernel/skills/adopt/SKILL.md` | `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | 74 / 76 | 5 / 3 |
 | `.rulesync/skills/adopt/SKILL.md` | `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` (equal to the kernel copy) | 74 / 76 | 5 / 3 |
 | `template/.rulesync/skills/adopt/SKILL.md` | `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` (equal to the kernel copy) | 74 / 76 | 5 / 3 |
-| `docs/research/W2-88-memory-practice.md` | `f4628a01434b0fc1638b8aa8a2fc804c48cef5d0150abd4376bb751459f61158` | `39bd7fea141d7a122dbd4f7f7895a38127470f4c76fdf11d19aec0957cfdfc55` | 280 / 291 | 15 / 4 |
+| `docs/research/W2-88-memory-practice.md` | `f4628a01434b0fc1638b8aa8a2fc804c48cef5d0150abd4376bb751459f61158` | `76eaaeb5487739643cef6d79d8f736331ee5396756b1f123c5236c9bcb60d312` | 280 / 291 | 15 / 4 |
 
 The skill's lines changed: 3 removed (version, step 6, governing sources) and 5 added (version, step 6, the blank line
 and the new paragraph, governing sources).
@@ -146,7 +152,7 @@ and the new paragraph, governing sources).
 |---|---|
 | Kernel skills | One skill: one step re-worded, one paragraph added, the sources line and the version. No other skill, role file, hook or guard rule changes |
 | Generated copies | `.rulesync/skills/adopt/` and `template/.rulesync/skills/adopt/` byte-equal to the kernel copy. `.claude/skills/adopt/SKILL.md` (front matter without a version) comes from the copies ACT after the owner's approval; this ticket does not write it, so until then its body differs |
-| W2-11's cases | `test_every_copy_carries_the_kernel_skills_body[adopt]` (`tests/acceptance/W2-11/test_w2_11_skills.py`) is red from the merge until the copies ACT regenerates the `.claude` copy, as W2-98's was. W2-11's version case and its round-2 twin (`test_w2_11_round2.py`) exclude `adopt`, so the bump does not touch them |
+| W2-11's cases | `test_every_copy_carries_the_kernel_skills_body[adopt]` (`tests/acceptance/W2-11/test_w2_11_skills.py`) is not a case: the test is parametrized over `test-design`, `orchestration`, `audit` and `qa-review` only (line 124), so `adopt` is left out. W2-11 therefore stays green after the merge (`tests/acceptance/W2-11` and `tests/acceptance/W2-88a`: 276 passed, 1 skipped on `599fa2a22`), and the `.claude/skills/adopt/SKILL.md` copy's drift from the kernel body, from the merge until the copies ACT regenerates it, is caught by no W2-11 case. W2-11's version case and its round-2 twin (`test_w2_11_round2.py`) exclude `adopt`, so the bump does not touch them |
 | W2-88a's cases | Step 6's matcher (`tests/acceptance/W2-88a/w2_88a_support.py`: "declar...", "measur...", "verdict set", "once") passes on the new text, the seven steps in order: `check_steps` was run on A9's region of each of the three copies and on the practice record's §6, and `check_pointer` on A9's region, all with no problem (`docs/probes/DAEO-zlog/checks.md`). The COPIES case diffs the base against the current kernel copy, so it passes while the three copies are byte-equal. The CIT-P cases read W2-88a's own record and fixed commits; unchanged. No W2-88a test is revised |
 | Skill check | `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` exits 0 on the new text |
 | W2-188's own acceptance | `tests/acceptance/W2-188/`, written by an independent test designer from the KPI lines |
@@ -156,7 +162,7 @@ and the new paragraph, governing sources).
 
 Review: PENDING. One fresh read-only reviewer (independent-auditor, Opus) reads the three copies, the practice record,
 this record and DEC-1179 as recorded, and gives a PASS or FAIL verdict with findings; at most two rounds
-(DEC-1131). The lead adds the reviewer's verdict line to this record after the review.
+(DEC-1010). The lead adds the reviewer's verdict line to this record after the review.
 
 The owner's approval of the skill's bytes (sha256 after, §3) is written in `owner_approval:` of the front matter by the
 CTO after the owner's yes, before the merge (CAP-33). This record holds none yet.
