@@ -23,6 +23,7 @@ import functools
 import hashlib
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -52,6 +53,16 @@ MARK = ".gov-cbm-base"
 LAUNCH_TMP_ENV, LAUNCH_PREFIX, LAUNCH_SUB = "CLAUDE_CODE_TMPDIR", "gov-launch-", "cbm"
 PROJECT = "code"
 _PAGE, _BUDGET = 50000, 100_000_000  # rows and output tokens of one answer of the tool; more is paged
+# Rows of one query's whole answer the tool gives at most: over it the tool refuses the query before its own paging
+# (``offset``, ``max_rows``), so a graph larger than this is read by edge type and node label, each its own query.
+# ``SKIP``/``LIMIT`` is no sound page of the tool (the lead's probe on redis, run 8) and is never asked.
+CAP = 100_000
+_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")  # an edge type or node label that may stand in a match
+_NODES = "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path"
+_EDGES = "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name"
+_LABELLED = "MATCH (n:{}) RETURN n.qualified_name, n.name, n.label, n.file_path"
+_TYPED = "MATCH (a)-[r:{}]->(b) RETURN a.qualified_name, type(r), b.qualified_name"
+_counted: dict = {}  # the graph's (nodes, edges) as the tool counted them, by the root ``_graph`` read
 # Seconds a session of the tool has for one answer, and for its end once its input is closed; then it is killed.
 _ANSWER_S, _END_S = 120.0, 10.0
 # Nodes that say where something stands, and edges that are no use of a symbol by another.
@@ -222,6 +233,30 @@ def _tool(root: Path, tool: str, **args) -> dict:
     raise RuntimeError(f"{TOOL} {tool} failed (exit code {done.returncode})")
 
 
+class GraphTooLarge(RuntimeError):
+    """The code graph holds an edge type or a node label (``what``, ``kind``) of ``count`` rows that one query of the
+    tool cannot answer: over its ``cap``, or (``refused``) a typed query of it that the tool still refused over its cap.
+    ``nodes`` and ``edges`` are the graph's counts as the tool gave them."""
+
+    def __init__(self, what: str, kind: str, count: int, nodes: int, edges: int, refused: bool = False) -> None:
+        self.what, self.kind, self.count, self.nodes, self.edges = what, kind, count, nodes, edges
+        self.cap, self.refused = CAP, refused
+        why = "the tool refused its typed query over its cap all the same" if refused else "over the cap"
+        super().__init__(f"{TOOL} refuses a query whose answer is over its cap of {CAP} rows: the code graph's {what} "
+                         f"{kind} has {count} rows ({why}), so it cannot be read under the cap (the graph: {nodes} "
+                         f"nodes, {edges} edges)")
+
+
+class GraphShort(RuntimeError):
+    """A read of the code graph's ``what`` ``kind`` (an edge type or node label; or all its nodes or edges) that ended
+    with ``read`` rows where the tool counted ``counted``."""
+
+    def __init__(self, what: str, kind: str, counted: int, read: int) -> None:
+        self.what, self.kind, self.counted, self.read = what, kind, counted, read
+        super().__init__(f"the code graph's {what} {kind}: {read} rows read where {TOOL} counted {counted}, so the "
+                         "graph is not whole (never a partial count)")
+
+
 class _Session:
     """Several tools of the binary under one daemon: the binary as a server on its standard input and output (MCP).
 
@@ -283,11 +318,15 @@ class _Session:
             envelope = self._ask("tools/call", name=tool, arguments=args)
             if envelope.get("isError", False) is False:  # MCP: an envelope without the field is no error
                 return json.loads(envelope["content"][0]["text"])
+            said = envelope["content"][0]["text"]  # what the tool said of its error, kept for the caller to name
+            text = " ".join(said.split())[:300] if isinstance(said, str) else ""
         except (OSError, ValueError, LookupError, TypeError, AttributeError):
-            pass
+            text = ""
         finally:
             limit.cancel()
-        raise RuntimeError(f"{TOOL} {tool} failed (exit code {self._end()})")
+        failed = RuntimeError(f"{TOOL} {tool} failed (exit code {self._end()})" + (f": {text}" if text else ""))
+        failed.text = text  # what the tool said of its error ("" for none), for a caller to name the cause
+        raise failed
 
 
 def index(root: Path) -> None:
@@ -297,6 +336,7 @@ def index(root: Path) -> None:
     if base.exists():  # first, so that a filter that cannot decide leaves no index behind
         shutil.rmtree(base)
     _graph.cache_clear()
+    _counted.clear()
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
                             capture_output=True, text=True, check=True, env=git_env(root)).stdout
     allowed = indexable(root, [rel for rel in listed.split("\0") if rel])
@@ -327,15 +367,87 @@ def _rows(session: _Session, query: str) -> list[list]:
     return rows
 
 
+def _number(value, query: str) -> int:
+    """A count the tool gave (it answers counts as text); anything else refuses."""
+    text = str(value).strip()
+    if not text.isdigit():
+        raise RuntimeError(f"{TOOL} query_graph answered {query!r} with no count gov can read: {text[:80]!r}")
+    return int(text)
+
+
+def _one(session: _Session, query: str) -> int:
+    rows = _rows(session, query)
+    if len(rows) != 1 or not isinstance(rows[0], list) or len(rows[0]) != 1:
+        raise RuntimeError(f"{TOOL} query_graph answered {query!r} with {len(rows)} rows, not one count")
+    return _number(rows[0][0], query)
+
+
+def _counts(session: _Session, query: str) -> dict[str, int]:
+    """The count of each edge type or node label, one row each; a name that cannot stand in a match refuses."""
+    found: dict[str, int] = {}
+    for row in _rows(session, query):
+        if not (isinstance(row, list) and len(row) == 2 and isinstance(row[0], str) and _NAME.fullmatch(row[0])
+                and row[0] not in found):
+            raise RuntimeError(f"{TOOL} query_graph answered {query!r} with a row gov cannot read by name: "
+                               f"{str(row)[:120]}")
+        found[row[0]] = _number(row[1], query)
+    return found
+
+
+def _read(session: _Session, whole: str, group: str, each: str, what: str, total: int, nodes: int,
+          edges: int) -> list[list]:
+    """Every row of the graph's nodes or edges (``what``): in one query (``whole``) where the tool's ``total`` is
+    under its cap, else one query of each edge type or node label (``each``), counted first (``group``), so no
+    query's answer is over the cap. The rows read equal each count, and the counts the total; else it refuses
+    (``GraphShort``); a type or label over the cap, or a typed query the tool still refuses over it, refuses by name
+    (``GraphTooLarge``). Never a partial read taken for the whole."""
+    if total <= CAP:
+        rows = _rows(session, whole)
+        if len(rows) != total:
+            raise GraphShort("whole read of its", what.split()[0] + "s", total, len(rows))
+        return rows
+    counts = _counts(session, group)
+    if sum(counts.values()) != total:
+        raise GraphShort(f"counts by {what} of its", what.split()[0] + "s", total, sum(counts.values()))
+    for kind, count in counts.items():
+        if count > CAP:
+            raise GraphTooLarge(what, kind, count, nodes, edges)
+    rows = []
+    for kind, count in counts.items():
+        try:
+            got = _rows(session, each.format(kind))
+        except RuntimeError as exc:
+            if "exceeded" in getattr(exc, "text", ""):  # the tool's own words for a query over its cap
+                raise GraphTooLarge(what, kind, count, nodes, edges, refused=True) from exc
+            raise
+        if len(got) != count:
+            raise GraphShort(what, kind, count, len(got))
+        rows += got
+    return rows
+
+
+def counted(root: Path) -> tuple[int, int] | None:
+    """The code graph's ``(nodes, edges)`` as the tool counted them when ``_graph(root)`` read it whole; None before."""
+    return _counted.get(root)
+
+
 @functools.cache
 def _graph(root: Path) -> tuple[dict, dict]:
     """The symbols of the index by qualified name, and for each the symbols that use it with the kind of use.
 
-    Both queries, pages included, are asked in one session of the tool: one start of its daemon (DEC-561).
+    The counts come first (nodes, edges); each part under the tool's cap is read in one query, a part over it by node
+    label or edge type (``_read``), each count checked against the rows read. Every query, pages included, is asked
+    in one session of the tool: one start of its daemon (DEC-561).
     """
+    _counted.pop(root, None)
     with _Session(root) as session:
-        found = _rows(session, "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path")
-        edges = _rows(session, "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name")
+        total_nodes = _one(session, "MATCH (n) RETURN count(n)")
+        total_edges = _one(session, "MATCH (a)-[r]->(b) RETURN count(r)")
+        found = _read(session, _NODES, "MATCH (n) RETURN n.label, count(n)", _LABELLED, "node label", total_nodes,
+                      total_nodes, total_edges)
+        edges = _read(session, _EDGES, "MATCH (a)-[r]->(b) RETURN type(r), count(r)", _TYPED, "edge type",
+                      total_edges, total_nodes, total_edges)
+    _counted[root] = (total_nodes, total_edges)
     nodes = {key: {"path": path, "name": name, "label": label} for key, name, label, path in found
              if label not in _PLACES and (root / BASE_REL / "files" / path).is_file()}
     users = defaultdict(list)

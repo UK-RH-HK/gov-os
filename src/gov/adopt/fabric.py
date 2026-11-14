@@ -504,40 +504,17 @@ def _memory_class(config: dict, space: str | None) -> str | None:
     return value.get("memory_class") if isinstance(value, dict) else None
 
 
-GRAPH_CAP = 100_000  # rows one query of the code graph tool answers at most; over it the tool refuses, before its paging
-
-
-def graph_counts(root: Path) -> tuple[int, int] | None:
-    """The code graph's ``(nodes, edges)`` as the tool counts them, each by a count query of one row; None where the tool
-    does not answer them (nothing is guessed)."""
+def too_large(exc) -> GovError:
+    """``CODEGRAPH_TOO_LARGE`` for a ``gov.codeintel.GraphTooLarge``: an edge type or node label of the graph that one
+    query of the tool cannot answer under its cap (``details``: ``nodes``, ``edges``, ``cap``, ``tool``, ``kind``)."""
     from gov import codeintel
 
-    try:
-        with codeintel._Session(root) as session:
-            found = [session.tool("query_graph", project=codeintel.PROJECT, format="json", query=query, max_rows=10,
-                                  max_output_tokens=codeintel._BUDGET)["rows"][0][0]
-                     for query in ("MATCH (n) RETURN count(n)", "MATCH (a)-[r]->(b) RETURN count(r)")]
-        return int(found[0]), int(found[1])
-    except Exception:  # noqa: BLE001 - whatever stops the count: the caller keeps the read's own error
-        return None
-
-
-def refuse_too_large(root: Path) -> None:
-    """``CODEGRAPH_TOO_LARGE`` (``details``: ``nodes``, ``edges``, ``cap``, ``tool``) where the graph the read could not take
-    has more nodes or more edges than ``GRAPH_CAP``: the tool refuses a query whose answer is longer, and ``gov.codeintel``
-    reads the whole graph in one query of each kind (its fix is outside W2-88's paths). Returns where the counts are
-    under the cap or cannot be had: the read's own failure then stands."""
-    from gov import codeintel
-
-    counts = graph_counts(root)
-    if counts is None or max(counts) <= GRAPH_CAP:
-        return
-    nodes, edges = counts
-    raise GovError("CODEGRAPH_TOO_LARGE", f"the code graph has {nodes} nodes and {edges} edges, and {codeintel.TOOL} refuses a "
-                   f"query whose answer is over its cap of {GRAPH_CAP} rows ({GRAPH_CAP:,}): gov's code-graph read "
-                   "(gov.codeintel, outside W2-88's paths) takes the whole graph in one query, so the graph of this "
-                   "repository cannot be read until that read is paged under the cap; nothing is recorded",
-                   {"nodes": nodes, "edges": edges, "cap": GRAPH_CAP, "tool": codeintel.TOOL})
+    why = ("and the tool refused its typed query over the cap all the same" if exc.refused else "over the cap")
+    return GovError("CODEGRAPH_TOO_LARGE", f"the code graph has {exc.nodes} nodes and {exc.edges} edges, and {codeintel.TOOL} "
+                    f"refuses a query whose answer is over its cap of {exc.cap} rows ({exc.cap:,}): gov reads the graph "
+                    f"by edge type and node label, each in its own query, and the {exc.what} {exc.kind} has {exc.count} "
+                    f"rows ({why}), so the graph of this repository cannot be read under the cap; nothing is recorded",
+                    {"nodes": exc.nodes, "edges": exc.edges, "cap": exc.cap, "tool": codeintel.TOOL, "kind": exc.kind})
 
 
 def _stores(run, result: dict) -> dict:
@@ -610,10 +587,12 @@ def _stores(run, result: dict) -> dict:
     if called_for and code_i:
         try:
             graph, users = codeintel._graph(run.root)
-            nodes, edges = len(graph), sum(len(each) for each in users.values())
+            # the tool's own counts of the graph read whole (run 8, package 2 (a)); a stand-in of the read gives none
+            nodes, edges = codeintel.counted(run.root) or (len(graph), sum(len(each) for each in users.values()))
+        except codeintel.GraphTooLarge as exc:  # a type or label over the tool's cap is named as that (S25)
+            raise too_large(exc) from exc
         except Exception as exc:  # noqa: BLE001 - a graph that cannot be read is named, never shown as 0 nodes and edges
             unreadable = f"{type(exc).__name__}: {' '.join(str(exc).split())}"
-            refuse_too_large(run.root)  # a graph over the tool's cap is named as that (S25), before the store is judged
     held = sorted(records & set(paths))  # the record store judges the files that carry records (a plain file is none)
     return {
         "record": {**base, "judged": len(held), "indexed": held, "nodes": n_records, "edges": n_edges, "refused": [],

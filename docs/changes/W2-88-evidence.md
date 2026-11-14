@@ -593,3 +593,41 @@ cases that pass on the old code are the ones that state what must stay the same)
   `gov/_shipped/`, equal to the source bytes, and reads the standard's pool from it. Run before the change: 8 of 8 red.
 - **The copies must follow their sources:** a change of any of the three files in the tree without the same change in
   `src/gov/_shipped/` fails `test_each_shipped_copy_equals_its_source_bytes` (the copy is refreshed by copying again).
+- **The wheel, checked in the release form:** `git archive` of the commit, `python3 -m pip wheel -q --no-deps
+  --no-build-isolation --no-index`, in the sandbox's own `$TMPDIR` (nothing installed): its `gov/_shipped/` holds the ten
+  files (`retrieval.yaml`, the six of `indep-walls/`, the three briefs).
+
+### Package 2 (a): the code graph read in pages by type (S25's cause, fixed)
+
+- **Built (`src/gov/codeintel/__init__.py`):** `_graph` asks the counts first (`MATCH (n) RETURN count(n)`,
+  `MATCH (a)-[r]->(b) RETURN count(r)`); nodes and edges are each read in one query where the count is at most `CAP`
+  (100,000), as before, else by node label and edge type: the counts by label or type (`RETURN n.label, count(n)`,
+  `RETURN type(r), count(r)`), then one match of each (`MATCH (n:<Label>) ...`, `MATCH (a)-[r:<TYPE>]->(b) ...`), each
+  paged by the tool's `offset`/`max_rows` as before; all in one session of the tool (DEC-561). `SKIP`/`LIMIT` is never
+  asked (the lead's probe: not a sound page). Checked at every step: the counts by label or type sum to the whole count,
+  the rows of each match equal its count, a whole read equals its count; else `GraphShort` (the type or label, both
+  figures). A type or label over the cap, or a typed match the tool still refuses with its over-cap words, raises
+  `GraphTooLarge` (`what`, `kind`, `count`, `nodes`, `edges`, `cap`, `refused`). A name that cannot stand in a match, or
+  a count that is no number, refuses. `counted(root)` gives the tool's `(nodes, edges)` of the graph `_graph` read.
+  `_Session.tool` keeps the tool's error text in its `RuntimeError` (message and `.text`), so an over-cap refusal is
+  told from other failures.
+- **Built (`src/gov/adopt/fabric.py`):** A9 records the code graph's `nodes` and `edges` as the tool counted them
+  (`codeintel.counted`; a stand-in of `_graph` that gives no count keeps the count of what it returned). A
+  `GraphTooLarge` refuses `CODEGRAPH_TOO_LARGE` (`fabric.too_large`): the message names `codebase-memory-mcp`, its cap,
+  the edge type or node label and its count; `details`: `nodes`, `edges`, `cap`, `tool`, `kind`. Any other failure,
+  `GraphShort` among them, keeps `FABRIC_INCOMPLETE` naming `codegraph` and the error text (for `GraphShort`, the type or
+  label and both figures). Run 7's `graph_counts` and `refuse_too_large` (the refusal for a read in one query) are
+  removed: the read no longer takes the whole graph in one query. `src/gov/retrieval/code_route.py` is unchanged (A9's
+  read does not go through it).
+- **Unit tests** (`tests/unit/codeintel/test_w2_88_graph.py`, 10 cases, and `tests/unit/adopt/test_w2_88_f1.py`, 9
+  cases, each with a stand-in `codebase-memory-mcp` first on `PATH` that refuses any query whose whole answer is over
+  100,000 rows and pages by `offset`/`max_rows`): a graph of 130,000 edges, every type under, read by type (counts equal,
+  no whole edge read asked); nodes over the cap read by label; no query asks `SKIP` or `LIMIT` (the stand-in answers
+  them short, so a reader using them would fail its count); a type over the cap and a label over the cap refused by name;
+  a typed match the tool still refuses refused by name; a typed read short of its count, counts by type short of the
+  whole and a whole read short all refuse with both figures; a graph under the cap read whole as today; the tool's error
+  text kept. A9: a graph shaped as the lead's redis probe (41,086 nodes, 142,983 edges, the largest type 40,849)
+  completes and its record holds 41,086 and 142,983; a type at the cap is read; a type or label over the cap is
+  `CODEGRAPH_TOO_LARGE` with `kind` and nothing written; a short typed read is `FABRIC_INCOMPLETE` naming `CALLS`, 40549
+  and 40546; a tool that cannot count refuses, never 0. The codeintel cases were run before the change: 10 of 10 red.
+- **Not run here:** A9 on the redis copy (`~/gov-os-runs/W2-88/redis`); the lead re-runs it outside the sandbox.
