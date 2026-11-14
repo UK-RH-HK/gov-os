@@ -348,8 +348,8 @@ def _standing_line(state, st, at, churn, r28, fig, repo, gov, measured) -> dict:
         line.update(n=n, right=right, wrong=v.get("wrong"), not_found=fig.get("not_found"), dropped=live.get("dropped"),
                     pct=round(100 * right / n, 4) if isinstance(n, int) and n > 0 and isinstance(right, int) else None,
                     word=word)
-        if isinstance(n, int) and n < record.MIN_LIVE:
-            line["flags"] = [f"STANDING_THIN {n}"]
+        if isinstance(n, int) and n < record.MIN_LIVE:  # I6: below 70 live questions the word is a list that names it
+            line["word"] = [word, f"STANDING_THIN {n}"]
     line.update(gov_pin=declare.gov_pin(gov or "~/.local/bin/gov"),
                 retrieval_yaml_sha256=_sha_at(repo, st["commit"], declare.RETRIEVAL),
                 path_map_sha256=_sha_at(repo, st["commit"], "governance/project/path-map.yaml"))

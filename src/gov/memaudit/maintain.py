@@ -107,7 +107,10 @@ def unindexed_item(link) -> int:
     out = set(lexical.kept_out(Path(link), files))
     conn = sqlite3.connect(f"file:{_db(link)}?mode=ro", uri=True)
     try:
-        held = {row[0] for row in conn.execute("SELECT DISTINCT path FROM lexical_chunk")}
+        try:
+            held = {row[0] for row in conn.execute("SELECT DISTINCT path FROM lexical_chunk")}
+        except sqlite3.OperationalError:  # a store with no chunk table holds no path: the count is a number all the same
+            held = set()
     finally:
         conn.close()
     return sum(1 for rel in files if rel not in out and rel not in held)
@@ -217,7 +220,7 @@ def run(sets_root, *, repo=None, link=None, gov=None, emit) -> str:
     two = guarded(lambda: layout_item(repo, link, gov, branch), "unknown")
     head = guarded(lambda: schedule.head_of(link), "")
     three = guarded(lambda: links_item(repo, gov, since), "none")
-    four = guarded(lambda: unindexed_item(link), "none")
+    four = guarded(lambda: unindexed_item(link), 0)
     five = guarded(lambda: answers_item(root, state), (0, 0))
     six = guarded(lambda: reanchor_item(root, state, link, week, head), 0)
     line = (f"MAINTAIN 1 store {one} 2 layout {two} 3 links {three} 4 unindexed {four} 5 not_found {five[0]} "

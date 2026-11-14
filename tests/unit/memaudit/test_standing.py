@@ -112,10 +112,19 @@ def test_a_wave0_verdict_set_with_used_and_its_record_is_accepted_its_own_misses
 
 def test_a_used_set_without_its_result_record_or_at_another_commit_is_spent(stand):
     wave0(stand, record=False)
-    assert declared(stand, AUDIT)[1]["code"].startswith("STANDING_SPENT")  # its own misses now count against it
+    # I3: the check skips the set's own run folder whether or not the Wave 0 conditions hold, so the count is 0
+    assert declared(stand, AUDIT)[1] == {"code": "STANDING_SPENT 0"}
     (stand.root / "runs" / AUDIT / "FIGURES.json").write_text("{}")
     (stand.state / "indep" / "AUDITS.log").write_text(json.dumps({"commit": "b" * 40}) + "\n")
-    assert declared(stand, AUDIT)[1]["code"].startswith("STANDING_SPENT")  # not the baseline's commit: not Wave 0
+    assert declared(stand, AUDIT)[1] == {"code": "STANDING_SPENT 0"}  # not the baseline's commit: not Wave 0
+
+
+def test_another_runs_record_of_a_used_sets_question_still_counts_against_it(stand):
+    wave0(stand)
+    other = stand.root / "runs" / "memory-audit-20260101"
+    other.mkdir(parents=True)
+    (other / "misses.jsonl").write_text(json.dumps({"question": stand.questions["q01"]["question"]}) + "\n")
+    assert declared(stand, AUDIT)[1] == {"code": "STANDING_SPENT 1"}
 
 
 def test_a_second_live_set_is_refused_until_the_first_is_retired_or_replaced_when_thin(stand):
@@ -129,7 +138,7 @@ def test_a_second_live_set_is_refused_until_the_first_is_retired_or_replaced_whe
     assert declared(stand, other)[1] == {"code": f"STANDING_LIVE {SET}"}
     assert declared(stand, other, replaces=SET)[1] == {"code": f"STANDING_LIVE {SET}"}  # not thin
     standing.append(stand.state, "HISTORY.jsonl", {"kind": "standing", "set": SET, "week": WEEK, "measured": True,
-                                                   "word": "pass", "flags": ["STANDING_THIN 69"]})
+                                                   "word": ["pass", "STANDING_THIN 69"]})
     word, _ = declared(stand, other, replaces=SET)
     assert word == "ok"
     assert [r["event"] for r in rows(stand.state / "STANDING.jsonl")] == ["declared", "retired", "declared"]
@@ -497,6 +506,14 @@ def test_fewer_than_70_live_questions_prints_standing_thin_in_the_block_and_70_d
                 if x.startswith("STANDING_THIN")]
     assert thin[0] == f"STANDING {SET} week {WEEK} commit aaaaaaaaaaaa" and thin[-2:] == ["STOP none", "OWNER none"]
     assert "VERDICT not reached" in thin and "P1 none" in thin and "MAINTAIN none" in thin and "REPAIR none" in thin
+
+
+def test_an_open_repair_is_the_digest_line_repair_open_with_no_week():
+    from gov.memaudit import digest
+    st = {"audit": SET, "week": WEEK, "commit": "a" * 40, "figures": None, "stop": None, "next": "2026-11-23",
+          "next_mode": "weekly", "next_fresh": "2026-12-14", "live": {"n": 80, "n_set": 80, "dropped": 0}}
+    assert "REPAIR open" in digest.standing_lines({**st, "repair": "2026-W44"})
+    assert "REPAIR none" in digest.standing_lines({**st, "repair": None})
 
 
 def due_cli(plant, *extra):

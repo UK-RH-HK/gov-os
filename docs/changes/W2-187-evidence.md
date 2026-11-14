@@ -69,7 +69,37 @@ Left out by the exclusion: the cases whose names hold `real`, `green_here` or `t
 - `tests/acceptance/W2-173`: `91 passed, 2 skipped`.
 - `tests/acceptance/W2-88`: `212 passed, 2 skipped, 3 failed`.
 
-## Acceptance folders: the reds, and why
+## Fix batch (eng-2): the acceptance suite merged, 14 cases red on the code's side, now green
+
+Run after the fix, each folder alone through the heavy-slot gate, empty HOME, same exclusion:
+
+- `tests/acceptance/W2-187`: `2 failed, 170 passed`. The two reds are the cases the test designer is revising
+  (`test_s2_a_run_writes_the_declaration_then_used_before_any_search`,
+  `test_s8_the_owners_decision_id_closes_it_and_is_recorded`).
+- `tests/acceptance/W2-170`: `184 passed, 1 skipped`.
+- `tests/acceptance/W2-171`: `2 failed, 137 passed, 2 skipped`. The two reds are the lead's package P1
+  (`test_the_ledger_events_have_item_3s_fields`, `test_s5_a_verdict_below_the_bar_stands_as_recorded_and_is_a_result`).
+- `tests/acceptance/W2-172`: `2 failed, 160 passed, 1 skipped`. The two reds are the ones the designer is fixing
+  (`test_s6_a_log_present_but_empty_is_empty`, `test_f2_no_question_gold_answer_answer_or_source_path_reaches_the_digest_the_output_or_a_log`).
+- `tests/acceptance/W2-173`: `91 passed, 2 skipped`.
+- `tests/acceptance/W2-88`: `215 passed, 2 skipped`.
+- `tests/unit/memaudit`: `306 passed, 1 deselected`. `tests/unit/adopt` was not touched by this batch (last run:
+  `192 passed, 54 deselected`).
+
+The fourteen cases and their causes (all in the code, none in the Interface):
+
+| cases | cause | change |
+|---|---|---|
+| S10 (9 cases) | item 4 printed `none` when the store holds no `lexical_chunk` table (the line must be `4 unindexed <k>`) | `maintain.unindexed_item`: no chunk table is an empty set of held paths; the guarded fallback is 0, a count |
+| S1 Wave 0 (2 cases) | the spent check counted the set's own `misses.jsonl` when the Wave 0 conditions failed | `standing._spent` skips the own run's `misses.jsonl` and `miss-classes.json` whenever `USED` exists; `declare` then answers `STANDING_SPENT 0` |
+| S6 (1 case) | `STANDING_THIN` was in a `flags` field, not in the HISTORY line's `word` | `driver._standing_line`: `word` is `[word, "STANDING_THIN <n>"]` below 70 live questions |
+| S8 (2 cases) | the digest line was `REPAIR open since <week>`, I12 says `REPAIR open` | `digest.standing_lines`; `status --repair` keeps `since <week>` (I8) |
+
+Unit cases added or changed: `test_maintain.py::test_a_store_with_no_chunk_table_...`; `test_standing.py` (the used set
+without its record or at another commit is `STANDING_SPENT 0`; another run's record of a used set's question still counts;
+the digest line `REPAIR open`; the thin plant's `word` list); `test_standing_run.py` (the `word` list for the 40-question plant).
+
+## Acceptance folders: the reds, and why (before the fix batch, kept for the record)
 
 All are expected until the designer's revision is merged (the files are named by their results only; I did not read the
 ticket's six revised files or the two G1 helpers).
@@ -95,12 +125,19 @@ separate commits, so a split into W2-187b leaves S1 to S9 clean.
 
 ## Readings of the Interface
 
-1. **I3, `STANDING_THIN` in the HISTORY line.** I4 gives `"word": "pass"|"miss"` and says `STANDING_THIN` goes "in the
-   `word` list". I write `word` as the string and add `"flags": ["STANDING_THIN <live>"]`. Readers (`--replaces`, repair,
-   drift) accept `word` as a string or a list and find `STANDING_THIN` anywhere in the line.
-2. **I3, the Wave 0 check.** "The first line of the repository's `AUDITS.log`" is the first line of
-   `<key folder>/indep/AUDITS.log`, else of `<runs-dir>/indep/AUDITS.log`. A retired set's name is `STANDING_SPENT 0` on a
-   second declaration.
+1. **I6, `STANDING_THIN` in the HISTORY line (revised after the acceptance run).** I4 gives `"word": "pass"|"miss"` and I6
+   says `STANDING_THIN` goes "in the HISTORY line's `word` list". `word` is the string `pass` or `miss`; below 70 live
+   questions it is the list `["pass"|"miss", "STANDING_THIN <live>"]` (no `flags` field any more). Readers (`--replaces`,
+   repair, drift, `verdict_of`) accept `word` as a string or a list.
+2. **I3, the Wave 0 check (revised after the acceptance run).** "The first line of the repository's `AUDITS.log`" is the
+   first line of `<key folder>/indep/AUDITS.log`, else of `<runs-dir>/indep/AUDITS.log`. The spent check skips the set's own
+   `runs/<set>/misses.jsonl` and `miss-classes.json` whenever `runs/<set>/USED` exists, whether or not the Wave 0
+   conditions then hold (the lead's reading of I3); a used set that lacks its record or is at another commit is then
+   `STANDING_SPENT 0`. A retired set's name is `STANDING_SPENT 0` on a second declaration.
+10. **I10, item 4 and I12's `REPAIR` line (revised after the acceptance run).** Item 4 is always a count: a store with no
+    `lexical_chunk` table holds no path (every indexed tracked path counts), and an unreadable store counts 0 (item 1 names
+    a store that could not be read). The digest's line is `REPAIR open` (I12), without the week; `status --repair` keeps
+    `REPAIR open since <week>` (I8).
 3. **I4, refusals.** `STANDING_NONE`, `STANDING_RETIRED` (a record exists, none live), `STANDING_DIGEST` and `USED` print as
    the bare code; an `RN-` refusal prints `REFUSED RN-<x>`. Nothing is written for any of them but the `LOCK` file of an `RN-`
    refusal (as in `run`). `RN-NOBASE`, `RN-RECENT` and `RN-NAME` are not asked of a standing run.

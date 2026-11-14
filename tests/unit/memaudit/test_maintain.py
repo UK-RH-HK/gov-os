@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import sqlite3
 import stat
 import subprocess
@@ -207,6 +208,17 @@ def test_the_links_count_runs_from_the_last_passes_commit_and_a_refusal_is_none(
 def test_the_unindexed_paths_are_counted_less_those_the_path_map_keeps_out(world):
     # tracked: a, b, c, docs/secret/x (kept out), docs/x, the path map, retrieval.yaml; the store holds chunks of four
     assert " 4 unindexed 2 " in world.maintain()
+
+
+def test_a_store_with_no_chunk_table_holds_no_path_so_the_unindexed_item_is_still_a_number(plant, monkeypatch):
+    world = World(plant, monkeypatch, behind=False)
+    conn = sqlite3.connect(world.link / ".gov-runtime" / "store.db")
+    conn.execute("DROP TABLE lexical_chunk")
+    conn.commit()
+    conn.close()
+    line = world.maintain()
+    got = re.search(r" 4 unindexed (\S+) ", line)
+    assert got and got[1].isdigit() and int(got[1]) > 2, line  # every indexed tracked path counts, as for an empty store
 
 
 def write_rows(folder, rows):

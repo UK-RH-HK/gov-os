@@ -160,7 +160,7 @@ def standing_lines(st: dict) -> list[str]:
     out.append(st.get("maintain") or "MAINTAIN none")
     out.append(f"P1 memory below 95 %: wrong {by['wrong']} incomplete {by['incomplete']} not_found {by['not_found']}"
                if v and by and not v["passes"] else "P1 none")
-    out.append(f"REPAIR open since {st['repair']}" if st.get("repair") else "REPAIR none")
+    out.append("REPAIR open" if st.get("repair") else "REPAIR none")
     out.append(f"NEXT standing {st['next']} {st['next_mode']}; fresh {st['next_fresh']}")
     stop = st.get("stop")
     out.append(f"STOP {stop['step']} exit {stop['exit']}" if stop else "STOP none")

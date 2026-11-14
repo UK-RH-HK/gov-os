@@ -113,10 +113,10 @@ def test_a_standing_run_judges_the_live_set_once_and_prints_the_digest_and_the_l
     assert digest and all(x in out for x in digest)  # the block as written is the block printed
     line = stand.history()[-1]
     assert line["kind"] == "standing" and line["set"] == SET and line["week"] == stand.week and line["audit"] == SET
-    assert (line["n"], line["right"], line["wrong"], line["dropped"], line["pct"], line["word"]) == (40, 40, 0, 0, 100.0,
-                                                                                                    "pass")
+    assert (line["n"], line["right"], line["wrong"], line["dropped"], line["pct"]) == (40, 40, 0, 0, 100.0)
+    assert line["word"] == ["pass", "STANDING_THIN 40"]  # I6: below 70 live questions the word list names it
     assert line["measured"] is True and line["used"] is True and line["passes"] is True
-    assert line["flags"] == ["STANDING_THIN 40"] and line["gov_pin"] == "pin-0123456789ab"
+    assert line["gov_pin"] == "pin-0123456789ab"
     assert line["retrieval_yaml_sha256"] and line["path_map_sha256"] and line["pool_regression"] is False
     starts = [json.loads(x) for x in (stand.state / "STARTS.log").read_text().splitlines()]
     assert starts[-1]["kind"] == "standing" and starts[-1]["week"] == stand.week
@@ -169,7 +169,7 @@ def test_five_planted_misses_leave_only_counts_in_every_line_and_file_outside_th
     assert "P1 memory below 95 %: wrong 2 incomplete 1 not_found 2" in out
     assert any(x.startswith("MISSES outcome wrong ") and "; rank 1-5 " in x and " absent " in x for x in out)
     line = s.history()[-1]
-    assert (line["word"], line["passes"], line["right"], line["n"]) == ("miss", False, 35, 40)
+    assert (line["word"], line["passes"], line["right"], line["n"]) == (["miss", "STANDING_THIN 40"], False, 35, 40)
 
 
 @pytest.mark.parametrize("wrong,word", [(2, "pass"), (3, "miss")])
@@ -184,7 +184,7 @@ def test_right_at_the_need_right_passes_and_one_under_it_misses(plant, monkeypat
     right = 40 - wrong
     assert done.stdout.splitlines()[-1] == f"STANDING {s.week} right {right} of 40: " + ("passes" if word == "pass" else "misses")
     assert (right >= need) == (word == "pass")
-    assert s.history()[-1]["word"] == word
+    assert s.history()[-1]["word"] == [word, "STANDING_THIN 40"]  # the 40-question plant is under 70 live
 
 
 def test_three_broken_anchors_are_dropped_by_count_and_the_set_is_never_edited(plant, monkeypatch):

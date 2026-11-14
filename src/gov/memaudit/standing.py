@@ -119,14 +119,15 @@ def _questions(hidden: Path) -> list[tuple[Path, dict | None]]:
     return out
 
 
-def _spent(p: dict, name: str, hidden: Path, wave0: bool) -> int | None:
-    """The count of this set's questions found in a ``misses.jsonl`` under ``runs/`` (the Wave 0 run's own record not
-    counted), or ``None`` when no question matched and no other mark of use stands."""
+def _spent(p: dict, name: str, hidden: Path, used: bool) -> int | None:
+    """The count of this set's questions found in a ``misses.jsonl`` under ``runs/`` (the own run's record of a set with
+    a ``USED`` mark not counted: I3 skips it whether or not the Wave 0 conditions then hold; the caller answers
+    ``STANDING_SPENT 0`` when they do not), or ``None`` when no question matched and no other mark of use stands."""
     runs = p["root"] / "runs"
     own = runs / name
     seen = set()
     for f in runs.rglob("misses.jsonl") if runs.is_dir() else []:
-        if wave0 and f == own / "misses.jsonl":
+        if used and f == own / "misses.jsonl":
             continue  # U1: the Wave 0 verdict set's own run does not spend it
         try:
             for line in f.read_text(encoding="utf-8").splitlines():
@@ -140,7 +141,7 @@ def _spent(p: dict, name: str, hidden: Path, wave0: bool) -> int | None:
             continue
     matched = sum(1 for _, data in _questions(hidden)
                   if isinstance(data, dict) and isinstance(data.get("question"), str) and data["question"] in seen)
-    classes = any(f != own / "miss-classes.json" if wave0 else True
+    classes = any(f != own / "miss-classes.json" if used else True
                   for f in own.rglob("miss-classes.json")) if own.is_dir() else False
     return matched if matched or classes else None
 
@@ -180,7 +181,7 @@ def declare(sets_root, name, *, repo=None, runs_dir=None, replaces=None) -> tupl
         decl, fig = read_json(own / "DECLARATION.json"), read_json(own / "FIGURES.json")
         base = _first_commit(_logs(state, runs))
         wave0 = isinstance(decl, dict) and isinstance(fig, dict) and base is not None and decl.get("audit_commit") == base
-    k = _spent(p, name, hidden, wave0)
+    k = _spent(p, name, hidden, used)
     if k is None and any(x.get("audit") == name for log in _logs(state, runs) for x in schedule.read_lines(log)):
         k = 0
     if k is None and name in retired_sets(state):
