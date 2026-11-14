@@ -1,9 +1,9 @@
-Status at 2026-11-14 22:20:37 (the last report's block)
-- Progress: 162 closed / 3 merged-not-closed / 0 built-and-held / 4 in flight / 23 not started, of 192.
-- Leads: 1 running (W2-88); queued next: W2-88; the gate: open.
+Status at 2026-11-14 23:09:32 (the last report's block)
+- Progress: 163 closed / 3 merged-not-closed / 0 built-and-held / 3 in flight / 23 not started, of 192.
+- Leads: 2 running (W2-188, W2-88); queued next: W2-88, W2-188; the gate: open.
 - Closes: none running; next: W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:42), W2-100 (12:52), W2-101 (13:19); refused since the last report: none.
-- Reopened since the last report: none. New tickets since the last report: none.
-- Memory chain: W2-61 closed; W2-61h REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
-- Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88 run 8b RUNNING since 22:03 on Route X (DEC-1183; paths widened c9b4347ac); then its land, 'release ready', the re-pin bundle, your sitting (~02:00-02:45), the clone, kit, A0 and the EXAMIN CTO.
+- Reopened since the last report: W2-111 (for Bash calls and many trees; the EXAMIN CTO's first brief b70ff233 approved; W2-61h's changed-lines list to the …). New tickets since the last report: none.
+- Memory chain: W2-61 closed; W2-61h closed; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
+- Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88 run 8b in its accept run (Route X, DEC-1183); its land overnight with no landing hold; 'release ready at C' ~06:30; your sitting from waking (~07:00); then the re-pin, your operator's EXAMIN setup and the EXAMIN CTO (brief b70ff233, DEC-1184 (4)). On track for 18 November..
 - Emergency plan: none (lifted, DEC-1158).
-- OWNER_ACTION: now: the CTO handover to a VS Code panel on the full window (no 300k setting): the window is OPEN since 22:21 (no land running); now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2; the sitting (release + re-pin) ~02:00-02:45 on Route X, then your operator's EXAMIN setup and the EXAMIN CTO (brief b70ff233)
+- OWNER_ACTION: P1 OWNER-BEFORE-1200-20261115 - the sitting's time (line: sitting 07:00); your backup push (490 commits since 11-13); in the sitting: yes ACT-REPIN-REL-0.1.0 <sha8> after the post-fill review; ~07:00: the live-hook ACT's yes

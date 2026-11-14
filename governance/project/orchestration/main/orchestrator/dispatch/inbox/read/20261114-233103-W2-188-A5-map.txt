@@ -1,0 +1,10 @@
+log: W2-188-A5-map.json
+W2: W2-188
+status: DONE. Head to land: `4711c0fb5b8e` (full `4711c0fb5b8eaf0b5a168eb6aac68a3124aa85`). The worktree is clean.
+
+task: DAEO-zlog (W2-188), resumed to fix the acceptance README so `gov accept` can read its map
+status: DONE. Head to land: `4711c0fb5b8e` (full `4711c0fb5b8eaf0b5a168eb6aac68a3124aa85`). The worktree is clean.
+work_completed:
+- Merged `w2/integrate` (10e98af9c) into `w2/W2-188` with `--no-ff`. There were no conflicts. Result: `fbcfef374b8d`.
+- **The cause was wider than the brief said.** The first designer (td-5) moved the self-checks row and then found, using the product's own `parse_map`, that it was not the first row refused. Two more problems in the map table:
+  - All eight KPI cells star

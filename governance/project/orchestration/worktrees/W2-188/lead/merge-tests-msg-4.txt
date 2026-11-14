@@ -1,0 +1,6 @@
+W2-188 (DAEO-zlog): merge the test designer's README map fix (199ea5103, td-5 and td-6) so gov accept reads every map row (DEC-1184)
+
+Task: DAEO-zlog
+Role: orchestrator
+Implements: DEC-1156, CAP-33
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

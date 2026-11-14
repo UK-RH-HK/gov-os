@@ -1,0 +1,202 @@
+...F.................................................................... [  5%]
+..........................................sss........................... [ 11%]
+........................................................................ [ 16%]
+........................................................................ [ 22%]
+........................................................................ [ 28%]
+........................................................................ [ 33%]
+........................................................................ [ 39%]
+........................................................................ [ 44%]
+........................................................................ [ 50%]
+........................................................................ [ 56%]
+...........................................................F............ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 72%]
+...................................................sss.................. [ 78%]
+...........................................s................sss...s..s.. [ 84%]
+.......sssssssssssssssss................sssssssss....................... [ 89%]
+........................................................................ [ 95%]
+.......................ss....................FF..FFFF.......             [100%]
+=================================== FAILURES ===================================
+________________ test_documented_lines_name_only_the_sets_root _________________
+
+    def test_documented_lines_name_only_the_sets_root():
+        lines = [x.strip() for x in indep_launch.__doc__.splitlines() if x.strip().startswith("python3 ")]
+        # the memory writer, checker and auditor; one per set-up A brief (DEC-1112 (3)); --dry; --counts-only
+>       assert len(lines) == 10
+E       AssertionError: assert 11 == 10
+E        +  where 11 = len(['python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief gover...ha256 bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068 --commit 6ff398a28 --set tuning --round 2', ...])
+
+tests/unit/orchestration/test_w2_149_indep_launch.py:381: AssertionError
+_ test_s11_f6_the_branch_changes_no_wall_or_brief_file_and_of_the_schemas_only_the_counts_schema _
+
+    def test_s11_f6_the_branch_changes_no_wall_or_brief_file_and_of_the_schemas_only_the_counts_schema():
+        # S13 (2026-11-14) changes indep-counts.schema.json by this ticket: it alone may differ under indep-schemas/
+        ref = _git("rev-parse", "--verify", "--quiet", "w2/integrate")
+        if ref.returncode != 0:
+            pytest.skip("w2/integrate is not a ref in this repository")
+        base = _git("merge-base", "HEAD", "w2/integrate").stdout.strip()
+        assert base
+        guarded = ["governance/project/indep-walls/", "governance/project/indep-briefs/",
+                   "governance/project/orchestration/tools/indep-schemas/"]
+        changed = _git("diff", "--name-only", base, "--", *guarded).stdout.split()
+        untracked = _git("ls-files", "--others", "--exclude-standard", "--", *guarded).stdout.split()
+>       assert [c for c in changed if c != COUNTS_SCHEMA_REL] == [] and untracked == [], (changed, untracked)
+E       AssertionError: (['governance/project/indep-walls/kinds.yaml', 'governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json'], [])
+E       assert (['governance/...s/kinds.yaml'] == []
+E         
+E         Left contains one more item: 'governance/project/indep-walls/kinds.yaml'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-94/test_w2_94_fix_flow.py:479: AssertionError
+_ test_s1_the_auditor_s_wall_differs_from_the_base_build_only_by_the_dropped_subtree _
+
+world = <w2_149_support.World object at 0x77e7a32ceea0>
+base_script = PosixPath('/tmp/gov-os-act-wr1/pytest-of-usain/pytest-5/w2-178-base0/base/governance/project/orchestration/tools/indep_launch.py')
+
+    def test_s1_the_auditor_s_wall_differs_from_the_base_build_only_by_the_dropped_subtree(world, base_script):
+        """Red today: the same world, the same arguments and seed, built by the script at the base and by the head's. The
+        head's wall equals the base's with every entry under ``input/set/dropped`` taken out: nothing else changes (the
+        run id inside files is the one field replaced, see ``w2_178_support.snapshot``)."""
+        s.plant(world, s.DROPPED)
+        base_line = s.build(world, base_script, "auditor")
+        head_line = s.build(world, None, "auditor")
+        base_snap, head_snap = s.snapshot(world, base_line), s.snapshot(world, head_line)
+        assert any(k.startswith("input/set/dropped/") for k in base_snap), "the base build carries no dropped files"
+        diff = s.differences(s.without_dropped(base_snap), head_snap)
+>       assert diff == {}, f"the head's auditor wall differs from the base's beyond the dropped subtree: {diff}"
+E       AssertionError: the head's auditor wall differs from the base's beyond the dropped subtree: {'WALL.json': 'differs'}
+E       assert {'WALL.json': 'differs'} == {}
+E         
+E         Left contains 1 more item:
+E         {'WALL.json': 'differs'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-178/test_w2_178_auditor.py:103: AssertionError
+_ test_s1_a_set_with_no_dropped_folder_builds_the_same_auditor_wall_as_before __
+
+world = <w2_149_support.World object at 0x77e7a32cce60>
+base_script = PosixPath('/tmp/gov-os-act-wr1/pytest-of-usain/pytest-5/w2-178-base0/base/governance/project/orchestration/tools/indep_launch.py')
+
+    def test_s1_a_set_with_no_dropped_folder_builds_the_same_auditor_wall_as_before(world, base_script):
+        """Green today: a set with no ``dropped/`` folder gives the auditor a wall equal to the base build's, entry for
+        entry (a script that changed anything else for the auditor would differ)."""
+        base_line = s.build(world, base_script, "auditor")
+        head_line = s.build(world, None, "auditor")
+        diff = s.differences(s.snapshot(world, base_line), s.snapshot(world, head_line))
+>       assert diff == {}, f"the head's auditor wall differs from the base's: {diff}"
+E       AssertionError: the head's auditor wall differs from the base's: {'WALL.json': 'differs'}
+E       assert {'WALL.json': 'differs'} == {}
+E         
+E         Left contains 1 more item:
+E         {'WALL.json': 'differs'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-178/test_w2_178_auditor.py:112: AssertionError
+_ test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_in_it[writer-round-2] _
+
+world = <w2_149_support.World object at 0x77e7a32afc80>
+base_script = PosixPath('/tmp/gov-os-act-wr1/pytest-of-usain/pytest-5/w2-178-base0/base/governance/project/orchestration/tools/indep_launch.py')
+kind = 'writer', round_ = 2
+
+    @pytest.mark.parametrize("kind,round_", KINDS)
+    def test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_in_it(world, base_script, kind, round_):
+        """Green today (the head is the base): the wall holds ``input/set/dropped/...`` (all three files and the two
+        folders on the way) in the base's build and in the head's, and the two walls are equal in every entry."""
+        s.plant(world, s.DROPPED, s.LOOKALIKES, s.NESTED, s.RAW, xcheck=True)
+        base_line = s.build(world, base_script, kind, round_)
+        head_line = s.build(world, None, kind, round_)
+        base_snap, head_snap = s.snapshot(world, base_line), s.snapshot(world, head_line)
+        for name, snap in (("base", base_snap), ("head", head_snap)):
+            for rel, data in s.DROPPED.items():
+                assert snap.get("input/set/" + rel, (None, None))[1] == data, f"the {name}'s {kind} wall lacks input/set/{rel}"
+        diff = s.differences(base_snap, head_snap)
+>       assert diff == {}, f"the head's {kind} wall differs from the base's: {diff}"
+E       AssertionError: the head's writer wall differs from the base's: {'WALL.json': 'differs'}
+E       assert {'WALL.json': 'differs'} == {}
+E         
+E         Left contains 1 more item:
+E         {'WALL.json': 'differs'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-178/test_w2_178_unchanged.py:50: AssertionError
+_ test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_in_it[checker] _
+
+world = <w2_149_support.World object at 0x77e7a32ae930>
+base_script = PosixPath('/tmp/gov-os-act-wr1/pytest-of-usain/pytest-5/w2-178-base0/base/governance/project/orchestration/tools/indep_launch.py')
+kind = 'checker', round_ = None
+
+    @pytest.mark.parametrize("kind,round_", KINDS)
+    def test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_in_it(world, base_script, kind, round_):
+        """Green today (the head is the base): the wall holds ``input/set/dropped/...`` (all three files and the two
+        folders on the way) in the base's build and in the head's, and the two walls are equal in every entry."""
+        s.plant(world, s.DROPPED, s.LOOKALIKES, s.NESTED, s.RAW, xcheck=True)
+        base_line = s.build(world, base_script, kind, round_)
+        head_line = s.build(world, None, kind, round_)
+        base_snap, head_snap = s.snapshot(world, base_line), s.snapshot(world, head_line)
+        for name, snap in (("base", base_snap), ("head", head_snap)):
+            for rel, data in s.DROPPED.items():
+                assert snap.get("input/set/" + rel, (None, None))[1] == data, f"the {name}'s {kind} wall lacks input/set/{rel}"
+        diff = s.differences(base_snap, head_snap)
+>       assert diff == {}, f"the head's {kind} wall differs from the base's: {diff}"
+E       AssertionError: the head's checker wall differs from the base's: {'WALL.json': 'differs'}
+E       assert {'WALL.json': 'differs'} == {}
+E         
+E         Left contains 1 more item:
+E         {'WALL.json': 'differs'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-178/test_w2_178_unchanged.py:50: AssertionError
+_ test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build[writer-round-2] _
+
+world = <w2_149_support.World object at 0x77e7a32acad0>
+base_script = PosixPath('/tmp/gov-os-act-wr1/pytest-of-usain/pytest-5/w2-178-base0/base/governance/project/orchestration/tools/indep_launch.py')
+kind = 'writer', round_ = 2
+
+    @pytest.mark.parametrize("kind,round_", KINDS)
+    def test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build(world, base_script, kind, round_):
+        """Green today: W2-149's planted set as it is (no ``dropped/``) gives the same wall as the base's, entry for entry."""
+        s.plant(world, xcheck=True)
+        base_line = s.build(world, base_script, kind, round_)
+        head_line = s.build(world, None, kind, round_)
+        diff = s.differences(s.snapshot(world, base_line), s.snapshot(world, head_line))
+>       assert diff == {}, f"the head's {kind} wall differs from the base's: {diff}"
+E       AssertionError: the head's writer wall differs from the base's: {'WALL.json': 'differs'}
+E       assert {'WALL.json': 'differs'} == {}
+E         
+E         Left contains 1 more item:
+E         {'WALL.json': 'differs'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-178/test_w2_178_unchanged.py:60: AssertionError
+_ test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build[checker] _
+
+world = <w2_149_support.World object at 0x77e7a32f6a50>
+base_script = PosixPath('/tmp/gov-os-act-wr1/pytest-of-usain/pytest-5/w2-178-base0/base/governance/project/orchestration/tools/indep_launch.py')
+kind = 'checker', round_ = None
+
+    @pytest.mark.parametrize("kind,round_", KINDS)
+    def test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build(world, base_script, kind, round_):
+        """Green today: W2-149's planted set as it is (no ``dropped/``) gives the same wall as the base's, entry for entry."""
+        s.plant(world, xcheck=True)
+        base_line = s.build(world, base_script, kind, round_)
+        head_line = s.build(world, None, kind, round_)
+        diff = s.differences(s.snapshot(world, base_line), s.snapshot(world, head_line))
+>       assert diff == {}, f"the head's {kind} wall differs from the base's: {diff}"
+E       AssertionError: the head's checker wall differs from the base's: {'WALL.json': 'differs'}
+E       assert {'WALL.json': 'differs'} == {}
+E         
+E         Left contains 1 more item:
+E         {'WALL.json': 'differs'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-178/test_w2_178_unchanged.py:60: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/orchestration/test_w2_149_indep_launch.py::test_documented_lines_name_only_the_sets_root
+FAILED tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s11_f6_the_branch_changes_no_wall_or_brief_file_and_of_the_schemas_only_the_counts_schema
+FAILED tests/acceptance/W2-178/test_w2_178_auditor.py::test_s1_the_auditor_s_wall_differs_from_the_base_build_only_by_the_dropped_subtree
+FAILED tests/acceptance/W2-178/test_w2_178_auditor.py::test_s1_a_set_with_no_dropped_folder_builds_the_same_auditor_wall_as_before
+FAILED tests/acceptance/W2-178/test_w2_178_unchanged.py::test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_in_it[writer-round-2]
+FAILED tests/acceptance/W2-178/test_w2_178_unchanged.py::test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_in_it[checker]
+FAILED tests/acceptance/W2-178/test_w2_178_unchanged.py::test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build[writer-round-2]
+FAILED tests/acceptance/W2-178/test_w2_178_unchanged.py::test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build[checker]
+8 failed, 1236 passed, 40 skipped in 411.38s (0:06:51)

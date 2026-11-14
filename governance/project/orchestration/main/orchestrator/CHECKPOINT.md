@@ -1,6 +1,18 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-14 12:53: session `6ff2ee7c` (the trial session) WORKING. Next free id **DEC-1180** (DEC-1179 recorded 976e53791 + marks e0381969c). READ THE NOW BLOCK FIRST; the dated lines below are history.
+## RESUME HERE — 2026-11-14 23:09: session `acd80751` (FULL window, no 300k; VS Code panel in tmux `cto`) WORKING. Next free id **DEC-1185** (DEC-1184 recorded 7527ec340).
+
+### NOW (23:09)
+- **23:32:** W2-188 map round DONE 4711c0fb5b8e (gov accept pass 54/0 pinned + tree; verify 6479/0; P-W2-188-MAP-1 (a) accepted by the CTO: README-only, 8 KPI cells unbackticked + S10 code span + self-checks list). d7e1c6f8d (DEC-1184 in sources + note + brief gap). LAND QUEUED land.txt W2-188=4711c0fb5b8e. NO COMMIT DURING THE LAND. After: the queue closes W2-188 (leave closed); remove worktree ~/gov-os-worktrees/W2-188 + branch after sync.
+- **23:16:** W2-111 r4 RELEASED (briefs/W2-111-A5-r4.md, C3 FULL; worktree ~/gov-os-worktrees/W2-111 ff to d54654eab; DAEO-qvff C3 in ticket-class.json). HELPERS (Sonnet high): ACT-GUARD-FIX-6 builder (live hook to W2-42a's parser, DEC-1174 (1); bundle acts/ACT-GUARD-FIX-6*, drafts/act-guard-fix-6/) -> then independent Opus review -> owner yes ~07:00; ACT-WALLS-REANCHOR-1 builder (DND 203; acts/ACT-WALLS-REANCHOR-1*) -> review -> digest. W2-188 map round: td fix 199ea5103 merged 4711c0fb5, lead in lead_verify (td-4 died; inbox item filed). WAKE: CronCreate one-shot c39345d9 at 05:25 (release prep) + wake_at bxy6n9jeh (dies at 2 h cap; backup only). Digest crons 21cdf21b/4a3f5149. Watchers may end at the 2 h cap: re-arm on completion.
+- **Handover done 22:56:** id in log/cto-session.txt; cto-old killed (pid 3253666 gone); standby ended; watchers re-armed (inbox bu398ixno, helper_watch b0u99rxib, sentinel b3hvwv390, bare b6ccdqdxy, store backstop bh69yr2pv, usage bkvcacdll, refused_starts b1pnytdhq); digest crons 21cdf21b (09:02) + 4a3f5149 (18:02); W2-88 lead wait bsrg2jlch (pid 3715094).
+- **Committed:** 7527ec340 DEC-1184 (Q-REFRESH-1 (a), Q-SCAN-1 (a), Q-SCAN-2 (a) W2-111 reopened, EXAMIN-CTO brief b70ff233 yes, W2-61h list, q02 cause = my command) + W2-111 reopen; 96321d437 W2-61h CLOSED; 10e98af9c W2-94 CLOSED; d54654eab packages/OWNER-BEFORE-1200-20261115.md; record/w2 6d25f3385.
+- **COPIES-12 APPLIED** dfe271298 (landing check clean). **W2-188 fresh accept REFUSED ACCEPT_MAP_UNREADABLE** (README self-check row names no KPI line; pinned + tree gov alike); suite direct 54/0 at dfe271298 -> W2-188 map round RELEASED 23:06 (briefs/W2-188-A5-map.md, TD Opus C3 moves the row; accept; DONE -> land -> queue closes it).
+- **OWNER 23:05:** leads keep starting/landing/closing overnight; NO landing hold overnight when W2-88 lands; fix release C + re-pin bundle early morning (~05:30 hold on src/ lands, real-C rehearsal, 'release ready' ~06:30); after goodnight, owner items wait until ~07:00. Package OWNER-BEFORE-1200 given (sitting time line; push; re-pin yes in sitting; live-hook ACT yes ~07:00).
+- **Next (mine):** W2-111 claim + interface + worktree + brief + ready line (DEC-1157 (6)); live-hook ACT build/rehearse/review overnight (DEC-1133 (2), DND 215/122/123); reanchor ACT draft (DND 203); W2-88 DONE -> land.txt -> S27 folder-mode round brief; 05:30 hold + real-C rehearsal; 09:00 package.
+- Lessons saved: check-own-tmux-before-paste, walls-approved-line-kind, close-record-append-not-write.
+
+## (history) RESUME HERE — 2026-11-14 12:53: session `6ff2ee7c` (the trial session) WORKING. Next free id **DEC-1180** (DEC-1179 recorded 976e53791 + marks e0381969c). READ THE NOW BLOCK FIRST; the dated lines below are history.
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
 

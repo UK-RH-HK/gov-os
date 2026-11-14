@@ -1,0 +1,20 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "head",
+   "before": "fbcfef374b8d",
+   "after": "199ea5103478"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-188/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "acceptance folder",
+   "folder": "W2-188"
+  }
+ ]
+}

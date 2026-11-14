@@ -1,0 +1,254 @@
+#!/bin/bash
+# ACT-WALLS-REANCHOR-1's apply.sh: check | apply | verify | undo [<sets root>]. Class (O): rows `walled-sessions`
+# (governance/project/indep-walls/** and gov-os-eval/**) and the catch-all `unknown` (the launch script, its counts schema,
+# tests) of governance/project/operator/class-rules.yaml. The owner's operator runs it BY HAND, from the repository's top
+# folder (its cwd); the operator agent never takes it (G6 refuses a manifest naming (O) paths as "yours").
+# Under DEC-1179 (6) G2 and DEC-1178 (1) (the changed-lines list reaches the walled writer without a hand step), DEC-1184 (5)
+# (REANCHOR-LIST-20261116.md is the hand step until this lands), DEC-1180 (2) and DEC-1101 (2) (the walls' template files
+# change only by an ACT the owner approves; their sha256s are in <sets root>/indep-walls/APPROVED).
+#
+# What it changes, and nothing else (list.txt: root|path|before|after sha256; the frozen copies are in before/ and after/):
+#   1. six repository files:
+#        the launch script (the weekly re-anchoring flow: `--reanchor <week>` on the writer's round 2),
+#        its counts schema (an optional `reanchor` object, numbers only),
+#        the walls' kinds.yaml (the writer kind declares `input_reanchor: [questions, reanchor]`),
+#        W2-149's unit file (two pins: the usage-line count 10 -> 11 and the schema's optional key `reanchor`),
+#        two new unit-test files (the flow's cases; the maintenance pass's request staged by the launcher end to end).
+#   2. ONE line of the walls' approved list <sets root>/indep-walls/APPROVED: the `template` line of
+#        governance/project/indep-walls/kinds.yaml, its sha256 replaced (the before hash -> the after hash); the spelling
+#        around the hash is kept, every other line is byte-identical. The launch script reads the list through its own
+#        parse_approved and needs exactly one hash for each template file (stage 11), so the line is replaced, not added.
+#
+# The sets root: the argument if given, else the path map's `sets_root_hidden.root` (governance/project/path-map.yaml,
+# "~/gov-os-eval", so $HOME/gov-os-eval), expanded with $HOME. Neither: refused. It never guesses and never creates the list.
+#
+# States (decided from the six files' sha256s and the list's lines, read through the launch script's own parse_approved;
+# nothing else is read; the list is read here by this script's own code and never printed):
+#   before   every file hashes as its before (a new file is absent) and the list holds exactly one template line for
+#            kinds.yaml, with the before hash
+#   applied  every file hashes as its after and the list's one kinds.yaml template line holds the after hash
+#   other    anything else (a changed byte, a file missing, a link, the list missing, a link or not ending in a newline,
+#            the line absent, twice or with another hash, the parser not loadable): refused, nothing touched
+#   check   read-only: "state before|applied (...)" exit 0; "state other: <why>" on stderr, exit 3
+#   apply   only from before: the new list (the old bytes with that one hash replaced, built beside the old by mktemp and
+#           checked with the parser) first; then each file, written through a mktemp file beside it and renamed (mode kept,
+#           new files 0644); then the list renamed over the old (mode kept, 0400 stays 0400); then re-checked to "state
+#           applied". A failure part way puts back what this run wrote from the frozen before copies (the old list is never
+#           edited in place)
+#   verify  exit 0 only in the state applied; exit 3 otherwise
+#   undo    only from applied: the four changed files put back from before/, the two new files removed, the list's one
+#           hash put back; then re-checked to "state before"
+# Exit codes: 0 done; 2 usage; 3 state refused; 4 the bundle does not hash as listed; 5 a write failed (what this run wrote
+# was put back); 9 not run from a repository's top folder, or no sets root.
+#
+# After the apply, a launch repository whose scaffold holds the OLD kinds.yaml is refused at stage 11 (the list now names the
+# new bytes): the package gives the one commit that brings the new file into such a clone. This script touches only the
+# repository it runs in and the list.
+set -u
+umask 022
+B="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+step="${1:-}"
+case "$step" in check|apply|undo|verify) ;; *) echo "usage: apply.sh check|apply|verify|undo [<sets root>]" >&2; exit 2 ;; esac
+[ $# -le 2 ] || { echo "usage: apply.sh check|apply|verify|undo [<sets root>]" >&2; exit 2; }
+
+LAUNCHER=governance/project/orchestration/tools/indep_launch.py
+KINDS=governance/project/indep-walls/kinds.yaml
+PATH_MAP=governance/project/path-map.yaml
+want_list='@LIST@'
+
+h() { if [ -f "$1" ] && [ ! -L "$1" ]; then sha256sum "$1" | cut -c1-64; else echo null; fi; }
+
+# -- the bundle hashes as listed -------------------------------------------------------------------------------------
+[ "$(cat "$B/list.txt" 2>/dev/null)" = "$want_list" ] || { echo "the bundle's list.txt is not as frozen" >&2; exit 4; }
+P=(); BF=(); AF=()
+while IFS='|' read -r r p b a; do
+  [ "$r" = repo ] || continue
+  P+=("$p"); BF+=("$b"); AF+=("$a")
+  [ "$b" = null ] || [ "$(h "$B/before/repo/$p")" = "$b" ] || { echo "the frozen copy does not hash as listed: before/repo/$p" >&2; exit 4; }
+  [ "$(h "$B/after/repo/$p")" = "$a" ] || { echo "the frozen copy does not hash as listed: after/repo/$p" >&2; exit 4; }
+done < "$B/list.txt"
+N=${#P[@]}
+[ "$N" = 6 ] || { echo "the bundle's list.txt does not name six repository files" >&2; exit 4; }
+KB=""; KA=""
+for i in "${!P[@]}"; do [ "${P[$i]}" = "$KINDS" ] && { KB="${BF[$i]}"; KA="${AF[$i]}"; }; done
+[ -n "$KB" ] && [ "$KB" != null ] && [ -n "$KA" ] || { echo "the bundle's list.txt does not name kinds.yaml" >&2; exit 4; }
+
+# -- the repository (cwd) and the sets root --------------------------------------------------------------------------
+R="$PWD"
+top="$(git -C "$R" rev-parse --show-toplevel 2>/dev/null)" || top=""
+{ [ -n "$top" ] && [ "$(realpath "$top")" = "$(realpath "$R")" ] && [ -f "$R/$PATH_MAP" ] && [ -f "$R/$LAUNCHER" ]; } \
+  || { echo "refused: run from the repository's top folder (no $PATH_MAP or $LAUNCHER here)" >&2; exit 9; }
+if [ $# -eq 2 ]; then
+  given="$2"; from="the argument"
+else
+  given="$(python3 -I -c 'import sys, yaml
+d = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))
+r = d.get("sets_root_hidden", {}).get("root") if isinstance(d, dict) and isinstance(d.get("sets_root_hidden"), dict) else None
+sys.exit(1) if not isinstance(r, str) or not r.strip() else print(r)' "$R/$PATH_MAP")" \
+    || { echo "refused: no sets root (no argument, and the path map names no sets_root_hidden.root)" >&2; exit 9; }
+  from="the path map's sets_root_hidden.root ($given)"
+fi
+case "$given" in "~") given="$HOME" ;; "~/"*) given="$HOME/${given#\~/}" ;; esac
+case "/$given/" in */indep-walls/*) echo "refused: the sets root is named, never a folder under it" >&2; exit 9 ;; esac
+case "$given" in /*) ;; *) echo "refused: the sets root must be an absolute path: $given" >&2; exit 9 ;; esac
+SR="$given"
+WALLS="$SR/indep-walls"
+LIST="$WALLS/APPROVED"
+
+# The list's one line, by this script's own code: facts | repin | unpin. The list is never printed.
+PY='import sys, os, re, importlib.util
+mode, launcher, lst, kpath, old, new = sys.argv[1:7]
+spec = importlib.util.spec_from_file_location("indep_launch_for_act", launcher)
+il = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(il)
+RX = re.compile(rb"([0-9a-f]{64})(\s+template\s+)(\S.*?)(\s*)")
+K, O, N = kpath.encode(), old.encode(), new.encode()
+def split(data):
+    lines = data.split(b"\n")
+    tail = lines.pop() if lines else b""
+    return lines, tail
+def live(lines):
+    return [(i, x) for i, x in enumerate(lines) if not x.lstrip().startswith(b"#")]
+def facts(data):
+    lines, tail = split(data)
+    ends = data == b"" or data.endswith(b"\n")
+    own = [(i, x) for i, x in live(lines) if K in x]
+    exact = {O: 0, N: 0}
+    for _i, x in own:
+        m = RX.fullmatch(x)
+        if m and m.group(3) == K and m.group(1) in exact:
+            exact[m.group(1)] += 1
+    t, _b = il.parse_approved(data)
+    got = sorted(t.get(kpath, ()))
+    parser = "old" if got == [old] else "new" if got == [new] else "none" if not got else "other"
+    return {"ends_nl": int(ends), "nlines": len(lines), "own": len(own), "old_exact": exact[O], "new_exact": exact[N],
+            "old_rel": sum(1 for _i, x in live(lines) if O in x), "new_rel": sum(1 for _i, x in live(lines) if N in x),
+            "parser": parser}
+data = open(lst, "rb").read()
+f = facts(data)
+if mode == "facts":
+    print(" ".join(f"{k}={v}" for k, v in f.items()))
+    sys.exit(0)
+tmp = sys.argv[7]
+src, dst = (O, N) if mode == "repin" else (N, O)
+want = ("old" if mode == "repin" else "new")
+if not (f["ends_nl"] == 1 and f["own"] == 1 and f[("old" if mode == "repin" else "new") + "_exact"] == 1
+        and f[("old" if mode == "repin" else "new") + "_rel"] == 1 and f[("new" if mode == "repin" else "old") + "_rel"] == 0
+        and f["parser"] == want):
+    sys.exit("the list is not in the state " + ("before" if mode == "repin" else "applied"))
+lines, tail = split(data)
+out = []
+for x in lines:
+    m = RX.fullmatch(x) if not x.lstrip().startswith(b"#") else None
+    out.append(x.replace(src, dst, 1) if m and m.group(3) == K and m.group(1) == src else x)
+new_data = b"".join(x + b"\n" for x in out) + tail
+g = facts(new_data)
+t0, b0 = il.parse_approved(data)
+t1, b1 = il.parse_approved(new_data)
+back = {k: v for k, v in t1.items() if k != kpath}
+base = {k: v for k, v in t0.items() if k != kpath}
+if not (g["parser"] == ("new" if mode == "repin" else "old") and g["nlines"] == f["nlines"] and back == base and b0 == b1
+        and sum(1 for a, c in zip(lines, out) if a != c) == 1 and len(new_data) == len(data)):
+    sys.exit("the new list does not read as the old with that one hash replaced")
+with open(tmp, "wb") as fh:
+    fh.write(new_data)
+    fh.flush()
+    os.fsync(fh.fileno())
+'
+
+# -- the state -------------------------------------------------------------------------------------------------------
+why=""
+file_state() { # file_state <i>: before | applied | other
+  local f="$R/${P[$1]}" now
+  if [ -L "$f" ] || { [ -e "$f" ] && [ ! -f "$f" ]; }; then echo other; return; fi
+  now="$(h "$f")"
+  if [ "$now" = "${BF[$1]}" ]; then echo before
+  elif [ "$now" = "${AF[$1]}" ]; then echo applied
+  else echo other; fi
+}
+decide() {
+  st=other; why=""; F=""
+  local i s nb=0 na=0 bad=""
+  for i in "${!P[@]}"; do
+    s="$(file_state "$i")"
+    case "$s" in before) nb=$((nb + 1)) ;; applied) na=$((na + 1)) ;; *) bad="$bad ${P[$i]}" ;; esac
+  done
+  FILES="$nb before, $na applied, $((N - nb - na)) other"
+  if [ ! -d "$SR" ]; then why="the sets root $SR is not a folder ($from)"; return; fi
+  if [ -L "$WALLS" ] || [ ! -d "$WALLS" ]; then why="$WALLS is not a folder (a list is never created)"; return; fi
+  if [ -L "$LIST" ]; then why="the list $LIST is a link"; return; fi
+  if [ ! -e "$LIST" ]; then why="the list $LIST does not exist (a new list is never created)"; return; fi
+  if [ ! -f "$LIST" ] || [ ! -r "$LIST" ]; then why="the list $LIST is not a readable file"; return; fi
+  F="$(python3 -I -c "$PY" facts "$B/before/repo/$LAUNCHER" "$LIST" "$KINDS" "$KB" "$KA" 2>/dev/null)" \
+    || { why="the launch script's parser cannot read the list"; return; }
+  local ends_nl nlines own old_exact new_exact old_rel new_rel parser
+  eval "$F"
+  [ "$ends_nl" = 1 ] || { why="the list does not end in a newline"; return; }
+  if [ "$nb" = "$N" ] && [ "$own $old_exact $old_rel $new_exact $new_rel $parser" = "1 1 1 0 0 old" ]; then st=before
+  elif [ "$na" = "$N" ] && [ "$own $old_exact $old_rel $new_exact $new_rel $parser" = "1 0 0 1 1 new" ]; then st=applied
+  else why="files: $FILES${bad:+ (other:$bad)}; list: kinds.yaml template line(s) $own, with the before hash $old_exact (naming it $old_rel), with the after hash $new_exact (naming it $new_rel), parsed as $parser"; fi
+}
+summary() { echo "$N files, list sha256 $(h "$LIST" | cut -c1-12), $(echo "$F" | sed -n 's/.*nlines=\([0-9]*\).*/\1/p') lines; sets root from $from"; }
+
+put_file() { # put_file <i> <from>: <from>'s bytes written through a mktemp file beside the target, then renamed
+  local f="$R/${P[$1]}" tmp mode=644
+  [ -d "$(dirname "$f")" ] || return 1
+  [ -f "$f" ] && mode="$(stat -c %a "$f")"
+  tmp="$(mktemp "$f.act-tmp.XXXXXX")" || return 1
+  if cat "$2" > "$tmp" && chmod "$mode" "$tmp" && mv -f "$tmp" "$f"; then return 0; fi
+  rm -f "$tmp"; return 1
+}
+new_list() { # new_list repin|unpin: the new list as a mktemp file beside the old (mode kept); prints its name
+  local mode tmp
+  mode="$(stat -c %a "$LIST")" || return 1
+  tmp="$(mktemp "$WALLS/.APPROVED.act-wr1.XXXXXX")" || return 1
+  if python3 -I -c "$PY" "$1" "$B/before/repo/$LAUNCHER" "$LIST" "$KINDS" "$KB" "$KA" "$tmp" && chmod "$mode" "$tmp"; then echo "$tmp"; return 0; fi
+  rm -f "$tmp"; return 1
+}
+put_back() { # put_back <indexes>: each from its frozen before copy (a new file is removed)
+  local i
+  for i in "$@"; do
+    if [ "${BF[$i]}" = null ]; then rm -f "$R/${P[$i]}"; else put_file "$i" "$B/before/repo/${P[$i]}"; fi
+  done
+}
+
+decide
+case "$step" in
+  check)
+    [ "$st" = other ] && { echo "state other: $why" >&2; exit 3; }
+    echo "state $st ($(summary))"; exit 0 ;;
+  verify)
+    [ "$st" = applied ] || { echo "not applied: ${why:-state $st}" >&2; exit 3; }
+    echo "state applied ($(summary))"; exit 0 ;;
+  apply)
+    [ "$st" = other ] && { echo "refused: state other: $why; nothing touched" >&2; exit 3; }
+    [ "$st" = applied ] && { echo "refused: already applied ($(summary)); nothing touched" >&2; exit 3; }
+    tmp="$(new_list repin)" || { echo "failed: the new list could not be built beside the old; nothing touched" >&2; exit 5; }
+    wrote=()
+    for i in "${!P[@]}"; do
+      if put_file "$i" "$B/after/repo/${P[$i]}"; then wrote+=("$i")
+      else echo "failed: ${P[$i]} could not be written; what this run wrote is put back" >&2; put_back "${wrote[@]}"; rm -f "$tmp"; exit 5; fi
+    done
+    mv -f "$tmp" "$LIST" || { echo "failed: the list could not be renamed into place; the files are put back" >&2; put_back "${wrote[@]}"; rm -f "$tmp"; exit 5; }
+    decide
+    [ "$st" = applied ] || { echo "failed: after the apply the state is not applied: ${why:-state $st}" >&2; exit 5; }
+    echo "state applied ($(summary))"; exit 0 ;;
+  undo)
+    [ "$st" = other ] && { echo "refused: state other: $why; nothing touched" >&2; exit 3; }
+    [ "$st" = before ] && { echo "refused: nothing to undo, state before ($(summary)); nothing touched" >&2; exit 3; }
+    tmp="$(new_list unpin)" || { echo "failed: the new list could not be built beside the old; nothing touched" >&2; exit 5; }
+    done_=()
+    for i in "${!P[@]}"; do
+      if put_back "$i"; then done_+=("$i")
+      else
+        echo "failed: ${P[$i]} could not be put back; restored" >&2
+        for j in "${done_[@]}"; do put_file "$j" "$B/after/repo/${P[$j]}"; done
+        rm -f "$tmp"; exit 5
+      fi
+    done
+    mv -f "$tmp" "$LIST" || { echo "failed: the list could not be renamed into place; the files are restored" >&2
+      for j in "${done_[@]}"; do put_file "$j" "$B/after/repo/${P[$j]}"; done; rm -f "$tmp"; exit 5; }
+    decide
+    [ "$st" = before ] || { echo "failed: after the undo the state is not before: ${why:-state $st}" >&2; exit 5; }
+    echo "state before ($(summary))"; exit 0 ;;
+esac

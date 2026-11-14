@@ -366,3 +366,4 @@ W2-94-A5-s13c.json
 W2-88-A5-p1.json
 W2-187-A5-run1.json
 W2-88-A5-r8.json
+W2-188-A5-map.json
