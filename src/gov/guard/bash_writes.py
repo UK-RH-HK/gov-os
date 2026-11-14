@@ -571,6 +571,45 @@ def _runs_stdin(words):
     return bool(head) and (_kind(words) in ("shell", "python") or os.path.basename(head[0]) in _STDIN_RUNNERS)
 
 
+def _read_bound(cmds):
+    """The variables ``read`` binds in the simple commands ``cmds`` (the words that are no option, an ``-a`` array,
+    REPLY when it names none). A here-string is data to ``read``, but what it binds may be run as a command later
+    (DEC-1164 (18), R3 F1 second batch)."""
+    out = set()
+    for words, _, _ in cmds:
+        head = lead(words)
+        if not head or os.path.basename(head[0]) != "read":
+            continue
+        args, i, bound = head[1:], 0, []
+        while i < len(args):
+            a = args[i]
+            i += 1
+            if a == "--":
+                bound += args[i:]
+                break
+            if len(a) > 1 and a[0] == "-":
+                k = next((k for k, ch in enumerate(a) if k and ch in "adinNptu"), None)
+                if k is not None:  # the option's value: the rest of the word, or the next word
+                    value = a[k + 1:]
+                    if not value and i < len(args):
+                        value, i = args[i], i + 1
+                    if a[k] == "a":
+                        bound.append(value)
+            else:
+                bound.append(a)
+        out |= {m.group(0) for w in bound or ["REPLY"] for m in [re.match(r"[A-Za-z_]\w*", w)] if m}
+    return out
+
+
+def _uses_var(word, names):
+    """Whether ``word`` expands one of the variables ``names``."""
+    return any(re.search(_NAME_USE.format(re.escape(n)), word) for n in names)
+
+
+# Programs that run a command given in their words: a variable there may name the command that runs.
+_RUN_WRAPPERS = frozenset("xargs sudo doas parallel watch stdbuf setsid chrt ionice taskset strace ltrace".split())
+
+
 def _check_here_strings(cmds):
     """Raises Unreadable when a here-string's text reaches, by its own command or through a pipe, a command that
     may run it (``bash <<< ...``, ``cat <<< ... | sh``, an unknown program): such a call is read as it was before
@@ -1369,6 +1408,9 @@ _NOT_RUNNERS = frozenset(
     "dos2unix unix2dos fold fmt iconv expand unexpand du df wait sleep cd pushd popd pwd export unset read set "
     "declare local typeset readonly shift exit return break continue git ruff black flake8 pyflakes pylint mypy "
     "isort yamllint for select case in esac done fi".split())  # a loop's words: a run inside it is judged there
+# What a mapfile/readarray -C callback may be and still be judged as the command it is: a command the walker knows
+# (anything else may be a function the guard cannot read).
+_CALLBACK_KNOWN = _NOT_RUNNERS | frozenset(_SHELLS)
 # xargs options that take no value (xargs runs its command with the words of a here-string, R3).
 _XARGS_FLAGS = frozenset(("--no-run-if-empty", "--verbose", "--exit", "--open-tty", "--interactive"))
 # Programs that run the file they are given as Python.
@@ -1531,7 +1573,7 @@ class Judgement:
     naming of the acceptance tests refuses an unresolvable target; ``code``: it is code (Python, perl or node, a
     script body), whose naming counts in any spelling (names_tests)."""
 
-    def __init__(self, parse, expand, bodies=None, loose=frozenset()):
+    def __init__(self, parse, expand, bodies=None, loose=frozenset(), readvars=None):
         self.parse = parse    # the product's parser: (command, cwd) -> targets or None
         self.expand = expand  # the product's word expansion: (word) -> text or None
         # judge's second readings of a command the first cannot read (APOS-3/APOS-4): "strings", a here-string a
@@ -1543,6 +1585,9 @@ class Judgement:
         self.bodies = [] if bodies is None else bodies  # every heredoc body met, nested commands' too
         self.ctx = ({}, {}, set())  # the variables of the command being walked
         self.prefix = set()  # the variables the simple command being judged sets for itself (X=1 cmd, env X=1 cmd)
+        # The variables ``read`` binds in a command with a here-string, shared with the commands nested in it
+        # (DEC-1164 (18), R3 F1 second batch): one used as a command's name is a command the guard cannot know.
+        self.readvars = set() if readvars is None else readvars
 
     def targets(self):
         """What the product's write parser enforces (W2-42a): the shell's own writes, the writes the line parser
@@ -1575,6 +1620,8 @@ class Judgement:
         text, subs = lift(text)
         if "<<<" in text and "strings" not in self.loose:
             _check_here_strings(simples(tokens(text)))
+        if "<<<" in text:
+            self.readvars |= _read_bound(simples(tokens(text)))
 
         def expand(value, env):
             with environ(env, ()):
@@ -1600,6 +1647,8 @@ class Judgement:
                 name = os.path.basename(head[0]) if head else ""
                 args = head[1:]
                 part = " ".join(words)
+                if self.readvars and self.names_read_var(words, head):
+                    self.unread.append(SENT)
                 for names, body in scripts:
                     self.script(names, body, words, reds, subs, part, ecwd, whole, depth, staged)
                 if name in ("cd", "pushd", "popd"):
@@ -1626,6 +1675,8 @@ class Judgement:
                     for t, where in mine:
                         raw, full = self.place(t, where)
                         self.writes.append(SENT if full is None else os.path.realpath(full))
+                elif name in ("mapfile", "readarray"):
+                    self.callback(args, ecwd, whole, depth)
                 elif _INLINE.search(part):
                     # perl, node, ruby: code the guard does not read (ACT-GUARD-FIX-2's judgement of the part; any
                     # spelling of the tests' folder counts, round 2, F4)
@@ -1652,6 +1703,50 @@ class Judgement:
                             if targets:
                                 scripts.append(({self.basename(t) for t in targets}, self.bodies[k]))
                     stage, held, staged = [], [], []
+
+    def names_read_var(self, words, head):
+        """Whether the simple command ``words`` runs a command named by a variable ``read`` bound from a here-string,
+        or hands one to a program that runs its words (xargs, sudo, find -exec, ...): the guard cannot know it."""
+        if head:
+            name = os.path.basename(head[0])
+            if _uses_var(head[0], self.readvars):
+                return True
+            if name in _RUN_WRAPPERS or (name == "find" and any(a in ("-exec", "-execdir", "-ok", "-okdir")
+                                                                 for a in head[1:])):
+                return any(_uses_var(w, self.readvars) for w in head[1:])
+            return False
+        first = next((w for w in words if not _ASSIGN.match(w) and w not in _OPENS), "")
+        return os.path.basename(first) in _RUN_WRAPPERS and any(_uses_var(w, self.readvars) for w in words)
+
+    def callback(self, args, ecwd, whole, depth):
+        """``mapfile``/``readarray -C CALLBACK`` (also joined, ``-tC``) runs the callback as a command: a literal one is
+        judged as that command; one the guard cannot know (a variable, a substitution, a function or a program it does
+        not read) is unresolvable (DEC-1164 (18), R3 F1 second batch)."""
+        cb, i = None, 0
+        while i < len(args) and len(args[i]) > 1 and args[i][0] == "-" and args[i] != "--":
+            a = args[i]
+            i += 1
+            k = next((k for k, ch in enumerate(a) if k and ch in "dnOsuCc"), None)
+            if k is not None:  # the option's value: the rest of the word, or the next word
+                value = a[k + 1:]
+                if not value and i < len(args):
+                    value, i = args[i], i + 1
+                if a[k] == "C":
+                    cb = value
+        if not cb:
+            return
+        text = self.expand(cb)
+        if text is None or "`" in text:
+            self.unread.append(SENT)
+            return
+        try:
+            self.sub(text, ecwd, whole, depth)
+            known = all(not (h := lead(w)) or os.path.basename(h[0]) in _CALLBACK_KNOWN or _PY.match(
+                os.path.basename(h[0])) for w, _, _ in simples(tokens(text)))
+        except Unreadable:
+            known = False
+        if not known:
+            self.unread.append(SENT)
 
     def basename(self, word):
         """The name of the file a word names, or None when it does not expand."""
@@ -1713,7 +1808,7 @@ class Judgement:
         """A script file's shell body, run by this command: its writes are the command's (rule 5); under rule 1 a
         target that names the tests refuses wherever the script runs, and one it cannot work out refuses when the
         body names them."""
-        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
         try:
             sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
         except Unreadable:
@@ -1734,7 +1829,7 @@ class Judgement:
         self.findings.append(([(SENT, None)], part + "\n" + text, True))
         if shell:
             self.unread.append(SENT)
-            sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+            sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
             try:
                 sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
                 self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
@@ -1788,7 +1883,7 @@ class Judgement:
 
     def unknown_cwd(self, command, whole, depth):
         """A command judged where the shell's folder is unknown: its relative targets are unresolvable."""
-        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
         sub.run(command, UNKNOWN, whole, depth + 1)
         self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
         self.adopt(sub)
@@ -1883,7 +1978,7 @@ class Judgement:
         name = os.path.basename(reader[0]) if reader else ""
         if name in _PRODUCT_DATA:
             return
-        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
         try:
             sub.run(body["text"], UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
         except Unreadable:

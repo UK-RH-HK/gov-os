@@ -260,3 +260,17 @@ body is then judged by its own words. A `$(…)` in the text is still judged as 
 its input keep R3's rule. **Counts:** test_w2_42a_here_string_ro.py (acceptance) went from 21 failed, 32 passed to
 **53 passed**; the builder file tests/unit/guard/test_w2_42a_here_string_ro.py holds **64 passed** (31 red on the
 unfixed parser); tests/acceptance/W2-42a with tests/unit/guard: **1670 passed, 2 xfailed** before the builder file.
+
+**R3 F1, second batch: a here-string read as data must not hide a command it feeds (DEC-1164 (18)).** Taking a
+here-string as data is safe only while that data is not run. In `bash_writes.Judgement` (a) `_read_bound` collects the
+variables `read` binds (its non-option words, an `-a` array, REPLY) in a text that holds a `<<<`, shared with the
+commands nested in it; `names_read_var` then gives the unresolvable target when one is a command's name (`$f`, `${f}`,
+`"$f" x`, `$a $b`, after `env`, `command`, `time`, `nohup`) or an argument of a program that runs its words (`xargs`,
+`sudo`, `find -exec`, `stdbuf`...); a variable used only as an argument of a command that writes nothing stays free.
+(b) `Judgement.callback` reads the `-C` of `mapfile`/`readarray` (also joined, `-tC`, `-C'cmd'`): a literal callback is
+judged as that command, and one the guard cannot know (a variable, a substitution, a function or a program the walker
+does not read) is the unresolvable target. **Counts:** test_w2_42a_here_string_ro_2.py (acceptance) went from 17 failed,
+6 passed to **23 passed**; the builder file tests/unit/guard/test_w2_42a_here_string_ro_2.py holds **37 passed** (27 red
+on 98eff3c84); tests/acceptance/W2-42a: **988 passed, 2 xfailed**; with tests/unit/guard and tests/unit/hooks **1990
+passed, 2 xfailed, 2 failed** (test_live_hook.py `test_a_catastrophic_rm_is_refused[outside the project]` and
+`test_the_reason_is_plain`, which fail the same on 98eff3c84 under the sandbox's empty HOME).
