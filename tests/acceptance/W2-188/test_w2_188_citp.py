@@ -12,7 +12,9 @@ Readings (also in the README):
 * TEXT: every non-blank removed line and every added line of that diff (a leading list number or bullet dropped,
   whitespace collapsed, markdown block-quote marks and backticks dropped) stands in the record, except the version line,
   for which `1.0.0` and `1.1.0` standing in the record is enough.
-* IMPACT: a table row names W2-11's case with `red`; a table row names W2-88a with `unchanged`.
+* IMPACT (re-baselined 2026-11-14, DEC-1157 (12), P-W2-188-S5 (a)): table rows say W2-11's body and version cases do not
+  cover `adopt` (so they stay as they are); `adapter-portability` reports `GENERATED_DIFFERS` on
+  `.claude/skills/adopt/SKILL.md` until the copies ACT; W2-88a's cases are `unchanged`.
 * VERDICT: the record says an independent review was made and its last `verdict:` begins with PASS.
 * OWNER: its own case: an `owner_approval:` line that names the after sha256 and says `approved`.
 """
@@ -24,8 +26,6 @@ import re
 import pytest
 
 import w2_188_support as support
-
-W2_11_CASE = "test_every_copy_carries_the_kernel_skills_body[adopt]"
 
 
 def _record():
@@ -93,12 +93,19 @@ def test_s5_the_record_gives_the_old_and_new_text_of_each_changed_place():
     assert not missing, f"{support.CITP_REL} lacks the text of {len(missing)} changed line(s): {missing[:3]}"
 
 
-def test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged():
+def test_s5_the_impact_table_says_w2_11_does_not_cover_adopt_adapter_portability_differs_until_the_copies_act_and_w2_88a_unchanged():
     rows = [line for line in _record().splitlines() if line.lstrip().startswith("|")]
     flat_rows = [support.flat(row) for row in rows]
     problems = []
-    if not any(support.flat(W2_11_CASE) in row and "red" in row for row in flat_rows):
-        problems.append(f"no table row names `{W2_11_CASE}` with `red`")
+    if not any(re.search(r"w2-11(?!\d)", row) and "adopt" in row and "body" in row and "version" in row
+               and re.search(r"(do(es)? not|don't|doesn't|never|neither|nor) (cover|include|reach)|not covered|no case covers", row)
+               and re.search(r"stay|remain|unchanged|as they are|as is|not red|none red|no change|unaffected|not affected|"
+                         r"still (pass|green)|green", row) for row in flat_rows):
+        problems.append("no table row says W2-11's body and version cases do not cover `adopt` and so stay as they are")
+    if not any("adapter-portability" in row and "generated_differs" in row and ".claude/skills/adopt/skill.md" in row
+               and re.search(r"until|till|before", row) and re.search(r"\bact\b", row) for row in flat_rows):
+        problems.append("no table row says `adapter-portability` reports `GENERATED_DIFFERS` on "
+                        "`.claude/skills/adopt/SKILL.md` until the copies ACT")
     if not any("w2-88a" in row and "unchanged" in row for row in flat_rows):
         problems.append("no table row names W2-88a's cases with `unchanged`")
     assert not problems, f"{support.CITP_REL}'s impact table: {'; '.join(problems)}"
