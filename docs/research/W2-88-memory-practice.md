@@ -89,7 +89,7 @@
 - **Judged on all sets together** (hit@5, then MRR). A fix is adopted if the total does not fall and the gap between
   the halves does not widen.
 - **Consistency is the proof:** the same product must score within 3 points on different sets. Then the measurement
-  set is measured once, as the confirmation.
+  set is measured once, as the confirmation, and kept from then on as the standing set, judged every week (§9; DEC-1179).
 - **Diagnose before fixing:** classify every miss by where it is lost. The stages: never searched, in no route's top
   30, a sibling only, a phrasing cut, cut from the reranked pool, reranked low. Then turn the kinds into structural
   weaknesses measured across the whole index.
@@ -187,8 +187,8 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
      was judged on all 80, with vocabulary a smaller part. The hidden half and the blind set are about equally far
      from their answers (0.43 against 0.41), yet score 84.6 % against 67.8 %.
    - **The practice:**
-     - a set used to judge a fix is a tuning set from then on;
-     - only a fresh blind set gives a verdict, used once;
+     - a set used to choose or judge a fix is a tuning set from then on;
+     - a verdict comes only from a set nothing was tuned on: a fresh blind set, used once, or the standing set, which sits behind its walls, is judged every week with counts only, never chooses or judges a fix, and is checked each month against a fresh set (§9; DEC-1179);
      - consistency is judged within 5 points, on sets of about 80;
      - the next lever is chosen from the misses' kinds (never retrieved against ranked low).
 7. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
@@ -218,7 +218,7 @@ The adopt skill's A9 step (`template/governance/kernel/skills/adopt/SKILL.md`) s
    verdict set outside every tree.
 5. Measure the tuning set and fix only the structure, never a named question, until its halves agree within 5 points on
    sets of about 80 (DEC-1074 (4)). Diagnose by stage and by structure.
-6. Declare and measure the verdict set once.
+6. Declare and measure the verdict set once, at Wave 0. From then on it is the standing set: judged end to end every week against 95 %, counts only, never used to choose or judge a fix, and checked each month against a fresh set (§9).
 7. Record every method and figure here, or in the repository's copy of this record.
 
 Note: the models (reranker, embedder) are chosen on all three sets, with speed and GPU figures, after the structure is
@@ -278,3 +278,14 @@ Records in `governance/project/orchestration/packages/LIFT-1/` (E0 to E5, E0B, E
   per search would, and changes ranking (re-measure the 138 if it lands).
 - **Next:** the owner's decisions (the fresh 80's configuration and the K9 bar, M3, the glossary), then the fresh 80
   once (`FRESH-80-1.md`, `FRESH-80-READINESS.md`).
+
+## 9. The standing set (DEC-1179)
+- **What it is:** the verdict set of Wave 0 (about 80 questions, written by the independent writer and checked by the independent checker under the rubric), kept after its first measure and judged end to end every week on the same questions (monthly once the repository is stable, back to weekly at once on a miss, a retrieval change or churn of 10 % or more: DEC-1125 (2), W2-172 S5).
+- **How it is judged, the same way as Gov OS's memory (FRESH-80-1, DEC-1097 (1), DEC-1098 (1)):** the store at the audit commit, served with the standard; each question's first bundle from the retrieval measure; the reader (pinned prompt and model, no tools) ranks the whole bundle itself, in its one reading, and chooses what answers (E3: the ranked, widened bundle read whole gave 114 of 138 in one call, against 84 for the top 5); it may search again once with its own words (A2: E2 gave 115 at one search and 128 at two, of 138; a second search never lost a right answer); graded by a named grader with a second grader's agreement; the citation checked by the measure's matcher. The figure is right end to end at A2. The 0.6B reranker is the only reranking model. "A second reranker" in W2-88 S10 is a second reranking model, which stays forbidden; the reader is not one.
+- **The bar:** at least ceil(0.95 n) right end to end; wrong claims reported beside it.
+- **The walls:** the set and its run folder are hidden from every measured role, counts only: only counts leave the run: right, wrong, not found, the outcome and rank buckets, the questions dropped by the anchor check. No id, question, gold or answer is printed, logged or read, not even by the auditor.
+- **Fixes:** chosen only on the tuning set and on the fresh sets' misses, structural only (DEC-1071 (1)), brought to the owner. The standing set never chooses or judges a fix, and never adopts or rejects one.
+- **Staleness:** a question whose gold no longer resolves at the audit commit is dropped from that week's count and never re-labelled.
+- **The monthly check against fitting:** each month a fresh set, measured once, is compared with the mean of the standing set's last four weekly figures. Standing 5 points or more above fresh: the standing set is declared fitted, joins the pool as a diagnostic set, and the writer writes its replacement. Fresh 5 points or more above standing: the checker's staleness pass on the standing set.
+- **The rule below 95 % is the owner's, DEC-1179 (4); the next line is its text word for word, as recorded.**
+- **Below 95 %:** the package's §5.1 rules R1 to R9 (a miss recorded by counts only, never re-run or re-scored; a fault is not a miss; a P1 to the repository's owner in the next digest; the maintenance pass at once; the cadence back to weekly; fixes chosen only on the tuning set and the fresh sets' misses; the standing set re-judged at the next scheduled run only; memory repair on two consecutive misses or one 5 points below; R9 with the check against fitting).
