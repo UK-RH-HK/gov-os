@@ -14,3 +14,12 @@
 - gitleaks: off by configuration (DEC-1045): the change was not scanned
 - Queue run: 2026-11-14 18:41:10 to 2026-11-14 19:00:20
 - Closed: 2026-11-14 19:01:17 GMT, by the orchestrator under DEC-953 items 1 and 5, DEC-989
+
+## Final close (DEC-1184 (6)): kept open after the land, closed on the owner's operator's result
+
+- Merged into w2/integrate by the merge queue: the one-question fix flow (16:18, 0b43625da) and S13's counts-schema `fix` key (36423324c, fdf397527), kept open at 61793c613 for the q02 run
+- Reviews: `docs/probes/DAEO-g87r/PR-DAEO-g87r-fix.md` (P1-P8 rows, pass), `PR-DAEO-g87r-s13b.md` and the path case's narrow check (4480c451c, pass at 900035fdd51c, no findings)
+- q02's writer variant version 2 (sha256 7aa6d88c, DEC-1182 (5)) installed at aa1fa659f (on w2/integrate, not yet pushed)
+- The owner's operator's run (2026-11-14): step 2's approved line, as the CTO's command gave it, lacked the kind `writer` (the cause was the CTO's command, DEC-1184 (6)); the operator corrected it to `brief writer <path>`, set the mode back to 400 and relaunched: run `20261114T222836Z-examin-r2` delivered, fix q02 `corrected`, `check_gold` 20 of 20 hold
+- No launched session read the hidden half; counts only reached the CTO (DEC-820 (d))
+- Closed: 2026-11-14, by the orchestrator under DEC-953 items 1 and 5, DEC-1132 (1), DEC-1182 (5), DEC-1184 (6)

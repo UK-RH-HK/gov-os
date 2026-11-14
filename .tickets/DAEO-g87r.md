@@ -1,6 +1,6 @@
 ---
 id: DAEO-g87r
-status: in_progress
+status: closed
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:09Z
@@ -84,3 +84,5 @@ Card: MEMORY-SPEC-MAP gap 7, resolved by the owner in DEC-957; W2-61's KPI 6 mov
 **Path case 2026-11-14 18:01 (P-W2-94-S13-1 (a), the CTO under DEC-1156 (7); listed for the owner's reading):** S13 builds an optional root key `fix`. The W2-149 unit case `test_counts_schema_closes_every_object_and_string` (tests/unit/orchestration/test_w2_149_indep_launch.py, about lines 1088-1116) requires every root property to be required, except the keys in its hard-coded `optional` map. The ticket gains that one file. Its `optional` map gains `fix` for the whole schema, and nothing else in it changes. The revision is checked by a narrow independent check (DEC-1154). S12's and S13's "the W2-149 cases pass unchanged" read: unchanged except this one entry. S13's `action` may be `null` until the result has passed its checks; that is the reading built and judged correct by the narrow check (review R1). R2 (`$` accepts `"q02\n"`) and R3 (the revised diff case passes with the schema deleted) are rows.
 
 **Kept open 2026-11-14 19:03 by the CTO (DEC-1180 (4), DEC-1182 (5); listed for the owner's reading):** S13 landed at fdf397527 (the queue closed the ticket in the same step). W2-94 closes on the owner's operator's q02 run with variant v2 and `check_gold` 20 of 20; the four commands were given at 16:22 and again in full at 18:20.
+
+**Closed 2026-11-14 by the CTO (DEC-1184 (6)):** q02 done by the owner's operator: run `20261114T222836Z-examin-r2` delivered, fix q02 `corrected`, `check_gold` 20 of 20 hold. Step 2's approved line, as the CTO's command gave it, lacked the kind `writer` (the cause was the CTO's command); the operator corrected it to `brief writer <path>` and relaunched. Close record: `governance/project/orchestration/closes/W2-94-DAEO-g87r.md`.
