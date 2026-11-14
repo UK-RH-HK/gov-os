@@ -14,7 +14,18 @@ S7 (source families, DEC-1078 (4), DEC-1079) and failure line 4 are tested apart
 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-61h -p no:cacheprovider
 # the hidden form, by an unmeasured session only (a session whose GOV_ROLE the set measures skips them too)
 GOV_EVAL_SETS_ROOT=$HOME/gov-os-eval PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-61h -p no:cacheprovider
+# the owner's operator's walled run (DEC-1178 (1)): the hidden form alone, unmeasured, with the list shown
+env -u GOV_ROLE -u GOV_TICKET GOV_EVAL_SETS_ROOT=$HOME/gov-os-eval PYTHONPATH=<tree>/src \
+  python3 -m pytest tests/acceptance/W2-61h/test_w2_61h_hidden_form.py -p no:cacheprovider -rA
 ```
+
+**The changed-lines list (DEC-1178 (1)).** S4's hidden and visible cases never fail for a cited block whose lines
+changed at HEAD; they list it. The list is a `GoldBlockChanged` warning, one per case: pytest's default summary prints
+it for a passing and a failing run alike, under "warnings summary", in the form `W2-61h S4 maintenance list (DEC-1178
+(1)): N cited block(s) changed at HEAD, for the walled writer: h03.yaml entry 2; ...` (file name and entry number
+only; no flag is needed, and `-rA` is the walled command's flag for the pass or fail line per case). Nothing is
+written to a file. Under `-W error` the same line is printed to standard output instead, so the list never fails a
+case. The operator's record quotes the warning's line; no line means no changed block.
 
 Each hidden case fails through `pytest.fail(..., pytrace=False)`: no traceback and no assertion introspection, so
 pytest shows no value it read. A failure names a hidden question by its **file name** and a source by its **entry
@@ -31,12 +42,13 @@ with `GOV_EVAL_SETS_ROOT`).
 | S1 | V `test_s1_the_four_new_visible_questions_are_in_the_question_form`; V `test_s1_the_visible_four_are_the_stratified_draw_s_share`; H `test_s1_the_hidden_half_holds_40_question_files`; H `test_s1_every_hidden_question_is_in_the_question_form` | q21-q24 exist; **39** hidden `*.yaml` (DEC-1069 (4)'s 40, less h10, which DEC-1171 (2) retired; 40 again when the walled writer's replacement lands) and nothing else in the folder; each file is in `measure.py`'s question form (`question`, `gold_answer`, `sources` of maps with a `path`); q21-q24 with a category of S3's ten, each hidden file with one of **R5's twelve** (RUBRIC.md v2, R5 item 6); each names a commit, its own `commit` or a `commit` on every source alternative (R10 item 2; the operator's per-source form), and every commit it names is one this repository holds; comments such as h08's `# volatile:` line (R11) are no part of the form, as for the measure's loader; ids are distinct across all 80. The visible four are the draw's share: one each from decision, exact-string, callers, and one from the three categories of 3 (4 × count / 28, largest remainder) |
 | S2 | V `test_s2_the_new_questions_and_these_tests_come_from_no_measured_role`, `test_s2_judges_the_role_on_a_planted_commit`; the record below | Every commit that writes q21-q24 or these tests has exactly one `Role`, `independent-test-designer`, `owner` or `orchestrator` (which landed the designer's draw, 6dca09f0), never one of the path map's `measures.roles`; the `Task` is not judged (the CTO's decision of 2026-11-03, P2: D-4's cut rewrote these tests under the coordination ticket's `Task: DAEO-sdxk`, DEC-1063); the ticket's role and assignee are not measured roles. On a planted repository the rule is red on an engineer's, research's, another role's or a role-less commit, whatever its `Task` |
 | S3 (amended by DEC-1069 (5)) | H `test_s3_the_hidden_40_spread_as_r5_s_quotas_state`; V's draw-share case for q21-q24 | The hidden 39 alone (DEC-1171 (2): the 40 less retired h10; R5 item 6: the quotas apply in full to a half wholly in this form) meet R5's table (the twelve minimums sum to 40; less h10's retired place the half's sum to 39): decision 6, contract 4, plan 4, ticket 4, exact-string 4, callers 4, code-paraphrase 3, kernel-template 3, multi-file 3, failure-memory 3, history 1, nonexistent-id 1, each at least, **save the owner's accepted shortfall of one in decision, callers and code-paraphrase (`R5_SHORT`) and h10's retired place in callers (`R5_RETIRED = {"callers": 1}`; DEC-1171 (2), the owner's (b), DEC-1175 to be recorded), and no other**: the floors are decision 5, **callers 2** (two short: the accepted shortfall and h10's retirement), code-paraphrase 2 and every other category's full minimum; no category outside the twelve; each multi-file question has two or more source entries on two or more paths. The first 28's S3 spread (5, 4, 4, 3, 3, 3, 2, 2, 1, 1) is kept only as the record the q21-q24 draw rests on |
-| S4 | V `test_s4_f3_every_new_visible_gold_source_resolves_at_head`; V `test_f3_each_new_visible_gold_source_holds_its_answer`; V `test_s4_no_new_visible_source_names_the_set_s_own_files`; H `test_s4_f3_every_hidden_gold_source_resolves_at_head` | Each gold source is a file at HEAD outside `fixtures/evaluation/` and the set's report; its heading is found by the measure's rule, or its stated lines are a span of the file; **a source cited by lines alone (or by a heading no longer found) has the same lines at HEAD as at the question's `commit`** (the measure reads spans at the measured root, so lines that drifted no longer hold the answer). This is the measure's own span rule (`_span`, and `repin_gold.py`'s: a source's own `commit`, else the question's); the measure reads the stated lines as written and re-anchors nothing, so a block that **moved unchanged** to other lines is red too, reported apart as a re-anchor for `repin_gold.py --write` (which writes the DEC-1069 (6) reason line). For q21-q24 the designer also checks that each resolved span holds a string from its answer |
+| S4 (re-worded, DEC-1178 (1)) | V `test_s4_f3_every_new_visible_gold_source_resolves_at_head`; V `test_f3_each_new_visible_gold_source_holds_its_answer`; V `test_s4_f3_judges_each_source_at_its_own_commit_on_planted_data`; V `test_s4_no_new_visible_source_names_the_set_s_own_files`; H `test_s4_f3_every_hidden_gold_source_resolves_at_head` | **Each gold source is judged at its own commit** (the alternative's `commit`, else the question's): the path is a file there and its heading or lines are a span there by the measure's rule (`span_of`, the designer's copy of `_span`); else it is **red**, named by file name and entry number only. A source that names no commit at all is judged at HEAD. **At HEAD, a block that moved unchanged is no fault** (the same lines, or exactly one other place: W2-134's re-anchor and `repin_gold.py`'s). **A block whose lines changed is listed, never failed** (see the rule below) as a `GoldBlockChanged` warning in the default summary. For q21-q24 the designer also checks that the span at the source's own commit holds a string from its answer (`ANCHORS`); that a hidden source holds its answer is the operator's cross-check, not a test |
+| S4 (the "changed" rule: the designer's call, DEC-1178 (1)) | the same support function, `judge_sources` | For a source that holds its answer at its own commit, listed at HEAD when: **the path is no longer a file** (a deleted or renamed file's block is gone; the measure counts it not found); **the heading is no longer a line of the file and no lines are stated** (the measure has nothing to follow); or, for lines (no heading cited, or the heading gone), **the block, the stated lines as the file read at its own commit, is found nowhere at HEAD, or more than once away from its stated lines** (the measure's `_anchored` takes no place when there is none or more than one; the same lines win when they still hold it). Not listed: a block at its stated lines, or found exactly once elsewhere (moved unchanged); a path cited alone while the file stands; a heading still found at HEAD (the measure follows the heading; whether its section's text still answers is the operator's cross-check). The rule lists what the measure would count not found (S8's own cases), so the list is the label-maintenance queue and nothing else |
 | S5 | H `test_s5_f1_the_hidden_half_is_held_only_in_the_sets_root` | The sets root is outside every `git worktree list` path and in no git work tree; its mode is 700 (no group or other bits); no worktree and no run clone under `~/gov-os-runs` has `fixtures/evaluation/memory-retrieval/hidden/*.yaml`; no hidden file's bytes are an object of this repository's store (every branch, stash and worktree shares it) or of a run clone's |
 | S6 | H `test_s6_a_measured_role_is_refused_the_hidden_half_by_the_measure`; the hidden module's design (skip, untraced, file names only) | The sets root's path map declares the set, covers the hidden folder and measures at least this tree's measured roles; `measure.py --sets-root <root> --part hidden`, run as each measured role, exits 1 with a refusal and no output, before any retriever is asked |
 | F1 | H `test_s5_f1_...`; H `test_s6_...`; the measured-role skip | As S5 and S6: no route by a tree, a commit, a run clone or the measure; a measured session's own run of these tests reads nothing hidden |
 | F2 | V `test_f2_no_new_visible_question_repeats_lens_b_s_twenty_or_another_new_one`; H `test_f2_no_hidden_question_repeats_a_visible_one` | No new question equals, case, spacing and punctuation aside, one of lens B's 20 or another of the set. A **paraphrase** is not judged by a test: it rests on the writer's independence (S2's record) and the brief it wrote to |
-| F3 | as S4 | A gold source that does not resolve, or whose cited lines changed since the question's commit, is red |
+| F3 (re-worded, DEC-1178 (1)) | as S4 | A gold source that does not hold its answer at its own commit (path not a file there; heading or lines no span there; for q21-q24 the anchor missing from the span there) is red. A block that moved or changed at HEAD is **no failure**: a moved one is not listed, a changed one is listed by file name and entry number only |
 
 **Not covered by a test, named:** S3's "at least 2 whose naive answer is superseded" (a fact of the hidden text
 that only an unmeasured reader can judge); R5's items 2 to 5 beyond the category table (each governing domain at
@@ -67,7 +79,9 @@ throwaway sets root (a stray file, a missing `gold_answer`, a file that is not Y
 lens B's Q01 repeated, mode 755, a committed blob, all one category) turned every hidden case red for its fault,
 and a measured `GOV_ROLE` skipped them all. Against `~/gov-os-eval` at this branch's head, every case passed except
 S4/F3's hidden case. It found 6 gold sources in 5 hidden files whose cited lines changed after the questions'
-commit. Those sources must be re-pinned by an unmeasured session before the hidden half is measured.
+commit. Those sources must be re-pinned by an unmeasured session before the hidden half is measured. *(Superseded by
+DEC-1178 (1), 2026-11-14: S4/F3 no longer judges against HEAD, so this red and its re-pin step no longer apply; a
+changed block is listed, see "DEC-1178 (1)" below.)*
 
 **DEC-1171 (2): the hidden count is 39 (revised under `Task: DAEO-h2k3`).** h10 was retired from the hidden half
 (moved to `retired-hidden/` by the owner's operator), so S1's count case (`HIDDEN_COUNT`) reads 39 until the walled
@@ -84,14 +98,15 @@ per category and names which floors carry a reduction. Checked on a throwaway se
 
 **The hidden 40 (DEC-1069 (4), (5); rewritten under `Task: DAEO-sdxk`).** The count, the form (R5's twelve
 categories, a per-source `commit`, comments ignored) and S3's spread were revised to the rubric's version 2; the
-S4/F3 rule is unchanged (it already is the measure's span rule) save its message, which tells a block that moved
-unchanged apart from one that changed. Planted faults in throwaway sets roots of synthetic files (two short in
+S4/F3 rule was then the measure's span rule judged at HEAD, red for a block that moved too (replaced by DEC-1178 (1),
+below). Planted faults in throwaway sets roots of synthetic files (two short in
 decision, plan short, a category outside the twelve, no commit, a commit the repository does not hold, 39 files)
 turned the S1 and S3 cases red for each fault; a plant with the accepted shortfall, a `# volatile:` line and
 per-source commits only passed. Against `~/gov-os-eval` at `13947cea`: every case passed except S4/F3's hidden
 case, which names 3 sources in 3 files (h02 entry 2, h16 entry 1, h23 entry 1) whose cited block moved unchanged
 to other lines; `repin_gold.py`'s dry run counts the same 3 as `re-pinned` (with `unresolved: 0`). The labels
-need the re-anchor (`repin_gold.py --write`, by an unmeasured session), not the test.
+need the re-anchor (`repin_gold.py --write`, by an unmeasured session), not the test. *(Superseded by DEC-1178 (1): a
+block that moved unchanged is no fault now and is not listed; the measure re-anchors it in memory, W2-134.)*
 
 ## KPI map after D-4's cut (DEC-1061)
 
@@ -102,19 +117,19 @@ the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--
 switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
 (`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 15 in the full run, 9 in `breadth`, 0 in `lifted` (S2's planted case added by the CTO's decision of 2026-11-03, P2: its engineer's row in the full run, its six others in `breadth`).
+Cases: 16 in the full run, 9 in `breadth`, 0 in `lifted` (S2's planted case added by the CTO's decision of 2026-11-03, P2: its engineer's row in the full run, its six others in `breadth`; S4's planted case added under DEC-1178 (1), a single non-parametrised function, so in the full run).
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
 | S1: Twenty-eight new questions about this repository's governance and code, each with its gold answer and the governing source or sources an answer... | `test_w2_61h_visible_new.py::test_s1_the_visible_four_are_the_stratified_draw_s_share`, `test_w2_61h_visible_new.py::test_s1_the_four_new_visible_questions_are_in_the_question_form`, `test_w2_61h_hidden_form.py::test_s1_the_hidden_half_holds_40_question_files` | the ticket's words |
 | S2: Written by a session independent of the retrieval tickets: no session that builds or tunes retrieval (W2-03, W2-55, W2-61's engineer, W2-64, W2... | `test_w2_61h_visible_new.py::test_s2_the_new_questions_and_these_tests_come_from_no_measured_role`, `test_w2_61h_visible_new.py::test_s2_judges_the_role_on_a_planted_commit` (1 of 7: the engineer's row) | the ticket's words (the planted case added by the CTO's decision of 2026-11-03, P2) |
 | S3: The spread covers the combined memory spec (DEC-954 Q9c): decisions and supersession 5 (at least 2 whose naive answer is superseded), exact str... | `test_w2_61h_visible_new.py::test_s1_the_visible_four_are_the_stratified_draw_s_share`, `test_w2_61h_visible_new.py::test_s1_the_four_new_visible_questions_are_in_the_question_form` | the ticket's words |
-| S4: Every gold source exists at the commit the auditor reads and holds the answer, cited by path and heading or line [DEC-828 item 4] | `test_w2_61h_visible_new.py::test_f3_each_new_visible_gold_source_holds_its_answer`, `test_w2_61h_hidden_form.py::test_s4_f3_every_hidden_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_every_new_visible_gold_source_resolves_at_head` | the ticket's words |
+| S4: Every gold source exists at its own commit and holds the answer there, cited by path and heading or line; at the head the auditor reads, a cited block that moved unchanged is no fault, and a cited block whose lines changed is listed by question id and entry number only, never failed [DEC-828 item 4] [changed, DEC-1178 (1)] | `test_w2_61h_visible_new.py::test_f3_each_new_visible_gold_source_holds_its_answer`, `test_w2_61h_hidden_form.py::test_s4_f3_every_hidden_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_every_new_visible_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_judges_each_source_at_its_own_commit_on_planted_data` | the ticket's words (re-worded, DEC-1178 (1)) |
 | S5: The hidden half is held only in the sets root outside every worktree (~/gov-os-eval, mode 700): in no worktree, run clone, store or commit; no ... | `test_w2_61h_hidden_form.py::test_s5_f1_the_hidden_half_is_held_only_in_the_sets_root` | the ticket's words |
 | S6: The hidden half is read for a measure only by the unmeasured measure run (`measure.py --sets-root ~/gov-os-eval`), and its form is checked by t... | `test_w2_61h_hidden_form.py::test_s5_f1_the_hidden_half_is_held_only_in_the_sets_root`, `test_w2_61h_hidden_form.py::test_s6_a_measured_role_is_refused_the_hidden_half_by_the_measure` | the ticket's words |
 | F1: A hidden question or answer readable by a measured role by a route an honest agent takes in ordinary work. | `test_w2_61h_hidden_form.py::test_s1_the_hidden_half_holds_40_question_files`, `test_w2_61h_hidden_form.py::test_s1_every_hidden_question_is_in_the_question_form`, `test_w2_61h_hidden_form.py::test_s6_a_measured_role_is_refused_the_hidden_half_by_the_measure` | the ticket's words |
 | F2: A question copied from or paraphrasing lens B's visible 20. | `test_w2_61h_visible_new.py::test_f2_no_new_visible_question_repeats_lens_b_s_twenty_or_another_new_one`, `test_w2_61h_hidden_form.py::test_f2_no_hidden_question_repeats_a_visible_one` | the ticket's words |
-| F3: A gold source that does not hold its answer. | `test_w2_61h_visible_new.py::test_f3_each_new_visible_gold_source_holds_its_answer`, `test_w2_61h_hidden_form.py::test_s4_f3_every_hidden_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_every_new_visible_gold_source_resolves_at_head` | the ticket's words |
+| F3: A gold source that does not hold its answer at its own commit [changed, DEC-1178 (1)]. | `test_w2_61h_visible_new.py::test_f3_each_new_visible_gold_source_holds_its_answer`, `test_w2_61h_hidden_form.py::test_s4_f3_every_hidden_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_every_new_visible_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_judges_each_source_at_its_own_commit_on_planted_data` | the ticket's words (re-worded, DEC-1178 (1)) |
 
 ## S7 and F4: source families (DEC-1078 (4), DEC-1079; DEC-1068 (4))
 
@@ -158,3 +173,46 @@ re-score fails on the unknown `--kept`, after its first half (the kept form writ
 minimal family rule, `--kept` and a "family hits" clause in the line): 13 passed. Three planted faults in it each
 turned their own cases red: a member counted by path alone (the three F4 cases), any file counted by its text (the
 three outside cases), no normalising (the hit, the four normalisation cases and, through their controls, the rest).
+
+## DEC-1178 (1): judged at each source's own commit (2026-11-14; `Rewrite-Reason: DEC-1178 (1)`)
+
+The owner's operator's walled run of 2026-11-14 gave 6 passed and 1 failed: one hidden question's cited lines changed
+at HEAD, six others whose blocks moved unchanged had been re-anchored by hand. The check judged every block against
+HEAD, so ordinary work on a cited file turned it red. Revised by an independent test designer
+(`w2_61h_support.py`'s `judge_sources` / `judge_all`, used by the hidden and the visible S4 cases alike; no hidden file
+was read, every proof below is on planted data):
+
+1. **Own commit.** A source's own commit is its `commit`, else the question's. The path must be a file there and its
+   heading or lines a span there (`span_of`); else red. q21-q24's anchors are read from that span (`span_text_own`).
+2. **At HEAD, moved unchanged is no fault** (the same lines, or exactly one other place).
+3. **Changed is listed, never failed**: by file name and entry number, a `GoldBlockChanged` warning in the default
+   summary (rule and form above). Fixed words only: no question, answer, path, category, heading or span text.
+4. **Never held at its own commit stays red**, naming the file and the entry only.
+5. The old "a re-anchor: repin_gold.py --write" message is gone; every test function keeps its name. The new function
+   `test_s4_f3_judges_each_source_at_its_own_commit_on_planted_data` is one non-parametrised case, so it runs in the
+   full run (`tests/optin-lifted-breadth.txt` keeps only the first row of a parametrised function).
+
+**Planted proofs, by outcome only.**
+
+- *Visible module, always run* (a planted repository with two commits and a planted folder of question YAMLs, the
+  same `judge_all` the real cases use). p01 a block moved unchanged (six lines inserted above): passes, not listed.
+  p02 lines rewritten: passes, **listed** (`p02.yaml entry 1`). p03 a heading that exists only from commit two on, and
+  p05 a path that is a file only from commit two on (neither held its answer at its own commit): **red**, named
+  `p03.yaml source entry 1` and `p05.yaml source entry 1`. p04 the control (lines appended below, the block steady):
+  passes, not listed. p06 the block gone from its lines and found twice elsewhere, and p07 its file deleted: both
+  passes and **listed**. No message holds a planted question, answer, category, path, heading or span text (every one
+  carries `zqxw`, `docs/` or `.md`; none appears). The list is shown as a warning that names the three listed entries
+  and no other; an empty list emits no warning even under `-W error`.
+- *Hidden-form module against a throwaway sets root under `$TMPDIR`* (five planted files in the hidden folder, citing
+  the first commit of `src/gov/retrieval/measure.py` and real non-evaluation files of this repository, never the real
+  sets root): the S4 case gave (a) a moved block: pass, not listed; (b) a changed block: pass with the list
+  `h02.yaml entry 1` in the warnings summary; (c) a heading only at HEAD and a path only at HEAD: red, naming
+  `h03.yaml source entry 1` and `h05.yaml source entry 1` only; (d) a control: pass, not listed. With (c) removed it
+  passes with the list; with (b) also removed it passes with no warning; under `-W error` the list is printed and the
+  case still passes. Without `GOV_EVAL_SETS_ROOT`, and under `GOV_ROLE=engineer`, all 7 hidden cases skip.
+- *The visible module at HEAD:* q21-q24 pass (every source holds its place and its anchor at its own commit; the list
+  is empty); the whole folder run as in the ticket's command gives 22 passed, 7 skipped (the hidden cases), 9
+  deselected (`breadth` rows).
+
+**Older text this revision corrects:** the "re-anchors nothing" and "a block that moved unchanged is red too" sentences
+(the S4 row, the "Expected state" notes) are replaced or marked superseded above.
