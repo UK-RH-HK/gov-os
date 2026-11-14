@@ -106,29 +106,48 @@ def test_f1_no_copy_names_a_memaudit_subcommand_or_standing_declare():
     assert not problems, "; ".join(problems)
 
 
-def test_f2_the_claude_copy_of_the_skill_equals_the_base():
-    """Guard (holds on the base): the copies ACT regenerates it after the owner's approval, not this ticket."""
+# The copies ACT ACT-CLAUDE-COPIES-12's after-bytes of `.claude/skills/adopt/SKILL.md`, generated from the kernel skill
+# the owner approved (sha256 6a884cf1...9489, DEC-1181 (1)); P-C12-1 (a), DEC-1156 (7).
+ACT_CLAUDE_COPY_SHA256 = "65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc"
+ACT_SUBJECT_MARK = "ACT-CLAUDE-COPIES-"
+
+
+def test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_after_bytes():
+    """Guard (holds on the base): the `.claude` copy is the base's bytes, or exactly the copies ACT's after-bytes
+    (sha256 `65d6abd9...dbc`, the ACT's regeneration after the owner's approval); any other bytes mean the ticket
+    wrote it."""
     now = support.read_bytes(support.CLAUDE_COPY_REL)
     then = support.base_blob(support.CLAUDE_COPY_REL)
-    assert now == then, f"{support.CLAUDE_COPY_REL} differs from the base's"
+    if now == then:
+        return
+    found = support.sha256_of(now)
+    assert found == ACT_CLAUDE_COPY_SHA256, (
+        f"{support.CLAUDE_COPY_REL} has sha256 {found}: neither the base's ({support.sha256_of(then)}) "
+        f"nor the copies ACT's after-bytes ({ACT_CLAUDE_COPY_SHA256})")
 
 
-def test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests():
+def test_f2_no_commit_of_the_ticket_outside_the_test_designer_or_the_copies_act_touches_claude_or_tests():
     """Guard (holds on the base): a commit after the base with `Task: DAEO-zlog` whose `Role:` is not
-    `independent-test-designer` (or that has no Role) names no `.claude/` path and no `tests/` path."""
+    `independent-test-designer` (or that has no Role) names no `.claude/` path and no `tests/` path. The one excuse:
+    a commit whose trailers carry `Role: owner` and whose subject names `ACT-CLAUDE-COPIES-` (the copies ACT) may
+    touch `.claude/` paths; its `tests/` paths still count."""
     done = support.git("log", "--no-merges", "--name-only",
                        "--format=%x1e%H%x1f%(trailers:key=Task,valueonly,separator=%x2c)%x1f"
-                       "%(trailers:key=Role,valueonly,separator=%x2c)%x1f", f"{support.BASE}..HEAD")
+                       "%(trailers:key=Role,valueonly,separator=%x2c)%x1f%s%x1f", f"{support.BASE}..HEAD")
     problems = []
     for entry in done.stdout.decode("utf-8", "replace").split("\x1e"):
         if "\x1f" not in entry:
             continue
-        commit, tasks, roles, files = entry.split("\x1f", 3)
+        commit, tasks, roles, subject, files = entry.split("\x1f", 4)
         if support.TICKET not in [task.strip() for task in tasks.split(",")]:
             continue
-        if "independent-test-designer" in [role.strip() for role in roles.split(",")]:
+        role_list = [role.strip() for role in roles.split(",")]
+        if "independent-test-designer" in role_list:
             continue
-        touched = [name for name in files.split() if name.startswith((".claude/", "tests/"))]
+        copies_act = "owner" in role_list and ACT_SUBJECT_MARK in subject
+        prefixes = ("tests/",) if copies_act else (".claude/", "tests/")
+        touched = [name for name in files.split() if name.startswith(prefixes)]
         if touched:
-            problems.append(f"{commit[:12]} (Role: {roles.strip() or 'none'}) touches {touched[:3]}")
+            problems.append(f"{commit[:12]} (Role: {roles.strip() or 'none'}; subject: {subject[:60]!r}) "
+                            f"touches {touched[:3]}")
     assert not problems, "; ".join(problems)
