@@ -64,10 +64,14 @@ def _source_tree(start: Path | None = None) -> Path | None:
     return None
 
 
-# The files A9 needs that are not under ``template/`` (so no ``copier copy`` installs them): the wheel carries a copy of
-# each, byte for byte, at its path in the Gov OS repository under the ``gov`` package's ``_shipped/`` folder
-# (``pyproject.toml``'s package data; run 8, package 1 (a)). The source tree's own file is the original.
-PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON)  # the cron script: run 8b, item 21
+# What the wheel carries: every file or folder ``shipped`` is asked for, each copied byte for byte at its path in the
+# Gov OS repository (the ``template/`` prefix kept) under the ``gov`` package's ``_shipped/`` folder (``pyproject.toml``'s
+# package data; run 8, package 1 (a)). The files A9 needs that are not under ``template/`` (no ``copier copy`` installs
+# them), and, under ``template/`` (W2-88 S29, DEC-1189 (1)), A0's and MA's ``.gitleaks.toml`` and A9's kernel sources,
+# so an installed release finds them in a repository with no kit. The source tree's own file is the original.
+PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON,  # the cron script: run 8b, item 21
+            "template/.gitleaks.toml",  # ``safety.TEMPLATE_GITLEAKS_REL``'s value (S29's unit test holds them equal)
+            *(source for source, _ in KERNEL_FOLDERS + KERNEL_FILES))
 
 
 def _package_copy() -> Path:
