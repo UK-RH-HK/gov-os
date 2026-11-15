@@ -48,7 +48,7 @@ archive), and no other file of the set. A brief's front matter need not name `sa
 (`corrected` or `replaced`) and its counts must sum to 1. The counts carry `fix` {id, code, action}.
 
 The weekly re-anchoring flow (ACT-WALLS-REANCHOR-1; DEC-1179 (6), DEC-1178 (1)): one flag, the ISO week of the request
-that `gov.memaudit maintain` wrote, given on the writer's round 2 (the --reanchor usage line above, whose brief and
+that `gov.memaudit maintain` wrote, given on the writer's round 2 (the re-anchoring usage line above, whose brief and
 hashes are an example: the re-anchoring brief is the owner's, approved before the first run; never with the fix flow's
 pair). The commit is the request's audit_commit. It reads runs/<set>/REANCHOR-<week>.json under the sets root in its own code, checks its fixed form (week,
 audit_commit, set, changed, count; a question id and an entry number per row, nothing else) and that its audit_commit is
@@ -61,8 +61,10 @@ not staged; none staged, or two hidden files for one id, refuses 10. The templat
 is what opens the input. Because --commit must equal the request's audit_commit, the commit carrying the approved
 kinds.yaml line and the brief must be at or before the audit commit that wrote the request (else 11 or 10). At delivery
 each `out/<stem>.yaml` must equal its staged copy but for the named entries' `path`, `lines`, `heading` and `commit` and
-an optional top-level `replace_reason` (else 20); then only the staged stems' `hidden/<stem>.yaml` are replaced, all or
-nothing, the old files packed into the run's tar. The result adds `corrected` and `replaced` (counts summing to
+an optional top-level `replace_reason` on either side (a delivered one a non-empty string; else 20). The comparison
+uses the launcher's own reading, never the wall's input/: the named entries as planned, and the hidden file's bytes,
+which must still hash to what was staged (else 20, nothing replaced); then only the staged stems' `hidden/<stem>.yaml`
+are replaced, all or nothing, the old files packed into the run's tar. The result adds `corrected` and `replaced` (counts summing to
 `questions`, the number of staged ids). The counts carry `reanchor` {week, entries, ids, absent, corrected, replaced},
 numbers only.
 
@@ -925,7 +927,10 @@ def plan_reanchor(root, set_name, week, commit):
     the commit the tree is built at (14). Ids are matched case-insensitively (W2-94 F3): each requested id's question is
     the top-level hidden/<stem>.yaml whose stem equals it so, staged as a byte copy at input/<stem>.yaml in the set's own
     spelling; an id with none is counted as absent; two such files for one id, one that is not a plain file, a form that
-    is not the fixed one, or no id staged: 10. info: entries, ids, absent and present (the staged stems, sorted)."""
+    is not the fixed one, or no id staged: 10. info: entries, ids, absent and present (the staged stems, sorted), and,
+    as attributes for the delivery only (never printed or counted), .named ({stem: sorted entry numbers}) and .sha256
+    ({stem: the staged file's sha256}), so the delivery compares against the launcher's own reading, never the wall's
+    input/."""
     path = os.path.join(root, "runs", set_name, f"REANCHOR-{week}.json")
     data = read_plain(path, root)
     if data is None or len(data) > MOST_RESULT_BYTES:
@@ -959,7 +964,7 @@ def plan_reanchor(root, set_name, week, commit):
         stem = name[:-len(".yaml")]
         if name.endswith(".yaml") and stem.isascii() and stem.lower() in by_id:
             stems.setdefault(stem.lower(), []).append(stem)
-    plan, present, changed = [], [], []
+    plan, present, changed, named, shas = [], [], [], {}, {}
     for key in sorted(by_id):
         found = stems.get(key, [])
         if not found:
@@ -967,17 +972,30 @@ def plan_reanchor(root, set_name, week, commit):
         src = os.path.join(hidden, f"{found[0]}.yaml")
         if len(found) > 1 or not real_inside(src, root) or not regular(src):
             raise Refuse(10, "input")
+        data = read_plain(src, root)
+        if data is None:
+            raise Refuse(10, "input")
         plan.append((src, f"input/{found[0]}.yaml"))
         present.append(found[0])
         changed += [{"id": found[0], "entry": n} for n in by_id[key]]
+        named[found[0]], shas[found[0]] = sorted(by_id[key]), sha_bytes(data)
     if not present:
         raise Refuse(10, "input")
     plan.sort(key=lambda p: p[1])
     present.sort()
     request = {"week": week, "changed": sorted(changed, key=lambda r: (r["id"], r["entry"]))}
     staged = {"input/reanchor.json": (json.dumps(request, indent=1) + "\n").encode("utf-8")}
-    return plan, staged, {"entries": len(rows), "ids": len(present), "absent": len(by_id) - len(present),
-                          "present": present}
+    return plan, staged, ReanchorInfo({"entries": len(rows), "ids": len(present), "absent": len(by_id) - len(present),
+                                       "present": present}, named, shas)
+
+
+class ReanchorInfo(dict):
+    """plan_reanchor's info: the public keys as the mapping; named and sha256 as attributes, kept for the delivery
+    only (never printed or counted, and outside the mapping's equality)."""
+
+    def __init__(self, public, named, sha256):
+        super().__init__(public)
+        self.named, self.sha256 = named, sha256
 
 
 # -- set-up A's inputs (S20, S24, S27): read and checked before anything is written ---------------------------------
@@ -2003,15 +2021,19 @@ def same_value(a, b):
 
 
 def reanchor_same(staged, got, named):
-    """W2-94 S15: a delivered question against its staged copy. With an optional top-level `replace_reason` (a non-empty
-    string) removed from the delivered mapping, the two have the same top-level keys and equal values for every key but
-    `sources`; `sources` has the same length; every entry not in *named* (1-based indexes) is equal; a named entry keeps
-    its shape (a mapping, or a list of the same length of mappings), and each of its alternatives differs at most in
-    REANCHOR_FREE (each may be added, changed or removed)."""
+    """W2-94 S15: a delivered question against its staged copy. With an optional top-level `replace_reason` removed from
+    both mappings (the staged one may be kept, changed or dropped; a delivered one must be a non-empty string), the two
+    have the same top-level keys and equal values for every key but `sources`; `sources` has the same length; every
+    entry not in *named* (1-based indexes) is equal; a named entry keeps its shape (a mapping, or a list of the same
+    length of mappings), and each of its alternatives differs at most in REANCHOR_FREE (each may be added, changed or
+    removed)."""
     if not isinstance(staged, dict) or not isinstance(got, dict):
         return False
-    got = dict(got)
-    if isinstance(got.get("replace_reason"), str) and got["replace_reason"]:
+    staged, got = dict(staged), dict(got)
+    staged.pop("replace_reason", None)
+    if "replace_reason" in got:
+        if not (isinstance(got["replace_reason"], str) and got["replace_reason"]):
+            return False
         del got["replace_reason"]
     if set(got) != set(staged) or not all(same_value(staged[k], got[k]) for k in staged if k != "sources"):
         return False
@@ -2042,28 +2064,16 @@ def reanchor_same(staged, got, named):
     return True
 
 
-def reanchor_named(wall):
-    """The entry numbers the staged request names for each staged stem, from the wall's input/reanchor.json (written by
-    plan_reanchor; the session writes only into out/): {stem: {entry, ...}}."""
-    inp = os.path.join(wall, "input")
-    data = read_plain(os.path.join(inp, "reanchor.json"), inp)
-    try:
-        rows = load_json_strict(data.decode("utf-8"))["changed"]
-        named = {}
-        for row in rows:
-            named.setdefault(row["id"], set()).add(row["entry"])
-        return named
-    except (AttributeError, ValueError, UnicodeDecodeError, RecursionError, KeyError, TypeError):
-        raise Refuse(20, "staged")
-
-
 def deliver_reanchor(st, ctx):
     """ACT-WALLS-REANCHOR-1: the weekly re-anchoring flow's delivery. out/ holds exactly out/<stem>.yaml for each staged
-    stem and out/result.json; each YAML is a mapping that differs from its staged copy only where reanchor_same allows
-    (W2-94 S15; else 20 reanchor_changed); every check first, then only the staged stems' hidden/<stem>.yaml are
+    stem and out/result.json; each hidden/<stem>.yaml must still hash to the sha256 plan_reanchor recorded (else 20
+    destination); each YAML is a mapping that differs from those hidden bytes only where reanchor_same allows, the
+    named entries being plan_reanchor's own (W2-94 S15; else 20 reanchor_changed). Nothing is read back from the wall's
+    input/, which the session can write. Every check first, then only the staged stems' hidden/<stem>.yaml are
     replaced, all or nothing (the old files kept for the run's tar as replaced-hidden/<stem>.yaml). Any refusal leaves
     the set unchanged: 20."""
-    ids, out = ctx["reanchor"]["present"], os.path.join(st.wall, "out")
+    rea = ctx["reanchor"]
+    ids, out = rea["present"], os.path.join(st.wall, "out")
     hidden = os.path.join(ctx["root"], "fixtures", "evaluation", ctx["set"], "hidden")
     try:
         entries = sorted(os.listdir(out))
@@ -2071,8 +2081,6 @@ def deliver_reanchor(st, ctx):
         raise Refuse(20, "missing")
     if entries != sorted([f"{q}.yaml" for q in ids] + ["result.json"]):
         raise Refuse(20, "entries")
-    named = reanchor_named(st.wall)
-    inp = os.path.join(st.wall, "input")
     land, new, old, shas = Landing(ctx["root"]), {}, {}, []
     try:
         for qid in ids:
@@ -2080,30 +2088,28 @@ def deliver_reanchor(st, ctx):
             data = read_plain(os.path.join(out, name), out)
             if data is None or len(data) > MOST_RESULT_BYTES:
                 raise Refuse(20, "missing")
-            staged = read_plain(os.path.join(inp, name), inp)
-            if staged is None:
-                raise Refuse(20, "staged")
             try:
                 q = yaml.safe_load(data.decode("utf-8"))
             except (UnicodeDecodeError, yaml.YAMLError, RecursionError):
                 raise Refuse(20, "yaml")
             if not isinstance(q, dict):
                 raise Refuse(20, "yaml")
+            # the staged side: the hidden file as the launcher reads it now, unchanged since plan_reanchor hashed it
+            if not real_inside(dst, ctx["root"]) or not regular(dst):
+                raise Refuse(20, "destination")
+            before = read_plain(dst, hidden)
+            if before is None or sha_bytes(before) != rea.sha256[qid]:
+                raise Refuse(20, "destination")
             try:
-                was = yaml.safe_load(staged.decode("utf-8"))
+                was = yaml.safe_load(before.decode("utf-8"))
             except (UnicodeDecodeError, yaml.YAMLError, RecursionError):
                 raise Refuse(20, "reanchor_changed")
             try:
-                kept_form = reanchor_same(was, q, named.get(qid, set()))
+                kept_form = reanchor_same(was, q, set(rea.named[qid]))
             except RecursionError:  # a self-referring YAML alias
                 kept_form = False
             if not kept_form:
                 raise Refuse(20, "reanchor_changed")
-            if not real_inside(dst, ctx["root"]) or not regular(dst):
-                raise Refuse(20, "destination")
-            before = read_plain(dst, hidden)
-            if before is None:
-                raise Refuse(20, "destination")
             old[name] = before
             new[name] = (dst, data)
         kept = st.wall + ".replaced"

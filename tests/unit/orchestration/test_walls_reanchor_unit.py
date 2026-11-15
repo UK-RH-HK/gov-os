@@ -294,6 +294,10 @@ def test_plan_reanchor_returns_the_plan_the_staged_request_and_the_numbers(fx):
     assert json.loads(staged["input/reanchor.json"]) == {"week": WEEK, "changed": [{"id": "Q07", "entry": 1},
                                                                                      {"id": "h20", "entry": 2}]}
     assert info == {"entries": 3, "ids": 2, "absent": 1, "present": ["Q07", "h20"]}
+    # batch 2: the named entries and each staged file's sha256 kept for the delivery, outside the mapping
+    assert info.named == {"Q07": [1], "h20": [2]}
+    assert info.sha256 == {"Q07": sha((fx.setdir / "hidden" / "Q07.yaml").read_bytes()),
+                           "h20": sha(OLD["h20"].encode())}
 
 
 def test_an_upper_case_id_is_delivered_under_the_sets_spelling(fx):
@@ -664,6 +668,113 @@ def test_a_destination_that_goes_missing_before_delivery_refuses_20_and_changes_
     assert not (fx.setdir / "hidden" / "h20.yaml").exists()
     assert not any(n.endswith(".replaced") for n in os.listdir(fx.sets / WALLS / "writer"))
     assert [n for n in os.listdir(fx.setdir / "hidden") if n.startswith(".")] == []
+
+
+# -- batch 2: the comparison from the launcher's own reading, never from the wall --------------------------------------
+WALL_PUT = ("def put(rel, text):\n"
+            "    p = os.path.join(wall, rel)\n"
+            "    os.chmod(os.path.dirname(p), 0o700)\n"
+            "    if os.path.lexists(p):\n"
+            "        os.chmod(p, 0o600)\n"
+            "        os.unlink(p)\n"
+            "    if text is not None:\n"
+            "        with open(p, 'w') as f:\n"
+            "            f.write(text)\n")
+
+
+def session_alters_wall(fx, files):
+    """A hook that, after the session, rewrites (or, for None, removes) the named files in the wall's input/."""
+    body = WALL_PUT + "if point == 'after_session':\n"
+    body += "".join(f"    put({rel!r}, {text!r})\n" for rel, text in files.items())
+    return {"GOV_INDEP_TEST_HOOK": fx.hook(body)}
+
+
+@pytest.mark.parametrize("alter", ["staged_yaml", "staged_request", "both_removed"])
+def test_a_wall_input_the_session_altered_does_not_open_a_refused_change(fx, alter):
+    h03, h20 = changed("unnamed_entry_lines")  # h03's entry 3 changed: refused against the hidden file
+    if alter == "staged_yaml":  # the wall's staged copy made to match the delivered question
+        files = {"input/h03.yaml": text_of(h03)}
+    elif alter == "staged_request":  # the wall's request made to name h03's entry 3
+        files = {"input/reanchor.json": json.dumps({"week": WEEK, "changed": ROWS + [{"id": "h03", "entry": 3}]})}
+    else:
+        files = {"input/h03.yaml": None, "input/reanchor.json": None}
+    fx.stub({"session": "write", "out": out_files(**{"out/h03.yaml": text_of(h03), "out/h20.yaml": text_of(h20)})})
+    before = tree_hash(fx.setdir)
+    rc, counts, p = fx.run(*fx.args(rnd=2), *REA, extra=session_alters_wall(fx, files))
+    assert rc == 20 and counts["status"] == "rejected", p.stderr
+    assert "reanchor_changed" in (fx.runs / "writer" / counts["run"] / "launch.log").read_text()
+    assert tree_hash(fx.setdir) == before
+    assert not any(n.endswith(".replaced") for n in os.listdir(fx.sets / WALLS / "writer"))
+
+
+@pytest.mark.parametrize("alter", ["staged_yaml", "staged_request", "both_removed"])
+def test_a_wall_input_the_session_altered_does_not_refuse_a_good_delivery(fx, alter):
+    if alter == "staged_yaml":
+        files = {"input/h03.yaml": "id: other\n"}
+    elif alter == "staged_request":
+        files = {"input/reanchor.json": json.dumps({"week": WEEK, "changed": []})}
+    else:
+        files = {"input/h03.yaml": None, "input/h20.yaml": None, "input/reanchor.json": None}
+    fx.stub({"session": "write", "out": out_files()})
+    rc, counts, p = fx.run(*fx.args(rnd=2), *REA, extra=session_alters_wall(fx, files))
+    assert rc == 0 and counts["status"] == "delivered", p.stderr
+    for qid in ("h03", "h20"):
+        assert (fx.setdir / "hidden" / f"{qid}.yaml").read_text() == NEW[qid]
+
+
+def test_a_hidden_file_changed_between_staging_and_delivery_refuses_20_with_the_hidden_half_as_it_was(fx):
+    edited = OLD["h20"].replace("old h20", "edited h20")
+    target = fx.setdir / "hidden" / "h20.yaml"
+    hook = fx.hook("if point == 'after_session':\n"
+                   f"    with open({str(target)!r}, 'w') as f:\n"
+                   f"        f.write({edited!r})\n")
+    fx.stub({"session": "write", "out": out_files()})
+    rc, counts, p = fx.run(*fx.args(rnd=2), *REA, extra={"GOV_INDEP_TEST_HOOK": hook})
+    assert rc == 20 and counts["status"] == "rejected", p.stderr
+    assert "destination" in (fx.runs / "writer" / counts["run"] / "launch.log").read_text()
+    assert (fx.setdir / "hidden" / "h03.yaml").read_text() == OLD["h03"]  # nothing replaced, the first id included
+    assert target.read_text() == edited and (fx.setdir / "hidden" / "q01.yaml").read_text() == OLD["q01"]
+    assert not any(n.endswith(".replaced") for n in os.listdir(fx.sets / WALLS / "writer"))
+    assert [n for n in os.listdir(fx.setdir / "hidden") if n.startswith(".") or n.endswith(".tmp")] == []
+    for text in (p.stdout, p.stderr):
+        assert "ZZMARKER" not in text and "edited" not in text
+
+
+@pytest.mark.parametrize("delivered", ["kept", "changed", "dropped"])
+def test_a_replace_reason_on_the_staged_side_kept_changed_or_dropped_is_accepted(fx, delivered):
+    marked = dict(question("h20", "old h20"), replace_reason="marked-earlier")
+    (fx.setdir / "hidden" / "h20.yaml").write_text(text_of(marked))
+    h20 = reanchored("h20", "old h20")
+    if delivered == "kept":
+        h20["replace_reason"] = "marked-earlier"
+    elif delivered == "changed":
+        h20["replace_reason"] = "moved-again"
+    fx.stub({"session": "write", "out": out_files(**{"out/h20.yaml": text_of(h20)})})
+    rc, counts, p = rea_run(fx)
+    assert rc == 0 and counts["status"] == "delivered", p.stderr
+    assert yaml.safe_load((fx.setdir / "hidden" / "h20.yaml").read_text()) == h20
+
+
+@pytest.mark.parametrize("bad", ["", 1, None])
+def test_a_delivered_replace_reason_that_is_not_a_non_empty_string_is_refused_even_when_staged(fx, bad):
+    marked = dict(question("h20", "old h20"), replace_reason="marked-earlier")
+    (fx.setdir / "hidden" / "h20.yaml").write_text(text_of(marked))
+    h20 = dict(reanchored("h20", "old h20"), replace_reason=bad)
+    fx.stub({"session": "write", "out": out_files(**{"out/h20.yaml": text_of(h20)})})
+    before = tree_hash(fx.setdir)
+    rc, counts, p = rea_run(fx)
+    assert rc == 20 and counts["status"] == "rejected", p.stderr
+    assert "reanchor_changed" in (fx.runs / "writer" / counts["run"] / "launch.log").read_text()
+    assert tree_hash(fx.setdir) == before
+
+
+def test_reanchor_same_ignores_a_staged_replace_reason_but_checks_a_delivered_one():
+    same = indep_launch.reanchor_same
+    a = dict(question("h03", "x"), replace_reason="old")
+    b = question("h03", "x")
+    assert same(a, b, set()) and same(b, a, set()) and same(a, dict(b, replace_reason="new"), set())
+    for bad in ("", 0, None, ["x"]):
+        assert not same(a, dict(b, replace_reason=bad), set()) and not same(b, dict(b, replace_reason=bad), set())
 
 
 def test_a_stopped_result_delivers_nothing_21(fx):
