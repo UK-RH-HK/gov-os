@@ -716,7 +716,7 @@ CORPUS = os.environ.get("GOV_LIVE_HOOK_CORPUS") or os.path.join(
 TWIN = {50: 54, 51: 55, 52: 58, 53: 59}
 ROLE = {**{i: O for i in (61, 62, 63, 70, 71, 72)}, **{i: A for i in (64, 67, 68, 69, 75, 76)},
         **{i: E for i in (65, 66, 73, 74, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86)}}
-STILL_REFUSED = [64, 80]
+STILL_REFUSED = [46, 64, 80]  # row 46 refused again by ACT-GUARD-FIX-6 option (B) (an unreadable run naming tests/acceptance)
 
 
 @pytest.mark.skipif(not os.path.exists(CORPUS), reason="the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)")
