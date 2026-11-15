@@ -196,8 +196,10 @@ def cron_span(row: str) -> str:
 def test_s11_step_6s_cron_line_names_the_gitleaks_a9_found_on_the_path_or_a_placeholder(make_world, tmp_path, planted):
     """Review round 1's R1 (the CTO's fix of 2026-11-14): cron's ``PATH`` does not hold ``~/.local/bin``, so A9's step 6 line
     carries ``GOV_MEMAUDIT_GITLEAKS=<gitleaks>`` before the wrapper: the absolute path ``shutil.which("gitleaks")`` gives when
-    A9 runs, else the literal ``<path to gitleaks>``. The rest of the line and I13's sentence stay. ``PATH`` is planted whole: a
-    folder with a planted ``gitleaks`` (never run) first, or none holding one."""
+    A9 runs; the rest of the line and I13's sentence stay. When ``shutil.which("gitleaks")`` finds none, step 6 names
+    ``GITLEAKS_MISSING`` and holds no cron line with a slot: no ``<path to gitleaks>``, no ``GOV_MEMAUDIT_GITLEAKS=<`` (the
+    CTO's path case, DEC-893, DEC-1156 (7); run 8b's interface item 24). ``PATH`` is planted whole: a folder with a planted
+    ``gitleaks`` (never run) first, or none holding one."""
     world = make_world(link=False)
     empty = tmp_path / "pathbin"                     # git and nothing else
     empty.mkdir()
@@ -223,6 +225,14 @@ def test_s11_step_6s_cron_line_names_the_gitleaks_a9_found_on_the_path_or_a_plac
     assert done.returncode == 0, done.stderr[-800:]
     text = (out / "memory-audit" / "ACT-WALLS" / "ACT.md").read_text(encoding="utf-8")
     row = step6(text)
+    if not planted:                                  # the CTO's path case: no slot, GITLEAKS_MISSING named, a cron line not required
+        flat = " ".join(row.replace("`", "").split())
+        assert "<path to gitleaks>" not in row and "GOV_MEMAUDIT_GITLEAKS=<" not in flat, f"no gitleaks slot in step 6: {row}"
+        assert "GITLEAKS_MISSING" in row, f"step 6 names GITLEAKS_MISSING: {row}"
+        if "0 21 * * 1" in flat and "memaudit_cron.sh --repo" in flat:
+            assert "<" not in cron_span(row), f"a cron line in step 6 holds no slot: {row}"
+        assert world.crontab_calls() == "" and not os.path.exists(sets_root), "text only"
+        return
     line = cron_span(row)
     names = {expected} | ({os.path.realpath(expected)} if planted else set())
     assert any(f"GOV_MEMAUDIT_GITLEAKS={n} " in line for n in names), f"GOV_MEMAUDIT_GITLEAKS={expected} before the wrapper: {line}"
