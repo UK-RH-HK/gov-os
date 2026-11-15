@@ -715,3 +715,8 @@ cases that pass on the old code are the ones that state what must stay the same)
   candidate's count asked, a path of 0 not read, the label never asked whole); `Method` with 2 nodes at
   `<python-builtins>` (no File or Folder path) is refused by name (counted 100,002, sum 100,000); a (`Method`, `m0.c`)
   piece of 100,001 is refused by name.
+
+## Run 8b, the lead's measures (S28 on the redis copy; the acceptance run's time limit)
+
+- **S28 on the redis copy** (`~/gov-os-runs/W2-88/redis`, A9 by the lead outside the sandbox at f4e882ddb, the reader before R8-2 (a) and item 27; log `.gov-runtime/scratch/lead/log/redis-a9-8b.*`, record `governance/adoption/A9-memory-fabric.md` in the copy): exit 0, ok, A9 14:44.68 wall, peak RSS 838,032 KiB; the code graph 41,086 nodes and 143,008 links, the tool's own totals (the stage refuses any gap); 1,977 pieces read by source path, 0 from the record (a first read); `read_seconds` 493.893. The lead's probes of the real tool that chose the pieces (keyset paging not sound: a string comparison in `WHERE` answers 0 rows silently, functions in `WHERE`, `IN`, `STARTS WITH` and a grouped count by file refused, answers cut by size silently, a whole-graph `ORDER BY` killed the tool) are `.gov-runtime/scratch/lead/log/f1-probe5b.txt` to `f1-probe11.txt`.
+- **`gov accept W2-88` runs with `--timeout 5400`** (the CTO, 2026-11-15): at f4e882ddb the default 1,800 s ran out (`error_kind: timeout`, accept-10) under the night's load, after run 8b's S28 cases added several A9 runs over planted graphs of up to 250,000 links to the folder; run 8's accept at a5144a3ec took about 28 minutes with the default.
