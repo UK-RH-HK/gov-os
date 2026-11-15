@@ -1,9 +1,14 @@
 ---
+type: probe
 task: DAEO-cv58
-decisions: [DEC-1120, DEC-1156, DEC-801, DEC-808, DEC-1010]
-head: 02533b5ebe374f6abb36adcf4102f0b8d1ed596e
-base: 076cded14882b58af148f4493ccc3ed4c4f29750
-role: independent-auditor
+reviewer_session: 8258087c-2fbf-4188-90b0-654376ed6fae
+implementer_session: "6bed9fa7-2e08-41e0-85a8-b867b50bd47c"
+reviewer_wrote_nothing: true
+commissioned_by: orchestrator
+judged_by: orchestrator
+judgement: pass
+probed_commit: 02533b5ebe374f6abb36adcf4102f0b8d1ed596e
+decisions_applied: [DEC-1120, DEC-1156, DEC-801, DEC-808, DEC-1010]
 ---
 # W2-60a (DAEO-cv58): check of the live fixture's effort revision
 
