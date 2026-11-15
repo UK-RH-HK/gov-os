@@ -13,8 +13,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -91,11 +93,16 @@ def test_a_nested_gov_process_with_an_environment_built_anew_lands_in_the_sessio
 def test_a_nested_process_takes_the_nearest_mark_above_the_repository(tmp_path):
     base = tmp_path / "base"
     base.mkdir()
-    named = tmp_path / "s"
-    codeintel.write_mark(base, named)
-    root = _repository(base / "case" / "repo")
-    got = _nested(tmp_path, root, _tools(tmp_path))
-    assert got["seen"] == str(named / _hash(root)) and (named / _hash(root)).is_dir()
+    # A short named folder, so the nested child's socket path fits and the runtime-path fallback leaves the placement
+    # judged (the CTO's P2 under DEC-338); removed with what the child made under it.
+    named = Path(tempfile.mkdtemp(dir="/tmp", prefix="cbm-n-"))
+    try:
+        codeintel.write_mark(base, named)
+        root = _repository(base / "case" / "repo")
+        got = _nested(tmp_path, root, _tools(tmp_path))
+        assert got["seen"] == str(named / _hash(root)) and (named / _hash(root)).is_dir()
+    finally:
+        shutil.rmtree(named, ignore_errors=True)
 
 
 def test_a_mark_this_process_wrote_is_not_followed_here(tmp_path, monkeypatch):
