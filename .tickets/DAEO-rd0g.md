@@ -1,6 +1,6 @@
 ---
 id: DAEO-rd0g
-status: open
+status: in_progress
 deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-r9ss, DAEO-zqvn, DAEO-kl5e, DAEO-h2k3]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -85,3 +85,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-15a), as approved (DEC-729). The list ro
 This ticket has no `wbs_id`: the kernel's grammar (`common.schema.json`, `^W[0-9]+-[0-9]{2,}$`) refuses the letter suffix. Its W2 id is its `external-ref`, which `gov close` reads when `wbs_id` is absent (`src/gov/close/command.py`).
 
 **D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: S1, S5 and S7 (`ff691ec2`, `docs/research/EXP-003/w2-15a-baseline.md`); met in part: S3 (its lighter reranker was not run, not installed); S2, S4 and S6 moved to W2-15b (the cold-rebuild peak RSS moves with S4). The CTO closes it at the lift (P1-13). The numbers above are D9-FATES': S2, S4 and S6 are now under `kpis.moved`, so S3, S5 and S7 are now S2, S3 and S4.
+
+**Claimed 2026-11-15 by the CTO (DEC-1186 (3), DEC-1171 (3); package P-W2-15A-CLOSE):** the close run. A research session (1) rewrites section 2 of `docs/research/EXP-003/w2-15a-baseline.md` as the metric for the current set (40 visible, 39 hidden; W2-61's measure, both figures; pass at 34 of 39 or 35 of 40) and commits it before any new run; (2) records one refused probe of the sets root's hidden folder from its own worktree (a Read of a file that does not exist, the guard's refusal recorded, no content); (3) prepares the record's table from the visible run and the operator's counts. The CTO's visible run and the owner's operator's walled hidden run (counts only, `drafts/w2-15a-close/walled_hidden_counts.sh`) follow at one named head after the re-pin's done, never beside a store rebuild. On a miss: the record as measured, at most three gaps to W2-15b, S1's memory clause re-worded to "recorded against 34 of 39" (DEC-1186 (3)).
