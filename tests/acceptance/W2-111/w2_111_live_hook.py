@@ -1,5 +1,6 @@
-"""Support for W2-111's S9 (the 30 ms drop) and S10 (the 100 ms bound) on the live hook's patched copy (DEC-1187 (1));
-standard library only.
+"""Support for W2-111's S9 and S10 on the live hook's patched copy, judged by DEC-1187 (1)'s own target (every case
+within 100 ms at p95, paired against the applied ACT-GUARD-FIX-6 hook, decisions unchanged, the measured drop recorded;
+S9 amended by P-W2-111-S9-DROP (a), DEC-1157 (12): the 30 ms drop is no longer judged); standard library only.
 
 The interface (the ticket's S9 and S10 lines): the engineer's diff, ``docs/changes/W2-111-live-hook/live-hook.diff``,
 a git-style diff of ``.claude/hooks/`` (paths ``a/.claude/hooks/...``, ``b/...``) against the applied ACT-GUARD-FIX-6
@@ -45,8 +46,7 @@ HOOK_NAME = "pretooluse.py"
 DIFF_REL = "docs/changes/W2-111-live-hook/live-hook.diff"
 BEFORE_SHA256_PREFIX = {"pretooluse.py": "9b4228ea095a", "bash_writes.py": "f03f9ac3e431"}   # ACT-GUARD-FIX-6
 
-BOUND_S = support.BOUND_S          # 100 ms at p95
-DROP_S = 0.030                     # S9: each mapped case at least 30 ms below its before figure
+BOUND_S = support.BOUND_S          # 100 ms at p95 (S9 and S10: DEC-1187 (1)'s target; the drop is recorded, not judged)
 SAMPLES, WARM_UP, ROUNDS = support.SAMPLES, support.WARM_UP, support.ROUNDS
 TICKET = "DAEO-qvff"
 CTO_TICKET = "DAEO-sdxk"
@@ -295,13 +295,14 @@ def make_runner(base):
 @dataclass
 class Paired:
     name: str
-    mapped: bool
+    mapped: bool    # one of the 15 mapped W1-05, W1-02 and W2-57 cases (else a Bash case); judged alike, reported
     rounds: list = field(default_factory=list)   # (before judged, after judged, before wall p95, after wall p95, load)
     decisions: set = field(default_factory=set)  # {(before decision, after decision)}
 
     def round_passes(self, r):
-        before, after = r[0], r[1]
-        return after < BOUND_S and (not self.mapped or before - after >= DROP_S)
+        """DEC-1187 (1)'s target: the after figure under the bound (the decisions are asserted call by call). The drop
+        (before less after) is recorded, never judged: P-W2-111-S9-DROP (a) removed S9's 30 ms clause."""
+        return r[1] < BOUND_S
 
     @property
     def passed(self):
@@ -310,12 +311,13 @@ class Paired:
     def describe(self):
         def ms(i):
             return ", ".join(f"{r[i] * 1000:.1f}" for r in self.rounds)
-        want = (f"after under {BOUND_S * 1000:.0f} ms and at least {DROP_S * 1000:.0f} ms below before"
-                if self.mapped else f"after under {BOUND_S * 1000:.0f} ms")
-        return (f"{self.name}: p95 CPU time of the hook and its children per call less the median CPU time of the "
-                f"reference hook timed beside it, per round (ms): before {ms(0)}; after {ms(1)}; drop "
-                f"{', '.join(f'{(r[0] - r[1]) * 1000:.1f}' for r in self.rounds)}; the judgement: {want} in one "
-                f"round (for information: wall p95 before {ms(2)}, after {ms(3)}; load "
+        kind = "mapped" if self.mapped else "Bash"
+        verdict = "PASS" if self.passed else "FAIL"
+        return (f"{verdict} {self.name} ({kind}): p95 CPU time of the hook and its children per call less the median "
+                f"CPU time of the reference hook timed beside it, per round (ms): before {ms(0)}; after {ms(1)}; "
+                f"drop (recorded, not judged) {', '.join(f'{(r[0] - r[1]) * 1000:.1f}' for r in self.rounds)}; the "
+                f"judgement: after under {BOUND_S * 1000:.0f} ms in one round, every decision the same in both copies "
+                f"(for information: wall p95 before {ms(2)}, after {ms(3)}; load "
                 f"{', '.join(f'{r[4]:.1f}' for r in self.rounds)}; decisions {sorted(self.decisions)})")
 
 
