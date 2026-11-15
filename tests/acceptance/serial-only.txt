@@ -40,6 +40,11 @@ tests/acceptance/W1-18/test_w1_18_deadline.py::test_a_daemon_that_never_becomes_
 tests/acceptance/W1-18/test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call  # serial: latency: the time taken against the hang limit
 tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder  # serial: latency: the check on 60 small files and one large SQLite store within 15 s
 tests/acceptance/W2-13/test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget  # serial: latency: warm p95 of the lexical route, no model, over each dev tier's query set at most 0.5 s (W1-19's budget)
+tests/acceptance/W2-111/test_w2_111_bash_p95.py  # serial: latency: p95 under 100 ms of the hook's own work on an engineer's Bash calls (a plain command, a pipe, a redirect); red only inside the close's parallel phase at load 10 to 20 (rv-3 F2)
+tests/acceptance/W2-111/test_w2_111_many_trees_p95.py  # serial: latency: p95 under 100 ms of the hook's own work on a Read, a Write and a Bash call with 150 worktrees registered (rv-3 F2)
+tests/acceptance/W2-111/test_w2_111_slow_hook.py  # serial: latency: a planted hook doing 150 ms of its own work per call fails each of W2-111's six timing cases, three rounds each (rv-3 F2)
+tests/acceptance/W2-111/test_w2_111_live_hook_diff_p95.py  # serial: latency: the live hook's patched copy within 100 ms at p95 of its own work, paired against the applied hook in the same run (rv-3 F2: red in the parallel phase at load 10 to 20)
+tests/acceptance/W2-111/test_w2_111_live_hook_slow_hook.py  # serial: latency: a planted hook doing 150 ms of its own work per call fails the live-hook case's judgement, paired, three rounds each (rv-3 F2)
 
 # --- race: kept serial in this run
 tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # serial: race: claims raced from separate processes
