@@ -888,3 +888,19 @@ slot, CPU set 13-19 (7 CPUs), the machine shared with other slots; the old form 
   --optin lifted,breadth`: 128 passed (the filter leaves none of them out). The suites around `indexable`
   (`retrieval/test_lexical.py`, `semantic/test_semantic.py`, `impact/test_impact.py`, `gitenv/test_lexical_pinned.py`,
   `rebuild/test_w2_116_integration.py`, `rebuild/test_w2_122_seed.py`, `context/test_bounded.py`): 128 passed.
+
+### The lead's checks of run 9 (2026-11-15, outside the sandbox)
+
+- **The 36,000-file timing** (`.gov-runtime/scratch/lead/time36k.py`): a planted tree of 36,000 small texts in 100
+  folders, every 97th (371) holding a planted secret (W2-81's builders, values built at run time), the record of clean
+  results off, one heavy slot (pool 1). Folder mode at `767e3e87a`: **36,000 files in 37.3 s, 966.0 files a second**,
+  every planted secret file left out, no clean file left out. The one-per-file form (`301708296`): 1,000 sampled files
+  (every 36th) in 608.3 s, 1.64 files a second. **Ratio 587.7**, with the same verdict per file on the sample.
+- **The acceptance cases** of S27 at `d26814f32a0a` (td-19's and td-20's): 38 passed; the 5,000-file case printed 9.4
+  files a second before (500 paths) and 1,421.3 after (5,000 paths), ratio 151.5, pool 6. `gov accept W2-88`: 311
+  passed, 0 failed, 0 skipped; every mapped line pass.
+- **Interface item 5b** (the lead, after the engineer's probe): gitleaks runs in the batch's folder on `.`, because with
+  the folder given as a path the default allowlist dropped every finding under a temporary folder whose path held
+  `node_modules/` or `venv/lib` (exit 0). td-20's case plants exactly that and passes.
+- **The review:** `docs/probes/DAEO-2bdu/PR-DAEO-2bdu-s27.md` (PASS; S27-1, a batch folder left by a scan ended by
+  SIGTERM or SIGKILL, consequence other, brought as a package; R-1 and R-2 proposed as rows).
