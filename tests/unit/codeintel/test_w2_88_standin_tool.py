@@ -8,6 +8,9 @@ it refuses ``IN [...]``, ``STARTS WITH`` and a function in ``WHERE`` other than 
 
 The graph: ``files`` {source path: {link type: links}}; ``bare`` {label: {link type: links}} (links out of nodes with no
 string path); ``labels`` {label: {path: nodes}} (the path ``{}`` stands for a node whose path is no string);
+``labels``' value may instead be a list of the nodes' qualified names; ``edges`` {source path: [[id, source, type,
+target], ...]} gives a path's links one by one (else each generated link's ends are the path's first node, so every
+link's ends are nodes of the graph, as in the real tool);
 ``holders`` {label: {holder path: [file paths]}} (``CONTAINS_FILE``; holder path ``{}`` for a bare holder); ``cut``
 {answer: rows} with answers named ``links:<path>``, ``links:<path>:<type>``, ``list:<label>``, ``holder:<path>``,
 ``nodes:<label>``; ``fail``: a text whose query the tool fails with ``boom``.
@@ -45,24 +48,42 @@ class Graph:
         self.files = config.get("files", {})
         self.bare = config.get("bare", {})
         self.labels = config.get("labels", {})
+        self.edges = config.get("edges", {})
         self.holders = config.get("holders", {})
         self.cut = config.get("cut", {})
         self.fail = config.get("fail")
 
     def links(self, path: str, kind: str | None, by_label: bool = False) -> list[list]:
+        if not by_label and path in self.edges:  # links given one by one: [id, source, type, target]
+            return [list(row) for row in self.edges[path] if kind in (None, row[2])]
         groups = (self.bare if by_label else self.files).get(path, {})
-        return [[f"{path}|{t}|{i}", f"{path}::s{i % 50}", t, f"tgt{i % 97}"]
-                for t, n in sorted(groups.items()) if kind in (None, t) for i in range(n)]
+        end = self.node_of(path, by_label)  # as in a real graph, a link's ends are nodes of the graph
+        return [[f"{path}|{t}|{i}", end, t, end] for t, n in sorted(groups.items()) if kind in (None, t)
+                for i in range(n)]
+
+    def node_of(self, key: str, by_label: bool) -> str:
+        """The first node of the path ``key`` (or, ``by_label``, of the label ``key``); a path no label lists has none."""
+        for label in ([key] if by_label else sorted(self.labels)):
+            for name, path in self.label_nodes(label):
+                if by_label or path == key:
+                    return name
+        return f"{key}::none"
 
     def types(self) -> dict[str, int]:
         found: dict[str, int] = {}
-        for groups in [*self.files.values(), *self.bare.values()]:
-            for kind, n in groups.items():
-                found[kind] = found.get(kind, 0) + n
+        for rows in [*(self.links(p, None) for p in {*self.files, *self.edges}),
+                     *(self.links(label, None, by_label=True) for label in self.bare)]:
+            for row in rows:
+                found[row[2]] = found.get(row[2], 0) + 1
         return found
 
+    def label_nodes(self, label: str) -> list[tuple[str, object]]:
+        """``(qualified name, path)`` of each node of ``label``: a path's value is a count of nodes or their names."""
+        return [(name, {} if path == "{}" else path) for path, held in self.labels.get(label, {}).items()
+                for name in (held if isinstance(held, list) else [f"{label}:{path}:{k}" for k in range(held)])]
+
     def label_paths(self, label: str) -> list:
-        return [({} if path == "{}" else path) for path, n in self.labels.get(label, {}).items() for _ in range(n)]
+        return [path for _name, path in self.label_nodes(label)]
 
     def answer(self, query: str):
         """``(rows, None)``, or ``(None, error text)`` where the tool refuses."""
@@ -94,7 +115,7 @@ class Graph:
         if query == "MATCH (a)-[r]->(b) RETURN count(r)":
             return [[str(sum(self.types().values()))]], None
         if query == "MATCH (n) RETURN n.label, count(n)":
-            return [[label, str(sum(paths.values()))] for label, paths in self.labels.items()], None
+            return [[label, str(len(self.label_nodes(label)))] for label in self.labels], None
         if query == "MATCH (a)-[r:CONTAINS_FILE]->(n:File) RETURN a.label, count(r)":
             return [[label, str(sum(len(files) for files in held.values()))] for label, held in self.holders.items()], None
         m = re.fullmatch(r'MATCH \(a\)-\[r(?::(\w+))?\]->\(b\) WHERE a\.file_path = "([^"]*)" RETURN (.+)', query)
@@ -104,7 +125,8 @@ class Graph:
             if ret == "count(r)":
                 return count(rows), None
             if ret == "type(r), count(r)" and kind is None:
-                return [[k, str(n)] for k, n in sorted(self.files.get(path, {}).items())], None
+                kinds = sorted({row[2] for row in rows})
+                return [[k, str(sum(1 for row in rows if row[2] == k))] for k in kinds], None
             if ret == LINK:
                 return rows, f"links:{path}" + (f":{kind}" if kind else "")
             return None, None
@@ -116,13 +138,14 @@ class Graph:
         m = re.fullmatch(r'MATCH \(n:(\w+)\)(?: WHERE n\.file_path = "([^"]*)")? RETURN (.+)', query)
         if m:
             label, path, ret = m.groups()
-            paths = [p for p in self.label_paths(label) if path is None or p == path]
+            held = [(name, p) for name, p in self.label_nodes(label) if path is None or p == path]
+            paths = [p for _name, p in held]
             if ret == "count(n)":
                 return count(paths), None
             if ret == "n.file_path":
                 return [[p] for p in paths], f"list:{label}"
             if ret == NODE:
-                return [[f"{label}:{p}:{i}", f"n{i}", label, p] for i, p in enumerate(paths)], \
+                return [[name, name.rsplit(".", 1)[-1], label, p] for name, p in held], \
                     (f"nodes:{label}" if path is None else f"nodes:{label}:{path}")
             return None, None
         m = re.fullmatch(r'MATCH \((f|b):(\w+)\)-\[r:CONTAINS_FILE\]->\(n:File\)(?: WHERE f\.file_path = "([^"]*)")? '

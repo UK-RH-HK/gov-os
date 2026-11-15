@@ -444,7 +444,9 @@ def counted(root: Path) -> tuple[int, int] | None:
 
 def read_stats(root: Path) -> dict | None:
     """The last read of ``_graph(root)``: ``pieces_read`` (pieces asked of the tool), ``pieces_from_record`` (files
-    unchanged since the last read, taken from the record) and ``read_seconds`` (its wall time); None before."""
+    unchanged since the last read, taken from the record), ``record_stale`` (the record was found stale and every
+    piece read again: a link it held lost an end, item 25, or its pieces fell short of the total), ``stale_links`` (the
+    held links whose source or target the fresh node read lacks) and ``read_seconds`` (its wall time); None before."""
     return _stats.get(root)
 
 
@@ -463,6 +465,7 @@ class _Reader:
         self.labels = labels
         self.lists: dict[str, list] = {}  # each label's path list, read whole and checked against its count
         self.read = self.taken = 0
+        self.stale = 0  # links the record held whose source or target the fresh node read lacks (item 25)
 
     def rows(self, query: str) -> list[list]:
         return _rows(self.session, query)
@@ -591,22 +594,32 @@ class _Reader:
             raise GraphShort("links out of the source label", label, count, len({str(row[0]) for row in got}))
         return got
 
-    def links(self, paths: list[str]) -> tuple[list[list], dict]:
-        """Every link, each once: the pieces' counts sum to the tool's total and their ids are that many distinct."""
+    def links(self, paths: list[str], known: set | None = None) -> tuple[list[list], dict]:
+        """Every link, each once: the pieces' counts sum to the tool's total and their ids are that many distinct.
+
+        ``known``: the qualified names of the fresh node read. The record stands only while every link it holds for an
+        unchanged file has both ends among them (run 8b item 25, R8-2 (a)); else it is stale and every piece is read
+        again, as with no record (a callee moved or renamed while its caller's file is unchanged)."""
         pieces: dict[str, list[list]] = {}
         fresh: dict[str, dict] = {}
         kept = self.record.get("pieces", {}) if isinstance(self.record.get("pieces"), dict) else {}
+        digests = {path: _digest(self.root, path) for path in paths}
+        held = {path: kept[path]["links"] for path, digest in digests.items()
+                if digest is not None and isinstance(kept.get(path), dict) and kept[path].get("digest") == digest
+                and isinstance(kept[path].get("links"), list)}
+        if known is not None and held:
+            missing = sum(1 for rows in held.values() for row in rows
+                          if not (isinstance(row, list) and len(row) == 4 and row[1] in known and row[3] in known))
+            if missing:
+                self.stale, held = missing, {}
         for path in paths:
-            digest = _digest(self.root, path)
-            old = kept.get(path)
-            if digest is not None and isinstance(old, dict) and old.get("digest") == digest \
-                    and isinstance(old.get("links"), list):
-                pieces[path] = old["links"]
+            if path in held:
+                pieces[path] = held[path]
                 self.taken += 1
             else:
                 pieces[path] = self.path_piece(path)
-            if digest is not None:
-                fresh[path] = {"digest": digest, "links": pieces[path]}
+            if digests[path] is not None:
+                fresh[path] = {"digest": digests[path], "links": pieces[path]}
         for label in sorted(self.labels):
             if self.bare(label):
                 pieces[f"label {label}"] = self.label_piece(label)
@@ -729,8 +742,11 @@ def _graph(root: Path) -> tuple[dict, dict]:
             record = _load_record(root)
             reader = _Reader(session, root, types, labels, record)
             paths = reader.path_lists()
+            found = reader.node_rows()  # the nodes first: the record's links are checked against them (item 25)
+            known = {row[0] for row in found if isinstance(row, list) and row}
             try:
-                links, fresh = reader.links(paths)
+                links, fresh = reader.links(paths, known)
+                stale = bool(reader.stale)
             except GraphShort:
                 if not reader.taken:
                     raise
@@ -738,12 +754,12 @@ def _graph(root: Path) -> tuple[dict, dict]:
                 reader = _Reader(session, root, types, labels, {})
                 reader.lists, reader.read = lists, asked
                 links, fresh = reader.links(paths)
-            found = reader.node_rows()
+                stale = True
     if reader is not None:
         _save_record(root, fresh)
         _counted[root] = (reader.nodes, reader.edges)
-        _stats[root] = {"pieces_read": reader.read, "pieces_from_record": reader.taken,
-                        "read_seconds": round(time.monotonic() - started, 3)}
+        _stats[root] = {"pieces_read": reader.read, "pieces_from_record": reader.taken, "record_stale": stale,
+                        "stale_links": reader.stale, "read_seconds": round(time.monotonic() - started, 3)}
     nodes = {key: {"path": path, "name": name, "label": label} for key, name, label, path in found
              if label not in _PLACES and isinstance(path, str) and path
              and (root / BASE_REL / "files" / path).is_file()}

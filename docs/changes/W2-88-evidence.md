@@ -679,3 +679,22 @@ cases that pass on the old code are the ones that state what must stay the same)
   revised to the four shipped items.
 - **Red by this decided change (not this run's paths):** `tests/unit/adopt/test_w2_187_walls_act.py::test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`
   and `tests/acceptance/W2-187/test_w2_187_s11_cron.py::...[none-on-path]`: both assert the placeholder.
+
+## Run 8b, last round: the CTO's decisions on the narrow check nc-r8-2 (interface items 25, 26)
+
+- **R8-2 (a), item 25 (`src/gov/codeintel/__init__.py`, `_Reader.links`, `_graph`):** the nodes are now read before the
+  links; `links(paths, known)` takes the fresh node read's qualified names. The record stands only while every link it
+  holds for an unchanged file has its source and target among them; else it is stale: no piece is taken from it, every
+  piece is read again as with no record (items 15-17), and the record is rewritten after that read passes.
+  `read_stats` (and so A9's codegraph block, which spreads it) gains `record_stale` (true also where the record's pieces
+  fell short of the total and were read again) and `stale_links` (the held links with a missing end), beside
+  `pieces_from_record: 0`. A refresh whose held links all keep their ends reads only the changed files (item 18).
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_graph.py` (21 cases, 3 new: the callee moved from `b.py` to `c.py`
+  with the same ids and counts gives `c.foo`'s caller, `pieces_from_record` 0, `record_stale` true, `stale_links` 1, all
+  three pieces read again and the record rewritten; a renamed callee; a refresh with every held end present reads only
+  `c.py`, `pieces_from_record` 2). The stand-in `test_w2_88_standin_tool.py` now gives each generated link ends that are
+  nodes of the graph (as in the real tool) and takes links and node names one by one (`edges`, a list under `labels`).
+  The three new cases were red before the reader changed (the rename gave no caller of `code.b.bar`).
+- **R8-1, item 26:** `tests/unit/adopt/test_w2_187_walls_act.py::test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`
+  revised to item 24 (`GITLEAKS_MISSING` named, no `<path to gitleaks>`, no `<...>` slot, no cron line); its name kept
+  (this file and W2-187's evidence cite it); the file's other six cases unchanged (Rewrite-Reason: DEC-893, DEC-1156 (7)).

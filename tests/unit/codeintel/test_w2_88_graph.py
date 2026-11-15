@@ -162,7 +162,74 @@ def test_a_stale_record_is_read_again_whole_never_refused(graph):
     assert codeintel.counted(root) == (8, 21)
 
 
-FOLDERS = {"src": [f"src/s{i}.c" for i in range(20)], "lib": [f"lib/l{i}.c" for i in range(8)]}
+def call_graph(callee: str, home: str, ids: tuple = ("r1", "r2", "r3", "r4")) -> dict:
+    """``a.py``'s ``main`` calls ``callee``, defined in ``home``; the other of ``b.py``/``c.py`` holds ``spare``. Six
+    nodes and four links whatever ``callee`` and ``home`` are, with the same ``id(r)`` values (R8-2's probe)."""
+    other = "c.py" if home == "b.py" else "b.py"
+    stem = {"b.py": "code.b", "c.py": "code.c"}
+    return {"files": {}, "edges": {
+        "a.py": [[ids[0], "code.a.main", "CALLS", callee], [ids[1], "file.a", "DEFINES", "code.a.main"]],
+        home: [[ids[2], f"file.{home[0]}", "DEFINES", callee]],
+        other: [[ids[3], f"file.{other[0]}", "DEFINES", f"{stem[other]}.spare"]]},
+        "labels": {"File": {"a.py": ["file.a"], "b.py": ["file.b"], "c.py": ["file.c"]},
+                   "Function": {"a.py": ["code.a.main"], home: [callee], other: [f"{stem[other]}.spare"]}}}
+
+
+def write_staged(root, files: dict) -> None:
+    for rel, text in files.items():
+        place = root / codeintel.BASE_REL / "files" / rel
+        place.parent.mkdir(parents=True, exist_ok=True)
+        place.write_text(text)
+
+
+def test_a_callee_moved_to_another_file_makes_the_record_stale_and_every_link_is_read_again(graph):
+    """R8-2 (a), item 25: ``foo`` moves from ``b.py`` to ``c.py``, ``a.py`` unchanged, the counts unchanged."""
+    root, planted = graph
+    write_staged(root, {"a.py": "foo()\n", "b.py": "def foo(): ...\n", "c.py": "def spare(): ...\n"})
+    planted(call_graph("code.b.foo", "b.py"))
+    _nodes, users = codeintel._graph(root)
+    assert users["code.b.foo"] == [("code.a.main", "CALLS")]
+    write_staged(root, {"b.py": "def spare(): ...\n", "c.py": "def foo(): ...\n"})  # a.py's digest unchanged
+    asked = planted(call_graph("code.c.foo", "c.py"))
+    nodes, users = codeintel._graph(root)
+    assert users.get("code.c.foo") == [("code.a.main", "CALLS")]
+    assert "code.b.foo" not in users and "code.b.foo" not in nodes
+    stats = codeintel.read_stats(root)
+    assert stats["pieces_from_record"] == 0 and stats["record_stale"] is True and stats["stale_links"] == 1
+    assert codeintel.counted(root) == (6, 4)
+    assert {q.split('"')[1] for q in link_queries(asked())} == {"a.py", "b.py", "c.py"}  # every piece read again
+    rewritten = codeintel.record_path(root).read_text()
+    assert "code.c.foo" in rewritten and "code.b.foo" not in rewritten  # rewritten after the read that passed
+
+
+def test_a_renamed_callee_makes_the_record_stale_and_the_caller_of_the_new_name_is_read(graph):
+    root, planted = graph
+    write_staged(root, {"a.py": "foo()\n", "b.py": "def foo(): ...\n", "c.py": "def spare(): ...\n"})
+    planted(call_graph("code.b.foo", "b.py"))
+    codeintel._graph(root)
+    write_staged(root, {"b.py": "def bar(): ...\n"})
+    planted(call_graph("code.b.bar", "b.py"))
+    _nodes, users = codeintel._graph(root)
+    assert users.get("code.b.bar") == [("code.a.main", "CALLS")] and "code.b.foo" not in users
+    assert codeintel.read_stats(root)["record_stale"] is True
+    assert codeintel.read_stats(root)["pieces_from_record"] == 0
+
+
+def test_a_refresh_whose_held_links_all_keep_their_ends_reads_only_the_changed_files(graph):
+    root, planted = graph
+    write_staged(root, {"a.py": "foo()\n", "b.py": "def foo(): ...\n", "c.py": "def spare(): ...\n"})
+    planted(call_graph("code.b.foo", "b.py"))
+    codeintel._graph(root)
+    write_staged(root, {"c.py": "def spare(): return 1\n"})  # only c.py changed; every end a.py holds still exists
+    asked = planted(call_graph("code.b.foo", "b.py"))
+    _nodes, users = codeintel._graph(root)
+    assert {q.split('"')[1] for q in link_queries(asked())} == {"c.py"}
+    stats = codeintel.read_stats(root)
+    assert stats["pieces_from_record"] == 2 and stats["record_stale"] is False and stats["stale_links"] == 0
+    assert users["code.b.foo"] == [("code.a.main", "CALLS")]
+
+
+FOLDERS = {"src":[f"src/s{i}.c" for i in range(20)], "lib": [f"lib/l{i}.c" for i in range(8)]}
 ROOT_FILES = ["main.c", "util.c"]
 
 
