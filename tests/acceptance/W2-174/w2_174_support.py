@@ -137,6 +137,10 @@ class Repo:
         path.write_text(front_text(ticket_id, w2, status, success, failure, body), encoding="utf-8")
         return path
 
+    def bare(self, ticket_id: str, w2: str, status: str = "open", state_class: bool = True, **fields) -> Path:
+        """A ticket without the six fields (``bare_text``), with the given ones set (``with_fields``)."""
+        return self.raw_ticket(ticket_id, with_fields(bare_text(ticket_id, w2, status, state_class), **fields))
+
     def raw_ticket(self, ticket_id: str, text: str) -> Path:
         path = self.tickets / f"{ticket_id}.md"
         path.write_text(text, encoding="utf-8")
@@ -339,3 +343,76 @@ def marker_invariant(root: Path) -> None:
 
 
 ISO = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+# --- the launch fields (S6, S7, F4; DEC-1188) -----------------------------------------------------------------------
+
+FIELD_NAMES = ("role", "allowed_paths", "kpis", "reads", "needs", "waits_on")  # L10, in this order
+SCHEMAS = REPO / "template/governance/kernel/schemas"
+ROLES = ("orchestrator", "product-spec", "independent-test-designer", "engineer", "independent-auditor", "research")
+
+
+def bare_text(ticket_id: str, w2: str, status: str = "open", state_class: bool = True, body: str | None = None) -> str:
+    """A ticket as ``tk create`` writes it plus the common keys the schema requires (L16), none of the six fields, no
+    ``class`` and no ``non_goals``; a comment sits between keys so a re-dump would lose it."""
+    if body is None:
+        body = f"# {w2} Fixture ticket {w2}\n\nThe adoption's coordination work, written before the product.\n"
+    head = ["---", f"id: {ticket_id}", f"status: {status}", "deps: []", "links: []", f"created: {CREATED_AFTER}",
+            "type: task", "priority: 1", "assignee: operator", f"external-ref: {w2}", "tags:", "- adoption",
+            f"wbs_id: {w2}", f"title: Fixture ticket {w2}", "# a comment between keys that must stay"]
+    if state_class:
+        head.append("state_class: AUTHORITATIVE  # a trailing comment that must stay")
+    return "\n".join([*head, "---"]) + "\n" + body
+
+
+def field_text(name: str, value) -> str:
+    """The YAML text lines of one front-matter field."""
+    return yaml.safe_dump({name: value}, sort_keys=False, allow_unicode=True, width=1000)
+
+
+def with_fields(text: str, **values) -> str:
+    """``text`` with the given fields inserted just before the front matter's closing ``---`` (L10 order)."""
+    lines = text.split("\n")
+    end = lines.index("---", 1)
+    added = "".join(field_text(name, values[name]) for name in FIELD_NAMES if name in values)
+    return "\n".join([*lines[:end], *added.rstrip("\n").split("\n"), *lines[end:]]) if added else text
+
+
+def good_kpis(tag: str = "The widget") -> dict:
+    return {"success": [{"line": f"{tag} prints its name [DEC-1].", "verify": "a unit test runs it and reads what it prints"}],
+            "failure": [{"line": f"{tag} never crashes on an empty name.", "verify": "a unit test feeds an empty name and sees a refusal"}]}
+
+
+def good_fields(role: str = "engineer", tag: str = "The widget") -> dict:
+    """An answer for all six fields that every check accepts."""
+    return {"role": role, "allowed_paths": ["src/widget/**", "tests/unit/widget/**"], "kpis": good_kpis(tag),
+            "reads": ["src/widget/**"], "needs": [], "waits_on": []}
+
+
+def schema_errors(front: dict) -> list[str]:
+    """The errors of ``front`` against the kernel's ticket schema, ``common.schema.json`` resolved (a read of this tree's
+    kernel schemas, the copy ``gov check`` uses)."""
+    import jsonschema
+
+    schema = json.loads((SCHEMAS / "ticket.schema.json").read_text(encoding="utf-8"))
+    common = json.loads((SCHEMAS / "common.schema.json").read_text(encoding="utf-8"))
+    try:
+        from referencing import Registry, Resource
+        from referencing.jsonschema import DRAFT202012
+
+        registry = Registry().with_resource("common.schema.json", Resource.from_contents(common, DRAFT202012))
+        validator = jsonschema.Draft202012Validator(schema, registry=registry)
+    except ImportError:
+        resolver = jsonschema.RefResolver.from_schema(schema, store={"common.schema.json": common})
+        validator = jsonschema.Draft202012Validator(schema, resolver=resolver)
+    instance = json.loads(json.dumps(front, default=str))
+    return [f"/{'/'.join(map(str, error.absolute_path))}: {error.message}" for error in validator.iter_errors(instance)]
+
+
+def refusals_of(root: Path, ticket_id: str) -> list[str]:
+    """``ready_check``'s refusals of one ticket as ``CODE detail`` (the fixtures' ``new_since``)."""
+    from gov.brief.build import Tickets, ready_check
+
+    tickets = Tickets(root)
+    front = tickets.load(root / ".tickets" / f"{ticket_id}.md")[0]
+    return [f"{item['code']} {item['detail']}" for item in ready_check(front, tickets, root, NEW_SINCE)[0]]
