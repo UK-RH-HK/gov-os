@@ -2,12 +2,15 @@
 
 `live-hook.diff` is a diff of `.claude/hooks/` against the bytes applied by ACT-GUARD-FIX-6:
 `pretooluse.py` `9b4228ea095a`, `bash_writes.py` `f03f9ac3e431` and `role_reads.py` `5407aade9417`. The ticket
-never writes `.claude/`; the CTO builds the ACT from this file. After the diff: `pretooluse.py` `665614961cd0`,
-`role_reads.py` `543cf1b26701` and `bash_writes.py` unchanged (`f03f9ac3e431`).
+never writes `.claude/`; the CTO builds the ACT from this file. After the diff (r5, with rv-3's F1 fixed):
+`pretooluse.py` `101bee39d5c9`, `role_reads.py` `543cf1b26701` and `bash_writes.py` unchanged (`f03f9ac3e431`).
+The r5 copy before F1 was `665614961cd0`; only the YAML loader changed since.
 
 Apply it to a clean copy, from the folder that holds `.claude/`: `git apply live-hook.diff` (or `patch -p1 <
-live-hook.diff`). The engineer checked both on fresh copies of the three applied files: `git apply --check -v`
-checked both files, `git apply` applied cleanly, and the result was byte-identical to the measured copy.
+live-hook.diff`). The engineer checked it on fresh copies of the live repository's three applied files (`9b4228ea095a`,
+`f03f9ac3e431`, `5407aade9417`). `git apply --check -v` exited 0 ("Checking patch .claude/hooks/pretooluse.py...",
+"Checking patch .claude/hooks/role_reads.py..."). `git apply` applied cleanly, and the result was byte-identical to
+the measured copy (`101bee39d5c9`).
 
 **Follow-ups for the ACT (outside this ticket's paths):**
 - `tests/unit/guard/test_w2_141_search.py::test_the_staged_pretooluse_adds_only_glob_to_g14s_tools` checks that
@@ -15,22 +18,26 @@ checked both files, `git apply` applied cleanly, and the result was byte-identic
   copy from the patched file the same way, as was done for ACT-GUARD-FIX-6.
 - `role_reads.py` changes, so its `_method()` key (the module's own sha256) changes. The link cache it keys under
   `LINK_CACHE` is filled again once, on the first refusal that reads it. This affects speed only.
+- The W2-111 live-hook acceptance cases (`test_w2_111_live_hook_diff_p95.py`, `test_w2_111_live_hook_slow_hook.py`
+  and the live-hook part of `test_w2_111_yaml_parity.py`; 32 cases) check the before copy against ACT-GUARD-FIX-6's
+  hashes. They fail by design once ACT-GUARD-FIX-7 is applied, and are to be retired or re-pointed then.
 
 ## What changes, and why no decision can change
 
-Line ranges are before → after: pretooluse.py 9b4228ea095a → 665614961cd0, role_reads.py 5407aade9417 →
-543cf1b26701.
+Line ranges are before → after: pretooluse.py 9b4228ea095a → 101bee39d5c9, role_reads.py 5407aade9417 →
+543cf1b26701. r5's F1 fix added 24 lines in the YAML loader, so every pretooluse.py range after line 316 moved down
+by 24 from the 665614961cd0 copy.
 
 | function | lines before → after | what | why the decision is the same | hook-local until 0.1.1 |
 |---|---|---|---|---|
-| `load_yaml_unique`, `use_fast_yaml` (new) | — → 316-347, 350-359 | Parses the YAML the guard reads with libyaml's `CSafeLoader`: the held-out list, the evaluation sets and the hook's three path-map blocks. The pinned names `gov.util.parts.load_yaml_unique` and `gov.guard.heldout.load_yaml_unique` are pointed at it for this hook run. Each text is parsed once per run. | It uses SafeLoader's own constructor and resolver, and the product's duplicate-key check word for word. On any error (a YAML error, a key written twice, no libyaml) the product's own loader runs on the same text, so every refusal and its text are the product's. A stream is read first. Each caller gets a deep copy. Nothing is kept on disk or across calls (one hook process judges one call). Checked equal on 88 distinct texts: every `*.yaml` under `governance/` and `template/` (this tree and the live repository), the tests' fixtures, the planted fixtures, and the four path-map blocks of both maps as the hook slices them. Same data, and the same 8 refusals with the same text. | yes: 0.1.1's `parts.load_yaml_unique` does the same (5532c6f80462) |
-| `_tree_roots` | 395-419 → 446-469 | Builds the runs clones' `.git` list with `runs_gits` instead of 4 globs, and resolves real paths with `realpaths`. | It gives the same list in the same order (see the two rows below). | no |
-| `runs_gits`, `_glob_folders` (new) | — → 498-528 | Exactly `[g for p in ("*/.git", …, "*/*/*/*/.git") for g in glob.glob(join(RUNS, p))]`, with each folder listed once. Before, the first level was listed 4 times, the second 3 and the third 2: about 640 listings on every call. | It follows glob's own rules: dirs only for a `*` with parts after it (`is_dir()` follows links), hidden names left out, `os.path.lexists` for the literal `.git`, the listing order kept, and a folder that cannot be listed gives what was listed. Checked equal to glob on the live `~/gov-os-runs` (55 found), the corpus plant, and a planted edge folder (folder links, a broken `.git` link, a hidden folder, a file named `.git`, a folder that can be entered but not listed, a link loop, too deep). | no |
-| `realpaths` (new) | — → 472-492 | `os.path.realpath` of each tree, with shared folders resolved once. | It is r4's `gov.guard.reads._realpaths`, word for word. Checked equal to `os.path.realpath` on 633 paths: live and planted trees, run clones, links, a broken link, a loop, `..`, `.`, `//`, relative, empty. | could be imported from 0.1.1 |
-| `session_applies` | 638-651 → 747-764 | Reads the main tree's ticket only when the main tree is another tree. | When root and main are the same folder it is the same file: the same names, or the same refusal raised by the first read. | no |
-| `classes` → `tree_part`, `tree_parts` (new) | 764-1233 → 877-1401 (new 1352-1397, 1407-1410) | Makes each tree's hidden part (the judge's `_Part`, and `Narrow`) when a path at, in or above the tree is judged. This is S8's rule, as r4's `gov.guard.reads._TreePart`. | Every answer is the part's own. A path not below the root is in no part of the tree (`rel()` is None, `match(None)` is False). A path not at, in or above the root is at or above none of its literal folders (each at or below the root). `below()` keeps the part's own first test. `held`, `files` and `match` make the part. `getattr(part, "wbs", None)` stays None without making it (no `__getattr__`). The globs are the evaluation sets' and the block's, already checked as text paths (`_paths_ok`), so making a part cannot raise: making it later turns no refusal into an allow. | `TreePart` of `_Part` could be 0.1.1's `_TreePart`; `TreeNarrow` stays (Narrow is the hook's) |
-| `main` | 1386-1545 → 1634-1795 | Calls `use_fast_yaml()`, builds `TreePart`/`TreeNarrow` instead of `_Part`/`Narrow` per tree, and uses the hook's own `has_install`. | As the rows above. | — |
-| `_path_folders`, `has_install` (new) | — → 1535-1598 | The install check with PATH's real folders read only when a download names a target, once per PATH value (S7, r4's `install.py` 143-211). | It is r4's `has_install`, line for line, over the pinned module's own helpers (`_segments`, `_split`, `_head`, `_PKG`, `_SH`, `_uv_install`, `_download_target`: identical in 0.1.0 and 0.1.1). It gives the same answer for every command (r4's review). When the pinned gov has `_path_folders` (0.1.1 on), the product's own is called. | yes |
+| `libyaml_reads_as_python`, `load_yaml_unique`, `use_fast_yaml` (new) | — → 316-325, 328-371, 374-383 | Parses the YAML the guard reads: the held-out list, the evaluation sets and the hook's three path-map blocks. libyaml's `CSafeLoader` parses a text only when `libyaml_reads_as_python` passes it: a str with no tab, no `?` and no BOM after its first character. Every other text goes to the pinned product's own loader (the pure-Python SafeLoader). The pinned names `gov.util.parts.load_yaml_unique` and `gov.guard.heldout.load_yaml_unique` are pointed at it for this hook run. Each text is parsed once per run. | Every answer is the pure SafeLoader's: the same data, or the same refusal (exception type and text). libyaml reads three kinds of text that the pure parser refuses (rv-3 F1): a tab as a separator, a `?` inside a flow item, and a BOM at the start of a later line. Those texts never reach libyaml. Any `?` at all goes to the pure parser, because whether a `?` lies inside a flow cannot be told without scanning. For the other texts libyaml uses SafeLoader's own constructor and resolver, and the product's duplicate-key check word for word. On any error of that parse (a YAML error, a key written twice, no libyaml) the product's own loader runs on the same text. So every refusal and its text are the pure loader's, whichever parser read the text first. A stream is read first and handed to the product's loader as a stream of the same name and text, so the error's mark names the file as the pure loader names it. Each caller gets a deep copy. Nothing is kept on disk or across calls (one hook process judges one call). Checked equal (r5, F1) on 100 distinct texts, each as a text and as an open file: every `*.yaml` under `governance/` and `template/` (126 files, this tree and the live repository), every top-level block of both path maps as the hook slices it, and the planted fixtures (the unit tests' samples, broken texts and the ten divergent texts). Same data, and the same 17 refusals with the same text. A fuzz of 40,000 mutated texts (20,000 inserting tabs, `?`, `? `, BOMs and colons; 20,000 over a wider alphabet: line breaks, flow and block indicators, quotes, anchors, tags, NUL and control characters, NEL, LS, `￾`) gave **0 differences** from the pure loader, in the product and in this copy, as texts and, for every fourth text, as named streams. Raw libyaml without the rule differed on 1,382 of them, and every one held a tab, a `?` or a BOM after the start. | yes: 0.1.1's `parts.load_yaml_unique` does the same (the r5 F1 commit) |
+| `_tree_roots` | 395-419 → 470-493 | Builds the runs clones' `.git` list with `runs_gits` instead of 4 globs, and resolves real paths with `realpaths`. | It gives the same list in the same order (see the two rows below). | no |
+| `runs_gits`, `_glob_folders` (new) | — → 522-552 | Exactly `[g for p in ("*/.git", …, "*/*/*/*/.git") for g in glob.glob(join(RUNS, p))]`, with each folder listed once. Before, the first level was listed 4 times, the second 3 and the third 2: about 640 listings on every call. | It follows glob's own rules: dirs only for a `*` with parts after it (`is_dir()` follows links), hidden names left out, `os.path.lexists` for the literal `.git`, the listing order kept, and a folder that cannot be listed gives what was listed. Checked equal to glob on the live `~/gov-os-runs` (55 found), the corpus plant, and a planted edge folder (folder links, a broken `.git` link, a hidden folder, a file named `.git`, a folder that can be entered but not listed, a link loop, too deep). | no |
+| `realpaths` (new) | — → 496-516 | `os.path.realpath` of each tree, with shared folders resolved once. | It is r4's `gov.guard.reads._realpaths`, word for word. Checked equal to `os.path.realpath` on 633 paths: live and planted trees, run clones, links, a broken link, a loop, `..`, `.`, `//`, relative, empty. | could be imported from 0.1.1 |
+| `session_applies` | 638-651 → 771-788 | Reads the main tree's ticket only when the main tree is another tree. | When root and main are the same folder it is the same file: the same names, or the same refusal raised by the first read. | no |
+| `classes` → `tree_part`, `tree_parts` (new) | 764-1233 → 901-1425 (new 1376-1421, 1431-1434) | Makes each tree's hidden part (the judge's `_Part`, and `Narrow`) when a path at, in or above the tree is judged. This is S8's rule, as r4's `gov.guard.reads._TreePart`. | Every answer is the part's own. A path not below the root is in no part of the tree (`rel()` is None, `match(None)` is False). A path not at, in or above the root is at or above none of its literal folders (each at or below the root). `below()` keeps the part's own first test. `held`, `files` and `match` make the part. `getattr(part, "wbs", None)` stays None without making it (no `__getattr__`). The globs are the evaluation sets' and the block's, already checked as text paths (`_paths_ok`), so making a part cannot raise: making it later turns no refusal into an allow. | `TreePart` of `_Part` could be 0.1.1's `_TreePart`; `TreeNarrow` stays (Narrow is the hook's) |
+| `main` | 1386-1545 → 1658-1819 | Calls `use_fast_yaml()`, builds `TreePart`/`TreeNarrow` instead of `_Part`/`Narrow` per tree, and uses the hook's own `has_install`. | As the rows above. | — |
+| `_path_folders`, `has_install` (new) | — → 1559-1622 | The install check with PATH's real folders read only when a download names a target, once per PATH value (S7, r4's `install.py` 143-211). | It is r4's `has_install`, line for line, over the pinned module's own helpers (`_segments`, `_split`, `_head`, `_PKG`, `_SH`, `_uv_install`, `_download_target`: identical in 0.1.0 and 0.1.1). It gives the same answer for every command (r4's review). When the pinned gov has `_path_folders` (0.1.1 on), the product's own is called. | yes |
 | role_reads `_realpaths` (new), `Judge.trees` | — → 439-461; 443-453 → 468-478 | `trees()` resolves its ~140 trees with shared folders resolved once. | The same code as `realpaths` above (checked equal on the same 633 paths). | no |
 
 Fails closed, as before: any error in the new code (an import, a YAML error, a key written twice, a part that cannot
@@ -38,6 +45,29 @@ be walked) raises inside `main()`, and the top-level handler refuses with the sa
 No cache is written to disk. The per-run memos are dicts inside the one hook process.
 
 ## Proof that no decision changed (F4)
+
+**r5, rv-3's F1 (the copy `101bee39d5c9` and the product's `parts.load_yaml_unique`):**
+
+- **The YAML loader:** the equality check and the 40,000-text fuzz are in the `load_yaml_unique` row above, with 0
+  differences. Through the hook as a process, with an engineer's Read of an ordinary file: each of the ten divergent
+  held-out.yaml texts of `tests/unit/guard/test_w2_111_load.py` is decided the same by the applied copy (the pinned
+  pure loader) and by `101bee39d5c9`. Eight are refused with `could not decide: governance/project/held-out.yaml
+  cannot be read`, and the BOM inside a later line's key and the key written twice give the same answers on both. The
+  copy before the fix (`665614961cd0`) allowed 8 of those 10.
+- **The product corpus**, rebuilt: the committed 1,190 kept calls plus every `decide` call recorded while
+  `tests/unit/guard/` and the acceptance suites of W2-42a, W1-02, W1-05, W2-84, W2-141 and W2-57 ran. That makes
+  3,781 distinct calls (r5's earlier 4,204-call record went with its engineer's sandbox). The calls were replayed on
+  `test_w2_111_plant`'s repository for 4 roles, giving 15,124 answers of `decide`, `policy_refusal` and `has_install`
+  under three `src` trees: the base (`87c7fe8f3`, integrate, the pure loader), the head before the fix (`4466208f2`)
+  and the fix. There are **0 differences** between any two of them (7,108 refused on each). The 1,190 kept calls also
+  equal the committed pre-W2-111 answers.
+- **The live-hook corpus**, the same 3,781 calls through the applied copy and `101bee39d5c9` as processes. It used the
+  settings.json form (the pinned interpreter, `-E`: configuration A), paired per call, for the engineer and the test
+  designer. The plant's path map was given the live repository's `role_paths`, `sets_root_hidden`, `session_hidden` and
+  `write_refused` blocks, plus a held-out list. Of 7,562 decisions there are **0 differences** in exit code, decision,
+  reason and stderr: 5,964 allowed, 1,590 denied and 8 refused by exit 2 on both copies.
+
+**Before r5's F1:**
 
 - **The decision corpus through both copies as processes**, in the settings.json command form (pinned interpreter,
   `-E`: configuration A). The planted repository is `test_w2_111_plant`'s: 155 trees, one nested, one through a link,
@@ -57,6 +87,25 @@ No cache is written to disk. The per-run memos are dicts inside the one hook pro
   in no git tree, and that case uses the hook's own tree.
 
 ## Measured (S10, S9): measure.py's method, paired, the live repository
+
+**r5, after F1 (the copy `101bee39d5c9`), a quick check of 5 cases:** measure.py's method, before (the live
+repository's applied hooks) and after (a clean copy with this diff applied) alternating per sample in the same run,
+each call with its own reference. The live repository was used, with the recorded 46-entry session PATH. Every case is
+within 100 ms with the same decision, in the first round. The live repository's `git status --short` was the same
+before and after.
+
+| case | before judged | after judged | drop | ref median b/a | CPU p95 b/a | wall p95 b/a | decision | load |
+|---|---|---|---|---|---|---|---|---|
+| W1-05 Read-engineer | 83.5 | 61.1 | 22.3 | 15.1/15.1 | 98.6/76.3 | 96.2/74.6 | allow → allow | 3.7-3.3 |
+| W1-05 Write-engineer | 78.6 | 65.5 | 13.1 | 15.5/15.7 | 94.1/81.2 | 92.0/79.3 | allow → allow | 3.3-3.1 |
+| W2-57 test-designer Read ordinary | 78.1 | 63.4 | 14.6 | 15.5/15.4 | 93.6/78.8 | 91.5/77.1 | allow → allow | 3.1-2.8 |
+| Bash ls (engineer) | 94.2 | 71.6 | 22.7 | 15.8/15.7 | 110.1/87.3 | 170.8/87.2 | allow → allow | 2.8-2.6 |
+| Bash pipeline (engineer) | 90.8 | 67.5 | 23.3 | 15.5/15.8 | 106.3/83.3 | 158.9/83.2 | allow → allow | 2.6-2.6 |
+
+The live files parse through libyaml as before: neither `governance/project/held-out.yaml` nor `path-map.yaml` holds
+a tab, a `?` or a BOM.
+
+**Before r5's F1 (the copy `665614961cd0`):**
 
 The method is `~/gov-os-runs/W2-111/gf6-measure/measure.py`'s, copied: the reference hook, the settings command
 through `sh -c`, RUSAGE_CHILDREN deltas, 3 warm-up calls, rounds of 40, judged = nearest-rank p95(CPU) −

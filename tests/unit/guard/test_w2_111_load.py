@@ -1,7 +1,8 @@
 """Builder tests for W2-111 r5 (DEC-1187, S9): a call pays only for the YAML and the imports it needs.
 
-The duplicate-key loader parses through libyaml's CSafeLoader when it is installed and gives the pure-Python loader's
-answer, refusal and text; the held-out list and the evaluation sets are parsed at most once per process for the same
+The duplicate-key loader parses through libyaml's CSafeLoader, when it is installed, only a text with no tab, no ``?``
+and no BOM after the start, and gives the pure-Python loader's answer, refusal and text for every text and stream (the
+live hook's copy in docs/changes/W2-111-live-hook/live-hook.diff too; rv-3 F1); the held-out list and the evaluation sets are parsed at most once per process for the same
 text (a changed file is parsed again; nothing is kept on disk); a call that needs neither parses neither; the read
 rules import the shell parser only for a Bash call. Regression evidence only (DEC-136).
 """
