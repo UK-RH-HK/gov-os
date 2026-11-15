@@ -19,6 +19,7 @@ allowed_paths:
 - src/gov/adopt/command.py
 - src/gov/adopt/facts.py  # the adoption's facts file (DEC-1148 (2), item 4 (a1))
 - tests/unit/adopt/test_w2_174*
+- docs/probes/DAEO-zmo4/**  # [added, DEC-1188: the FULL run's review record]
 reads:
 - src/gov/brief/build.py
 - src/gov/adopt/**
