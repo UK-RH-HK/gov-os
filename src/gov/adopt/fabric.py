@@ -505,16 +505,21 @@ def _memory_class(config: dict, space: str | None) -> str | None:
 
 
 def too_large(exc) -> GovError:
-    """``CODEGRAPH_TOO_LARGE`` for a ``gov.codeintel.GraphTooLarge``: an edge type or node label of the graph that one
-    query of the tool cannot answer under its cap (``details``: ``nodes``, ``edges``, ``cap``, ``tool``, ``kind``)."""
+    """``CODEGRAPH_TOO_LARGE`` for a ``gov.codeintel.GraphTooLarge``: a piece of the graph (a link type inside one
+    source file, a source label, a path list) that no query of the tool answers under its cap (S28; ``details``:
+    ``nodes``, ``edges``, ``cap``, ``tool``, ``kind``, and ``file`` where the piece is inside one)."""
     from gov import codeintel
 
-    why = ("and the tool refused its typed query over the cap all the same" if exc.refused else "over the cap")
+    file = getattr(exc, "file", None)
+    why = ("and the tool refused its query over the cap all the same" if exc.refused else "over the cap")
+    where = f" of the source file {file}" if file is not None else ""
     return GovError("CODEGRAPH_TOO_LARGE", f"the code graph has {exc.nodes} nodes and {exc.edges} edges, and {codeintel.TOOL} "
-                    f"refuses a query whose answer is over its cap of {exc.cap} rows ({exc.cap:,}): gov reads the graph "
-                    f"by edge type and node label, each in its own query, and the {exc.what} {exc.kind} has {exc.count} "
-                    f"rows ({why}), so the graph of this repository cannot be read under the cap; nothing is recorded",
-                    {"nodes": exc.nodes, "edges": exc.edges, "cap": exc.cap, "tool": codeintel.TOOL, "kind": exc.kind})
+                    f"refuses a query whose answer is over its cap of {exc.cap} rows ({exc.cap:,}): gov reads the links "
+                    f"in pieces by source file and, inside a file, by link type, and the {exc.what} {exc.kind}{where} "
+                    f"has {exc.count} rows ({why}), so the graph of this repository cannot be read soundly in pieces "
+                    "under the cap; nothing is recorded",
+                    {"nodes": exc.nodes, "edges": exc.edges, "cap": exc.cap, "tool": codeintel.TOOL, "kind": exc.kind,
+                     **({"file": file} if file is not None else {})})
 
 
 def _stores(run, result: dict) -> dict:
@@ -583,13 +588,14 @@ def _stores(run, result: dict) -> dict:
         else:
             code_r.append({"path": rel, "reason": "secrets" if verdicts.get(rel) == 0 else "not-embedded"})
     nodes = edges = 0
-    unreadable = None
+    unreadable, read = None, {}
     if called_for and code_i:
         try:
             graph, users = codeintel._graph(run.root)
-            # the tool's own counts of the graph read whole (run 8, package 2 (a)); a stand-in of the read gives none
+            # the tool's own counts of the graph read in pieces (S28); a stand-in of the read gives none
             nodes, edges = codeintel.counted(run.root) or (len(graph), sum(len(each) for each in users.values()))
-        except codeintel.GraphTooLarge as exc:  # a type or label over the tool's cap is named as that (S25)
+            read = codeintel.read_stats(run.root) or {}  # pieces read, taken from the record, and the wall time
+        except codeintel.GraphTooLarge as exc:  # a piece over the tool's cap is named as that (S25, S28)
             raise too_large(exc) from exc
         except Exception as exc:  # noqa: BLE001 - a graph that cannot be read is named, never shown as 0 nodes and edges
             unreadable = f"{type(exc).__name__}: {' '.join(str(exc).split())}"
@@ -603,7 +609,7 @@ def _stores(run, result: dict) -> dict:
                     "chunks": n_chunks, "vectors": n_vectors, "binary_held": [rel for rel in vec_i if rel in binary_files],
                     "seconds": timing.get("semantic_s", 0.0)},
         "codegraph": {**base, "judged": len(code_i) + len(code_r), "indexed": code_i, "refused": code_r, "nodes": nodes,
-                      "edges": edges, "seconds": timing.get("codeintel_s", 0.0),
+                      "edges": edges, "seconds": timing.get("codeintel_s", 0.0), **read,
                       **({} if called_for else {"requested": False}),
                       **({"built": False, "error": unreadable} if unreadable else {})},
     }

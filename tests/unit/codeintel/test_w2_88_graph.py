@@ -1,214 +1,241 @@
-"""W2-88 run 8, package 2 (a) (the owner's answer to be recorded as DEC-1183): the code graph is read in pages by type.
+"""W2-88 run 8b, S28 (DEC-1185): the code graph is read in bounded pieces by source path, each link exactly once.
 
-Regression evidence only (DEC-136). ``codebase-memory-mcp`` refuses any query whose whole answer is over 100,000 rows,
-before its own ``offset``/``max_rows`` paging; ``gov.codeintel._graph`` asks the counts first, reads a total under the
-cap whole, else each edge type and each node label with its own match, and checks the rows read against each count.
-``SKIP``/``LIMIT`` is no sound page (the lead's probe) and is never asked. The seam is the tool's answers: a stand-in
-``codebase-memory-mcp`` first on ``PATH`` that speaks MCP over stdio and answers as the real tool does.
+Regression evidence only (DEC-136). ``codebase-memory-mcp`` refuses a query whose whole answer is over 100,000 rows,
+cuts an answer short by its size silently, and answers no sound keyset cursor (the run 8b interface, items 13-14).
+``gov.codeintel._graph`` asks the total by type, the labels and their path lists (each counted first, the File list per
+Folder where it is cut), then one piece a source path by equality, by link type inside a piece cut or over the cap;
+every piece's rows equal its count, the pieces' ids are distinct and sum to the total; a file unchanged since the last
+read is taken from the record. The seam is the tool's answers: the stand-in of ``test_w2_88_standin_tool``.
 """
 from __future__ import annotations
 
-import json
 import os
 import subprocess
-import sys
 
 import pytest
 
 from gov import codeintel
 
-CAP_TEXT = "result exceeded 100k rows — use narrower filters or add LIMIT"
-
-STAND_IN = '''#!%s
-import json, re, sys
-from pathlib import Path
-
-CAP = 100_000
-here = Path(__file__).resolve().parent
-config = json.loads((here / "stand-in.json").read_text())
-if sys.argv[1:2] == ["config"]:
-    sys.exit(0)
-EDGES, LABELS = config["edges"], config["labels"]
-SHORT, REFUSE = config.get("short", {}), config.get("refuse", [])
-
-
-def nodes(label):
-    count = LABELS[label] - SHORT.get(label, 0)
-    return [[f"{label}.{i}", f"n{i}", label, f"f{i %% 7}.c"] for i in range(count)]
-
-
-def edges(kind):
-    count = EDGES[kind] - SHORT.get(kind, 0)
-    return [[f"a{i}", kind, f"b{i}"] for i in range(count)]
-
-
-def answer(query):
-    """Every row of the query's whole answer, or None where the tool refuses it."""
-    whole = None
-    if query == "MATCH (n) RETURN count(n)":
-        return [[str(sum(LABELS.values()) + config.get("unlabelled", 0))]]
-    if query == "MATCH (a)-[r]->(b) RETURN count(r)":
-        return [[str(sum(EDGES.values()) + config.get("untyped", 0))]]
-    if query == "MATCH (a)-[r]->(b) RETURN type(r), count(r)":
-        return [[kind, str(count)] for kind, count in EDGES.items()]
-    if query == "MATCH (n) RETURN n.label, count(n)":
-        return [[label, str(count)] for label, count in LABELS.items()]
-    typed = re.fullmatch(r"MATCH \\(a\\)-\\[r:(\\w+)\\]->\\(b\\) RETURN a.qualified_name, type\\(r\\), b.qualified_name", query)
-    labelled = re.fullmatch(r"MATCH \\(n:(\\w+)\\) RETURN n.qualified_name, n.name, n.label, n.file_path", query)
-    if typed:
-        if typed.group(1) in REFUSE:
-            return None
-        whole = edges(typed.group(1)) if typed.group(1) in EDGES else []
-    elif labelled:
-        if labelled.group(1) in REFUSE:
-            return None
-        whole = nodes(labelled.group(1)) if labelled.group(1) in LABELS else []
-    elif query.startswith("MATCH (a)-[r]->(b) RETURN a.qualified_name"):
-        whole = [row for kind in EDGES for row in edges(kind)]
-    elif query.startswith("MATCH (n) RETURN n.qualified_name"):
-        whole = [row for label in LABELS for row in nodes(label)]
-    if whole is None:
-        return []
-    if " LIMIT " in query or " SKIP " in query:  # no sound page: a short answer, as the lead's probe saw
-        return whole[: len(whole) // 3]
-    return None if len(whole) > CAP else whole
-
-
-for line in sys.stdin:
-    if not line.startswith("{"):
-        continue
-    message = json.loads(line)
-    if "id" not in message:
-        continue
-    if message["method"] == "initialize":
-        result = {"protocolVersion": "2024-11-05", "capabilities": {}, "serverInfo": {"name": "stand-in", "version": "0"}}
-    else:
-        arguments = message["params"]["arguments"]
-        query = arguments.get("query", "")
-        with open(here / "queries.log", "a") as log:
-            log.write(query + "\\n")
-        rows = answer(query)
-        if rows is None:
-            result = {"content": [{"type": "text", "text": %r}], "isError": True}
-        else:
-            at, most = arguments.get("offset", 0), arguments.get("max_rows", 1000)
-            page = rows[at:at + most]
-            result = {"content": [{"type": "text", "text": json.dumps({"rows": page, "has_more": at + most < len(rows)})}],
-                      "isError": False}
-    print(json.dumps({"jsonrpc": "2.0", "id": message["id"], "result": result}), flush=True)
-''' % (sys.executable, CAP_TEXT)
-
-LABELS = {"Function": 30_000, "Variable": 12_000, "File": 900, "Macro": 4_000}
-UNDER = {"CALLS": 45_000, "USAGE": 44_000, "DEFINES": 39_000, "IMPORTS": 2_000}  # 130,000 edges, every type under
+from .test_w2_88_standin_tool import CAP_TEXT, plant
 
 
 @pytest.fixture()
 def graph(tmp_path, monkeypatch):
-    """A repository root and a stand-in tool first on ``PATH``; ``graph(**config)`` plants its answers and returns a
-    reader of the queries it was asked."""
+    """A repository root and a stand-in tool first on ``PATH``; ``graph(config)`` plants its answers and returns a
+    reader of the queries it was asked since."""
     root = tmp_path / "repo"
     root.mkdir()
     subprocess.run(["git", "init", "-q", str(root)], check=True)
     bin_dir = tmp_path / "tool-bin"
-    bin_dir.mkdir()
-    place = bin_dir / codeintel.TOOL
-    place.write_text(STAND_IN)
-    place.chmod(0o755)
     monkeypatch.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
     codeintel._graph.cache_clear()
 
-    def plant(**config):
-        (bin_dir / "stand-in.json").write_text(json.dumps({"labels": LABELS, "edges": UNDER, **config}))
-        (bin_dir / "queries.log").write_text("")
-        return lambda: (bin_dir / "queries.log").read_text().splitlines()
+    def planted(config):
+        log = plant(bin_dir, config)
+        codeintel._graph.cache_clear()
+        return lambda: log.read_text().splitlines()
 
-    yield root, plant
+    yield root, planted
     codeintel._graph.cache_clear()
 
 
-def test_a_graph_over_the_cap_whose_every_type_is_under_is_read_whole_by_type(graph):
-    root, plant = graph
-    asked = plant()
+def files_graph(files: dict, **extra) -> dict:
+    """A graph whose links come out of ``files`` (each path one File node and one Function node)."""
+    return {"files": files, "labels": {"File": {p: 1 for p in files}, "Function": {p: 1 for p in files}}, **extra}
+
+
+def link_queries(queries):
+    return [q for q in queries if "WHERE a.file_path =" in q]
+
+
+def test_one_link_type_of_250000_links_over_files_is_read_whole_each_link_once(graph):
+    root, planted = graph
+    files = {f"src/m{i:02}.c": {"USAGE": 5_000} for i in range(50)}
+    asked = planted(files_graph(files))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (100, 250_000)
+    queries = asked()
+    assert "MATCH (a)-[r:USAGE]->(b) RETURN a.qualified_name, type(r), b.qualified_name" not in queries  # no type whole
+    assert len([q for q in link_queries(queries) if q.endswith("count(r)")]) == 50  # one piece a file
+    assert codeintel.read_stats(root)["pieces_read"] == 50 and codeintel.read_stats(root)["pieces_from_record"] == 0
+
+
+def test_one_file_of_120000_links_in_two_types_is_read_by_type_inside_the_file(graph):
+    root, planted = graph
+    asked = planted(files_graph({"big.c": {"CALLS": 70_000, "USAGE": 50_000}, "small.c": {"CALLS": 3}}))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (4, 120_003)
+    queries = asked()
+    for kind in ("CALLS", "USAGE"):
+        assert f'MATCH (a)-[r:{kind}]->(b) WHERE a.file_path = "big.c" RETURN {codeintel._LINK}' in queries
+    assert f'MATCH (a)-[r]->(b) WHERE a.file_path = "big.c" RETURN {codeintel._LINK}' not in queries  # over the cap
+
+
+def test_a_file_and_type_piece_over_the_cap_is_refused_by_name(graph):
+    root, planted = graph
+    planted(files_graph({"huge.c": {"CALLS": 100_001, "USAGE": 2}}))
+    with pytest.raises(codeintel.GraphTooLarge) as raised:
+        codeintel._graph(root)
+    err = raised.value
+    assert (err.kind, err.file, err.count, err.cap) == ("CALLS", "huge.c", 100_001, codeintel.CAP)
+    assert "huge.c" in str(err) and "CALLS" in str(err) and "100001" in str(err) and codeintel.TOOL in str(err)
+    assert codeintel.counted(root) is None
+
+
+def test_a_file_the_tool_cuts_short_is_read_again_by_type(graph):
+    root, planted = graph
+    asked = planted(files_graph({"a.c": {"CALLS": 30, "USAGE": 20}, "b.c": {"CALLS": 4}}, cut={"links:a.c": 10}))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (4, 54)
+    assert f'MATCH (a)-[r:USAGE]->(b) WHERE a.file_path = "a.c" RETURN {codeintel._LINK}' in asked()
+
+
+def test_a_file_and_type_piece_the_tool_cuts_short_is_refused_with_both_figures(graph):
+    root, planted = graph
+    planted(files_graph({"a.c": {"CALLS": 30, "USAGE": 20}}, cut={"links:a.c": 10, "links:a.c:CALLS": 25}))
+    with pytest.raises(codeintel.GraphShort) as raised:
+        codeintel._graph(root)
+    err = raised.value
+    assert (err.kind, err.file, err.counted, err.read) == ("CALLS", "a.c", 30, 25)
+    assert "a.c" in str(err) and "30" in str(err) and "25" in str(err)
+
+
+def test_a_link_no_piece_holds_is_refused_naming_the_total_and_the_sum(graph):
+    root, planted = graph
+    config = files_graph({"a.c": {"CALLS": 3}})
+    config["files"]["ghost.c"] = {"CALLS": 2}  # links out of a path no label lists: no piece reads them
+    planted(config)
+    with pytest.raises(codeintel.GraphShort) as raised:
+        codeintel._graph(root)
+    assert raised.value.counted == 5 and raised.value.read == 3 and "5" in str(raised.value)
+
+
+def stage(root, files):
+    for rel in files:
+        place = root / codeintel.BASE_REL / "files" / rel
+        place.parent.mkdir(parents=True, exist_ok=True)
+        place.write_text(f"int {rel.replace('/', '_').replace('.', '_')};\n")
+
+
+def test_a_refresh_after_three_changed_files_reads_the_links_of_those_three_only(graph):
+    root, planted = graph
+    files = {f"src/f{i}.c": {"CALLS": 5, "USAGE": 2} for i in range(10)}
+    stage(root, files)
+    planted(files_graph(files))
+    codeintel._graph(root)
+    assert codeintel.record_path(root).is_file()
+    changed = ["src/f1.c", "src/f4.c", "src/f7.c"]
+    for rel in changed:
+        (root / codeintel.BASE_REL / "files" / rel).write_text("int changed;\n")
+    asked = planted(files_graph(files))
+    codeintel._graph(root)
+    asked_paths = {q.split('"')[1] for q in link_queries(asked())}
+    assert asked_paths == set(changed)
+    assert codeintel.counted(root) == (20, 70)
+    assert codeintel.read_stats(root)["pieces_from_record"] == 7
+    assert "MATCH (a)-[r]->(b) RETURN type(r), count(r)" in asked()  # the total is asked every time
+
+
+def test_a_failed_refresh_keeps_the_last_good_record(graph):
+    root, planted = graph
+    files = {f"f{i}.c": {"CALLS": 5} for i in range(4)}
+    stage(root, files)
+    planted(files_graph(files))
+    codeintel._graph(root)
+    good = codeintel.record_path(root).read_bytes()
+    (root / codeintel.BASE_REL / "files" / "f2.c").write_text("int changed;\n")
+    planted(files_graph(files, cut={"links:f2.c": 1, "links:f2.c:CALLS": 1}))
+    with pytest.raises(codeintel.GraphShort):
+        codeintel._graph(root)
+    assert codeintel.record_path(root).read_bytes() == good
+
+
+def test_a_stale_record_is_read_again_whole_never_refused(graph):
+    root, planted = graph
+    files = {f"f{i}.c": {"CALLS": 5} for i in range(4)}
+    stage(root, files)
+    planted(files_graph(files))
+    codeintel._graph(root)
+    files["f0.c"] = {"CALLS": 6}  # an unchanged file whose links the tool now counts otherwise
+    planted(files_graph(files))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (8, 21)
+
+
+FOLDERS = {"src": [f"src/s{i}.c" for i in range(20)], "lib": [f"lib/l{i}.c" for i in range(8)]}
+ROOT_FILES = ["main.c", "util.c"]
+
+
+def folder_graph(**extra) -> dict:
+    every = [f for fs in FOLDERS.values() for f in fs] + ROOT_FILES
+    return {"files": {**{f: {"CALLS": 2} for f in every}, **{d: {"CONTAINS_FILE": len(fs)} for d, fs in FOLDERS.items()}},
+            "bare": {"Branch": {"CONTAINS_FILE": len(ROOT_FILES), "CONTAINS_FOLDER": 2}},
+            "labels": {"File": {f: 1 for f in every}, "Folder": {d: 1 for d in FOLDERS}, "Branch": {"{}": 1}},
+            "holders": {"Folder": FOLDERS, "Branch": {"{}": ROOT_FILES}}, **extra}
+
+
+def test_a_file_list_cut_by_the_size_cut_is_read_per_folder_and_branch(graph):
+    root, planted = graph
+    asked = planted(folder_graph(cut={"list:File": 10}))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (33, 30 * 2 + 28 + 4)
+    queries = asked()
+    assert 'MATCH (f:Folder)-[r:CONTAINS_FILE]->(n:File) WHERE f.file_path = "src" RETURN count(n)' in queries
+    assert "MATCH (b:Branch)-[r:CONTAINS_FILE]->(n:File) RETURN n.file_path" in queries
+    assert "MATCH (a:Branch)-[r]->(b) RETURN count(r)" in queries  # a label with no string path: one piece
+    assert len([q for q in link_queries(queries) if q.endswith("count(r)")]) == 32  # 30 files and 2 folders
+
+
+def test_a_folder_piece_of_the_file_list_cut_is_refused_by_name(graph):
+    root, planted = graph
+    planted(folder_graph(cut={"list:File": 10, "holder:src": 3}))
+    with pytest.raises(codeintel.GraphShort) as raised:
+        codeintel._graph(root)
+    assert raised.value.kind == "src" and raised.value.counted == 20 and raised.value.read == 3
+
+
+def test_the_folder_list_cut_while_the_file_list_is_cut_is_refused_by_name(graph):
+    root, planted = graph
+    planted(folder_graph(cut={"list:File": 10, "list:Folder": 1}))
+    with pytest.raises(codeintel.GraphShort) as raised:
+        codeintel._graph(root)
+    assert raised.value.kind == "Folder" and "Folder" in str(raised.value)
+
+
+def test_a_node_label_the_tool_cuts_is_read_by_path(graph):
+    root, planted = graph
+    asked = planted(files_graph({"a.c": {"CALLS": 1}, "b.c": {"CALLS": 1}}, cut={"nodes:Function": 1}))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (4, 2)
+    assert 'MATCH (n:Function) WHERE n.file_path = "b.c" RETURN n.qualified_name, n.name, n.label, n.file_path' \
+        in asked()
+
+
+def test_no_query_asks_an_unsound_form(graph):
+    root, planted = graph
+    asked = planted(folder_graph(cut={"list:File": 10, "links:src/s1.c": 1}))
+    codeintel._graph(root)
+    for query in asked():
+        assert not any(form in query for form in (" SKIP ", " LIMIT ", " IN ", "STARTS WITH", " > ", "ORDER BY")), query
+        assert "WHERE" not in query or "id(" not in query.split("WHERE")[1].split("RETURN")[0]
+
+
+def test_a_read_that_fails_for_another_reason_keeps_the_tools_text(graph):
+    root, planted = graph
+    planted(files_graph({"a.c": {"CALLS": 1}}, fail='WHERE a.file_path = "a.c" RETURN count(r)'))
+    with pytest.raises(RuntimeError) as raised:
+        codeintel._graph(root)
+    assert "query_graph failed" in str(raised.value) and "boom" in str(raised.value)
+    assert not isinstance(raised.value, (codeintel.GraphShort, codeintel.GraphTooLarge))
+
+
+def test_the_symbols_and_their_users_come_from_the_pieces(graph):
+    root, planted = graph
+    stage(root, ["a.c"])
+    planted(files_graph({"a.c": {"CALLS": 1}}))
     nodes, users = codeintel._graph(root)
-    assert codeintel.counted(root) == (sum(LABELS.values()), sum(UNDER.values()))  # 46,900 and 130,000
-    queries = asked()
-    for kind in UNDER:
-        assert f"MATCH (a)-[r:{kind}]->(b) RETURN a.qualified_name, type(r), b.qualified_name" in queries
-    assert "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name" not in queries  # over the cap whole
-    assert "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path" in queries  # nodes under the cap: whole
-
-
-def test_no_query_asks_skip_or_limit(graph):
-    root, plant = graph
-    asked = plant(labels={"Function": 60_000, "Variable": 50_000})  # nodes over the cap too: read by label
-    codeintel._graph(root)
-    queries = asked()
-    assert queries and not any(" SKIP " in query or " LIMIT " in query for query in queries)
-    for label in ("Function", "Variable"):
-        assert f"MATCH (n:{label}) RETURN n.qualified_name, n.name, n.label, n.file_path" in queries
-    assert codeintel.counted(root) == (110_000, sum(UNDER.values()))
-
-
-def test_a_type_over_the_cap_is_refused_by_name_with_its_count(graph):
-    root, plant = graph
-    plant(edges={**UNDER, "USAGE": 100_001})
-    with pytest.raises(codeintel.GraphTooLarge) as raised:
-        codeintel._graph(root)
-    err = raised.value
-    assert (err.kind, err.count, err.cap) == ("USAGE", 100_001, codeintel.CAP) and err.what == "edge type"
-    assert (err.nodes, err.edges) == (sum(LABELS.values()), sum(UNDER.values()) - 44_000 + 100_001)
-    assert "USAGE" in str(err) and "100001" in str(err) and codeintel.TOOL in str(err)
-    assert codeintel.counted(root) is None  # nothing read is a count
-
-
-def test_a_label_over_the_cap_is_refused_by_name(graph):
-    root, plant = graph
-    plant(labels={**LABELS, "Function": 120_000})
-    with pytest.raises(codeintel.GraphTooLarge) as raised:
-        codeintel._graph(root)
-    assert raised.value.kind == "Function" and raised.value.count == 120_000 and raised.value.what == "node label"
-
-
-def test_a_typed_page_the_tool_still_refuses_is_refused_by_name(graph):
-    root, plant = graph
-    plant(refuse=["CALLS"])
-    with pytest.raises(codeintel.GraphTooLarge) as raised:
-        codeintel._graph(root)
-    assert raised.value.kind == "CALLS" and raised.value.count == 45_000 and raised.value.refused is True
-
-
-def test_a_typed_read_short_of_its_count_refuses_with_both_figures(graph):
-    root, plant = graph
-    plant(short={"DEFINES": 7})
-    with pytest.raises(codeintel.GraphShort) as raised:
-        codeintel._graph(root)
-    err = raised.value
-    assert (err.kind, err.counted, err.read) == ("DEFINES", 39_000, 38_993)
-    assert "DEFINES" in str(err) and "39000" in str(err) and "38993" in str(err)
-
-
-def test_type_counts_short_of_the_total_refuse(graph):
-    root, plant = graph
-    plant(untyped=5)  # five edges the counts by type do not hold: reading by type would miss them
-    with pytest.raises(codeintel.GraphShort) as raised:
-        codeintel._graph(root)
-    assert raised.value.counted == sum(UNDER.values()) + 5 and raised.value.read == sum(UNDER.values())
-
-
-def test_a_whole_read_short_of_its_count_refuses(graph):
-    root, plant = graph
-    plant(edges={"CALLS": 10, "USAGE": 20}, short={"USAGE": 1})  # under the cap: read whole, 29 rows of 30
-    with pytest.raises(codeintel.GraphShort) as raised:
-        codeintel._graph(root)
-    assert raised.value.counted == 30 and raised.value.read == 29
-
-
-def test_a_graph_under_the_cap_is_read_whole_as_today(graph):
-    root, plant = graph
-    asked = plant(labels={"Function": 3}, edges={"CALLS": 2})
-    codeintel._graph(root)
-    assert codeintel.counted(root) == (3, 2)
-    assert "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name" in asked()
+    assert set(nodes) == {"Function:a.c:0"}  # a File node is a place, not a symbol
+    assert codeintel.read_stats(root)["read_seconds"] >= 0
 
 
 def test_a_tool_that_answers_no_count_is_read_whole_as_before_and_gives_no_count(tmp_path, monkeypatch):
@@ -225,10 +252,10 @@ def test_a_tool_that_answers_no_count_is_read_whole_as_before_and_gives_no_count
 
 
 def test_a_tool_error_keeps_the_tools_text(graph):
-    root, plant = graph
-    plant(refuse=["CALLS"])
+    root, planted = graph
+    planted(files_graph({"a.c": {"CALLS": 100_001}}))
     with codeintel._Session(root) as session:
         with pytest.raises(RuntimeError) as raised:
             session.tool("query_graph", project=codeintel.PROJECT, format="json", max_rows=10,
-                         query="MATCH (a)-[r:CALLS]->(b) RETURN a.qualified_name, type(r), b.qualified_name")
-    assert "query_graph failed" in str(raised.value) and "exceeded 100k rows" in str(raised.value)
+                         query=f'MATCH (a)-[r]->(b) WHERE a.file_path = "a.c" RETURN {codeintel._LINK}')
+    assert "query_graph failed" in str(raised.value) and CAP_TEXT.split(" —")[0] in str(raised.value)

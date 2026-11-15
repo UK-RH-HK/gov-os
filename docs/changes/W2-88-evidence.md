@@ -635,3 +635,32 @@ cases that pass on the old code are the ones that state what must stay the same)
   `CODEGRAPH_TOO_LARGE` with `kind` and nothing written; a short typed read is `FABRIC_INCOMPLETE` naming `CALLS`, 40549
   and 40546; a tool that cannot count refuses, never 0. The codeintel cases were run before the change: 10 of 10 red.
 - **Not run here:** A9 on the redis copy (`~/gov-os-runs/W2-88/redis`); the lead re-runs it outside the sandbox.
+
+## Run 8b (2026-11-15; DEC-1185): S28, the code graph read in pieces by source file
+
+- **Built (`src/gov/codeintel/__init__.py`, `_Reader`, `_graph`):** the total from `MATCH (a)-[r]->(b) RETURN type(r), count(r)` summed;
+  the labels (`MATCH (n) RETURN n.label, count(n)`), each label's path list counted first (`MATCH (n:<Label>) RETURN count(n)`)
+  and read (`RETURN n.file_path`) only at or under the cap, its rows checked equal to the count; a File list cut or over
+  the cap is read per holder by equality (`MATCH (f:Folder)-[r:CONTAINS_FILE]->(n:File) WHERE f.file_path = ...`, each
+  piece counted first; a holder with no string path, e.g. Branch, as one piece), the pieces summing to the File count;
+  where no sound piece exists (the holder's list cut, a piece cut or over the cap) it refuses by name. Then one piece a
+  distinct non-empty string path in sorted order (`WHERE a.file_path = "<path>"`, count first, then
+  `id(r), a.qualified_name, type(r), b.qualified_name`); a piece over the cap or cut short is read again by link type
+  inside the file; a (file, type) piece over the cap raises `GraphTooLarge` (`kind` the type, `file`), short of its
+  count `GraphShort` (the file, the type, both figures). A label whose nodes have no string path is one piece by
+  source label. Every piece's ids are distinct; the pieces' counts must sum to the total and their ids be that many
+  distinct, else `GraphShort` naming the total, the sum, the pieces read twice and the labels whose paths leave a gap.
+  Nodes are read by label, each checked against its count; a label cut or over the cap by its paths, by equality.
+  No query asks `SKIP`, `LIMIT`, `IN`, `STARTS WITH`, a string `>` or a function in `WHERE`.
+- **Refresh:** `codeintel.record_path(root)` (`home(root)/gov-links.json`) keeps each source path's content digest (of
+  the staged file, or a staged folder's listing) and its links, no file text; kept across `index`. A path whose digest
+  is unchanged is taken from the record with no query; the total is asked every time. A refresh whose pieces do not
+  sum to the total is read again whole without the record before any refusal. The record is written only after a read
+  passes (a failed read leaves the last good one).
+- **Built (`src/gov/adopt/fabric.py`):** `too_large` names the file and the type (`details.file`); A9's codegraph record
+  holds `pieces_read`, `pieces_from_record` and `read_seconds` (`codeintel.read_stats`).
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_graph.py` (18 cases; stand-in `test_w2_88_standin_tool.py` as items
+  13-14 say the tool behaves) and `tests/unit/adopt/test_w2_88_f1.py` (7 cases). The reader was written before its
+  tests in this run; the tests were then checked against three mutated readers (no type split, no record, no total
+  check): each mutation is caught (3, 1 and 1 cases red).
+- **Not run here:** A9 on the redis copy and its wall time; the lead re-runs it outside the sandbox.
