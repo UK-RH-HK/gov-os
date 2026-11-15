@@ -1,7 +1,7 @@
 diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
 --- a/.claude/hooks/pretooluse.py
 +++ b/.claude/hooks/pretooluse.py
-@@ -308,6 +308,57 @@
+@@ -308,6 +308,81 @@
              reads.RUNTIME_REFUSAL: "2-listing"}.get(why, "2-judge")
  
  
@@ -10,34 +10,58 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
 +_YAML = {"product": None, "seen": {}}  # the product's own loader, and this call's answers by their text
 +
 +
++def libyaml_reads_as_python(text):
++    """Whether libyaml's parser is taken for *text* (W2-111, P-W2-111-R5-ROWS (a)): a str with no tab, no ``?`` and no
++    BOM after its first character. libyaml reads three kinds of text the pure-Python parser refuses (rv-3 F1): a tab
++    as a separator (inside or after a value, after ``key:``), a ``?`` inside a flow item (``[a? b]``, ``[a?b]``: in a
++    flow the pure scanner ends a plain scalar at any ``?`` and takes it as a key indicator) and a BOM at the start of
++    a later line (libyaml skips it; the pure scanner only at the first character). Whether a ``?`` lies in a flow
++    cannot be told without scanning, so any ``?`` takes the pure parser; so does a byte string. The product's
++    gov.util.parts.libyaml_reads_as_python, word for word."""
++    return (isinstance(text, str) and "\t" not in text and "?" not in text
++            and "﻿" not in text[1:])
++
++
 +def load_yaml_unique(stream):
-+    """W2-111 (DEC-1187): gov.util.parts.load_yaml_unique's answer (yaml.safe_load that refuses a mapping with a key
-+    written twice), parsed by libyaml's CSafeLoader when it is installed (the pure-Python SafeLoader took 30 ms of
-+    every call). The constructor and the resolver are SafeLoader's own; the check of a key written twice is the
-+    product's, word for word. On any error of that parse (a YAML error, a key written twice, no libyaml) the
-+    product's own loader is run on the same text, so a refusal and its text are the product's, never this one's. A
-+    stream is read first (its text is what the product's loader read). Each text is parsed once per hook run (one run
-+    judges one call; nothing is kept on disk or across calls), and each caller gets its own copy.
++    """W2-111 (DEC-1187, P-W2-111-R5-ROWS (a)): the pure-Python SafeLoader's answer with the check of a key written
++    twice (the pinned product's loader), the same data or the same refusal with its text. A text
++    ``libyaml_reads_as_python`` passes is parsed by libyaml's CSafeLoader when it is installed (the pure-Python
++    SafeLoader took 30 ms of every call); its constructor and resolver are SafeLoader's own and the check of a key
++    written twice is the product's, word for word. Any other text, and any text whose libyaml parse raises (a YAML
++    error, a key written twice, no libyaml), is given to the product's own loader, so every refusal and its text are
++    the pure loader's, never this one's. A stream is read first and given to the product's loader as a stream of the
++    same name and text (the pure loader names a stream's file in its error's mark). Each text is parsed once per hook
++    run (one run judges one call; nothing is kept on disk or across calls), and each caller gets its own copy.
 +    Hook-local until 0.1.1: the product's loader does the same from 0.1.1 on (gov.util.parts, W2-111)."""
 +    import copy
 +    text = stream.read() if hasattr(stream, "read") else stream
 +    seen = _YAML["seen"]
 +    key = (type(text), text) if isinstance(text, (str, bytes)) else None
 +    if key is None or key not in seen:
-+        try:
-+            import yaml
++        done = False
++        if libyaml_reads_as_python(text):
++            try:
++                import yaml
 +
-+            class Loader(yaml.CSafeLoader):
-+                def construct_mapping(self, node, deep=False):
-+                    mapping = super().construct_mapping(node, deep=deep)
-+                    if len(mapping) != len(node.value):
-+                        raise yaml.constructor.ConstructorError(
-+                            None, None, "a key is written twice", node.start_mark)
-+                    return mapping
++                class Loader(yaml.CSafeLoader):
++                    def construct_mapping(self, node, deep=False):
++                        mapping = super().construct_mapping(node, deep=deep)
++                        if len(mapping) != len(node.value):
++                            raise yaml.constructor.ConstructorError(
++                                None, None, "a key is written twice", node.start_mark)
++                        return mapping
 +
-+            data = yaml.load(text, Loader=Loader)
-+        except Exception:
-+            data = _YAML["product"](text)  # the product's answer, or its own error
++                data, done = yaml.load(text, Loader=Loader), True
++            except Exception:
++                pass  # the product's answer, or its own error, below
++        if not done:
++            again = text
++            if text is not stream:  # a stream: the same text again, under the stream's name
++                import io
++                again = io.BytesIO(text) if isinstance(text, bytes) else io.StringIO(text)
++                if hasattr(stream, "name"):
++                    again.name = stream.name
++            data = _YAML["product"](again)
 +        if key is None:
 +            return data
 +        seen[key] = data
@@ -59,7 +83,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
  def parse_both(parse, command, cwd):
      """The product's parser on a command it is to read as before this fix, and, when the command continues a line
      with a backslash-newline, on the text with each one removed too (ACT-GUARD-FIX-3 round 2): the targets of both,
-@@ -399,7 +450,7 @@
+@@ -399,7 +474,7 @@
          try:
              out = subprocess.run(["git", "-C", repo, "worktree", "list", "--porcelain"], capture_output=True,
                                   text=True, timeout=5).stdout
@@ -68,7 +92,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
          except Exception:
              return []
  
-@@ -414,11 +465,69 @@
+@@ -414,11 +489,69 @@
              roots += [os.path.realpath(origin)] + worktrees(origin)
      except Exception:
          pass
@@ -140,7 +164,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
  def review_may_write(path, root, cwd, made=()):
      """Rule 5: a reviewer's or auditor's write lands only in its record paths, its own scratch, or /tmp. A record
      folder itself only when the command makes it (``made``: mkdir's folders, none of them deleted; ACT-GUARD-FIX-4),
-@@ -647,7 +756,11 @@
+@@ -647,7 +780,11 @@
      if not ticket:
          return False
      from gov.guard import reads
@@ -153,7 +177,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
      return bool(names & set(tickets))
  
  
-@@ -1229,10 +1342,74 @@
+@@ -1229,10 +1366,74 @@
                  raise PolicyError(_REV_FAULT) from None
              return None if out.returncode else out.stdout
  
@@ -228,7 +252,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
  def inside(path, folder):
      return path == folder or path.startswith(folder.rstrip("/") + "/")
  
-@@ -1350,6 +1527,77 @@
+@@ -1350,6 +1551,77 @@
      return None
  
  
@@ -306,7 +330,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
  def answer(decision, reason, rule):
      record(decision, rule)  # ACT-GUARD-CALLLOG-1: never raises, never changes the decision
      out = {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": decision,
-@@ -1397,6 +1645,7 @@
+@@ -1397,6 +1669,7 @@
      ticket = os.environ.get("GOV_TICKET")
      from gov.guard import reads
      from gov.guard.heldout import load_held_out, names_held_out
@@ -314,7 +338,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
      acting = reads.acting_role(role, data.get("agent_type"))
      command = tin.get("command") if tool == "Bash" and isinstance(tin.get("command"), str) else None
  
-@@ -1410,11 +1659,12 @@
+@@ -1410,11 +1683,12 @@
  
      # Rules 2 and 3, the hidden half and secrets: the product's read judge with only these parts.
      SetsRoot, Judge, Narrow = classes()
@@ -328,7 +352,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
      # DEC-1082 (3): the sets root outside the repository. The main tree's block names the root, its globs and the roles
      # refused them. To those globs are added the hidden globs of each set that measures the role, from the main tree's
      # map (an older branch's map cannot drop a set). They are refused under the sets root and in every tree.
-@@ -1429,7 +1679,7 @@
+@@ -1429,7 +1703,7 @@
          outside = list(dict.fromkeys(outside))
          if outside:
              sets_parts = [SetsRoot(top, outside, reads.HIDDEN_REFUSAL)] + \
@@ -337,7 +361,7 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
      parts += sets_parts
      seen = tin
      if command is not None:
-@@ -1529,7 +1779,7 @@
+@@ -1529,7 +1803,7 @@
  
      # Rule 4, installs.
      if tool == "Bash":

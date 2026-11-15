@@ -57,27 +57,60 @@ def _unique_loader(yaml, base):
     return loader
 
 
+def libyaml_reads_as_python(text) -> bool:
+    """Whether libyaml's parser is taken for *text* (W2-111, P-W2-111-R5-ROWS
+    (a)): a str with no tab, no ``?`` and no BOM after its first character.
+
+    libyaml reads three kinds of text that the pure-Python parser refuses
+    (rv-3 F1): a tab as a separator (inside or after a value, after
+    ``key:``), a ``?`` inside a flow item (``[a? b]``, ``[a?b]``: in a flow
+    the pure scanner ends a plain scalar at any ``?`` and takes it as a key
+    indicator) and a BOM at the start of a later line (libyaml skips it;
+    the pure scanner skips one only at the first character).  Whether a
+    ``?`` lies in a flow cannot be told without scanning, so any ``?``
+    takes the pure parser; so does a byte string (its encoding is the
+    parser's to work out)."""
+    return (isinstance(text, str) and "\t" not in text and "?" not in text
+            and "﻿" not in text[1:])
+
+
+def _as_stream(text, stream):
+    """*text*, read from *stream*, as a stream again under *stream*'s name:
+    the pure loader names a stream's file in its error's mark (and quotes
+    no line of it), so its refusal is the one it gives for *stream*."""
+    import io
+
+    again = io.BytesIO(text) if isinstance(text, bytes) else io.StringIO(text)
+    if hasattr(stream, "name"):
+        again.name = stream.name
+    return again
+
+
 def load_yaml_unique(stream):
     """yaml.safe_load that refuses a mapping with a key written twice:
     a reader that kept the last value would drop the first without a word.
 
-    W2-111 (DEC-1187): parsed by libyaml's CSafeLoader when it is installed
-    (SafeLoader's own constructor and resolver over the C parser; the
-    pure-Python parser took most of a guard call).  On any error of that
-    parse the pure-Python SafeLoader runs on the same text, so a refusal
-    (a key written twice, a YAML error) and its text are SafeLoader's.  A
-    stream is read first."""
+    W2-111 (DEC-1187, P-W2-111-R5-ROWS (a)): every answer is the pure-Python
+    SafeLoader's, the same data or the same refusal with its text.  A text
+    ``libyaml_reads_as_python`` passes is parsed by libyaml's CSafeLoader
+    when it is installed (SafeLoader's own constructor and resolver over the
+    C parser; the pure-Python parser took most of a guard call); any other
+    text, and any text whose libyaml parse raises, is parsed by the
+    pure-Python SafeLoader, so every refusal is the pure loader's own.  A
+    stream is read first, and given to the pure loader as a stream of the
+    same name and text."""
     import yaml
 
-    if hasattr(stream, "read"):
-        stream = stream.read()
+    text = stream.read() if hasattr(stream, "read") else stream
     fast = getattr(yaml, "CSafeLoader", None)
-    if fast is not None:
+    if fast is not None and libyaml_reads_as_python(text):
         try:
-            return yaml.load(stream, Loader=_unique_loader(yaml, fast))
+            return yaml.load(text, Loader=_unique_loader(yaml, fast))
         except Exception:
             pass  # SafeLoader's own answer, or its own error, below
-    return yaml.load(stream, Loader=_unique_loader(yaml, yaml.SafeLoader))
+    if text is not stream:
+        text = _as_stream(text, stream)
+    return yaml.load(text, Loader=_unique_loader(yaml, yaml.SafeLoader))
 
 
 class _Glob:

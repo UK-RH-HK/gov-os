@@ -131,6 +131,118 @@ def test_the_loader_parses_through_libyaml_when_it_is_installed(parses):
     assert parses and all(issubclass(loader, yaml.CSafeLoader) for _kind, loader in parses)
 
 
+# -- the texts libyaml reads and the pure SafeLoader refuses (rv-3 F1, P-W2-111-R5-ROWS (a)) ----------------------
+
+# Each one libyaml's CSafeLoader reads (or reads differently) and the pure-Python SafeLoader refuses: a held-out.yaml
+# written so must stop every call (DEC-218), as it did before W2-111.
+DIVERGENT = {
+    "tab-inside-an-entry": "held_out_paths:\n- /material/held\tmat\n",
+    "tab-after-an-entry": "held_out_paths:\n- /material/held\t\n",
+    "tab-after-the-key": "held_out_paths:\t\n- /material/held\n",
+    "tab-after-the-key-flow": "held_out_paths:\t[/material/held]\n",
+    "question-in-a-flow-item": "held_out_paths: [/material/held? mat]\n",
+    "question-glued-in-a-flow-item": "held_out_paths: [/material/held?mat]\n",
+    "question-in-a-flow-key": "{held_out_paths?x: [/material/held]}\n",
+    "bom-after-a-line-break": "held_out_paths:\n﻿- /material/held\n",
+    "bom-before-the-second-key": "held_out_paths: [/material/held]\n﻿other: 1\n",
+    "key-written-twice": "held_out_paths: [/a]\nheld_out_paths: [/b]\n",
+}
+
+
+def file_outcome(load, path):
+    with open(path, encoding="utf-8") as stream:
+        return outcome(load, stream)
+
+
+@pytest.mark.parametrize("name", DIVERGENT)
+def test_a_text_libyaml_reads_differently_gets_the_pure_loaders_answer(name):
+    text = DIVERGENT[name]
+    want = outcome(python_loader, text)
+    assert outcome(parts.load_yaml_unique, text) == want
+    if name != "bom-before-the-second-key":  # the pure loader reads this BOM as the key's first character
+        assert want[0] != "ok"
+
+
+@pytest.mark.parametrize("name", DIVERGENT)
+def test_a_file_libyaml_reads_differently_gets_the_pure_loaders_answer_with_the_files_name(name, tmp_path):
+    f = tmp_path / "held-out.yaml"
+    f.write_text(DIVERGENT[name], encoding="utf-8")
+    want = file_outcome(python_loader, f)
+    assert file_outcome(parts.load_yaml_unique, f) == want
+    if want[0] != "ok":
+        assert str(f) in want[1]
+
+
+def test_a_stream_with_no_name_is_refused_as_the_pure_loader_refuses_it():
+    import io
+    text = DIVERGENT["key-written-twice"]
+    assert outcome(parts.load_yaml_unique, io.StringIO(text)) == outcome(python_loader, io.StringIO(text))
+
+
+def test_a_byte_stream_is_refused_as_the_pure_loader_refuses_it(tmp_path):
+    f = tmp_path / "held-out.yaml"
+    f.write_bytes(DIVERGENT["tab-after-an-entry"].encode())
+
+    def run(load):
+        with open(f, "rb") as stream:
+            return outcome(load, stream)
+    assert run(parts.load_yaml_unique) == run(python_loader)
+
+
+@pytest.mark.parametrize("name", ["tab-after-an-entry", "question-in-a-flow-item", "bom-after-a-line-break"])
+def test_a_held_out_file_libyaml_would_read_still_stops_the_call(project, name):
+    (project / "governance/project/held-out.yaml").write_text(DIVERGENT[name])
+    with pytest.raises(heldout.HeldOutError):
+        heldout.load_held_out(str(project))
+    verdict, why = decide("Read", {"file_path": str(project / "README.md")}, str(project), "engineer",
+                          "DAEO-zz91", None, str(project))[:2]
+    assert verdict == "deny" and "held-out.yaml cannot be read" in why
+
+
+# -- the live hook's copy (docs/changes/W2-111-live-hook/live-hook.diff) ----------------------------------------
+
+@pytest.fixture(scope="module")
+def patched_hook(tmp_path_factory):
+    """The applied hooks (ACT-GUARD-FIX-6's bytes, this tree's .claude/hooks/) with the diff applied, imported."""
+    import importlib.util
+    import shutil
+    base = tmp_path_factory.mktemp("hook")
+    (base / ".claude/hooks").mkdir(parents=True)
+    for name in ("pretooluse.py", "bash_writes.py", "role_reads.py"):
+        shutil.copy(REPO / ".claude/hooks" / name, base / ".claude/hooks" / name)
+    subprocess.run(["git", "apply", str(REPO / "docs/changes/W2-111-live-hook/live-hook.diff")], cwd=base,
+                   check=True, capture_output=True)
+    spec = importlib.util.spec_from_file_location("w2_111_patched_pretooluse", base / ".claude/hooks/pretooluse.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@pytest.fixture
+def hook_loader(patched_hook, monkeypatch):
+    """The patched copy's loader, its fallback the pinned 0.1.0 product's loader (the pure SafeLoader's)."""
+    monkeypatch.setitem(patched_hook._YAML, "product", python_loader)
+    monkeypatch.setitem(patched_hook._YAML, "seen", {})
+    return patched_hook.load_yaml_unique
+
+
+@pytest.mark.parametrize("name", DIVERGENT)
+def test_the_live_hooks_copy_gives_the_pure_loaders_answer_for_a_text(hook_loader, name):
+    assert outcome(hook_loader, DIVERGENT[name]) == outcome(python_loader, DIVERGENT[name])
+
+
+@pytest.mark.parametrize("name", DIVERGENT)
+def test_the_live_hooks_copy_gives_the_pure_loaders_answer_for_a_file(hook_loader, name, tmp_path):
+    f = tmp_path / "held-out.yaml"
+    f.write_text(DIVERGENT[name], encoding="utf-8")
+    assert file_outcome(hook_loader, f) == file_outcome(python_loader, f)
+
+
+@pytest.mark.parametrize("text", SAMPLES)
+def test_the_live_hooks_copy_gives_the_pure_loaders_data(hook_loader, text):
+    assert outcome(hook_loader, text) == outcome(python_loader, text)
+
+
 # -- the held-out list -----------------------------------------------------------------------------------------
 
 def test_the_held_out_list_is_parsed_once_for_the_same_text(project, parses):
