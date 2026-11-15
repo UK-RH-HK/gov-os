@@ -1,6 +1,6 @@
 # W2-88 acceptance tests: memory for any repository (the assessment, the plan, A9 lite, the store layout)
 
-Ticket `DAEO-2bdu` (W2-88), profile FULL, class C2. **Run 8 (DEC-1183: P-W2-88-S27-1 (b), packages 1 (a) and 2 (a))** on the base `0821e8514`: "Run 8 revisions" at the end (`test_w2_88_p1_shipped_bytes.py` new; `test_w2_88_p1_installed.py`, `test_w2_88_f1_codegraph.py`, `standin_f1/tool.py`, `test_w2_88_scan_speed.py` revised). **Run 7 (the reopen of 2026-11-14, DEC-1178 (3)(b), (4): S24 to S27)** on the base `a23678e27`: four modules in "Run 7 revisions" below (`test_w2_88_p1_installed.py`, `test_w2_88_f1_codegraph.py`, `test_w2_88_f3_ignored.py`, `test_w2_88_scan_speed.py`; helpers `shipped_child.py`, `import_child.py`, `scan_driver.py`, `standin_f1/`); every other case stands. **Run 6 (the narrow check's NC-1 and NC-2, P1-W2-88-NC-1 (a))** on the base `01ec6d2a7`: three cases in "Run 6 revisions" below (`test_w2_88_nc1_commit.py`, `standin_nc1/`, `standin_nc2/`); every other case stands. **Run 5 (review round 2's RV2-1 and RV2-2, P1-W2-88-RV2-1 (a))** on the base `a15de913e8c4`: the cases are in
+Ticket `DAEO-2bdu` (W2-88), profile FULL, class C2 (run 9: C3, the secrets filter). **Run 9 (DEC-1183 (2): S27's folder mode)** on the base `301708296`: "Run 9 revisions" at the end (`test_w2_88_scan_folder.py` and `w2_88_scan_support.py` new; `test_w2_88_scan_speed.py` and `scan_driver.py` revised). **Run 8 (DEC-1183: P-W2-88-S27-1 (b), packages 1 (a) and 2 (a))** on the base `0821e8514`: "Run 8 revisions" at the end (`test_w2_88_p1_shipped_bytes.py` new; `test_w2_88_p1_installed.py`, `test_w2_88_f1_codegraph.py`, `standin_f1/tool.py`, `test_w2_88_scan_speed.py` revised). **Run 7 (the reopen of 2026-11-14, DEC-1178 (3)(b), (4): S24 to S27)** on the base `a23678e27`: four modules in "Run 7 revisions" below (`test_w2_88_p1_installed.py`, `test_w2_88_f1_codegraph.py`, `test_w2_88_f3_ignored.py`, `test_w2_88_scan_speed.py`; helpers `shipped_child.py`, `import_child.py`, `scan_driver.py`, `standin_f1/`); every other case stands. **Run 6 (the narrow check's NC-1 and NC-2, P1-W2-88-NC-1 (a))** on the base `01ec6d2a7`: three cases in "Run 6 revisions" below (`test_w2_88_nc1_commit.py`, `standin_nc1/`, `standin_nc2/`); every other case stands. **Run 5 (review round 2's RV2-1 and RV2-2, P1-W2-88-RV2-1 (a))** on the base `a15de913e8c4`: the cases are in
 "Run 5 revisions" below (`test_w2_88_rv2_undo.py`, `standin_rv2/`, two cases in `test_w2_88_s2_plan.py`); every other case stands as run 4 wrote it. **Run 4 (td-3, one narrow revision, 2026-11-13)** on the base `b1fe858ac` (the ticket
 branch's head with P-W2-88-B-1 decided, DEC-1157 (3), (12), after review round 1 failed): B-1.1 + B-1.3 (A9's copy step, S16), B-1.2 (the reranker
 and the bundle are the pin's constants, S11/F7), B-1.4 (the pool is the whole shipped block), B-1.5 (the secrets scan not run, S2), RV1-2 (a vector scan
@@ -624,3 +624,89 @@ tool again, serve every planted link's `id(r)` (a distinct-id count equal to the
 stays S28 (e)'s cases, unchanged.
 
 **Revised after the lead's verify at `b817f604c` (`Rewrite-Reason: DEC-1185`; node id unchanged):** `test_w2_88_f1_codegraph.py::test_s25_real_redis_copy_a9_is_ok_or_names_the_cause` (`real`, not in the map) now runs A9 with `adoption.a9`'s own call (the same arguments and session `adopter-w2-124`) but a limit of 2,400 s instead of W2-124's `COMMAND_TIMEOUT_S` of 240 s, since under S28 A9 on redis completes, in 8 to 15 minutes. If A9 does not end within that limit, the case fails by saying so. Every other assertion is kept, and the docstring now says the copy is at its latest adoption commit (it holds the lead's two A9 runs).
+
+## Run 9 revisions (DEC-1183 (2); base 301708296)
+
+S27's folder mode as its own round (each batch's texts written to a private temporary folder outside the repository, one `gitleaks dir` per batch and rule set, each
+finding naming its own file). Written from the ticket's S27 line, its reopen paragraphs of 2026-11-14 and 2026-11-15 05:20, DEC-1183 (1) and (2), the lead's run 9
+interface (items 1-10) and P1R-1 (`docs/probes/DAEO-2bdu/PR-DAEO-2bdu-p1.md`, "Findings"), before the fix, never from the engineer's tree (DEC-820: nothing of
+`/home/usain/gov-os-worktrees/W2-88` was read). This tree's own `src` (`301708296`, the one-per-file form again since run 8) was read for the public names and the
+form of the scan only. **The oracle** of every verdict case is the one-per-file form of `a23678e27` (`git archive` of `src`, run by `scan_driver.py`, as run 7's
+cases), on a copy of the tree of its own; the red list below is this tree's `src` run as "after". Secrets are built from parts in each case's memory (W2-81's
+builder; the private-key header is joined from parts too); no secret-shaped string is committed, none printed.
+
+**Helpers.** `w2_88_scan_support.py` (new): a recording `gitleaks` (a Python program first on `PATH`) that notes at each call its arguments, start and end, the
+folder after `dir` (whether a folder, its mode, every entry's name and mode) and, per text (each folder file, or the whole of standard input), the planted tags
+(`s27tag-...`, plain words in the planted files) and whether the case's marker is there; then runs the real gitleaks and passes its answer on (`pass`), or for a
+call holding the marker answers exit 2 with the real report (`fail`), exit 3 with `{ not a report` (`garbage`), or exit 3 with one finding whose `File` is
+`<folder>/999999` (`foreign`). No value is read into its log. `scan_driver.py` (revised, backward compatible): prints `counts` (`scan_counts()` after the call)
+and, with `S27_DRIVER_CATCH=1`, reports an exception out of `indexable` as `raised`/`message` instead of crashing. "That batch", in the failing cases, is every text
+of the calls whose texts held the marker (by their tags), so the cases need no knowledge of the engineer's batch sizes.
+
+**Revised** (`Rewrite-Reason: DEC-1183 (2)`, node ids unchanged): the `BATCHED_ONLY` skip is removed from the three cases run 8 skipped.
+`test_s27_many_texts_are_judged_per_gitleaks_process` now asserts every gitleaks call is `gitleaks dir <folder>`, the folders together hold at least one entry per
+file asked, and **at most one gitleaks process per 10 files asked, both rule sets counted** (`TEXTS_PER_PROCESS = 10`: on average at least 10 texts per process).
+`test_s27_batches_run_in_parallel_and_never_more_than_the_budget_allows` uses the recording wrapper (0.2 s per call): at most 3 at once under
+`GOV_HEAVY_THREAD_BUDGET=3`; where there was more than one batch (distinct `dir` folders, or processes for the one-per-file form), two ran at once; every clean file
+kept. The speed case is unchanged but for the skip (5,000 files; at least 10 times the one-per-file form's files per second; the same verdicts on the 500 sampled;
+both figures printed).
+
+| KPI id / item | tests | on the base `301708296` (this tree's `src`), and after |
+|---|---|---|
+| success-27 | `test_w2_88_scan_speed.py::test_s27_a_five_thousand_file_tree_is_judged_at_least_ten_times_faster_with_the_same_findings` (revised, `slow`) | **red** for the ratio: the base judges one gitleaks per file, the same code as the oracle (run 7 measured 1.2 on that form; the line is 10). Not completed in this designer's run: the base's 5,000 paths one file at a time pass the 600 s limit of a foreground call here. After: green at a ratio of at least 10 |
+| success-27 | `test_w2_88_scan_speed.py::test_s27_many_texts_are_judged_per_gitleaks_process` (revised) | **red:** `590 of 590 gitleaks calls are not gitleaks dir <folder> (first argument ['stdin'])`. After: green (all `dir`, at most 30 processes for 300 files) |
+| success-27 | `test_w2_88_scan_speed.py::test_s27_batches_run_in_parallel_and_never_more_than_the_budget_allows` (revised) | **GUARD (green on the base):** at most 3 at once, the per-file processes overlapping. After: green with batches in parallel |
+| success-27 | `test_w2_88_scan_folder.py::test_s27_p1r_1_the_pair_alone_each_file_keeps_its_own_verdict` (6: `curl-bare`, `curl-backslash`, `private-key` x `a-then-b`, `b-then-a`) | **GUARD (green on the base):** P1R-1's shapes, the pair alone: B (the real `curl -u deploy:<password>` then `echo ok` then the allowlisted `curl -u user:$PASSWORD`; or a real key) left out, A (ending in a bare `curl https://...` line, with or without `\`; or an unterminated BEGIN header then `false`) kept, on a first and a second call in the same `HOME` with a reuse record; each file first checked alone by a real gitleaks run. After: green (fails open if it goes red) |
+| success-27 | `test_w2_88_scan_folder.py::test_s27_p1r_1_pairs_at_the_start_the_middle_and_the_end_of_a_long_list_each_keep_their_own_verdict` (6, the same ids) | **GUARD (green on the base):** three pairs at the very start, the middle and the very end of 48 clean files. After: green |
+| success-27 | `test_w2_88_scan_folder.py::test_s27_two_files_whose_secrets_would_collide_in_one_stream_each_keep_their_own_verdict` (2: `a-then-b`, `b-then-a`) | **GUARD (green on the base):** the same secret in two files; the halves of one forge token (neither holds it whole: both kept); `KEY=<cloud key>` with no newline then a forge token at B's first byte; a cloud key with no newline then a clean B beginning `Q7ZX9`; each file alone checked first. After: green |
+| success-27 | `test_w2_88_scan_folder.py::test_s27_names_with_a_space_and_a_newline_are_judged_each_by_its_own_name_and_reach_no_gitleaks_argument` | **GUARD (green on the base):** `src/with space/a b secret.txt` and `src/newline-dir/line<newline>break secret.txt` left out, their clean neighbours of the same kind kept (the path map names the newline paths exactly); no gitleaks argument or folder entry holds the root, an asked path or a planted name. After: green |
+| success-27 | `test_w2_88_scan_folder.py::test_s27_a_failing_gitleaks_in_one_batch_fails_closed_and_nothing_of_that_batch_is_remembered_clean` (3: `exit-2`, `exit-3-unreadable-report`, `exit-3-finding-names-no-file`) | **GUARD (green on the base):** the base's batch is the marked file alone: exit 2 raises; exit 3 unreadable or foreign leaves it out; the second run (real answers, same `HOME` and reuse record) scans it again and leaves it out. After: `indexable` raises or leaves out every file of the marked calls; no `dir` folder remains after it returns or raises; the second run gives each of those files to gitleaks again (`scan_counts` "scanned" at least that many), the secret file out, every clean file kept |
+| success-27 | `test_w2_88_scan_folder.py::test_s27_a_large_file_with_secrets_across_chunk_and_piece_edges_gets_the_one_per_file_forms_verdict` | **GUARD (green on the base):** twelve 1.2 MB files, one secret each straddling bytes 100,000, 200,003, 500,000, 1,000,000, 1,048,576 and neighbours, 65,536 x 3, 24,000 x 5, 14,784 x 9, the very start, the very end (no newline); a clean 1.3 MB file kept. After: green |
+| success-27, failure-2 (the brief's F2, old `F1`: nothing written in a repository) | `test_w2_88_scan_folder.py::test_s27_each_batch_folder_is_private_outside_the_root_holds_no_repository_name_and_is_removed` | **red:** `no gitleaks call was gitleaks dir <folder> (38 calls, first arguments [('stdin',)])`. After: each folder a folder outside the root, mode 0700, its entries owner-only, no entry name holding the root, an asked path or a planted name; none remains after `indexable` returns; the repository holds no new file |
+| success-27, failure-2 | `test_w2_88_scan_folder.py::test_s27_a_temporary_folder_inside_the_root_is_refused_by_name_and_nothing_is_written_there` | **red:** `with TMPDIR inside the root, indexable did not raise RuntimeError (raised None; kept 6 of 7)` (the base writes no folder at all). After: `RuntimeError` naming `scan-tmp`, the folder left empty (interface item 2) |
+| success-27, failure-6 (the brief's F6, old `F5`: a secret's value in any output) | `test_w2_88_scan_folder.py::test_s27_the_assessments_scan_names_the_curl_credential_file_of_the_p1r_1_pair_by_rule_id_only` | **red, the P1R-1 shape in the assessment:** `the assessment does not name config/11-deploy.sh by curl-auth-user ...; secrets listed: [('config/settings.env', 'aws-access-token')]`: `assess.py`'s `_Scan` joins the texts on one gitleaks stdin, A's bare `curl` match runs into B and is dropped by the rule's allowlist. After: `{path: config/11-deploy.sh, rule: curl-auth-user}` listed with the orchard's own secret, never `config/10-health.md`; no value in the record or the run's output |
+
+**Bite checks (run 9, scratch; nothing committed).** With "after" set to other commits' `src` (the oracle still `a23678e27`): against `d766514fd` (the batched stdin head
+P1R-1 was found in) `alone [curl-bare-a-then-b]` and `spread [curl-backslash-a-then-b]` go **red** (`'src/p1r/00-b-deploy.sh', which holds a planted secret, is kept
+... (fails open)`), `spread [curl-bare-b-then-a]` stays green (the guard order); against `0821e8514` (run 8's base, the batched scan as it then stood)
+`alone [private-key-a-then-b]` goes red the same way and `failing [exit-3-finding-names-no-file]` goes red (`indexable returned and kept 14 file(s) of the batch whose
+gitleaks failed`). A first draft of B with a `#!/bin/sh` line did not bite: the batched form's fence plus that line put the allowlisted `curl` beyond the rule's
+five line breaks; B is now the probe's (no shebang).
+
+**Residuals and notes (run 9).** (1) The speed case was not run to its end here (the base's 5,000 paths one file at a time take more than a 600 s foreground call);
+its red reason is the ratio, as at run 7. (2) The parallel case cannot see parallelism when every text fits one batch (the speed case is the arbiter, as before).
+(3) The folder case asserts entries owner-only (`mode & 0o077 == 0`), which interface item 2's 0600 meets; names are checked as holding no repository name, not as
+digits only. (4) The assessment's case reads the record's `secrets` as the S1 cases do (`{path, rule}`); it runs MA through `gov adopt --lite --stage MA`.
+(5) The P1R-1 cases put each pair adjacent; the same batch for both is likely but not forced (the batch caps are the engineer's): a batch boundary between them
+makes the case pass for that pair, so each list holds three pairs.
+
+**Run 9, second batch (interface item 5b, the lead, 2026-11-15 18:12; `Rewrite-Reason: run9-interface item 5b (the lead, DEC-1183 (2))`).** Item 5b: gitleaks
+runs with the batch's folder as its working directory, on `.` (`gitleaks dir . ...`), so its `File` and every path allowlist see the bare number. The reason is the
+engineer's probe: with the folder given by its path, gitleaks' default path allowlist (`useDefault = true` in the project's `.gitleaks.toml`) dropped every finding
+when the temporary folder's own path held `node_modules/`, `venv/lib` or `gitleaks.toml` (exit 0, a fail-open). The lead's run at the merged head failed four cases
+because the wrapper noted the argument after `dir` as given (`.`), so their folder checks looked at the test's own working directory.
+
+- `w2_88_scan_support.py` (revised): the wrapper notes `folder` as the argument after `dir` resolved against its own working directory at the call (`os.getcwd()`,
+  `os.path.abspath`; the real gitleaks inherits that directory), plus the argument as given (`folder_arg`) and that directory (`cwd`). Everything else is unchanged.
+  A folder given by an absolute path (the earlier form) is noted as before. The `foreign` answer's `File` is `<absolute folder>/999999`, which still names no
+  file of the batch. The scratch check: `gitleaks dir .` run in a 0700 folder holding one clean file is noted as that folder's absolute path, mode `0o700`, the
+  entry `1`.
+- `test_w2_88_scan_folder.py::test_s27_a_failing_gitleaks_in_one_batch_fails_closed_and_nothing_of_that_batch_is_remembered_clean` (all 3 ids) and
+  `test_w2_88_scan_folder.py::test_s27_each_batch_folder_is_private_outside_the_root_holds_no_repository_name_and_is_removed`: only the docstrings changed (the folder
+  is the resolved one). The cases keep every assertion as it was: outside the root, mode 0700, entries owner-only and holding no repository name, gone after
+  `indexable` returns or raises. On this tree's `src` they stand as before: the failing cases are **GUARD** (green: no `dir` call, so no folder to check), and the folder
+  case is **red** for `no gitleaks call was gitleaks dir <folder> (38 calls, first arguments [('stdin',)])`.
+- `test_w2_88_scan_speed.py::test_s27_batches_run_in_parallel_and_never_more_than_the_budget_allows` is unchanged, but it gains from the wrapper's fix. It counts
+  batches by distinct `dir` folders, and with every call noted as `.` it would have counted one batch and so skipped its two-at-once check.
+- **New** `test_w2_88_scan_folder.py::test_s27_a_temporary_folder_whose_path_holds_a_default_allowlisted_name_still_leaves_out_the_secret_file` (2 ids:
+  `node-modules`, `venv-lib`). `TMPDIR` names an empty folder outside the root whose path holds `node_modules/` or `venv/lib`. First the hazard is shown to be real:
+  the secret file, copied into a folder under that `TMPDIR`, is reported by a real `gitleaks dir .` run inside that folder, and by nothing when the folder is given by
+  its path (the case fails with "the plant did not take" if a future gitleaks no longer drops it). Then `indexable` runs with that `TMPDIR`: the secret file is left
+  out and every clean file kept, matching the one-per-file form; at least one `gitleaks dir` call is made; every batch folder sits under that `TMPDIR`; none remains;
+  no value is in the log or under the outside folder.
+
+| KPI id / item | tests | on the base `301708296` (this tree's `src`), and after |
+|---|---|---|
+| success-27 (item 5b) | `test_w2_88_scan_folder.py::test_s27_a_temporary_folder_whose_path_holds_a_default_allowlisted_name_still_leaves_out_the_secret_file` (2: `node-modules`, `venv-lib`) | **red:** `no gitleaks call was gitleaks dir <folder> (17 calls, first arguments [('stdin',)])`. The hazard check and the verdicts pass first (the base reads standard input, so `TMPDIR` plays no part). After: green; it goes red, failing open (the secret file kept), if the folder is given to gitleaks by its path |
+
+The two revised cases keep their rows in the run 9 table above (node ids unchanged).

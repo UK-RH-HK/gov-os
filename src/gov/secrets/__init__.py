@@ -4,8 +4,11 @@
 the paths the indexer may read. ``stores_with_secrets(root)`` is the subject of the
 secrets-indexing family check. ``path_holds_secret(root, path)`` judges a path name,
 for an index that stores paths (DEC-339). All run the gitleaks binary with the rules of the
-project's ``.gitleaks.toml`` (DEC-287) over content given on standard input, so a
-path allowlist never applies (DEC-290) and no report is written. The file's other
+project's ``.gitleaks.toml`` (DEC-287), so that a path allowlist never applies (DEC-290) and no report is written:
+``path_holds_secret`` and ``stores_with_secrets`` over one text on standard input; ``indexable``, and the assessment
+of ``gov.adopt.assess``, in folder mode (``_Folder``, DEC-1183 (2)): a batch's texts, each a file of its own named by
+its number in a private folder outside the root, judged by one ``gitleaks dir`` per batch and rule set, each finding
+on the file it names, so no match runs from one text into the next. The file's other
 allowlists and its disabled rules are left out of the scan (DEC-298), and a second scan with
 the file's rules alone keeps the allowlist of gitleaks' defaults from sheltering them
 (DEC-347). Whatever cannot be decided raises or is left out; nothing is let through undecided.
@@ -58,9 +61,14 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 6  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
-# (6: each file's text has gitleaks processes of its own again, as form 4; no record forms 4 or 5 wrote is reused, so
-# none the batched form 5 judged clean answers again. Run 7's P1-1 and P1R-1: a match crossed from one text into the next.)
+_FORM = 7  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
+# (7: folder mode, DEC-1183 (2): each text a file of its own in a batch's folder, one gitleaks dir per batch and rule set.
+# No record an earlier form wrote is reused: 5, the batched stdin form, judged clean what run 7's P1-1 and P1R-1 let through.)
+# Folder mode's batch (the engineer's figures, W2-88 evidence, run 9): at most this many texts and bytes of content, one
+# text larger than the byte cap a batch of its own. gitleaks dir costs about 0.33 s a process and 2,000 small texts a
+# second besides; the byte cap bounds the folder's disk (a tmpfs is memory) and the run's time limit.
+_BATCH_TEXTS, _BATCH_BYTES = 1_000, 8 << 20
+_UNPLACED = "unreadable-report"  # the finding put on every text of a batch whose report cannot be placed on its files
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
@@ -83,6 +91,8 @@ _BUSY_S = 10.0  # how long a store's lock held by another process is waited out 
 _FTS5 = re.compile(rb"\s*CREATE\s+VIRTUAL\s+TABLE\b.*?\bUSING\s+fts5\b", re.IGNORECASE | re.DOTALL)
 
 __all__ = ["SCAN_OFF", "indexable", "path_holds_secret", "scan_counts", "scan_on", "stores_with_secrets"]
+_COMMAND = ("--no-banner", "--report-format", "json", "--report-path", "-", "--ignore-gitleaks-allow",
+            "--gitleaks-ignore-path", "/dev/null", "--log-level", "error", "--exit-code", str(_LEAKS))
 
 
 def scan_on(root: Path) -> bool:
@@ -283,12 +293,8 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list 
     env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
     hashes = set()  # the matches that may be commit hashes, asked of git once every scan has run
     for each in rules:  # clean only when every scan ran and found nothing but such hashes
-        done = subprocess.run(
-            ["gitleaks", "stdin", "--no-banner", "--report-format", "json", "--report-path", "-",
-             "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
-             "--exit-code", str(_LEAKS)],
-            input=data, capture_output=True, timeout=_TIMEOUT_S + len(data) / _FLOOR,
-            env=env | {"GITLEAKS_CONFIG_TOML": each})
+        done = subprocess.run(["gitleaks", "stdin", *_COMMAND], input=data, capture_output=True,
+                              timeout=_TIMEOUT_S + len(data) / _FLOOR, env=env | {"GITLEAKS_CONFIG_TOML": each})
         if done.returncode not in (0, _LEAKS):
             raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
         if done.returncode == _LEAKS:
@@ -303,6 +309,144 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list 
                 return True
             hashes.update(found)
     return bool(hashes) and _commits(root, hashes) != hashes
+
+
+def _outside(root: Path | None) -> str:
+    """The temporary folder a batch's folder is made in, resolved; RuntimeError naming it where it lies inside ``root``
+    (the root being scanned): then nothing is made there."""
+    where = Path(tempfile.gettempdir()).resolve()
+    if root is not None:
+        top = Path(root).resolve()
+        if where == top or top in where.parents:
+            raise RuntimeError(f"the secrets scan's temporary folder {where} lies inside {top}, the root it scans: "
+                               "set TMPDIR to a folder outside it")
+    return str(where)
+
+
+class _Folder:
+    """One batch of folder mode (DEC-1183 (2)): each text a file of its own in a private folder outside the root, one
+    ``gitleaks dir`` per rule set over the folder, each finding put on the file its report names.
+
+    The folder is made by ``tempfile.mkdtemp`` (0700), each file 0600, named by its number in the batch only, so no
+    repository path reaches gitleaks and no path rule or path allowlist can apply (DEC-290). gitleaks runs in the folder
+    on ``.``: the path it matches its path allowlists against is the number alone (the default allowlist drops every
+    finding under a path holding ``node_modules/`` or ``venv/lib``, which a temporary folder's own path may). Each file
+    holds what the one-per-file form gives gitleaks on standard input for that text (the leading newline, each piece of
+    each form followed by a blank line), written as it is added: memory follows one text, never the batch or the tree.
+    The folder is removed on leaving, whatever happened (a ``with`` block, or ``close``).
+    """
+
+    def __init__(self, root: Path | None) -> None:
+        self.path = tempfile.mkdtemp(prefix="gov-secrets-", dir=_outside(root))
+        self.count = self.bytes = 0
+
+    def __enter__(self) -> _Folder:
+        return self
+
+    def __exit__(self, *_exc) -> None:
+        self.close()
+
+    def close(self) -> None:
+        shutil.rmtree(self.path, ignore_errors=True)
+
+    def add(self, chunks) -> int:
+        """Writes one text, given as its chunks (``_forms``), as the batch's next numbered file; its number."""
+        number = self.count
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+        with os.fdopen(os.open(os.path.join(self.path, str(number)), flags, 0o600), "wb") as stream:
+            stream.write(b"\n")  # keeps gitleaks from skipping content it would take for a binary file
+            size = 1
+            for chunk in chunks:
+                for piece in _pieces(chunk):
+                    stream.write(piece)
+                    stream.write(b"\n\n")
+                    size += len(piece) + 2
+        self.count += 1
+        self.bytes += size
+        return number
+
+    def judge(self, rules: tuple[str, ...]) -> list[list[tuple[str, str | None]]]:
+        """For each text, by its number, every finding on it by every rule set: ``(rule id, the commit hash it may be
+        (row W2-L423) or None)``. Raises ``RuntimeError`` where gitleaks cannot run or does not decide: an exit other
+        than 0 or 3, a time-out, no gitleaks, an exit 0 with a report that is not an empty list, or an exit 3 with no
+        finding. An exit 3 whose report cannot be read, or holds a finding whose ``File`` names no text of the batch,
+        puts ``_UNPLACED`` on every text of the batch. Only rule ids and possible commit hashes are kept."""
+        names = {str(number) for number in range(self.count)}
+        # gitleaks dir reads a .gitleaksignore found in the folder, whatever --gitleaks-ignore-path says (W2-88 run 9)
+        if set(os.listdir(self.path)) != names:
+            raise RuntimeError(f"the secrets scan's folder {self.path} holds an entry it did not write")
+        found: list[list[tuple[str, str | None]]] = [[] for _ in range(self.count)]
+        if not self.count:
+            return found
+        binary = shutil.which("gitleaks")
+        if binary is None:
+            raise RuntimeError("gitleaks is not on PATH: nothing can be decided")
+        env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
+        for each in rules:
+            try:
+                done = subprocess.run(["gitleaks", "dir", ".", *_COMMAND], executable=binary, cwd=self.path,
+                                      stdin=subprocess.DEVNULL, capture_output=True,
+                                      timeout=_TIMEOUT_S + self.bytes / _FLOOR, env=env | {"GITLEAKS_CONFIG_TOML": each})
+            except (OSError, subprocess.SubprocessError) as error:
+                raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL}: {type(error).__name__}") from None
+            if done.returncode not in (0, _LEAKS):
+                raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
+            try:
+                report = json.loads(done.stdout)
+            except ValueError:
+                report = None
+            if done.returncode == 0:
+                if report != []:
+                    raise RuntimeError("gitleaks found no leak but reported something: nothing is decided")
+                continue
+            if report == []:
+                raise RuntimeError("gitleaks found a leak but reported none: nothing is decided")
+            placed = []
+            for finding in report if isinstance(report, list) else [None]:
+                name = finding.get("File") if isinstance(finding, dict) else None
+                if not (isinstance(name, str) and name in names):
+                    placed = None  # cannot be put on its own file: every text of the batch holds a secret
+                    break
+                rule = finding.get("RuleID")
+                placed.append((int(name), rule if isinstance(rule, str) and rule else "unnamed-rule", _hash(finding)))
+            del report, done
+            for number, rule, commit in placed if placed is not None else [(n, _UNPLACED, None) for n in range(self.count)]:
+                found[number].append((rule, commit))
+        return found
+
+
+def _hash(finding: dict) -> str | None:
+    """The commit hash a finding of row W2-L423's rule may be (DEC-911 item 4), else None: only that is kept."""
+    secret = finding.get("Secret")
+    if finding.get("RuleID") == _COMMIT_RULE and isinstance(secret, str) and _HASH.fullmatch(secret):
+        return secret
+    return None
+
+
+def _held(findings: list[tuple[str, str | None]], root: Path | None) -> bool:
+    """Whether a text with ``findings`` holds a secret: unless every finding is a commit hash that git confirms as a
+    commit of the repository at ``root`` (DEC-911 item 4; with no ``root``, none is)."""
+    if not findings:
+        return False
+    hashes = {commit for _, commit in findings}
+    if None in hashes or root is None:
+        return True
+    return _commits(root, hashes) != hashes
+
+
+def _batches(items: list, sizes: list[int], width: int):
+    """``items`` in order, in batches of at most ``_BATCH_TEXTS`` texts and ``_BATCH_BYTES`` bytes (one text larger is
+    a batch of its own), and no larger than the share that keeps ``width`` workers busy."""
+    per = max(1, min(_BATCH_TEXTS, -(-len(items) // max(1, width))))
+    batch, held = [], 0
+    for item, size in zip(items, sizes):
+        if batch and (len(batch) >= per or held + size > _BATCH_BYTES):
+            yield batch
+            batch, held = [], 0
+        batch.append(item)
+        held += size
+    if batch:
+        yield batch
 
 
 def _workers() -> int:
@@ -349,21 +493,69 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
     scanning = scan_on(root)  # off (DEC-1045): the namespace filter alone, no content given to gitleaks
     rules = _rules(root) if scanning else ()
     namespaces = load_config(root)["path-map.yaml"]["namespaces"]
-
-    def allowed(rel: str) -> bool:
+    asked = list(dict.fromkeys(paths))
+    candidates, sizes = [], []
+    for index, rel in enumerate(asked):
         try:  # a link is judged by what it points to: its namespace and its content
             real = (root / rel).resolve(strict=True)
             target = real.relative_to(root).as_posix()
-            content = real.read_bytes()
         except (OSError, ValueError, RuntimeError):  # no file, a link loop, or a place outside the root
-            return False
-        if not (_governance(namespaces, rel) and _governance(namespaces, target)):
-            return False
-        return not (scanning and _holds_secret(rules, content, root, "content"))
+            continue
+        if _governance(namespaces, rel) and _governance(namespaces, target):
+            candidates.append((index, real))
+            try:
+                sizes.append(real.stat().st_size)
+            except OSError:
+                sizes.append(0)
 
-    with ThreadPoolExecutor(max_workers=_workers()) as pool:  # results in the order asked, whatever the width
-        verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
-    return [rel for rel, verdict in zip(dict.fromkeys(paths), verdicts) if verdict]
+    def judge(batch: list[tuple[int, Path]]) -> dict[int, bool]:
+        """Each text of ``batch`` allowed or not: a file that cannot be read is not; one the record holds clean is;
+        the rest are judged in one folder, a text holding a secret left out and one with no finding remembered."""
+        verdicts, given = {}, []
+        if not scanning:
+            for index, real in batch:
+                try:
+                    with open(real, "rb"):
+                        verdicts[index] = True
+                except OSError:
+                    verdicts[index] = False
+            return verdicts
+        engine = cache.engine(rules, _FORM)  # taken once before the batch's scan
+        with _Folder(root) as folder:
+            for index, real in batch:
+                try:
+                    content = real.read_bytes()
+                except OSError:
+                    verdicts[index] = False
+                    continue
+                digest = hashlib.sha256(content).hexdigest()
+                if cache.remembered("content", digest, engine):
+                    _count("content", "remembered")
+                    verdicts[index] = True
+                    continue
+                _count("content", "scanned")
+                given.append((index, digest, folder.add(_forms(content))))
+                del content
+            found = folder.judge(rules) if given else []
+        for index, digest, number in given:
+            verdicts[index] = not _held(found[number], root)
+            if not found[number]:  # no finding at all, by any rule set: remembered (an exempt hash is not)
+                cache.remember("content", digest, engine)
+        return verdicts
+
+    allowed = [False] * len(asked)
+    width = _workers()  # at most this many batches, each one gitleaks at a time, at once (W2-20 S18)
+    with ThreadPoolExecutor(max_workers=width) as pool:
+        futures = [pool.submit(judge, batch) for batch in _batches(candidates, sizes, width)]
+        try:
+            for future in futures:
+                for index, verdict in future.result().items():
+                    allowed[index] = verdict
+        except BaseException:
+            for future in futures:  # the first batch that cannot be decided raises; none not yet started starts
+                future.cancel()
+            raise
+    return [rel for rel, verdict in zip(asked, allowed) if verdict]
 
 
 def path_holds_secret(root: Path, path: str) -> bool:
