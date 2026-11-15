@@ -389,3 +389,8 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 234 | DEC-1188 (2): W2-174 reopened (S6, S7, F4: the launch fields by the checked apply), FULL; then release 0.1.1 with W2-111's src part | IN PROGRESS: next: the W2-174 lead brief |
 | 235 | DEC-1188 (3): `gov brief` fills `{W2}`, `{PROFILE}` and the objective for an adopted repository's ticket (outside W2-174, which never changes gov brief) | NOT STARTED: a ticket on the owner's P1 |
 | 236 | DEC-1188 (3): A0 writes the coordination ticket's launch fields itself (W2-113's area); the adopt skill's A5, A7, A10 steps name the apply (W2-88a, the skill's one writer, DEC-1150 (1)) | NOT STARTED: at W2-88a's next opening, or a ticket on the owner's P1 |
+| 237 | DEC-1189 (1): W2-88 reopened (S29: the template's .gitleaks.toml in the wheel, the resolver-vs-package check), then release 0.1.1 | IN PROGRESS: next: the W2-88 lead brief |
+| 238 | DEC-1189 (2): W2-81's full run on 0.1.0 tonight: the operator script (tested on a clone) and the adopting session's brief to the owner; the operator runs both; overnight; then --mode read and the summary | IN PROGRESS: next: the script and the brief |
+| 239 | DEC-1190 (2): EXAMIN's settings reshape by the operator (operator_settings.py), the EXAMIN CTO's restart with its tools at start, probes r3, then A5 | IN PROGRESS: the operator runs it |
+| 240 | DEC-1190 (2): the same settings reshape for EXAMIN's real repository at W2-29, judged again on its files | WAITS: W2-29 |
+| 241 | DEC-1190 (3) and the W2-27 product findings (F-000 to F-015, W81-1 to W81-3): one owner package after W2-27, flag-not-drop for the adapters and doctor | NOT STARTED: after W2-27 |
