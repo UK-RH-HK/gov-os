@@ -47,8 +47,26 @@ def project(tmp_path):
 
 @pytest.fixture()
 def scans(monkeypatch):
-    """Every text the filter or the check would give to gitleaks, recorded instead; each judged clean."""
+    """Every text the filter or the check would give to gitleaks, recorded instead; each judged clean.
+
+    The filter's folder mode (DEC-1183 (2)) writes each text into a batch folder (``_Folder.add``) and hands the folder
+    to one ``gitleaks dir`` (``_Folder.judge``): a text is recorded, as ``("content", its bytes)``, when the folder it
+    was written into is judged, and the judgement is stood in. No record of clean texts is used, so no text is answered
+    from it instead of being handed over."""
     given = []
+    monkeypatch.setenv("GOV_SECRETS_CACHE", "")
+    add = secrets._Folder.add
+
+    def written(folder, chunks):
+        chunks = list(chunks)
+        folder.texts = [*getattr(folder, "texts", []), chunks[0]]  # chunks[0]: the text as it is (``_forms``)
+        return add(folder, chunks)
+
+    def judged(folder, rules):
+        texts = getattr(folder, "texts", [])
+        assert sorted(os.listdir(folder.path)) == sorted(str(number) for number in range(len(texts)))
+        given.extend(("content", text) for text in texts)
+        return [[] for _ in texts]
 
     def holds(rules, content, root=None, kind=None):
         given.append((kind, content))
@@ -60,6 +78,8 @@ def scans(monkeypatch):
 
     monkeypatch.setattr(secrets, "_holds_secret", holds)
     monkeypatch.setattr(secrets, "_scan", scan)
+    monkeypatch.setattr(secrets._Folder, "add", written)
+    monkeypatch.setattr(secrets._Folder, "judge", judged)
     return given
 
 
