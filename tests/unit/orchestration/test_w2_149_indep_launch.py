@@ -377,8 +377,9 @@ def test_no_name_matched_stop_in_the_script():
 
 def test_documented_lines_name_only_the_sets_root():
     lines = [x.strip() for x in indep_launch.__doc__.splitlines() if x.strip().startswith("python3 ")]
-    # the memory writer, checker and auditor; one per set-up A brief (DEC-1112 (3)); --dry; --counts-only
-    assert len(lines) == 10
+    # the memory writer, checker and auditor; one per set-up A brief (DEC-1112 (3)); --dry; the fix flow; the weekly
+    # re-anchoring flow (ACT-WALLS-REANCHOR-1); --counts-only
+    assert len(lines) == 11
     briefs = [ln.split("--brief ")[1].split()[0] for ln in lines if "--brief " in ln]
     # the five set-up A briefs at their real paths (ACT-W2-149-INSTALL-1): governance/project/indep-briefs/sgx1/<name>.md
     sgx = sorted(b for b in briefs if b.startswith("governance/project/indep-briefs/sgx1/"))
@@ -1094,7 +1095,7 @@ def test_counts_schema_closes_every_object_and_string():
     # set-up A's numbers are optional keys of `out` (and files_sha256 of `delivered`): present only when given
     optional = {id(whole["properties"]["out"]): set(indep_launch.SGX_OUT) - {"labelled", "allow", "refuse"},
                 id(whole["properties"]["delivered"]): {"files_sha256"},
-                id(whole): {"fix"}}
+                id(whole): {"fix", "reanchor"}}
 
     def walk(node):
         if isinstance(node, dict):

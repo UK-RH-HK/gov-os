@@ -116,10 +116,11 @@ HOOK_CASES = [
 ]
 
 
-@pytest.mark.xfail(strict=True, reason="judges the hook fixture (fixtures/hook/bash_writes.py has the F1 gap itself "
-                                       "and is not changed here), not the product; the live hook's own fix is "
-                                       "ACT-GUARD-FIX-5 (P1-GUARD-HEREDOC-OPTS-1): strict, so an XPASS fails loudly "
-                                       "once the fix lands, and the mark is removed with that ACT's companion")
+@pytest.mark.xfail(strict=False, reason="judges the hook fixture (fixtures/hook/bash_writes.py has the F1 gap itself "
+                                        "and is not changed here), not the product; ACT-GUARD-FIX-6 (the live hook "
+                                        "brought to W2-42a's parser, DEC-1174 (1)) makes these cases XPASS: the mark "
+                                        "is non-strict so they pass before and after it applies, and it is removed "
+                                        "after that ACT applies (DECIDED-NOT-DONE's follow-up row)")
 @pytest.mark.parametrize("command", HOOK_CASES, ids=["bash-euo-pipefail", "cat-pipe-bash-o-pipefail"])
 def test_review_f1_hook_an_engineer_s_shell_with_options_writing_the_tests_is_refused_by_rule_1(command):
     got, why, code = s.run_hook("Bash", {"command": command}, s.REPO, s.REPO, "engineer")

@@ -140,11 +140,31 @@ def _uv_install(args):
             and words[1] == "install")
 
 
+# W2-111 (DEC-1184 (3)): the real folders of PATH, read once per PATH value
+# in this process, and only when a download names a folder to compare
+# them with; a changed PATH is read again.
+_PATH_READ: dict = {}
+
+
+def _read_path(value):
+    """The real paths of the folders a PATH value names."""
+    return frozenset(os.path.realpath(d) for d in value.split(":") if d)
+
+
+def _path_folders():
+    """The real folders of the current PATH (read once per value)."""
+    value = os.environ.get("PATH", "")
+    found = _PATH_READ.get(value)
+    if found is None:
+        found = _read_path(value)
+        _PATH_READ.clear()
+        _PATH_READ[value] = found
+    return found
+
+
 def has_install(command):
     """True when *command* is a package-manager install, a download piped
     to a shell, or a binary download into a ``PATH`` directory."""
-    pd = {os.path.realpath(d)
-          for d in os.environ.get("PATH", "").split(":") if d}
     for seg in _segments(command):
         cs = _split(seg, _is_pipe)
         # Pipe to shell: curl/wget ... | sh/bash
@@ -186,7 +206,7 @@ def has_install(command):
                     t = os.path.expanduser(t)
                     if os.path.isabs(t) \
                             and os.path.realpath(
-                                os.path.dirname(t)) in pd:
+                                os.path.dirname(t)) in _path_folders():
                         return True
     return False
 

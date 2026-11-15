@@ -91,6 +91,76 @@ SHM = "/dev/shm"  # the memory-backed scratch the project's locks use (gov-os-W2
 CTO_WBS = "W2-00"  # the coordination ticket whose orchestrator session is the CTO
 MOST_GLOB = 20000  # the paths one rm glob may name that the guard checks
 # rm in a command the scan cannot read (ACT-GUARD-FIX-4): its words up to the next ; & | ) or newline.
+# R5 (W2-42a, DEC-1133 (2); gov.guard.decide, copied): a file tool's path or glob field that is no path the system takes
+# (not text, or text holding a NUL byte) is refused by its own rule, before another rule resolves it.
+# The fields of a file tool's call that are resolved as a path or a glob.
+_PATH_FIELDS = {"Read": ("file_path",), "Grep": ("path", "glob"),
+                "Glob": ("path", "pattern"), "Write": ("file_path",),
+                "Edit": ("file_path",), "MultiEdit": ("file_path",),
+                "NotebookEdit": ("notebook_path",)}
+
+NO_PATH_REFUSAL = ("a path field of the call is not a path (not text, or text holding a "
+                   "NUL byte), so the guard cannot say what it names: refused to every "
+                   "role (DEC-1133 (2))")
+
+
+def _no_path(tool_name, tool_input: dict) -> bool:
+    """True when a path or a glob field of a file tool's call is given but is
+    no path the system takes: not a string, or one holding a NUL byte."""
+    fields = _PATH_FIELDS.get(tool_name, ()) if isinstance(tool_name, str) else ()
+    return any(tool_input.get(key) is not None and (
+        not isinstance(tool_input[key], str) or "\0" in tool_input[key]) for key in fields)
+
+
+# R4 (W2-42a, DEC-1133 (2); gov.guard.reads, copied): a revision-colon-path in git show or cat-file, or on a side of
+# git diff, is judged as a read of its path; a revision git does not resolve, or one the guard cannot read, is a ruled
+# refusal, not the error path; the methods that use these are copied into ``Judge`` in ``classes`` below.
+REV_REFUSAL = ("the call names a revision the guard cannot resolve: git does not resolve "
+               "it (or its <rev>:<path>) to a commit, tree or blob, or it is given at run "
+               "time (a variable, a substitution, --stdin), so what the call shows cannot "
+               "be judged against the parts refused to this session (DEC-820): refused; "
+               "name a revision and a path that exist")
+# W2-42a R4: in <rev>:<path> the path starts at the top of the tree <rev> names;
+# only a commit (or the index) places it at the repository's top. A subtree's
+# id, or a blob named by its id alone and shown as text, leaves the file's path
+# unknown to the guard, so it cannot be judged against the parts refused here.
+PLACE_REFUSAL = ("the call shows a git object whose path in the repository the guard "
+                 "cannot place: a <rev>:<path> whose <rev> names a tree that is not a "
+                 "commit's top (a subtree's id), or a blob named by its id alone and "
+                 "shown as text, so what it shows cannot be judged against the parts "
+                 "refused to this session (DEC-820): refused; name the file as "
+                 "<commit>:<path from the top> or :<path>")
+
+
+def _blob_ref(word: str) -> tuple[str, str] | None:
+    """A revision-colon-path's revision and path (``<rev>:<path>``, the
+    index's ``:<path>`` and ``:<n>:<path>``), or None: no colon, an empty
+    path (a revision's whole tree), a message search (``:/<text>``), or a
+    range or a negation before the colon (judged as revisions)."""
+    if ":" not in word or word.startswith(":/"):
+        return None
+    rev, _, path = word.partition(":")
+    if not rev and re.match(r"[0-3]:", path):
+        path = path[2:]
+    if not path or ".." in rev or rev.startswith("^"):
+        return None
+    return rev, path
+
+
+def _output_joined(words: list[str]) -> list[str]:
+    """git's ``--output <file>`` as one word, ``--output=<file>`` (W2-42a):
+    the file it writes is no revision word."""
+    out, k = [], 0
+    while k < len(words):
+        if words[k] == "--output" and k + 1 < len(words):
+            out.append("--output=" + words[k + 1])
+            k += 2
+        else:
+            out.append(words[k])
+            k += 1
+    return out
+
+
 CRUDE_RM = re.compile(r"(?:^|[;&|(\n`]|\$\(|\b(?:do|then|else|nohup|command|exec|xargs)\s)\s*"
                       r"(?:[\w./-]*/)?\\?rm\s+([^;&|)\n`]*)")
 
@@ -251,6 +321,18 @@ def parse_both(parse, command, cwd):
     return list(found or []) + list(more or [])
 
 
+def line_parser(command):
+    """The line parser the judgement reads shell text with (ACT-GUARD-FIX-6): the product's of W2-42a, copied into
+    bash_writes.py (``line_write_targets``), with the command's own glob options deciding whether an unmatched glob is
+    its literal word, as ``gov.guard.decide._extract_bash_write_targets`` hands it."""
+    import bash_writes
+    literal = not bash_writes.GLOB_OPTIONS_RE.search(command)
+
+    def parse(text, where):
+        return bash_writes.line_write_targets(text, where, literal)
+    return parse
+
+
 _JUDGED = {}
 
 
@@ -260,11 +342,11 @@ def bash_judgement(command, cwd):
     if (command, cwd) in _JUDGED:
         return _JUDGED[(command, cwd)]
     import bash_writes
-    from gov.guard.decide import _UNRESOLVABLE, _expand_token, _extract_bash_write_targets
+    from gov.guard.decide import _UNRESOLVABLE, _expand_token
     if bash_writes.SENT != _UNRESOLVABLE:
         raise RuntimeError("bash_writes.SENT differs from the parser's sentinel")
     try:
-        judged = bash_writes.judge(command, cwd, _extract_bash_write_targets, _expand_token)
+        judged = bash_writes.judge(command, cwd, line_parser(command), _expand_token)
     except bash_writes.Unreadable:
         judged = None
     _JUDGED[(command, cwd)] = judged
@@ -281,13 +363,22 @@ def bash_writes_of(command, cwd):
     """The write targets of a Bash command the guard resolves (ACT-GUARD-FIX-4): the shell's own, and those of the
     code it runs inline that resolve to a path. A command the scan cannot read is read by the product's parser
     alone."""
-    from gov.guard.decide import _extract_bash_write_targets
+    import bash_writes
     from bash_writes import SENT
     judged = bash_judgement(command, cwd)
     if judged is None:
-        return resolved(parse_both(_extract_bash_write_targets, command, cwd)), []
-    return resolved(judged.shell), resolved([full for _targets, _scope, _code in judged.findings
-                                             for raw, full in _targets if raw != SENT and full])
+        return resolved(parse_both(line_parser(command), command, cwd)), []
+    # ``writes``: what the product enforces beside the shell's own (git checkout, restore, rm and mv on paths, dd,
+    # truncate, sort -o, rsync, a script written and run, a body an unknown reader may run as shell; W2-42a). Like the
+    # findings they are not the shell's own writes: rule 1 reads them, rule 5 never did (DEC-1050 (12), G-2).
+    code = resolved([full for _targets, _scope, _code in judged.findings
+                     for raw, full in _targets if raw != SENT and full] + judged.writes)
+    # ACT-GUARD-FIX-6 option B (the CTO, stricter only): a run the scan cannot read for certain (the unresolvable target
+    # in ``unread``: a script written and run, a body an unknown reader may run) in a call whose text names the acceptance
+    # tests is a write into them, as ACT-GUARD-FIX-3's round 2 refused it; rule 1 reads it, rule 5 never did.
+    if SENT in judged.unread and (bash_writes.names_tests(command) or bash_writes.names_tests(bash_writes.joined(command))):
+        code.append(os.path.join(os.environ.get("CLAUDE_PROJECT_DIR") or cwd, bash_writes.ACCEPTANCE.rstrip("/")))
+    return resolved(judged.shell), code
 
 
 _ROOTS = {}
@@ -675,8 +766,29 @@ def classes():
     main's fail-closed try)."""
     if _CLASSES:
         return _CLASSES[0]
+    import copy
     import fnmatch
     from gov.guard import reads
+    # R4 (W2-42a): the names the copied _Judge methods below use, from the pinned judge (the same helpers before and
+    # after a re-pin); REV_REFUSAL, PLACE_REFUSAL, _blob_ref and _output_joined are this module's own copies.
+    HIDDEN_REFUSAL = reads.HIDDEN_REFUSAL
+    SECRET_REFUSAL = reads.SECRET_REFUSAL
+    PolicyError = reads.PolicyError
+    _ARCHIVE_VALUED = reads._ARCHIVE_VALUED
+    _COUNT_RE = reads._COUNT_RE
+    _GIT_GREP_VALUED = reads._GIT_GREP_VALUED
+    _GIT_LOG_VALUED = reads._GIT_LOG_VALUED
+    _GIT_QUIET = reads._GIT_QUIET
+    _GIT_SIDES = reads._GIT_SIDES
+    _NO_CONVERT = reads._NO_CONVERT
+    _PATTERN_OPTIONS = reads._PATTERN_OPTIONS
+    _Part = reads._Part
+    _REV_FAULT = reads._REV_FAULT
+    _git = reads._git
+    _expand_token = reads._expand_token
+    _options = reads._options
+    _pathspecs = reads._pathspecs
+    _x_top = reads._x_top
     matched = {}  # Narrow.match's answers, per tuple of globs, then per path (one hook run judges one call)
     listed = {}  # Narrow's folder listings, per folder (one hook run judges one call)
 
@@ -825,6 +937,298 @@ def classes():
                         return why
             return ""
 
+        # R4 (W2-42a, DECIDED-NOT-DONE 215): the product's _Judge.git, colon, placed, cat_file, patched, stored and ask,
+        # copied as merged (b42e8628b835): revision-colon-paths are judged as reads of their paths, a git answer that is
+        # no is a ruled refusal, git that cannot run (and the deadline) still refuse by the error path.
+        def git(self, args: list[str], cwd: str) -> str:
+            i, addr = 0, []  # the repository and tree the command addresses
+            while i < len(args) and args[i].startswith("-"):
+                if args[i] == "-C" and i + 1 < len(args):
+                    cwd = os.path.join(cwd, _expand_token(args[i + 1]) or args[i + 1])
+                elif args[i] in ("--git-dir", "--work-tree") and i + 1 < len(args):
+                    addr.append(f"{args[i]}={args[i + 1]}")
+                elif args[i].startswith(("--git-dir=", "--work-tree=")):
+                    addr.append(args[i])
+                i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree") else 1
+            sub, rest = (args[i], args[i + 1:]) if i < len(args) else ("", [])
+            hidden = [p for p in self.parts if p.strict]
+            if sub not in ("show", "log", "diff", "grep", "whatchanged"):
+                why = self.reads("git", args, cwd)
+                # W2-42a R4: git cat-file is judged on for any session with a
+                # refused part (the object's place), the other two for the hidden.
+                if why or sub not in ("cat-file", "format-patch", "archive") or not (
+                        hidden or (sub == "cat-file" and self.parts)):
+                    return why
+            dd = rest.index("--") if "--" in rest else len(rest)
+            before, specs = rest[:dd], rest[dd + 1:]
+            if sub in ("show", "log", "diff", "whatchanged"):
+                # W2-42a: --output <file> is a write (the write rules judge it);
+                # its file is no revision word.
+                before = _output_joined(before)
+            operands = [a for a in before if not a.startswith("-")]
+            if sub == "grep":
+                # W2-141 (F1): the engineer's own folder, with the pathspecs'
+                # exclusions; the other parts as before.
+                why = self._own_git(sub, rest, cwd)
+                if why:
+                    return why
+                others = self._not_own()
+                operands, options = _options(before, _GIT_GREP_VALUED)
+                if _PATTERN_OPTIONS.isdisjoint(o for o, _ in options):
+                    operands = operands[1:]
+                specs = [o for o in operands if os.path.lexists(os.path.join(cwd, o))] + specs
+                for s in specs or ["."]:
+                    why = others.spec(s, cwd, True)
+                    if why:
+                        return why
+                revs = [o for o in operands if not os.path.lexists(os.path.join(cwd, o))]
+                if hidden and (revs or "--cached" in before) and self.covers(specs, cwd, hidden):
+                    return self.stored(revs, "--cached" in before, cwd, addr, hidden)
+                return ""
+            if sub == "archive":  # its tree-ish, then its paths
+                operands = _options(before, _ARCHIVE_VALUED)[0] + specs
+                return self.stored(operands[:1], False, cwd, addr, hidden) if (
+                    self.covers(operands[1:], cwd, hidden)) else ""
+            # W2-42a R4: a revision-colon-path in git show or cat-file, or on a
+            # side of git diff, is read as its path.
+            diffing = sub == "diff" and "--no-index" not in before
+            shown = []
+            for o in (operands if sub in ("show", "cat-file") or diffing else []):
+                exp = _expand_token(o)
+                ref = _blob_ref(o if exp is None else exp)
+                if ref is None:
+                    continue
+                shown.append(o)
+                why = self.colon(sub, exp, ref, cwd, addr, hidden)
+                if why:
+                    return why
+            if sub == "cat-file":
+                return self.cat_file(before, operands, shown, cwd, addr)
+            if diffing and shown:
+                # git diff <blob> <blob>, or <blob> <file>: those paths alone, not
+                # a tree; with a revision beside them it is judged as revisions.
+                files = [o for o in operands if o not in shown]
+                if all(os.path.lexists(os.path.join(cwd, _expand_token(o) or o)) for o in files):
+                    for o in files:
+                        why = self.word(o, cwd)
+                        if why:
+                            return why
+                    for s in specs:
+                        why = self.spec(s, cwd, True)
+                        if why:
+                            return why
+                    return ""
+            quiet = (any(a in _GIT_QUIET or a.startswith("--stat=") for a in before)
+                     and not any(a in ("-p", "--patch", "-u") or a.startswith("-U")
+                                 for a in before))
+            if sub in ("log", "whatchanged"):
+                patch = not quiet and any(a in ("-p", "--patch", "-u") or a.startswith("-U")
+                                          for a in before)
+            else:
+                patch = sub == "format-patch" or not quiet and (
+                    sub == "diff" or len(shown) < len(operands) or not operands)
+            if patch and sub != "format-patch":  # with no pathspec, the whole tree
+                others = copy.copy(self)
+                others.parts = [p for p in self.parts if not p.strict]
+                for s in specs or [self.root]:
+                    why = others.spec(s, cwd, False)
+                    if why:
+                        return why
+            # git show :/<text> names a commit by its message: a patch, too.
+            patch = patch or any(o.startswith(":/") for o in shown if sub == "show")
+            return self.patched(sub, before, specs, cwd, addr, hidden) if (
+                patch and hidden) else ""
+
+        def colon(self, sub: str, word: str | None, ref: tuple[str, str], cwd: str,
+                  addr: list[str], hidden: list[_Part]) -> str:
+            """W2-42a R4: why a revision-colon-path (*word*, None when the guard
+            cannot expand it; *ref*, its revision and path) is refused: by the
+            rule its path names, as a read; then, with a part refused to this
+            session, when git does not resolve it (git show, git diff); a tree on
+            a side of git diff shows its files, judged as a folder's."""
+            rev, path = ref
+            here = os.path.realpath(cwd)
+            top = _x_top(here) or self.root
+            local = path.startswith(("./", "../"))
+            at = cwd if local else top
+            names = self.spellings(path, at)
+            if sub != "cat-file" and any(self.secret(p) for p in names):
+                return SECRET_REFUSAL
+            for part in (self.parts if sub != "cat-file" else []):
+                if any(part.inside(p) for p in names) and not (
+                        part.base and self.base_version(rev, part.rel(
+                            os.path.abspath(os.path.join(at, path))))):
+                    return part.reason
+            # The hidden part's path names it in whichever tree (W2-84).
+            rel = os.path.relpath(os.path.normpath(os.path.join(here if local else top, path)), top)
+            inside = not rel.startswith("..")
+            if any(h.inside(p) for h in hidden for p in names) or (
+                    inside and any(h.match(rel) for h in hidden)):
+                return HIDDEN_REFUSAL
+            if not self.parts:
+                return ""
+            if word is None:
+                return REV_REFUSAL
+            kind = self.ask(cwd, addr, "cat-file", "-t", "--end-of-options", word)
+            if kind is None:
+                return REV_REFUSAL
+            # The path starts at the top of the tree <rev> names (W2-42a R4).
+            if not self.placed(rev, cwd, addr):
+                return PLACE_REFUSAL
+            if sub != "diff" or kind.strip() == "blob":
+                return ""
+            why = self.above(path, at)
+            if why or not hidden:
+                return why
+            out = self.ask(cwd, addr, "ls-tree", "-r", "--full-tree", "--name-only", "-z",
+                           "--end-of-options", word)
+            if out is None or not inside:
+                return REV_REFUSAL
+            return HIDDEN_REFUSAL if any(h.match(os.path.normpath(os.path.join(rel, n)))
+                                         for h in hidden for n in out.split("\0") if n) else ""
+
+        def placed(self, rev: str, cwd: str, addr: list[str]) -> bool:
+            """W2-42a R4: whether ``<rev>:<path>`` places its path at the
+            repository's top: the index (an empty *rev*), a commit, a commit's
+            ``^{tree}``, or the tree HEAD's top is. A subtree's id, or what git
+            cannot answer, is not placed (fail closed)."""
+            if not rev:
+                return True
+            base = rev
+            while base.endswith("^{tree}"):
+                base = base[:-len("^{tree}")]
+            if base and self.ask(cwd, addr, "rev-parse", "--verify", "--quiet",
+                                 "--end-of-options", base + "^{commit}") is not None:
+                return True
+            out = (self.ask(cwd, addr, "rev-parse", "--end-of-options", rev + "^{tree}",
+                            "HEAD^{tree}") or "").split()
+            return len(out) == 2 and out[0] == out[1]
+
+        def cat_file(self, before: list[str], operands: list[str], shown: list[str],
+                     cwd: str, addr: list[str]) -> str:
+            """W2-42a R4: git cat-file of an object named by its id alone (no
+            ``<rev>:<path>``) that it prints as a file's text (``-p``,
+            ``--textconv``, ``--filters``, or ``<type> <object>``) and that is a
+            blob: its path cannot be placed, so a session with a refused part is
+            refused; ``-t``, ``-s``, ``-e`` and a commit or a tree stay open."""
+            if not self.parts:
+                return ""
+            objs = [o for o in operands if o not in shown]
+            typed = len(objs) >= 2  # <type> <object>
+            if not (typed or any(a in ("-p", "--textconv", "--filters") for a in before)):
+                return ""
+            for o in objs[1:] if typed else objs:
+                word = _expand_token(o)
+                if word is None:
+                    return REV_REFUSAL
+                kind = self.ask(cwd, addr, "cat-file", "-t", "--end-of-options", word)
+                if kind is None:
+                    return REV_REFUSAL
+                if kind.strip() == "blob":
+                    return PLACE_REFUSAL
+            return ""
+
+        def patched(self, sub: str, before: list[str], specs: list[str], cwd: str,
+                    addr: list[str], hidden: list[_Part]) -> str:
+            """Why a patch shows the hidden part, asked of git in a fixed
+            read-only form: the changed paths alone, filtered by the hidden
+            globs, with the command's revisions and the options that widen or
+            choose its sides; merges parent by parent (W2-84)."""
+            sides, revs, paths, negated = [], [], [], False
+            j = 0
+            while j < len(before):
+                a = before[j]
+                if a in _GIT_SIDES or a.startswith(("--branches=", "--tags=", "--remotes=",
+                                                    "--glob=")) or _COUNT_RE.fullmatch(a):
+                    sides.append(a)
+                elif a in ("-n", "--max-count") and j + 1 < len(before):
+                    sides += before[j:j + 2]
+                    j += 1
+                elif a in _GIT_LOG_VALUED:
+                    j += 1
+                elif a == "--not":  # what follows is taken whole: never fewer sides
+                    negated = True
+                elif not a.startswith("-") and not (
+                        sub == "show" and _blob_ref(_expand_token(a) or a)):
+                    if os.path.lexists(os.path.join(cwd, a)):
+                        paths.append(a)
+                    else:
+                        revs += ([e or "HEAD" for e in re.split(r"\.\.\.?", a.lstrip("^"))]
+                                 if negated else [a])
+                j += 1
+            if "--no-index" in before:  # two files, no revision
+                return HIDDEN_REFUSAL if any(h.inside(p) for a in paths for h in hidden
+                                             for p in self.spellings(a, cwd)) else ""
+            if not self.covers(paths + specs, cwd, hidden):
+                return ""
+            if sub == "diff":
+                query = ["diff", *_NO_CONVERT]
+            else:
+                query = ["log", *_NO_CONVERT, "--format=", "--diff-merges=separate",
+                         "--full-history"]
+                counted = any(a in ("-n", "--max-count") or _COUNT_RE.fullmatch(a)
+                              for a in sides)
+                if sub == "show" and not counted:
+                    query.append("--no-walk")
+                if (sub == "format-patch" and len(revs) == 1 and ".." not in revs[0]
+                        and not counted and "--root" not in before):
+                    revs = [revs[0] + "..HEAD"]  # <since> means <since>..HEAD
+            words = [_expand_token(w) for w in sides + revs]
+            if None in words or "--stdin" in before:  # a revision it cannot resolve
+                return REV_REFUSAL
+            # Each revision must be a commit: git log passes over a blob or tree;
+            # a message search (:/<text>) must name one.
+            ends = [e + "^{commit}" for w in words[len(sides):] if not w.startswith(":/")
+                    for e in re.split(r"\.\.\.?", w.lstrip("^")) if e]
+            ends += [w for w in words[len(sides):] if w.startswith(":/")]
+            if ends and self.ask(cwd, addr, "rev-parse", "--end-of-options", *ends, "--") is None:
+                return REV_REFUSAL
+            out = self.ask(cwd, addr, *query, *words[:len(sides)], "--end-of-options",
+                           *words[len(sides):], "--", *_pathspecs(hidden))
+            if out is None:
+                return REV_REFUSAL
+            return HIDDEN_REFUSAL if out.strip() else ""
+
+        def stored(self, revs: list[str], cached: bool, cwd: str, addr: list[str],
+                   hidden: list[_Part]) -> str:
+            """Why a revision's tree (or the index) holds the hidden part, asked
+            of git in a fixed read-only form (W2-84)."""
+            for rev in revs:
+                word = _expand_token(rev)
+                if word is None:
+                    return REV_REFUSAL
+                prefix = os.path.normpath(word.partition(":")[2] or ".")
+                prefix = "" if prefix == "." else prefix
+                out = self.ask(cwd, addr, "ls-tree", "-r", "--full-tree", "--name-only", "-z",
+                               "--end-of-options", word)
+                if out is None:
+                    return REV_REFUSAL
+                if any(h.match(os.path.join(prefix, n) if prefix else n) for h in hidden
+                       for n in out.split("\0") if n):
+                    return HIDDEN_REFUSAL
+            if cached:
+                out = self.ask(cwd, addr, "ls-files", "--cached", "-z", "--", *_pathspecs(hidden))
+                if out is None:
+                    return REV_REFUSAL
+                if out:
+                    return HIDDEN_REFUSAL
+            return ""
+
+        @staticmethod
+        def ask(cwd: str, addr: list[str], *args: str) -> str | None:
+            """git's answer in the repository the command addresses; None when
+            git answers it cannot, or the repository is named by a word the guard
+            cannot expand (a ruled refusal, W2-42a R5); git that cannot be run is
+            a fault, which refuses (fail closed)."""
+            words = [_expand_token(a) for a in addr]
+            if None in words:
+                return None
+            try:
+                out = _git(cwd, *words, *args)
+            except PolicyError:
+                raise PolicyError(_REV_FAULT) from None
+            return None if out.returncode else out.stdout
+
     _CLASSES.append((SetsRoot, Judge, Narrow))
     return _CLASSES[0]
 
@@ -912,7 +1316,9 @@ def rm_refusal(command, cwd, root):
     if not re.search(r"(?<![\w.-])rm(?![\w.-])", command):
         return None
     judged = bash_judgement(command, cwd)
-    deletes = judged.deletes if judged is not None else crude_deletes(command, cwd)
+    deletes = judged.deletes if judged is not None else []
+    if judged is None or judged.recovered:
+        deletes = deletes + crude_deletes(command, cwd)  # a command only a second reading read: its rm read crudely too
     if not deletes:
         return None
     main = main_tree(root)
@@ -993,6 +1399,10 @@ def main():
     from gov.guard.heldout import load_held_out, names_held_out
     acting = reads.acting_role(role, data.get("agent_type"))
     command = tin.get("command") if tool == "Bash" and isinstance(tin.get("command"), str) else None
+
+    # R5 (W2-42a): a path field that is no path is refused by its rule, before a rule resolves it.
+    if _no_path(tool, tin):
+        answer("deny", NO_PATH_REFUSAL, "no-path")
 
     # Rule 2, the held-out material: every role, any tool that names or reaches it.
     if names_held_out(tool, tin, root, cwd, load_held_out(root)):

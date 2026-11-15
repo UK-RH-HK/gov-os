@@ -1039,6 +1039,60 @@
         }
       },
       "description": "The one-question fix flow only (W2-94 S13, DEC-1180 (4)): its question id, its reason code and the action the delivered result names; action null until a delivered result names it (dry, refused, stopped)."
+    },
+    "reanchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "week",
+        "entries",
+        "ids",
+        "absent",
+        "corrected",
+        "replaced"
+      ],
+      "properties": {
+        "week": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-W[0-9]{2}$"
+        },
+        "entries": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "ids": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "absent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "corrected": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "replaced": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "description": "The weekly re-anchoring flow only (ACT-WALLS-REANCHOR-1, DEC-1179 (6)): its week and numbers only: the request's rows (entries), the questions staged (ids), the requested ids with no hidden file (absent), and the delivered result's corrected and replaced; each null until known (dry, refused, stopped)."
     }
   }
 }
