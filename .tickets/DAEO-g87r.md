@@ -1,6 +1,6 @@
 ---
 id: DAEO-g87r
-status: closed
+status: in_progress
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:09Z
@@ -25,6 +25,8 @@ allowed_paths:
 - tests/unit/orchestration/test_w2_94_fix_flow_unit.py  # the engineer's unit tests of the fix flow
 - governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json  # S13: the optional fix object (rv P4, DEC-1180 (4))
 - tests/unit/orchestration/test_w2_149_indep_launch.py  # the one pin S13 meets, its optional map gains fix (P-W2-94-S13-1 (a), the CTO, DEC-1156 (7))
+- tests/unit/orchestration/test_walls_reanchor_unit.py  # [added, DEC-1186 (4): the --reanchor flow's unit cases]
+- tests/unit/memaudit/test_maintain_reanchor_launch.py  # [added, DEC-1186 (4): maintain's request through the launcher, planted]
 kpis:
   success:
   - 'Between 10 and 20 questions about EXAMIN''s code and governance, each with its gold answer and the source or sources an answer must cite (file and section or line), in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, splits the set into a development half (`hidden/visible/`) and a hidden half, both written by the walled writer inside the hidden folder; the owner''s release step (`release_visible.sh`) then copies the development half into `visible/` Verify: a planted stand-in set: a count outside 10 to 20 is refused; the record holds the seed and the draw; the two halves each hold half (within one) with each category in both halves; the release step copies exactly the development half into `visible/` and refuses a second release [DEC-957, DEC-828 items 3 and 4, DEC-954 Q9f]'
@@ -40,7 +42,10 @@ kpis:
   - 'S11 The script''s docstring gains the fix flow''s usage line; `governance/project/indep-walls/**` and `governance/project/indep-briefs/**` are unchanged (the owner''s class O). Verify: `git diff --stat` of the branch names only the ticket''s paths'
   - 'S12 Without `--fix`, every existing flow behaves as before. Verify: the W2-149, W2-173 and W2-178 launcher unit suites pass unchanged'
   - 'S13 The counts schema takes the fix flow''s `fix` key (rv P4, 2026-11-14): `indep-counts.schema.json` allows an optional `fix` object with exactly `id` (a question id), `code` (the reason code) and `action` (`corrected` or `replaced`), and nothing else; a fix run''s counts validate, so `finish()` no longer logs "counts schema failed" and `--counts-only` of a fix run no longer refuses with 17; every other flow''s counts validate as before [rv-fix P4, DEC-1180 (4)] Verify: a fix run''s counts with `fix` validate; a `fix` with an extra key or another action is refused; the W2-149 counts cases pass unchanged'
+  - 'S14 (DEC-1186 (4)) The writer''s round 2 takes `--reanchor <ISO week>`: it reads `runs/<set>/REANCHOR-<week>.json` (written by `gov.memaudit maintain` item 6), checks its form and that its `audit_commit` equals `--commit` (else exit 14), and stages `input/<id>.yaml` for each named id that has a hidden file plus `input/reanchor.json`; an id with no hidden file is counted absent; ids are matched case-insensitively in their set''s own form (`Q01` and `q02` both served); the flow refuses (exit 11) when the walls'' kinds file does not declare `input_reanchor` for the writer. Verify: planted sets roots (never the real one) with requests of each form; a mismatched audit commit exits 14 with nothing staged; upper- and lower-case ids staged; an undeclared kind exits 11. [DEC-1186 (4), DEC-1179 (6), DEC-1180 (2)]'
+  - 'S15 (DEC-1186 (4)) Delivery replaces only the staged ids'' hidden files, all or nothing, keeps the old files in the run''s tar, and refuses any delivered file whose question text, gold answer, category or unnamed entries differ from the staged file (only the named entries'' cited blocks and source `commit` may change, plus an optional top-level `replace_reason`); the counts carry `reanchor` {week, entries, ids, absent, corrected, replaced}, numbers only. Verify: a planted delivery failing at each rename leaves the hidden half byte-identical; an id not requested keeps its inode and mtime; a planted delivery that changes a question''s text is refused with nothing replaced; unique planted strings never appear in stdout, stderr, the counts or any file outside the sets root. [DEC-1186 (4), DEC-820 (d)]'
   failure:
+  - 'S14/S15''s failure: hidden content outside the walls, a request served for another commit, an id not requested touched, a partial delivery, or a delivered file whose question, answer or unnamed entries changed. Verify: S14 and S15''s planted cases.'
   - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work. Verify: a planted stand-in hidden file: a read, a grep and a `git log` from a measured session''s sandbox (the guard''s path map) are refused or find it 0 times'
   - 'A write in the workbench, the owner''s copy or EXAMIN''s real repository; a clone outside ~/gov-os-runs/W2-94/. Verify: `git status` in the workbench, the owner''s copy and EXAMIN''s real repository shows no change after the run; a `find` for a clone of the copy outside `~/gov-os-runs/W2-94/` finds none'
   - 'A gold source that does not hold its answer. Verify: the S4 script on a planted source that does not hold its answer reports that question''s id as failing'
@@ -49,6 +54,7 @@ kpis:
   - 'F6 The fix flow needs a change to the approved variant''s bytes or to the walls'' class O files to run. Verify: S10 runs the variant at its approved sha256; S11''s diff'
 profile: STANDARD
 sources:
+- DEC-1186
 - DEC-957
 - DEC-1175
 - DEC-1178
@@ -86,3 +92,5 @@ Card: MEMORY-SPEC-MAP gap 7, resolved by the owner in DEC-957; W2-61's KPI 6 mov
 **Kept open 2026-11-14 19:03 by the CTO (DEC-1180 (4), DEC-1182 (5); listed for the owner's reading):** S13 landed at fdf397527 (the queue closed the ticket in the same step). W2-94 closes on the owner's operator's q02 run with variant v2 and `check_gold` 20 of 20; the four commands were given at 16:22 and again in full at 18:20.
 
 **Closed 2026-11-14 by the CTO (DEC-1184 (6)):** q02 done by the owner's operator: run `20261114T222836Z-examin-r2` delivered, fix q02 `corrected`, `check_gold` 20 of 20 hold. Step 2's approved line, as the CTO's command gave it, lacked the kind `writer` (the cause was the CTO's command); the operator corrected it to `brief writer <path>` and relaunched. Close record: `governance/project/orchestration/closes/W2-94-DAEO-g87r.md`.
+
+**Reopened 2026-11-15 by the CTO (DEC-1186 (4), P-WALLS-REANCHOR-1 (B)):** the walls launcher's `--reanchor` flow, so `maintain`'s weekly request reaches the walled writer without the operator's hand. Start from the built and reviewed bundle's after-copy (`.gov-runtime/scratch/orchestrator/acts/ACT-WALLS-REANCHOR-1/after/`; review `reviews/act-walls-reanchor-1.md`: F1 a check line naming the home path, F3 upper-case ids refused, F4 the kinds file before the audit commit), with F3 fixed and the delivered-against-staged check added (the re-anchoring brief's notes, `drafts/reanchor-brief/NOTES.md`). The walls' `kinds.yaml` and the APPROVED line go by a small class (O) ACT after this lands. **Interface at claim (DEC-1157 (3)):** `indep_launch.py` gains `--reanchor <week>` on the writer kind, round 2 only; `plan_reanchor(sets_root, set, week, commit)` returns the staged ids and the absent count; `deliver_reanchor(...)` is all or nothing; the counts schema gains an optional `reanchor` object (numbers only); every existing flow unchanged (S12). The writer's result is `out/<id>.yaml` plus `out/result.json`, as the drafted brief expects. Listed for the owner's reading.
