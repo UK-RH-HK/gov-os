@@ -45,8 +45,12 @@ No cache is written to disk. The per-run memos are dicts inside the one hook pro
   wildcard globs, `session_hidden`, `write_refused`, `role_paths`) and a held-out list. The calls: 4,204 corpus calls
   (r4's kept 1,190; the calls of `tests/unit/guard/` and of W2-42a's, W1-02's, W1-05's, W2-84's and W2-141's
   acceptance suites, recorded this run) plus 87 hook-only calls at the planted blocks. That is 4,291 calls × 4 roles
-  (engineer, test designer, auditor, none) = 17,164 decisions. Final copy: see `hfinalA` in the engineer's return.
-  Earlier copy: 0 differences in exit code, decision, reason and stderr; 3,946 refused and 16 fail-closed on both.
+  (engineer, test designer, auditor, none) = 17,164 decisions. On the final copy
+  (665614961cd0, 543cf1b26701) there are **0 differences** in exit code, decision, reason and stderr: 13,218
+  allowed, 3,946 refused and 16 fail-closed on both copies, in 1,050 s. Every rule shows among the refusals (2 hidden,
+  2 held-out, 2b write and line, 2c, 2d, 1, 5, rm, 3 secret, 4 sudo and install, g14, R4/R5). An earlier copy had
+  also given 0 differences. Product side: `decide`, `policy_refusal` and `has_install` on the 4,204 calls × 4 roles
+  before and after `5532c6f80462`: 0 differences.
 - **The live hook's unit suite** (`tests/unit/hooks/test_live_hook.py`, pointed at each copy, pinned interpreter):
   62 passed and 1 failed, the same on both copies. The one failure,
   `test_a_removed_worktree_falls_back_to_the_hook_s_own_tree`, comes from the copy's location: the scratch copy is
@@ -62,9 +66,34 @@ session PATH recorded by the lead, 46 entries (27 under `/mnt/c`). The engineer'
 so the recorded one was used and not shortened. The live repository's `git status --short` was the same before and
 after (empty).
 
-**Configuration A**: the pinned 0.1.0 gov as is, which is what ACT-GUARD-FIX-7 alone gives. The load column is the
-1-minute load at each round. It was not quiet for most cases (over 10 from the 4th case on), so these figures are
-**not quiet figures**.
+**Configuration A, quiet** (load 1.5-7.8; the last case had a load burst, to 7.8, and its rounds spread): the
+pinned 0.1.0 gov as is, which is what ACT-GUARD-FIX-7 alone gives.
+
+| case | before judged | after judged | drop | ref median b/a | CPU p95 b/a | wall p95 b/a | load |
+|---|---|---|---|---|---|---|---|
+| W1-05 Edit-engineer | 72.9 | 57.9 | 15.0 | 14.7/14.7 | 87.7/72.6 | 87.3/72.4 | 5.2-6.0 |
+| W1-05 Glob-engineer | 78.9 | 63.3 | 15.6 | 15.4/15.3 | 94.4/78.6 | 94.3/78.5 | 5.0-6.6 |
+| W1-05 Glob-no-role | 52.0 | 47.9 | 4.1 | 14.7/14.8 | 66.7/62.7 | 67.0/63.2 | 5.2-6.5 |
+| W1-05 Grep-engineer | 77.6 | 58.0 | 19.7 | 15.0/15.0 | 92.6/72.9 | 92.0/72.5 | 4.0-5.2 |
+| W1-05 Grep-no-role | 52.6 | 48.7 | 4.0 | 15.0/15.0 | 67.6/63.7 | 67.6/63.6 | 3.5-4.0 |
+| W1-05 NotebookEdit-engineer | 73.5 | 57.1 | 16.5 | 15.1/15.1 | 88.6/72.1 | 88.4/71.8 | 3.1-3.5 |
+| W1-05 Read-engineer | 74.6 | 57.8 | 16.8 | 14.8/15.0 | 89.3/72.8 | 90.2/72.9 | 2.8-3.1 |
+| W1-05 Read-no-role | 53.9 | 48.8 | 5.1 | 15.0/14.8 | 68.9/63.6 | 69.0/63.7 | 2.5-2.8 |
+| W1-05 Write-engineer | 72.2 | 55.6 | 16.6 | 14.8/15.0 | 87.1/70.6 | 87.0/71.4 | 2.3-2.5 |
+| W1-02 no-role Write (scratch) | 56.4 | 50.3 | 6.1 | 14.9/15.0 | 71.3/65.3 | 71.9/65.8 | 2.3-2.7 |
+| W1-02 engineer Write src (allow) | 72.0 | 56.2 | 15.8 | 14.9/14.8 | 86.9/71.1 | 86.8/71.0 | 2.4-3.0 |
+| W1-02 engineer Write acceptance (deny r1) | 73.2 | 57.0 | 16.3 | 14.7/14.8 | 88.0/71.7 | 87.7/71.5 | 2.6-3.0 |
+| W1-02 test-designer Write acceptance | 70.5 | 54.0 | 16.6 | 14.6/14.5 | 85.1/68.5 | 85.6/69.2 | 2.0-2.6 |
+| W1-02 auditor Write src (deny r5) | 70.5 | 55.4 | 15.1 | 14.6/14.5 | 85.1/69.9 | 84.7/69.7 | 1.7-2.0 |
+| W2-57 test-designer Read ordinary | 72.0 | 58.4 | 13.6 | 14.7/14.8 | 86.7/73.2 | 86.5/73.9 | 1.7-1.8 |
+| Bash ls (engineer) | 81.2 | 59.6 | 21.6 | 14.8/14.9 | 96.0/74.5 | 144.1/74.1 | 1.6-1.8 |
+| Bash pipeline (engineer) | 82.6 | 60.2 | 22.4 | 14.8/14.8 | 97.4/75.0 | 146.9/75.5 | 1.5-1.8 |
+| Bash write to scratch (engineer) | 82.9 | 61.4 | 21.5 | 14.8/14.8 | 97.7/76.2 | 145.6/76.3 | 1.5-1.9 |
+| Bash git status (CTO) | 78.2 | 58.5 | 19.7 | 14.9/14.9 | 93.1/73.5 | 144.5/73.1 | 1.6-1.9 |
+| Bash grep\|wc (test-designer) | 118.6 | 81.4 | 37.2 | 15.3/15.3 | 133.9/96.7 | 184.6/96.2 | 1.9-7.8 |
+
+An earlier run of configuration A at load 3.5-20 (not quiet, kept for the record) gave after 47.8-78.6, drop
+3.4-26.1:
 
 | case | before judged | after judged | drop | ref median b/a | CPU p95 b/a | wall p95 b/a | load |
 |---|---|---|---|---|---|---|---|
@@ -89,9 +118,9 @@ after (empty).
 | Bash git status (CTO) | 88.8 | 74.1 | 14.8 | 15.8/16.0 | 104.6/90.1 | 171.9/87.0 | 10.6-11.7 |
 | Bash grep\|wc (test-designer) | 99.2 | 76.5 | 22.7 | 16.3/16.2 | 115.5/92.7 | 178.6/89.2 | 10.3-11.3 |
 
-In configuration A every case is within 100 ms, after 47.8-78.6 ms. On wall time, the PATH-once check brings Bash
-from about 175 to about 90 ms. **S9's 30 ms is not reached: the drop is 3.4-26.1 ms on the 15 mapped cases.** The
-quiet trial of 4 cases at load 0.9-1.9 gave the same picture: before 72-87, after 57-68, drop 14-22.
+Quiet, in configuration A, every one of the 20 cases is within 100 ms (after 47.9-81.4 ms; before 52.0-118.6). On
+wall time, the PATH-once check brings Bash from about 145 to about 75 ms. **S9's 30 ms is not reached: the drop on
+the 15 mapped cases is 4.0-19.7 ms quiet** (13.6-19.7 for the role-checked ones, 4.0-6.1 for the no-role ones).
 
 What remains is not the hook's own code. Of an after call's ~72 ms of process CPU (quiet, engineer Read), about 15 ms
 is the interpreter (the reference), about 27 ms is the pinned gov's import chain (`gov.guard.reads` 11.9 ms with
@@ -101,6 +130,29 @@ The git children take 4.5 ms (`worktree list`, `remote get-url`, `rev-parse`). T
 because they build no hidden parts: their cost is mostly those imports. See the engineer's return,
 `proposed_decisions`/`unresolved`, for the options.
 
-**Configuration B**: the after copy with the gov of the W2-111 tree's `src`, which is what it gives after 0.1.1. It is
-the pinned interpreter run without `-E`, with `PYTHONPATH=<tree>/src`, paired against the same before copy in A. See
-the engineer's return.
+**Configuration B** (load 2.2-9.6): the after copy with the gov of the W2-111 tree's `src`, which is what it gives
+after 0.1.1. It is the pinned interpreter run without `-E`, with `PYTHONPATH=<tree>/src`, paired against the same
+before copy in A. Every case is within 100 ms (after 45.5-73.0); the drop is 8.2-25.4 ms, also short of 30.
+
+| case | before judged | after judged | drop | ref median b/a | CPU p95 b/a | wall p95 b/a | load |
+|---|---|---|---|---|---|---|---|
+| W1-05 Edit-engineer | 80.8 | 58.4 | 22.4 | 15.8/15.8 | 96.6/74.2 | 97.0/73.9 | 7.9-9.6 |
+| W1-05 Glob-engineer | 77.1 | 57.9 | 19.3 | 15.8/15.8 | 92.9/73.7 | 93.3/73.3 | 6.4-7.9 |
+| W1-05 Glob-no-role | 54.9 | 46.7 | 8.3 | 15.6/15.6 | 70.5/62.2 | 70.9/62.1 | 5.4-6.4 |
+| W1-05 Grep-engineer | 78.8 | 58.8 | 20.1 | 15.5/15.5 | 94.4/74.3 | 94.0/74.0 | 4.4-5.4 |
+| W1-05 Grep-no-role | 56.5 | 47.9 | 8.6 | 15.4/15.4 | 71.9/63.2 | 71.9/63.3 | 3.8-4.2 |
+| W1-05 NotebookEdit-engineer | 76.9 | 55.0 | 21.8 | 15.4/15.3 | 92.3/70.3 | 92.3/70.4 | 3.2-3.8 |
+| W1-05 Read-engineer | 78.1 | 56.3 | 21.8 | 15.3/15.1 | 93.4/71.4 | 93.1/71.2 | 2.8-3.2 |
+| W1-05 Read-no-role | 57.0 | 47.5 | 9.6 | 15.3/15.2 | 72.3/62.7 | 72.2/62.6 | 2.5-2.8 |
+| W1-05 Write-engineer | 76.4 | 55.5 | 20.9 | 15.3/15.4 | 91.7/70.9 | 91.8/70.9 | 2.3-2.5 |
+| W1-02 no-role Write (scratch) | 53.7 | 45.5 | 8.2 | 15.1/15.3 | 68.8/60.7 | 69.5/60.6 | 2.2-2.3 |
+| W1-02 engineer Write src (allow) | 73.4 | 54.6 | 18.8 | 14.8/14.9 | 88.3/69.6 | 88.3/68.9 | 2.2-3.2 |
+| W1-02 engineer Write acceptance (deny r1) | 82.2 | 65.3 | 17.0 | 15.3/16.3 | 97.5/81.5 | 97.8/82.1 | 3.2-4.7 |
+| W1-02 test-designer Write acceptance | 72.6 | 54.4 | 18.2 | 14.9/15.0 | 87.5/69.5 | 87.2/69.2 | 4.1-5.3 |
+| W1-02 auditor Write src (deny r5) | 85.9 | 63.2 | 22.7 | 15.9/15.8 | 101.8/79.0 | 101.5/78.7 | 5.1-5.8 |
+| W2-57 test-designer Read ordinary | 84.1 | 62.8 | 21.2 | 16.3/15.2 | 100.3/78.1 | 99.8/77.9 | 5.8-6.6 |
+| Bash ls (engineer) | 97.3 | 71.9 | 25.4 | 15.8/16.0 | 113.1/87.9 | 176.1/88.7 | 6.6-8.0 |
+| Bash pipeline (engineer) | 94.3 | 73.0 | 21.3 | 15.2/15.1 | 109.5/88.1 | 165.0/87.8 | 6.3-8.0 |
+| Bash write to scratch (engineer) | 88.4 | 66.5 | 21.9 | 15.0/15.5 | 103.4/82.0 | 156.9/81.9 | 5.4-6.3 |
+| Bash git status (CTO) | 86.9 | 64.0 | 22.8 | 15.2/15.4 | 102.1/79.5 | 157.6/79.5 | 5.3-5.9 |
+| Bash grep\|wc (test-designer) | 86.8 | 64.5 | 22.3 | 15.2/15.2 | 102.0/79.7 | 157.1/80.4 | 4.5-5.4 |
