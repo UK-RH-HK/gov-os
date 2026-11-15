@@ -78,13 +78,7 @@ sha256sum /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orches
 python3 -I /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/w2-27-settings/operator_settings.py
 #   prints the commit, and: status after: ''
 ```
-Then restart the EXAMIN CTO with its tools given at start. Without them, every Bash call now asks.
-```
-tmux kill-session -t examin-cto
-tmux new -d -s examin-cto -c /home/usain/gov-os-runs/W2-27/examin env -u GOV_TICKET -u GOV_DEV_TIERS -u GOV_ROLE GOV_ROLE=orchestrator GOV_TICKET=exa-dt1z claude --permission-mode acceptEdits --allowedTools Bash Read Edit Write Grep Glob Skill
-```
-Then paste brief b70ff2332e89 as at the first start. The replies file tells it to re-run the precondition probes (r3),
-then A5.
+**No restart is needed** (corrected 22:58). The user-level `~/.claude/settings.json` already allows Bash, Read, Edit and Write in the working directories (acceptEdits), and the session reloads the project settings. The replies file tells the EXAMIN CTO to re-run the precondition probes (r3) once the commit is on top, then A5.
 
 ## 5. At W2-29 (EXAMIN's real repository)
 The same table applies to the real repository's settings, as the owner decided. They are judged again there because
