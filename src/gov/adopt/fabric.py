@@ -71,7 +71,11 @@ def _source_tree(start: Path | None = None) -> Path | None:
 # so an installed release finds them in a repository with no kit. The source tree's own file is the original.
 PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON,  # the cron script: run 8b, item 21
             "template/.gitleaks.toml",  # ``safety.TEMPLATE_GITLEAKS_REL``'s value (S29's unit test holds them equal)
-            *(source for source, _ in KERNEL_FOLDERS + KERNEL_FILES))
+            *(source for source, _ in KERNEL_FOLDERS + KERNEL_FILES),
+            # DEC-1189 (1): the two ticket schemas W2-174's Verify pass validates against; it reads them through its
+            # own lookup (``gov.adopt.verify_pass``), never through ``shipped``
+            "template/governance/kernel/schemas/ticket.schema.json",
+            "template/governance/kernel/schemas/common.schema.json")
 
 
 def _package_copy() -> Path:
