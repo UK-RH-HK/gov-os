@@ -25,7 +25,7 @@ def test_s1_cli_names_exactly_the_open_ticket_with_two_lines_lacking_a_verify(re
     _three_tickets(repo)
     before = s.snapshot(repo.root)
     result = s.result_of(repo.verify_list())
-    assert result.get("missing") == [{"ticket": "DAEO-bb02", "labels": ["S2", "F1"]}], \
+    assert result.get("missing") == [{"ticket": "DAEO-bb02", "labels": ["S2", "F1"], "fields": []}], \
         f"missing is not exactly the second ticket's two labels: {result!r}"
     assert result.get("text") == "DAEO-bb02 S2 F1", f"text is not '<id> <label> <label>': {result.get('text')!r}"
     assert s.snapshot(repo.root) == before, "--verify-list changed the repository"
@@ -34,7 +34,7 @@ def test_s1_cli_names_exactly_the_open_ticket_with_two_lines_lacking_a_verify(re
 def test_s1_function_names_exactly_the_open_ticket_with_two_lines_lacking_a_verify(repo):
     _three_tickets(repo)
     found = s.verify_pass().missing(repo.root)
-    assert found == [{"ticket": "DAEO-bb02", "labels": ["S2", "F1"]}], f"missing(root) gave {found!r}"
+    assert found == [{"ticket": "DAEO-bb02", "labels": ["S2", "F1"], "fields": []}], f"missing(root) gave {found!r}"
 
 
 def test_s1_cli_without_json_prints_the_result_as_gov_does(repo):
@@ -42,7 +42,7 @@ def test_s1_cli_without_json_prints_the_result_as_gov_does(repo):
     done = repo.adopt("--verify-list", json_out=False)
     assert done.returncode == 0, f"gov adopt --verify-list failed: {s.describe(done)}"
     printed = json.loads(done.stdout)
-    assert printed == {"missing": [{"ticket": "DAEO-bb02", "labels": ["S2", "F1"]}], "text": "DAEO-bb02 S2 F1"}, \
+    assert printed == {"missing": [{"ticket": "DAEO-bb02", "labels": ["S2", "F1"], "fields": []}], "text": "DAEO-bb02 S2 F1"}, \
         f"stdout is not gov's result dict: {done.stdout!r}"
 
 
@@ -79,9 +79,9 @@ def test_s1_open_and_in_progress_listed_sorted_by_id_labels_in_kpi_order(repo):
                 [s.lacking("M one [DEC-1]."), s.verified("M two [DEC-1]."), s.lacking("M three [DEC-1].")],
                 [s.verified("M failure one [DEC-1]."), s.lacking("M failure two [DEC-1].")])
     repo.ticket("DAEO-cc03", "W2-903", "closed", [s.lacking()], [s.lacking("C failure [DEC-1].")])
-    expected = [{"ticket": "DAEO-aa01", "labels": ["S2"]},
-                {"ticket": "DAEO-mm05", "labels": ["S1", "S3", "F2"]},
-                {"ticket": "DAEO-zz09", "labels": ["S1", "F1"]}]
+    expected = [{"ticket": "DAEO-aa01", "labels": ["S2"], "fields": []},
+                {"ticket": "DAEO-mm05", "labels": ["S1", "S3", "F2"], "fields": []},
+                {"ticket": "DAEO-zz09", "labels": ["S1", "F1"], "fields": []}]
     result = s.result_of(repo.verify_list())
     assert result.get("missing") == expected, \
         f"missing is not sorted by id with labels in kpi_rows order: {result.get('missing')!r}"
@@ -102,5 +102,5 @@ def test_s1_the_list_agrees_with_the_ready_check(repo):
     front = tickets.load(repo.tickets / "DAEO-bb02.md")[0]
     refused = [finding["detail"] for finding in ready_check(front, tickets, repo.root, s.NEW_SINCE)[0]
                if finding["code"] == "KPI_NO_VERIFY"]
-    assert listed == [{"ticket": "DAEO-bb02", "labels": refused}] and refused == ["S2", "S3", "F1"], \
+    assert listed == [{"ticket": "DAEO-bb02", "labels": refused, "fields": []}] and refused == ["S2", "S3", "F1"], \
         f"the list {listed!r} and ready_check's KPI_NO_VERIFY {refused!r} disagree"

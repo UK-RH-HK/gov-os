@@ -15,6 +15,8 @@ import w2_174_support as s
 
 FORBIDDEN_IMPORTS = {"socket", "http", "urllib", "requests", "httpx", "anthropic", "openai", "subprocess"}
 CODE_SUFFIXES = (".py", ".pyc", ".so", ".pyd")
+# L15 (DEC-1188): the pass also reads the kernel's ticket schema shipped with gov (this tree's, never a copy in the repository)
+SHIPPED = (s.SCHEMAS.resolve(), (s.REPO / "governance/kernel/schemas").resolve())
 GUARDED = ("src/gov/brief/", "template/governance/kernel/templates/", "template/governance/kernel/schemas/")
 UNCHANGED = ("src/gov/adopt/stages.py", "tests/acceptance/W2-152/")
 
@@ -157,7 +159,7 @@ def _stray_opens(events, allowed: list[Path], allowed_folder: Path) -> tuple[lis
         path = (path if path.is_absolute() else Path.cwd() / path).resolve()
         if path.suffix in CODE_SUFFIXES:
             continue
-        if path in allowed or allowed_folder in path.parents:
+        if path in allowed or allowed_folder in path.parents or any(folder in path.parents for folder in SHIPPED):
             inside.append(path)
         else:
             stray.append((mode, str(path)))
