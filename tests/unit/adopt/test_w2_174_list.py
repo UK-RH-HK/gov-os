@@ -8,9 +8,9 @@ from gov.adopt import verify_pass
 
 def three(tmp_path):
     return repo_with(tmp_path, {
-        "DAEO-a1": ticket("DAEO-a1", "open", success=[DONE, DONE], failure=[DONE]),
-        "DAEO-b2": ticket("DAEO-b2", "in_progress", success=["plain line one", DONE], failure=["'quoted failure line'"]),
-        "DAEO-c3": ticket("DAEO-c3", "closed", success=["a closed ticket's line with no verify"]),
+        "DAEO-aa11": ticket("DAEO-aa11", "open", success=[DONE, DONE], failure=[DONE]),
+        "DAEO-bb22": ticket("DAEO-bb22", "in_progress", success=["plain line one", DONE], failure=["'quoted failure line'"]),
+        "DAEO-cc33": ticket("DAEO-cc33", "closed", success=["a closed ticket's line with no verify"]),
     })
 
 
@@ -19,15 +19,15 @@ def test_list_gives_exactly_the_second_tickets_two_labels(tmp_path):
     before = snapshot(root)
     code, envelope, _ = gov_json("adopt", "--verify-list", "--root", str(root))
     assert code == 0
-    assert envelope["result"]["missing"] == [{"ticket": "DAEO-b2", "labels": ["S1", "F1"]}]
-    assert envelope["result"]["text"] == "DAEO-b2 S1 F1"
-    assert verify_pass.missing(root) == [{"ticket": "DAEO-b2", "labels": ["S1", "F1"]}]
+    assert envelope["result"]["missing"] == [{"ticket": "DAEO-bb22", "labels": ["S1", "F1"], "fields": []}]
+    assert envelope["result"]["text"] == "DAEO-bb22 S1 F1"
+    assert verify_pass.missing(root) == [{"ticket": "DAEO-bb22", "labels": ["S1", "F1"], "fields": []}]
     assert snapshot(root) == before
 
 
 def test_list_of_an_all_verified_repository_prints_none_and_exits_0(tmp_path):
-    root = repo_with(tmp_path, {"DAEO-a1": ticket("DAEO-a1", success=[DONE, DONE], failure=[DONE]),
-                                "DAEO-c3": ticket("DAEO-c3", "closed", success=["no verify, but closed"])})
+    root = repo_with(tmp_path, {"DAEO-aa11": ticket("DAEO-aa11", success=[DONE, DONE], failure=[DONE]),
+                                "DAEO-cc33": ticket("DAEO-cc33", "closed", success=["no verify, but closed"])})
     code, envelope, _ = gov_json("adopt", "--verify-list", "--root", str(root))
     assert code == 0
     assert envelope["result"] == {"missing": [], "text": "none"}
@@ -35,15 +35,15 @@ def test_list_of_an_all_verified_repository_prints_none_and_exits_0(tmp_path):
 
 def test_list_is_sorted_by_id_and_a_line_with_verify_text_in_it_counts_as_verified(tmp_path):
     root = repo_with(tmp_path, {
-        "DAEO-z9": ticket("DAEO-z9", success=["one line"]),
-        "DAEO-m5": ticket("DAEO-m5", success=["'a line Verify: with its own clause'", "next line", "{line: x, verify: ''}"]),
-        "DAEO-k0": ticket("DAEO-k0", "open", success=["'Verify:'"]),
+        "DAEO-zz99": ticket("DAEO-zz99", success=["one line"]),
+        "DAEO-mm55": ticket("DAEO-mm55", success=["'a line Verify: with its own clause'", "next line", "{line: x, verify: ''}"]),
+        "DAEO-kk00": ticket("DAEO-kk00", "open", success=["'Verify:'"]),
     })
     found = verify_pass.missing(root)
-    assert [item["ticket"] for item in found] == ["DAEO-k0", "DAEO-m5", "DAEO-z9"]
+    assert [item["ticket"] for item in found] == ["DAEO-kk00", "DAEO-mm55", "DAEO-zz99"]
     assert found[1]["labels"] == ["S2", "S3"]  # a mapping with an empty verify lacks one, as kpi_rows reads it
     code, out, _ = gov("adopt", "--verify-list", "--root", str(root))
-    assert code == 0 and '"text": "DAEO-k0 S1\\nDAEO-m5 S2 S3\\nDAEO-z9 S1"' in out
+    assert code == 0 and '"text": "DAEO-kk00 S1\\nDAEO-mm55 S2 S3\\nDAEO-zz99 S1"' in out
 
 
 def test_list_without_a_tickets_folder_is_none(tmp_path):

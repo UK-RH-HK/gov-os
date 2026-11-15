@@ -12,20 +12,20 @@ FORBIDDEN = {"socket", "http", "urllib", "requests", "httpx", "anthropic", "open
 
 
 def test_decoys_outside_the_tickets_folder_are_byte_identical_after_list_and_apply(tmp_path):
-    root = repo_with(tmp_path, {"DAEO-a1": ticket("DAEO-a1", success=["one", DONE])})
+    root = repo_with(tmp_path, {"DAEO-aa11": ticket("DAEO-aa11", success=["one", DONE])})
     for rel in ("README.md", "src/mod.py", "governance/project/facts.yaml", "docs/ticket-copy.md", ".gov-runtime/x.json"):
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(f"decoy {rel}\n", encoding="utf-8")
     (root / ".tickets/notes.txt").write_text("not a ticket\n", encoding="utf-8")
-    (root / ".tickets/DAEO-a1.md.bak").write_text("a backup\n", encoding="utf-8")
-    answers = answers_file(tmp_path, {"DAEO-a1": {"S1": "clause"}})
+    (root / ".tickets/DAEO-aa11.md.bak").write_text("a backup\n", encoding="utf-8")
+    answers = answers_file(tmp_path, {"DAEO-aa11": {"S1": "clause"}})
     before = snapshot(root)
     answers_before = answers.read_bytes()
     gov_json("adopt", "--verify-list", "--root", str(root))
     assert snapshot(root) == before
     gov_json("adopt", "--verify-apply", str(answers), "--root", str(root), "--session", "s")
     after = snapshot(root)
-    assert {name for name in after if after.get(name) != before.get(name)} == {".tickets/DAEO-a1.md"}
+    assert {name for name in after if after.get(name) != before.get(name)} == {".tickets/DAEO-aa11.md"}
     assert set(after) == set(before)  # no temporary or other file left anywhere
     assert answers.read_bytes() == answers_before
 
@@ -39,17 +39,17 @@ def test_the_module_imports_no_network_or_model_package():
         elif isinstance(node, ast.ImportFrom) and node.module:
             imported.add(node.module.split(".")[0])
     assert imported and not imported & FORBIDDEN, imported & FORBIDDEN
-    assert imported <= {"__future__", "datetime", "os", "re", "pathlib", "yaml", "gov"}, imported
+    assert imported <= {"__future__", "datetime", "json", "jsonschema", "os", "re", "pathlib", "yaml", "gov"}, imported
 
 
 def test_the_module_opens_no_path_but_a_ticket_or_the_answers_file(tmp_path):
-    root = repo_with(tmp_path, {"DAEO-a1": ticket("DAEO-a1", success=["one"])})
+    root = repo_with(tmp_path, {"DAEO-aa11": ticket("DAEO-aa11", success=["one"])})
     (root / "outside.txt").write_text("outside\n", encoding="utf-8")
     opened = []
     import pathlib
 
     original_open = pathlib.Path.open
-    answers = answers_file(tmp_path, {"DAEO-a1": {"S1": "clause"}})
+    answers = answers_file(tmp_path, {"DAEO-aa11": {"S1": "clause"}})
 
     def spy(self, *args, **kwargs):
         opened.append(str(self))
@@ -62,4 +62,8 @@ def test_the_module_opens_no_path_but_a_ticket_or_the_answers_file(tmp_path):
     finally:
         pathlib.Path.open = original_open
     assert opened  # the spy saw the reads and the writes
-    assert all(path.startswith(str(root / ".tickets")) or path == str(answers) for path in opened), opened
+    schemas = [path for path in opened if path.endswith(".schema.json")]
+    assert schemas and all(path.endswith("template/governance/kernel/schemas/" + path.rsplit("/", 1)[1])
+                           and not path.startswith(str(root)) for path in schemas), schemas  # gov's own, never the repo's
+    assert all(path.startswith(str(root / ".tickets")) or path == str(answers) or path in schemas
+               for path in opened), opened
