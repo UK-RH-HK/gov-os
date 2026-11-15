@@ -265,8 +265,8 @@ class ReanchorWorld(World):
 
     def inproc(self, monkeypatch, capsys, argv, fail_at=None):
         """``indep_launch.main(argv)`` in this process, HOME and PATH planted, the module's ``os.replace`` wrapped:
-        the calls whose target lies in the set's hidden folder (or below it) are counted, and the ``fail_at``-th of
-        them raises. Returns (rc, counts, the counted targets)."""
+        the calls whose target lies directly in the set's hidden folder (not below it: the lead's answer 5 to td-4's
+        questions) are counted, and the ``fail_at``-th of them raises. Returns (rc, counts, the counted targets)."""
         monkeypatch.chdir(self.repo)
         for k in list(os.environ):
             if k.startswith("GOV_"):
@@ -278,7 +278,7 @@ class ReanchorWorld(World):
 
         def replace(src, dst, *a, **kw):
             d = os.path.realpath(os.path.dirname(os.path.abspath(os.fspath(dst))))
-            if d == hidden or d.startswith(hidden + os.sep):
+            if d == hidden:
                 calls.append(os.fspath(dst))
                 if fail_at is not None and len(calls) == fail_at:
                     raise OSError(errno.EIO, "planted rename failure")

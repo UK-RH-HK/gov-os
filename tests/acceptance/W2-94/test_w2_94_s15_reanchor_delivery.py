@@ -14,8 +14,8 @@ import os
 
 import pytest
 
-from w2_94_reanchor_support import (DROP, NEW_MARKERS, SETN, STAGED_STEMS, UID, WEEK, ReanchorWorld, indep_launch,
-                                    good_delivered, out_files, result_json, schema)
+from w2_94_reanchor_support import (DROP, NEW_MARKERS, SETN, STAGED_STEMS, UID, WEEK, ReanchorWorld, dump,
+                                    good_delivered, indep_launch, m, out_files, result_json, schema)
 
 
 @pytest.fixture
@@ -100,6 +100,61 @@ def test_s15_only_cited_keys_and_a_replace_reason_may_change_and_are_accepted(rw
     no_leaks(rw)
 
 
+# a question marked in an earlier week: the staged hidden file already carries a top-level replace_reason
+# (the ticket's S15: "plus an optional top-level `replace_reason`"; the lead's point 2: ignored on both sides)
+OLD_REASON = m("q02", "replace-reason-old")
+NEW_REASON = m("q02", "replace-reason-new")
+
+
+def _plant_staged_reason(w):
+    d = w.staged("q02")
+    d["replace_reason"] = OLD_REASON
+    (w.hidden / "q02.yaml").write_text(dump(d), encoding="utf-8")
+    w.markers += [OLD_REASON, NEW_REASON]
+
+
+STAGED_REASON_KEPT = {"kept": lambda d: None, "changed": lambda d: d.update(replace_reason=NEW_REASON),
+                      "removed": lambda d: d.pop("replace_reason")}
+
+
+@pytest.mark.parametrize("form", list(STAGED_REASON_KEPT))
+def test_s15_a_staged_replace_reason_kept_changed_or_removed_is_accepted(rw, form):
+    """S15 (the lead's point 2, amending interface 5): a staged hidden file that already carries a top-level
+    replace_reason is delivered re-anchored with that replace_reason kept, changed to another non-empty string, or
+    removed: each is accepted (exit 0) and the delivered mapping lands as delivered."""
+    _plant_staged_reason(rw)
+    delivered = good_delivered(rw)
+    assert delivered["q02"]["replace_reason"] == OLD_REASON
+    STAGED_REASON_KEPT[form](delivered["q02"])
+    rw.session(out_files(rw, delivered))
+    rc, counts, p = rw.ra()
+    assert rc == 0, (rc, counts, p.stderr)
+    assert counts["status"] == "delivered"
+    import yaml
+    assert yaml.safe_load((rw.hidden / "q02.yaml").read_text()) == delivered["q02"]
+    no_leaks(rw)
+
+
+STAGED_REASON_BAD = {"emptied": "", "a number": 3, "null": None, "a list": [NEW_REASON]}
+
+
+@pytest.mark.parametrize("form", list(STAGED_REASON_BAD))
+def test_s15_failure_a_staged_replace_reason_delivered_not_a_non_empty_string_is_20(rw, form):
+    """S15 (interface 5 with the lead's point 2): when the staged file carries a replace_reason, a delivered
+    replace_reason that is not a non-empty string (empty, a number, null, a list) is still refused 20, nothing
+    replaced."""
+    _plant_staged_reason(rw)
+    delivered = good_delivered(rw)
+    delivered["q02"]["replace_reason"] = STAGED_REASON_BAD[form]
+    rw.session(out_files(rw, delivered))
+    before = rw.set_files()
+    rc, counts, p = rw.ra()
+    assert rc == 20, (rc, counts, p.stderr)
+    assert counts["status"] == "rejected"
+    assert rw.set_files() == before
+    no_leaks(rw)
+
+
 # =====================================================================================================================
 # S15 / failure -- all or nothing: a failure at a rename leaves the hidden half byte-identical
 # =====================================================================================================================
@@ -107,7 +162,7 @@ def test_s15_only_cited_keys_and_a_replace_reason_may_change_and_are_accepted(rw
 def test_s15_failure_a_delivery_failing_at_a_rename_is_20_and_leaves_the_hidden_half_byte_identical(
         tmp_path, monkeypatch, capsys, at):
     """S15 / S14-S15's failure ("a partial delivery"): in-process, the module's os.replace raising at the 1st, 2nd or
-    last call whose target lies in the set's hidden folder gives 20; the hidden half is byte-identical with no
+    last call whose target lies directly in the set's hidden folder gives 20; the hidden half is byte-identical with no
     temporary file left in it, and nothing else of the set changed."""
     counting = ReanchorWorld(tmp_path / "count")
     counting.session(out_files(counting))

@@ -123,6 +123,7 @@ def test_s14_an_undeclared_or_malformed_input_reanchor_is_11_with_nothing_built(
     rc, counts, p = w.dry()
     assert rc == 11, (rc, counts, p.stderr)
     assert counts["status"] == "refused" and counts["code"] == 11
+    assert indep_launch.schema_ok(counts, schema()), counts  # the lead's answer 4: `reanchor` here is not pinned
     unchanged(w, before, name)
     no_leaks(w)
 
@@ -237,6 +238,7 @@ def test_s14_a_request_of_a_wrong_form_is_10_with_nothing_built(rw, name):
     rc, counts, p = rw.dry()
     assert rc == 10, (rc, counts, p.stderr)
     assert counts["status"] == "refused" and counts["code"] == 10
+    assert indep_launch.schema_ok(counts, schema()), counts  # the lead's answer 4: `reanchor` here is not pinned
     unchanged(rw, before, name)
     no_leaks(rw)
 
@@ -273,6 +275,7 @@ def test_s14_failure_a_request_for_another_commit_is_14_nothing_staged_nothing_b
     rc, counts, p = rw.dry()
     assert rc == 14, (rc, counts, p.stderr)
     assert counts["status"] == "refused" and counts["code"] == 14
+    assert indep_launch.schema_ok(counts, schema()), counts  # the lead's answer 4: `reanchor` here is not pinned
     unchanged(rw, before, which)
     no_leaks(rw)
 
@@ -350,6 +353,33 @@ def test_f1_a_dry_run_shows_no_planted_string_outside_the_sets_root(dry):
     no_leaks(w)
 
 
+def test_s14_a_writer_brief_whose_front_matter_names_no_sample_is_accepted_for_a_dry_run(tmp_path):
+    """S14 (the lead's answer 2 to td-4's questions): the flow takes a plain writer brief with or without a `sample:`
+    line. Beside the module dry run (the planted brief names `sample: 3`), the writer's brief rewritten without its
+    `sample:` line (the drafted re-anchoring brief's form), committed and approved, gives a dry run that exits 0 with
+    the same wall: the fixed files, the staged ids and input/reanchor.json, and brief.md the new brief byte for byte."""
+    w = ReanchorWorld(tmp_path)
+    text = w.brief_text("writer")
+    plain = "".join(ln for ln in text.splitlines(True) if not ln.startswith("sample:"))
+    assert plain != text and "sample" not in plain.split("---")[1]
+    rel = "governance/project/indep-briefs/writer.md"
+    w.put(rel, plain)
+    w.commit = w.commit_all("a writer brief naming no sample")
+    w.approve(w.commit)
+    w.write_request(w.request())
+    rc, counts, p = w.dry()
+    assert rc == 0, (rc, counts, p.stderr)
+    assert counts["status"] == "dry"
+    wall = w.wall(counts)
+    assert (wall / "brief.md").read_bytes() == plain.encode()
+    files = w.wall_listing(wall)[0]
+    assert files == sorted(FIXED + [f"input/{s}.yaml" for s in STAGED_STEMS] + ["input/reanchor.json"])
+    assert counts["reanchor"] == {"week": WEEK, "entries": 5, "ids": 3, "absent": 1, "corrected": None,
+                                  "replaced": None}
+    assert indep_launch.schema_ok(counts, schema())
+    no_leaks(w)
+
+
 def test_s14_an_id_with_no_top_level_hidden_file_is_counted_absent_and_not_staged(tmp_path):
     """S14 (interface 4): ids held only in hidden/visible/, only in hidden/dropped/, or nowhere are absent; only the
     top-level file of the one present id is staged."""
@@ -412,6 +442,7 @@ def test_s14_an_ambiguous_linked_or_empty_match_is_10_with_nothing_built(rw, nam
     rc, counts, p = rw.dry()
     assert rc == 10, (rc, counts, p.stderr)
     assert counts["status"] == "refused"
+    assert indep_launch.schema_ok(counts, schema()), counts  # the lead's answer 4: `reanchor` here is not pinned
     unchanged(rw, before, name)
     no_leaks(rw)
 
