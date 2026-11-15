@@ -98,6 +98,8 @@ kpis:
   - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved to W2-124, DEC-1083] (was S5)'
 profile: FULL
 sources:
+- W2-124  # [added 2026-11-15 by the CTO: cited in the KPI brackets (structural links notice after the land)]
+- W2-26  # [added 2026-11-15 by the CTO: the same]
 - DEC-1185
 - DEC-1183
 - DEC-1154
