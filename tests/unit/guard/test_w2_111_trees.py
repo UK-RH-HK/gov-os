@@ -156,7 +156,7 @@ def test_the_lazy_part_answers_as_the_part_made_at_once(places, tree):
 
 # -- the listing's real paths: realpath's own answers ----------------------------------------------------------------
 
-def test_the_listing_s_real_paths_are_realpath_s(tmp_path):
+def test_the_listing_resolves_each_path_as_os_path_resolves_it(tmp_path):  # no "real" in the name: -k keeps it
     b = tmp_path
     (b / "a" / "b" / "c").mkdir(parents=True)
     (b / "a" / "file").write_text("x")
