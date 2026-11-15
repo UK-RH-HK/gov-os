@@ -354,7 +354,8 @@ def test_s27_a_failing_gitleaks_in_one_batch_fails_closed_and_nothing_of_that_ba
     whose texts hold the planted marker (the secret file's) it answers: (exit-2) the real report and exit 2; (exit-3-unreadable-report) exit 3
     and ``{ not a report``; (exit-3-finding-names-no-file) exit 3 and one finding whose ``File`` is ``<folder>/999999``. "That batch" is
     every text of the calls holding the marker (their tags). ``indexable`` raises, or returns with every file of that batch left out (never
-    a clean verdict on them); every folder given to gitleaks is gone after it returns or raises. A second run with a logging-only wrapper
+    a clean verdict on them); every folder given to gitleaks (the argument after ``dir`` resolved against its working directory, item 5b) is
+    gone after it returns or raises. A second run with a logging-only wrapper
     (the real answers), the same ``HOME`` and reuse record: every file of that batch is given to gitleaks again (its tag is among the second
     run's texts; ``scan_counts()["content"]["scanned"]`` at least that many), the secret file is left out and every clean file kept."""
     tree = failing_tree(box, f"failing-{mode}")
@@ -396,7 +397,8 @@ def test_s27_a_failing_gitleaks_in_one_batch_fails_closed_and_nothing_of_that_ba
 
 def test_s27_each_batch_folder_is_private_outside_the_root_holds_no_repository_name_and_is_removed(box):
     """success-S27 (interface items 2 and 3; F2: nothing written in the repository): 20 tagged files (two hold a planted secret). The
-    recording ``gitleaks`` notes, at each call, the folder after ``dir``: there is at least one such call; each folder is a folder outside the
+    recording ``gitleaks`` notes, at each call, the folder after ``dir`` (resolved against the gitleaks process's working directory: interface
+    item 5b runs ``gitleaks dir .`` there): there is at least one such call; each folder is a folder outside the
     root being scanned, of mode 0700, its entries readable by the owner only (no group or other bit), no entry name holds the root, an asked
     path or a planted name; after ``indexable`` returns no such folder remains; the verdict is right (secrets out, clean kept); and the
     repository holds no new file."""
@@ -454,6 +456,63 @@ def test_s27_a_temporary_folder_inside_the_root_is_refused_by_name_and_nothing_i
                                                 f"(raised {answer['raised']}; kept {len(answer['kept'] or [])} of {len(tree.paths)})")
     assert "scan-tmp" in (answer["message"] or ""), f"the RuntimeError does not name the folder: {answer['message']!r}"
     assert_no_value(tree, box, [run], "TMPDIR inside the root")
+
+
+# Run 9's interface item 5b: the folders gitleaks' default path allowlist (``useDefault = true`` in the project's ``.gitleaks.toml``) drops
+TMP_HAZARDS = {"node-modules": ("node_modules",), "venv-lib": ("venv", "lib")}
+
+
+def rules_found(box, tree: Tree, cwd: Path, target: str) -> list:
+    """The rule ids a real ``gitleaks dir <target>`` run in ``cwd`` with the project's ``.gitleaks.toml`` reports (redacted; no value kept)."""
+    report = Path(box.base) / "hazard-check.json"
+    report.unlink(missing_ok=True)
+    done = subprocess.run([W.S124.REAL_GITLEAKS, "dir", target, "--config", str(tree.root / ".gitleaks.toml"), "--no-banner", "--redact",
+                           "--exit-code", "0", "--report-format", "json", "--report-path", str(report)],
+                          cwd=str(cwd), env=W.env(box, "127.0.0.1:9"), capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
+    assert done.returncode == 0, f"gitleaks failed in {cwd} on {target!r} (exit {done.returncode}):\n{done.stderr[-800:]}"
+    found = json.loads(report.read_text(encoding="utf-8") or "[]") if report.is_file() else []
+    report.unlink(missing_ok=True)
+    return sorted({item["RuleID"] for item in found})
+
+
+@pytest.mark.parametrize("hazard", list(TMP_HAZARDS))
+def test_s27_a_temporary_folder_whose_path_holds_a_default_allowlisted_name_still_leaves_out_the_secret_file(box, before_src, hazard):
+    """success-S27 (interface item 5b, its reason; fails open if broken): ``TMPDIR`` names an empty folder outside the root being scanned whose
+    path holds ``node_modules/`` (node-modules) or ``venv/lib`` (venv-lib). The hazard is first shown real: the secret file copied into a folder
+    under that ``TMPDIR`` is reported by a real ``gitleaks dir .`` run inside it, and by none when that folder is given by its path (gitleaks'
+    default path allowlist). Then ``indexable`` with that ``TMPDIR``: at least one ``gitleaks dir`` call, each batch folder under that
+    ``TMPDIR``; the secret file left out and every clean file kept (the one-per-file form's answer); no batch folder remains."""
+    held = secret("cloud-access-key", 70 + list(TMP_HAZARDS).index(hazard), f"hazard-{hazard}")
+    files = [(f"src/plain/h{n:02d}.txt", clean_text(n, f"h{n:02d}"), False) for n in range(8)]
+    files.insert(4, ("src/keys/hazard.env", held.line(f"# {SW.TAG}hazard\nKEY={{value}}\n"), True))
+    tree = plant(box.base, f"hazard-{hazard}", files)
+    tree.helds = [held]
+    outside = Path(box.base) / f"outside-{hazard}"
+    tmp = outside.joinpath(*TMP_HAZARDS[hazard])
+    tmp.mkdir(parents=True)
+    assert not tmp.resolve().is_relative_to(tree.root.resolve()), f"the plant did not take: {tmp} is inside the root"
+    probe = tmp / "probe"
+    probe.mkdir()
+    shutil.copy2(tree.root / "src/keys/hazard.env", probe / "1")
+    inside, by_path = rules_found(box, tree, probe, "."), rules_found(box, tree, Path(box.base), str(probe))
+    shutil.rmtree(probe)
+    assert inside, f"the plant did not take: gitleaks dir . inside {probe} reports nothing on the secret file"
+    assert by_path == [], (f"the plant did not take: with the folder given by its path under {tmp}, gitleaks still reports {by_path}: the "
+                           f"default path allowlist no longer drops it, the case shows nothing")
+    before_kept = oracle(before_src, tree, box, f"hazard-{hazard}")
+    log = Path(box.base) / f"hazard-{hazard}.log"
+    tools = SW.recording_gitleaks(Path(box.base) / f"tools-hazard-{hazard}", log)
+    after, run = judge(W.SRC, tree, box, f"hazard-{hazard}-after.json", tools=(tools,), TMPDIR=str(tmp))
+    assert_own_verdicts(kept_of(after, f"TMPDIR under {hazard}"), before_kept, tree, f"TMPDIR under {'/'.join(TMP_HAZARDS[hazard])}")
+    noted = SW.calls(log)
+    dirs = [call for call in noted if call["folder"] is not None]
+    assert dirs, (f"no gitleaks call was `gitleaks dir <folder>` ({len(noted)} calls, first arguments "
+                  f"{sorted({tuple(c['args'][:1]) for c in noted})}): the texts are not written to a batch folder")
+    stray = sorted({c["folder"] for c in dirs if not Path(c["folder"]).resolve().is_relative_to(tmp.resolve())})
+    assert not stray, f"the plant did not take: {len(stray)} batch folder(s) not under TMPDIR {tmp}: {stray[:2]}"
+    left = sorted({c["folder"] for c in dirs if Path(c["folder"]).exists()})
+    assert not left, f"{len(left)} batch folder(s) remain after indexable returned: {left[:2]}"
+    assert_no_value(tree, box, [run], f"TMPDIR under {hazard}", log, outside)
 
 
 # ------------------------------------------------------------------------------------------------------------
