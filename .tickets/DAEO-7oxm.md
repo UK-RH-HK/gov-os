@@ -1,6 +1,6 @@
 ---
 id: DAEO-7oxm
-status: closed
+status: in_progress
 deps: [DAEO-qz4p]
 links: [DAEO-qz4p, DAEO-61vm, DAEO-k1e2]
 created: 2026-11-12T05:03:31Z
@@ -18,6 +18,7 @@ profile: FULL
 depends_on: [DAEO-qz4p]
 waits_on: []
 allowed_paths:
+- tests/acceptance/W2-178/w2_178_support.py  # [added, the CTO's path case DEC-1156 (7), 2026-11-15: the base build takes the head's schemas]
 - governance/project/orchestration/tools/indep_launch.py
 - tests/unit/orchestration/test_w2_178*
 - docs/changes/W2-178-evidence.md
@@ -52,3 +53,5 @@ Class C2. The held-out and hidden-half rules hold: tests plant their own sets ro
 ## Approved after the fact (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
 
 Filed by the CTO without the owner's P1 (DEC-974; the prompt's §3); the owner approved it after the fact. It should have been a fix inside an existing ticket (its paths and KPI lines widened by the owner's decision), not a new ticket.
+
+**Reopened 2026-11-15 by the CTO (path case, DEC-1156 (7); the 11-15 nightly's red, drafts/nightly-20261115/DIAG.md):** six W2-178 cases fail with `WALL.json differs` since W2-94's counts-schema change (46eb8bf11856): `indep_launch.py:2599` records that schema's sha256 in WALL.json, while `w2_178_support.py:107-114` builds the base wall with the old schemas folder from git. A test designer revises the support so the base build uses the head's schemas (or compares WALL.json without `schema_sha256`), `Rewrite-Reason: DEC-1156 (7)`; no product change. Listed for the owner's reading.
