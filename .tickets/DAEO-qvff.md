@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-nqa2
 allowed_paths:
+- tests/acceptance/serial-only.txt  # [added 2026-11-15 by the CTO, DEC-1156 (7), P-W2-111-R5-ROWS (a): the ticket's own five timing files as 'serial: latency' entries, beside W1-02's, W1-05's and W2-57's]
 - tests/acceptance/W1-02/test_w1_02_guard_hook.py
 - tests/acceptance/W1-02/README.md
 - tests/acceptance/W1-05/test_w1_05_live_hooks.py
@@ -89,3 +90,5 @@ The owner's D2 (a) on CAPACITY-1 (DEC-979, P-LATENCY-1): a fresh independent tes
 **Reopened 2026-11-15 by the owner (DEC-1187, P-W2-111-MARGIN (a)):** after ACT-GUARD-FIX-6 the live hook measured over 100 ms (Bash 112-208 ms, role-checked calls 127-153 ms; `~/gov-os-runs/W2-111/gf6-measure/`). S9 cuts the hook's fixed import and YAML cost in the product; S10 prepares the live hook's diff (the r4 speed-ups plus the cut) for the CTO's ACT-GUARD-FIX-7. The src part reaches the live hook through release 0.1.1's re-pin (DEC-1178 (3)(c)). FULL, class C3; the kernel gate and the owner's approval of any kernel bytes at the land.
 
 **Interface for S9's count case (the CTO, 2026-11-15, DEC-1157 (3), on the r5 lead's measure at 0e2cdf33e):** observed in the product hook's process as W1-02 runs it, by the YAML files opened under `governance/` and the number of parses through yaml's public load API: (1) a call refused before the held-out check (for example `dangerouslyDisableSandbox` set) parses no YAML file; (2) a write or edit, of any role, parses no `path-map.yaml`; (3) every call parses each YAML file it opens at most once. `held-out.yaml` stays read on every call past decide()'s early refusals (DEC-218: a broken held-out.yaml stops every call). Decisions and reasons are unchanged (the corpus).
+
+**Widened 2026-11-15 by the CTO (DEC-1156 (7), P-W2-111-R5-ROWS (a)):** `tests/acceptance/serial-only.txt`, so a test designer lists W2-111's five timing files as `serial: latency` (rv-3's F2: they red only inside lead_verify's parallel phase at load 10-20; alone and quiet 25/25 pass). rv-3's F1 (libyaml accepts tab and `? ` texts the pure SafeLoader refuses, so a malformed held-out.yaml no longer stops every call: fails open) is fixed in the same round by DEC-802 (engineer, product and live-hook diff, with a test-design batch giving it as a described behaviour), and F3's README line with it; then a narrow independent re-check at the new head (DEC-1154).
