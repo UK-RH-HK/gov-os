@@ -522,6 +522,13 @@ def too_large(exc) -> GovError:
                      **({"file": file} if file is not None else {})})
 
 
+def runtime_too_long(exc) -> GovError:
+    """``CODEGRAPH_RUNTIME_PATH_TOO_LONG`` for a ``gov.codeintel.RuntimePathTooLong`` (DEC-338: a socket path holds at
+    most 107 bytes; ``details``: ``path``, ``length``, ``limit``, ``long``), named in A9's refusal as itself."""
+    return GovError(exc.code, str(exc), {"path": str(exc.path), "length": exc.length, "limit": exc.limit,
+                                         "long": str(exc.long)})
+
+
 def _stores(run, result: dict) -> dict:
     """Per store ``{judged, indexed[], refused[{path, reason}], chunks, vectors, nodes, edges, seconds,
     peak_rss_bytes}``. The peak is the stage's whole process (one rebuild, not one per store)."""
@@ -597,6 +604,8 @@ def _stores(run, result: dict) -> dict:
             read = codeintel.read_stats(run.root) or {}  # pieces read, taken from the record, and the wall time
         except codeintel.GraphTooLarge as exc:  # a piece over the tool's cap is named as that (S25, S28)
             raise too_large(exc) from exc
+        except codeintel.RuntimePathTooLong as exc:  # the tool's socket cannot be placed: named as that (DEC-338)
+            raise runtime_too_long(exc) from exc
         except Exception as exc:  # noqa: BLE001 - a graph that cannot be read is named, never shown as 0 nodes and edges
             unreadable = f"{type(exc).__name__}: {' '.join(str(exc).split())}"
     held = sorted(records & set(paths))  # the record store judges the files that carry records (a plain file is none)

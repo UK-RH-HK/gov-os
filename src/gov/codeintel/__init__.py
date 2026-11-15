@@ -51,6 +51,15 @@ MARK = ".gov-cbm-base"
 # ... and, in a session ``gov launch`` started, its own temp folder (``gov-launch-`` and a few letters, DEC-159),
 # found from ``CLAUDE_CODE_TMPDIR``: the launcher's folder itself, or the CLI's ``claude-<uid>`` folder in it.
 LAUNCH_TMP_ENV, LAUNCH_PREFIX, LAUNCH_SUB = "CLAUDE_CODE_TMPDIR", "gov-launch-", "cbm"
+# The tool's socket under its runtime folder (0.11.0, measured in W2-88 run 8b): ``cbm-daemon-<uid>/cbm-<16 hex>.sock``
+# (a 65-byte folder works, a 66-byte one fails "secure CLI coordination could not be created (endpoint)"); its daemon's
+# pending name ``.sock.pending`` is counted too. A socket path holds at most 107 bytes (DEC-338): a runtime folder whose
+# socket would pass it is replaced by a short one of its own under ``SHORT_BASE`` (the CTO's P2, W2-88 run 8b), and a
+# short one that cannot be made or is still too long is refused by name (``TOO_LONG``).
+SOCKET_MAX = 107
+SOCKET_TAIL = f"cbm-daemon-{os.getuid()}/cbm-{'0' * 16}.sock.pending"
+SHORT_BASE = Path(f"/tmp/gov-cbm-{os.getuid()}")
+TOO_LONG = "CODEGRAPH_RUNTIME_PATH_TOO_LONG"
 PROJECT = "code"
 _PAGE, _BUDGET = 50000, 100_000_000  # rows and output tokens of one answer of the tool; more is paged
 # Rows of one query's whole answer the tool gives at most: over it the tool refuses the query before its own paging
@@ -77,8 +86,9 @@ _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
 _FUNCTIONS = {"Function", "Method"}
 
-__all__ = ["callees", "callers", "daemon_base", "daemon_dir", "dead_code", "definitions", "home", "impact", "index",
-           "launch_folder", "make_session_base", "marked_base", "projects", "references", "write_mark"]
+__all__ = ["RuntimePathTooLong", "callees", "callers", "daemon_base", "daemon_dir", "dead_code", "definitions", "home",
+           "impact", "index", "launch_folder", "make_session_base", "marked_base", "projects", "references",
+           "socket_length", "write_mark"]
 
 
 def home(root: Path) -> Path:
@@ -172,20 +182,57 @@ def make_session_base(env=None) -> Path:
     raise OSError("no folder for the test session's daemon directories can be made")
 
 
+def socket_length(runtime) -> int:
+    """The bytes of the tool's socket path under the runtime folder ``runtime`` (``SOCKET_TAIL``)."""
+    return len(os.fsencode(os.path.join(str(runtime), SOCKET_TAIL)))
+
+
+class RuntimePathTooLong(RuntimeError):
+    """``TOO_LONG``: the runtime folder ``long`` would put the tool's socket over ``SOCKET_MAX`` bytes, and its short
+    folder ``path`` (``length``: the bytes of its socket) cannot be made or is still too long (``why``)."""
+
+    code = TOO_LONG
+
+    def __init__(self, long: Path, path: Path, why: str) -> None:
+        self.long, self.path, self.length, self.limit = long, path, socket_length(path), SOCKET_MAX
+        super().__init__(f"{TOO_LONG}: the code index tool's socket under its runtime folder {long} would be "
+                         f"{socket_length(long)} bytes, over the {SOCKET_MAX} a socket path holds (DEC-338), and its "
+                         f"short folder {path} ({self.length} bytes for the socket, limit {SOCKET_MAX}) {why}: the code "
+                         "index tool is not run")
+
+
+def _placed(root: Path) -> tuple[Path, Path | None]:
+    """The runtime folder for ``root`` and, where the one ``daemon_base`` gives would put the socket over
+    ``SOCKET_MAX``, that long one (else None)."""
+    root = Path(root).resolve()
+    long = daemon_base(root=root) / hashlib.sha256(os.fsencode(root)).hexdigest()[:16]
+    if socket_length(long) <= SOCKET_MAX:
+        return long, None
+    return SHORT_BASE / hashlib.sha256(os.fsencode(os.path.realpath(long))).hexdigest()[:12], long
+
+
 def daemon_dir(root: Path) -> Path:
     """The tool's runtime directory for the repository at ``root`` (its ``CBM_RUNTIME_DIR``), outside the repository,
-    as this process sees it (``daemon_base``)."""
-    root = Path(root).resolve()
-    return daemon_base(root=root) / hashlib.sha256(os.fsencode(root)).hexdigest()[:16]
+    as this process sees it (``daemon_base``); where that one would put the socket over ``SOCKET_MAX`` bytes, a short
+    one of its own under ``SHORT_BASE`` (12 hex of the sha256 of the long one's real path)."""
+    return _placed(root)[0]
 
 
 def _daemon_dir(root: Path) -> Path:
-    """``daemon_dir(root)``, made. Raises unless it and the folder above it are the user's own real directories."""
-    made = daemon_dir(root)
-    for place in (made.parent, made):  # /tmp is shared: a folder or a link put there by another user is not used
-        place.mkdir(mode=0o700, exist_ok=True)
-        if place.is_symlink() or place.stat().st_uid != os.getuid():
-            raise RuntimeError(f"{place} is not a directory of this user: the code index tool is not run")
+    """``daemon_dir(root)``, made. Raises unless it and the folder above it are the user's own real directories; a
+    short folder that cannot be made, or is still too long, raises ``RuntimePathTooLong``."""
+    made, long = _placed(root)
+    if long is not None and socket_length(made) > SOCKET_MAX:
+        raise RuntimePathTooLong(long, made, "is still too long")
+    try:
+        for place in (made.parent, made):  # /tmp is shared: a folder or a link put there by another user is not used
+            place.mkdir(mode=0o700, exist_ok=True)
+            if place.is_symlink() or place.stat().st_uid != os.getuid():
+                raise RuntimeError(f"{place} is not a directory of this user: the code index tool is not run")
+    except (OSError, RuntimeError) as exc:
+        if long is None:
+            raise
+        raise RuntimePathTooLong(long, made, f"cannot be made ({exc})") from exc
     return made
 
 
