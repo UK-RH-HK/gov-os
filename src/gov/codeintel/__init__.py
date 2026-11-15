@@ -28,7 +28,7 @@ import shutil
 import stat
 import subprocess
 import threading
-from collections import defaultdict
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -648,12 +648,13 @@ class _Reader:
                 f"the code graph's node label {label}: its {count} nodes were cut short by {TOOL} and cannot be read "
                 "by path (its path list is cut or holds paths that are no string)"))
         found: list[list] = []
-        for path in sorted(set(values)):
+        held = Counter(values)  # the nodes of each path, from the label's list checked against its count
+        for path in sorted(held):
             quoted = _quoted(path)
             if quoted is None:
                 raise GraphShort("node label", label, count, len(found), file=path)
             found += self.checked(f"MATCH (n:{label}) WHERE n.file_path = {quoted} RETURN n.qualified_name, n.name, "
-                                  "n.label, n.file_path", "node label", label, values.count(path), file=path)
+                                  "n.label, n.file_path", "node label", label, held[path], file=path)
         return found
 
 
