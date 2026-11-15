@@ -15241,6 +15241,15 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-15 ~21:50: "W2-88-GITLEAKS-SHIP yes. P-W2-81-FULLRUN (a), started tonight, not tomorrow morning (my standing rule: nothing is deferred)."
 - **Governing sources:** package `packages/P-W2-81-FULLRUN.md` (ef8a2a32b); DEC-1178 (3)(c), (3)(e); DEC-1183 (1); DEC-1188 (1).
 
+### DEC-1190 — The W2-81 adopter brief approved (65438a2e); EXAMIN's copy's settings reshaped to Gov OS's standard (the owner as EXAMIN's owner, F-015); the product fix stays flag-not-drop
+- **Status:** ACCEPTED (owner, 2026-11-15 ~22:30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-15)`) · **Under:** DEC-1189 (2), DEC-1184 (4), DEC-313, DEC-315, DEC-158, DEC-1178 (3)
+- **Decision:**
+  - (1) **`yes W2-81-adopter-brief 65438a2e`:** the brief `drafts/w2-81-fullrun/W2-81-adopter-brief.md` (sha256 65438a2e2da1…) starts the six W2-81 adopting sessions; the operator's set-up script `operator_setup.py` (sha256 c40a0099…) runs first.
+  - (2) **EXAMIN's settings (F-015):** the owner, as EXAMIN's owner, reshapes the copy's whole settings to Gov OS's standard (package `packages/P-W2-27-SETTINGS.md`): the allow list keeps `Bash(gov launch:*)` only; the dead Windows `additionalDirectories` entry is dropped; `.claude/settings.local.json` is removed and its tools are given to each session at its start (`--allowedTools`, as Gov OS's launcher does); every deny rule and hook stays, EXAMIN's own guard and compaction hooks included. An owner commit by the operator (`operator_settings.py`, sha256 1f76e8ea…); then the EXAMIN CTO re-runs its precondition probes on the new settings before A5. The same reshape applies to EXAMIN's real repository at W2-29, judged again on its files.
+  - (3) **The product fix stays flag-not-drop:** `gov adapters generate` and `gov doctor` name each carried rule that pre-approves an "ask" tool and each dead directory, and the launcher's refusal names the entry. F-014 and F-015 join the W2-27 product findings package.
+- **Basis:** the owner's message of 2026-11-15 ~22:30: "yes W2-81-adopter-brief 65438a2e … as EXAMIN's owner I decide to reshape the copy's whole settings to Gov OS's standard … The product fix stays flag-not-drop … add F-014 and F-015 to the product findings package."
+- **Governing sources:** packages `P-W2-81-FULLRUN.md`, `P-W2-27-SETTINGS.md`; EXAMIN's FINDINGS F-000, F-002, F-014, F-015; DEC-313; DEC-315; DEC-158.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15365,3 +15374,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.568 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1187 (P-W2-111-MARGIN (a): W2-111 reopened for the live hook's speed and the hook's fixed import cost, ACT-GUARD-FIX-7 to follow, the src part in 0.1.1; ACT-GUARD-FIX-6 kept; DEC-1186 (2) changed). Next free id: DEC-1188. |
 | 0.569 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1188 (P-W2-27-F011 (a): EXAMIN's review and coordination tickets by the owner's operator tonight; W2-174 reopened for the launch fields by its checked apply, in 0.1.1). Next free id: DEC-1189. |
 | 0.570 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1189 (W2-88-GITLEAKS-SHIP yes: W2-88 reopened within S24 for the shipped .gitleaks.toml, in 0.1.1; P-W2-81-FULLRUN (a): W2-81's full run on 0.1.0 tonight). Next free id: DEC-1190. |
+| 0.571 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1190 (the W2-81 adopter brief approved; EXAMIN's settings reshaped to Gov OS's standard; the product fix flag-not-drop). Next free id: DEC-1191. |
