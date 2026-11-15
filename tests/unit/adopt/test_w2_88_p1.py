@@ -26,7 +26,8 @@ REPO = Path(__file__).resolve().parents[3]
 SKILLS = "template/governance/kernel/skills"
 KIT = ("template/governance/kernel/templates/brief.md", "template/governance/kernel/templates/role-cto.md",
        f"{SKILLS}/retrieval", f"{SKILLS}/discovery")
-SHIPPED_FILES = (*KIT, "template/.gitleaks.toml", fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS)
+SHIPPED_FILES = (*KIT, "template/.gitleaks.toml", fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS,
+                 memory_sets.CRON)  # step 6's cron script, found by ``fabric.shipped`` only (run 8b, item 22)
 MARK = "\nSHIPPED-MARK\n"
 
 

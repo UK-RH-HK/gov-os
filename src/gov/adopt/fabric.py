@@ -67,7 +67,7 @@ def _source_tree(start: Path | None = None) -> Path | None:
 # The files A9 needs that are not under ``template/`` (so no ``copier copy`` installs them): the wheel carries a copy of
 # each, byte for byte, at its path in the Gov OS repository under the ``gov`` package's ``_shipped/`` folder
 # (``pyproject.toml``'s package data; run 8, package 1 (a)). The source tree's own file is the original.
-PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS)
+PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON)  # the cron script: run 8b, item 21
 
 
 def _package_copy() -> Path:
@@ -835,7 +835,10 @@ def _stage(run, out: Path, standard: dict, copies: dict) -> dict:
             "refresh": {"command": memory_sets.REFRESH, "hook": "installed by the owner's operator through "
                                                                  "memory-audit/ACT-WALLS, never by this tool"},
             "audit": {"record": "memory-audit/AUDIT-RECORD.json", "due": memory["due"], "variants": memory["variants"],
-                      "dropped_categories": dropped}, "cost": price}
+                      "dropped_categories": dropped, "act": "memory-audit/ACT-WALLS/ACT.md",
+                      # no gitleaks on the PATH: step 6 holds no cron line, and the record says so (run 8b, item 24)
+                      **({"gitleaks": memory_sets.GITLEAKS_MISSING} if memory_sets.gitleaks_missing() else {})},
+            "cost": price}
     if built.get("layout"):
         data["layout"] = built["layout"]
     rel = commit(run, copies, data)  # A9's own step, not ``run.finish`` (NC-1)

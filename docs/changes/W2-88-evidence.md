@@ -664,3 +664,18 @@ cases that pass on the old code are the ones that state what must stay the same)
   tests in this run; the tests were then checked against three mutated readers (no type split, no record, no total
   check): each mutation is caught (3, 1 and 1 cases red).
 - **Not run here:** A9 on the redis copy and its wall time; the lead re-runs it outside the sandbox.
+
+## Run 8b: step 6 (DEC-893, no unfilled slot in an operator command; interface items 21, 22, 24)
+
+- **Built:** `governance/project/orchestration/tools/memaudit_cron.sh` copied byte for byte (`cp -p`, mode 0755) to
+  `src/gov/_shipped/governance/project/orchestration/tools/memaudit_cron.sh`, declared in `pyproject.toml` and in
+  `fabric.PACKAGED` (four items). `memory_sets._cron` uses `fabric.shipped(CRON, root)` only: found nowhere, A9 refuses
+  `SHIPPED_FILE_MISSING` naming it and the places looked; the `<path to Gov OS>/...` fallback is removed. Cron runs the
+  path itself (W2-187's line form kept), so the copy keeps its executable mode in the wheel.
+- **Built:** with no gitleaks on the PATH at A9, step 6 is `GITLEAKS_MISSING` by name: the weekly scan cannot run and the
+  push stays blocked (DEC-1182 (2)); install gitleaks and run A9 again (or add the line by hand); no cron line, no `<`.
+  A9's record names it (`audit.gitleaks: GITLEAKS_MISSING`, beside `audit.act`); A9 is not refused for it.
+- **Unit tests:** `tests/unit/adopt/test_w2_88_cron.py` (8 cases); `test_w2_88_shipped.py` and `test_w2_88_p1.py`
+  revised to the four shipped items.
+- **Red by this decided change (not this run's paths):** `tests/unit/adopt/test_w2_187_walls_act.py::test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`
+  and `tests/acceptance/W2-187/test_w2_187_s11_cron.py::...[none-on-path]`: both assert the placeholder.

@@ -38,6 +38,7 @@ NOT_DUE = "not due: no verdict set used"
 EXIT_UNAPPROVED = 10  # the exit code of a launch under a variant the owner has not approved
 REFRESH = "gov rebuild --integration <branch>"  # S11: installed through the ACT, never by the tool
 CRON = "governance/project/orchestration/tools/memaudit_cron.sh"  # W2-187 I11: the repository's weekly line
+GITLEAKS_MISSING = "GITLEAKS_MISSING"  # step 6 and A9's record, where A9 finds no gitleaks on the PATH (run 8b, item 24)
 # W2-187 I13 (DEC-1182 (2)): step 6's sentence on the cycle's order and the owner's declaration of the push
 PUSH_ORDER = ("The cycle runs the audit and measure, then one gitleaks scan, then `git push` only on a clean scan; "
               "declare the push with `GOV_MEMAUDIT_PUSH=\"<remote> <branch>\"` on this line; leave it out for no push.")
@@ -146,24 +147,42 @@ def _toplevel(out: Path) -> str:
     return done.stdout.strip() if done.returncode == 0 and done.stdout.strip() else str(here)
 
 
-def _gitleaks() -> str:
+def _gitleaks() -> str | None:
     """The scanner for step 6's line: the absolute path ``shutil.which`` finds when A9 runs (cron's PATH lacks
-    ``~/.local/bin``; review round 1 R1), else the placeholder the operator fills in."""
+    ``~/.local/bin``; review round 1 R1), else None: step 6 then names ``GITLEAKS_MISSING`` and holds no line with a
+    slot (DEC-893; the run 8b interface, item 24)."""
     found = shutil.which("gitleaks")
-    return os.path.abspath(found) if found else "<path to gitleaks>"
+    return os.path.abspath(found) if found else None
+
+
+def gitleaks_missing() -> bool:
+    """True where A9 finds no gitleaks on the PATH: its record and step 6 name ``GITLEAKS_MISSING``."""
+    return _gitleaks() is None
 
 
 def _cron(root: Path | None) -> str:
-    """The weekly wrapper for step 6's line: its path where Gov OS ships it (``fabric.shipped``, never a root taken
-    from the package's own folder), else the placeholder the operator fills in. A9 never reads the script; the line is
-    text."""
+    """The weekly wrapper for step 6's line: its path where Gov OS ships it (``fabric.shipped``: the source tree's, or
+    the installed package's ``_shipped/`` copy), never a placeholder; found nowhere, ``SHIPPED_FILE_MISSING`` naming it
+    and the places looked (the run 8b interface, item 22). A9 never reads the script; the line is text."""
     from gov.adopt import fabric
-    from gov.cli.errors import GovError
 
-    try:
-        return str(fabric.shipped(CRON, root))
-    except GovError:
-        return f"<path to Gov OS>/{CRON}"
+    return str(fabric.shipped(CRON, root))
+
+
+def _step_6(sets_root: str, root: Path | None, repo: str) -> str:
+    """ACT.md's step 6: the weekly cron line with the scanner's absolute path, or, with no gitleaks on the PATH,
+    ``GITLEAKS_MISSING`` by name and no line (no unfilled slot in an operator command, DEC-893)."""
+    cron, scanner = _cron(root), _gitleaks()
+    if scanner is None:
+        return (f"6. `{GITLEAKS_MISSING}`: gitleaks was not on the PATH when A9 ran, so the weekly memory audit's "
+                "gitleaks scan cannot run, and the push stays blocked without it (DEC-1182 (2)); no cron line is given. "
+                "Install gitleaks (the scanner `gov.memaudit push` runs) on this machine, then run A9 again: it writes "
+                "this step's cron line with gitleaks's absolute path (or add that line by hand once gitleaks is on the "
+                f"machine, with `GOV_MEMAUDIT_GITLEAKS` set to its absolute path, the wrapper `{cron}`, and "
+                f"`--repo {repo}`).\n")
+    return ("6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by "
+            f"adoption): `0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} GOV_MEMAUDIT_GITLEAKS={scanner} {cron} "
+            f"--repo {repo}` {PUSH_ORDER}\n")
 
 
 def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str], root: Path | None = None,
@@ -202,10 +221,7 @@ def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[
         f"4. Add `hidden-globs.txt`'s globs to the path map's `evaluation_sets` (`{audit}`), every role but the "
         "orchestrator refused.\n"
         f"5. Install the refresh the operator runs after each update of the integration branch: `{REFRESH}` "
-        "(W2-116), with the daily backstop.\n"
-        "6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by adoption): "
-        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} GOV_MEMAUDIT_GITLEAKS={_gitleaks()} {_cron(root)} "
-        f"--repo {repo}` {PUSH_ORDER}\n", encoding="utf-8")
+        "(W2-116), with the daily backstop.\n" + _step_6(sets_root, root, repo), encoding="utf-8")
     return act
 
 

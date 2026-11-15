@@ -16,7 +16,7 @@ from gov.cli.errors import GovError
 
 REPO = Path(__file__).resolve().parents[3]
 PACKAGE = REPO / "src/gov/_shipped"
-THE_THREE = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS)
+THE_THREE = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON)  # four since run 8b (item 21)
 
 
 def _files(base: Path, rel: str) -> dict[str, bytes]:

@@ -28,4 +28,5 @@ where = ["src"]
          "_shipped/governance/project/indep-walls/wall_hook.py",
          "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/auditor.md",
          "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/checker.md",
-         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/writer.md"]
+         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/writer.md",
+         "_shipped/governance/project/orchestration/tools/memaudit_cron.sh"]
