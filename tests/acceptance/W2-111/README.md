@@ -161,3 +161,39 @@ the stated reason**:
 Neither was forced red: no PATH was shortened or lengthened, no tree added past the line's 150, the bound not lowered.
 The question goes to the lead (the test designer's return, `unresolved`). The lead adds the after figures and the
 loaded runs' figures below.
+
+## Measured figures before and after the change (the lead, 2026-11-15)
+
+`Rewrite-Reason: DEC-1184 (3)` (figures added, no case changed).
+
+**The method.** W1-02's measure, unchanged: the p95 of the hook's own CPU time, less the reference hook's median, in
+ms; the bound is 100. The call's PATH was the CTO's interactive session's PATH: 46 entries, 27 of them under `/mnt/c`
+(a launched session has 5). The load came from the lead's CPU burners; the load shown is `os.getloadavg()[0]` at each
+round. "Before" is the guard's code at `15c380fdc64a`; "after" is the change (src at `689e9706b2d3`). The PATH matters
+because the install check before the change resolved every PATH entry on each Bash call. On `/mnt/c` that is mostly a
+9p wait, which wall time counts and CPU time largely does not.
+
+Judged figure per round, in ms; "red" = all three rounds over 100. The gov accept row's red is load-sensitive: the
+same cases pass run alone at load 25.
+
+| run | code | load | Bash plain | Bash pipe | Bash redirect | 151 trees Read | 151 trees Write | 151 trees Bash | planted 150 ms hook (all six) |
+|---|---|---|---|---|---|---|---|---|---|
+| quiet | before | 3 | 58.8 | 56.0 | 58.7 | 53.3 | 30.7 | 63.6 | not run |
+| about 20 | before | 20-24 | 118.0, 111.3, 117.6 (red) | 104.2, 106.8, 116.2 (red) | 165.7, 122.1, 64.6 | 55.1 | 30.3 | 63.9 | 180-271, each fails |
+| 50 or more | before | 52-53 | 99.9 | 88.1 | 86.9 | 83.7 | 50.7 | 109.3, 97.3 | 201-298, each fails |
+| about 20 | after | 20-23 | 85.0 | 93.7 | 93.8 | 91.8 | 58.6 | 106.5, 93.8 | 209-304, each fails |
+| 37-49 | after | 37-49 | 86.9 | 89.4 | 83.0 | 93.2 | 51.5 | 89.8 | 202-246, each fails |
+| 50 or more | after | 51-59 | 86.9 | 94.8 | 91.9 | 86.5 | 57.8 | 97.4 | 238-283 (4 of 6 run, then stopped), each fails |
+| gov accept, PATH 5 entries | after | 25-40 | pass | pass | pass | one of the three 151-tree cases red | (same run) | (same run) | 6 of 6 fail |
+| alone, PATH 5 entries | after | 25 | not run | not run | not run | 83.1 | 51.3 | 87.4 | not run |
+
+The quiet run after the change is not yet taken: the machine stayed at load 23 or more from other work.
+
+**What the figures show.**
+
+- Before the change, the Bash cases' verdict changed with the load: red at load 20-24 (plain and pipe), green at load
+  3 and 52 (plain at 99.9).
+- After the change, every timing case passed in the lead's runs at every load (20-59). Under `gov accept` at load
+  25-40, one 151-tree case went red; the same cases passed run alone at load 25. The margin under load is 3-15 ms, so
+  the cases still judge near the bound: about 50 ms of each call is imports and YAML reads, outside this ticket's paths.
+- The planted 150 ms hook failed every case at every load (180-304).
