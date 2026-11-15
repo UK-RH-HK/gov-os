@@ -276,7 +276,6 @@ commits and the tree `W2-174` were not read. The cases are in `test_w2_174_field
 | F3 | `test_w2_174_scope.py::test_f3_the_module_imports_no_network_or_model_package` | red | src/gov/adopt/verify_pass.py is missing |
 | F3 | `test_w2_174_scope.py::test_f3_list_and_apply_open_nothing_outside_tickets_and_the_answers_file_and_start_no_connection` | red | src/gov/adopt/verify_pass.py is missing (`gov.adopt.verify_pass` does not import) |
 | F3 | `test_w2_174_scope.py::test_f3_a_refusal_opens_nothing_outside_either` | red | src/gov/adopt/verify_pass.py is missing (`gov.adopt.verify_pass` does not import) |
-
 | F3 | `test_w2_174_fields.py::test_l15_the_field_pass_opens_nothing_of_the_repository_but_tickets_starts_no_process_and_no_connection` | red | the answers' field names are refused `VERIFY_PASS_UNKNOWN_LABEL`: the fields are not written yet (L12, L14) |
 | F4 | `test_w2_174_fields.py::test_f4_overwriting_a_set_field_is_refused_and_the_tree_is_byte_identical[different]` | red | refused `VERIFY_PASS_UNKNOWN_LABEL`, expected `VERIFY_PASS_FIELD_SET`: a field name is no label yet (L12) |
 | F4 | `test_w2_174_fields.py::test_f4_overwriting_a_set_field_is_refused_and_the_tree_is_byte_identical[same]` | red | refused `VERIFY_PASS_UNKNOWN_LABEL`, expected `VERIFY_PASS_FIELD_SET`: a field name is no label yet (L12) |
