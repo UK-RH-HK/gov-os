@@ -52,6 +52,7 @@ def daemon_base(tmp_path, monkeypatch):
     monkeypatch.delenv(codeintel.BASE_ENV, raising=False)
     monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV, raising=False)
     monkeypatch.setattr(codeintel, "DAEMON_BASE", tmp_path / "daemons")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     return tmp_path / "daemons"
 
 

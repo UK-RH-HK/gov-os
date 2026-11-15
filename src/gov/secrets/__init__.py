@@ -58,7 +58,9 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 4  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
+_FORM = 6  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
+# (6: each file's text has gitleaks processes of its own again, as form 4; no record forms 4 or 5 wrote is reused, so
+# none the batched form 5 judged clean answers again. Run 7's P1-1 and P1R-1: a match crossed from one text into the next.)
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).

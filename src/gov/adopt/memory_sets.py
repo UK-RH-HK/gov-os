@@ -29,7 +29,6 @@ from pathlib import Path
 from gov.memaudit import declare, figures, layout, pool, preflight, schedule
 
 CORE = (preflight, declare, layout, figures, schedule, pool)  # the one core (S20): imported, never restated here
-GOV_OS = Path(__file__).resolve().parents[3]
 BRIEFS = "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs"
 WALLS = "governance/project/indep-walls"
 KINDS = ("writer", "checker", "auditor")
@@ -39,6 +38,7 @@ NOT_DUE = "not due: no verdict set used"
 EXIT_UNAPPROVED = 10  # the exit code of a launch under a variant the owner has not approved
 REFRESH = "gov rebuild --integration <branch>"  # S11: installed through the ACT, never by the tool
 CRON = "governance/project/orchestration/tools/memaudit_cron.sh"  # W2-187 I11: the repository's weekly line
+GITLEAKS_MISSING = "GITLEAKS_MISSING"  # step 6 and A9's record, where A9 finds no gitleaks on the PATH (run 8b, item 24)
 # W2-187 I13 (DEC-1182 (2)): step 6's sentence on the cycle's order and the owner's declaration of the push
 PUSH_ORDER = ("The cycle runs the audit and measure, then one gitleaks scan, then `git push` only on a clean scan; "
               "declare the push with `GOV_MEMAUDIT_PUSH=\"<remote> <branch>\"` on this line; leave it out for no push.")
@@ -147,23 +147,59 @@ def _toplevel(out: Path) -> str:
     return done.stdout.strip() if done.returncode == 0 and done.stdout.strip() else str(here)
 
 
-def _gitleaks() -> str:
+def _gitleaks() -> str | None:
     """The scanner for step 6's line: the absolute path ``shutil.which`` finds when A9 runs (cron's PATH lacks
-    ``~/.local/bin``; review round 1 R1), else the placeholder the operator fills in."""
+    ``~/.local/bin``; review round 1 R1), else None: step 6 then names ``GITLEAKS_MISSING`` and holds no line with a
+    slot (DEC-893; the run 8b interface, item 24)."""
     found = shutil.which("gitleaks")
-    return os.path.abspath(found) if found else "<path to gitleaks>"
+    return os.path.abspath(found) if found else None
 
 
-def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str], repo=None) -> Path:
-    """Write ``<out>/memory-audit/ACT-WALLS/``: the walls' template copy, the sets root's spec (mode 0700), the
+def gitleaks_missing() -> bool:
+    """True where A9 finds no gitleaks on the PATH: its record and step 6 name ``GITLEAKS_MISSING``."""
+    return _gitleaks() is None
+
+
+def _cron(root: Path | None) -> str:
+    """The weekly wrapper for step 6's line: its path where Gov OS ships it (``fabric.shipped``: the source tree's, or
+    the installed package's ``_shipped/`` copy), never a placeholder; found nowhere, ``SHIPPED_FILE_MISSING`` naming it
+    and the places looked (the run 8b interface, item 22). A9 never reads the script; the line is text."""
+    from gov.adopt import fabric
+
+    return str(fabric.shipped(CRON, root))
+
+
+def _step_6(sets_root: str, root: Path | None, repo: str) -> str:
+    """ACT.md's step 6: the weekly cron line with the scanner's absolute path, or, with no gitleaks on the PATH,
+    ``GITLEAKS_MISSING`` by name and no line (no unfilled slot in an operator command, DEC-893)."""
+    cron, scanner = _cron(root), _gitleaks()
+    if scanner is None:
+        return (f"6. `{GITLEAKS_MISSING}`: gitleaks was not on the PATH when A9 ran, so the weekly memory audit's "
+                "gitleaks scan cannot run, and the push stays blocked without it (DEC-1182 (2)); no cron line is given. "
+                "Install gitleaks (the scanner `gov.memaudit push` runs) on this machine, then run A9 again: it writes "
+                "this step's cron line with gitleaks's absolute path (or add that line by hand once gitleaks is on the "
+                f"machine, with `GOV_MEMAUDIT_GITLEAKS` set to its absolute path, the wrapper `{cron}`, and "
+                f"`--repo {repo}`).\n")
+    return ("6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by "
+            f"adoption): `0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} GOV_MEMAUDIT_GITLEAKS={scanner} {cron} "
+            f"--repo {repo}` {PUSH_ORDER}\n")
+
+
+def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str], root: Path | None = None,
+              repo=None) -> Path:
+    """Write ``<out>/memory-audit/ACT-WALLS/``: the walls' template copy (as Gov OS ships it, found by
+    ``fabric.shipped``, refused ``SHIPPED_FILE_MISSING`` where it is nowhere), the sets root's spec (mode 0700), the
     approved list with the three variant briefs, the path map's hidden globs, the refresh the operator installs and the
     repository's weekly cron line (text for its owner's operator, W2-187 I11). ``repo`` defaults to the git top level of
     ``out``. Nothing is applied: no folder is made at the sets root, no path map is changed and no cron table is read or
     written."""
+    from gov.adopt import fabric
+
+    walls = fabric.shipped(WALLS, root)
     repo = str(repo) if repo is not None else _toplevel(out)
     act = Path(out) / "memory-audit" / "ACT-WALLS"
     (act / "walls").mkdir(parents=True, exist_ok=True)
-    for source in sorted((GOV_OS / WALLS).glob("*")):
+    for source in sorted(walls.glob("*")):
         if source.is_file():
             (act / "walls" / source.name).write_bytes(source.read_bytes())
     (act / "sets-root.json").write_text(json.dumps({"path": sets_root, "mode": "0700", "create": True}, indent=2) + "\n",
@@ -185,10 +221,7 @@ def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[
         f"4. Add `hidden-globs.txt`'s globs to the path map's `evaluation_sets` (`{audit}`), every role but the "
         "orchestrator refused.\n"
         f"5. Install the refresh the operator runs after each update of the integration branch: `{REFRESH}` "
-        "(W2-116), with the daily backstop.\n"
-        "6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by adoption): "
-        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} GOV_MEMAUDIT_GITLEAKS={_gitleaks()} {GOV_OS / CRON} "
-        f"--repo {repo}` {PUSH_ORDER}\n", encoding="utf-8")
+        "(W2-116), with the daily backstop.\n" + _step_6(sets_root, root, repo), encoding="utf-8")
     return act
 
 

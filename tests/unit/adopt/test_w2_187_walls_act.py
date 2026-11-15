@@ -2,6 +2,7 @@
 installed and no cron table is read or written."""
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -49,11 +50,15 @@ def test_step_6_names_the_scanner_found_when_a9_runs_because_crons_path_lacks_it
 
 
 def test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator(tmp_path, monkeypatch):
+    """Revised to run 8b's item 24 (DEC-893, DEC-1156 (7)): with no gitleaks on the PATH, step 6 holds no placeholder
+    and no unfilled ``<...>`` slot; it names ``GITLEAKS_MISSING`` instead (the name kept: other records cite it)."""
     monkeypatch.setattr(memory_sets.shutil, "which", _which(None))
-    step = next(x for x in act_text(tmp_path / "out", tmp_path / "sets", repo=tmp_path / "a").splitlines()
-                if x.startswith("6. "))
-    assert " GOV_MEMAUDIT_GITLEAKS=<path to gitleaks> " in step.split("`")[1]
-    assert step.endswith(PUSH_SENTENCE)
+    text = act_text(tmp_path / "out", tmp_path / "sets", repo=tmp_path / "a")
+    step = "\n".join(text[text.index("\n6. ") + 1:].split("\n7. ")[0].splitlines())
+    assert "GITLEAKS_MISSING" in step
+    assert "<path to gitleaks>" not in text
+    assert not re.search(r"<[^<>\n]*>", step)
+    assert "0 21 * * 1" not in step  # no cron line is given without the scanner
 
 
 def test_a_relative_answer_of_which_is_written_as_an_absolute_path(tmp_path, monkeypatch):

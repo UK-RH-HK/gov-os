@@ -9,7 +9,9 @@ A9 writes, under ``--out``/``memory-audit/``: ``AUDIT-RECORD.json`` (S18), ``bri
 from __future__ import annotations
 
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -189,6 +191,76 @@ def test_s22_adoption_never_applies_the_act_and_changes_nothing_of_the_sets_root
     now = (nine.project / "governance/project/path-map.yaml").read_bytes()
     assert now == before["path_map"], "the path map changed"
     assert oct(nine.audit["sets"].stat().st_mode & 0o777) == "0o700"
+
+
+def act_step6(text: str) -> str:
+    """ACT.md's step 6 as one line: its line and the lines after it up to the next numbered step."""
+    lines = text.splitlines()
+    starts = [i for i, line in enumerate(lines) if line.startswith("6.")]
+    assert len(starts) == 1, f"ACT.md has no single step 6:\n{text[:1500]}"
+    rest = []
+    for line in lines[starts[0] + 1:]:
+        if line[:1].isdigit():
+            break
+        rest.append(line)
+    return " ".join([lines[starts[0]], *rest])
+
+
+SLOT = re.compile(r"<[^<>\n]*>")
+CALL_WALLS_ACT = W.REPO_ROOT / "tests" / "acceptance" / "W2-187" / "call_walls_act.py"   # W2-187's seam, used read-only
+
+
+def cron_line(row: str) -> str:
+    """Step 6's cron line: the code span that starts ``0 21 * * 1``."""
+    found = re.search(r"`(0 21 \* \* 1[^`]*)`", row)
+    assert found, f"step 6 holds no cron line (a code span starting `0 21 * * 1`): {row}"
+    return found.group(1)
+
+
+def test_s22_step_6_with_no_gitleaks_on_path_holds_no_slot_and_names_gitleaks_missing(tmp_path):
+    """success-S22 (run 8b item 24, the CTO's condition 2, DEC-893, DEC-1156 (7)): A9's ``memory_sets.walls_act`` (this tree's, through
+    W2-187's caller) run with no ``gitleaks`` on ``PATH`` (the python's folder, ``/usr/bin`` and ``/bin``). ACT.md's step 6 holds no
+    ``<path to gitleaks>`` and no ``<...>`` slot in its cron line, and names ``GITLEAKS_MISSING``. (A9 itself cannot run with no gitleaks: its
+    rebuild's lexical index refuses ``REBUILD_FAILED``, ``No such file or directory: 'gitleaks'``; the record half of item 24 is a package.)"""
+    folders = [str(Path(sys.executable).parent), "/usr/bin", "/bin"]
+    path = os.pathsep.join(folders)
+    assert shutil.which("gitleaks", path=path) is None, "the plant: a gitleaks sits in a system folder"
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    W.git(repo, "init", "-q", "-b", "main")
+    out, sets_root = tmp_path / "out", str(tmp_path / "never-made-sets")
+    env = {"PATH": path, "HOME": str(tmp_path), "PYTHONPATH": str(W.SRC), "LANG": "C.UTF-8", "TMPDIR": str(tmp_path),
+           "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull}
+    done = subprocess.run([sys.executable, str(CALL_WALLS_ACT), str(out), sets_root, "memory-audit-20261115", str(repo)], cwd=str(tmp_path),
+                          env=env, capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, f"walls_act failed with no gitleaks on PATH: {done.stderr[-1200:]}"
+    row = act_step6((out / "memory-audit" / "ACT-WALLS" / "ACT.md").read_text(encoding="utf-8"))
+    assert "<path to gitleaks>" not in row, f"step 6 holds the unfilled slot <path to gitleaks> (DEC-893): {row}"
+    assert "GITLEAKS_MISSING" in row, f"step 6 does not name GITLEAKS_MISSING with no gitleaks on PATH: {row}"
+    line = re.search(r"`(0 21 \* \* 1[^`]*)`", row)
+    assert not (line and SLOT.findall(line.group(1))), f"step 6 writes a cron line with a slot: {line.group(1) if line else ''}"
+
+
+def test_s22_a9_with_gitleaks_on_path_names_its_absolute_path_in_step_6s_cron_line_and_no_slot(worlds):
+    """success-S22 (run 8b items 22 and 24), GUARD (green on the base: W2-187's line must stay): A9 on a fork of the planted adoption at A8 with
+    the suite's gitleaks on ``PATH``: step 6's cron line names gitleaks' absolute path (``GOV_MEMAUDIT_GITLEAKS=<that path>``), holds no
+    ``<...>`` slot, and step 6 holds neither ``<path to gitleaks>`` nor ``<path to Gov OS>``; A9 is ok."""
+    nine = worlds.a9("s22-gitleaks-a8", run_a9=False)
+    nine.need_chain()
+    adoption = W.fork(nine, "s22-gl-on")
+    out = Path(adoption.box.base) / "s22-gl-on-out"
+    run = adoption.a9(out)
+    W.assert_offered(run, "A9")
+    W.assert_ok(run, "A9 with gitleaks on PATH")
+    row = act_step6((out / "memory-audit" / "ACT-WALLS" / "ACT.md").read_text(encoding="utf-8"))
+    for slot in ("<path to gitleaks>", "<path to Gov OS>"):
+        assert slot not in row, f"step 6 holds the unfilled slot {slot}: {row}"
+    line = cron_line(row)
+    assert not SLOT.findall(line), f"step 6's cron line holds unfilled slots {SLOT.findall(line)}: {line}"
+    found = shutil.which("gitleaks", path=adoption.env()["PATH"])
+    assert found, "the plant: the suite's box puts no gitleaks on PATH"
+    names = {os.path.abspath(found), os.path.realpath(found)}
+    assert any(f"GOV_MEMAUDIT_GITLEAKS={name} " in line for name in names), f"step 6 does not name gitleaks' absolute path {found}: {line}"
 
 
 # ---- S23: the cost --------------------------------------------------------------------------------------------
