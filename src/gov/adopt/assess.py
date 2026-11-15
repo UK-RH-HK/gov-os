@@ -26,7 +26,6 @@ the repository free of secrets (B-1.5).
 from __future__ import annotations
 
 import json
-import os
 import re
 import resource
 import shutil
@@ -83,7 +82,6 @@ MINIFIED_NAMES = re.compile(r"\.min\.(js|css|mjs)$")
 MINIFIED_SUFFIXES = frozenset(".js .css .mjs .cjs .html .svg".split())
 MINIFIED_LINE = 1000
 HEAD = 4096
-_COMMIT_RULE = "".join(("source", "graph", "-access-token"))  # row W2-L423's rule: a commit's hash is no secret
 
 
 def _git(root: Path, *args: str) -> bytes:
@@ -156,61 +154,52 @@ def _rules(root: Path, head: str) -> tuple[tuple[str, ...] | None, str | None]:
 
 
 class _Scan:
-    """The files' texts judged by gitleaks a batch at a time (one process for many small files), each text set off by
-    blank lines as ``gov.secrets`` does, and each finding put back on its file by its line. A batch holds at most
-    ``BATCH_BYTES`` unless one file is larger: memory follows the largest file, never the tree. The findings' values
-    are dropped as they are read; only a path and a rule id leave this class."""
+    """The files' texts judged by gov.secrets' folder mode (DEC-1183 (2)): each text written, as it is added, as a file
+    of its own in a batch's private folder outside ``root``, one ``gitleaks dir`` per batch and rule set, each finding
+    on the file it names. No text is joined to another in one gitleaks input (run 7's P1R-1: a match ran from one text
+    into the next and hid that text's own secret). A batch holds at most ``gov.secrets._BATCH_TEXTS`` texts and
+    ``_BATCH_BYTES`` bytes unless one file is larger: memory follows one text, never the tree. A report that cannot be
+    placed on its files names every file of its batch (rule ``unreadable-report``); a scan that cannot decide is
+    ``ASSESS_SCAN_FAILED``. A row W2-L423 commit hash is no finding here, as before. Only a path and a rule id leave
+    this class."""
 
-    BATCH_BYTES = 1 << 20
-
-    def __init__(self, rules: tuple[str, ...]) -> None:
-        self.rules, self.held, self.size, self.found = rules, [], 0, set()
+    def __init__(self, rules: tuple[str, ...], root: Path | None = None) -> None:
+        self.rules, self.root, self.found = rules, root, set()
+        self.folder, self.rels, self.size = None, [], 0
 
     def add(self, rel: str, data: bytes) -> None:
-        if self.held and self.size + len(data) > self.BATCH_BYTES:
+        from gov import secrets
+
+        if self.rels and (self.size + len(data) > secrets._BATCH_BYTES or len(self.rels) >= secrets._BATCH_TEXTS):
             self.flush()
-        self.held.append((rel, data))
+        try:
+            if self.folder is None:
+                self.folder = secrets._Folder(self.root)
+            self.folder.add(secrets._forms(data))
+        except (OSError, RuntimeError) as error:
+            self.close()
+            raise GovError("ASSESS_SCAN_FAILED", f"the secrets scan's folder failed: {error}", {}) from None
+        self.rels.append(rel)
         self.size += len(data)
 
     def flush(self) -> None:
-        from gov.secrets import _FLOOR, _LEAKS, _TIMEOUT_S
-
-        if not self.held:
+        if self.folder is None:
             return
-        parts, spans, line = [b"\n"], [], 2  # the leading newline keeps gitleaks from taking the text for a binary
-        for rel, data in self.held:
-            block = data + b"\n\n"
-            lines = block.count(b"\n")
-            parts.append(block)
-            spans.append((line, line + lines - 1, rel))
-            line += lines
-        data = b"".join(parts)
-        self.held, self.size = [], 0
-        env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
-        for each in self.rules:
-            done = subprocess.run(["gitleaks", "stdin", "--no-banner", "--report-format", "json", "--report-path", "-",
-                                   "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level",
-                                   "error", "--exit-code", str(_LEAKS)], input=data, capture_output=True,
-                                  timeout=_TIMEOUT_S + len(data) / _FLOOR, env=env | {"GITLEAKS_CONFIG_TOML": each})
-            if done.returncode not in (0, _LEAKS):
-                raise GovError("ASSESS_SCAN_FAILED", f"gitleaks could not scan (exit code {done.returncode})", {})
-            if done.returncode != _LEAKS:
-                continue
-            try:
-                report = json.loads(done.stdout)
-            except ValueError:
-                report = [{"RuleID": "unreadable-report", "StartLine": 0}]
-            for finding in report if isinstance(report, list) else []:
-                if not isinstance(finding, dict):
-                    continue
-                rule = str(finding.get("RuleID") or "unnamed-rule")
-                if rule == _COMMIT_RULE and re.fullmatch(r"[0-9a-fA-F]{40}", str(finding.get("Secret", ""))):
-                    continue
-                at = finding.get("StartLine") if isinstance(finding.get("StartLine"), int) else 0
-                owner = next((rel for first, last, rel in spans if first <= at <= last), spans[0][2])
-                self.found.add((owner, rule))
-            del report
-        del data
+        rels = self.rels
+        try:
+            found = self.folder.judge(self.rules)
+        except (OSError, RuntimeError) as error:
+            raise GovError("ASSESS_SCAN_FAILED", f"gitleaks could not scan: {error}", {}) from None
+        finally:
+            self.close()
+        for rel, findings in zip(rels, found):
+            self.found.update((rel, rule) for rule, commit in findings if commit is None)
+
+    def close(self) -> None:
+        """Removes an open batch's folder, its texts unjudged."""
+        if self.folder is not None:
+            self.folder.close()
+        self.folder, self.rels, self.size = None, [], 0
 
 
 def _name_flags(rel: str) -> dict:
@@ -291,7 +280,7 @@ def assess(root: Path, out: Path) -> dict:
     lists = {"binary": [], "generated": [], "minified": [], "vendored": []}
     secrets, no_route, unscanned = [], [], []
     code_files = chunks = 0
-    blobs, scan = _Blobs(root), _Scan(rules or ())
+    blobs, scan = _Blobs(root), _Scan(rules or (), root)
     try:
         for entry in listing:
             meta, _, rel = entry.partition("\t")
@@ -336,6 +325,7 @@ def assess(root: Path, out: Path) -> dict:
         secrets = [{"path": rel, "rule": rule} for rel, rule in scan.found]
     finally:
         blobs.close()
+        scan.close()
     commits = int(_git(root, "rev-list", "--count", head).decode().strip() or 0)
     nodes, edges = int(code_files * NODES_PER_FILE), int(code_files * EDGES_PER_FILE)
     rss = int(BASE_RSS + edges * RSS_PER_EDGE)

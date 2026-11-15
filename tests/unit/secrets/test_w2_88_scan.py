@@ -1,9 +1,10 @@
-"""Builder tests for W2-88 run 8, S27 (b) (the owner's answer to be recorded as DEC-1183): the secret scan judges each
-file's text with its own gitleaks process, as at a23678e27; S27's batched scan runs as its own round after this land.
+"""Builder tests for W2-88 S27, revised for run 9's folder mode (DEC-1183 (2)); written in run 8 for the one-per-file
+form of a23678e27.
 
 Regression evidence only (DEC-136). ``indexable`` keeps its verdict per file, in the order asked, and no gitleaks
-process reads two files' texts (run 7's checks P1-1 and P1R-1: a match crossing from one file's text into the next's).
-No secret stands whole in this file: the planted string is built from parts, and no test prints or records a value.
+input joins two files' texts (run 7's checks P1-1 and P1R-1: a match crossing from one file's text into the next's):
+each text is a file of its own in a batch's folder, one ``gitleaks dir`` per batch and rule set. No secret stands whole
+in this file: the planted string is built from parts, and no test prints or records a value.
 """
 from __future__ import annotations
 
@@ -54,33 +55,42 @@ def _one_per_file(root: Path, rels: list[str]) -> list[str]:
 
 @pytest.fixture()
 def processes(monkeypatch):
-    """Each gitleaks process started, by the input it was given."""
+    """Each gitleaks process started, by the texts it was given: its standard input, or each file of its folder."""
     seen = []
     real = secrets.subprocess.run
 
     def spy(command, **options):
         if command and command[0] == "gitleaks":
-            seen.append(options.get("input", b""))
+            if options.get("cwd"):
+                folder = Path(options["cwd"])
+                seen.append([(folder / name).read_bytes() for name in sorted(os.listdir(folder))])
+            else:
+                seen.append([options.get("input", b"")])
         return real(command, **options)
 
     monkeypatch.setattr(secrets.subprocess, "run", spy)
     return seen
 
 
-def test_no_gitleaks_process_reads_two_files_texts(project, processes, monkeypatch, tmp_path):
-    """Each file's text goes to gitleaks processes of its own (S27 (b), DEC-1183): one per rule set, never shared."""
+def test_no_gitleaks_input_joins_two_files_texts(project, processes, monkeypatch, tmp_path):
+    """Each file's text is a gitleaks input of its own (DEC-1183 (2)): one file of a batch's folder, never shared;
+    one gitleaks dir per batch and rule set (run 8's one process per file and rule set, now per batch)."""
     monkeypatch.setenv("GOV_SECRETS_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("GOV_HEAVY_THREAD_BUDGET", "1")
     marks = [f"MARKER{number:03d}Q" for number in range(12)]
     rels = [_write(project, f"notes/m{number:03d}.md", f"Note {mark}.\nPlain text.\n") for number, mark in enumerate(marks)]
     assert secrets.indexable(project, rels) == rels
-    assert len(processes) == len(rels) * len(secrets._rules(project))
-    for data in processes:
-        assert sum(mark.encode() in data for mark in marks) == 1
+    assert len(processes) == len(secrets._rules(project))  # one batch at one worker
+    for texts in processes:
+        assert len(texts) == len(rels)
+        for data in texts:
+            assert sum(mark.encode() in data for mark in marks) == 1
 
 
-def test_no_batched_scan_is_left_in_the_module():
-    for name in ("_scan_batch", "_batched", "_BATCH_BYTES", "_BATCH_FILES", "_BATCH_MIN", "_FENCE"):
+def test_no_batched_stdin_scan_is_left_in_the_module():
+    for name in ("_scan_batch", "_batched", "_BATCH_FILES", "_BATCH_MIN", "_FENCE"):
         assert not hasattr(secrets, name), name
+    assert secrets._BATCH_TEXTS >= 1 and secrets._BATCH_BYTES >= 1  # folder mode's caps (run 9)
 
 
 def test_the_verdict_per_file_is_the_one_per_file_forms_in_the_order_asked(project):
@@ -149,7 +159,7 @@ def test_a_clean_file_is_remembered_and_not_scanned_again(project, monkeypatch, 
     after = secrets.scan_counts()["content"]
     assert after["remembered"] - before["remembered"] == 9  # the nine clean files; the finding is scanned every time
     assert after["scanned"] - before["scanned"] == 1
-    assert processes and all(PLANTED.encode() in data for data in processes)  # the finding's file only
+    assert processes and all(texts == [texts[0]] and PLANTED.encode() in texts[0] for texts in processes)  # the finding's file only
 
 
 VALUE = "".join(["Zq8W", "m4Xk", "2Vn7", "Bp3R", "t9Yh"])  # a generic-key value, built from parts; never printed
@@ -183,9 +193,10 @@ def test_the_pair_in_the_middle_of_a_long_list_is_judged_as_one_per_file(project
     assert got == _one_per_file(project, rels) and "config/b-head.env" not in got and "config/a-tail.txt" in got
 
 
-@pytest.mark.parametrize("old", [4, 5])
+@pytest.mark.parametrize("old", [4, 5, 6])
 def test_a_record_written_under_an_earlier_form_is_not_reused(project, monkeypatch, tmp_path, old):
-    """Forms 4 (a23678e27, ef9c773c3) and 5 (d766514fd, the batched scan) wrote records; form 6 trusts none of them."""
+    """Forms 4 (a23678e27, ef9c773c3), 5 (d766514fd, the batched stdin scan) and 6 (run 8) wrote records; form 7
+    (folder mode, run 9) trusts none of them."""
     monkeypatch.setenv("GOV_SECRETS_CACHE", str(tmp_path / "cache.sqlite"))
     rels = [_write(project, "config/b-head.env", f"API_KEY={VALUE}\n")]
     rules = secrets._rules(project)
@@ -193,7 +204,7 @@ def test_a_record_written_under_an_earlier_form_is_not_reused(project, monkeypat
     secrets.cache.remember("content", digest, secrets.cache.engine(rules, old))
     assert secrets.cache.remembered("content", digest, secrets.cache.engine(rules, old))
     assert secrets.indexable(project, rels) == []  # the old record says clean; it is not asked
-    assert secrets._FORM == 6
+    assert secrets._FORM == 7
 
 
 def test_a_commit_hash_of_the_project_is_still_no_finding(project):

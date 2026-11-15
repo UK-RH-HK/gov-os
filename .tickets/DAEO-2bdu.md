@@ -1,6 +1,6 @@
 ---
 id: DAEO-2bdu
-status: in_progress
+status: closed
 deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 links: []
 created: 2026-10-30T22:14:08Z
@@ -42,6 +42,7 @@ allowed_paths:
 - src/gov/adopt/safety.py  # [added, DEC-1178 (P-1): its parents[3] read]
 - src/gov/secrets/__init__.py  # [added, DEC-1178: the secret scan's speed]
 - tests/unit/secrets/test_w2_88*  # [added, DEC-1178]
+- tests/unit/secrets_check/test_dec1045_switch.py  # [added, DEC-1156 (7): run 9's P-1 path case, routed by the CTO]
 - pyproject.toml  # [added, DEC-1183 (1): package 1 (a), the shipped copies as package data]
 - src/gov/_shipped/**  # [added, DEC-1183 (1): package 1 (a)]
 - src/gov/codeintel/__init__.py  # [added, DEC-1183 (1): package 2 (a), the graph read in pages]
@@ -97,6 +98,8 @@ kpis:
   - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved to W2-124, DEC-1083] (was S5)'
 profile: FULL
 sources:
+- W2-124  # [added 2026-11-15 by the CTO: cited in the KPI brackets (structural links notice after the land)]
+- W2-26  # [added 2026-11-15 by the CTO: the same]
 - DEC-1185
 - DEC-1183
 - DEC-1154
@@ -379,3 +382,5 @@ This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill
 **The short runtime fallback (the CTO's P2 under DEC-338, 2026-11-15, listed for the owner's reading):** S25's real-redis case failed in the test box because the code-graph tool's runtime socket path passed the 108-byte AF_UNIX limit (W2-88's own harness puts CODEINTEL_DAEMON_BASE deep in the pytest box). `gov.codeintel` now uses a short per-session folder `/tmp/gov-cbm-<uid>/<12 hex>` (0700) only when the socket path would pass 107 bytes (counting `.sock.pending`, as W2-56's tests do), and refuses `CODEGRAPH_RUNTIME_PATH_TOO_LONG` by name otherwise; paths under the limit are unchanged. Path case: W2-56's placement fixtures in `tests/unit/codeintel/test_codeintel.py` and `test_w2_56_nested_daemon.py` set `SOCKET_MAX` high for placement-only cases (the length rule has its own cases in `test_w2_88_runtime_path.py`); allowed_paths widen to those two files.
 
 **Landed and queue-closed 2026-11-15 05:20 (a9045e382, run 8b at 54c96c9c40e5); reopened at once by the CTO (DEC-1183 (2)):** W2-88 stays open for S27's folder mode as its own round (each batch's files written to a private temporary folder outside the repository, one `gitleaks dir` per batch, each finding naming its own file). That round changes `src/`, so it starts only after release 0.1.0's re-pin is done (the release hold keeps `src/` at C). Residuals for the rows: R8-3, N1-N5 (N3: the sandbox profile allows the short runtime root /tmp/gov-cbm-<uid>), the refresh's full re-read on the real tool (record_stale with short pieces, fail-closed), the briefs' rule that workers run tests in the foreground.
+
+**Widened 2026-11-15 by the CTO under DEC-1156 (7) (run 9's P-1 (a)):** `tests/unit/secrets_check/test_dec1045_switch.py` only. Its case `test_on_the_filter_gives_every_governance_file_to_gitleaks` records `_holds_secret`, which folder mode's `indexable` no longer calls; the recorder is re-pointed at folder mode's batch (the verdict and intent it asserts unchanged), `Rewrite-Reason: DEC-1183 (2), DEC-1156 (7)`, then a narrow independent check (DEC-1154) and the land.
