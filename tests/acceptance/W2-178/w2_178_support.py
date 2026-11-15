@@ -8,8 +8,10 @@ on any location outside pytest's temporary folder, so no case can reach the real
 held-out material.
 
 The base script (``BASE``, the ticket's claim commit and the merge-base with ``w2/integrate``) is taken out of git into
-a temporary folder next to its ``indep-schemas`` folder and run the same way as the head's, on the same planted world,
-so the two builds differ only in the script.
+a temporary folder, next to a copy of the *head's* ``indep-schemas`` folder (the one the head's build reads), and run the
+same way as the head's, on the same planted world, so the two builds differ only in the script. The base's own schemas
+are not used: WALL.json records their sha256, and a schema changed after ``BASE`` (the counts schema, by W2-94) would
+make the two manifests differ for that alone, not for anything the launch script did.
 """
 
 from __future__ import annotations
@@ -105,13 +107,17 @@ def sets_snapshot(world) -> dict:
 # -- the script as it stood before the change -----------------------------------------------------------------------
 
 def extract_base_script(dst: Path) -> Path:
-    """The launch script at ``BASE`` and its ``indep-schemas`` folder, out of git, under ``dst``; the script's path."""
-    raw = support.git(support.TREE, "archive", "--format=tar", BASE, "--", SCRIPT_REL, SCHEMAS_REL, raw=True)
+    """The launch script at ``BASE``, out of git, under ``dst``, with the head's ``indep-schemas`` folder (the one the
+    head's script reads: ``support.SCHEMAS``) copied beside it, where the script looks for its schemas; the script's
+    path. The base build then differs from the head's in the script only, never in a schema WALL.json hashes."""
+    raw = support.git(support.TREE, "archive", "--format=tar", BASE, "--", SCRIPT_REL, raw=True)
     dst.mkdir(parents=True)
     with tarfile.open(fileobj=io.BytesIO(raw)) as t:
         t.extractall(dst, filter="data")
     script = dst / SCRIPT_REL
-    assert script.is_file() and (dst / SCHEMAS_REL).is_dir(), f"{BASE} holds no launch script or no schemas"
+    assert script.is_file(), f"{BASE} holds no launch script"
+    shutil.copytree(support.SCHEMAS, dst / SCHEMAS_REL)
+    assert (dst / SCHEMAS_REL).is_dir() and any((dst / SCHEMAS_REL).iterdir()), "the head holds no schemas"
     return script
 
 
