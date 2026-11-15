@@ -88,12 +88,24 @@ def test_s1_a_failed_batch_keeps_a_file_the_user_made_during_it_and_removes_the_
     assert not (root / "pkg").exists() and (root / "lib/util.py").is_file() and staged(root) == ""
 
 
-def test_s1_a_stage_writes_nothing_over_an_untracked_file(root):
-    write(root, ".gitignore", ".gov-runtime/\ngovernance/\n")
-    commit(root, "ignore the records' folder")
-    write(root, project.record_path("A0"), "the user's own, ignored\n")
+def test_s1_a_stage_writes_nothing_over_an_untracked_file(root, monkeypatch):
+    # W2-88 run 8 (DEC-1183): S26 refuses ADOPT_PATH_IGNORED first for an ignored record path, and an untracked file the ignore rules let
+    # through makes the tree not clean before A0 starts. So the user writes the untracked record (not ignored: the fixture's .gitignore
+    # ignores only .gov-runtime/) during A0, after its first look at the tree (`git status`), as the A6 case above writes during a batch.
+    rel, planted, real = project.record_path("A0"), [], project.git
+
+    def git(where, *args):
+        out = real(where, *args)
+        if args and args[0] == "status" and not planted:
+            write(where, rel, "the user's own, untracked\n")
+            planted.append(rel)
+        return out
+
+    monkeypatch.setattr(project, "git", git)
     refused("WOULD_OVERWRITE", root, "A0")
-    assert (root / project.record_path("A0")).read_text() == "the user's own, ignored\n"
+    assert planted, "the plant did not take: A0 asked no `git status` through project.git"
+    assert subprocess.run(["git", "-C", str(root), "check-ignore", "-q", rel]).returncode == 1, "the plant: the ignore rules ignore A0's record"
+    assert (root / rel).read_text() == "the user's own, untracked\n"
 
 
 # ---------------------------------------------------------------- S4: a failed or killed batch resumes

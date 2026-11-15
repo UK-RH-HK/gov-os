@@ -134,15 +134,16 @@ def _rules(root: Path, head: str) -> tuple[tuple[str, ...] | None, str | None]:
     """``(rules, why not)``: the secrets rules as ``gov.secrets`` reads them (the repository's own ``.gitleaks.toml`` at
     ``head``, else the template's, which A0 puts in). ``(None, reason)`` where gitleaks or the rules cannot be had: the
     assessment says so, and so does the plan."""
-    from gov.adopt.safety import TEMPLATE_GITLEAKS
+    from gov.adopt import fabric
+    from gov.adopt.safety import TEMPLATE_GITLEAKS_REL
     from gov.secrets import CONFIG_REL, _rules as rules_of
 
     try:
         text = _git(root, "show", f"{head}:{CONFIG_REL}").decode("utf-8")
     except GovError:
-        try:
-            text = TEMPLATE_GITLEAKS.read_text(encoding="utf-8")
-        except OSError:
+        try:  # the template's, found as Gov OS ships it (a source tree, or the project's copy): never a default
+            text = fabric.shipped(TEMPLATE_GITLEAKS_REL, root).read_text(encoding="utf-8")
+        except (GovError, OSError):
             return None, "no secrets rules (.gitleaks.toml) could be read"
     if shutil.which("gitleaks") is None:
         return None, "gitleaks is not on PATH"

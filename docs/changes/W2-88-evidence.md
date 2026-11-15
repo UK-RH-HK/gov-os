@@ -403,3 +403,333 @@ A3's `--assessment`, A9 lite) on its clone at adoption, on W2-16's release; that
 | success S15, S16 (the kernel copy) | `fabric.install`, `undo`; called by `fabric.a9` | built (B-1.1, B-1.3); its own unit tests |
 | success S18 to S23 | `adopt/memory_sets.py` | built; its own unit tests |
 | failure 1 to 9 | the same modules; nothing is written in the repository by MA and the plan; no `tk` call | built; see the tests |
+
+## Run 7 (2026-11-14; the reopen under DEC-1164 (18) on DEC-1178 (3)(b) and (4)): S24 to S27
+
+Where each is built, and the unit tests that show it (`tests/unit/adopt/test_w2_88_p1.py`, `_f1.py`, `_ignored.py`;
+`tests/unit/secrets/test_w2_88_scan.py`). Each test file was run against the code before its item and failed there
+(S26 and S24: 17 of 21 failed on `a23678e27`; S25: 4 of 6 failed on S24's commit; S27: 4 of 12 failed on `a23678e27`; the
+cases that pass on the old code are the ones that state what must stay the same).
+
+### S24 (P-1): A9 from an installed release
+
+- **Built:** `fabric.shipped(rel, root)` and `fabric._source_tree()`. The source tree is the nearest ancestor of the running
+  `gov` package that holds `copier.yml`, `template/` and `src/gov/` (no fixed number of levels); then, for a `rel` under
+  `template/`, the project's own copy that `copier copy` installed (`template/X` read as `<root>/X`); else
+  `SHIPPED_FILE_MISSING` (`details`: `file`, `looked`), never a default. The search for the source tree is a place looked
+  (run 7, fix 2): `looked` is never empty; it names first the tree's `<tree>/<rel>`, or, where none was found, the gov
+  package's folder and that no folder at or above it holds `copier.yml`, `template/` and `src/gov/`; then, for a `rel`
+  under `template/`, `<root>/X`; never `<root>/<rel>` for a `rel` outside `template/`. Every read of a shipped file goes through it, when
+  it is needed: A9's kernel copies (`fabric._sources`, `install`), its copy of `retrieval.yaml` and the standard's `pool:`
+  block (`fabric.standard_of`, read by `read_standard`; `fabric.STANDARD` is now a module attribute computed when read, and
+  `departures` takes the standard as an argument), the walls template (`memory_sets.walls_act`, with the new `root`
+  argument), the audit briefs (`fabric._stage`) and the `.gitleaks.toml` fallback (`safety.setup`, `assess._rules`;
+  `safety.TEMPLATE_GITLEAKS` is computed when read). A9 also asks for the walls and the briefs before it copies anything, so
+  a missing one refuses before the stores are built. `grep -n "parents\[3\]\|GOV_OS" src/gov/adopt/*.py` finds nothing.
+- **The release form, shown in a unit test** (`test_a_wheel_in_the_release_form_runs_a9s_reads_with_no_source_tree`): an
+  export of `src/` and `pyproject.toml` is built with `python3 -m pip wheel -q --no-deps --no-build-isolation --no-index`,
+  installed with `--no-deps --no-index` into a fresh `--system-site-packages` venv, and run from a folder outside the tree
+  with no `PYTHONPATH`: `gov.__file__` is in the venv, `_source_tree()` is None, importing `gov.adopt.fabric`,
+  `memory_sets` and `safety` reads no shipped file and does not fail.
+- **What an installed release now finds, and what it refuses (item 4 of the interface):** it finds the kit's files that
+  `copier copy` installs from `template/`: the retrieval and discovery skill folders (`governance/kernel/skills/...`),
+  `brief.md` and `role-cto.md` (`governance/kernel/templates/...`). It refuses `SHIPPED_FILE_MISSING` for the files that are
+  neither in the wheel nor under `template/`: `governance/project/retrieval.yaml` (the pool: the first read, so A9 refuses
+  at its start with nothing written), `governance/project/indep-walls` and
+  `governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs`; and `template/.gitleaks.toml` for a project that has no
+  `.gitleaks.toml` of its own (A0; MA's assessment then says "no secrets rules could be read"). So an installed release
+  cannot yet run A9 end to end: the three are the package's (the lead's). **What it would take (outside these paths):** the
+  wheel must carry them as package data of `gov` (`pyproject.toml`, `[tool.setuptools.package-data]`, or a `src/gov/...`
+  folder that holds copies) and the resolver gets that folder as a place after (1) and (2). Moving them under `template/`
+  is not enough and is wrong for the pool: `template/governance/project/` is the overlay copier installs once and never
+  overwrites, so (2) would read the project's own, possibly tuned, `retrieval.yaml` as Gov OS's standard, and the
+  departure check would compare the file with itself.
+
+### S25 (F-1): redis's code graph
+
+- **Built:** `fabric.refuse_too_large(root)`, called when `_stores` cannot read the graph, and `fabric.graph_counts(root)`
+  (two count queries of one row, in the same session class `gov.codeintel._graph` uses). Where either count is over
+  `fabric.GRAPH_CAP` (100,000), A9 refuses `CODEGRAPH_TOO_LARGE` (`details`: `nodes`, `edges`, `cap`, `tool`), the message
+  naming `codebase-memory-mcp`, its cap, the counts and that `gov.codeintel`'s read takes the whole graph in one query;
+  the copies are undone as for any refusal after them. Any other failure keeps `FABRIC_INCOMPLETE` naming `codegraph` and
+  the error text; a failed read is never 0 nodes and edges.
+- **Not built (outside the paths):** the cause. `gov.codeintel._graph` reads all edges in one query
+  (`MATCH (a)-[r]->(b) RETURN ...`), which the tool refuses over 100,000 rows before its own `offset`/`max_rows` paging; the
+  lead's probe measured 41,086 nodes and 143,008 edges on redis. **What it would take:** `_graph` reads each query in
+  pages the tool accepts (the probe in `.gov-runtime/scratch/lead/f1_probe2.py` asks `SKIP`/`LIMIT` under the cap), a change
+  of `src/gov/codeintel/__init__.py`; with it A9 on redis reads and checks the graph, and this refusal stays for a graph the
+  paging cannot bring under the cap. The unit tests plant a stand-in `codebase-memory-mcp` first on `PATH` (MCP over stdio)
+  that answers as the real tool does over its cap (`isError: true`, "result exceeded 100k rows"); the redis copy's A9
+  re-run is the lead's, outside the sandbox.
+
+### S26 (F-3): ignore rules found at the start
+
+- **Built:** `safety.written_paths(root)` (the one list: A0's `.gitleaks.toml` and `.gitignore`, the roster and a ticket
+  where `tk` is vendored, every stage's record, A2's packages, A8's CIT-E, and A9's copies, each file of the kernel folders
+  and templates, and `retrieval.yaml`), `safety.ignored(root, paths)` (`git check-ignore -v -z --stdin`; a path the index
+  tracks is not judged by git, a re-including rule `!` is no finding) and `safety.refuse_ignored(root)`, called first by
+  stage MA (`stages.run`) and by A0 (`stages.a0`). A path ignored and untracked refuses `ADOPT_PATH_IGNORED` at once, the
+  message naming each path with `source:line:pattern` as `git check-ignore -v` gives them (`details["ignored"]`: `path`,
+  `source`, `line`, `pattern`); nothing is written, staged or committed, no ignore file is edited, `git add -f` is never run.
+- **Not in the list:** what a stage writes later from the caller's proposal (A6's targets, A8's imports) is not known at the
+  start. **A change of behaviour to know:** an untracked file already standing at an ignored path of the list used to be
+  refused by the stage that writes it (`ADOPT_WOULD_OVERWRITE`); it is now refused at the start as ignored. The existing test
+  `tests/unit/adopt/test_safety.py::test_s1_a_stage_writes_nothing_over_an_untracked_file` plants exactly that (a
+  `.gitignore` of `governance/`) and expects the older code; it needs its expected code changed (outside these paths).
+
+### Run 7: the secret scan's speed (S27)
+
+- **Built:** `gov.secrets.indexable` reads each worker's group of files in batches (`_BATCH_BYTES` 1 MiB or `_BATCH_FILES` 256, a
+  file of 1 MiB or more alone), gives each batch to **one gitleaks process per rule set** (`_scan_batch`: each file's
+  chunks framed as `_scan` frames them, a blank line after every piece, each finding put back on its file by its line,
+  which gitleaks counts over the whole input: confirmed with a planted secret in two of 60 files), and runs the batches in
+  the one pool of `_workers()` (the CPU set within `GOV_HEAVY_THREAD_BUDGET`). A file the record holds clean is answered
+  from it; a file no finding names is clean (counted `scanned`, kept in the record); a file a finding names, a finding that
+  cannot be put back on a file, or a report that cannot be read sends the file (or the batch) to the one-per-file judgement
+  as ever, so the commit-hash exemption and every other rule of `_holds_secret` stand. `indexable`, `path_holds_secret`,
+  `pool_size` and `scan_counts` keep their signatures and meaning; `_holds_secret` is still the one verdict per file
+  (the batch's result reaches it through a thread-local, set around that worker's own calls). No secret's value is
+  printed or recorded; the planted secret in the tests and in the tree is built from parts.
+- **Fix 3 (P1-1, the narrow check's blocker):** a bare generic key at one file's end (`password:`, `token =`) had its `\s`
+  classes run over the blank line between two files in a batch and take the next file's first line as its value; the match
+  was then dropped by the rule's own filter (stopwords or entropy, on a value such as `token=...`), so gitleaks reported
+  nothing and the next file's own secret was shadowed: it was written to the reuse record as clean. Built:
+  (1) every text of a batch ends with a line of one `#` and a blank line (`_FENCE`), which no rule's value class takes in,
+  so no match runs from one file into the next (this is the cause fixed; a report cannot name a swallowed match that a
+  filter dropped, so lines alone could not); (2) a finding is put back on **every** file its `StartLine` to `EndLine`
+  covers, and on the file after the last of them, each then judged alone; (3) `_FORM` is 5, so every record the batched
+  scan wrote under form 4 is ignored. Unit tests: the pair in both orders, 4 bare tails by 4 head forms, with a clean file
+  before and after, in a batch of 16 with the pair in the middle; the rules without the fence (`_FENCE` empty) still give
+  the one-per-file verdict through (2); a form-4 record is not reused.
+- **The measure** (`indexable` over every file of a planted tree, same machine, same slot kind, gitleaks 8.30.1,
+  `GOV_SECRETS_CACHE` empty so no clean result is reused; the tree: 5,000 files in 50 folders, 15.3 MB, 3,013 of 8 lines,
+  1,732 of 60 lines, 255 of 400 lines, one file in fifty holding the planted test secret = 100; the machine has 20 CPUs
+  and was shared with other slots; the slot's CPU set was 7 CPUs and its exported thread budget 1; the old code is `git
+  archive a23678e27 src` on `PYTHONPATH`):
+
+| form | thread budget (workers) | seconds | files per second | files left out |
+|---|---|---|---|---|
+| one gitleaks per file (`a23678e27`) | 1 | 2,808.4 | 1.8 | 100 |
+| batched (this change) | 1 | 46.2 | 108.2 | 100 |
+| one gitleaks per file (`a23678e27`) | 7 | 574.3 | 8.7 | 100 |
+| batched (this change) | 7 | 40.6, 40.2 (two runs) | 123.3, 124.5 | 100 |
+
+  **Re-measure after fix 3 (P1-1, 2026-11-14; same slot kind, a freshly generated tree of the same shape: 5,000 files in 50
+  folders, 15.6 MB, 100 holding the planted secret; `GOV_SECRETS_CACHE` empty; the batched code of this change, now with
+  the `#` fence and the owner's neighbours):** budget 1 (1 worker): **41.7 s, 119.8 files per second, 100 files left
+  out**; budget raised to 7 (the CPU set gave 6 workers): **34.3 s, 145.8 files per second, 100 left out**. The old form
+  (`a23678e27`) was not re-run over all 5,000 files (47 minutes at budget 1, over this run's hour): on every 20th file (250
+  files, 5 holding the secret) at budget 1 it took 122.3 s, 2.0 files per second, 5 left out, so the whole tree at that rate
+  is about 2,500 s. **Ratio now:** about 60 times at budget 1 (2,500 s extrapolated over 41.7 s; 67 times against the
+  measured 2,808.4 s above) and 16.7 times at budget 7 (574.3 s measured above over 34.3 s). S27's line is at least 10
+  times: met. The fix cost nothing visible (42 s here against 46 s above; the machine is shared, so the small difference
+  is noise): a file a finding names was already judged alone, and now so is the file after it (two per finding).
+
+  **Ratio (the first measure, before fix 3):** 60 times at the slot's own budget (1 worker), 14.3 times with the budget raised to the whole CPU set (7
+  workers), both at least 10 times; the verdicts are the same (the same 100 files left out in every run, and the unit
+  tests compare each file's verdict with the one-per-file form's). The old form's 1.8 files per second is grafana's A6
+  rate (about 2 a second). **What the figures say about the rest:** a gitleaks process already uses every CPU it may, so
+  more workers add little (108 to 124 files per second from 1 to 7): the scan now costs gitleaks' own time on the bytes
+  (about 0.37 MB a second here with this rule file), not a process per file. EXAMIN's copy of 36,000 files, at the same
+  shape (about 3 KB a file), is about 110 MB: roughly 5 minutes here, against about 5.5 hours one process per file.
+  If a repository's files are many and large the time follows the bytes; a faster scan then needs gitleaks' own rule cost
+  cut (the rule file), outside these paths. `gov.codeintel` still calls `path_holds_secret` once per allowed path (one
+  gitleaks per path on a cold record, each answered from the record once clean); batching those calls would take a
+  change of `src/gov/codeintel/__init__.py` and of `path_holds_secret`'s callers, outside these paths.
+
+## Run 8 (2026-11-14; the owner's answer of 21:50, to be recorded as DEC-1183: `P-W2-88-S27-1 (b), package 1 (a), package 2 (a)`)
+
+### S27: its next round (DEC-1183)
+
+- **S27 is not delivered in this land.** The section "Run 7: the secret scan's speed (S27)" above records what was built
+  and measured in run 7; that code is gone. `src/gov/secrets/__init__.py` is back to the one-file-at-a-time scan of
+  `a23678e27` (each file's text read by gitleaks processes of its own, one per rule set; the same findings as before S27);
+  `indexable`, `path_holds_secret`, `pool_size` and `scan_counts` keep their signatures and meaning. The batched path is
+  removed entirely (`_scan_batch`, `_batched`, `_BATCH_BYTES`, `_BATCH_FILES`, `_BATCH_MIN`, `_FENCE`): no code path in
+  `src/gov/secrets/` judges two files' texts in one gitleaks process. Nothing else in the file had changed since
+  `a23678e27` (the diff `a23678e27..2491c9bec` of the file is batching only; the `.gitleaks.toml` fallback through
+  `fabric.shipped` lives in `safety.py` and `assess.py`, not here).
+- **The reuse record's form is 6** (`_FORM`), a value no earlier form used (4: `a23678e27` and `ef9c773c3`; 5: `d766514fd`,
+  the batched scan), so no record any earlier form wrote, in the content cache or a store's record, is reused: a file the
+  batched form judged clean wrongly (P1R-1: 0 scanned, 12 remembered on a second run) is scanned again.
+- **Why the text-batch form was dropped:** run 7's narrow checks found it fails open twice. P1-1 (`PR-DAEO-2bdu-p1-check1.md`):
+  a bare generic key at one text's end took the next text's first line over the blank line between them, the match was
+  dropped by the rule's own filter, and the next file's secret was shadowed. The `#` fence of fix 3 closed that shape; P1R-1
+  (`PR-DAEO-2bdu-p1.md`): two other default rules still cross it, `curl-auth-user` (a gap of up to five lines that takes in
+  `#`) and `private-key` (a body class that takes in anything); a match dropped by a filter (the rule's allowlist or the
+  global allowlist) swallowed the next file's own secret, which was judged clean, kept as indexable and recorded clean.
+  A text batch read by one gitleaks process cannot be fenced against every rule a project's rule file may hold.
+- **Evidence kept for the next round (no code for it here):** the run 7 figures above (one gitleaks per file: 1.8 files a
+  second at budget 1, 8.7 at budget 7, on a planted 5,000-file tree; the text batches about 60 and 14 to 17 times that);
+  and the lead's record of a folder form: `gitleaks dir` judges a folder in one process and reports one file per finding
+  (its own file boundaries, so no match runs from one file into the next), and a scratch test judged 403 files in 0.34 s.
+  A next round built on it would need the one-per-file form as its oracle for every default rule (P1-1's and P1R-1's
+  shapes among them) and its own measure on the same tree.
+- **Unit tests** (`tests/unit/secrets/test_w2_88_scan.py`, 14 cases): every gitleaks process reads one file's text (12
+  clean files, 12 times the rule sets' processes, each input holding exactly one file's marker); no batched name is left
+  in the module; the verdict per file is the one-per-file form's in the order asked; links; namespaces; a gitleaks that
+  cannot run refuses; `scan: off` starts no gitleaks; counts one per file; a clean file is remembered and not scanned
+  again; P1-1's bare-key pairs (4 tails by 4 heads, three orders) and the pair in the middle of a long list; a record
+  written under form 4 or 5 is not reused; a commit hash of the project is no finding. The cases only a batched scan
+  meets (few processes, parallel batches, put-back and fence internals) are deleted. Run against the batched code
+  first: 4 of 14 failed (the one-file and no-batch cases, and the form cases); after the revert: 14 of 14 pass.
+
+### Package 1 (a): the three files A9 needs ship inside the wheel
+
+- **Built:** byte-for-byte copies (`cp -p`, never re-typed) of `governance/project/retrieval.yaml`, every file of
+  `governance/project/indep-walls/` and the MEMORY-AUDIT-1 briefs (`auditor.md`, `checker.md`, `writer.md`) under
+  `src/gov/_shipped/`, each at its path in the Gov OS repository; `pyproject.toml` declares them package data of `gov`,
+  each file by its name (`tests/unit/retrieval/test_w2_59_project_root.py` reads each pattern as one path).
+  `fabric.PACKAGED` names the three once; `fabric._package_copy()` is `<the gov package's folder>/_shipped`.
+  `fabric.shipped(rel, root)` now looks (1) in the source tree, (2) in the package's copy `<package>/_shipped/<rel>`,
+  (3) for a `rel` under `template/`, in the project's copier copy; found nowhere, `SHIPPED_FILE_MISSING` names `rel` and
+  every place looked (the tree's search, the package's copy, and for `template/` the project's copy). The source
+  tree's own file is the original: gov run from the tree reads it there, first.
+- **Unit tests** (`tests/unit/adopt/test_w2_88_shipped.py`, 8 cases; `test_w2_88_p1.py` brought to the three places):
+  each shipped copy equals its source bytes, nothing missing from either side and nothing extra in the copy; the
+  package ships nothing but the three; `shipped` finds a `rel` in the package's copy when no source tree is found, the
+  project's own `retrieval.yaml` never read in its place; the order tree, package, project; the refusal names every
+  place looked; the release-form wheel case (an export of `src/` and `pyproject.toml`, `pip wheel --no-build-isolation
+  --no-index`, a fresh `--system-site-packages` venv, no `PYTHONPATH`) now finds the three in the venv's
+  `gov/_shipped/`, equal to the source bytes, and reads the standard's pool from it. Run before the change: 8 of 8 red.
+- **The copies must follow their sources:** a change of any of the three files in the tree without the same change in
+  `src/gov/_shipped/` fails `test_each_shipped_copy_equals_its_source_bytes` (the copy is refreshed by copying again).
+- **The wheel, checked in the release form:** `git archive` of the commit, `python3 -m pip wheel -q --no-deps
+  --no-build-isolation --no-index`, in the sandbox's own `$TMPDIR` (nothing installed): its `gov/_shipped/` holds the ten
+  files (`retrieval.yaml`, the six of `indep-walls/`, the three briefs).
+
+### Package 2 (a): the code graph read in pages by type (S25's cause, fixed)
+
+- **Built (`src/gov/codeintel/__init__.py`):** `_graph` asks the counts first (`MATCH (n) RETURN count(n)`,
+  `MATCH (a)-[r]->(b) RETURN count(r)`); nodes and edges are each read in one query where the count is at most `CAP`
+  (100,000), as before, else by node label and edge type: the counts by label or type (`RETURN n.label, count(n)`,
+  `RETURN type(r), count(r)`), then one match of each (`MATCH (n:<Label>) ...`, `MATCH (a)-[r:<TYPE>]->(b) ...`), each
+  paged by the tool's `offset`/`max_rows` as before; all in one session of the tool (DEC-561). `SKIP`/`LIMIT` is never
+  asked (the lead's probe: not a sound page). Checked at every step: the counts by label or type sum to the whole count,
+  the rows of each match equal its count, a whole read equals its count; else `GraphShort` (the type or label, both
+  figures). A type or label over the cap, or a typed match the tool still refuses with its over-cap words, raises
+  `GraphTooLarge` (`what`, `kind`, `count`, `nodes`, `edges`, `cap`, `refused`). A name that cannot stand in a match, or
+  a count by type or label that is no number, refuses. A whole count (`count(n)`, `count(r)`) the tool answers with no
+  single number (a tool or a stand-in that does not count; the stand-ins of `tests/unit/codeintel/test_codeintel.py`
+  answer every query with graph rows) reads that part whole, as before, unchecked, and gives no count; an error of the
+  tool on a count still raises. `counted(root)` gives the tool's `(nodes, edges)` of the graph `_graph` read.
+  `_Session.tool` keeps the tool's error text in its `RuntimeError` (message and `.text`), so an over-cap refusal is
+  told from other failures.
+- **Built (`src/gov/adopt/fabric.py`):** A9 records the code graph's `nodes` and `edges` as the tool counted them
+  (`codeintel.counted`; a stand-in of `_graph` that gives no count keeps the count of what it returned). A
+  `GraphTooLarge` refuses `CODEGRAPH_TOO_LARGE` (`fabric.too_large`): the message names `codebase-memory-mcp`, its cap,
+  the edge type or node label and its count; `details`: `nodes`, `edges`, `cap`, `tool`, `kind`. Any other failure,
+  `GraphShort` among them, keeps `FABRIC_INCOMPLETE` naming `codegraph` and the error text (for `GraphShort`, the type or
+  label and both figures). Run 7's `graph_counts` and `refuse_too_large` (the refusal for a read in one query) are
+  removed: the read no longer takes the whole graph in one query. `src/gov/retrieval/code_route.py` is unchanged (A9's
+  read does not go through it).
+- **Unit tests** (`tests/unit/codeintel/test_w2_88_graph.py`, 10 cases, and `tests/unit/adopt/test_w2_88_f1.py`, 9
+  cases, each with a stand-in `codebase-memory-mcp` first on `PATH` that refuses any query whose whole answer is over
+  100,000 rows and pages by `offset`/`max_rows`): a graph of 130,000 edges, every type under, read by type (counts equal,
+  no whole edge read asked); nodes over the cap read by label; no query asks `SKIP` or `LIMIT` (the stand-in answers
+  them short, so a reader using them would fail its count); a type over the cap and a label over the cap refused by name;
+  a typed match the tool still refuses refused by name; a typed read short of its count, counts by type short of the
+  whole and a whole read short all refuse with both figures; a graph under the cap read whole as today; the tool's error
+  text kept. A9: a graph shaped as the lead's redis probe (41,086 nodes, 142,983 edges, the largest type 40,849)
+  completes and its record holds 41,086 and 142,983; a type at the cap is read; a type or label over the cap is
+  `CODEGRAPH_TOO_LARGE` with `kind` and nothing written; a short typed read is `FABRIC_INCOMPLETE` naming `CALLS`, 40549
+  and 40546; a tool that cannot count refuses, never 0. The codeintel cases were run before the change: 10 of 10 red.
+- **Not run here:** A9 on the redis copy (`~/gov-os-runs/W2-88/redis`); the lead re-runs it outside the sandbox.
+
+## Run 8b (2026-11-15; DEC-1185): S28, the code graph read in pieces by source file
+
+- **Built (`src/gov/codeintel/__init__.py`, `_Reader`, `_graph`):** the total from `MATCH (a)-[r]->(b) RETURN type(r), count(r)` summed;
+  the labels (`MATCH (n) RETURN n.label, count(n)`), each label's path list counted first (`MATCH (n:<Label>) RETURN count(n)`)
+  and read (`RETURN n.file_path`) only at or under the cap, its rows checked equal to the count; a File list cut or over
+  the cap is read per holder by equality (`MATCH (f:Folder)-[r:CONTAINS_FILE]->(n:File) WHERE f.file_path = ...`, each
+  piece counted first; a holder with no string path, e.g. Branch, as one piece), the pieces summing to the File count;
+  where no sound piece exists (the holder's list cut, a piece cut or over the cap) it refuses by name. Then one piece a
+  distinct non-empty string path in sorted order (`WHERE a.file_path = "<path>"`, count first, then
+  `id(r), a.qualified_name, type(r), b.qualified_name`); a piece over the cap or cut short is read again by link type
+  inside the file; a (file, type) piece over the cap raises `GraphTooLarge` (`kind` the type, `file`), short of its
+  count `GraphShort` (the file, the type, both figures). A label whose nodes have no string path is one piece by
+  source label. Every piece's ids are distinct; the pieces' counts must sum to the total and their ids be that many
+  distinct, else `GraphShort` naming the total, the sum, the pieces read twice and the labels whose paths leave a gap.
+  Nodes are read by label, each checked against its count; a label cut or over the cap by its paths, by equality.
+  No query asks `SKIP`, `LIMIT`, `IN`, `STARTS WITH`, a string `>` or a function in `WHERE`.
+- **Refresh:** `codeintel.record_path(root)` (`home(root)/gov-links.json`) keeps each source path's content digest (of
+  the staged file, or a staged folder's listing) and its links, no file text; kept across `index`. A path whose digest
+  is unchanged is taken from the record with no query; the total is asked every time. A refresh whose pieces do not
+  sum to the total is read again whole without the record before any refusal. The record is written only after a read
+  passes (a failed read leaves the last good one).
+- **Built (`src/gov/adopt/fabric.py`):** `too_large` names the file and the type (`details.file`); A9's codegraph record
+  holds `pieces_read`, `pieces_from_record` and `read_seconds` (`codeintel.read_stats`).
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_graph.py` (18 cases; stand-in `test_w2_88_standin_tool.py` as items
+  13-14 say the tool behaves) and `tests/unit/adopt/test_w2_88_f1.py` (7 cases). The reader was written before its
+  tests in this run; the tests were then checked against three mutated readers (no type split, no record, no total
+  check): each mutation is caught (3, 1 and 1 cases red).
+- **Not run here:** A9 on the redis copy and its wall time; the lead re-runs it outside the sandbox.
+
+## Run 8b: step 6 (DEC-893, no unfilled slot in an operator command; interface items 21, 22, 24)
+
+- **Built:** `governance/project/orchestration/tools/memaudit_cron.sh` copied byte for byte (`cp -p`, mode 0755) to
+  `src/gov/_shipped/governance/project/orchestration/tools/memaudit_cron.sh`, declared in `pyproject.toml` and in
+  `fabric.PACKAGED` (four items). `memory_sets._cron` uses `fabric.shipped(CRON, root)` only: found nowhere, A9 refuses
+  `SHIPPED_FILE_MISSING` naming it and the places looked; the `<path to Gov OS>/...` fallback is removed. Cron runs the
+  path itself (W2-187's line form kept), so the copy keeps its executable mode in the wheel.
+- **Built:** with no gitleaks on the PATH at A9, step 6 is `GITLEAKS_MISSING` by name: the weekly scan cannot run and the
+  push stays blocked (DEC-1182 (2)); install gitleaks and run A9 again (or add the line by hand); no cron line, no `<`.
+  A9's record names it (`audit.gitleaks: GITLEAKS_MISSING`, beside `audit.act`); A9 is not refused for it.
+- **Unit tests:** `tests/unit/adopt/test_w2_88_cron.py` (8 cases); `test_w2_88_shipped.py` and `test_w2_88_p1.py`
+  revised to the four shipped items.
+- **Red by this decided change (not this run's paths):** `tests/unit/adopt/test_w2_187_walls_act.py::test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`
+  and `tests/acceptance/W2-187/test_w2_187_s11_cron.py::...[none-on-path]`: both assert the placeholder.
+
+## Run 8b, last round: the CTO's decisions on the narrow check nc-r8-2 (interface items 25, 26)
+
+- **R8-2 (a), item 25 (`src/gov/codeintel/__init__.py`, `_Reader.links`, `_graph`):** the nodes are now read before the
+  links; `links(paths, known)` takes the fresh node read's qualified names. The record stands only while every link it
+  holds for an unchanged file has its source and target among them; else it is stale: no piece is taken from it, every
+  piece is read again as with no record (items 15-17), and the record is rewritten after that read passes.
+  `read_stats` (and so A9's codegraph block, which spreads it) gains `record_stale` (true also where the record's pieces
+  fell short of the total and were read again) and `stale_links` (the held links with a missing end), beside
+  `pieces_from_record: 0`. A refresh whose held links all keep their ends reads only the changed files (item 18).
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_graph.py` (21 cases, 3 new: the callee moved from `b.py` to `c.py`
+  with the same ids and counts gives `c.foo`'s caller, `pieces_from_record` 0, `record_stale` true, `stale_links` 1, all
+  three pieces read again and the record rewritten; a renamed callee; a refresh with every held end present reads only
+  `c.py`, `pieces_from_record` 2). The stand-in `test_w2_88_standin_tool.py` now gives each generated link ends that are
+  nodes of the graph (as in the real tool) and takes links and node names one by one (`edges`, a list under `labels`).
+  The three new cases were red before the reader changed (the rename gave no caller of `code.b.bar`).
+- **R8-1, item 26:** `tests/unit/adopt/test_w2_187_walls_act.py::test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`
+  revised to item 24 (`GITLEAKS_MISSING` named, no `<path to gitleaks>`, no `<...>` slot, no cron line); its name kept
+  (this file and W2-187's evidence cite it); the file's other six cases unchanged (Rewrite-Reason: DEC-893, DEC-1156 (7)).
+
+## Run 8b, the last fix: a node label over the cap is read by path (interface item 27)
+
+- **Cause** (the lead's run of the code-graph module at d5f7f4282): `_Reader.node_rows` sent a label over the cap to
+  `nodes_by_path`, which had no path list for it (item 15 reads path lists only for labels of at most 100,000 nodes)
+  and refused `CODEGRAPH_TOO_LARGE` for `Method` (100,002 nodes over several files, each file's share under the cap).
+- **Fix (`src/gov/codeintel/__init__.py`, `_Reader.nodes_by_path`):** a label over the cap, or cut, is read by path with
+  the equality filter `MATCH (n:<Label>) WHERE n.file_path = "<path>"`, each path's `count(n)` first and a path of 0
+  nodes not read; the candidate paths are the label's own path list where it was read whole, else the File and Folder
+  paths already known (item 15 (ii), item 23). The pieces' counts must sum to the label's count, else
+  `FABRIC_INCOMPLETE` (`GraphShort`, naming the label, its count and the sum); a single (label, path) piece over the
+  cap refuses `CODEGRAPH_TOO_LARGE` (`GraphTooLarge`, `kind` the label, `file` the path). Never a partial read.
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_graph.py` (24 cases, 3 new, all three red before the fix with the
+  old up-front refusal): `Method` of 100,002 nodes over three of five files is read (counted 100,012 nodes, each
+  candidate's count asked, a path of 0 not read, the label never asked whole); `Method` with 2 nodes at
+  `<python-builtins>` (no File or Folder path) is refused by name (counted 100,002, sum 100,000); a (`Method`, `m0.c`)
+  piece of 100,001 is refused by name.
+
+## Run 8b, the lead's measures (S28 on the redis copy; the acceptance run's time limit)
+
+- **S28 on the redis copy** (`~/gov-os-runs/W2-88/redis`, A9 by the lead outside the sandbox at f4e882ddb, the reader before R8-2 (a) and item 27; log `.gov-runtime/scratch/lead/log/redis-a9-8b.*`, record `governance/adoption/A9-memory-fabric.md` in the copy): exit 0, ok, A9 14:44.68 wall, peak RSS 838,032 KiB; the code graph 41,086 nodes and 143,008 links, the tool's own totals (the stage refuses any gap); 1,977 pieces read by source path, 0 from the record (a first read); `read_seconds` 493.893. The lead's probes of the real tool that chose the pieces (keyset paging not sound: a string comparison in `WHERE` answers 0 rows silently, functions in `WHERE`, `IN`, `STARTS WITH` and a grouped count by file refused, answers cut by size silently, a whole-graph `ORDER BY` killed the tool) are `.gov-runtime/scratch/lead/log/f1-probe5b.txt` to `f1-probe11.txt`.
+- **`gov accept W2-88` runs with `--timeout 5400`** (the CTO, 2026-11-15): at f4e882ddb the default 1,800 s ran out (`error_kind: timeout`, accept-10) under the night's load, after run 8b's S28 cases added several A9 runs over planted graphs of up to 250,000 links to the folder; run 8's accept at a5144a3ec took about 28 minutes with the default.
+- **The real-redis case's own limit** (td-18, 162311d26; the CTO, 2026-11-15): `test_s25_real_redis_copy_a9_is_ok_or_names_the_cause` ran A9 through W2-124's `S124.gov`, whose limit is 240 s; under S28 A9 on the redis copy completes, in 8 to 15 minutes (the lead's runs: 14:44 at f4e882ddb, 8:15 at b817f604c, both exit 0, ok, 142,986 to 143,008 links, the tool's totals), so the lead's verify at b817f604c timed it out (`exit code: None after 240.1 s`). The case now gives A9 2,400 s (same call, same session; every assertion kept). The land queue's scoped run therefore carries an 8 to 15 minute A9 on the redis copy. At b817f604c a second A9 on the copy (a refresh) read every piece again: `record_stale: true`, `stale_links: 0` (the record's pieces fell short of the total, so the reader re-read all: fail-closed), 1,984 pieces, `read_seconds` 422.8; the refresh's saving on the real tool is not yet shown (a named residual).
+
+## Run 8b, the CTO's P2 under DEC-338 (for the owner's reading): a runtime folder too long for the tool's socket
+
+- **The cause** (the lead, 2026-11-15 ~03:50): A9 on a redis copy, in a test whose `CODEINTEL_DAEMON_BASE` is deep in the pytest temp tree, was refused `FABRIC_INCOMPLETE ... codegraph: RuntimeError: codebase-memory-mcp config set ui_enabled false failed`. The tool makes its socket under `CBM_RUNTIME_DIR`, and a Unix socket path holds at most 107 bytes; `daemon_dir` took the folder from the base as given, with no length check. The cache folder's length does not matter.
+- **The rule** (measured on 0.11.0 in the engineer's sandbox, `config set ui_enabled false` with runtime folders of every length by bisection): a 65-byte folder works, a 66-byte one fails `secure CLI coordination could not be created (endpoint)`, so the socket is `<runtime>/cbm-daemon-<uid>/cbm-<16 hex>.sock` (42 bytes after the folder for uid 1000). The daemon's pending name `.sock.pending` (the binary names it; its start cannot be run in the sandbox) is counted too, as `test_codeintel.py` already counts it: a runtime folder fits when `len(folder + "/cbm-daemon-<uid>/cbm-<16 hex>.sock.pending") <= 107` (`codeintel.socket_length`, `SOCKET_MAX`).
+- **The behaviour** (the CTO, delegated, under DEC-338: "a socket path is limited to 108 bytes"): a folder that fits stays exactly where W2-56 puts it, byte for byte; a longer one is replaced by `/tmp/gov-cbm-<uid>/<the first 12 hex of the sha256 of the long folder's real path>` (`SHORT_BASE`), made 0700, the folder above it checked as before (the user's own real directory, no link), so each session keeps its own folder. A short folder that cannot be made or is still too long raises `RuntimePathTooLong`, whose message starts with `CODEGRAPH_RUNTIME_PATH_TOO_LONG` and names the path and its socket's length against the limit; `fabric._stores` maps it to a `GovError` of that code (`runtime_too_long`), so A9 shows the name, not a bare `FABRIC_INCOMPLETE`.
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_runtime_path.py` (9 cases, red before the change): the rule's count; a short base and a base exactly at the limit unchanged byte for byte; a base one byte over gets the short folder; two long bases get two folders; the short folder made 0700; the refusal by name when the short folder is still too long, under a file, or a link. The real case (the tool's daemon on a long base) runs outside the sandbox (the sandbox refuses Unix sockets).
+- **Open, outside this change's paths:** 14 W2-56 unit cases (`tests/unit/codeintel/test_codeintel.py`, 11;
+  `tests/unit/codeintel/test_w2_56_nested_daemon.py`, 3) put their daemon base in the pytest temp tree, whose folders'
+  sockets pass 107 bytes. They expect the long folder as given, so under the decided behaviour they are red: their
+  folders now move to `/tmp/gov-cbm-<uid>`, which is read-only in the sandbox. Their fixtures need a short base, or
+  `SHORT_BASE` set to a test folder, or `SOCKET_MAX` raised for placement-only cases. That change belongs to the lead.

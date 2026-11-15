@@ -13,8 +13,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -91,11 +93,16 @@ def test_a_nested_gov_process_with_an_environment_built_anew_lands_in_the_sessio
 def test_a_nested_process_takes_the_nearest_mark_above_the_repository(tmp_path):
     base = tmp_path / "base"
     base.mkdir()
-    named = tmp_path / "s"
-    codeintel.write_mark(base, named)
-    root = _repository(base / "case" / "repo")
-    got = _nested(tmp_path, root, _tools(tmp_path))
-    assert got["seen"] == str(named / _hash(root)) and (named / _hash(root)).is_dir()
+    # A short named folder, so the nested child's socket path fits and the runtime-path fallback leaves the placement
+    # judged (the CTO's P2 under DEC-338); removed with what the child made under it.
+    named = Path(tempfile.mkdtemp(dir="/tmp", prefix="cbm-n-"))
+    try:
+        codeintel.write_mark(base, named)
+        root = _repository(base / "case" / "repo")
+        got = _nested(tmp_path, root, _tools(tmp_path))
+        assert got["seen"] == str(named / _hash(root)) and (named / _hash(root)).is_dir()
+    finally:
+        shutil.rmtree(named, ignore_errors=True)
 
 
 def test_a_mark_this_process_wrote_is_not_followed_here(tmp_path, monkeypatch):
@@ -103,6 +110,7 @@ def test_a_mark_this_process_wrote_is_not_followed_here(tmp_path, monkeypatch):
     monkeypatch.delenv(codeintel.BASE_ENV, raising=False)
     monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV, raising=False)
     monkeypatch.setattr(codeintel, "DAEMON_BASE", tmp_path / "daemons")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     codeintel.write_mark(tmp_path, tmp_path / "s")
     assert codeintel.marked_base(tmp_path / "repo") is None
     assert codeintel.daemon_dir(tmp_path / "repo").parent == tmp_path / "daemons"
@@ -129,6 +137,7 @@ def test_the_variable_and_a_launched_sessions_folder_come_before_a_mark(tmp_path
     mark.write_text(json.dumps({"base": str(tmp_path / "marked"), "pid": os.getpid() + 1}), encoding="utf-8")
     monkeypatch.setenv(codeintel.BASE_ENV, str(tmp_path / "given"))
     monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, "/tmp/gov-launch-abcd1234/claude-1000")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     assert codeintel.daemon_dir(tmp_path / "repo").parent == tmp_path / "given"
     monkeypatch.delenv(codeintel.BASE_ENV)
     assert codeintel.daemon_dir(tmp_path / "repo").parent == Path("/tmp/gov-launch-abcd1234") / codeintel.LAUNCH_SUB
@@ -147,6 +156,7 @@ def test_a_folder_made_for_a_tool_that_cannot_be_started_is_not_left(tmp_path, m
     monkeypatch.delenv(codeintel.BASE_ENV, raising=False)
     monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV, raising=False)
     monkeypatch.setattr(codeintel, "DAEMON_BASE", tmp_path / "daemons")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     root = _repository(tmp_path / "repo")
     empty = tmp_path / "no-tool"
     empty.mkdir()

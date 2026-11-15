@@ -59,6 +59,7 @@ class Run:
 def run(root: Path, args, config: dict) -> dict:
     if args.stage == "MA":  # in no chain, and it writes nothing in the repository: a clean tree is not its condition
         project.require_commit(root)
+        safety.refuse_ignored(root)  # S26: before anything else, at once
         return ma(Run(root, args, config, "MA", {}, {}, {}))
     project.require_repository(root)
     tracked = project.tree(root)
@@ -150,6 +151,7 @@ def _coordination(root: Path) -> tuple[dict, dict]:
 
 
 def a0(run: Run) -> dict:
+    safety.refuse_ignored(run.root)  # S26: before any other work (a run that skipped MA is asked here)
     head = resolve(run.root, "HEAD")
     ref = f"{REFS}/backup/{head[:12]}"
     existed = resolve(run.root, ref)

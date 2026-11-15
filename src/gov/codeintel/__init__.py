@@ -23,6 +23,7 @@ import functools
 import hashlib
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -50,8 +51,34 @@ MARK = ".gov-cbm-base"
 # ... and, in a session ``gov launch`` started, its own temp folder (``gov-launch-`` and a few letters, DEC-159),
 # found from ``CLAUDE_CODE_TMPDIR``: the launcher's folder itself, or the CLI's ``claude-<uid>`` folder in it.
 LAUNCH_TMP_ENV, LAUNCH_PREFIX, LAUNCH_SUB = "CLAUDE_CODE_TMPDIR", "gov-launch-", "cbm"
+# The tool's socket under its runtime folder (0.11.0, measured in W2-88 run 8b): ``cbm-daemon-<uid>/cbm-<16 hex>.sock``
+# (a 65-byte folder works, a 66-byte one fails "secure CLI coordination could not be created (endpoint)"); its daemon's
+# pending name ``.sock.pending`` is counted too. A socket path holds at most 107 bytes (DEC-338): a runtime folder whose
+# socket would pass it is replaced by a short one of its own under ``SHORT_BASE`` (the CTO's P2, W2-88 run 8b), and a
+# short one that cannot be made or is still too long is refused by name (``TOO_LONG``).
+SOCKET_MAX = 107
+SOCKET_TAIL = f"cbm-daemon-{os.getuid()}/cbm-{'0' * 16}.sock.pending"
+SHORT_BASE = Path(f"/tmp/gov-cbm-{os.getuid()}")
+TOO_LONG = "CODEGRAPH_RUNTIME_PATH_TOO_LONG"
 PROJECT = "code"
 _PAGE, _BUDGET = 50000, 100_000_000  # rows and output tokens of one answer of the tool; more is paged
+# Rows of one query's whole answer the tool gives at most: over it the tool refuses the query before its own paging
+# (``offset``, ``max_rows``). The tool also cuts an answer short by its size, silently, and answers a string ``>`` in
+# ``WHERE`` with 0 rows: no keyset cursor and no ``SKIP``/``LIMIT`` page is sound (the lead's probes, run 8b, items
+# 13-14). So the links are read in pieces by their source node's path, one path a piece by equality, and inside a piece
+# the tool cuts or that is over the cap, by link type; every piece counted first and its rows checked against its count.
+CAP = 100_000
+_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")  # an edge type or node label that may stand in a match
+_NODES = "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path"
+_EDGES = "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name"
+_LABELLED = "MATCH (n:{}) RETURN n.qualified_name, n.name, n.label, n.file_path"
+_TYPES = "MATCH (a)-[r]->(b) RETURN type(r), count(r)"
+_LABELS = "MATCH (n) RETURN n.label, count(n)"
+_HOLDERS = "MATCH (a)-[r:CONTAINS_FILE]->(n:File) RETURN a.label, count(r)"
+_LINK = "id(r), a.qualified_name, type(r), b.qualified_name"  # the columns of a piece's links
+RECORD = "gov-links.json"  # the per-file record of the last read that passed, under ``home(root)`` (S28)
+_counted: dict = {}  # the graph's (nodes, edges) as the tool counted them, by the root ``_graph`` read
+_stats: dict = {}  # the last read's pieces read, pieces taken from the record and wall time, by root
 # Seconds a session of the tool has for one answer, and for its end once its input is closed; then it is killed.
 _ANSWER_S, _END_S = 120.0, 10.0
 # Nodes that say where something stands, and edges that are no use of a symbol by another.
@@ -59,8 +86,9 @@ _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
 _FUNCTIONS = {"Function", "Method"}
 
-__all__ = ["callees", "callers", "daemon_base", "daemon_dir", "dead_code", "definitions", "home", "impact", "index",
-           "launch_folder", "make_session_base", "marked_base", "projects", "references", "write_mark"]
+__all__ = ["RuntimePathTooLong", "callees", "callers", "daemon_base", "daemon_dir", "dead_code", "definitions", "home",
+           "impact", "index", "launch_folder", "make_session_base", "marked_base", "projects", "references",
+           "socket_length", "write_mark"]
 
 
 def home(root: Path) -> Path:
@@ -154,20 +182,57 @@ def make_session_base(env=None) -> Path:
     raise OSError("no folder for the test session's daemon directories can be made")
 
 
+def socket_length(runtime) -> int:
+    """The bytes of the tool's socket path under the runtime folder ``runtime`` (``SOCKET_TAIL``)."""
+    return len(os.fsencode(os.path.join(str(runtime), SOCKET_TAIL)))
+
+
+class RuntimePathTooLong(RuntimeError):
+    """``TOO_LONG``: the runtime folder ``long`` would put the tool's socket over ``SOCKET_MAX`` bytes, and its short
+    folder ``path`` (``length``: the bytes of its socket) cannot be made or is still too long (``why``)."""
+
+    code = TOO_LONG
+
+    def __init__(self, long: Path, path: Path, why: str) -> None:
+        self.long, self.path, self.length, self.limit = long, path, socket_length(path), SOCKET_MAX
+        super().__init__(f"{TOO_LONG}: the code index tool's socket under its runtime folder {long} would be "
+                         f"{socket_length(long)} bytes, over the {SOCKET_MAX} a socket path holds (DEC-338), and its "
+                         f"short folder {path} ({self.length} bytes for the socket, limit {SOCKET_MAX}) {why}: the code "
+                         "index tool is not run")
+
+
+def _placed(root: Path) -> tuple[Path, Path | None]:
+    """The runtime folder for ``root`` and, where the one ``daemon_base`` gives would put the socket over
+    ``SOCKET_MAX``, that long one (else None)."""
+    root = Path(root).resolve()
+    long = daemon_base(root=root) / hashlib.sha256(os.fsencode(root)).hexdigest()[:16]
+    if socket_length(long) <= SOCKET_MAX:
+        return long, None
+    return SHORT_BASE / hashlib.sha256(os.fsencode(os.path.realpath(long))).hexdigest()[:12], long
+
+
 def daemon_dir(root: Path) -> Path:
     """The tool's runtime directory for the repository at ``root`` (its ``CBM_RUNTIME_DIR``), outside the repository,
-    as this process sees it (``daemon_base``)."""
-    root = Path(root).resolve()
-    return daemon_base(root=root) / hashlib.sha256(os.fsencode(root)).hexdigest()[:16]
+    as this process sees it (``daemon_base``); where that one would put the socket over ``SOCKET_MAX`` bytes, a short
+    one of its own under ``SHORT_BASE`` (12 hex of the sha256 of the long one's real path)."""
+    return _placed(root)[0]
 
 
 def _daemon_dir(root: Path) -> Path:
-    """``daemon_dir(root)``, made. Raises unless it and the folder above it are the user's own real directories."""
-    made = daemon_dir(root)
-    for place in (made.parent, made):  # /tmp is shared: a folder or a link put there by another user is not used
-        place.mkdir(mode=0o700, exist_ok=True)
-        if place.is_symlink() or place.stat().st_uid != os.getuid():
-            raise RuntimeError(f"{place} is not a directory of this user: the code index tool is not run")
+    """``daemon_dir(root)``, made. Raises unless it and the folder above it are the user's own real directories; a
+    short folder that cannot be made, or is still too long, raises ``RuntimePathTooLong``."""
+    made, long = _placed(root)
+    if long is not None and socket_length(made) > SOCKET_MAX:
+        raise RuntimePathTooLong(long, made, "is still too long")
+    try:
+        for place in (made.parent, made):  # /tmp is shared: a folder or a link put there by another user is not used
+            place.mkdir(mode=0o700, exist_ok=True)
+            if place.is_symlink() or place.stat().st_uid != os.getuid():
+                raise RuntimeError(f"{place} is not a directory of this user: the code index tool is not run")
+    except (OSError, RuntimeError) as exc:
+        if long is None:
+            raise
+        raise RuntimePathTooLong(long, made, f"cannot be made ({exc})") from exc
     return made
 
 
@@ -220,6 +285,34 @@ def _tool(root: Path, tool: str, **args) -> dict:
     except (ValueError, LookupError, TypeError):
         pass
     raise RuntimeError(f"{TOOL} {tool} failed (exit code {done.returncode})")
+
+
+class GraphTooLarge(RuntimeError):
+    """A piece of the code graph (``what`` ``kind``: a link type inside the source ``file``, a source label, a list of
+    paths) of ``count`` rows that no query of the tool can answer soundly: over its ``cap``, or (``refused``) a query
+    of it the tool still refused over its cap. ``nodes`` and ``edges`` are the graph's counts as the tool gave them."""
+
+    def __init__(self, what: str, kind: str, count: int, nodes: int, edges: int, refused: bool = False,
+                 file: str | None = None) -> None:
+        self.what, self.kind, self.count, self.nodes, self.edges = what, kind, count, nodes, edges
+        self.cap, self.refused, self.file = CAP, refused, file
+        why = "the tool refused its query over its cap all the same" if refused else "over the cap"
+        where = f" of the source file {file}" if file is not None else ""
+        super().__init__(f"{TOOL} refuses a query whose answer is over its cap of {CAP} rows: the code graph's {what} "
+                         f"{kind}{where} has {count} rows ({why}), so it cannot be read in pieces under the cap (the "
+                         f"graph: {nodes} nodes, {edges} edges)")
+
+
+class GraphShort(RuntimeError):
+    """A read of the code graph's ``what`` ``kind`` (inside the source ``file`` where one is named) that ended with
+    ``read`` rows where the tool counted ``counted``; or (``said``) links missed or read twice over the pieces."""
+
+    def __init__(self, what: str, kind: str, counted: int, read: int, file: str | None = None,
+                 said: str | None = None) -> None:
+        self.what, self.kind, self.counted, self.read, self.file = what, kind, counted, read, file
+        where = f" of the source file {file}" if file is not None else ""
+        super().__init__(said or f"the code graph's {what} {kind}{where}: {read} rows read where {TOOL} counted "
+                         f"{counted}, so the graph is not whole (never a partial count)")
 
 
 class _Session:
@@ -283,20 +376,30 @@ class _Session:
             envelope = self._ask("tools/call", name=tool, arguments=args)
             if envelope.get("isError", False) is False:  # MCP: an envelope without the field is no error
                 return json.loads(envelope["content"][0]["text"])
+            said = envelope["content"][0]["text"]  # what the tool said of its error, kept for the caller to name
+            text = " ".join(said.split())[:300] if isinstance(said, str) else ""
         except (OSError, ValueError, LookupError, TypeError, AttributeError):
-            pass
+            text = ""
         finally:
             limit.cancel()
-        raise RuntimeError(f"{TOOL} {tool} failed (exit code {self._end()})")
+        failed = RuntimeError(f"{TOOL} {tool} failed (exit code {self._end()})" + (f": {text}" if text else ""))
+        failed.text = text  # what the tool said of its error ("" for none), for a caller to name the cause
+        raise failed
 
 
 def index(root: Path) -> None:
     """Build the code index of the repository anew, from the files the pre-index filter returns and no other."""
     root = _checked(root)  # first of all: a refused root loses nothing
     base, staged = root / BASE_REL, root / BASE_REL / "files"
+    try:  # the per-file record of the last read is kept: a file unchanged is not read again (S28)
+        kept = (home(root) / RECORD).read_bytes()
+    except OSError:
+        kept = None
     if base.exists():  # first, so that a filter that cannot decide leaves no index behind
         shutil.rmtree(base)
     _graph.cache_clear()
+    _counted.clear()
+    _stats.clear()
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
                             capture_output=True, text=True, check=True, env=git_env(root)).stdout
     allowed = indexable(root, [rel for rel in listed.split("\0") if rel])
@@ -310,6 +413,8 @@ def index(root: Path) -> None:
     home(root).mkdir(parents=True, exist_ok=True)
     staged.mkdir(exist_ok=True)
     _tool(root, "index_repository", repo_path=str(staged), name=PROJECT)
+    if kept is not None:
+        (home(root) / RECORD).write_bytes(kept)
 
 
 def projects(root: Path) -> list[str]:
@@ -327,19 +432,397 @@ def _rows(session: _Session, query: str) -> list[list]:
     return rows
 
 
+def _number(value, query: str) -> int:
+    """A count the tool gave (it answers counts as text); anything else refuses."""
+    text = str(value).strip()
+    if not text.isdigit():
+        raise RuntimeError(f"{TOOL} query_graph answered {query!r} with no count gov can read: {text[:80]!r}")
+    return int(text)
+
+
+def _one(session: _Session, query: str) -> int | None:
+    """The one count ``query`` asks; None where the tool answers it with no single count."""
+    rows = _rows(session, query)
+    if len(rows) != 1 or not isinstance(rows[0], list) or len(rows[0]) != 1 or not str(rows[0][0]).strip().isdigit():
+        return None
+    return int(str(rows[0][0]).strip())
+
+
+def _count(session: _Session, query: str) -> int:
+    """The one count ``query`` asks (no row: 0); any other answer refuses (an error of the tool still raises)."""
+    rows = _rows(session, query)
+    if not rows:
+        return 0
+    if len(rows) != 1 or not isinstance(rows[0], list) or len(rows[0]) != 1:
+        raise RuntimeError(f"{TOOL} query_graph answered {query!r} with no count gov can read: {str(rows)[:120]}")
+    return _number(rows[0][0], query)
+
+
+def _pairs(session: _Session, query: str) -> dict[str, int] | None:
+    """The count of each link type or node label ``query`` groups, one row each; None where the answer holds rows of
+    another shape (a tool, or a stand-in, that does not count: the graph is then read whole as before). A name that
+    cannot stand in a match, or one named twice, refuses."""
+    rows = _rows(session, query)
+    if not all(isinstance(row, list) and len(row) == 2 and str(row[1]).strip().isdigit() for row in rows):
+        return None
+    found: dict[str, int] = {}
+    for name, count in rows:
+        if not (isinstance(name, str) and _NAME.fullmatch(name)) or name in found:
+            raise RuntimeError(f"{TOOL} query_graph answered {query!r} with a row gov cannot read by name: "
+                               f"{str([name, count])[:120]}")
+        found[name] = int(str(count).strip())
+    return found
+
+
+def _quoted(path: str) -> str | None:
+    """``path`` as a string the tool's ``WHERE`` compares by equality; None where no quoting is sure (a backslash or a
+    line end in it, or both quotes)."""
+    if "\\" in path or "\n" in path or "\r" in path:
+        return None
+    if '"' not in path:
+        return f'"{path}"'
+    return f"'{path}'" if "'" not in path else None
+
+
+def counted(root: Path) -> tuple[int, int] | None:
+    """The code graph's ``(nodes, edges)`` as the tool counted them when ``_graph(root)`` read it; None before."""
+    return _counted.get(root)
+
+
+def read_stats(root: Path) -> dict | None:
+    """The last read of ``_graph(root)``: ``pieces_read`` (pieces asked of the tool), ``pieces_from_record`` (files
+    unchanged since the last read, taken from the record), ``record_stale`` (the record was found stale and every
+    piece read again: a link it held lost an end, item 25, or its pieces fell short of the total), ``stale_links`` (the
+    held links whose source or target the fresh node read lacks) and ``read_seconds`` (its wall time); None before."""
+    return _stats.get(root)
+
+
+def record_path(root: Path) -> Path:
+    """The per-file record of the last read that passed (S28): paths, digests and links, no file text."""
+    return home(root) / RECORD
+
+
+class _Reader:
+    """One read of the graph's nodes and links in pieces (S28; the interface of run 8b, items 15-19 and 23)."""
+
+    def __init__(self, session: _Session, root: Path, types: dict[str, int], labels: dict[str, int],
+                 record: dict) -> None:
+        self.session, self.root, self.record = session, root, record
+        self.edges, self.nodes = sum(types.values()), sum(labels.values())
+        self.labels = labels
+        self.lists: dict[str, list] = {}  # each label's path list, read whole and checked against its count
+        self.read = self.taken = 0
+        self.stale = 0  # links the record held whose source or target the fresh node read lacks (item 25)
+
+    def rows(self, query: str) -> list[list]:
+        return _rows(self.session, query)
+
+    def count(self, query: str) -> int:
+        return _count(self.session, query)
+
+    def checked(self, query: str, what: str, kind: str, count: int, file: str | None = None) -> list[list]:
+        """The rows of ``query``, a piece of ``count`` rows (over the cap: refused by name, never asked); rows short of
+        or over the count refuse (``GraphShort``)."""
+        if count > CAP:
+            raise GraphTooLarge(what, kind, count, self.nodes, self.edges, file=file)
+        try:
+            got = self.rows(query)
+        except RuntimeError as exc:
+            if "exceeded" in getattr(exc, "text", ""):  # the tool's own words for a query over its cap
+                raise GraphTooLarge(what, kind, count, self.nodes, self.edges, refused=True, file=file) from exc
+            raise
+        if len(got) != count:
+            raise GraphShort(what, kind, count, len(got), file=file)
+        return got
+
+    # ---- (ii) and item 23: the source paths, each list counted first and checked
+    def path_lists(self) -> list[str]:
+        for label in sorted(self.labels, key=lambda name: name == "File"):  # Folder's list before File's
+            count = self.count(f"MATCH (n:{label}) RETURN count(n)")
+            if count != self.labels[label]:
+                raise GraphShort("list of the paths of the label", label, self.labels[label], count,
+                                 said=f"the code graph's label {label}: {TOOL} counted {self.labels[label]} nodes by "
+                                      f"label and {count} by its own count, so its path list cannot be checked")
+            got = self.rows(f"MATCH (n:{label}) RETURN n.file_path") if count <= CAP else None
+            if got is not None and len(got) == count:
+                self.lists[label] = [row[0] if isinstance(row, list) and len(row) == 1 else row for row in got]
+            elif label == "File":
+                self.lists[label] = self.files_by_folder(count)
+        return sorted({path for values in self.lists.values() for path in values if isinstance(path, str) and path})
+
+    def bare(self, label: str) -> bool:
+        """The label's every node has no string path (on redis Project and Branch, whose path is ``{}``)."""
+        values = self.lists.get(label)
+        return values is not None and not any(isinstance(path, str) and path for path in values)
+
+    def files_by_folder(self, files: int) -> list[str]:
+        """The File paths read per holder by equality on the holder's path (item 23), the pieces' counts summing to the
+        File count; where no sound piece exists it refuses by name, never a partial list."""
+        holders = _pairs(self.session, _HOLDERS)
+        if holders is None:
+            raise RuntimeError(f"{TOOL} query_graph answered {_HOLDERS!r} with no count by label gov can read")
+        if sum(holders.values()) != files:
+            raise GraphShort("list of", "File paths", files, sum(holders.values()),
+                             said=f"the code graph's list of File paths: the holders of files count "
+                                  f"{sum(holders.values())} where {TOOL} counted {files} File nodes")
+        found: list[str] = []
+        for holder, held in sorted(holders.items()):
+            values = self.lists.get(holder)
+            if values is None:  # the holder's own list is cut or over the cap: no sound piece
+                count = self.labels.get(holder, 0)
+                if count > CAP:
+                    raise GraphTooLarge("list of the paths of the label", holder, count, self.nodes, self.edges)
+                raise GraphShort("list of the paths of the label", holder, count, 0,
+                                 said=f"the code graph's list of the paths of the label {holder} (which holds "
+                                      f"{held} files) was cut short by {TOOL}, so the File list cannot be read in "
+                                      "sound pieces")
+            got: list = []
+            if self.bare(holder):
+                match = f"MATCH (b:{holder})-[r:CONTAINS_FILE]->(n:File)"
+                got += self.checked(f"{match} RETURN n.file_path", "list of the File paths held by", holder,
+                                    self.count(f"{match} RETURN count(n)"))
+            elif all(isinstance(path, str) and path for path in values):
+                for path in sorted(set(values)):
+                    quoted = _quoted(path)
+                    if quoted is None:
+                        raise GraphShort("list of", "File paths", held, len(got),
+                                         said=f"the code graph's {holder} path {path!r} cannot be asked by equality")
+                    match = f"MATCH (f:{holder})-[r:CONTAINS_FILE]->(n:File) WHERE f.file_path = {quoted}"
+                    got += self.checked(f"{match} RETURN n.file_path", f"list of the File paths of the {holder}",
+                                        path, self.count(f"{match} RETURN count(n)"))
+            else:
+                raise GraphShort("list of", "File paths", held, 0,
+                                 said=f"the code graph's label {holder} holds files and mixes string and other "
+                                      "paths, so the File list cannot be read in sound pieces")
+            if len(got) != held:
+                raise GraphShort(f"list of the File paths held by the label", holder, held, len(got))
+            found += [row[0] if isinstance(row, list) and len(row) == 1 else row for row in got]
+        if len(found) != files:
+            raise GraphShort("list of", "File paths", files, len(found))
+        return found
+
+    # ---- (iii) and 16: one piece a source path; inside it, by link type where it is cut or over the cap
+    def path_piece(self, path: str) -> list[list]:
+        quoted = _quoted(path)
+        if quoted is None:
+            raise GraphShort("links of", "a path", 0, 0, file=path,
+                             said=f"the code graph's source path {path!r} cannot be asked by equality")
+        where = f"WHERE a.file_path = {quoted}"
+        count = self.count(f"MATCH (a)-[r]->(b) {where} RETURN count(r)")
+        self.read += 1
+        if count == 0:
+            return []
+        if count <= CAP:
+            got = self.rows(f"MATCH (a)-[r]->(b) {where} RETURN {_LINK}")
+            if len(got) == count and _distinct(got):
+                return got
+        types = _pairs(self.session, f"MATCH (a)-[r]->(b) {where} RETURN type(r), count(r)")
+        if types is None or sum(types.values()) != count:
+            raise GraphShort("links by type", "of the file", count, sum((types or {}).values()), file=path)
+        rows: list[list] = []
+        for kind, number in sorted(types.items()):
+            match = f"MATCH (a)-[r:{kind}]->(b) {where}"
+            own = self.count(f"{match} RETURN count(r)")
+            if own != number:
+                raise GraphShort("link type", kind, number, own, file=path)
+            got = self.checked(f"{match} RETURN {_LINK}", "link type", kind, own, file=path)
+            if not _distinct(got):
+                raise GraphShort("link type", kind, own, len({str(row[0]) for row in got}), file=path)
+            rows += got
+        return rows
+
+    # ---- (iv): one piece a label whose nodes have no string path
+    def label_piece(self, label: str) -> list[list]:
+        match = f"MATCH (a:{label})-[r]->(b)"
+        count = self.count(f"{match} RETURN count(r)")
+        self.read += 1
+        got = self.checked(f"{match} RETURN {_LINK}", "links out of the source label", label, count) if count else []
+        if not _distinct(got):
+            raise GraphShort("links out of the source label", label, count, len({str(row[0]) for row in got}))
+        return got
+
+    def links(self, paths: list[str], known: set | None = None) -> tuple[list[list], dict]:
+        """Every link, each once: the pieces' counts sum to the tool's total and their ids are that many distinct.
+
+        ``known``: the qualified names of the fresh node read. The record stands only while every link it holds for an
+        unchanged file has both ends among them (run 8b item 25, R8-2 (a)); else it is stale and every piece is read
+        again, as with no record (a callee moved or renamed while its caller's file is unchanged)."""
+        pieces: dict[str, list[list]] = {}
+        fresh: dict[str, dict] = {}
+        kept = self.record.get("pieces", {}) if isinstance(self.record.get("pieces"), dict) else {}
+        digests = {path: _digest(self.root, path) for path in paths}
+        held = {path: kept[path]["links"] for path, digest in digests.items()
+                if digest is not None and isinstance(kept.get(path), dict) and kept[path].get("digest") == digest
+                and isinstance(kept[path].get("links"), list)}
+        if known is not None and held:
+            missing = sum(1 for rows in held.values() for row in rows
+                          if not (isinstance(row, list) and len(row) == 4 and row[1] in known and row[3] in known))
+            if missing:
+                self.stale, held = missing, {}
+        for path in paths:
+            if path in held:
+                pieces[path] = held[path]
+                self.taken += 1
+            else:
+                pieces[path] = self.path_piece(path)
+            if digests[path] is not None:
+                fresh[path] = {"digest": digests[path], "links": pieces[path]}
+        for label in sorted(self.labels):
+            if self.bare(label):
+                pieces[f"label {label}"] = self.label_piece(label)
+        owner: dict[str, str] = {}
+        doubled: set[str] = set()
+        for key, rows in pieces.items():
+            for row in rows:
+                ident = str(row[0])
+                if ident in owner:
+                    doubled |= {owner[ident], key}
+                owner[ident] = key
+        summed = sum(len(rows) for rows in pieces.values())
+        if summed != self.edges or len(owner) != self.edges:
+            gaps = sorted(label for label in self.labels if label not in self.lists or (
+                not self.bare(label) and any(not (isinstance(path, str) and path) for path in self.lists[label])))
+            raise GraphShort("links of", "all pieces", self.edges, summed, said=(
+                f"the code graph's links: {TOOL} counted {self.edges}, the pieces by source path and label hold "
+                f"{summed} with {len(owner)} distinct ids, so links are missed or read twice (never a partial read)"
+                + (f"; read twice in: {', '.join(sorted(doubled)[:20])}" if doubled else "")
+                + (f"; labels whose paths leave a gap: {', '.join(gaps)}" if gaps else "")))
+        return [row for rows in pieces.values() for row in rows], fresh
+
+    # ---- the nodes: by label, each checked; a label cut or over the cap by its paths, by equality
+    def node_rows(self) -> list[list]:
+        found: list[list] = []
+        for label, count in sorted(self.labels.items()):
+            got = self.rows(_LABELLED.format(label)) if count <= CAP else None
+            if got is None or len(got) != count:
+                got = self.nodes_by_path(label, count)
+            found += got
+        return found
+
+    def nodes_by_path(self, label: str, count: int) -> list[list]:
+        """A label over the cap, or cut, read by path with the equality filter (run 8b item 27): the candidate paths
+        are its own path list where it was read whole, else the File and Folder paths already known; each path's count
+        first; the pieces' counts must sum to the label's count, and a (label, path) piece over the cap refuses."""
+        values = self.lists.get(label)
+        source = "its own path list" if values is not None else "the File and Folder paths"
+        if values is None:
+            values = [path for name in ("File", "Folder") for path in self.lists.get(name, [])]
+        candidates = sorted({path for path in values if isinstance(path, str) and path})
+        found: list[list] = []
+        summed = 0
+        for path in candidates:
+            quoted = _quoted(path)
+            if quoted is None:
+                continue  # a path no equality can ask: its nodes are missed and the sum below refuses
+            match = f"MATCH (n:{label}) WHERE n.file_path = {quoted}"
+            own = self.count(f"{match} RETURN count(n)")
+            if own == 0:
+                continue
+            summed += own
+            found += self.checked(f"{match} RETURN n.qualified_name, n.name, n.label, n.file_path", "node label",
+                                  label, own, file=path)
+        if summed != count or len(found) != count:
+            raise GraphShort("node label", label, count, summed, said=(
+                f"the code graph's node label {label}: {TOOL} counted {count} nodes, and its pieces by path (over "
+                f"{source}, by equality) hold {summed}, so it cannot be read soundly in pieces under the cap of {CAP} "
+                "rows (never a partial read)"))
+        return found
+
+
+def _distinct(rows: list[list]) -> bool:
+    return all(isinstance(row, list) and len(row) == 4 for row in rows) and len({str(row[0]) for row in rows}) == len(rows)
+
+
+def _digest(root: Path, path: str) -> str | None:
+    """The content digest of the file (or folder) the tool indexed at ``path``; None where the path is neither (its
+    links are read every time)."""
+    if path.startswith("/") or ".." in Path(path).parts:
+        return None
+    place = root / BASE_REL / "files" / path
+    try:
+        if place.is_file() and not place.is_symlink():
+            return "file:" + hashlib.sha256(place.read_bytes()).hexdigest()
+        if place.is_dir() and not place.is_symlink():
+            names = sorted(child.name + ("/" if child.is_dir() else "") for child in place.iterdir())
+            return "folder:" + hashlib.sha256("\0".join(names).encode()).hexdigest()
+    except OSError:
+        return None
+    return None
+
+
+def _load_record(root: Path) -> dict:
+    try:
+        record = json.loads(record_path(root).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return record if isinstance(record, dict) and record.get("version") == 1 else {}
+
+
+def _save_record(root: Path, fresh: dict) -> None:
+    """Written only after a read that passed; a write that fails leaves the last good record."""
+    place = record_path(root)
+    staged = place.with_name(f"{RECORD}.{os.getpid()}")
+    try:
+        place.parent.mkdir(parents=True, exist_ok=True)
+        staged.write_text(json.dumps({"version": 1, "pieces": fresh}), encoding="utf-8")
+        os.replace(staged, place)
+    except OSError:
+        try:
+            staged.unlink()
+        except OSError:
+            pass
+
+
 @functools.cache
 def _graph(root: Path) -> tuple[dict, dict]:
     """The symbols of the index by qualified name, and for each the symbols that use it with the kind of use.
 
-    Both queries, pages included, are asked in one session of the tool: one start of its daemon (DEC-561).
+    The links are read in pieces by their source node's path (S28, ``_Reader``): the tool's total first, then the
+    paths, then one piece a path (by link type inside a piece cut or over the cap), every piece's rows checked against
+    its count and the pieces' ids against the total. A file unchanged since the last read that passed is taken from the
+    record. Every query, pages included, is asked in one session of the tool: one start of its daemon (DEC-561).
     """
+    import time
+
+    _counted.pop(root, None)
+    _stats.pop(root, None)
+    started = time.monotonic()
     with _Session(root) as session:
-        found = _rows(session, "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path")
-        edges = _rows(session, "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name")
+        types = _pairs(session, _TYPES)
+        if types is None:  # a tool, or a stand-in, that does not count: read whole as before, unchecked
+            found = _rows(session, _NODES)
+            links = [[None, *row] for row in _rows(session, _EDGES)]
+            fresh = reader = None
+        else:
+            labels = _pairs(session, _LABELS)
+            if labels is None:
+                raise RuntimeError(f"{TOOL} query_graph answered {_LABELS!r} with no count by label gov can read")
+            record = _load_record(root)
+            reader = _Reader(session, root, types, labels, record)
+            paths = reader.path_lists()
+            found = reader.node_rows()  # the nodes first: the record's links are checked against them (item 25)
+            known = {row[0] for row in found if isinstance(row, list) and row}
+            try:
+                links, fresh = reader.links(paths, known)
+                stale = bool(reader.stale)
+            except GraphShort:
+                if not reader.taken:
+                    raise
+                lists, asked = reader.lists, reader.read  # the record is stale: every piece is read again
+                reader = _Reader(session, root, types, labels, {})
+                reader.lists, reader.read = lists, asked
+                links, fresh = reader.links(paths)
+                stale = True
+    if reader is not None:
+        _save_record(root, fresh)
+        _counted[root] = (reader.nodes, reader.edges)
+        _stats[root] = {"pieces_read": reader.read, "pieces_from_record": reader.taken, "record_stale": stale,
+                        "stale_links": reader.stale, "read_seconds": round(time.monotonic() - started, 3)}
     nodes = {key: {"path": path, "name": name, "label": label} for key, name, label, path in found
-             if label not in _PLACES and (root / BASE_REL / "files" / path).is_file()}
+             if label not in _PLACES and isinstance(path, str) and path
+             and (root / BASE_REL / "files" / path).is_file()}
     users = defaultdict(list)
-    for source, kind, target in edges:
+    for _ident, source, kind, target in links:
         if kind not in _NO_USE and source in nodes and target in nodes and (source, kind) not in users[target]:
             users[target].append((source, kind))
     return nodes, users

@@ -1,6 +1,6 @@
 ---
 id: DAEO-cv58
-status: closed
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- tests/acceptance/W2-60a/test_w2_60a_live_sessions.py  # [added, the CTO's path case DEC-1156 (7), 2026-11-15: the live fixture launches at the role's own effort]
 - src/gov/launch/command.py  # S12's --plan flag and its call (P-6 (a), CTO, DEC-1157 (12)); the plan's refusal exits 1 like a launch
 - src/gov/launch/launcher.py
 - src/gov/launch/role.py
@@ -110,3 +111,5 @@ Card: the draft card `W2-60` (W2-60a part), from the accepted plan (`docs/plan/W
 - **The merge's four acceptance conflicts** (W2-50's and W2-58's files in the paths): resolved by a test designer keeping both sides' cases.
 - **S10 moved to W2-184 (CTO, 2026-11-13 15:20, DEC-1157 (12), within P1-W2-60a-P5 (B)):** S10 (the second review on a different setting) entered with DEC-1015 after review 3 and was never built or tested; DEC-1167 (2)'s "back to its DEC-839 form" was the CTO's error for it (it never had one). W2-184 carries RUBRIC-2's review-setting line in its place.
 - **Delegated (CTO, 2026-11-13 16:35):** P-6 (a): `src/gov/launch/command.py` added for `--plan`; the plan's refusal exits 1 (EXIT_GOV_ERROR, like every LAUNCH_REFUSED), S12's case revised under Rewrite-Reason. P-7 (a): `role.py` takes a named skill's version from `template/governance/kernel/skills/superpowers/vendored.yaml` when the loaded copy carries none and is listed there (the hash stays the loaded copy's, the record names the source); a really unversioned skill still refuses (S2 holds).
+
+**Reopened 2026-11-15 by the CTO (path case, DEC-1156 (7); the 11-15 nightly's red, drafts/nightly-20261115/DIAG.md):** six live-session cases error with `LAUNCH_REFUSED: --effort low below the floor 'high' (DEC-1120 (3))` since W2-184's launcher floor (3b4523b04a52): the fixture passes `--effort low` (`test_w2_60a_live_sessions.py:131-132`). A test designer revises the fixture to launch at the role's own effort and fixes the two docstring lines, `Rewrite-Reason: DEC-1120 (3), DEC-1156 (7)`; one unsandboxed run of the six cases (real sessions). No product change. Listed for the owner's reading.
