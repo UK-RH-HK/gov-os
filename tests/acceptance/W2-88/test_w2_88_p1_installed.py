@@ -337,7 +337,8 @@ def test_s24_the_standards_pool_is_read_from_the_shipped_file_when_a9_runs(world
         assert not (W.a9_record(adoption.project, run).get("standard") or {}).get("departures"), "the record names a departure"
 
 
-SHIPPED_ITEMS = [POOL, "governance/project/indep-walls", "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs"]
+CRON = "governance/project/orchestration/tools/memaudit_cron.sh"     # run 8b item 21: the fourth item (the CTO, DEC-893)
+SHIPPED_ITEMS = [POOL, "governance/project/indep-walls", "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs", CRON]
 
 
 def test_s24_the_installed_wheels_gov_package_holds_shipped_with_the_pool_the_walls_and_the_audit_briefs(release):
@@ -403,3 +404,68 @@ def test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refus
     assert W.head(project) == start, "A9 moved HEAD"
     assert not [n for n in W.git(project, "ls-files", "governance/adoption").splitlines() if "/A9" in n], "A9 committed a record though it was refused"
     assert W.git(project, "status", "--porcelain", "--untracked-files=all").strip() == "", "the tree is not clean after the refusal"
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Run 8b (the CTO's item on step 6, DEC-893; run 8b interface items 21-22): step 6 names the installed package's cron script, no slot
+# ------------------------------------------------------------------------------------------------------------
+
+def installed_gov_folder(release) -> Path:
+    probe = "import importlib.util, pathlib; print(pathlib.Path(importlib.util.find_spec('gov').origin).parent)"
+    folder = Path(run([release.python, "-c", probe], clean_env(release.scratch), release.scratch, "finding gov in the venv").stdout.strip())
+    assert str(folder).startswith(str(release.venv)), f"gov was found at {folder}, not in the venv {release.venv}"
+    return folder
+
+
+def step6(text: str) -> str:
+    """ACT.md's step 6 as one line: its line and the lines after it up to the next numbered step."""
+    lines = text.splitlines()
+    starts = [i for i, line in enumerate(lines) if line.startswith("6.")]
+    assert len(starts) == 1, f"ACT.md has no single step 6:\n{text[:1500]}"
+    rest = []
+    for line in lines[starts[0] + 1:]:
+        if line[:1].isdigit():
+            break
+        rest.append(line)
+    return " ".join([lines[starts[0]], *rest])
+
+
+def test_s24_a9_from_an_installed_wheel_writes_step_6_naming_the_packages_shipped_cron_script_and_no_slot(worlds, release):
+    """success-S24 and success-S22 (run 8b items 21-22, DEC-893): A9 run by the wheel's gov (kit by copier, no source tree) writes
+    ``memory-audit/ACT-WALLS/ACT.md`` whose step 6 names the installed package's ``_shipped/governance/project/orchestration/tools/
+    memaudit_cron.sh`` and holds no ``<path to Gov OS>``; the named copy can run from cron (step 6 runs it through ``bash``, or the installed
+    file keeps its executable mode)."""
+    adoption, done, out, _start = installed_a9(worlds, release, "p1-cron")
+    W.assert_ok(done, "A9 run by a gov installed from a wheel")
+    act = out / "memory-audit" / "ACT-WALLS" / "ACT.md"
+    assert act.is_file(), "A9 wrote no memory-audit/ACT-WALLS/ACT.md"
+    row = step6(act.read_text(encoding="utf-8"))
+    assert "<path to Gov OS>" not in row, f"step 6 holds the unfilled slot <path to Gov OS> (DEC-893): {row}"
+    script = installed_gov_folder(release) / "_shipped" / CRON
+    flat = " ".join(row.replace("`", "").split())
+    named = [str(script), os.path.realpath(script)]
+    assert any(name in flat for name in named), f"step 6 does not name the installed package's shipped cron script {script}: {row}"
+    runs = any(f"bash {name}" in flat for name in named) or (script.is_file() and os.access(script, os.X_OK))
+    assert runs, f"step 6 names {script}, which cron cannot run: not through bash and not executable"
+
+
+def test_s24_a9_from_an_installed_wheel_whose_cron_script_is_removed_is_refused_shipped_file_missing_naming_it(worlds, release):
+    """success-S24 and success-S22 (run 8b item 22: found nowhere, refused by name; the ``<path to Gov OS>`` fallback is gone): the installed
+    package's ``_shipped/<cron script>`` removed for this case (put back after it). A9 run by the wheel's gov is refused
+    ``SHIPPED_FILE_MISSING`` naming ``governance/project/orchestration/tools/memaudit_cron.sh``; no ACT.md holds a slot; HEAD unmoved."""
+    script = installed_gov_folder(release) / "_shipped" / CRON
+    aside = script.with_name(script.name + ".w2-88-aside")
+    moved = script.is_file()
+    if moved:
+        script.rename(aside)
+    try:
+        adoption, done, out, start = installed_a9(worlds, release, "p1-cron-missing")
+    finally:
+        if moved:
+            aside.rename(script)
+    W.assert_refused(done, "SHIPPED_FILE_MISSING", "A9 run from a wheel whose shipped cron script is removed")
+    assert CRON in W.error_text(done), f"the refusal does not name {CRON}: {W.error_text(done)!r}"
+    act = out / "memory-audit" / "ACT-WALLS" / "ACT.md"
+    if act.is_file():
+        assert "<path to Gov OS>" not in act.read_text(encoding="utf-8"), "an ACT.md with the slot <path to Gov OS> was written"
+    assert W.head(adoption.project) == start, "A9 moved HEAD though it was refused"

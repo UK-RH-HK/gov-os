@@ -6,6 +6,9 @@ of ``governance/project/indep-walls/`` and of ``governance/project/orchestration
 copy fails, naming the file. A string check of the tree (no gov run): ``__pycache__`` folders and ``*.pyc`` files are not files of a copy; an
 ``__init__.py`` directly under ``_shipped/`` or ``_shipped/governance/...`` above the copied folders is let through (packaging may want one),
 any other file under ``_shipped/`` that is not a copy is an extra.
+
+Run 8b (the CTO's item on step 6, DEC-893; run 8b interface item 21): ``governance/project/orchestration/tools/memaudit_cron.sh`` is a fourth
+item, byte for byte (``the-cron-script``); the "only the copies" case lets it through as a copy.
 """
 
 from __future__ import annotations
@@ -21,6 +24,8 @@ ITEMS = {
     "the-pool": "governance/project/retrieval.yaml",
     "the-walls-template": "governance/project/indep-walls",
     "the-audit-briefs": "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs",
+    # Run 8b (the CTO, DEC-893; run 8b interface item 21): step 6's cron script ships as a fourth item.
+    "the-cron-script": "governance/project/orchestration/tools/memaudit_cron.sh",
 }
 
 

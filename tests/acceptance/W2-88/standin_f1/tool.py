@@ -1,4 +1,4 @@
-"""A stand-in ``codebase-memory-mcp`` for the S25 cases (``test_w2_88_f1_codegraph.py``): the tool's answers, planted.
+"""A stand-in ``codebase-memory-mcp`` for the S25 and S28 cases (``test_w2_88_f1_codegraph.py``, ``test_w2_88_s28_pieces.py``).
 
 The case copies this file as ``codebase-memory-mcp`` into a folder that is first on the child's ``PATH`` (the first line becomes a
 ``#!`` line naming the python that runs the suite). ``gov.codeintel`` meets it three ways, all answered:
@@ -10,38 +10,44 @@ The case copies this file as ``codebase-memory-mcp`` into a folder that is first
 * ``codebase-memory-mcp`` with no argument: the MCP stdio server (``initialize``, ``notifications/initialized``, ``tools/call``), one JSON
   line in, one JSON line out, ``query_graph`` among the tools; it exits 0 when its input closes, as the real server does.
 
-Run 8 (DEC-1183, package 2 (a); the lead's probe of the real tool on redis, run 8 interface item 7): ``query_graph`` behaves as the real tool
-was seen to:
+Run 8b (DEC-1185, S28; the run 8b interface items 13, 14, 20 and 23, the lead's probes of the real tool on redis): ``query_graph`` is a small
+Cypher reader over a generated graph and behaves as the real tool was seen to:
 
-* **Count queries** (any query holding ``count(``) answer in full: ``MATCH (a)-[r]->(b) RETURN type(r), count(r)`` one row per edge type;
-  ``MATCH (n) RETURN n.label, count(n)`` one row per node label; ``count(r)`` / ``count(n)`` one row (the edges or nodes, of the type or label
-  the match names if it names one).
-* **The typed edge match** (``MATCH (a)-[r:TYPE]->(b) RETURN a.qualified_name, type(r), b.qualified_name``) and **the label node match**
-  (``MATCH (n:Label) RETURN n.qualified_name, n.name, n.label, n.file_path``) answer every row of that type or label, paged by the tool's
-  ``offset`` and ``max_rows``. With no type or label named, the whole edges or nodes.
-* **The cap**: a query whose result would exceed 100,000 rows is refused before any paging, ``isError: true`` with the real tool's text
-  ``result exceeded 100k rows — use narrower filters or add LIMIT``.
-* **``SKIP``/``LIMIT`` is not a sound page**: a query with ``SKIP`` or ``LIMIT`` answers short (about two thirds of the rows asked, as the probe
-  saw 32,943 rows for ``LIMIT 50000``), so a reader that pages by them gets a partial count.
+* **Sound:** ``count(r)``, ``count(n)``, counts grouped by ``type(r)`` or by a node's ``label``; ``MATCH (n:<Label>) RETURN n.file_path``
+  (any node property: ``qualified_name``, ``name``, ``label``, ``file_path``); typed matches ``-[r:T]->``; source and target labels
+  ``(a:<Label>)``; the equality filter ``WHERE v.file_path = "<path>"`` (and ``v.label = "<L>"``), ``AND``-joined;
+  ``coalesce(v.file_path, "") = ""``; ``id(r)`` as a column (unique per link, stable while the link's file is unchanged);
+  ``DISTINCT``; ``ORDER BY`` on returned columns or aliases; the tool's own paging by ``offset`` and ``max_rows``.
+* **Refused** (``isError: true``): any query whose result exceeds 100,000 rows, before the tool's paging, with the real tool's text
+  ``result exceeded 100k rows — use narrower filters or add LIMIT``; ``IN`` and ``STARTS WITH``; a function in ``WHERE`` other than
+  ``coalesce, substring, replace, left, right`` (``unsupported function 'type' in WHERE (supported: coalesce, substring, replace, left,
+  right)``); a count grouped by a file path; a pattern, condition or return item it does not know.
+* **Not sound:** a string comparison in ``WHERE`` (``>``, ``<``, ``>=``, ``<=``) answers **0 rows**, silently; ``SKIP``/``LIMIT`` answers
+  short (two thirds of the rows asked, as run 8's probe saw); **the size cut**: a piece the plan names (``cut``) answers fewer rows than its
+  count, with ``has_more`` false.
 
-The graph it answers with, by the settings (environment variables, the case's own):
+The graph (generated rows, never a real index), from the staged files and the plan (``W2_88_F1_PLAN``, a JSON file; absent, the defaults):
 
-* ``W2_88_F1_TYPES`` (``USAGE=60000,CALLS=50000``) and ``W2_88_F1_LABELS`` (``Function=60000,Variable=45000``): a generated graph of
-  that many edges per type and nodes per label (labels default to ``Function=1000`` when only types are given). Every node's file is one of
-  the staged ``.c``/``.h`` files; every edge is unique (no two share source, type and target). Unset: the graph made from the staged files
-  (each ``.c`` or ``.h`` file two ``Function`` nodes, joined by ``CALLS`` edges in a chain).
-* ``W2_88_F1_SHORT`` (``CALLS=7``): the typed match of that edge type (or the label match of that label) answers that many rows fewer than
-  its count says (a read that ends short).
-* ``W2_88_F1_NODES`` and ``W2_88_F1_EDGES`` (run 7): the totals the count queries answer in place of the graph's (grouped counts then answer
-  one group, ``Function`` or ``CALLS``, holding the total).
-* ``W2_88_F1_READ`` (run 7): what a read of edges that is not a count does. ``ok`` (the default): answers as above. ``cap``: refused with the
-  cap's text whatever its size. ``locked``: ``isError: true`` with the text ``database is locked`` (a failure that is not the cap).
-* ``W2_88_F1_COUNTS``: ``ok`` (the default) or ``fail`` (a count query answers ``isError: true``, ``database is locked``).
-* ``W2_88_F1_LOG``: a file to which every ``query_graph`` query is appended as a JSON line (``{"query": ..., "args": {...}, "rows": n}``,
-  ``rows`` the result's size before paging, or ``"error"``).
+* a ``Project`` node and a ``Branch`` node, whose ``file_path`` is ``{}`` (not a string, as on redis); a ``Folder`` node per folder of the
+  staged files (its path the folder's); a ``File`` node per staged file; ``functions`` (default 2) ``Function`` nodes per ``.c``/``.h``
+  file (``labels`` adds nodes of other labels per code file, e.g. ``{"Method": 3}``); ``builtins`` ``Class`` nodes whose path is
+  ``<python-builtins>``.
+* links: ``Project -HAS_BRANCH-> Branch``; ``Branch -CONTAINS_FILE->`` each root file and ``-CONTAINS_FOLDER->`` each top folder; ``Folder
+  -CONTAINS_FILE->`` its files and ``-CONTAINS_FOLDER->`` its subfolders; ``File -DEFINES->`` each of its code nodes; and, per code file,
+  ``links[<path>]`` (else ``default_links``, ``{"CALLS": 1}``) links by type from its code nodes to code nodes (each source, type and
+  target once); ``builtin_links`` (``{"BUILTIN_USAGE": 12}``, a type of its own so a case's type totals are its plan's) out of the ``<python-builtins>`` nodes.
+* ``cut``: a list of ``{"piece": ..., "by": n}``: ``file`` (a links read filtered by a source file, untyped), ``file-type`` (the same with
+  ``"type"``), ``list`` (``MATCH (n:<label>) RETURN ...file_path``, unfiltered), ``folder`` (a ``CONTAINS_FILE`` read filtered by a
+  Folder's path), ``label-links`` (a links read by source label, unfiltered): that read answers ``by`` rows fewer than its count.
+* ``read``: ``ok`` or ``locked`` (a links read, a query returning ``id(r)``, ``type(r)`` or a qualified name over a link match, not a
+  count, answers ``isError: true``, ``database is locked``); ``counts``: ``ok`` or ``fail`` (every count query answers that error).
+* ``W2_88_F1_LOG``: every ``query_graph`` call is appended as a JSON line ``{"query", "offset", "max_rows", "rows": the result's size
+  before paging or "error", "error", "served": the rows of this answer, "links": true for a links read, "file": the source file the
+  equality filter names, "type": the typed match's type, "ids": the id(r) values served}``.
 """
 
 import functools
+import hashlib
 import json
 import os
 import re
@@ -51,9 +57,15 @@ from pathlib import Path
 CAP = 100_000
 ERROR_CAP = "result exceeded 100k rows — use narrower filters or add LIMIT"
 ERROR_LOCKED = "database is locked"
-SHORT_SHARE = 0.66                 # the share of the rows asked a SKIP/LIMIT query answers (the probe: 32,943 of 50,000)
-EDGE_COLUMNS = ("source", "type", "target")
-NODE_COLUMNS = ("qualified_name", "name", "label", "file_path")
+WHERE_FUNCTIONS = ("coalesce", "substring", "replace", "left", "right")
+SHORT_SHARE = 0.66
+CODE_SUFFIXES = (".c", ".h")
+BUILTINS = "<python-builtins>"
+PROPS = ("qualified_name", "name", "label", "file_path")
+
+
+class Refused(Exception):
+    pass
 
 
 def cache() -> Path:
@@ -62,61 +74,340 @@ def cache() -> Path:
     return folder
 
 
-def staged_files() -> list:
+@functools.lru_cache(maxsize=None)
+def plan() -> dict:
+    where = os.environ.get("W2_88_F1_PLAN", "").strip()
+    return json.loads(Path(where).read_text(encoding="utf-8")) if where and Path(where).is_file() else {}
+
+
+def staged() -> tuple:
+    """``(folder, [rel...])``: the folder the tool indexed and its files, sorted."""
     note = cache() / "staged.json"
     if not note.is_file():
-        return []
+        return None, []
     folder = Path(json.loads(note.read_text(encoding="utf-8"))["repo_path"])
-    return sorted(p.relative_to(folder).as_posix() for p in folder.rglob("*") if p.is_file() and p.suffix in (".c", ".h"))
+    return folder, sorted(p.relative_to(folder).as_posix() for p in folder.rglob("*") if p.is_file())
 
 
-def spec(name: str) -> list:
-    """``A=1,B=2`` as ``[("A", 1), ("B", 2)]``."""
-    text = os.environ.get(name, "").strip()
-    return [(part.split("=")[0].strip(), int(part.split("=")[1])) for part in text.split(",") if "=" in part]
+def link_id(*parts) -> int:
+    return int(hashlib.sha1("\0".join(str(p) for p in parts).encode()).hexdigest()[:13], 16)
 
 
 @functools.lru_cache(maxsize=None)
 def graph():
-    """``(nodes, edges)``: nodes ``[qualified_name, name, label, file_path]``, edges ``[source, type, target]``."""
-    files = staged_files() or ["src/server.c"]
-    types = spec("W2_88_F1_TYPES")
-    if not types and not os.environ.get("W2_88_F1_LABELS", "").strip():
-        nodes, edges = [], []
-        for number, rel in enumerate(staged_files()):
-            for part in (0, 1):
-                name = f"fn_{number}_{part}"
-                nodes.append([f"code.{name}", name, "Function", rel])
-        for number in range(len(nodes) - 1):
-            edges.append([nodes[number][0], "CALLS", nodes[number + 1][0]])
-        return nodes, edges
-    labels = spec("W2_88_F1_LABELS") or [("Function", 1000)]
-    nodes = []
-    for label, count in labels:
-        for number in range(count):
-            name = f"{label.lower()}_{number}"
-            nodes.append([f"code.{name}", name, label, files[number % len(files)]])
-    total, edges = len(nodes), []
-    for kind, count in types:
-        for number in range(count):
-            source = number % total
-            target = (source + 1 + number // total) % total
-            edges.append([nodes[source][0], kind, nodes[target][0]])
-    return nodes, edges
+    """``(nodes, links)``: a node ``{"qualified_name", "name", "label", "file_path"}``; a link ``(id, source, type, target)`` (indexes)."""
+    folder, files = staged()
+    settings = plan()
+    nodes, links = [], []
+
+    def node(label, name, path):
+        nodes.append({"qualified_name": f"code.{name}", "name": name.rsplit(".", 1)[-1], "label": label, "file_path": path})
+        return len(nodes) - 1
+
+    def link(source, kind, target, *key):
+        links.append((link_id(*key), source, kind, target))
+
+    project = node("Project", "code", {})
+    branch = node("Branch", "code.main", {})
+    link(project, "HAS_BRANCH", branch, "project", "branch")
+    folders = sorted({str(Path(rel).parents[i].as_posix()) for rel in files for i in range(len(Path(rel).parents) - 1)})
+    at = {name: node("Folder", f"folder.{name}", name) for name in folders}
+    for name in folders:
+        parent = str(Path(name).parent.as_posix())
+        link(at[parent] if parent in at else branch, "CONTAINS_FOLDER", at[name], "folder", name)
+    file_node = {}
+    for rel in files:
+        file_node[rel] = node("File", f"file.{rel}", rel)
+        parent = str(Path(rel).parent.as_posix())
+        link(at[parent] if parent in at else branch, "CONTAINS_FILE", file_node[rel], "contains", rel)
+    code_files = [rel for rel in files if rel.endswith(CODE_SUFFIXES)]
+    extra_labels = {"Function": int(settings.get("functions", 2)), **{k: int(v) for k, v in (settings.get("labels") or {}).items()}}
+    by_file, targets = {}, []
+    for number, rel in enumerate(code_files):
+        own = []
+        for label, count in extra_labels.items():
+            for index in range(count):
+                own.append(node(label, f"{label.lower()}_{number}_{index}", rel))
+        by_file[rel] = own
+        targets += own
+        digest = hashlib.sha1((folder / rel).read_bytes()).hexdigest() if folder else ""
+        for index, target in enumerate(own):
+            link(file_node[rel], "DEFINES", target, "defines", rel, digest, index)
+    builtin_nodes = [node("Class", f"builtins.class_{i}", BUILTINS) for i in range(int(settings.get("builtins", 3)))]
+    targets = targets or builtin_nodes
+    default = settings.get("default_links", {"CALLS": 1})
+
+    def spread(sources, spec, key, digest):
+        for kind, count in spec.items():
+            for ordinal in range(int(count)):
+                source = sources[ordinal % len(sources)]
+                target = targets[(ordinal // len(sources)) % len(targets)]
+                link(source, kind, target, key, digest, kind, ordinal)
+
+    for rel in code_files:
+        digest = hashlib.sha1((folder / rel).read_bytes()).hexdigest() if folder else ""
+        spread(by_file[rel], (settings.get("links") or {}).get(rel, default), rel, digest)
+    if builtin_nodes:
+        spread(builtin_nodes, settings.get("builtin_links", {"BUILTIN_USAGE": 12}), BUILTINS, "")
+    return nodes, links
 
 
 @functools.lru_cache(maxsize=None)
-def grouped(about_edges: bool) -> dict:
-    """The count per edge type or node label, as the count queries answer it."""
-    nodes, edges = graph()
-    given = os.environ.get("W2_88_F1_EDGES" if about_edges else "W2_88_F1_NODES", "").strip()
-    if given:
-        return {"CALLS" if about_edges else "Function": int(given)}
-    counts = {}
-    for row in edges if about_edges else nodes:
-        key = row[1] if about_edges else row[2]
-        counts[key] = counts.get(key, 0) + 1
-    return counts
+def by_source_path() -> dict:
+    nodes, links = graph()
+    index = {}
+    for item in links:
+        path = nodes[item[1]]["file_path"]
+        if isinstance(path, str):
+            index.setdefault(path, []).append(item)
+    return index
+
+
+# --- the reader --------------------------------------------------------------------------------------------------------
+
+NODE = r"\(\s*(\w*)\s*(?::\s*`?(\w+)`?)?\s*\)"
+EDGE = NODE + r"\s*-\s*\[\s*(\w*)\s*(?::\s*`?(\w+)`?)?\s*\]\s*->\s*" + NODE
+
+
+def split_top(text: str) -> list:
+    parts, depth, current = [], 0, ""
+    for char in text:
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        if char == "," and depth == 0:
+            parts.append(current)
+            current = ""
+        else:
+            current += char
+    parts.append(current)
+    return [p.strip() for p in parts if p.strip()]
+
+
+def parse(query: str) -> dict:
+    text = " ".join(query.split())
+    found = re.match(r"(?i)^MATCH\s+(.+?)(?:\s+WHERE\s+(.+?))?\s+RETURN\s+(.+)$", text)
+    if not found:
+        raise Refused(f"unsupported query: {text[:80]}")
+    pattern, where, tail = found.group(1).strip(), found.group(2), found.group(3)
+    edge = re.fullmatch(EDGE, pattern)
+    single = re.fullmatch(NODE, pattern)
+    if edge:
+        shape = {"edge": True, "a": edge.group(1) or "_a", "la": edge.group(2), "r": edge.group(3) or "_r", "type": edge.group(4),
+                 "b": edge.group(5) or "_b", "lb": edge.group(6)}
+    elif single:
+        shape = {"edge": False, "n": single.group(1) or "_n", "ln": single.group(2)}
+    else:
+        raise Refused(f"unsupported pattern: {pattern[:80]}")
+    skip = re.search(r"(?i)\bSKIP\s+(\d+)", tail)
+    limit = re.search(r"(?i)\bLIMIT\s+(\d+)", tail)
+    order = re.search(r"(?i)\bORDER\s+BY\s+(.+?)(?=\s+SKIP\b|\s+LIMIT\b|$)", tail)
+    clause = re.split(r"(?i)\s+(?:ORDER\s+BY|SKIP|LIMIT)\b", tail, maxsplit=1)[0].strip()
+    distinct = bool(re.match(r"(?i)^DISTINCT\s+", clause))
+    clause = re.sub(r"(?i)^DISTINCT\s+", "", clause)
+    items = []
+    for raw in split_top(clause):
+        alias = re.search(r"(?i)\s+AS\s+(\w+)\s*$", raw)
+        expression = raw[:alias.start()].strip() if alias else raw.strip()
+        items.append((expression, alias.group(1) if alias else expression))
+    shape.update(where=where, items=items, distinct=distinct, skip=int(skip.group(1)) if skip else None,
+                 limit=int(limit.group(1)) if limit else None, order=order.group(1) if order else None)
+    shape["conditions"], shape["zero"] = conditions(where)
+    return shape
+
+
+def conditions(where):
+    """``([(var, prop, value)], zero)``: the equality conditions; ``zero`` for a string comparison (answered with no rows)."""
+    if not where:
+        return [], False
+    if re.search(r"(?i)\bIN\b", where):
+        raise Refused("unsupported operator 'IN' in WHERE")
+    if re.search(r"(?i)\bSTARTS\s+WITH\b", where):
+        raise Refused("unsupported operator 'STARTS WITH' in WHERE")
+    for name in re.findall(r"(\w+)\s*\(", where):
+        if name.lower() not in WHERE_FUNCTIONS:
+            raise Refused(f"unsupported function '{name}' in WHERE (supported: {', '.join(WHERE_FUNCTIONS)})")
+    found, zero = [], False
+    for part in re.split(r"(?i)\s+AND\s+", where.strip()):
+        part = part.strip().strip("()").strip() if part.strip().startswith("(") and part.strip().endswith(")") and "coalesce" not in part else part.strip()
+        literal = r"(?:\"([^\"]*)\"|'([^']*)')"
+        equal = re.fullmatch(r"(\w+)\.(\w+)\s*=\s*" + literal, part)
+        empty = re.fullmatch(r"(?i)coalesce\(\s*(\w+)\.(\w+)\s*,\s*(?:\"\"|'')\s*\)\s*=\s*(?:\"\"|'')", part)
+        compare = re.fullmatch(r"(\w+)\.(\w+)\s*(?:>=|<=|>|<)\s*" + literal, part)
+        if equal:
+            found.append((equal.group(1), equal.group(2), equal.group(3) if equal.group(3) is not None else equal.group(4)))
+        elif empty:
+            found.append((empty.group(1), empty.group(2), ""))
+        elif compare:
+            zero = True
+        else:
+            raise Refused(f"unsupported condition in WHERE: {part[:80]}")
+    return found, zero
+
+
+def holds(value, wanted: str) -> bool:
+    if wanted == "":
+        return value is None or value == ""
+    return isinstance(value, str) and value == wanted
+
+
+def bindings(shape: dict):
+    nodes, links = graph()
+    if not shape["edge"]:
+        for index, item in enumerate(nodes):
+            if shape["ln"] and item["label"] != shape["ln"]:
+                continue
+            if all(holds(item.get(prop), value) for var, prop, value in shape["conditions"] if var == shape["n"]):
+                yield {shape["n"]: item}
+        return
+    source_path = next((value for var, prop, value in shape["conditions"] if var == shape["a"] and prop == "file_path" and value), None)
+    pool = by_source_path().get(source_path, []) if source_path is not None else links
+    for identity, source, kind, target in pool:
+        if shape["type"] and kind != shape["type"]:
+            continue
+        a, b = nodes[source], nodes[target]
+        if shape["la"] and a["label"] != shape["la"]:
+            continue
+        if shape["lb"] and b["label"] != shape["lb"]:
+            continue
+        values = {shape["a"]: a, shape["b"]: b}
+        if all(holds(values[var].get(prop), value) if var in values else False for var, prop, value in shape["conditions"]):
+            yield {shape["a"]: a, shape["b"]: b, shape["r"]: {"id": identity, "type": kind}}
+
+
+def value_of(expression: str, binding: dict, shape: dict):
+    low = expression.replace(" ", "")
+    call = re.fullmatch(r"(?i)(id|type|labels)\((\w+)\)", low)
+    if call:
+        name, var = call.group(1).lower(), call.group(2)
+        if var not in binding:
+            raise Refused(f"unknown variable {var}")
+        if name == "id":
+            return binding[var]["id"]
+        if name == "type":
+            return binding[var]["type"]
+        return [binding[var]["label"]]
+    prop = re.fullmatch(r"(\w+)\.(\w+)", low)
+    if prop and prop.group(1) in binding and prop.group(2) in PROPS:
+        return binding[prop.group(1)][prop.group(2)]
+    raise Refused(f"unsupported return item: {expression[:60]}")
+
+
+def is_count(expression: str) -> bool:
+    return bool(re.fullmatch(r"(?i)count\(\s*(?:DISTINCT\s+)?[\w*.]+\s*\)", expression.strip()))
+
+
+def links_read(shape: dict) -> bool:
+    """A read of links (not a count, not a path list over a link match)."""
+    if not shape["edge"] or any(is_count(e) for e, _ in shape["items"]):
+        return False
+    for expression, _alias in shape["items"]:
+        low = expression.replace(" ", "").lower()
+        if low.startswith(("id(", "type(")) or low in (f"{shape['a']}.qualified_name".lower(), f"{shape['b']}.qualified_name".lower()):
+            return True
+    return False
+
+
+def evaluate(shape: dict) -> list:
+    items = shape["items"]
+    if shape["zero"]:
+        source = []
+    else:
+        source = bindings(shape)
+    if any(is_count(e) for e, _ in items):
+        keys = [e for e, _ in items if not is_count(e)]
+        if any(k.replace(" ", "").lower().endswith(".file_path") for k in keys):
+            raise Refused("unsupported aggregation: a count grouped by file_path")
+        groups = {}
+        for binding in source:
+            key = tuple(json.dumps(value_of(k, binding, shape)) for k in keys)
+            groups[key] = groups.get(key, 0) + 1
+        if not keys:
+            return [[groups.get((), 0) if e and is_count(e) else None for e, _ in items]]
+        rows = []
+        for key, number in groups.items():
+            values = iter(json.loads(part) for part in key)
+            rows.append([number if is_count(e) else next(values) for e, _ in items])
+        return rows
+    rows = [[value_of(e, binding, shape) for e, _ in items] for binding in source]
+    if shape["distinct"]:
+        seen, unique = set(), []
+        for row in rows:
+            mark = json.dumps(row, sort_keys=True)
+            if mark not in seen:
+                seen.add(mark)
+                unique.append(row)
+        rows = unique
+    if shape["order"]:
+        names = [alias for _e, alias in items]
+        exprs = [e for e, _a in items]
+        positions = []
+        for part in split_top(shape["order"]):
+            key = re.sub(r"(?i)\s+(ASC|DESC)$", "", part.strip())
+            if key in names:
+                positions.append(names.index(key))
+            elif key in exprs:
+                positions.append(exprs.index(key))
+            else:
+                raise Refused(f"unsupported ORDER BY key: {key[:60]}")
+        rows.sort(key=lambda row: [json.dumps(row[p], sort_keys=True) for p in positions])
+    return rows
+
+
+def piece(shape: dict) -> dict:
+    """What the query is, for the plan's cuts and the log."""
+    if shape["edge"]:
+        file = next((value for var, prop, value in shape["conditions"] if var == shape["a"] and prop == "file_path"), None)
+        return {"edge": True, "file": file, "type": shape["type"], "source_label": shape["la"], "target_label": shape["lb"]}
+    return {"edge": False, "label": shape["ln"], "filtered": bool(shape["conditions"])}
+
+
+def cut_by(shape: dict, about: dict) -> int:
+    counting = any(is_count(e) for e, _ in shape["items"])
+    if counting:
+        return 0
+    returns_paths = all(e.replace(" ", "").lower().endswith((".file_path",)) for e, _ in shape["items"])
+    for cut in plan().get("cut") or []:
+        kind, by = cut.get("piece"), int(cut.get("by", 1))
+        if kind == "file" and links_read(shape) and about["file"] == cut["file"] and not about["type"] and not about["source_label"]:
+            return by
+        if kind == "file-type" and links_read(shape) and about["file"] == cut["file"] and about["type"] == cut["type"]:
+            return by
+        if kind == "label-links" and links_read(shape) and about["file"] is None and about["source_label"] == cut["label"]:
+            return by
+        if kind == "list" and not about["edge"] and about["label"] == cut["label"] and not about["filtered"] and returns_paths:
+            return by
+        if kind == "folder" and about["edge"] and about["type"] == "CONTAINS_FILE" and about["file"] == cut["file"] and returns_paths:
+            return by
+    return 0
+
+
+_ANSWERS = {}
+
+
+def answer(query: str):
+    """``(rows, shape)`` of a query before the tool's paging; raises ``Refused`` with the tool's text."""
+    if query in _ANSWERS:
+        return _ANSWERS[query]
+    shape = parse(query)
+    counting = any(is_count(e) for e, _ in shape["items"])
+    if counting and plan().get("counts", "ok") == "fail":
+        raise Refused(ERROR_LOCKED)
+    if links_read(shape) and plan().get("read", "ok") == "locked":
+        raise Refused(ERROR_LOCKED)
+    rows = evaluate(shape)
+    if shape["skip"] is not None or shape["limit"] is not None:
+        start = shape["skip"] or 0
+        asked = rows[start:start + shape["limit"]] if shape["limit"] is not None else rows[start:]
+        rows = asked[:int(len(asked) * SHORT_SHARE)]
+    if len(rows) > CAP:
+        raise Refused(ERROR_CAP)
+    fewer = cut_by(shape, piece(shape))
+    if fewer:
+        rows = rows[:max(0, len(rows) - fewer)]
+    _ANSWERS[query] = (rows, shape)
+    return rows, shape
 
 
 def text_envelope(payload=None, error=None) -> dict:
@@ -125,124 +416,52 @@ def text_envelope(payload=None, error=None) -> dict:
     return {"isError": False, "content": [{"type": "text", "text": json.dumps(payload)}]}
 
 
-def returned(query: str) -> list:
-    """The items of the query's ``RETURN`` clause (aliases, ``ORDER BY``, ``SKIP`` and ``LIMIT`` taken off)."""
-    found = re.search(r"\breturn\b(.*)$", query, re.I | re.S)
-    if not found:
-        return []
-    clause = re.split(r"\b(?:order\s+by|skip|limit)\b", found.group(1), maxsplit=1, flags=re.I)[0]
-    items = [re.sub(r"\s+as\s+\w+\s*$", "", item.strip(), flags=re.I).strip() for item in clause.split(",")]
-    return [item for item in items if item]
-
-
-def named(query: str, about_edges: bool):
-    """The edge type or node label the match names (``-[r:T]->``, ``(n:L)``, ``WHERE type(r) = 'T'``, ``WHERE n.label = 'L'``), or None."""
-    if about_edges:
-        found = (re.search(r"\[\s*\w*\s*:\s*`?(\w+)`?", query)
-                 or re.search(r"type\(\s*\w+\s*\)\s*=\s*['\"](\w+)['\"]", query))
-    else:
-        found = (re.search(r"\(\s*\w*\s*:\s*`?(\w+)`?", query)
-                 or re.search(r"\w+\.label\s*=\s*['\"](\w+)['\"]", query)
-                 or re.search(r"['\"](\w+)['\"]\s+in\s+labels\(", query, re.I))
-    return found.group(1) if found else None
-
-
-def column(item: str, about_edges: bool, source_var: str):
-    """The index in the row of a ``RETURN`` item, or None for one the stand-in does not know."""
-    low = item.lower().replace(" ", "")
-    if about_edges:
-        if low.startswith("type("):
-            return 1
-        if low.endswith(".qualified_name") or low.endswith(".name"):
-            return 0 if low.split(".")[0] == source_var.lower() else 2
-        return None
-    for index, field in enumerate(NODE_COLUMNS):
-        if low.endswith("." + field):
-            return index
-    if low.startswith("labels("):
-        return 2
-    return None
-
-
-_ANSWERS = {}
-
-
-def result(query: str, about_edges: bool):
-    """The rows a query's result holds before the tool's paging, or an error text."""
-    if query in _ANSWERS:
-        return _ANSWERS[query]
-    nodes, edges = graph()
-    kind = named(query, about_edges)
-    position = 1 if about_edges else 2
-    rows = [row for row in (edges if about_edges else nodes) if kind is None or row[position] == kind]
-    short = dict(spec("W2_88_F1_SHORT"))
-    if kind is not None and kind in short:
-        rows = rows[:max(0, len(rows) - short[kind])]
-    skip = re.search(r"\bskip\s+(\d+)", query, re.I)
-    limit = re.search(r"\blimit\s+(\d+)", query, re.I)
-    if skip or limit:
-        start = int(skip.group(1)) if skip else 0
-        asked = rows[start:start + int(limit.group(1))] if limit else rows[start:]
-        rows = asked[:int(len(asked) * SHORT_SHARE)]
-    if len(rows) > CAP:
-        answer = ERROR_CAP
-    else:
-        source = re.search(r"\(\s*(\w+)", query)
-        items = returned(query)
-        columns = [column(item, about_edges, source.group(1) if source else "a") for item in items]
-        standard = list(range(len(EDGE_COLUMNS if about_edges else NODE_COLUMNS)))
-        if items and None not in columns and columns != standard:
-            rows = [[row[index] for index in columns] for row in rows]
-        answer = rows
-    _ANSWERS[query] = answer
-    return answer
-
-
-def counted(query: str, about_edges: bool):
-    counts = grouped(about_edges)
-    kind = named(query, about_edges)
-    if kind is not None:
-        counts = {kind: counts.get(kind, 0)}
-    items = returned(query)
-    by_group = any(("type(" in item.lower() if about_edges else "label" in item.lower()) and "count(" not in item.lower() for item in items)
-    if not by_group:
-        return [[sum(counts.values())]]
-    rows = []
-    for key, number in counts.items():
-        rows.append([number if "count(" in item.lower() else key for item in items])
-    return rows
-
-
-def log(query: str, args: dict, size) -> None:
+def log(entry: dict) -> None:
     where = os.environ.get("W2_88_F1_LOG")
     if where:
         with open(where, "a", encoding="utf-8") as handle:
-            handle.write(json.dumps({"query": query, "args": {k: v for k, v in args.items() if k != "query"}, "rows": size}) + "\n")
+            handle.write(json.dumps(entry) + "\n")
+
+
+def summary() -> None:
+    """The planted graph's totals, for the case to compare A9's record with: ``<W2_88_F1_LOG>.graph.json``."""
+    where = os.environ.get("W2_88_F1_LOG")
+    if not where:
+        return
+    nodes, links = graph()
+    by_type = {}
+    for _identity, _source, kind, _target in links:
+        by_type[kind] = by_type.get(kind, 0) + 1
+    _folder, files = staged()
+    Path(where + ".graph.json").write_text(json.dumps({"nodes": len(nodes), "links": len(links), "by_type": by_type, "files": files}),
+                                           encoding="utf-8")
+
+
+_SUMMARISED = []
 
 
 def query_graph(args: dict) -> dict:
+    if not _SUMMARISED:
+        _SUMMARISED.append(True)
+        summary()
     query = str(args.get("query", ""))
-    about_edges = "-[" in query or "->" in query or "<-" in query
-    if "count(" in query.lower():
-        if os.environ.get("W2_88_F1_COUNTS", "ok") == "fail":
-            log(query, args, "error")
-            return text_envelope(error=ERROR_LOCKED)
-        rows = counted(query, about_edges)
-        log(query, args, len(rows))
-        return text_envelope({"columns": returned(query), "rows": rows, "total": len(rows), "has_more": False})
-    if about_edges:
-        mode = os.environ.get("W2_88_F1_READ", "ok")
-        if mode in ("cap", "locked"):
-            log(query, args, "error")
-            return text_envelope(error=ERROR_CAP if mode == "cap" else ERROR_LOCKED)
-    rows = result(query, about_edges)
-    if isinstance(rows, str):
-        log(query, args, "error")
-        return text_envelope(error=rows)
     offset, limit = int(args.get("offset") or 0), int(args.get("max_rows") or CAP)
+    entry = {"query": query, "offset": offset, "max_rows": limit}
+    try:
+        rows, shape = answer(query)
+    except Refused as refusal:
+        log(entry | {"rows": "error", "error": str(refusal), "served": 0})
+        return text_envelope(error=str(refusal))
     page = rows[offset:offset + limit]
-    log(query, args, len(rows))
-    return text_envelope({"columns": returned(query), "rows": page, "total": len(rows), "has_more": offset + len(page) < len(rows)})
+    about = piece(shape)
+    entry |= {"rows": len(rows), "served": len(page), "links": links_read(shape), "file": about.get("file"), "type": about.get("type"),
+              "source_label": about.get("source_label")}
+    names = [e.replace(" ", "").lower() for e, _ in shape["items"]]
+    if entry["links"] and "id(" + shape["r"].lower() + ")" in names:
+        entry["ids"] = [row[names.index("id(" + shape["r"].lower() + ")")] for row in page]
+    log(entry)
+    columns = [alias for _e, alias in shape["items"]]
+    return text_envelope({"columns": columns, "rows": page, "total": len(rows), "has_more": offset + len(page) < len(rows)})
 
 
 def call(tool: str, args: dict) -> dict:
@@ -250,12 +469,14 @@ def call(tool: str, args: dict) -> dict:
         (cache() / "staged.json").write_text(json.dumps({"repo_path": args["repo_path"]}), encoding="utf-8")
         (cache() / "code.db").write_bytes(b"stand-in graph\n" * 64)
         graph.cache_clear()
-        grouped.cache_clear()
-        nodes, edges = graph()
-        return text_envelope({"status": "indexed", "project": args.get("name", "code"), "nodes": len(nodes), "edges": len(edges)})
+        by_source_path.cache_clear()
+        _ANSWERS.clear()
+        nodes, links = graph()
+        summary()
+        return text_envelope({"status": "indexed", "project": args.get("name", "code"), "nodes": len(nodes), "edges": len(links)})
     if tool == "list_projects":
-        nodes, edges = graph()
-        return text_envelope({"projects": [{"name": "code", "nodes": len(nodes), "edges": len(edges)}]})
+        nodes, links = graph()
+        return text_envelope({"projects": [{"name": "code", "nodes": len(nodes), "edges": len(links)}]})
     if tool == "query_graph":
         return query_graph(args)
     return text_envelope(error=f"unknown tool {tool}")
