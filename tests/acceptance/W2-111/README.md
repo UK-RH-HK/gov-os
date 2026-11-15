@@ -7,6 +7,10 @@ reading the engineer's work (DEC-820, DEC-963). No earlier case is changed.
 `Rewrite-Reason: DEC-1187` (new cases for S9 and S10, the owner's second reopen of 2026-11-15, P-W2-111-MARGIN (a);
 the earlier cases unchanged; the figure table corrected as the r4c review found): see "S9 and S10 (DEC-1187)" below.
 
+`Rewrite-Reason: DEC-1157 (12), P-W2-111-S9-DROP (a)` (brief td-5, 2026-11-15: S9 amended by the CTO; the live-hook
+case's judgement loses the "at least 30 ms below the before figure" clause and records the drop instead; nothing else
+changed): see "S9 and S10 on the live hook's patched copy" below.
+
 **Which lines this folder judges.** `gov accept W2-111` runs this folder only. It judges the reopen's lines:
 success-5 to success-10, failure-4 and failure-5. The earlier lines (success-1 to success-4, failure-1 to failure-3) are
 judged on the 15 revised hook-latency cases in their own three files, `tests/acceptance/W1-02/test_w1_02_guard_hook.py`,
@@ -61,9 +65,9 @@ per round; the PATH entry count; the tree count); `-s` or `-rA` shows them.
 | success-7 | `test_w2_111_install_decisions.py::test_each_install_form_is_still_refused_with_a_role_set`, `test_w2_111_install_decisions.py::test_the_same_non_installs_are_still_allowed_with_a_role_set`, `test_w2_111_install_decisions.py::test_a_changed_PATH_is_read_again_within_one_session` | none: green before the change, by design; they pin today's answers. Red after it only if an install is allowed, a non-install refused, or a call answered by another call's PATH. |
 | success-8, failure-4 | `test_w2_111_hidden_part_decisions.py::test_a_read_of_the_hidden_part_is_still_refused_with_150_worktrees`, `test_w2_111_hidden_part_decisions.py::test_a_read_outside_the_hidden_part_is_still_allowed_with_150_worktrees` | none: green before the change, by design (the fails-open check). Red after it only if a refusal turned into an allow, or an allow into a refusal. |
 | failure-5 | `test_w2_111_slow_hook.py::test_the_planted_150_ms_hook_fails_each_new_timing_case`, `test_w2_111_live_hook_slow_hook.py::test_the_planted_150_ms_hook_fails_the_live_hook_case` | the first: none, green before and after the change; red only if a new timing case passes the planted 150 ms hook. The second (DEC-1187): red before the change because the after copy cannot be built: `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared`; after it, red only if the live-hook case's judgement passes the planted hook. |
-| success-9 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_and_30_ms_below_the_applied_hook` | The count cases: **none, green before the change** (35 passed at `00c9327e0`): they pin behaviours 1, 2 and 3 and DEC-218; behaviour 3 was expected red and is not (see "Before the change, S9"). The live-hook case: `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (20 of 20). |
-| success-10 | `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_and_30_ms_below_the_applied_hook` | the diff is absent (the same text, 20 of 20). |
-| failure-4 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_and_30_ms_below_the_applied_hook` | the count cases' decisions: none, green before (today's decisions, pinned); the live-hook case: the diff is absent. After the change, red if a decision differs from today's (the count cases) or between the two copies or from `measure.py`'s record (the live-hook case). |
+| success-9 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` | The count cases: **none, green before the change** (35 passed at `00c9327e0`): they pin behaviours 1, 2 and 3 and DEC-218; behaviour 3 was expected red and is not (see "Before the change, S9"). The live-hook case (S9 as amended, P-W2-111-S9-DROP (a): every mapped case within 100 ms at p95, quiet, paired; decisions unchanged; the drop recorded): `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (20 of 20). |
+| success-10 | `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` | the diff is absent (the same text, 20 of 20). |
+| failure-4 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` | the count cases' decisions: none, green before (today's decisions, pinned); the live-hook case: the diff is absent. After the change, red if a decision differs from today's (the count cases) or between the two copies or from `measure.py`'s record (the live-hook case). |
 
 ## The cases
 
@@ -267,7 +271,7 @@ with 3 worktrees registered and with the `role_paths:` section present (a scratc
 forced red (no file planted to be parsed twice, no bound changed): the question goes to the lead
 (`proposed_decisions` of the test designer's return).
 
-### S9's 30 ms and S10's bound on the live hook's patched copy (`test_w2_111_live_hook_diff_p95.py`, 20 cases; support `w2_111_live_hook.py`)
+### S9 and S10 on the live hook's patched copy: within 100 ms, the drop recorded (`test_w2_111_live_hook_diff_p95.py`, 20 cases; support `w2_111_live_hook.py`)
 
 **What it measures.** The engineer's diff of `.claude/hooks/` (`docs/changes/W2-111-live-hook/live-hook.diff`, paths
 `a/.claude/hooks/...`) is applied with `git apply` (in a fresh `git init` folder) to a clean copy of the tree's
@@ -288,25 +292,40 @@ cases; the last 5 the Bash cases. The measure is W2-111's: per call, the CPU tim
 children (`RUSAGE_CHILDREN`) less the median CPU time of the reference hook timed beside it; nearest-rank p95 over 40
 calls after 3 warm-up calls; a round that does not pass is repeated, up to 3 rounds. **Before and after are paired in
 the same run**: each sample times a reference and the before copy, and a reference and the after copy, the order
-alternating sample by sample. A case passes when, in one round, the after figure is **under 100 ms** and, for the 15
-mapped cases, **at least 30 ms below** the before figure of that round. Every call (warm-up included) must be decided
+alternating sample by sample. A case passes when, in one round, the after figure is **under 100 ms** (DEC-1187 (1)'s
+own target, the same for the 15 mapped cases and the 5 Bash cases). Every call (warm-up included) must be decided
 the same by both copies, and by the before copy as `measure.py` recorded on the live repository (allow, but deny for
 the engineer's and the auditor's refused Writes) (failure-4). `git status --porcelain --untracked-files=all` of the
-repository is the same after the case as before it: the case writes nothing there. Each case prints its figures per
-round (before, after, the drop, the wall p95 of each, the load).
+repository is the same after the case as before it: the case writes nothing there. **The drop is recorded, not
+judged**: each case gives, per round, before, after and the drop (before less after), with the wall p95 of each and
+the load, in its failure message and in a line printed on a pass (`-s` shows it; the line starts `PASS` or `FAIL`), so
+S9's measured drop is visible in every run.
 
-**Why so.** S9's 30 ms is judged on the live hook, where the fixed cost lies (P-W2-111-S9-BASE (a)); pairing the two
-copies in one run makes the drop a difference taken under the same load, never a figure from another day. CPU time less
-a reference beside it, not the wall time under load: W1-02's README, section "W2-111".
+**Why so.** S9 is judged on the live hook, where the fixed cost lies (P-W2-111-S9-BASE (a)); pairing the two copies in
+one run makes the drop a difference taken under the same load, never a figure from another day. CPU time less a
+reference beside it, not the wall time under load: W1-02's README, section "W2-111".
+
+**Why the 30 ms clause went** (P-W2-111-S9-DROP (a), the CTO under DEC-1157 (12), 2026-11-15; the ticket's S9 line).
+The case used to require each of the 15 mapped cases to be at least 30 ms below its before figure as well. That figure
+came from a measure taken at load 14-28; quiet, the applied ACT-GUARD-FIX-6 hook already runs 52-83 ms, under the
+bound, and the rest of each call (the interpreter, the pinned gov's imports, compiling the script) lies outside
+`.claude/hooks/`, where the diff cannot reach it. S9 is now judged by DEC-1187 (1)'s own target, S10's measure, with
+the drop recorded. The bound (100 ms), the pairing, the 40 samples, 3 warm-ups, up to 3 rounds, the before copy's
+hash check, the `git apply`, the decision equality, the porcelain check and the 20 parameter ids are unchanged. The test
+function, whose name ended "and 30 ms below the applied hook", was renamed to
+`test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` (td-6, the lead's decision
+on P-W2-111-TD5-NAME (a)), so that its name says what it now checks: the old name named a clause the case no longer
+judges. The 20 node ids are new in this run and never landed, so the rename removes no landed case (F1 guards only the
+15 revised cases of W1-02, W1-05 and W2-57, untouched).
 
 **Before the change:** all 20 red, each `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent:
 S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (0.1 s).
 
 **The harness checked without the diff** (a scratch run, not a case; 2026-11-15, the launched session, empty `HOME`,
 load 4-12): with a stand-in diff that adds one comment line, the copies built, the pinned interpreter resolved from the
-real home, every decision matched `measure.py`'s record in both copies, `git status` was unchanged, and the judgement
-failed the mapped cases as it must (two identical hooks): at 40 samples the drop between identical copies was -28.3 to
-+12.2 ms over 15 rounds (5 cases), well short of 30 ms.
+real home, every decision matched `measure.py`'s record in both copies, and `git status` was unchanged. At 40 samples
+the drop between identical copies was -28.3 to +12.2 ms over 15 rounds (5 cases): the noise of a recorded drop at this
+sample count (that run judged the 30 ms clause, since removed; not re-run for td-5).
 
 ### failure-5 for the live-hook case (`test_w2_111_live_hook_slow_hook.py`, 5 cases)
 
