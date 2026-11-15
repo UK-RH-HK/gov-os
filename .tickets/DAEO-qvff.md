@@ -1,6 +1,6 @@
 ---
 id: DAEO-qvff
-status: closed
+status: in_progress
 deps: [DAEO-nqa2]
 links: []
 created: 2026-10-31T21:53:25Z
@@ -28,6 +28,10 @@ allowed_paths:
 - src/gov/guard/reads.py
 - tests/unit/guard/test_w2_111*
 - docs/probes/DAEO-qvff/**
+- src/gov/guard/decide.py  # [added, DEC-1187: S9 the fixed import cut]
+- src/gov/guard/heldout.py  # [added, DEC-1187]
+- src/gov/util/parts.py  # [added, DEC-1187: the parsed-once loader]
+- docs/changes/W2-111-live-hook/**  # [added, DEC-1187: S10 the live-hook diff for ACT-GUARD-FIX-7]
 - tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py  # [added, the CTO's path case DEC-1156 (7): the two strict xfail marks made non-strict before ACT-GUARD-FIX-6 applies]
 kpis:
   success:
@@ -39,6 +43,8 @@ kpis:
   - 'A call is decided within the bound with 150 or more worktrees registered Verify: a case that registers 150 or more planted worktrees on a planted repository and times Read, Write and Bash calls with a role set: p95 within 100 ms of the hook''s own work. [DEC-1184 (3)]'
   - 'The install check reads PATH once per session, not on every call; a changed PATH is read again Verify: a unit case counts PATH lookups over 20 calls of one session (one lookup), then changes PATH (one more); `has_install`''s answers are the same as before for the same commands. [DEC-1184 (3)]'
   - 'A call is judged only against the trees its target lies in, and every decision is the same as before Verify: the guard''s rule suites pass unchanged, and the same corpus of calls (W2-42a''s parser corpus and the five rules'' cases) gives the same allow or refuse decision before and after, with the per-tree judge called only for trees holding the call''s targets. [DEC-1184 (3)]'
+  - 'S9 (DEC-1187) The hook''s fixed cost is cut: the guard''s imports and YAML loads are lazy or parsed once (the held-out and parts loaders), so a call that needs neither pays for neither; decisions are unchanged. Verify: the decision corpus (3,452 calls x 4 roles) gives the same decisions; the product hook''s p95 for each W1-02, W1-05 and W2-57 timing case drops by at least 30 ms against its r4b figure, quiet, by W2-111''s method. [DEC-1187 (1)]'
+  - 'S10 (DEC-1187) The live hook''s changes are prepared for ACT-GUARD-FIX-7: the PATH-once and per-target-trees speed-ups and the import cut, as a diff of `.claude/hooks/` against the applied ACT-GUARD-FIX-6 bytes, with the functions and lines named. The CTO builds the ACT; the ticket never writes `.claude/`. Verify: the diff applies to a clean copy of the live hook, and in that copy every W1-02, W1-05, W2-57 and Bash case is within 100 ms at p95 by W2-111''s method (`~/gov-os-runs/W2-111/gf6-measure/measure.py`) on the live repository. [DEC-1187 (1)]'
   failure:
   - 'The 100 ms bound raised, a case removed, skipped or marked flaky. Verify: diff of the revised files against the unrevised: the bound is the same 100 ms, the 15 ids are all present, and grep for `skip`, `xfail` and `flaky` marks finds none added.'
   - 'A case that passes a hook doing more than 100 ms of its own work. Verify: the planted 150 ms hook run against each revised case: none passes.'
@@ -47,6 +53,7 @@ kpis:
   - 'A Bash or many-tree case that still passes a hook doing 150 ms of its own work. Verify: the planted 150 ms hook against each new case: none passes.'
 profile: FULL
 sources:
+- DEC-1187
 - DEC-979
 - DEC-906
 - DEC-968
@@ -78,3 +85,5 @@ The owner's D2 (a) on CAPACITY-1 (DEC-979, P-LATENCY-1): a fresh independent tes
 **Path case 2026-11-15 (the CTO, DEC-1156 (7)):** ACT-GUARD-FIX-6 (the live hook to W2-42a's parser, DEC-1174 (1)) makes `tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py`'s two `xfail(strict=True)` cases (lines 119-126) XPASS, which fails strict. W2-111's test designer makes the two marks non-strict now (`strict=False`, reason naming ACT-GUARD-FIX-6), `Rewrite-Reason: DEC-1156 (7), DEC-1174 (1)`, no other change; the marks' removal after the apply is DECIDED-NOT-DONE's follow-up row. Listed for the owner's reading.
 
 **Run r4 returned PACKAGES 2026-11-15 02:31 (the CTO's delegated P2s, listed for the owner's reading):** P-W2-111-MARGIN (a): land on a `gov accept` taken at a quiet moment in the CTO's load window (the one red, success-6 at 151 trees under load 25-40, passes alone at load 25: a load-sensitive timing red, never retried into green, no accepted red); (b) cutting the hook's fixed ~50 ms of imports and YAML (kernel files) goes to the owner as a follow-up decision. P-W2-111-RED-BEFORE (a)+(c): success-5's "before the change they fail" is accepted as shown at the CTO's load of about 20 (plain and pipe Bash cases fail before; quiet 56-59 ms and load 52 do not), and the wall-time and /mnt/c cost go to the live-hook ACT's rehearsal. Review round 1 PASS (PR-DAEO-qvff-r4.md). Next: run r4b in the load window after the re-pin (quiet after-change run, quiet `gov accept`, lead_verify at 75e709f68371, the side-by-side at load 50+), then DONE, land; W2-111 lands before ACT-GUARD-FIX-6 is queued (W2-42a's non-strict marks ride in it).
+
+**Reopened 2026-11-15 by the owner (DEC-1187, P-W2-111-MARGIN (a)):** after ACT-GUARD-FIX-6 the live hook measured over 100 ms (Bash 112-208 ms, role-checked calls 127-153 ms; `~/gov-os-runs/W2-111/gf6-measure/`). S9 cuts the hook's fixed import and YAML cost in the product; S10 prepares the live hook's diff (the r4 speed-ups plus the cut) for the CTO's ACT-GUARD-FIX-7. The src part reaches the live hook through release 0.1.1's re-pin (DEC-1178 (3)(c)). FULL, class C3; the kernel gate and the owner's approval of any kernel bytes at the land.

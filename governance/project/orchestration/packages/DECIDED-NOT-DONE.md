@@ -379,3 +379,4 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 224 | DEC-1186 (4): W2-94 reopened for the walls launcher's --reanchor flow (F1, F3, F4), then a walls-only ACT (kinds.yaml + APPROVED) | NOT STARTED: next: reopen W2-94 with the interface, brief, ready line |
 | 225 | DEC-1186 (5): the re-anchoring brief for the walled writer, drafted by product-spec, the owner's bytes approval | NOT STARTED: next: brief product-spec |
 | 226 | DEC-1186 (1), (2): ACT-GUARD-FIX-6 .req after the re-pin's done; the hook measured by W2-111's method; P-W2-111-MARGIN (b) at once if Bash > 100 ms | WAITS: the re-pin's done |
+| 227 | DEC-1187: W2-111 reopened (S9 the fixed import cut, S10 the live-hook diff), then ACT-GUARD-FIX-7 (the CTO's build, review, the owner's yes), and the src part in release 0.1.1 (DEC-1178 (3)(c)) | IN PROGRESS: next: W2-111 r5 brief and lead |
