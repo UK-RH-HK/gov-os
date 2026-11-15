@@ -632,18 +632,24 @@ def test_s25_a_graph_under_the_cap_is_read_and_checked_as_today(c_world):
 # ------------------------------------------------------------------------------------------------------------
 
 REDIS = Path.home() / "gov-os-runs" / "W2-88" / "redis"
+REDIS_A9_TIMEOUT_S = 2400   # run 8b (Rewrite-Reason: DEC-1185): under S28 A9 on redis completes, in 8 to 15 minutes (W2-124's 240 s cut it)
 
 
 @pytest.mark.real
 @pytest.mark.skipif(not REDIS.is_dir(), reason="no copy of redis under ~/gov-os-runs/W2-88/ on this machine")
 def test_s25_real_redis_copy_a9_is_ok_or_names_the_cause(box, host):
-    """success-S25 (the real tool; the lead runs it outside the sandbox; not run by the whole-folder runs: its name holds ``real``): A9 on a fresh
-    copy of ``~/gov-os-runs/W2-88/redis`` (W2-88b's, at A8's commit) made in tmp, with the real ``codebase-memory-mcp`` on PATH. Exit 0, or
-    the refusal ``CODEGRAPH_TOO_LARGE`` naming 41,086 and 143,008 (the graph is the same one); never ``FABRIC_INCOMPLETE`` with ``exit code 0``."""
+    """success-S25 (the real tool; the lead runs it outside the sandbox; not run by the whole-folder runs: its name holds ``real``; revised in
+    run 8b, Rewrite-Reason: DEC-1185: A9's limit is 2,400 s, not W2-124's 240 s, since under S28 A9 on redis completes, in 8 to 15 minutes): A9
+    on a fresh copy of ``~/gov-os-runs/W2-88/redis`` (W2-88b's, at its latest adoption commit) made in tmp, with the real ``codebase-memory-mcp``
+    on PATH. Exit 0, or the refusal ``CODEGRAPH_TOO_LARGE`` naming 41,086 and 143,008 (the graph is the same one); never ``FABRIC_INCOMPLETE``
+    with ``exit code 0``."""
     copy = Path(box.base) / "redis"
     shutil.copytree(REDIS, copy, symlinks=True)
     adoption = W.Adoption(copy, box, host, code_graph=True)
-    run = adoption.a9(Path(box.base) / "redis-out")
+    # adoption.a9's own call (the same arguments and session), with a limit that fits a completing A9 on redis
+    run = W.S124.gov(copy, adoption.env(), "adopt", "--lite", "--stage", "A9", "--out", str(Path(box.base) / "redis-out"), "--json",
+                     "--session", W.S124.ADOPTER, timeout=REDIS_A9_TIMEOUT_S)
+    assert run.returncode is not None, f"A9 on the copy of redis did not end within {REDIS_A9_TIMEOUT_S} s\n{run.describe()}"
     if run.returncode == 0:
         assert run.prints_ok, run.describe()
         return

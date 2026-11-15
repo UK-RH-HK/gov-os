@@ -622,3 +622,5 @@ calls `foo`) unchanged, the node and link counts unchanged; the second A9 must c
 tool again, serve every planted link's `id(r)` (a distinct-id count equal to the total; a link served twice is not asserted against), and note
 `record_stale` true and `pieces_from_record` 0 anywhere in the A9 record (the key names item 25 gives). A refresh whose held links' ends all exist
 stays S28 (e)'s cases, unchanged.
+
+**Revised after the lead's verify at `b817f604c` (`Rewrite-Reason: DEC-1185`; node id unchanged):** `test_w2_88_f1_codegraph.py::test_s25_real_redis_copy_a9_is_ok_or_names_the_cause` (`real`, not in the map) now runs A9 with `adoption.a9`'s own call (the same arguments and session `adopter-w2-124`) but a limit of 2,400 s instead of W2-124's `COMMAND_TIMEOUT_S` of 240 s, since under S28 A9 on redis completes, in 8 to 15 minutes. If A9 does not end within that limit, the case fails by saying so. Every other assertion is kept, and the docstring now says the copy is at its latest adoption commit (it holds the lead's two A9 runs).
