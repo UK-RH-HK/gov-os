@@ -29,6 +29,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import w2_88_scan_support as SW
 import w2_88_support as W
 
 BASE_REV = "a23678e27"
@@ -36,9 +37,9 @@ DRIVER = W.HERE / "scan_driver.py"
 FORMS = ("cloud-access-key", "forge-token")
 FACTOR = 10                      # the line: at least 10 times the one-per-file form's files per second
 SAMPLE_EVERY = 10                # the one-per-file form is timed on every 10th path of the 5,000 (its run at 16 files/s would take minutes)
-# Run 8 (DEC-1183, the owner's P-W2-88-S27-1 (b)): the scan goes back to one file at a time; the cases only a batched scan can meet are
-# skipped until S27 runs as its own round. Every other S27 case stays live (the one-file scan must meet them).
-BATCHED_ONLY = pytest.mark.skip(reason="DEC-1183: S27 runs as its own round after this land (P-W2-88-S27-1 (b))")
+# Run 8 (DEC-1183 (1)) skipped the three cases only a batched scan can meet; run 9 (DEC-1183 (2), S27's folder mode) makes them live again:
+# the speed case, "many texts per gitleaks dir process" and "batches in parallel within the budget" (README, "Run 9 revisions").
+TEXTS_PER_PROCESS = 10           # run 9's bound: on average at least 10 texts per gitleaks process (each a `gitleaks dir`), both rule sets counted
 
 
 # ------------------------------------------------------------------------------------------------------------
@@ -229,37 +230,47 @@ def test_s27_a_second_run_on_the_same_tree_gives_the_same_verdict(box):
 # Many texts per process, in parallel, within the budget
 # ------------------------------------------------------------------------------------------------------------
 
-@BATCHED_ONLY
 def test_s27_many_texts_are_judged_per_gitleaks_process(box):
-    """success-S27: 300 files with a planted secret in some are judged by far fewer gitleaks processes than files (at most one process per
-    ten files; the one-per-file form starts one for each). The logging ``gitleaks`` first on ``PATH`` counts the starts; the verdict is the
-    list of the case above (no planted secret kept)."""
+    """success-S27 (run 9, DEC-1183 (2): many texts per ``gitleaks dir`` process): 300 files with a planted secret in some are judged with every
+    gitleaks call a ``gitleaks dir <folder>`` (no ``stdin``), the folders together holding at least one text per file asked (each rule set
+    may hold it again), and **at most one gitleaks process per 10 files asked** (both rule sets counted: on average at least 10 texts per
+    process; the one-per-file form starts two per file). The recording ``gitleaks`` first on ``PATH`` notes each call; the verdict is the
+    list of the verdict case (no planted secret kept, every clean file kept)."""
     tree = plant_tree(box.base, "batches", 300, every=29, extras=False)
     log = Path(box.base) / "gitleaks-calls.log"
-    tools = logging_gitleaks(Path(box.base) / "tools-count", log)
+    tools = SW.recording_gitleaks(Path(box.base) / "tools-count", log)
     answer, _ = judge(W.SRC, tree, box, "paths.json", tools=(tools,))
-    started, _peak = calls_of(log)
-    assert started >= 1, "the plant did not take: no gitleaks process was started through the logging program on PATH"
-    assert started * 10 <= len(tree.paths), (f"{started} gitleaks processes were started for {len(tree.paths)} files: many texts per "
-                                              f"process means at most one process per ten files")
+    noted = SW.calls(log)
+    assert noted, "the plant did not take: no gitleaks process was started through the recording program on PATH"
+    other = [c["args"][:1] for c in noted if c["folder"] is None]
+    assert not other, f"{len(other)} of {len(noted)} gitleaks calls are not `gitleaks dir <folder>` (first argument {other[0]}): the texts are not judged per folder"
+    given = sum(len(c.get("entries", [])) for c in noted)
+    assert given >= len(tree.paths), f"the gitleaks dir folders held {given} entries for {len(tree.paths)} files asked: a file was not given to gitleaks"
+    assert len(noted) * TEXTS_PER_PROCESS <= len(tree.paths), (
+        f"{len(noted)} gitleaks processes were started for {len(tree.paths)} files: many texts per process means at most one process per "
+        f"{TEXTS_PER_PROCESS} files ({given} texts given in all)")
     assert not (set(answer["kept"]) & tree.secret_paths), "a file with a planted secret is kept"
     assert len(answer["kept"]) == len(tree.paths) - len(tree.secret_paths), "a clean file is left out"
 
 
-@BATCHED_ONLY
 def test_s27_batches_run_in_parallel_and_never_more_than_the_budget_allows(box):
-    """success-S27: with ``GOV_HEAVY_THREAD_BUDGET=3`` and a logging ``gitleaks`` that waits 0.2 s, 600 files are judged with never more than 3
-    gitleaks processes at the same moment; where the files took more than one process, two ran at once (the batches are parallel). A design that
-    puts 600 files in one process has no parallelism to observe and passes this case: the speed case is the arbiter."""
+    """success-S27 (run 9): with ``GOV_HEAVY_THREAD_BUDGET=3`` and a recording ``gitleaks`` that waits 0.2 s per call, 600 files are judged
+    with never more than 3 gitleaks processes at the same moment; where the scan took more than one batch (more than one distinct ``dir``
+    folder, or, for the one-per-file form, more than one process), two ran at once (the batches are parallel). A design that puts the 600
+    files in one batch has no parallelism to observe and passes the second half: the speed case is the arbiter."""
     tree = plant_tree(box.base, "parallel", 600, every=201, extras=False)
     log = Path(box.base) / "gitleaks-times.log"
-    tools = logging_gitleaks(Path(box.base) / "tools-time", log, delay=0.2)
+    tools = SW.recording_gitleaks(Path(box.base) / "tools-time", log, delay=0.2)
     answer, _ = judge(W.SRC, tree, box, "paths.json", tools=(tools,), GOV_HEAVY_THREAD_BUDGET="3")
-    started, peak = calls_of(log)
-    assert started >= 1, "the plant did not take: no gitleaks process was started through the logging program on PATH"
-    assert peak <= 3, f"{peak} gitleaks processes ran at the same moment with GOV_HEAVY_THREAD_BUDGET=3 (at most _workers() = 3)"
-    assert started < 2 or peak >= 2, f"{started} processes ran one after the other: the batches are not run in parallel"
+    noted = SW.calls(log)
+    assert noted, "the plant did not take: no gitleaks process was started through the recording program on PATH"
+    top = SW.peak(noted)
+    folders = {c["folder"] for c in noted if c["folder"] is not None}
+    units = len(folders) if folders else len(noted)
+    assert top <= 3, f"{top} gitleaks processes ran at the same moment with GOV_HEAVY_THREAD_BUDGET=3 (at most _workers() = 3)"
+    assert units < 2 or top >= 2, f"{units} batches ({len(noted)} processes) ran one after the other: the batches are not run in parallel"
     assert not (set(answer["kept"]) & tree.secret_paths), "a file with a planted secret is kept"
+    assert len(answer["kept"]) == len(tree.paths) - len(tree.secret_paths), "a clean file is left out"
 
 
 def test_s27_the_public_names_keep_their_signatures_and_meaning(box):
@@ -297,7 +308,6 @@ def test_s27_the_public_names_keep_their_signatures_and_meaning(box):
 # The speed: at least 10 times the one-per-file form's files per second, on a planted 5,000-file tree
 # ------------------------------------------------------------------------------------------------------------
 
-@BATCHED_ONLY
 @pytest.mark.slow
 def test_s27_a_five_thousand_file_tree_is_judged_at_least_ten_times_faster_with_the_same_findings(box, before_src):
     """success-S27 (the speed line): the planted 5,000-file tree (about 52 files hold a planted secret, two rules) judged by ``indexable`` of
