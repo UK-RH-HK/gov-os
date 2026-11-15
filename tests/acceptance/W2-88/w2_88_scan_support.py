@@ -2,8 +2,10 @@
 
 The wrapper is a small Python program the case writes into a folder of its own. At each call it notes, as one JSON line in
 the case's log (under a lock): its pid, its arguments, its start and end times, and, for ``gitleaks dir <folder>``, the
-folder argument (the one after ``dir``), whether it is a folder, its mode, and every entry under it (the name relative to
-the folder and its mode), and for each text it was given (each file of the folder, or the whole of standard input for
+folder: the argument after ``dir`` resolved against the wrapper's own working directory at the call, which the real
+gitleaks inherits (``folder``, an absolute path; run 9's interface item 5b runs ``gitleaks dir .`` with the batch's folder
+as the working directory, so the argument as given, ``folder_arg``, and that directory, ``cwd``, are noted too), whether
+it is a folder, its mode, and every entry under it (the name relative to the folder and its mode), and for each text it was given (each file of the folder, or the whole of standard input for
 ``gitleaks stdin``) the planted tags it holds (``s27tag-...``: words the case writes into its planted files, never a secret)
 and whether it holds the case's marker. It then runs the real gitleaks with the same arguments and standard input and, by
 its mode, passes the answer through or (only for a call whose texts hold the marker) answers otherwise:
@@ -35,8 +37,9 @@ args = sys.argv[1:]
 entry = {{"pid": os.getpid(), "args": args, "start": time.time(), "folder": None}}
 texts, data = [], None
 if len(args) > 1 and args[0] == "dir":
-    folder = args[1]
-    entry["folder"] = folder
+    cwd = os.getcwd()
+    folder = os.path.abspath(os.path.join(cwd, args[1]))
+    entry["folder"], entry["folder_arg"], entry["cwd"] = folder, args[1], cwd
     try:
         info = os.stat(folder)
         entry["mode"], entry["isdir"] = stat.S_IMODE(info.st_mode), stat.S_ISDIR(info.st_mode)

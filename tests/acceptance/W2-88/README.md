@@ -679,3 +679,34 @@ its red reason is the ratio, as at run 7. (2) The parallel case cannot see paral
 digits only. (4) The assessment's case reads the record's `secrets` as the S1 cases do (`{path, rule}`); it runs MA through `gov adopt --lite --stage MA`.
 (5) The P1R-1 cases put each pair adjacent; the same batch for both is likely but not forced (the batch caps are the engineer's): a batch boundary between them
 makes the case pass for that pair, so each list holds three pairs.
+
+**Run 9, second batch (interface item 5b, the lead, 2026-11-15 18:12; `Rewrite-Reason: run9-interface item 5b (the lead, DEC-1183 (2))`).** Item 5b: gitleaks
+runs with the batch's folder as its working directory, on `.` (`gitleaks dir . ...`), so its `File` and every path allowlist see the bare number. The reason is the
+engineer's probe: with the folder given by its path, gitleaks' default path allowlist (`useDefault = true` in the project's `.gitleaks.toml`) dropped every finding
+when the temporary folder's own path held `node_modules/`, `venv/lib` or `gitleaks.toml` (exit 0, a fail-open). The lead's run at the merged head failed four cases
+because the wrapper noted the argument after `dir` as given (`.`), so their folder checks looked at the test's own working directory.
+
+- `w2_88_scan_support.py` (revised): the wrapper notes `folder` as the argument after `dir` resolved against its own working directory at the call (`os.getcwd()`,
+  `os.path.abspath`; the real gitleaks inherits that directory), plus the argument as given (`folder_arg`) and that directory (`cwd`). Everything else is unchanged.
+  A folder given by an absolute path (the earlier form) is noted as before. The `foreign` answer's `File` is `<absolute folder>/999999`, which still names no
+  file of the batch. The scratch check: `gitleaks dir .` run in a 0700 folder holding one clean file is noted as that folder's absolute path, mode `0o700`, the
+  entry `1`.
+- `test_w2_88_scan_folder.py::test_s27_a_failing_gitleaks_in_one_batch_fails_closed_and_nothing_of_that_batch_is_remembered_clean` (all 3 ids) and
+  `test_w2_88_scan_folder.py::test_s27_each_batch_folder_is_private_outside_the_root_holds_no_repository_name_and_is_removed`: only the docstrings changed (the folder
+  is the resolved one). The cases keep every assertion as it was: outside the root, mode 0700, entries owner-only and holding no repository name, gone after
+  `indexable` returns or raises. On this tree's `src` they stand as before: the failing cases are **GUARD** (green: no `dir` call, so no folder to check), and the folder
+  case is **red** for `no gitleaks call was gitleaks dir <folder> (38 calls, first arguments [('stdin',)])`.
+- `test_w2_88_scan_speed.py::test_s27_batches_run_in_parallel_and_never_more_than_the_budget_allows` is unchanged, but it gains from the wrapper's fix. It counts
+  batches by distinct `dir` folders, and with every call noted as `.` it would have counted one batch and so skipped its two-at-once check.
+- **New** `test_w2_88_scan_folder.py::test_s27_a_temporary_folder_whose_path_holds_a_default_allowlisted_name_still_leaves_out_the_secret_file` (2 ids:
+  `node-modules`, `venv-lib`). `TMPDIR` names an empty folder outside the root whose path holds `node_modules/` or `venv/lib`. First the hazard is shown to be real:
+  the secret file, copied into a folder under that `TMPDIR`, is reported by a real `gitleaks dir .` run inside that folder, and by nothing when the folder is given by
+  its path (the case fails with "the plant did not take" if a future gitleaks no longer drops it). Then `indexable` runs with that `TMPDIR`: the secret file is left
+  out and every clean file kept, matching the one-per-file form; at least one `gitleaks dir` call is made; every batch folder sits under that `TMPDIR`; none remains;
+  no value is in the log or under the outside folder.
+
+| KPI id / item | tests | on the base `301708296` (this tree's `src`), and after |
+|---|---|---|
+| success-27 (item 5b) | `test_w2_88_scan_folder.py::test_s27_a_temporary_folder_whose_path_holds_a_default_allowlisted_name_still_leaves_out_the_secret_file` (2: `node-modules`, `venv-lib`) | **red:** `no gitleaks call was gitleaks dir <folder> (17 calls, first arguments [('stdin',)])`. The hazard check and the verdicts pass first (the base reads standard input, so `TMPDIR` plays no part). After: green; it goes red, failing open (the secret file kept), if the folder is given to gitleaks by its path |
+
+The two revised cases keep their rows in the run 9 table above (node ids unchanged).
