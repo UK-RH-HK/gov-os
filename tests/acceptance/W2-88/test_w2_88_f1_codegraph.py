@@ -24,6 +24,7 @@ source file filtered on) and writes the planted totals beside the log. The plant
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -353,6 +354,72 @@ def test_s28_e_a_failed_refresh_leaves_the_last_good_record_and_the_next_refresh
     run, log, _start = run_a9(c_world, adoption, "s28-ef-3", code_links(REFRESH_AFTER, functions=40))
     graph = assert_read_whole(adoption, run, log, "the third A9 after a failed refresh")
     assert_refreshed_only_the_changed(log, graph, "the refresh after a failed one")
+
+
+# ------------------------------------------------------------------------------------------------------------
+# S28 (h), R8-2 (a) (run 8b item 25): a held link whose end is gone makes the record stale: every link is read again
+# ------------------------------------------------------------------------------------------------------------
+
+CALLER = "src/util.c"
+START_C = "/* The server's start-up helpers. */\nint start_extra(void) {\n    return 4;\n}\n"
+FOO_C = "\nint foo(void) {\n    return 5;\n}\n"
+CALL_KEY = "helper-calls-foo"
+CALL_ID = int(hashlib.sha1(f"call\0{CALL_KEY}".encode()).hexdigest()[:13], 16)  # the stand-in's id(r) of the call, keyed alone
+
+
+def foo_plan(where: str, name: str = "foo") -> dict:
+    """The stand-in's plan: ``helper`` in ``src/util.c`` calls ``name`` defined in ``where``; the call keeps its ``id(r)`` (keyed alone)."""
+    return {"named": {where: [name], CALLER: ["helper"]},
+            "calls": [{"key": CALL_KEY, "file": CALLER, "source": "helper", "type": "CALLS", "target": name}]}
+
+
+def served_ids(log) -> set:
+    return {identity for q in queries(log) if q.get("links") for identity in q.get("ids", [])}
+
+
+@pytest.mark.parametrize("change", ["move", "rename"])
+def test_s28_h_a_refresh_after_a_target_moves_to_another_file_rereads_every_link(c_world, change):
+    """success-S28 (h), run 8b item 25 (the CTO's R8-2 (a) on the narrow check), S28's failure (a refresh that gives a stale graph): ``helper``
+    in ``src/util.c`` calls ``foo`` in ``src/server.c``; A9 once (no record: every link read); then ``foo`` moves to ``src/start.c`` (``move``)
+    or is renamed ``foo_renamed`` in ``src/server.c`` (``rename``), committed; ``src/util.c`` unchanged, the node and link counts unchanged, the
+    call keeping its ``id(r)``. The second A9 (the refresh) finds the record's link ``code.src.util.helper -> code.src.server.foo`` ends on a
+    node no longer in the graph, so the record is stale: A9 completes with the planted totals, the links of the unchanged ``src/util.c`` are
+    read again from the tool (not taken from the record), every planted link's ``id(r)`` is served in this read, and the A9 record notes
+    ``record_stale`` true and ``pieces_from_record`` 0."""
+    adoption = fork(c_world, f"s28-h-{change}")
+    project = adoption.project
+    (project / "src" / "start.c").write_text(START_C, encoding="utf-8")
+    (project / "src" / "server.c").write_text(C_FILES["src/server.c"] + FOO_C, encoding="utf-8")
+    W.commit_all(project, "src/start.c added; foo defined in src/server.c")
+    run, log, _start = run_a9(c_world, adoption, f"s28-h-{change}-1", foo_plan("src/server.c"))
+    first = assert_read_whole(adoption, run, log, "the first A9 of the moved-target case")
+    call_ids = {identity for q in links_reads_of(log, CALLER) for identity in q.get("ids", [])}
+    assert CALL_ID in call_ids, f"the plant: the first A9 did not read helper's call to foo (id {CALL_ID}) among {CALLER}'s links"
+    if change == "move":
+        (project / "src" / "server.c").write_text(C_FILES["src/server.c"], encoding="utf-8")
+        (project / "src" / "start.c").write_text(START_C + FOO_C, encoding="utf-8")
+        after = foo_plan("src/start.c")
+    else:
+        (project / "src" / "server.c").write_text(C_FILES["src/server.c"] + FOO_C.replace("foo", "foo_renamed"), encoding="utf-8")
+        after = foo_plan("src/server.c", "foo_renamed")
+    W.commit_all(project, f"foo {'moved to src/start.c' if change == 'move' else 'renamed foo_renamed'}; src/util.c unchanged")
+    run, log, _start = run_a9(c_world, adoption, f"s28-h-{change}-2", after)
+    what = f"the refresh after foo's {change}"
+    graph = assert_read_whole(adoption, run, log, what)
+    code_types = ("CALLS", "DEFINES")  # the code links; A9's own committed record adds a File node and its CONTAINS_FILE link between runs
+    assert [graph["by_type"].get(t) for t in code_types] == [first["by_type"].get(t) for t in code_types], (
+        f"the plant: the {change} changed the code links' counts {first['by_type']} -> {graph['by_type']}")
+    assert links_reads_of(log, CALLER), (
+        f"{what}: the refresh asked the tool for no links of the unchanged {CALLER}: it took them from the record, whose link to "
+        f"code.src.server.foo ends on a node no longer in the graph (the record is stale; every link must be read again)")
+    ids = served_ids(log)
+    assert call_ids <= ids, f"{what}: the links of {CALLER} read in the first A9 (call's id(r) kept) were not served again: {sorted(call_ids - ids)}"
+    assert len(ids) == graph["links"], (
+        f"{what}: {len(ids)} distinct id(r) values served for {graph['links']} links: a stale record's refresh reads every link again")
+    record = W.a9_record(adoption.project, run)
+    stale, from_record = find_key(record, "record_stale"), find_key(record, "pieces_from_record")
+    assert stale is True, f"{what}: the A9 record does not note record_stale true (found {stale!r})"
+    assert from_record == 0, f"{what}: the A9 record's pieces_from_record is {from_record!r}, not 0, for a stale record"
 
 
 # ------------------------------------------------------------------------------------------------------------

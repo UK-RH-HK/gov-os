@@ -39,6 +39,11 @@ The graph (generated rows, never a real index), from the staged files and the pl
 * ``cut``: a list of ``{"piece": ..., "by": n}``: ``file`` (a links read filtered by a source file, untyped), ``file-type`` (the same with
   ``"type"``), ``list`` (``MATCH (n:<label>) RETURN ...file_path``, unfiltered), ``folder`` (a ``CONTAINS_FILE`` read filtered by a
   Folder's path), ``label-links`` (a links read by source label, unfiltered): that read answers ``by`` rows fewer than its count.
+* ``named`` and ``calls`` (run 8b item 25, R8-2 (a): a link's end moving to another file): ``named`` ``{"<path>": ["foo", ...]}`` adds a
+  ``Function`` node per name in that code file, its qualified name ``code.<path's module>.<name>`` (``code.src.server.foo``), so a
+  function moved to another file, or renamed, is a node of a new qualified name; ``calls`` ``[{"key", "file", "source", "type",
+  "target"}]`` adds a link from the named node ``source`` of ``file`` to the named node ``target`` wherever it is defined, its ``id(r)``
+  from ``key`` alone, so it keeps its ``id(r)`` while its target moves. Named nodes get their ``DEFINES`` link and no other generated link.
 * ``read``: ``ok`` or ``locked`` (a links read, a query returning ``id(r)``, ``type(r)`` or a qualified name over a link match, not a
   count, answers ``isError: true``, ``database is locked``); ``counts``: ``ok`` or ``fail`` (every count query answers that error).
 * ``W2_88_F1_LOG``: every ``query_graph`` call is appended as a JSON line ``{"query", "offset", "max_rows", "rows": the result's size
@@ -122,7 +127,8 @@ def graph():
         link(at[parent] if parent in at else branch, "CONTAINS_FILE", file_node[rel], "contains", rel)
     code_files = [rel for rel in files if rel.endswith(CODE_SUFFIXES)]
     extra_labels = {"Function": int(settings.get("functions", 2)), **{k: int(v) for k, v in (settings.get("labels") or {}).items()}}
-    by_file, targets = {}, []
+    named = settings.get("named") or {}
+    by_file, targets, named_at = {}, [], {}
     for number, rel in enumerate(code_files):
         own = []
         for label, count in extra_labels.items():
@@ -130,8 +136,13 @@ def graph():
                 own.append(node(label, f"{label.lower()}_{number}_{index}", rel))
         by_file[rel] = own
         targets += own
+        module = rel.rsplit(".", 1)[0].replace("/", ".")
+        own_named = []
+        for name in named.get(rel, []):
+            named_at[(rel, name)] = node("Function", f"{module}.{name}", rel)
+            own_named.append(named_at[(rel, name)])
         digest = hashlib.sha1((folder / rel).read_bytes()).hexdigest() if folder else ""
-        for index, target in enumerate(own):
+        for index, target in enumerate(own + own_named):
             link(file_node[rel], "DEFINES", target, "defines", rel, digest, index)
     builtin_nodes = [node("Class", f"builtins.class_{i}", BUILTINS) for i in range(int(settings.get("builtins", 3)))]
     targets = targets or builtin_nodes
@@ -147,6 +158,11 @@ def graph():
     for rel in code_files:
         digest = hashlib.sha1((folder / rel).read_bytes()).hexdigest() if folder else ""
         spread(by_file[rel], (settings.get("links") or {}).get(rel, default), rel, digest)
+    defined = {name: index for (_rel, name), index in sorted(named_at.items())}
+    for item in settings.get("calls") or []:
+        source, target = named_at.get((item["file"], item["source"])), defined.get(item["target"])
+        if source is not None and target is not None:
+            link(source, item.get("type", "CALLS"), target, "call", item["key"])
     if builtin_nodes:
         spread(builtin_nodes, settings.get("builtin_links", {"BUILTIN_USAGE": 12}), BUILTINS, "")
     return nodes, links

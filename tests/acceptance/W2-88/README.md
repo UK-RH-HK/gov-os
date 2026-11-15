@@ -587,6 +587,7 @@ agreeing). The redis copy's re-run (`real`) is unchanged and not in the map. The
 | success-28, failure-1 | `test_w2_88_f1_codegraph.py::test_s28_d_a_file_and_type_read_cut_short_is_refused_fabric_incomplete_naming_the_file_the_type_and_both_figures` | `A9 where src/server.c's USAGE read ends 7 rows short of its count: expected a refusal` (the base's whole reads meet no cut piece and A9 completes) |
 | success-28, failure-1 | `test_w2_88_f1_codegraph.py::test_s28_e_a_refresh_after_three_changed_files_reads_only_those_files_links` | `the refresh read links not filtered by a source path (so unchanged files' links again): ['MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name']` |
 | success-28, failure-1 | `test_w2_88_f1_codegraph.py::test_s28_e_a_failed_refresh_leaves_the_last_good_record_and_the_next_refreshes_what_changed_since_it` | `the second A9, whose read of src/util.c ends short: expected a refusal` (the base reads whole and completes) |
+| success-28, failure-1 | `test_w2_88_f1_codegraph.py::test_s28_h_a_refresh_after_a_target_moves_to_another_file_rereads_every_link` (2: `move`, `rename`; added in run 8b's last round, the CTO's R8-2 (a), item 25; red on the ticket branch's head `f21439de5`, which holds S28's reader and record without the fix) | `the refresh after foo's move: the refresh asked the tool for no links of the unchanged src/util.c: it took them from the record, whose link to code.src.server.foo ends on a node no longer in the graph` (and `foo's rename`): the base takes the unchanged file's links from the record |
 | success-28 | `test_w2_88_f1_codegraph.py::test_s28_g_a_file_list_cut_short_is_read_per_folder_and_branch_and_a9_completes` | `A9 completed on a cut File list without reading the File paths per Folder and Branch (CONTAINS_FILE)` |
 | success-28 | `test_w2_88_f1_codegraph.py::test_s28_g_a_folder_piece_also_cut_is_refused_by_name_never_a_partial_list` | `A9 on a cut File list whose folder deps/hiredis's piece is also cut was not refused by name` |
 | failure-1 | `test_w2_88_f1_codegraph.py::test_s28_f_guard_a_cursor_in_skip_limit_or_whole_graph_reader_gets_a_partial_or_refused_answer` (harness kind: it drives the stand-in alone over stdio) | **GUARD (green on the base by design):** it holds the stand-in to items 13-14, so the A9 cases cannot pass by a string-cursor, `IN`, `SKIP`/`LIMIT` or whole-graph reader |
@@ -610,3 +611,14 @@ package. (3) W2-187's case asserting the placeholder (`[none-on-path]`) is the C
 designer for it; the brief does not). (4) A label over 100,000 nodes (`a-node-label-one-over`) is asserted read, as item 23 says (its path list is not
 needed when the File pieces sum to the total). (5) The refresh cases run A9 two and three times on one fork, the source files changed and committed
 between runs; the stand-in's `id(r)` of an unchanged file's links stay the same across runs.
+
+**The last round of run 8b (the CTO's R8-2 (a) on the narrow check, item 25; `docs/probes/DAEO-2bdu/PR-DAEO-2bdu-r8.md`).** One case,
+`test_s28_h_a_refresh_after_a_target_moves_to_another_file_rereads_every_link`, written from item 25's text before the fix (DEC-136, DEC-820: no
+engineer's code read). The stand-in gains two plan keys (inert when absent, so the other cases are unchanged): `named` (a `Function` node of
+qualified name `code.<module>.<name>` in a named file, so a function moved to another file or renamed is a node of a new name) and `calls` (a link
+between named nodes whose `id(r)` comes from its key alone, so it keeps its `id(r)` while its target moves). The case adds `src/start.c` and `foo`
+in `src/server.c`; A9 once; `foo` moves to `src/start.c` (`move`) or is renamed `foo_renamed` (`rename`), committed, `src/util.c` (whose `helper`
+calls `foo`) unchanged, the node and link counts unchanged; the second A9 must complete with the planted totals, read `src/util.c`'s links from the
+tool again, serve every planted link's `id(r)` (a distinct-id count equal to the total; a link served twice is not asserted against), and note
+`record_stale` true and `pieces_from_record` 0 anywhere in the A9 record (the key names item 25 gives). A refresh whose held links' ends all exist
+stays S28 (e)'s cases, unchanged.
