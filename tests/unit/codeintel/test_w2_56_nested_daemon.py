@@ -103,6 +103,7 @@ def test_a_mark_this_process_wrote_is_not_followed_here(tmp_path, monkeypatch):
     monkeypatch.delenv(codeintel.BASE_ENV, raising=False)
     monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV, raising=False)
     monkeypatch.setattr(codeintel, "DAEMON_BASE", tmp_path / "daemons")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     codeintel.write_mark(tmp_path, tmp_path / "s")
     assert codeintel.marked_base(tmp_path / "repo") is None
     assert codeintel.daemon_dir(tmp_path / "repo").parent == tmp_path / "daemons"
@@ -129,6 +130,7 @@ def test_the_variable_and_a_launched_sessions_folder_come_before_a_mark(tmp_path
     mark.write_text(json.dumps({"base": str(tmp_path / "marked"), "pid": os.getpid() + 1}), encoding="utf-8")
     monkeypatch.setenv(codeintel.BASE_ENV, str(tmp_path / "given"))
     monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, "/tmp/gov-launch-abcd1234/claude-1000")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     assert codeintel.daemon_dir(tmp_path / "repo").parent == tmp_path / "given"
     monkeypatch.delenv(codeintel.BASE_ENV)
     assert codeintel.daemon_dir(tmp_path / "repo").parent == Path("/tmp/gov-launch-abcd1234") / codeintel.LAUNCH_SUB
@@ -147,6 +149,7 @@ def test_a_folder_made_for_a_tool_that_cannot_be_started_is_not_left(tmp_path, m
     monkeypatch.delenv(codeintel.BASE_ENV, raising=False)
     monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV, raising=False)
     monkeypatch.setattr(codeintel, "DAEMON_BASE", tmp_path / "daemons")
+    monkeypatch.setattr(codeintel, "SOCKET_MAX", 4096)  # placement only; the length rule: test_w2_88_runtime_path.py
     root = _repository(tmp_path / "repo")
     empty = tmp_path / "no-tool"
     empty.mkdir()
