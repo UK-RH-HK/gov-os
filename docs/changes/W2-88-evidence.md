@@ -698,3 +698,20 @@ cases that pass on the old code are the ones that state what must stay the same)
 - **R8-1, item 26:** `tests/unit/adopt/test_w2_187_walls_act.py::test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`
   revised to item 24 (`GITLEAKS_MISSING` named, no `<path to gitleaks>`, no `<...>` slot, no cron line); its name kept
   (this file and W2-187's evidence cite it); the file's other six cases unchanged (Rewrite-Reason: DEC-893, DEC-1156 (7)).
+
+## Run 8b, the last fix: a node label over the cap is read by path (interface item 27)
+
+- **Cause** (the lead's run of the code-graph module at d5f7f4282): `_Reader.node_rows` sent a label over the cap to
+  `nodes_by_path`, which had no path list for it (item 15 reads path lists only for labels of at most 100,000 nodes)
+  and refused `CODEGRAPH_TOO_LARGE` for `Method` (100,002 nodes over several files, each file's share under the cap).
+- **Fix (`src/gov/codeintel/__init__.py`, `_Reader.nodes_by_path`):** a label over the cap, or cut, is read by path with
+  the equality filter `MATCH (n:<Label>) WHERE n.file_path = "<path>"`, each path's `count(n)` first and a path of 0
+  nodes not read; the candidate paths are the label's own path list where it was read whole, else the File and Folder
+  paths already known (item 15 (ii), item 23). The pieces' counts must sum to the label's count, else
+  `FABRIC_INCOMPLETE` (`GraphShort`, naming the label, its count and the sum); a single (label, path) piece over the
+  cap refuses `CODEGRAPH_TOO_LARGE` (`GraphTooLarge`, `kind` the label, `file` the path). Never a partial read.
+- **Unit tests:** `tests/unit/codeintel/test_w2_88_graph.py` (24 cases, 3 new, all three red before the fix with the
+  old up-front refusal): `Method` of 100,002 nodes over three of five files is read (counted 100,012 nodes, each
+  candidate's count asked, a path of 0 not read, the label never asked whole); `Method` with 2 nodes at
+  `<python-builtins>` (no File or Folder path) is refused by name (counted 100,002, sum 100,000); a (`Method`, `m0.c`)
+  piece of 100,001 is refused by name.

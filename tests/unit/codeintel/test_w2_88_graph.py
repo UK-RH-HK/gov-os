@@ -278,6 +278,48 @@ def test_a_node_label_the_tool_cuts_is_read_by_path(graph):
         in asked()
 
 
+def method_graph(methods: dict) -> dict:
+    """``files_graph`` of five files with a ``Method`` label of ``methods`` {path: nodes} (item 27)."""
+    config = files_graph({f"m{i}.c": {"CALLS": 2} for i in range(5)})
+    config["labels"]["Method"] = methods
+    return config
+
+
+def test_a_node_label_over_the_cap_spread_over_files_is_read_whole_by_path(graph):
+    root, planted = graph
+    asked = planted(method_graph({"m0.c": 40_000, "m1.c": 40_000, "m2.c": 20_002}))
+    codeintel._graph(root)
+    assert codeintel.counted(root) == (10 + 100_002, 10)
+    queries = asked()
+    for path in ("m0.c", "m1.c", "m2.c", "m3.c"):  # each candidate path's count first
+        assert f'MATCH (n:Method) WHERE n.file_path = "{path}" RETURN count(n)' in queries
+    assert 'MATCH (n:Method) WHERE n.file_path = "m3.c" RETURN n.qualified_name, n.name, n.label, n.file_path' \
+        not in queries  # a path of 0 nodes is not read
+    assert "MATCH (n:Method) RETURN n.qualified_name, n.name, n.label, n.file_path" not in queries  # over the cap
+
+
+def test_a_node_label_over_the_cap_whose_pieces_do_not_sum_to_its_count_is_refused_by_name(graph):
+    root, planted = graph
+    planted(method_graph({"m0.c": 60_000, "m1.c": 40_000, "<python-builtins>": 2}))  # no File or Folder path
+    with pytest.raises(codeintel.GraphShort) as raised:
+        codeintel._graph(root)
+    err = raised.value
+    assert (err.kind, err.counted, err.read) == ("Method", 100_002, 100_000)
+    assert "Method" in str(err) and "100002" in str(err) and "100000" in str(err)
+    assert codeintel.counted(root) is None
+
+
+def test_a_single_label_and_path_piece_over_the_cap_is_refused_by_name(graph):
+    root, planted = graph
+    planted(method_graph({"m0.c": 100_001, "m1.c": 1}))
+    with pytest.raises(codeintel.GraphTooLarge) as raised:
+        codeintel._graph(root)
+    err = raised.value
+    assert (err.kind, err.file, err.count, err.cap) == ("Method", "m0.c", 100_001, codeintel.CAP)
+    assert "Method" in str(err) and "m0.c" in str(err) and "100001" in str(err)
+    assert codeintel.counted(root) is None
+
+
 def test_no_query_asks_an_unsound_form(graph):
     root, planted = graph
     asked = planted(folder_graph(cut={"list:File": 10, "links:src/s1.c": 1}))

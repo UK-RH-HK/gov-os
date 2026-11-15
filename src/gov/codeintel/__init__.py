@@ -28,7 +28,7 @@ import shutil
 import stat
 import subprocess
 import threading
-from collections import Counter, defaultdict
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -653,21 +653,32 @@ class _Reader:
         return found
 
     def nodes_by_path(self, label: str, count: int) -> list[list]:
+        """A label over the cap, or cut, read by path with the equality filter (run 8b item 27): the candidate paths
+        are its own path list where it was read whole, else the File and Folder paths already known; each path's count
+        first; the pieces' counts must sum to the label's count, and a (label, path) piece over the cap refuses."""
         values = self.lists.get(label)
-        if values is None or any(not (isinstance(path, str) and path) for path in values):
-            if count > CAP:
-                raise GraphTooLarge("node label", label, count, self.nodes, self.edges)
-            raise GraphShort("node label", label, count, 0, said=(
-                f"the code graph's node label {label}: its {count} nodes were cut short by {TOOL} and cannot be read "
-                "by path (its path list is cut or holds paths that are no string)"))
+        source = "its own path list" if values is not None else "the File and Folder paths"
+        if values is None:
+            values = [path for name in ("File", "Folder") for path in self.lists.get(name, [])]
+        candidates = sorted({path for path in values if isinstance(path, str) and path})
         found: list[list] = []
-        held = Counter(values)  # the nodes of each path, from the label's list checked against its count
-        for path in sorted(held):
+        summed = 0
+        for path in candidates:
             quoted = _quoted(path)
             if quoted is None:
-                raise GraphShort("node label", label, count, len(found), file=path)
-            found += self.checked(f"MATCH (n:{label}) WHERE n.file_path = {quoted} RETURN n.qualified_name, n.name, "
-                                  "n.label, n.file_path", "node label", label, held[path], file=path)
+                continue  # a path no equality can ask: its nodes are missed and the sum below refuses
+            match = f"MATCH (n:{label}) WHERE n.file_path = {quoted}"
+            own = self.count(f"{match} RETURN count(n)")
+            if own == 0:
+                continue
+            summed += own
+            found += self.checked(f"{match} RETURN n.qualified_name, n.name, n.label, n.file_path", "node label",
+                                  label, own, file=path)
+        if summed != count or len(found) != count:
+            raise GraphShort("node label", label, count, summed, said=(
+                f"the code graph's node label {label}: {TOOL} counted {count} nodes, and its pieces by path (over "
+                f"{source}, by equality) hold {summed}, so it cannot be read soundly in pieces under the cap of {CAP} "
+                "rows (never a partial read)"))
         return found
 
 
