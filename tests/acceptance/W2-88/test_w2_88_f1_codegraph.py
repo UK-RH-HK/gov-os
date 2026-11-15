@@ -156,16 +156,47 @@ def find_key(value, key: str):
     return None
 
 
+def a9_records(project) -> list:
+    return [n for n in W.git(project, "ls-files", "governance/adoption").splitlines() if "/A9" in n]
+
+
+def last_good(project) -> dict:
+    """What a good A9 left before a later run: its record and its copies, ``{path: bytes}``, and the record's last commit."""
+    paths = [*a9_records(project), *(target for target, _source in W.copy_plan() if (project / target).exists())]
+    commit = W.git(project, "log", "-1", "--format=%H", "--", "governance/adoption").strip()
+    return {"files": {rel: (project / rel).read_bytes() for rel in paths}, "record_commit": commit}
+
+
 def assert_nothing_left(adoption, start: str, run) -> None:
     """A refused A9 passed nothing: no ok on stdout, no A9 record, HEAD unmoved, A9's copies taken back."""
     project = adoption.project
     assert not run.prints_ok, f"A9 printed ok\n{run.describe()}"
     assert '"ok": true' not in run.stdout.replace('":true', '": true'), f"A9's output says ok: true\n{run.describe()}"
     assert W.head(project) == start, "A9 moved HEAD though it was refused"
-    names = [n for n in W.git(project, "ls-files", "governance/adoption").splitlines() if "/A9" in n]
+    names = a9_records(project)
     assert not names, f"A9 committed a record ({names}) though it was refused: a record that names no 0-node pass is not one"
     left = [target for target, _source in W.copy_plan() if (project / target).exists()]
     assert not left, f"A9 was refused and left its copies in the tree: {left[:4]}"
+    assert W.git(project, "status", "--porcelain", "--untracked-files=all").strip() == "", "the tree is not clean after A9's refusal"
+
+
+def assert_last_good_kept(adoption, start: str, run, good: dict) -> None:
+    """A refused A9 after a good one passed nothing: no ok on stdout, HEAD unmoved, the good run's A9 record as it wrote it (its bytes
+    unchanged, no new record commit), the good run's copies as they were and no other copy left, the tree clean."""
+    project = adoption.project
+    assert not run.prints_ok, f"A9 printed ok\n{run.describe()}"
+    assert '"ok": true' not in run.stdout.replace('":true', '": true'), f"A9's output says ok: true\n{run.describe()}"
+    assert W.head(project) == start, "A9 moved HEAD though it was refused"
+    records = a9_records(project)
+    kept = [rel for rel in good["files"] if "/A9" in rel and rel.startswith("governance/adoption")]
+    assert kept, "the plant: the good first A9 left no A9 record under governance/adoption/"
+    assert records == kept, f"the refused A9 changed the A9 records: {records} after it, {kept} after the good run"
+    commit = W.git(project, "log", "-1", "--format=%H", "--", "governance/adoption").strip()
+    assert commit == good["record_commit"], f"the refused A9 committed under governance/adoption/ ({commit}, the good run's {good['record_commit']})"
+    changed = [rel for rel, data in good["files"].items() if not (project / rel).is_file() or (project / rel).read_bytes() != data]
+    assert not changed, f"the refused A9 changed what the good A9 left (its record or its copies): {changed[:4]}"
+    left = [target for target, _source in W.copy_plan() if (project / target).exists() and target not in good["files"]]
+    assert not left, f"A9 was refused and left copies in the tree the good run had not: {left[:4]}"
     assert W.git(project, "status", "--porcelain", "--untracked-files=all").strip() == "", "the tree is not clean after A9's refusal"
 
 
@@ -348,9 +379,10 @@ def test_s28_e_a_failed_refresh_leaves_the_last_good_record_and_the_next_refresh
     change_three(adoption)
     broken = code_links(REFRESH_AFTER, functions=40) | {"cut": [{"piece": "file", "file": "src/util.c", "by": 3},
                                                                  {"piece": "file-type", "file": "src/util.c", "type": "CALLS", "by": 3}]}
+    good = last_good(adoption.project)
     run, _log, start = run_a9(c_world, adoption, "s28-ef-2", broken)
     W.assert_refused(run, INCOMPLETE, "the second A9, whose read of src/util.c ends short")
-    assert_nothing_left(adoption, start, run)
+    assert_last_good_kept(adoption, start, run, good)
     run, log, _start = run_a9(c_world, adoption, "s28-ef-3", code_links(REFRESH_AFTER, functions=40))
     graph = assert_read_whole(adoption, run, log, "the third A9 after a failed refresh")
     assert_refreshed_only_the_changed(log, graph, "the refresh after a failed one")
