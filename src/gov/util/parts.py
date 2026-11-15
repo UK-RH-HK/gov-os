@@ -38,20 +38,46 @@ class PolicyError(Exception):
     (fail closed).  The text is fixed: it carries nothing of a file."""
 
 
+_LOADERS: dict = {}  # the duplicate-key Loader made once for each base class
+
+
+def _unique_loader(yaml, base):
+    """*base* (SafeLoader, or libyaml's CSafeLoader) refusing a mapping with
+    a key written twice."""
+    loader = _LOADERS.get(base)
+    if loader is None:
+        class Loader(base):
+            def construct_mapping(self, node, deep=False):
+                mapping = super().construct_mapping(node, deep=deep)
+                if len(mapping) != len(node.value):
+                    raise yaml.constructor.ConstructorError(
+                        None, None, "a key is written twice", node.start_mark)
+                return mapping
+        loader = _LOADERS[base] = Loader
+    return loader
+
+
 def load_yaml_unique(stream):
     """yaml.safe_load that refuses a mapping with a key written twice:
-    a reader that kept the last value would drop the first without a word."""
+    a reader that kept the last value would drop the first without a word.
+
+    W2-111 (DEC-1187): parsed by libyaml's CSafeLoader when it is installed
+    (SafeLoader's own constructor and resolver over the C parser; the
+    pure-Python parser took most of a guard call).  On any error of that
+    parse the pure-Python SafeLoader runs on the same text, so a refusal
+    (a key written twice, a YAML error) and its text are SafeLoader's.  A
+    stream is read first."""
     import yaml
 
-    class Loader(yaml.SafeLoader):
-        def construct_mapping(self, node, deep=False):
-            mapping = super().construct_mapping(node, deep=deep)
-            if len(mapping) != len(node.value):
-                raise yaml.constructor.ConstructorError(
-                    None, None, "a key is written twice", node.start_mark)
-            return mapping
-
-    return yaml.load(stream, Loader=Loader)
+    if hasattr(stream, "read"):
+        stream = stream.read()
+    fast = getattr(yaml, "CSafeLoader", None)
+    if fast is not None:
+        try:
+            return yaml.load(stream, Loader=_unique_loader(yaml, fast))
+        except Exception:
+            pass  # SafeLoader's own answer, or its own error, below
+    return yaml.load(stream, Loader=_unique_loader(yaml, yaml.SafeLoader))
 
 
 class _Glob:
@@ -329,11 +355,27 @@ def evaluation_sets(root: str) -> dict:
         end = next((j for j in range(at[0] + 1, len(lines))
                     if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
         text = "".join(lines[at[0]:end])
-    try:
-        data = load_yaml_unique(text)
-    except Exception:
-        raise PolicyError(f"{PATH_MAP_REL} cannot be read") from None
-    block = data.get(SETS_KEY, {}) if isinstance(data, dict) else None
-    if not isinstance(block, dict):
-        raise PolicyError(f"{PATH_MAP_REL}: {SETS_KEY} is not a map of sets")
-    return block
+    # W2-111 (DEC-1187): parsed once in the process for the same file and
+    # text; a changed text is parsed again, and a text that refuses is not
+    # kept (it refuses each time).  Each caller gets its own copy.
+    key = (path, text)
+    block = _SETS_PARSED.get(key)
+    if block is None:
+        try:
+            data = load_yaml_unique(text)
+        except Exception:
+            raise PolicyError(f"{PATH_MAP_REL} cannot be read") from None
+        block = data.get(SETS_KEY, {}) if isinstance(data, dict) else None
+        if not isinstance(block, dict):
+            raise PolicyError(f"{PATH_MAP_REL}: {SETS_KEY} is not a map of sets")
+        if len(_SETS_PARSED) >= _MOST_KEPT:
+            _SETS_PARSED.clear()
+        _SETS_PARSED[key] = block
+    import copy
+    return copy.deepcopy(block)
+
+
+# W2-111 (DEC-1187): the evaluation sets parsed in this process, by the path
+# map's path and the text parsed; in memory only, never on disk.
+_SETS_PARSED: dict = {}
+_MOST_KEPT = 16
