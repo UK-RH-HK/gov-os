@@ -31,7 +31,8 @@ FACTS_SCHEMA = REPO / "template/governance/kernel/schemas/facts.schema.json"
 FACTS_REL = "governance/project/facts.yaml"
 TEMPLATES_REL = "template/governance/kernel/templates"
 
-BASE_COMMIT = "f2b1d38af"  # the base this ticket branches from (F2)
+BASE_COMMIT = "f2b1d38af"  # the base this ticket first branched from (F2): commits since it are searched by trailer
+TICKET_ID = "DAEO-zmo4"  # the trailer ``Task: <id>`` of this ticket's own commits (F2)
 TIMEOUT = 90
 
 # One fixed, distinctive folder name for every fixture repository: the facts file must not name it (S5).

@@ -70,11 +70,17 @@ test (`conftest.py` puts its `src/` first).
   `BRIEF_FACTS_MISSING`; `gov brief lead <ticket> --run build` is refused `BRIEF_NOT_READY` with a `PLACEHOLDER_LEFT`
   finding naming `UNSET_LEAD_VERIFY`. A repository with its own facts file (valid or not) keeps it byte-identical and gets
   `written: false`.
-- **Untouched (F2).** `git diff --name-only f2b1d38af HEAD` (plus tracked changes and `git status`) of the tree under
-  test names no file under `src/gov/brief/`, `template/governance/kernel/templates/` or
+- **Untouched (F2).** The files this ticket's own change names (the files of its own commits since `f2b1d38af`, found by
+  `git log --no-merges --name-only --grep='^Task: DAEO-zmo4$' f2b1d38af..HEAD`, any role; plus tracked changes against
+  `HEAD` and `git status`) under test include no file under `src/gov/brief/`, `template/governance/kernel/templates/` or
   `template/governance/kernel/schemas/`, and none of `src/gov/adopt/stages.py` or `tests/acceptance/W2-152/` (lead
-  decision L9). The base is `f2b1d38af`; `W2_174_BASE` names another when the CTO has merged a moved integrate into the
-  branch. The cases skip, with the reason, only when the tree is not a git checkout or the base commit is not in it.
+  decision L9). **Chosen (batch 3): the ticket's own commits by their `Task:` trailer, not a fixed base**, because a
+  fixed base also names every file other tickets changed since it (W2-88's `src/gov/adopt/stages.py`, integrated before
+  this reopen), both in the ticket branch and, worse, when the merge queue runs the folder on the ticket merged into
+  `w2/integrate`; the trailer judges this ticket's change alone in both places, and the merge commit names nothing.
+  `W2_174_BASE` still works as an override: set, the cases judge `git diff --name-only <base> HEAD` (plus tracked changes
+  and `git status`) as before. The cases skip, with the reason, only when the tree is not a git checkout or the base
+  commit is not in it.
   **`tests/acceptance/W2-152` must still pass unchanged: the lead runs it** (`gov accept W2-152`); it is not rerun here.
 - **Scope (F3).** A decoy file outside `.tickets/` (README, register, code, facts file, notes) and decoys beside the
   answers file are byte-identical after list and apply, through the CLI and the function, and `.tickets/` holds the same
@@ -147,9 +153,10 @@ commits and the tree `W2-174` were not read. The cases are in `test_w2_174_field
   characters of `[a-z0-9]`, which the old ids did not meet.
 - `test_w2_174_scope.py`: `_stray_opens` also counts as allowed a read under the kernel's schema folders (L15: the pass reads
   the schema shipped with gov); nothing else of that case changed.
-- **`test_f2_the_adoption_stages_and_w2_152s_acceptance_folder_are_unchanged` fails at the branch's base `aa717e110`** as it
-  did before this pass: its base `f2b1d38af` is older than the integrated `src/gov/adopt/stages.py` change (W2-88 S26).
-  Run with `W2_174_BASE=aa717e110`, as the README's F2 paragraph allows, it is green. Nothing was changed there.
+- **F2 no longer judges a stale base (batch 3).** `test_f2_the_adoption_stages_and_w2_152s_acceptance_folder_are_unchanged`
+  failed at the ticket's head because its base `f2b1d38af` is older than the integrated `src/gov/adopt/stages.py`
+  change (W2-88 S26). Both F2 cases now judge this ticket's own commits (see the F2 paragraph above) and are green with no
+  variable set; `W2_174_BASE` remains an override.
 
 ## Readings of the interface where it is silent (the implementation may differ in these only where noted)
 
@@ -269,8 +276,8 @@ commits and the tree `W2-174` were not read. The cases are in `test_w2_174_field
 | F1 | `test_w2_174_checks.py::test_f1_a_ticket_the_answers_file_does_not_name_is_never_edited` | red | `gov adopt --verify-list` / `--verify-apply` are not flags: exit 2, `unrecognized arguments` |
 | F1 | `test_w2_174_checks.py::test_f1_the_function_never_edits_an_unnamed_ticket_either` | red | src/gov/adopt/verify_pass.py is missing (`gov.adopt.verify_pass` does not import) |
 | F1 | `test_w2_174_checks.py::test_f1_no_ticket_is_marked_while_a_line_of_it_lacks_a_verify` | red | `gov adopt --verify-list` / `--verify-apply` are not flags: exit 2, `unrecognized arguments` |
-| F2 | `test_w2_174_scope.py::test_f2_the_diff_against_the_base_names_no_file_of_gov_brief_the_templates_or_the_schemas` | green | a guard: the base's own diff is empty (the tree under test, not integrate, is what it checks) |
-| F2 | `test_w2_174_scope.py::test_f2_the_adoption_stages_and_w2_152s_acceptance_folder_are_unchanged` | green | a guard: the base's own diff is empty (the tree under test, not integrate, is what it checks) |
+| F2 | `test_w2_174_scope.py::test_f2_the_diff_against_the_base_names_no_file_of_gov_brief_the_templates_or_the_schemas` | green | a guard: this ticket's own commits (by trailer) and uncommitted changes name no guarded file |
+| F2 | `test_w2_174_scope.py::test_f2_the_adoption_stages_and_w2_152s_acceptance_folder_are_unchanged` | green | a guard: this ticket's own commits (by trailer) and uncommitted changes name no guarded file |
 | F3 | `test_w2_174_scope.py::test_f3_a_decoy_outside_tickets_is_byte_identical_after_list_and_apply_cli` | red | `gov adopt --verify-list` / `--verify-apply` are not flags: exit 2, `unrecognized arguments` |
 | F3 | `test_w2_174_scope.py::test_f3_a_decoy_outside_tickets_is_byte_identical_after_list_and_apply_function` | red | src/gov/adopt/verify_pass.py is missing (`gov.adopt.verify_pass` does not import) |
 | F3 | `test_w2_174_scope.py::test_f3_the_module_imports_no_network_or_model_package` | red | src/gov/adopt/verify_pass.py is missing |
@@ -407,4 +414,4 @@ commits and the tree `W2-174` were not read. The cases are in `test_w2_174_field
 
 Cases per KPI line: S1 9, S2 15, S3 2, S4 36, S5 12, F1 15, F2 2, F3 5 (+1 L15), S6 11, S7 96, F4 20 (a case naming two lines counts for both).
 
-On base for S1 to S5 and F1 to F3: the first pass's rows say red for that pass's base. At `aa717e110` those cases are green (the first ticket's code is integrated) except the five S1 list cases above and the F2 stages case (see above). The 128 cases of the second pass are red at `aa717e110`, 0 green.
+On base for S1 to S5 and F1 to F3: the first pass's rows say red for that pass's base. At `aa717e110` those cases are green (the first ticket's code is integrated) except the five S1 list cases above. The 128 cases of the second pass are red at `aa717e110`, 0 green.
