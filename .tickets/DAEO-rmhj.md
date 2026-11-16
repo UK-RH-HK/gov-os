@@ -1,6 +1,6 @@
 ---
 id: DAEO-rmhj
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-f58b, DAEO-0pyc]
 created: 2026-11-07T15:48:35Z
