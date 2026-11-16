@@ -2,15 +2,19 @@
 
 `live-hook.diff` is a diff of `.claude/hooks/` against the bytes applied by ACT-GUARD-FIX-6:
 `pretooluse.py` `9b4228ea095a`, `bash_writes.py` `f03f9ac3e431` and `role_reads.py` `5407aade9417`. The ticket
-never writes `.claude/`; the CTO builds the ACT from this file. After the diff (r5, with rv-3's F1 fixed):
-`pretooluse.py` `101bee39d5c9`, `role_reads.py` `543cf1b26701` and `bash_writes.py` unchanged (`f03f9ac3e431`).
-The r5 copy before F1 was `665614961cd0`; only the YAML loader changed since.
+never writes `.claude/`; the CTO builds the ACT from this file. After the diff (r5, with rv-3's F1 fixed and
+P-W2-111-YAML-REST's two role_reads reads): `pretooluse.py` `101bee39d5c9`, `role_reads.py` `02a782e31145` and
+`bash_writes.py` unchanged (`f03f9ac3e431`). The r5 copy before F1 was `665614961cd0`; only the YAML loader changed
+since. The F1 copy's `role_reads.py` was `543cf1b26701`; P-W2-111-YAML-REST changed only `role_reads.py` (its
+`pretooluse.py` part of the diff is byte-identical).
 
 Apply it to a clean copy, from the folder that holds `.claude/`: `git apply live-hook.diff` (or `patch -p1 <
 live-hook.diff`). The engineer checked it on fresh copies of the live repository's three applied files (`9b4228ea095a`,
 `f03f9ac3e431`, `5407aade9417`). `git apply --check -v` exited 0 ("Checking patch .claude/hooks/pretooluse.py...",
 "Checking patch .claude/hooks/role_reads.py..."). `git apply` applied cleanly, and the result was byte-identical to
-the measured copy (`101bee39d5c9`).
+the measured copy (`101bee39d5c9`). Checked again for P-W2-111-YAML-REST on fresh copies of the live repository's
+applied files: `git apply --check -v` exited 0 (the same two lines), and the applied result hashes `101bee39d5c9`,
+`02a782e31145` and `f03f9ac3e431`.
 
 **Follow-ups for the ACT (outside this ticket's paths):**
 - `tests/unit/guard/test_w2_141_search.py::test_the_staged_pretooluse_adds_only_glob_to_g14s_tools` checks that
@@ -25,8 +29,9 @@ the measured copy (`101bee39d5c9`).
 ## What changes, and why no decision can change
 
 Line ranges are before → after: pretooluse.py 9b4228ea095a → 101bee39d5c9, role_reads.py 5407aade9417 →
-543cf1b26701. r5's F1 fix added 24 lines in the YAML loader, so every pretooluse.py range after line 316 moved down
-by 24 from the 665614961cd0 copy.
+02a782e31145. r5's F1 fix added 24 lines in the YAML loader, so every pretooluse.py range after line 316 moved down
+by 24 from the 665614961cd0 copy. P-W2-111-YAML-REST added 19 lines to role_reads.py before its `_realpaths`, so
+its ranges from there on moved down by 19 from the 543cf1b26701 copy.
 
 | function | lines before → after | what | why the decision is the same | hook-local until 0.1.1 |
 |---|---|---|---|---|
@@ -38,13 +43,53 @@ by 24 from the 665614961cd0 copy.
 | `classes` → `tree_part`, `tree_parts` (new) | 764-1233 → 901-1425 (new 1376-1421, 1431-1434) | Makes each tree's hidden part (the judge's `_Part`, and `Narrow`) when a path at, in or above the tree is judged. This is S8's rule, as r4's `gov.guard.reads._TreePart`. | Every answer is the part's own. A path not below the root is in no part of the tree (`rel()` is None, `match(None)` is False). A path not at, in or above the root is at or above none of its literal folders (each at or below the root). `below()` keeps the part's own first test. `held`, `files` and `match` make the part. `getattr(part, "wbs", None)` stays None without making it (no `__getattr__`). The globs are the evaluation sets' and the block's, already checked as text paths (`_paths_ok`), so making a part cannot raise: making it later turns no refusal into an allow. | `TreePart` of `_Part` could be 0.1.1's `_TreePart`; `TreeNarrow` stays (Narrow is the hook's) |
 | `main` | 1386-1545 → 1658-1819 | Calls `use_fast_yaml()`, builds `TreePart`/`TreeNarrow` instead of `_Part`/`Narrow` per tree, and uses the hook's own `has_install`. | As the rows above. | — |
 | `_path_folders`, `has_install` (new) | — → 1559-1622 | The install check with PATH's real folders read only when a download names a target, once per PATH value (S7, r4's `install.py` 143-211). | It is r4's `has_install`, line for line, over the pinned module's own helpers (`_segments`, `_split`, `_head`, `_PKG`, `_SH`, `_uv_install`, `_download_target`: identical in 0.1.0 and 0.1.1). It gives the same answer for every command (r4's review). When the pinned gov has `_path_folders` (0.1.1 on), the product's own is called. | yes |
-| role_reads `_realpaths` (new), `Judge.trees` | — → 439-461; 443-453 → 468-478 | `trees()` resolves its ~140 trees with shared folders resolved once. | The same code as `realpaths` above (checked equal on the same 633 paths). | no |
+| role_reads `_realpaths` (new), `Judge.trees` | — → 458-480; 443-453 → 487-497 | `trees()` resolves its ~140 trees with shared folders resolved once. | The same code as `realpaths` above (checked equal on the same 633 paths). | no |
+| role_reads `load_yaml` (new), `section` | — → 95-109; 95-119 → 112-136 | P-W2-111-YAML-REST (a): the path map's `role_paths:` block is parsed by `load_yaml`: libyaml's `CSafeLoader` only for a text with no tab, no `?` and no BOM after its first character (`libyaml_reads_as_python`'s rule, word for word); any other text, and any text whose libyaml parse raises (no libyaml too), by the pure-Python SafeLoader. Before, `CSafeLoader` read every block. | For every block libyaml is given, its answer is the pure loader's (the equality and fuzz below), so a well-formed block gives the same section. A block the pure loader refuses (a tab as a separator, a `?` in a flow item) now raises `role_paths cannot be read`, the refusal the block's YAML error always gave: a fail-open closed (libyaml read it and the hook decided from it). | yes: 0.1.1's `gov.util.parts.load_yaml` and `gov.util.role_paths.section` |
+| role_reads `ticket_front` | 149-174 → 166-193 | P-W2-111-YAML-REST (a) and -FRONT (a): the session ticket's front matter is parsed by `load_yaml`; front matter the pure loader refuses raises `ValueError("the session's ticket file cannot be read: its front matter is not YAML (fail closed, P-W2-111-YAML-REST-FRONT (a))")`. Before, `CSafeLoader` read it, and a front that could not be parsed gave `{}`. | Well-formed front matter gives the same dict. No front matter (`""`), a comment only, no ticket: `{}` as before. Only front matter the pure loader refuses changes: from `{}` (or libyaml's reading) to a refusal. An empty front handed a test designer the engineer's code (no `{ticket_impl}` paths): a fail-open closed. The top-level handler refuses with `could not decide: …` (exit 2). The text names no path (DEC-820). | yes: 0.1.1's `gov.util.role_paths.ticket_front` raises `RolePathsError` |
+| role_reads `judges` | 843-864 → 888-912 | Reads `ticket_front` for every role whose globs name the ticket (`{ticket_…}`), not only for `{ticket_impl}`; the front is kept for `{ticket_impl}` only, as before. | For well-formed front matter the value read is dropped for a `{ticket_tests}`-only role, so `front`, `allowed`, `names`, `wbs` and the links are what they were. Without it, a malformed front would reach `_links_unless_coordination`, whose catch-all turns a ticket that cannot be read into "no links" (the own folder only): the engineer's linked tests in other tickets' folders would open. Now it refuses first. It also closes, for the engineer and the designer, the pinned 0.1.0 `parts._front` that still reads the front with libyaml until 0.1.1. Cost: one read and libyaml parse of the ticket's front per role-checked call (see the measure). | yes: 0.1.1's `gov.util.role_paths.judges` |
 
 Fails closed, as before: any error in the new code (an import, a YAML error, a key written twice, a part that cannot
 be walked) raises inside `main()`, and the top-level handler refuses with the same `could not decide: …` text.
 No cache is written to disk. The per-run memos are dicts inside the one hook process.
 
 ## Proof that no decision changed (F4)
+
+**r5, P-W2-111-YAML-REST (the copy `101bee39d5c9` / `02a782e31145`, and the product at `1e455d6d57ce`):** the
+product's `role_paths.section`, `role_paths.ticket_front` and `parts._front` read through `gov.util.parts.load_yaml`,
+and the live hook's `role_reads.section` and `role_reads.ticket_front` through its copy (rows above).
+
+- **The rule, equality:** every ticket front matter of the live repository and this tree (258 distinct texts, 250 of
+  them handed to libyaml; the other 8 hold a `?`, a tab or a later BOM) and every `role_paths:` block of both path maps
+  and the planted ones (6 texts): **0 differences** from the pure SafeLoader, product and hook copy alike (same data,
+  or the same refusal with the same text).
+- **The rule, fuzz:** 24,000 mutated texts (block and front-matter seeds; 12,000 inserting tabs, `?`, `? `, BOMs,
+  colons and line breaks, 12,000 over a wider alphabet: flow and block indicators, quotes, anchors, aliases, tags,
+  merge keys, NUL and control characters, NEL, LS, `￾`, CR). 8,394 were handed to libyaml. **0 differences** from the
+  pure loader, product and hook copy. Raw libyaml without the rule differed on 15,645 (its data or its refusal's text).
+- **The product corpus:** the committed 1,190 kept calls plus every `decide` call recorded while `tests/unit/guard/`,
+  the role_paths unit suites and the acceptance suites of W2-13, W2-141, W2-148, W2-150, W1-46, W2-59, W1-02, W1-05,
+  W2-57 and W2-42a ran: 3,782 distinct calls, replayed on `test_w2_111_plant`'s repository for 4 roles (15,128 answers
+  of `decide`, `policy_refusal` and `has_install`) under the base (`803a1af1d2c8`) and the head (`1e455d6d57ce`):
+  **0 differences** (7,108 refused, 2,156 by the read rules, 40 installs, on both).
+- **The role filter:** `role_paths.caller` for each of the live repository's 250 tickets × engineer and test designer
+  (the live map's block, the live tickets, the links stubbed): 500 answers, **identical** on base and head (466
+  filters, 34 none, 0 refused).
+- **The live-hook corpus:** the same 3,782 calls through the applied copy and the patched copy (`101bee39d5c9`,
+  `02a782e31145`) as processes, in the settings.json form (the pinned interpreter, `-E`: configuration A), paired per
+  call, for the engineer and the test designer. The plant's path map was given the live repository's `role_paths`,
+  `sets_root_hidden`, `session_hidden` and `write_refused` blocks, plus a held-out list. Of 7,564 decisions there are
+  **0 differences** in exit code, decision, reason and stderr: 5,966 allowed, 1,590 denied and 8 refused by exit 2 on
+  both copies (1,636 s).
+- **The fail-opens closed (malformed input only):** each planted text libyaml reads and the pure loader refuses: in
+  the product, `section` refuses as the pure loader does; `ticket_front` and so `caller` refuse (designer and
+  engineer); `parts._front` gives the line reader's answer as with libyaml absent (a quoted `wbs_id` refuses with the
+  ticket fault). Through the hook as processes, on the corpus plant: the five planted fronts (a tab inside, after an
+  entry and after the key, a `?` in a flow item, a BOM after a line break) and four planted `role_paths:` blocks (a
+  tab inside and after an entry, after the key, a `?` in a flow item), each on three calls (Read of an ordinary file,
+  Read of code, `ls`) for the engineer and the test designer: 54 pairs, every one **allowed by the applied copy and
+  refused by the patched copy** (exit 2, `could not decide: the session's ticket file cannot be read: its front matter
+  is not YAML …` or `could not decide: governance/project/path-map.yaml: role_paths cannot be read`). These are the only
+  decisions that change: fail-opens closed. `tests/unit/guard/test_w2_111_yaml_rest.py` keeps one case of each.
 
 **r5, rv-3's F1 (the copy `101bee39d5c9` and the product's `parts.load_yaml_unique`):**
 
@@ -87,6 +132,27 @@ No cache is written to disk. The per-run memos are dicts inside the one hook pro
   in no git tree, and that case uses the hook's own tree.
 
 ## Measured (S10, S9): measure.py's method, paired, the live repository
+
+**r5, after P-W2-111-YAML-REST (the copy `101bee39d5c9` / `02a782e31145`), a quick check of 5 cases:** the same
+method: before (the live repository's applied hooks, copied) and after (a clean copy with this diff applied)
+alternating per sample in the same run, each call with its own reference, the live repository, the recorded 46-entry
+session PATH, quiet (load 3.5-2.5). Every case is within 100 ms with the same decision, in the first round; the live
+repository's `git status --short` was the same before and after.
+
+| case | before judged | after judged | drop | ref median b/a | CPU p95 b/a | wall p95 b/a | decision | load |
+|---|---|---|---|---|---|---|---|---|
+| W1-05 Read-engineer | 77.8 | 58.7 | 19.1 | 15.0/14.9 | 92.7/73.5 | 91.3/72.7 | allow → allow | 3.5-3.3 |
+| W1-05 Write-engineer | 79.6 | 63.9 | 15.7 | 15.2/15.2 | 94.8/79.2 | 88.2/73.7 | allow → allow | 3.1-2.9 |
+| W2-57 test-designer Read ordinary | 84.5 | 71.3 | 13.2 | 15.6/15.6 | 100.1/86.9 | 100.1/86.7 | allow → allow | 2.9-2.9 |
+| Bash ls (engineer) | 86.9 | 65.5 | 21.5 | 15.0/15.1 | 101.9/80.5 | 152.3/78.6 | allow → allow | 2.9-2.6 |
+| Bash pipeline (engineer) | 93.0 | 68.6 | 24.3 | 15.2/15.4 | 108.1/84.0 | 158.0/78.4 | allow → allow | 2.6-2.5 |
+
+The engineer's role-checked calls now also read and parse the session ticket's front matter (`judges`, row above):
+the live ticket's front holds no tab, `?` or BOM, so libyaml parses it. Against the F1 copy's run (a different run,
+one round each): Read-engineer 58.7 (61.1), Write-engineer 63.9 (65.5), Bash ls 65.5 (71.6), Bash pipeline 68.6
+(67.5), and the test designer's Read 71.3 (63.4). The designer's path read and parsed the front before this change
+too (`{ticket_impl}`); its only change is the parser choice, libyaml for this front as before. Its 7.9 ms rise is
+not explained by the code; its paired before figure rose too (84.5 against 78.1).
 
 **r5, after F1 (the copy `101bee39d5c9`), a quick check of 5 cases:** measure.py's method, before (the live
 repository's applied hooks) and after (a clean copy with this diff applied) alternating per sample in the same run,
