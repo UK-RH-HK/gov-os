@@ -400,3 +400,4 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 245 | DEC-1192 (1): the owner's operator copies the templates into the seven adopted repositories; the CTO resumes the sessions at A5 | IN PROGRESS: the operator runs it |
 | 246 | DEC-1192 (2): W2-153 reopened (S-adopted: gov adapters generate writes .claude/templates/ in an adopted repository; gov doctor names a missing copy), then release 0.1.1 | IN PROGRESS: next: the W2-153 lead brief |
 | 247 | DEC-1193: the job runner's summary-only mode (before its install); the owner writes ~/.config/gov-os/sets-root | IN PROGRESS: the runner's builder adds the mode |
+| 248 | DEC-1194: the operator runs operator_f016.py in EXAMIN; the CTO resumes the EXAMIN CTO at A5 | IN PROGRESS: the operator runs it |

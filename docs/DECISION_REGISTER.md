@@ -15273,6 +15273,12 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 ~00:45: "sets-root: yes: I write ~/.config/gov-os/sets-root once. A job that reads it returns only counts and ids, its full output stays in the operator's log, and only its summary reaches you."
 - **Governing sources:** DEC-1191 (2); DEC-820 (d); DEC-1082 (3).
 
+### DEC-1194 — P-W2-27-F016 (a): EXAMIN's three command files' description values quoted by the owner's commit, so gov launch can read them
+- **Status:** ACCEPTED (owner, 2026-11-16 ~01:05, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1188 (1), DEC-1190, DEC-1184 (4)
+- **Decision:** the owner's operator runs `operator_f016.py` (sha256 abb427a1…): in EXAMIN's copy, `.claude/commands/approve.md`, `impact.md` and `reject.md` each change in one line, the `description:` value quoted with its text unchanged (front matter only), one owner commit (`Role: owner`, `Task: W2-27`). Then the EXAMIN CTO is resumed at A5. The product finding (the launcher refuses a whole launch for one unreadable command file, and `--plan` does not run that check) goes to the W2-27 product findings package.
+- **Basis:** the owner's message of 2026-11-16 ~01:05: "P-W2-27-F016 (a)."
+- **Governing sources:** package `packages/P-W2-27-F016.md` (13a25081b); EXAMIN's F-016, F-007.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15401,3 +15407,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.572 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1191 (P-SESSIONS-1: adopting sessions headless; one operator job runner for everything the owner approves, (O) ACTs and the re-pin included; the sentinel's inbox rule by ACT). Next free id: DEC-1192. |
 | 0.573 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1192 (P-ADOPT-TEMPLATES (a): the role templates by the owner's operator tonight; W2-153 reopened for gov adapters generate to write them, in 0.1.1). Next free id: DEC-1193. |
 | 0.574 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1193 (the sets-root file; summary-only operator jobs for hidden-set steps). Next free id: DEC-1194. |
+| 0.575 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1194 (P-W2-27-F016 (a): EXAMIN's three command front matters quoted by the owner's commit). Next free id: DEC-1195. |
