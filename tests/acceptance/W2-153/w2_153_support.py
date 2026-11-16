@@ -419,6 +419,18 @@ class DispatchBed:
         self.home_cli = stub_cli(self.home / ".local" / "bin" / "claude")
         # DEC-1133 (3): the lead line checks the resource gate and registers the lead with gov; here the gate is open
         write(self.home / ".local" / "bin" / "gov", "#!/usr/bin/env bash\nexit 0\n").chmod(0o755)
+        # DEC-1207 (b): a lead may start inside the owner's pinned box (``~/.gov-os-owner/box``, held-out pin
+        # ``~/.gov-os-owner/heldout``); here a stand-in pinned box: it records its own arguments (one per line) to the
+        # file its ``.record`` pointer names, then runs the command after its first ``--`` with exec
+        self.box = write(self.home / ".gov-os-owner" / "box" / "session_start.sh", (
+            "#!/usr/bin/env bash\n"
+            'rec=$(cat "$0.record")\n'
+            "printf '%s\\n' \"$@\" > \"$rec\"\n"
+            'while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do shift; done\n'
+            "shift\n"
+            'exec "$@"\n'))
+        self.box.chmod(0o755)
+        write(self.home / ".gov-os-owner" / "heldout" / "MAP", "")
         self._runs = 0
 
     def expected_path(self) -> str:
@@ -439,11 +451,14 @@ class DispatchBed:
         record = self.base / f"calls-{self._runs}.jsonl"
         for stub in (self.cli, self.home_cli):
             point_record(stub, record)
+        box_record = self.base / f"box-{self._runs}.txt"
+        write(self.box.with_name(self.box.name + ".record"), str(box_record))
         env = {"PATH": f"{self.bin}:{SAFE_PATH}", "HOME": str(self.home), "TMPDIR": str(self.base), "LC_ALL": "C"}
         done = subprocess.run(["bash", str(script), DISPATCH_W2, DISPATCH_TICKET, "brief.md", f"out-{self._runs}.json"],
                               cwd=str(self.base), env=env, capture_output=True, text=True,
                               timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
-        return {"exit": done.returncode, "stderr": done.stderr, "calls": read_calls(record)}
+        box_args = box_record.read_text(encoding="utf-8").splitlines() if box_record.exists() else []
+        return {"exit": done.returncode, "stderr": done.stderr, "calls": read_calls(record), "box": box_args}
 
 
 def current_dispatch_script() -> str:
