@@ -1,6 +1,6 @@
 ---
 id: DAEO-rd0g
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-r9ss, DAEO-zqvn, DAEO-kl5e, DAEO-h2k3]
 links: []
 created: 2026-10-16T16:35:11Z
