@@ -1,6 +1,6 @@
 ---
 id: DAEO-5rgj
-status: open
+status: deferred
 deps: [DAEO-cb2b]
 links: [DAEO-cb2b]
 created: 2026-11-12T01:50:00Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-121c
-tags: [wave-2, dispatch, full, wave-3, deferred]
+tags: [dispatch, full, wave-3, deferred]
 wbs_id: W2-121c
 title: "gov dispatch, part c: health: heavy-job slots, the embedding servers health and GPU state, the busy-core band, overnight server errors, heartbeat alerts"
 class: implementation
@@ -50,3 +50,5 @@ Parked in docs/plan/WAVE_3_PARKING.md as W3-P33: filed or split by the CTO witho
 ## Its first KPI line moved to W2-121b (the owner, DEC-1144 (5), P1-E option 1, 2026-11-12)
 
 "Every heavy step takes a heavy-job slot ..." moved word for word into W2-121b (DAEO-ifgf), so K9's dispatcher is parts a and b. This part stays parked (W3-P33) with its other lines.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-121c leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.

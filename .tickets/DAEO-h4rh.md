@@ -1,6 +1,6 @@
 ---
 id: DAEO-h4rh
-status: open
+status: moved
 deps: [DAEO-pg6i, DAEO-wahn, DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm, DAEO-03ub, DAEO-f58b, DAEO-2tfd, DAEO-8s85, DAEO-ozyt]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: orchestrator
 external-ref: W2-27
-tags: [wave-2, integration, full]
+tags: [integration, full, examin-wave0]
 wbs_id: W2-27
 title: EXAMIN adoption on a copy
 class: integration
@@ -176,3 +176,5 @@ W2-115's close takes as its green base only a full close's record or a green nig
 W2-27's adoption runs on EXAMIN's copy `~/gov-os-workbench/examin` at `0a82082495f52df068c3c6b518969b419f02fe95` (the one commit of its 46 uncommitted entries, made on the owner's word at 10:45; the copy is clean at it), through a launch clone under `~/gov-os-runs/` as W2-94's was; the same commit EXAMIN's question set was written on (W2-94's run `20261112T185806Z-examin-r1`, scaffold commit `48459935c435` whose only parent it is, `COPY-HEAD.txt` holding it). A different commit of the copy needs the owner's word and a new question set.
 
 - **The owner's cut (2026-11-13, DEC-1167, DEC-946 (7)):** W2-60b, W2-156, W2-93, W2-94 and W2-174 are off W2-27's start: W2-94, W2-174 and W2-93 move to W2-28's deps, W2-156 to W2-29's, W2-60b to after the copy starts.
+
+**Moved out of Wave 2 2026-11-16 by the owner (DEC-1201 (4)):** W2-27 is EXAMIN's adoption or refactor work, so it becomes part of EXAMIN's Wave 0, filed by the EXAMIN CTO in the clone once its plan is approved (DEC-1199 (1), DEC-1200); Wave 2 keeps only Gov OS's own work. Status `moved`, tag `wave-2` removed; not closed and not done here.

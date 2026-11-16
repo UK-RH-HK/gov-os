@@ -1,6 +1,6 @@
 ---
 id: DAEO-yadm
-status: open
+status: deferred
 deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-34
-tags: [wave-2, implementation, standard, wave-3, deferred]
+tags: [implementation, standard, wave-3, deferred]
 wbs_id: W2-34
 title: gov readiness --generate
 class: implementation
@@ -85,3 +85,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-34), as approved (DEC-729). The list row
   - The bridge checks the role against the roster [W2-M082].
 
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-34 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
