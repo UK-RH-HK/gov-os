@@ -19,6 +19,7 @@ allowed_paths:
 - src/gov/close/select.py
 - src/gov/close/batch.py
 - tests/unit/close/test_w2_191*
+- src/gov/close/command.py
 reads:
 - template/governance/kernel/schemas/test-map.schema.json
 - src/gov/close/**
@@ -60,3 +61,5 @@ a target that escapes the project or does not exist; the selection reads such ta
 the lead brings its new bytes as a CIT-P for the owner before any merge. For release 0.1.2.
 
 **Started now** on the owner's line of 2026-11-16 14:5x ("Launch leads now for the two new tickets … nothing blocks building them"); it lands in 0.1.2.
+
+**Path case 2026-11-16 15:2x (P-W2-191-1 (b); the CTO, DEC-1156 (7); listed for the owner's reading):** the tests run returned DONE (27 cases, 17 red, 10 guards, 045e10bd8). For S2's strict and reused close to run an outside target (0.1.2 is EXAMIN's release; a strict close there must not silently skip its suites), the ticket gains `src/gov/close/command.py` (`_scope_form`: the run line names outside targets), and an independent test designer adds one acceptance case for it.
