@@ -15274,9 +15274,9 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** DEC-1191 (2); DEC-820 (d); DEC-1082 (3).
 
 ### DEC-1194 — P-W2-27-F016 (a): EXAMIN's three command files' description values quoted by the owner's commit, so gov launch can read them
-- **Status:** ACCEPTED (owner, 2026-11-16 ~01:05, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1188 (1), DEC-1190, DEC-1184 (4)
+- **Status:** ACCEPTED (owner, 2026-11-16 ~00:58, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1188 (1), DEC-1190, DEC-1184 (4)
 - **Decision:** the owner's operator runs `operator_f016.py` (sha256 abb427a1…): in EXAMIN's copy, `.claude/commands/approve.md`, `impact.md` and `reject.md` each change in one line, the `description:` value quoted with its text unchanged (front matter only), one owner commit (`Role: owner`, `Task: W2-27`). Then the EXAMIN CTO is resumed at A5. The product finding (the launcher refuses a whole launch for one unreadable command file, and `--plan` does not run that check) goes to the W2-27 product findings package.
-- **Basis:** the owner's message of 2026-11-16 ~01:05: "P-W2-27-F016 (a)."
+- **Basis:** the owner's message of 2026-11-16 ~00:58: "P-W2-27-F016 (a)."
 - **Governing sources:** package `packages/P-W2-27-F016.md` (13a25081b); EXAMIN's F-016, F-007.
 
 | Version | Date | Change |
