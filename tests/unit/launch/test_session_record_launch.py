@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import select
 import signal
 import subprocess
 import sys
@@ -27,6 +28,7 @@ from gov.launch import launcher, session_record as sr  # noqa: E402
 from test_sessionlog_w2_60b import SECRET, Log  # noqa: E402
 
 ROLES_REL = Path("template/governance/kernel/roles")
+REAL_POPEN = subprocess.Popen  # taken before the fixture puts the stand-in in its place
 TICKET, SPEC_TICKET = "TST-a001", "TST-a002"
 WORKER = ("- **Version:** 1.0.0\n- **Launch default:** model claude-opus-5-5, effort high\n")
 
@@ -157,12 +159,32 @@ def test_an_ended_session_leaves_one_whole_record_keyed_by_its_id(project, code)
     assert SECRET not in _records(project)[0].read_text(encoding="utf-8")
 
 
+def _caller_handles(number) -> None:
+    """The caller's own disposition of ``number``: a handler, not SIG_IGN. A job a non-interactive shell starts with
+    ``&`` inherits SIGINT ignored, and the launcher keeps a signal its caller ignores ignored (W2-56), so a case that
+    needs DEC-392's ending sets the caller's handler itself (the fixture gives the original back), as test_w1_32 does."""
+    signal.signal(number, signal.default_int_handler if number == signal.SIGINT else (lambda *_: None))
+
+
 @pytest.mark.parametrize("number", launcher.END_SIGNALS, ids=lambda number: signal.Signals(number).name)
 def test_a_signalled_session_leaves_its_record_with_the_interrupt_exit(project, number):
-    Session.plan = staticmethod(lambda session: signal.raise_signal(number))
+    _caller_handles(number)
+    Session.plan = staticmethod(lambda session: signal.raise_signal(number) or 0)  # a real wait() gives an int
     assert launcher.launch(project, "engineer", TICKET, []) == launcher.INTERRUPT_EXIT
     record = _record(project)
     assert record["exit_code"] == launcher.INTERRUPT_EXIT and record["ended_at"] is not None
+
+
+@pytest.mark.parametrize("number", launcher.END_SIGNALS, ids=lambda number: signal.Signals(number).name)
+def test_a_signal_the_caller_ignores_stays_ignored_and_the_session_s_own_code_is_returned(project, number):
+    """The lead's loaded run at 2d1e751d4 (launch returned None, not 130): it ran with SIGINT ignored (a ``&`` job of a
+    non-interactive shell), so the signal never reached the launcher, and the stand-in returned raise_signal's None.
+    The launcher returns the session's own code, an int, and records it; the caller's SIG_IGN is given back."""
+    signal.signal(number, signal.SIG_IGN)
+    Session.plan = staticmethod(lambda session: signal.raise_signal(number) or 7)
+    code = launcher.launch(project, "engineer", TICKET, [])
+    assert type(code) is int and code == 7
+    assert _record(project)["exit_code"] == 7 and signal.getsignal(number) is signal.SIG_IGN
 
 
 def test_an_unwritable_record_keeps_the_exit_code_with_one_stderr_line(project, capfd):
@@ -369,6 +391,159 @@ def test_a_live_reviewer_does_not_block_a_writer(project):
 def test_a_writer_s_own_ended_record_does_not_block_the_next_launch(project):
     assert launcher.launch(project, "engineer", TICKET, []) == 0
     assert launcher.launch(project, "engineer", TICKET, []) == 0
+    assert len(_records(project)) == 2
+
+
+# -- one writer per worktree under the start lock (review round 1, F1) ---------------------------------------------
+#
+# Two ``gov launch`` processes into one worktree. Each says "L" on the events pipe as it reaches the start lock (after
+# every check made before the lock), so the test knows both have passed those checks before either can take it: with
+# ``barrier`` each then waits for the test's go, so the two contend for the lock together; with ``held`` the test
+# holds the machine-wide start lock itself (a third party, as in a fan-out) until both have said "L". The planted CLI
+# says "S <session id>" when it starts and runs until the test closes the hold pipe. Every wait is on an event (a pipe
+# or a process's end), none on a sleep, so load cannot change the outcome.
+
+LAUNCHER = """
+import os, sys
+sys.path.insert(0, {src!r})
+from gov.cli.errors import GovError
+from gov.launch import gate, launcher
+launcher._check_repository_settings = lambda *args: None
+EVENTS, GO = {events!r}, {go}
+
+def event(text):
+    fd = os.open(EVENTS, os.O_WRONLY)
+    os.write(fd, (text + "\\n").encode())
+    os.close(fd)
+
+class AtTheLock(gate.StartLock):
+    def __init__(self, *args, **kwargs):
+        event("L")
+        if GO is not None:
+            os.read(GO, 1)
+        super().__init__(*args, **kwargs)
+
+gate.StartLock = AtTheLock
+try:
+    code = launcher.launch({project!r}, {role!r}, {ticket!r}, [])
+except GovError as error:
+    sys.stderr.write(f"{{error.code}}: {{error.message}}\\n")
+    event("E refused")
+    sys.exit(1)
+event(f"E {{code}}")
+sys.exit(code)
+"""
+
+HOLDING_CLI = """
+import os, select, sys
+session = sys.argv[sys.argv.index("--session-id") + 1]
+hold = os.open({hold!r}, os.O_RDONLY | os.O_NONBLOCK)  # opened before "S": the test's close always reaches it
+fd = os.open({events!r}, os.O_WRONLY)
+os.write(fd, f"S {{session}}\\n".encode())
+os.close(fd)
+select.select([hold], [], [], 120)  # until the test closes the hold pipe (its last writer): then exit 0
+"""
+
+
+class Events:
+    """The events FIFO, read by the test. The test keeps a writer open itself, so the reader never sees an end
+    between two writers."""
+
+    def __init__(self, path: Path):
+        os.mkfifo(path)
+        self.path, self.lines, self.buffer = path, [], b""
+        self.reader = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        self.keep = os.open(path, os.O_WRONLY)
+
+    def count(self, head: str) -> int:
+        return sum(1 for line in self.lines if line.split()[0] == head)
+
+    def until(self, done, timeout: float = 120.0) -> None:
+        deadline = time.monotonic() + timeout
+        while not done(self):
+            left = deadline - time.monotonic()
+            assert left > 0, f"no such events within {timeout} s: {self.lines}"
+            ready, _, _ = select.select([self.reader], [], [], left)
+            if ready:
+                try:
+                    self.buffer += os.read(self.reader, 4096)
+                except BlockingIOError:
+                    continue
+                *whole, self.buffer = self.buffer.split(b"\n")
+                self.lines += [line.decode() for line in whole if line]
+
+    def close(self) -> None:
+        os.close(self.reader)
+        os.close(self.keep)
+
+
+def _race(project, tmp_path, roles, mode):
+    """Two launches of ``roles`` into ``project``, started together; returns (events, the launchers, their stderr)."""
+    from gov.launch import gate
+    events, hold = Events(tmp_path / "events"), tmp_path / "hold"
+    os.mkfifo(hold)
+    holder = os.open(hold, os.O_RDWR)  # the CLIs' hold pipe's only writer
+    cli = Path(os.environ["HOME"]) / launcher.CLI_REL
+    cli.write_text(f"#!{sys.executable}\n" + HOLDING_CLI.format(hold=str(hold), events=str(events.path)),
+                   encoding="utf-8")
+    cli.chmod(0o755)
+    lock = gate.StartLock() if mode == "held" else None
+    env = dict(os.environ, PYTHONPATH=str(REPO / "src"))
+    procs, gos, errs = [], [], []
+    try:
+        for index, role in enumerate(roles):
+            read_go, write_go = os.pipe() if mode == "barrier" else (None, None)
+            err = tmp_path / f"launcher-{index}.err"
+            script = LAUNCHER.format(src=str(REPO / "src"), events=str(events.path), go=read_go,
+                                     project=str(project), role=role, ticket=TICKET)
+            with open(err, "wb") as handle:
+                procs.append(REAL_POPEN([sys.executable, "-c", script], stdout=subprocess.DEVNULL,
+                                              stderr=handle, env=env, pass_fds=(read_go,) if read_go else ()))
+            if read_go is not None:
+                os.close(read_go)
+                gos.append(write_go)
+            errs.append(err)
+        events.until(lambda e: e.count("L") == 2)  # both are past every check made before the start lock
+        for write_go in gos:
+            os.write(write_go, b"g")
+        if lock is not None:
+            lock.release()
+        writers = sum(1 for role in roles if role not in sr.REVIEWERS)
+        events.until((lambda e: e.count("S") >= 1 and e.count("E") >= 1 or e.count("S") >= 2) if writers == 2
+                     else (lambda e: e.count("S") >= 2))
+    finally:
+        os.close(holder)  # every started CLI ends now
+        for write_go in gos:
+            os.close(write_go)
+        if lock is not None:
+            lock.release()
+        for proc in procs:
+            proc.wait(timeout=120)
+    events.until(lambda e: e.count("E") == 2)
+    events.close()
+    return events, procs, [err.read_text(encoding="utf-8") for err in errs]
+
+
+@pytest.mark.parametrize("mode", ("barrier", "held"))
+def test_two_writers_launched_together_start_one_cli_and_refuse_the_other_naming_it(project, tmp_path, mode):
+    """F1: of two writing launches into one worktree, started together, or waiting together on a start lock a third
+    party holds, exactly one starts its CLI. The other is refused (LAUNCH_REFUSED, non-zero exit, no CLI start, no
+    session record of its own), naming the first's session id and the worktree."""
+    events, procs, errs = _race(project, tmp_path, ("engineer", "engineer"), mode)
+    starts = [line.split()[1] for line in events.lines if line.startswith("S ")]
+    assert len(starts) == 1, (starts, errs)
+    first = starts[0]
+    codes = sorted(proc.returncode for proc in procs)
+    assert codes == [0, 1], (codes, errs)
+    refused = errs[[proc.returncode for proc in procs].index(1)]
+    assert refused.startswith("LAUNCH_REFUSED: ") and first in refused and str(project) in refused
+    assert [path.stem for path in _records(project)] == [first]
+    assert [path.stem for path in (project / ".gov-runtime" / "launches").glob("*.json")] == [first]
+
+
+def test_a_reviewer_launched_together_with_a_writer_still_starts(project, tmp_path):
+    events, procs, errs = _race(project, tmp_path, ("engineer", "independent-auditor"), "barrier")
+    assert events.count("S") == 2 and [proc.returncode for proc in procs] == [0, 0], errs
     assert len(_records(project)) == 2
 
 

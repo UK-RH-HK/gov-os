@@ -1075,7 +1075,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     cli = _cli()
     # W2-60b S7: the role file says the role is a worker; today's refusals above come first (W2-60a Behaviour 10)
     _role_kind(root, role)
-    # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree, before anything is written
+    # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree. Here, a planted or long-live
+    # writer refuses before anything is written; the check that decides is made again under the start lock below.
     session_record.check_one_writer(root, str(root), role)
     session_record.make_folder(root)  # before the settings, so every launch's runtime rules are the same (W2-56 S3)
     settings = build_settings(root, role, ticket_id)
@@ -1093,6 +1094,11 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
                       f"({error.strerror or error}) (DEC-402)") from None
     lock = StartLock()
     try:
+        # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start
+        # record (Keeper.begin, in _run) before it gives the lock back, so a launch that takes the lock after it sees
+        # it live; two launches that start together, or wait together on a lock a third party holds, are judged one
+        # after the other. A refusal here starts no CLI and writes no record of its own.
+        session_record.check_one_writer(root, str(root), role)
         _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
         # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
         # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
@@ -1169,13 +1175,14 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 if written is not None:
                     record.remove(written)
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
-            source = getattr(state["session"], "stdout", None) if piped else None
-            if source is not None:  # a stand-in that starts no process has no pipe: nothing to relay
-                relay = _Relay(source.fileno())
-            if written is not None:  # W2-60b S1: the session record, whole, once the session's process has started
+            if written is not None:  # W2-60b S1: the session record, whole, once the session's process has started,
+                # and first, before the start lock can be given back by any path (review round 1, F1)
                 keeper = session_record.Keeper(root, written, worktree=str(root), pid=os.getpid(), say=_say,
                                                config=session_record.config_folder())
                 keeper.begin()
+            source = getattr(state["session"], "stdout", None) if piped else None
+            if source is not None:  # a stand-in that starts no process has no pipe: nothing to relay
+                relay = _Relay(source.fileno())
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:

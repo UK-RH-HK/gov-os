@@ -247,7 +247,10 @@ def test_a_json_launch_relays_exact_bytes(started, tmp_path):
 
 def test_a_signal_mid_run_keeps_relaying_to_the_end_and_gives_the_interrupt_exit(started, capfd):
     """DEC-392: the session asks its launcher to end (SIGINT) after a first part; the launcher asks the session's group
-    to end (SIGTERM), and the session writes its last part, the result line, on the way out: all of it is relayed."""
+    to end (SIGTERM), and the session writes its last part, the result line, on the way out: all of it is relayed.
+    The caller's SIGINT is a handler, not SIG_IGN (as a ``&`` job of a non-interactive shell inherits it, which made
+    this case give 0 after the stand-in's 30 s): the ordering rests on the signals alone, never on a sleep."""
+    base._caller_handles(signal.SIGINT)
     _stand_in_cli(started, f"""
         import json, os, signal, sys, time
         def bye(*_):
