@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/spend/**
 - src/gov/launch/launcher.py  # the one call that refuses a braked ticket's launch, after the gate's call
 - src/gov/check/commands.py  # the one line that records `spend` (the precedent: W2-20's `resources`)
+- src/gov/launch/command.py
 - tests/unit/spend/**
 - tests/unit/launch/test_w2_156*
 - docs/changes/W2-156-evidence.md
