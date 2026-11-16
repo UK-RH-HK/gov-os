@@ -1,4 +1,7 @@
 ---
+milestone: "The rubric research and design (DEC-1209 (4)): research, not a ticket"
+commit: "64af03362"
+pack_sha256: "none (no gov context pack; inputs are named under sources and in section 3)"
 record: research
 task: rubric-research (DEC-1209 (4); research, not a ticket)
 written: 2026-11-16 17:36 GMT (from date)

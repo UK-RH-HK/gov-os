@@ -3,6 +3,7 @@ milestone: "Memory in use, 2026-11-02 to 2026-11-16 (the owner's request of 2026
 commit: 4416b8403a386da14cd2a9f7a631846e4a8e2a1b
 author: independent auditor (fresh, read-only), returned as text; saved verbatim in substance by the CTO (the guard refused the auditor's own write under drafts/)
 evidence: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/acd80751-ac8f-4230-9bae-15c678a54895/scratchpad/memaudit-use/ (scan.py, roles.py, aggregate.py, retr_detail.py; out/*.json)
+pack_sha256: "none (no gov context pack; inputs are the transcripts, launch records and result logs named under evidence)"
 ---
 
 # Part 5: memory in use

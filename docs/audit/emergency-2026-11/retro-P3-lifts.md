@@ -1,7 +1,7 @@
 ---
-milestone: retro-2026-11 part 3 (what DEC-1047/DEC-1050 lifted: what stayed lifted, what crept back)
+milestone: "retro-2026-11 part 3 (what DEC-1047/DEC-1050 lifted: what stayed lifted, what crept back)"
 commit: 4416b8403a386da14cd2a9f7a631846e4a8e2a1b
-pack_sha256: none (no gov context pack given; inputs = the repository at the commit, the CTO's scratch, the memory folder)
+pack_sha256: "none (no gov context pack given; inputs = the repository at the commit, the CTO's scratch, the memory folder)"
 ---
 
 task: retro-2026-11-P3
