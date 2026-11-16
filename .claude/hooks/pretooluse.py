@@ -898,6 +898,246 @@ def write_refusal(entries, tool, tin, command, cwd):
 _CLASSES = []
 
 
+# -- P-GUARD-FP-1 (b), DEC-1199 (5): shell-local literal values for the revision rule (round 2: a strict grammar) ------
+# In one Bash command, a statement `NAME=<literal>` (at the top level, after the start, `;` or a newline, followed by
+# `;`, a newline, `&&`, `||` or the end) and a top-level `for NAME in <literal words>; do ... done` give NAME its values.
+# The revision rule (the copied _Judge.git, colon, cat_file, patched, stored and ask, through classes()'s _expand_token)
+# then judges each value as if typed: one judgement per value of a loop, at most _LOCAL_MOST. Nothing else reads them.
+# The reading is a grammar, not a deny list: the whole command must be made of what it follows, or nothing is bound
+# (every name stays a word the guard cannot resolve, refused as before). It follows only: plain words (letters, digits
+# and _./+:%@,^=- unquoted; any text in single quotes; in double quotes, text without a backslash, a backtick or $
+# other than $NAME); $NAME and ${NAME} references; the separators ; && || | & and newline; the redirections > >> <
+# >& <& &> >| to a plain word; the for-loop form above (not nested). Every command word must be a plain literal word,
+# not one of _LOCAL_DENY (the builtins and keywords that set or reread a variable or run text as code, the blocks and
+# the test forms). It refuses (binds nothing) on anything else: $( $[ $(( ${…:…} $' $" $1 $@ backticks, a backslash,
+# ( ) { } [ ] outside quotes, a heredoc or herestring, ;;, any IFS anywhere, an assignment anywhere but a statement of
+# its own at the top level, NAME+=, a value with anything but the plain characters (a value with a tilde, a glob, a
+# brace, a quote mark left or whitespace), a reference to NAME before NAME is first set, and a bound name written as
+# $NAME inside single quotes anywhere (the shell passes it literally). The pre-pass is skipped when the command has no
+# word git. A name the bind does not hold is not read from the hook's environment by the revision rule (round 2, F5),
+# but for $HOME, read as ~ is.
+
+_LOCAL = {"bind": {}}  # NAME -> value for the judgement being made; {} outside a Bash judgement
+_LOCAL_MOST = 16
+_LOCAL_DENY = frozenset(
+    "builtin command eval exec trap source . alias unalias declare typeset local export readonly unset read printf "
+    "mapfile readarray let getopts wait coproc enable shopt set fc history bind caller hash select case esac function "
+    "if then else elif fi while until time ! { } [ [[ ]] test in do done".split())
+_LOCAL_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
+_LOCAL_PLAIN = re.compile(r"[A-Za-z0-9_./+:%@,^=-]+\Z")
+_LOCAL_VALUE = re.compile(r"[A-Za-z0-9_./+:%@,^=-]+\Z")
+_LOCAL_REF = re.compile(r"\$(?:\{([A-Za-z_][A-Za-z0-9_]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
+_LOCAL_DOLLAR = re.compile(r"\$(?:\{[A-Za-z_][A-Za-z0-9_]*\}|[A-Za-z_][A-Za-z0-9_]*)")
+_LOCAL_REDIRECT = frozenset((">", ">>", "<", ">&", "<&", "&>", ">|"))
+_LOCAL_SEP = frozenset((";", "&&", "||", "|", "&"))
+
+
+def _local_lex(s):
+    """The command's tokens: ("op", text) or ("word", text without quotes, its unquoted-or-double-quoted text, plain
+    literal); and the single-quoted texts. None for anything outside the grammar."""
+    out, quoted, i, n = [], [], 0, len(s)
+    while i < n:
+        c = s[i]
+        if c in " \t\r":
+            i += 1
+            continue
+        if c == "\n":
+            out.append(("op", ";"))
+            i += 1
+            continue
+        if c == "#":
+            j = s.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        two = s[i:i + 2]
+        if two in ("<<", ";;", "|&"):
+            return None
+        if two in ("&&", "||", ">>", ">&", "<&", "&>", ">|"):
+            out.append(("op", two))
+            i += 2
+            continue
+        if c in ";&|<>":
+            out.append(("op", c))
+            i += 1
+            continue
+        if c in "(){}[]":
+            return None
+        text, seen, plain = [], [], True
+        while i < n and s[i] not in " \t\r\n;&|<>":
+            c = s[i]
+            if c == "'":
+                j = s.find("'", i + 1)
+                if j < 0:
+                    return None
+                text.append(s[i + 1:j])
+                quoted.append(s[i + 1:j])
+                plain = False
+                i = j + 1
+            elif c == '"':
+                j = s.find('"', i + 1)
+                if j < 0:
+                    return None
+                body = s[i + 1:j]
+                if "\\" in body or "`" in body or _LOCAL_DOLLAR.sub("", body).count("$"):
+                    return None
+                text.append(body)
+                seen.append(body)
+                plain = False
+                i = j + 1
+            elif c == "$":
+                m = _LOCAL_DOLLAR.match(s, i)
+                if not m:
+                    return None  # $( $[ $(( ${x:-y} $' $" $1 $@ $? ...
+                text.append(m.group(0))
+                seen.append(m.group(0))
+                plain = False
+                i = m.end()
+            elif c in "\\`(){}[]":
+                return None
+            else:
+                text.append(c)
+                seen.append(c)
+                i += 1
+        word = "".join(text)
+        if plain and not _LOCAL_PLAIN.match(word):
+            plain = False  # a glob, tilde or other character: allowed as an argument, never a command word or a value
+        out.append(("word", word, "".join(seen), plain))
+    return out, quoted
+
+
+def local_bindings(command):
+    """The binds to judge a Bash command under (P-GUARD-FP-1 (b)): [{}] when nothing is bound; otherwise one map of
+    NAME to value per judgement, every value of each loop."""
+    import itertools
+    if not command or not re.search(r"(?<![\w.-])git(?![\w.-])", command):
+        return [{}]
+    if re.search(r"(?<![A-Za-z0-9_])IFS(?![A-Za-z0-9_])", command):
+        return [{}]
+    lexed = _local_lex(command)
+    if lexed is None:
+        return [{}]
+    toks, quoted = lexed
+    values, first, refs, poisoned = {}, {}, {}, set()
+    start, before, in_loop = True, ";", False
+    i = 0
+    while i < len(toks):
+        t = toks[i]
+        if t[0] == "op":
+            op = t[1]
+            if op in _LOCAL_REDIRECT:
+                if i + 1 >= len(toks) or toks[i + 1][0] != "word" or not toks[i + 1][3]:
+                    return [{}]  # a redirection to anything but a plain word
+                i += 2
+                continue
+            before, start = op, True
+            i += 1
+            continue
+        _, word, seen, plain = t
+        for m in _LOCAL_REF.finditer(seen):
+            refs.setdefault(m.group(1) or m.group(2), i)
+        if not start:  # an argument (git -c a=b, env A=b): not an assignment of this shell
+            i += 1
+            continue
+        start = False
+        head = word.split("=", 1)[0]
+        if word == "for":
+            if in_loop or before not in (";",):
+                return [{}]  # nested, or after && || | &
+            if i + 2 >= len(toks) or toks[i + 1][0] != "word" or not toks[i + 1][3] or \
+                    not _LOCAL_NAME.match(toks[i + 1][1]) or toks[i + 2][:2] != ("word", "in"):
+                return [{}]
+            name, j, words = toks[i + 1][1], i + 3, []
+            while j < len(toks) and toks[j][0] == "word":
+                words.append(toks[j])
+                j += 1
+            if not words or j + 1 >= len(toks) or toks[j][:2] != ("op", ";") or toks[j + 1][:2] != ("word", "do"):
+                return [{}]
+            if all(w[3] and _LOCAL_VALUE.match(w[1]) for w in words):
+                values.setdefault(name, [])
+                values[name] += [w[1] for w in words]
+                first.setdefault(name, i)
+            else:
+                poisoned.add(name)
+            in_loop = True
+            i = j + 2  # past "; do"
+            start = True
+            continue
+        if word == "done":
+            if not in_loop:
+                return [{}]
+            in_loop = False
+            i += 1
+            continue
+        if "=" in word and _LOCAL_NAME.match(head.rstrip("+")) and seen.split("=", 1)[0] == head:
+            group, j = [], i
+            while j < len(toks) and toks[j][0] == "word" and "=" in toks[j][1] and \
+                    _LOCAL_NAME.match(toks[j][1].split("=", 1)[0].rstrip("+")):
+                group.append(toks[j])
+                j += 1
+            after = toks[j][1] if j < len(toks) else ";"
+            alone = j >= len(toks) or (toks[j][0] == "op" and after in (";", "&&", "||"))
+            for w in group:
+                name, value = w[1].split("=", 1)
+                if name.endswith("+"):
+                    poisoned.add(name[:-1])
+                elif (alone and not in_loop and before == ";" and w[3] and _LOCAL_VALUE.match(value)):
+                    values.setdefault(name, []).append(value)
+                    first.setdefault(name, i)
+                else:
+                    poisoned.add(name)
+            i = j
+            continue
+        if not plain or word in _LOCAL_DENY:
+            return [{}]  # a command word that is not a plain literal, or a builtin or keyword outside the grammar
+        i += 1
+    if in_loop:
+        return [{}]
+    for text in quoted:
+        for m in _LOCAL_REF.finditer(text):
+            poisoned.add(m.group(1) or m.group(2))  # written $NAME in single quotes: the shell passes it literally
+    names = [n for n in values if n not in poisoned and n in refs and refs[n] > first[n]]
+    choices = [(n, list(dict.fromkeys(values[n]))) for n in names]
+    total = 1
+    for _, vs in choices:
+        total *= len(vs)
+    if total > _LOCAL_MOST:
+        choices = [(n, vs) for n, vs in choices if len(vs) == 1]
+    if not choices:
+        return [{}]
+    return [dict(zip([n for n, _ in choices], combo)) for combo in itertools.product(*[vs for _, vs in choices])]
+
+
+def _local_subst(word):
+    """*word* with $NAME and ${NAME} of the judgement's bind replaced by their values; None when a $NAME is left that
+    the bind does not hold (round 2, F5: the revision rule never reads a name from the hook's own environment, which
+    need not be the shell's), except $HOME, which is read from the same HOME as ~ (the product expands both)."""
+    if not isinstance(word, str) or "$" not in word:
+        return word
+    bind = _LOCAL["bind"]
+    left = []
+
+    def one(m):
+        name = m.group(1) or m.group(2)
+        if name in bind:
+            return bind[name]
+        if name != "HOME":  # $HOME is read as ~ is, from the same HOME (the product expands both)
+            left.append(name)
+        return m.group(0)
+    out = _LOCAL_REF.sub(one, word)
+    return None if left else out
+
+
+# P-GUARD-FP-1 (b) round 2 (F5): every git option that prints a patch (a diff of file contents), so the revision rule
+# reads it as a patch: -p, -u, -U<n>, --unified, --patch-with-stat, --patch-with-raw, --cc, -c, --dd, --remerge-diff,
+# --binary, --word-diff[=...], --word-diff-regex=..., --color-words[=...], -W, --function-context.
+_PATCH_OPTIONS = frozenset(("-p", "--patch", "-u", "--patch-with-stat", "--patch-with-raw", "--cc", "-c", "--dd",
+                            "--remerge-diff", "--binary", "-W", "--function-context"))
+
+
+def _patchy(a):
+    return a in _PATCH_OPTIONS or a.startswith(("-U", "--unified", "--word-diff", "--color-words"))
+
+
 def classes():
     """SetsRoot, Judge (DEC-1082 (3)) and Narrow (ACT-SETS-GLOBS-1), made once the pinned judge is imported (inside
     main's fail-closed try)."""
@@ -922,7 +1162,11 @@ def classes():
     _Part = reads._Part
     _REV_FAULT = reads._REV_FAULT
     _git = reads._git
-    _expand_token = reads._expand_token
+    def _expand_token(word, _product=reads._expand_token):
+        """P-GUARD-FP-1 (b): the revision rule's expansion: a shell-local literal value of this judgement's bind
+        first (local_bindings); a $NAME the bind does not hold is not expanded (None: the hook's environment need
+        not be the shell's, round 2 F5); then the pinned judge's own expansion (~, and nothing else left)."""
+        return _product(_local_subst(word))
     _options = reads._options
     _pathspecs = reads._pathspecs
     _x_top = reads._x_top
@@ -1093,7 +1337,7 @@ def classes():
                 why = self.reads("git", args, cwd)
                 # W2-42a R4: git cat-file is judged on for any session with a
                 # refused part (the object's place), the other two for the hidden.
-                if why or sub not in ("cat-file", "format-patch", "archive") or not (
+                if why or sub not in ("cat-file", "format-patch", "archive", "ls-tree") or not (
                         hidden or (sub == "cat-file" and self.parts)):
                     return why
             dd = rest.index("--") if "--" in rest else len(rest)
@@ -1122,6 +1366,10 @@ def classes():
                 if hidden and (revs or "--cached" in before) and self.covers(specs, cwd, hidden):
                     return self.stored(revs, "--cached" in before, cwd, addr, hidden)
                 return ""
+            if sub == "ls-tree":  # P-GUARD-FP-1 (b): its tree-ish read with a literal revision, then its paths
+                operands = [a for a in before if not a.startswith("-")] + specs
+                return self.stored(operands[:1], False, cwd, addr, hidden) if (
+                    operands and self.covers(operands[1:], cwd, hidden)) else ""
             if sub == "archive":  # its tree-ish, then its paths
                 operands = _options(before, _ARCHIVE_VALUED)[0] + specs
                 return self.stored(operands[:1], False, cwd, addr, hidden) if (
@@ -1156,11 +1404,9 @@ def classes():
                             return why
                     return ""
             quiet = (any(a in _GIT_QUIET or a.startswith("--stat=") for a in before)
-                     and not any(a in ("-p", "--patch", "-u") or a.startswith("-U")
-                                 for a in before))
+                     and not any(_patchy(a) for a in before))
             if sub in ("log", "whatchanged"):
-                patch = not quiet and any(a in ("-p", "--patch", "-u") or a.startswith("-U")
-                                          for a in before)
+                patch = not quiet and any(_patchy(a) for a in before)
             else:
                 patch = sub == "format-patch" or not quiet and (
                     sub == "diff" or len(shown) < len(operands) or not operands)
@@ -1710,7 +1956,16 @@ def main():
         # ACT-GUARD-FIX-3: a heredoc that cat or tee takes as data is no read; $((n+6)) is no listing.
         import bash_writes
         seen = dict(tin, command=bash_writes.reads_view(command))
-    why = Judge(root, parts).tool(tool, seen, cwd)
+    # P-GUARD-FP-1 (b): a shell-local literal value is judged by the revision rule as if typed; a loop, every value.
+    why = ""
+    for bind in (local_bindings(command) if command is not None else [{}]):
+        _LOCAL["bind"] = bind
+        try:
+            why = Judge(root, parts).tool(tool, seen, cwd)
+        finally:
+            _LOCAL["bind"] = {}
+        if why:
+            break
     if why:
         answer("deny", why, judge_rule(why))
 
