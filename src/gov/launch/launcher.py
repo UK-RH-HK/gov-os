@@ -48,6 +48,7 @@ import io
 import json
 import os
 import re
+import select
 import shutil
 import signal
 import subprocess
@@ -1121,6 +1122,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
 
     state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None}
     keeper = None  # W2-60b: the session record's two calls, for a worker session with its launch record
+    relay = None  # W2-60b S2: the session's stdout relayed, for its result line, when it runs --output-format json
 
     def end(signum=None, frame=None):
         """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session's whole process group (W2-56 S12). It is asked
@@ -1159,13 +1161,17 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             if worker is not None:  # W2-60a: the record before the session starts; the appended file last (W2-153)
                 head, tail, written = _launch_line(worker, tmpdir, cli)
             terminal = _terminal()
+            piped = _relays(worker, cli_args)
             try:  # W2-56 S12: the session leads a process group of its own, which the ending signals reach
                 state["session"] = _start([str(cli), "--settings", json.dumps(settings), *head, *cli_args, *tail],
-                                          root, env, terminal)
+                                          root, env, terminal, piped)
             except (OSError, SubprocessError):
                 if written is not None:
                     record.remove(written)
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+            source = getattr(state["session"], "stdout", None) if piped else None
+            if source is not None:  # a stand-in that starts no process has no pipe: nothing to relay
+                relay = _Relay(source.fileno())
             if written is not None:  # W2-60b S1: the session record, whole, once the session's process has started
                 keeper = session_record.Keeper(root, written, worktree=str(root), pid=os.getpid(), say=_say,
                                                config=session_record.config_folder())
@@ -1182,8 +1188,12 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 lock.release()
             if state["ended"]:  # a signal that came while the session was started
                 end()
+            if relay is not None:  # relayed through DEC-392's endings too: the handler never stops it
+                relay.pump(lambda: state["session"].poll() is None)
             code = state["session"].wait()
             _end_group(state)  # W2-56 S12: what the session left in its group ends with it
+            if relay is not None:  # what the session wrote before it ended, to the pipe's end
+                relay.drain(END_WAIT_S)
             if state["ended"]:
                 code = INTERRUPT_EXIT
             state["code"] = code
@@ -1195,6 +1205,14 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             session.wait()
         if session is not None and _group_alive(session):
             _signal_session(session, signal.SIGKILL)
+        if relay is not None:  # W2-60b S2: the last line, and the pipe given back; the result line for the record
+            try:
+                relay.close()
+                session.stdout.close()
+            except (OSError, ValueError, AttributeError):
+                pass
+            if keeper is not None:
+                keeper.result = relay.result
         if keeper is not None:  # W2-60b S1, S5: replaced whole by every ending; it never changes the exit code
             keeper.end(state["code"] if state["code"] is not None else getattr(session, "returncode", None))
         if terminal is not None:
@@ -1214,6 +1232,127 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             signal.signal(number, handler or signal.SIG_DFL)
         signal.alarm(0)
         signal.signal(signal.SIGALRM, alarm or signal.SIG_DFL)
+
+
+OUTPUT_FORMAT = "--output-format"
+RELAY_CHUNK = 65536
+RESULT_LINE_MAX = 64 * 1024 * 1024  # a longer line is relayed whole but not parsed: its result is not measured
+
+
+def _json_output(cli_args: list[str]) -> bool:
+    """W2-60b S2: the session runs with ``--output-format json`` (spaced or ``=`` form; the last one given counts, as
+    the CLI takes it)."""
+    value = None
+    for index, arg in enumerate(cli_args):
+        if arg == OUTPUT_FORMAT:
+            value = cli_args[index + 1] if index + 1 < len(cli_args) else None
+        elif arg.startswith(OUTPUT_FORMAT + "="):
+            value = arg.split("=", 1)[1]
+    return value == "json"
+
+
+def _relays(worker: dict | None, cli_args: list[str]) -> bool:
+    """A worker session (which has a session record to read the result line into) run with ``--output-format json``.
+    A lead's stdout, and every other run's, stays inherited as before (S7)."""
+    return worker is not None and _json_output(cli_args)
+
+
+class _Relay:
+    """W2-60b S2 (the result line when the session ran with ``--output-format json``): every byte the session writes
+    to its stdout pipe goes, unchanged and in order, to the launcher's own stdout (``out``) as it arrives; the last
+    complete line that parses as a JSON object of ``"type": "result"`` is kept in ``result`` (a last line with no
+    newline counts when it parses whole). Nothing is added, dropped or reordered. When ``out`` cannot be written, one
+    line is said and the pipe is still read to its end, so the session is never blocked and its exit code is its own;
+    when the pipe cannot be read, one line is said and the relay stops. The result line's text never leaves here but
+    as ``result``, which the session record reads counts from (S3)."""
+
+    def __init__(self, source: int, out: int = 1, say=None):
+        self.source, self.out, self.say = source, out, say or _say
+        self.partial, self.overlong, self.result = bytearray(), False, None
+        self.writable, self.done, self.said = True, False, False
+        try:
+            sys.stdout.flush()  # what the launcher printed itself goes first
+        except (OSError, ValueError, AttributeError):
+            pass
+
+    def _fail(self, what: str, error: BaseException) -> None:
+        if not self.said:
+            self.said = True
+            why = " ".join(str(getattr(error, "strerror", None) or error).split()) or type(error).__name__
+            self.say(f"gov launch: the session's stdout {what} ({why}); the session's exit code is kept (DEC-392)\n")
+
+    def _write(self, data: bytes) -> None:
+        view = memoryview(data)
+        while view and self.writable:
+            try:
+                view = view[os.write(self.out, view):]
+            except BlockingIOError:  # a non-blocking stdout: wait until it takes more
+                select.select([], [self.out], [], 1.0)
+            except (OSError, ValueError) as error:
+                self.writable = False
+                self._fail("cannot be relayed to the launcher's stdout, and the rest of it is lost", error)
+
+    def _consider(self, line: bytes) -> None:
+        line = line.strip()
+        if not line.startswith(b"{") or b'"result"' not in line:
+            return
+        try:
+            value = json.loads(line)
+        except ValueError:
+            return
+        if isinstance(value, dict) and value.get("type") == "result":
+            self.result = value
+
+    def _feed(self, data: bytes) -> None:
+        self._write(data)
+        start = 0
+        while (end := data.find(b"\n", start)) != -1:
+            if not self.overlong:
+                self._consider(bytes(self.partial) + data[start:end])
+            self.partial.clear()
+            self.overlong, start = False, end + 1
+        rest = data[start:]
+        if not self.overlong:
+            if len(self.partial) + len(rest) > RESULT_LINE_MAX:
+                self.partial.clear()
+                self.overlong = True
+            else:
+                self.partial += rest
+
+    def _step(self, timeout: float) -> bool:
+        """Read what is ready within ``timeout``; False once the pipe has ended or cannot be read."""
+        try:
+            ready, _, _ = select.select([self.source], [], [], timeout)
+            if not ready:
+                return True
+            data = os.read(self.source, RELAY_CHUNK)
+        except (OSError, ValueError) as error:
+            self._fail("cannot be read to relay it", error)
+            self.done = True
+            return False
+        if not data:
+            self.done = True
+            return False
+        self._feed(data)
+        return True
+
+    def pump(self, running) -> None:
+        """Relay while the session's leader runs (``running()``); what is left is ``drain``'s, after its group ends."""
+        while not self.done and running():
+            self._step(0.1)
+
+    def drain(self, seconds: float) -> None:
+        """Relay what is left until the pipe ends; at most ``seconds`` more, for a process that left the session's
+        group and still holds the pipe."""
+        deadline = time.monotonic() + seconds
+        while not self.done and (left := deadline - time.monotonic()) > 0:
+            self._step(min(left, 0.1))
+
+    def close(self) -> None:
+        if self.partial and not self.overlong:
+            self._consider(bytes(self.partial))
+        self.partial.clear()
+        self.done = True
 
 
 def _terminal() -> int | None:
@@ -1241,11 +1380,13 @@ def _group_options(terminal: int | None) -> dict:
     return {"preexec_fn": foreground}
 
 
-def _start(argv: list[str], root: Path, env: dict, terminal: int | None):
-    """The session, started as the leader of its own process group. A ``Popen`` put in the real one's place that
-    takes no process options (the suites' in-process stand-ins) is called without them: it starts no process."""
+def _start(argv: list[str], root: Path, env: dict, terminal: int | None, relay: bool = False):
+    """The session, started as the leader of its own process group; with ``relay`` (W2-60b S2), its stdout on a pipe
+    the launcher relays, else inherited. A ``Popen`` put in the real one's place that takes no process options (the
+    suites' in-process stand-ins) is called without them: it starts no process."""
+    piped = {"stdout": subprocess.PIPE} if relay else {}
     try:
-        return subprocess.Popen(argv, cwd=root, env=env, **_group_options(terminal))
+        return subprocess.Popen(argv, cwd=root, env=env, **_group_options(terminal), **piped)
     except TypeError as error:
         if "unexpected keyword argument" not in str(error):
             raise

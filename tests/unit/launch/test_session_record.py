@@ -103,12 +103,67 @@ def test_the_window_is_not_measured_from_the_log_alone(tmp_path):
     assert record["window"]["value"] is None and "window" in record["window"]["not_measured"]
 
 
-def test_the_result_line_gives_the_window_cost_turns_and_minutes_with_its_source(tmp_path):
-    result = {"type": "result", "num_turns": 7, "total_cost_usd": 3.5, "duration_ms": 120000,
-              "modelUsage": {"claude-opus-5-5": {"contextWindow": 1000000, "costUSD": 3.5}}}
-    record = _finished(tmp_path, Log().user().assistant(), result=result)
+def _result(**kw):
+    line = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 7, "duration_ms": 120000,
+            "duration_api_ms": 90000, "session_id": SID, "total_cost_usd": 3.5, "result": SECRET,
+            "usage": {"input_tokens": 1, "output_tokens": 2, "cache_creation_input_tokens": 3,
+                      "cache_read_input_tokens": 4},
+            "modelUsage": {"claude-opus-5-5": {"inputTokens": 1, "outputTokens": 2, "costUSD": 3.4,
+                                               "contextWindow": 1000000, "maxOutputTokens": 64000},
+                           "claude-haiku-5-5": {"costUSD": 0.1, "contextWindow": 200000}},
+            "subagent_stats": {"spawned": 0, "completed": 0}}
+    line.update(kw)
+    return line
+
+
+def test_the_result_line_gives_the_cost_and_the_window_with_its_source(tmp_path):
+    """S2, S4: with a log of no cost-state line, the result line names the cost and the main model's window."""
+    record = _finished(tmp_path, Log().user().assistant(), result=_result())
     assert record["window"]["value"] == 1000000 and "result line" in record["window"]["source"]
-    assert record["turns"]["value"] == 7 and record["cost_usd"]["value"] == 3.5 and record["minutes"]["value"] == 2.0
+    assert record["cost_usd"]["value"] == 3.5 and "result line" in record["cost_usd"]["source"]
+    assert SECRET not in json.dumps(record)
+
+
+def test_the_result_line_s_cost_wins_over_the_log_s_cost_state(tmp_path):
+    record = _finished(tmp_path, Log().user().assistant().cost(1.25), result=_result())
+    assert record["cost_usd"]["value"] == 3.5 and "result line" in record["cost_usd"]["source"]
+
+
+def test_the_log_gives_turns_and_minutes_where_it_has_them_over_the_result_line(tmp_path):
+    record = _finished(tmp_path, Log().user().assistant(), result=_result())
+    assert record["turns"]["value"] == 1 and record["turns"]["source"].startswith("session log")
+    assert record["minutes"]["value"] == 1.0 and record["minutes"]["source"].startswith("session log")
+
+
+def test_the_result_line_gives_turns_minutes_cost_and_window_where_no_log_is_found(tmp_path):
+    record = _finished(tmp_path, result=_result(modelUsage={"claude-opus-5-5": {"contextWindow": 1000000}}))
+    assert record["turns"]["value"] == 7 and "result line" in record["turns"]["source"]
+    assert record["minutes"]["value"] == 2.0 and "result line" in record["minutes"]["source"]
+    assert record["cost_usd"]["value"] == 3.5 and record["window"]["value"] == 1000000
+    assert record["tokens_input"]["value"] is None and record["tokens_input"]["not_measured"]
+
+
+def test_with_no_log_and_several_models_in_the_result_line_the_window_is_not_measured(tmp_path):
+    """No main model known from the log, and more than one model in modelUsage: which window is the main one is not
+    stated, so it is not measured, never a guess."""
+    record = _finished(tmp_path, result=_result())
+    assert record["window"]["value"] is None and record["window"]["not_measured"]
+
+
+def test_the_window_of_a_model_named_with_a_window_suffix_is_matched(tmp_path):
+    record = _finished(tmp_path, Log().user().assistant(),
+                       result=_result(modelUsage={"claude-opus-5-5[1m]": {"contextWindow": 1000000}}))
+    assert record["window"]["value"] == 1000000
+
+
+@pytest.mark.parametrize("bad", ({"type": "assistant"}, "not a dict", None,
+                                 {"type": "result", "total_cost_usd": -1, "modelUsage": {"claude-opus-5-5": {
+                                     "contextWindow": 0}}},
+                                 {"type": "result", "total_cost_usd": True, "num_turns": "7"}))
+def test_a_result_line_of_another_form_gives_nothing(tmp_path, bad):
+    record = _finished(tmp_path, Log().user().assistant(), result=bad)
+    assert record["cost_usd"]["value"] is None and record["window"]["value"] is None
+    assert record["turns"]["value"] == 1
 
 
 def test_a_promotion_s_reason_and_the_criticality_come_from_the_launch_record(tmp_path):

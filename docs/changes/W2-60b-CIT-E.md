@@ -6,7 +6,7 @@ date: 2026-11-16
 branch: w2/W2-60b
 base: 4bc0399fb
 ticket: DAEO-ecac (W2-60b)
-author: engineer (DAEO-ecac), brief en-1
+author: engineer (DAEO-ecac), briefs en-1 and en-2
 decisions_recorded: [DEC-946, DEC-838, DEC-839, DEC-826, DEC-655, DEC-495, DEC-392, DEC-959, DEC-963, DEC-847, DEC-983, DEC-982, DEC-1120, DEC-1156]
 state_class: EVIDENCE
 ---
@@ -27,7 +27,7 @@ ticket's paths. They are drafted below and not applied: the live hook's reviewer
 |---|---|---|---|
 | 1 | `src/gov/launch/session_record.py` (new) | The record: `begin`, `finish`, `measures`, `write` (temporary file and rename), `read_record`, `Keeper` (the launcher's two calls, one stderr line), `live_writers` / `check_one_writer`, `REVIEWERS` | `tests/unit/launch/test_session_record.py` |
 | 2 | `src/gov/telemetry/sessionlog.py` | New reading only: `measure(path, session)` (turns, compactions, rate-limit events, cost, effort, minutes, the main session's models, one model per sub-agent, versions). `find`, `subagent_files` and `read` are not changed. | `tests/unit/telemetry/test_sessionlog_w2_60b.py` (one case checks that `read` is unchanged for a 429 line) |
-| 3 | `src/gov/launch/launcher.py` | (a) The `Keeper`'s `begin` once the session's process has started and its `end` in `_run`'s `finally`, on every exit path. (b) `_role_kind`: the launchable roles and the own-ticket rule, read from the role files. `OWN_TICKET_ROLES` is removed, and `WORKER_ROLES` is no longer the launchable set (§4). (c) `check_one_writer` before anything is written. (d) `tests_worktree()`. (e) A new role's template is found by name (§5). | `tests/unit/launch/test_session_record_launch.py` |
+| 3 | `src/gov/launch/launcher.py` | (a) The `Keeper`'s `begin` once the session's process has started and its `end` in `_run`'s `finally`, on every exit path. (b) `_role_kind`: the launchable roles and the own-ticket rule, read from the role files. `OWN_TICKET_ROLES` and the `WORKER_ROLES` assignment are removed (§4). (c) `check_one_writer` before anything is written. (d) `tests_worktree()`. (e) A new role's template is found by name (§5). (f) en-2: a `--output-format json` worker session's stdout relayed, and its result line given to the record (§2a). | `tests/unit/launch/test_session_record_launch.py`, `tests/unit/launch/test_session_record_relay.py` |
 | 4 | `src/gov/guard/decide.py` | `"qa-engineer"` added to `KNOWN_ROLES`, and nothing else in the file. | `test_session_record_launch.py` (the guard cases) |
 
 `git diff 4bc0399fb -- src/gov/guard/decide.py` shows one added line, and `.claude/hooks/pretooluse.py` is unchanged.
@@ -84,14 +84,14 @@ in a log with none.
 | `tokens_input`, `tokens_output`, `tokens_cache_creation`, `tokens_cache_read` | W1-31's `sessionlog.read`: the assistant lines' usage, each message once with its last line's figures, from the session's own file and its sub-agents' files |
 | `model` | the models of the session's own assistant lines (`<synthetic>` left out). One model gives a string; several give a list. |
 | `effort` | `perTurnEffort` of those lines, only when it is one of `low` .. `max`. One value gives a string; several give a list. |
-| `turns` | the result line's `num_turns`; else the session's own assistant messages (message ids, each once, harness-written ones left out) |
-| `cost_usd` | the result line's `total_cost_usd`; else `totalCostUSD` of the last `cost-state` line of the session's own file |
-| `minutes` | the result line's `duration_ms`; else the time from the first to the last line timestamp of the session's own file |
+| `turns` | the session log: the session's own assistant messages (message ids, each once, harness-written ones left out); where the log does not give it (no log, or one the reader refuses), the result line's `num_turns` |
+| `cost_usd` | the result line's `total_cost_usd` (it wins: the CLI's own total for the session); else `totalCostUSD` of the last `cost-state` line of the session's own file |
+| `minutes` | the session log: the time from the first to the last line timestamp of the session's own file; where the log does not give it, the result line's `duration_ms` / 60000 |
 | `subagents` | `{"count": n, "models": [...]}`: the files `<id>/subagents/agent-*.jsonl`, each one's first model (null when it has none) |
 | `rate_limit_events` | `[{"at": <timestamp>}, ...]`, one entry per line: a `system`/`api_error` line with `error.status` 429, or an assistant line with `isApiErrorMessage` true and `error` `rate_limit`, from the session's and its sub-agents' files. Each line counts once; the two forms are not merged. |
 | `compactions` | the `system` lines of subtype `compact_boundary` in the session's own file |
 | `claude_code_version` | the `version` the lines carry (one value gives a string, several give a list): the one log text allowed in the record |
-| `window` | the result line's `modelUsage.<model>.contextWindow`; else not measured (§8) |
+| `window` | the result line's `modelUsage.<model>.contextWindow` of the main model: the log's main model (its first when several; matched as named or without a bracketed suffix such as `[1m]`); with no model from the log, the one entry when `modelUsage` holds only one. Else not measured, never a guess (§8) |
 | `tier` | from the model's name: `opus`, `sonnet`, `haiku` or `other`. It is not measured when the model is not, or when the models span more than one tier. |
 
 **Counts only (S3):**
@@ -102,6 +102,14 @@ in a log with none.
 - Efforts are given out only as one of the five words.
 - A refusal's text names no line content (W1-31's rule).
 
+**Which source wins, key by key (en-2, the lead's decision on S2):** the result line names its source as
+`result line (--output-format json): <its key>`.
+- `cost_usd` and `window`: the result line where it gives them; else the log (`cost_usd`) or not measured.
+- `turns` and `minutes`: the log where it gives them; else the result line; else not measured.
+- Every other key: the log alone (the result line's `usage` and `subagent_stats` are not read).
+- The result line's `result` (the session's text) never reaches the record (S3).
+- A result line of another form (not `"type": "result"`, a negative or boolean figure, a window of 0) gives nothing.
+
 **Where the log is found:** W1-31's `find(config, session)`. `config` is `CLAUDE_CONFIG_DIR` when the launcher's
 environment sets it, else `<home>/.claude`. When there is no log, or the reader refuses the log, every log value is
 not measured and carries the reader's message as its reason.
@@ -111,6 +119,40 @@ not measured and carries the reader's message as its reason.
 - the repair count (W2-07's close keeps it);
 - any session text, the version excepted.
 
+## 2a. The result line: the relay (S2, S4; en-2)
+
+**When.** A worker launch whose CLI arguments hold `--output-format json` (`--output-format json` or
+`--output-format=json`; the last `--output-format` given counts, as the CLI takes it). `stream-json`, `text`, no
+flag, an interactive run and every lead launch keep stdout inherited exactly as before. A run at a terminal with
+`--output-format json` is relayed too: the bytes are the same.
+
+**What.** The CLI starts with its stdout on a pipe (`_start(..., relay=True)`). `_Relay` copies every byte, as it
+arrives, to the launcher's own descriptor 1: unbuffered `os.write`, binary, nothing added, dropped or reordered
+(Python's own buffered stdout is flushed first). It keeps the last complete line that parses as a JSON object with
+`"type": "result"`. A last line with no newline counts when it parses whole, so a truncated line is never a result.
+A line longer than 64 MiB is relayed but not parsed. The line goes to the `Keeper`, which reads only the figures
+of §2 from it.
+
+**Order, with DEC-392's endings.** `pump` relays while the session's leader runs. The signal handler is unchanged
+and never stops the relay, so a session asked to end (SIGTERM to its group) still has what it writes on the way out
+relayed. Then come `wait()` and `_end_group` as before. `drain` relays what is left until the pipe ends, at most
+`END_WAIT_S` more, for a process that left the group and still holds the pipe. The exit code is the session's (130
+after a signal), as before.
+
+**A relay failure (S5's rule).**
+- A stdout that cannot be written (closed, EPIPE): one stderr line, `gov launch: the session's stdout cannot be
+  relayed to the launcher's stdout, and the rest of it is lost (<reason>); the session's exit code is kept
+  (DEC-392)`. The pipe is still read to its end, so the session is never blocked on a full pipe and its exit code
+  is its own. The result line is still read.
+- A pipe that cannot be read: one stderr line, and the relay stops. Not seen in practice, since `os.read` on a pipe
+  fails only on a closed descriptor.
+
+**Tests:** `tests/unit/launch/test_session_record_relay.py` (22). They cover which runs are relayed; bytes
+identical, including all 256 byte values, a partial last line and a 5 MiB output; the last result line kept; a
+truncated line not taken; the exit code unchanged (3, 7, 9); a SIGINT mid-run relayed to the end with exit 130 and
+the result recorded; an unwritable stdout; an interactive run inherited; and `gov launch` run as its own process,
+its stdout compared byte for byte.
+
 ## 3. One writer per worktree (S10, S12)
 
 `gov launch` of a writing role reads the session records after today's checks and the role check, and before
@@ -119,16 +161,22 @@ anything is written (the launch record's folder, the placeholders, the temp fold
 **A live writing session** is a record that meets all of these:
 - its `worktree` (as a real path) is this launch's tree;
 - its `ended_at` is null;
-- its `pid` is alive: `kill(pid, 0)` succeeds or is refused with EPERM;
+- its `pid` is alive: `kill(pid, 0)` succeeds or fails with anything but "no such process" (EPERM included);
 - its role is not in the reviewer set `REVIEWERS = {independent-auditor, qa-engineer}`.
+
+Its `started_at` plays no part. en-1 discounted a live pid whose process began after the record's `started_at`
+(plus 2 s), as a pid-reuse guess. That judged the interface's planted live writer (a fixed stamp earlier than the
+live process's start) not live, and let the second writer in. en-2 removed it on the lead's decision: a record with
+`ended_at` null whose pid is alive **is live**, as the interface says.
 
 When there is one, the launch is refused with `LAUNCH_REFUSED`. The message names that session's id, its role, its
 pid and the worktree. A reviewer is never refused for this, and a live reviewer is never counted.
 
 **Ways it fails closed:**
-- **A reused pid.** If `/proc/<pid>/stat` shows the process started more than 2 s after the record's `started_at`,
-  the pid now belongs to another process and the record is not live. If `/proc` cannot be read, the session counts
-  as alive.
+- **A reused pid.** A record left with no end by a launcher that died (SIGKILL, power loss), whose pid now belongs to
+  another live process, is counted as live. The launch is refused, and the message names that record's session id,
+  role, pid and worktree, so someone can see it is stale and remove it. A false refusal that names its cause is the
+  fail-closed side, which the one-writer rule wants. A guess that let a second writer in would fail open.
 - **A bad record.** A `*.json` that cannot be read, is not JSON, or is not of the record's form (`record`,
   `session_id`, `worktree`, `pid`, `started_at`, `ended_at`, `role.value`) refuses the launch, naming the file: it
   could be a live writer's.
@@ -139,7 +187,15 @@ A place that is not a folder (a file at `.gov-runtime/sessions`) holds no record
 folder only, so it hides none. It refuses nothing, and S5 governs its write.
 
 **Accepted cost of failing closed:** a stale record that is malformed blocks every writing launch of the repository
-until someone removes it, and the refusal names the file.
+until someone removes it, and the refusal names the file. The same holds for a stale well-formed record of the same
+worktree whose pid was reused (above): it blocks that worktree's writing launches until it is removed or its process
+ends.
+
+**Unit cases for the probes:** a live pid with an earlier stamp is live
+(`test_a_live_pid_is_live_whatever_its_process_start`,
+`test_a_live_writer_with_an_earlier_fixed_start_stamp_refuses_the_second_writer`); EPERM counts as alive; a
+malformed record refuses, naming it; a folder that cannot be listed refuses; a dead pid or an ended record is not
+live.
 
 ## 4. Launchable roles and the own-ticket rule, read from the role files (S7, S8, F1)
 
@@ -174,11 +230,13 @@ the CLI arguments, the ticket, the repository's settings, the template and the C
 A role the template map does not name has its file read just before its template, so a ticket naming a role with no
 role file is refused `LAUNCH_REFUSED` naming the role, not `LAUNCH_NO_TEMPLATE`.
 
-**F1:** `OWN_TICKET_ROLES` is gone from `launcher.py`. The name `WORKER_ROLES` stays, as
-`tuple(role for role in ROLE_TEMPLATES if role not in LEAD_ROLES)`. It is no fixed tuple and no launch reads it to
-decide anything. It stays because `tests/unit/launch/test_w2_153_template.py` (keep-green) and
-`tests/acceptance/W1-50` import it. If F1's check is read as "the name must not appear", that conflicts with those
-two tests (see the return's `unresolved`).
+**F1:** `launcher.py` assigns neither `OWN_TICKET_ROLES` nor `WORKER_ROLES`, annotated or not (en-2, on the lead's
+decision). `tests/unit/launch/test_w2_153_template.py` (keep-green) and `tests/acceptance/W1-50` still read
+`launcher.WORKER_ROLES`. The module's `__getattr__` (PEP 562) serves that name when it is read: the template map's
+worker entries (its five, the lead names left out), worked out at the time. No launch reads it to decide anything;
+a launch admits whatever role file `_role_kind` admits. The unit case `test_no_fixed_role_tuple_is_left_in_the_launcher`
+walks the module's syntax tree for any assignment to either name, and `test_worker_roles_is_still_served_for_w2_153_s_readers`
+checks the served value.
 
 ## 5. How a new role's template is found
 
@@ -212,7 +270,13 @@ The behaviour is `launcher.tests_worktree(root, role, ticket_id)`:
 - it prints the path, returns 0, and starts, records and gates nothing;
 - an existing path or branch, or a tree on no branch, refuses.
 
-The flag needs these bytes in `src/gov/launch/command.py`, which is not in this ticket's `allowed_paths`:
+The flag needs these bytes in `src/gov/launch/command.py`, which is not in this ticket's `allowed_paths`.
+**Checked by en-2 (2026-11-16):** `git apply --check` applies the diff cleanly to a scratch copy of
+`command.py` at ce97dba4c, under `$TMPDIR`, never in the tree. With the patched copy,
+`gov launch independent-test-designer TST-a001 --tests-worktree` in a scratch repository on `w2/T-1` exits 0, prints
+`<repo>-tests` and makes that worktree on `w2/T-1-tests` at the repository's HEAD. Run again while the branch exists,
+it exits 1 with `LAUNCH_REFUSED: the tests worktree's branch w2/T-1-tests is already there` and makes no tree.
+Unpatched, the same line exits 2 with `unrecognized arguments: --tests-worktree`. The draft needed no fix.
 
 ```diff
 --- a/src/gov/launch/command.py
@@ -260,10 +324,12 @@ The flag needs these bytes in `src/gov/launch/command.py`, which is not in this 
 (`docs/assessment/2026-10/F-models-context.md` l.424 and l.504). The record reads it there when a result line is
 given.
 
-**The launcher reads no result line.** The session's stdout is not captured, and capturing it would change the
-launcher beyond its two calls. So a launched session's record says `window` not measured, with the reason: "the
-session log states no window in a form the specimens show, and no --output-format json result line
-(modelUsage.<model>.contextWindow) was read". S4 is open (see the return's `unresolved`). Compactions are counted
+**The launcher reads the result line (en-2).** A worker session run with `--output-format json` has its stdout
+relayed (§2a), and its record states the window from `modelUsage.<main model>.contextWindow`, with the source
+`result line (--output-format json): modelUsage.<model>.contextWindow`. A real Opus 5.5 run gave `1000000`
+(the lead's specimen of 2026-11-16, Claude Code 2.1.32x). Every other session (interactive, or another output
+format) records `window` not measured, with the reason: "the session log states no window in a form the specimens
+show, and no --output-format json result line (modelUsage.<model>.contextWindow) was read". Compactions are counted
 from the log (`compact_boundary`).
 
 ## 9. CIT-P draft (kernel, not applied): a `Ticket` line in each worker role file

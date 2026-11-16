@@ -204,19 +204,47 @@ def measures(config: Path, session_id: str, result: dict | None = None) -> dict:
 
     keys["window"] = not_measured(NO_WINDOW)
     if result is not None:
-        if _count(result.get("num_turns")):
-            keys["turns"] = measured(result["num_turns"], f"{RESULT}: num_turns")
+        # Which source wins (the CIT-E §2): cost and window, the result line's (the CLI's own total for the session,
+        # and the only form that states a window); turns and minutes, the log's where it gives them, else the line's.
         if _number(result.get("total_cost_usd")):
             keys["cost_usd"] = measured(result["total_cost_usd"], f"{RESULT}: total_cost_usd")
-        if _number(result.get("duration_ms")):
+        if keys["turns"]["value"] is None and _count(result.get("num_turns")):
+            keys["turns"] = measured(result["num_turns"], f"{RESULT}: num_turns")
+        if keys["minutes"]["value"] is None and _number(result.get("duration_ms")):
             keys["minutes"] = measured(round(result["duration_ms"] / 60000, 2), f"{RESULT}: duration_ms")
-        usage = result.get("modelUsage")
-        model = keys["model"]["value"]
-        entry = usage.get(model) if isinstance(usage, dict) and isinstance(model, str) else None
-        if isinstance(entry, dict) and _count(entry.get("contextWindow")) and entry["contextWindow"] > 0:
-            keys["window"] = measured(entry["contextWindow"], f"{RESULT}: modelUsage.<model>.contextWindow")
+        window = _window(result.get("modelUsage"), keys["model"]["value"])
+        if window is not None:
+            keys["window"] = measured(window, f"{RESULT}: modelUsage.<model>.contextWindow")
     keys["tier"] = _tier(keys["model"])
     return keys
+
+
+def _base(name: str) -> str:
+    """A model id without a bracketed suffix (``claude-opus-5-5[1m]`` -> ``claude-opus-5-5``)."""
+    return name.split("[", 1)[0]
+
+
+def _window(usage, model) -> int | None:
+    """The main model's ``contextWindow`` in the result line's ``modelUsage``: the entry of the log's main model (its
+    first, when it ran on several; matched as named, or without a bracketed suffix). With no model from the log, the
+    one entry when there is only one. Otherwise None: which window is the main one is not stated, and none is guessed."""
+    if not isinstance(usage, dict) or not usage:
+        return None
+    entry = None
+    if model is not None:
+        names = model if isinstance(model, list) else [model]
+        for name in (name for name in names if isinstance(name, str)):
+            entry = usage.get(name)
+            if entry is None:
+                entry = next((value for key, value in usage.items()
+                              if isinstance(key, str) and _base(key) == _base(name)), None)
+            if entry is not None:
+                break
+    elif len(usage) == 1:
+        entry = next(iter(usage.values()))
+    if isinstance(entry, dict) and _count(entry.get("contextWindow")) and entry["contextWindow"] > 0:
+        return entry["contextWindow"]
+    return None
 
 
 def finish(record: dict, exit_code, config: Path, result: dict | None = None) -> dict:
