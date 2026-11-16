@@ -71,9 +71,9 @@ worktree (the CIT-E, the launcher's source) as the KPI lines' verify parts name 
 | success-7 | `test_w2_60b_s7_s8_roles.py::test_s7_a_planted_sixth_worker_role_file_launches_with_no_code_change`, `test_w2_60b_s7_s8_roles.py::test_s7_the_kernel_s_qa_engineer_role_file_launches_as_a_sixth_role`, `test_w2_60b_s7_s8_roles.py::test_s7_a_missing_role_file_refuses_where_the_same_role_with_its_file_launches`, `test_w2_60b_s7_s8_roles.py::test_s7_an_unreadable_role_file_refuses_where_the_same_role_readable_launches`, `test_w2_60b_s7_s8_roles.py::test_s7_the_cto_s_senior_engineer_s_and_ticket_lead_s_files_do_not_become_launchable`, `test_w2_60b_s7_s8_roles.py::test_s7_a_missing_role_file_of_one_of_the_five_roles_still_refuses_naming_it` | the sixth role is refused: "'zq-checker' (or 'qa-engineer') is not a worker role (engineer, ...)"; the refusal cases' control launch is refused the same way. The last case is a guard, **green on the base** (a refusal of today's that must stay) |
 | success-8 | `test_w2_60b_s7_s8_roles.py::test_s8_a_ticket_naming_a_role_with_no_role_file_is_refused_naming_the_role` | the control launch of the sixth role on its own ticket is refused: "'zq-checker' is not a worker role" |
 | success-9 | `test_w2_60b_s9_qa_engineer.py::test_s9_qa_engineer_is_in_the_guard_s_known_roles`, `test_w2_60b_s9_qa_engineer.py::test_s9_a_qa_engineer_writes_its_findings_report_and_nothing_else`, `test_w2_60b_s9_qa_engineer.py::test_s9_only_known_roles_changes_in_decide_and_the_live_hook_is_unchanged`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_live_reviewer_or_qa_engineer_session_is_not_counted` | `qa-engineer` is not in `KNOWN_ROLES`; its write of its own findings report is denied (an unknown role writes nothing); `decide.py` is unchanged since `4bc0399fb`; the writing launch after the planted live `independent-test-designer` record is not refused |
-| success-10 | `test_w2_60b_s10_s12_one_writer.py::test_s10_a_second_writing_launch_into_a_tree_with_a_live_writing_session_is_refused_naming_it`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_live_reviewer_or_qa_engineer_session_is_not_counted`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_record_whose_pid_is_dead_or_that_has_ended_is_not_live`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_live_writing_session_in_another_worktree_is_not_counted`, `test_w2_60b_s10_s12_one_writer.py::test_s10_tests_worktree_makes_the_tests_worktree_on_its_own_branch_at_the_ticket_s_head`, `test_w2_60b_s10_s12_one_writer.py::test_s10_tests_worktree_refuses_while_its_branch_exists` | the second writing launch starts ("the launch was not refused with exit code 1"); `gov launch` does not take `--tests-worktree` (argparse: unrecognized arguments, exit 2), so no tests worktree is made |
+| success-10 | `test_w2_60b_s10_s12_one_writer.py::test_s10_a_second_writing_launch_into_a_tree_with_a_live_writing_session_is_refused_naming_it`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_live_reviewer_or_qa_engineer_session_is_not_counted`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_record_whose_pid_is_dead_or_that_has_ended_is_not_live`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_live_writing_session_in_another_worktree_is_not_counted`, `test_w2_60b_s10_s12_one_writer.py::test_s10_tests_worktree_makes_the_tests_worktree_on_its_own_branch_at_the_ticket_s_head`, `test_w2_60b_s10_s12_one_writer.py::test_s10_tests_worktree_refuses_while_its_branch_exists`, `test_w2_60b_s10_s12_start_together.py::test_s10_s12_two_writing_launches_started_together_into_one_tree_admit_exactly_one`, `test_w2_60b_s10_s12_start_together.py::test_s10_s12_two_writing_launches_waiting_on_a_held_start_lock_admit_exactly_one` | the second writing launch starts ("the launch was not refused with exit code 1"); `gov launch` does not take `--tests-worktree` (argparse: unrecognized arguments, exit 2), so no tests worktree is made; two writing launches started together (no gap, 0.05 s, 0.1 s; or on a held start lock) both start: "started 2 CLIs, not exactly one: both were admitted" |
 | success-11 | `test_w2_60b_s11_rubric_keys.py::test_s11_a_launch_with_a_promotion_records_the_tier_the_criticality_and_the_promotion`, `test_w2_60b_s11_rubric_keys.py::test_s11_a_launch_without_a_promotion_or_a_criticality_has_the_keys_null_and_the_tier_given`, `test_w2_60b_s11_rubric_keys.py::test_s11_the_tier_is_derived_from_the_model_s_name` (3: C3 opus, C2 sonnet, C0 haiku), `test_w2_60b_s11_rubric_keys.py::test_s11_a_model_of_another_family_is_tier_other` | no session record `<sid>.json` |
-| success-12 | `test_w2_60b_s10_s12_one_writer.py::test_s12_another_writing_role_is_refused_naming_the_worktree_and_a_read_only_reviewer_starts`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_second_writing_launch_into_a_tree_with_a_live_writing_session_is_refused_naming_it` | the test designer's launch into the tree with a live writing session starts ("not refused") |
+| success-12 | `test_w2_60b_s10_s12_one_writer.py::test_s12_another_writing_role_is_refused_naming_the_worktree_and_a_read_only_reviewer_starts`, `test_w2_60b_s10_s12_one_writer.py::test_s10_a_second_writing_launch_into_a_tree_with_a_live_writing_session_is_refused_naming_it`, `test_w2_60b_s10_s12_start_together.py::test_s10_s12_two_writing_launches_started_together_into_one_tree_admit_exactly_one`, `test_w2_60b_s10_s12_start_together.py::test_s10_s12_two_writing_launches_waiting_on_a_held_start_lock_admit_exactly_one`, `test_w2_60b_s10_s12_start_together.py::test_s12_a_writer_and_a_read_only_auditor_launched_together_into_one_tree_both_start` | the test designer's launch into the tree with a live writing session starts ("not refused"); two writing launches started together both start ("started 2 CLIs, not exactly one"). The writer-and-auditor case is a guard, **green on the base** |
 | failure-1 | `test_w2_60b_s7_s8_roles.py::test_f1_the_launcher_holds_no_fixed_tuple_of_launchable_roles`, `test_w2_60b_s7_s8_roles.py::test_s7_a_planted_sixth_worker_role_file_launches_with_no_code_change` | `launcher.py` holds `WORKER_ROLES = (...)` and `OWN_TICKET_ROLES = frozenset(...)`; the sixth role is refused |
 | failure-2 | `test_w2_60b_s2_s4_record_values.py::test_f2_a_log_with_no_cost_value_records_the_cost_not_measured_never_0`, `test_w2_60b_s2_s4_record_values.py::test_f2_a_session_with_no_log_records_every_log_value_not_measured_never_0`, `test_w2_60b_s2_s4_record_values.py::test_s3_no_text_of_the_session_s_log_reaches_the_record` | no session record `<sid>.json` |
 | failure-3 | `test_w2_60b_s1_record_endings.py::test_f3_a_session_ended_early_has_its_record_while_it_runs`, `test_w2_60b_s1_record_endings.py::test_f3_a_session_that_ends_by_exit_0_found_its_record_whole_at_its_start`, `test_w2_60b_s1_record_endings.py::test_s1_a_session_ended_by_sigterm_to_the_launcher_leaves_one_record_with_every_key`, `test_w2_60b_s5_s6_write_and_read.py::test_s5_an_unwritable_record_keeps_the_exit_code_says_one_line_and_leaves_no_part` | the running session has no record (none appears within 10 s); the record-write failure says nothing on stderr |
@@ -111,9 +111,36 @@ covers "another role's ticket".
   redirect, all denied; the findings report allowed.
 - `test_w2_60b_s10_s12_one_writer.py` (7): as listed; a refusal names the planted session's id and the tree's real
   path; a refused launch leaves no session record.
+- `test_w2_60b_s10_s12_start_together.py` (6): see "Round 1, finding F1 (DEC-136)" below.
 - `test_w2_60b_s11_rubric_keys.py` (6): a promotion (two failed probe records, W2-184's form): tier `opus`,
   criticality `C2`, promotion the launch record's (or its reason); no `criticality.yaml`: criticality and promotion
   null, tier given; tier by the model's name for C3, C2, C0 and for `claude-fable-5-2` (`other`).
+
+## Round 1, finding F1 (DEC-136)
+
+The independent review (round 1) found, as described behaviour, that two writing launches into one worktree that start
+together are both admitted: launches started within about 0.1 s of each other both start their CLI, and when a third
+party holds the machine-wide start lock (`<HOME>/.gov-os/machine/launch.lock`, an exclusive `flock`) two writing
+launches started 1 s apart both start once it is given back. S10 and S12 refuse a second writing session however close
+together the two start. `test_w2_60b_s10_s12_start_together.py` (brief td-2) plants, in a linked worktree `W2-zw61` of
+the fixture project, the planted CLI sleeping until it is signalled (so the first session stays live while the other
+launch is judged), and starts each `gov launch` in a session of its own (`start_launch`); every started session is ended
+by SIGTERM to its `gov launch` and every process reaped in a `finally`. Every wait is bounded (30 s at most).
+
+- `test_s10_s12_two_writing_launches_started_together_into_one_tree_admit_exactly_one` (4): an engineer launch and a
+  test designer launch (on the engineer's ticket) started with no gap, 0.05 s and 0.1 s apart, and two engineer launches
+  with no gap. Exactly one CLI start is recorded; the other `gov launch` exits non-zero, `LAUNCH_REFUSED`, naming the
+  started session's id and the worktree's real path, and leaves no session record and no launch record of its own.
+  Either launch may be the one that starts.
+- `test_s10_s12_two_writing_launches_waiting_on_a_held_start_lock_admit_exactly_one`: the test takes the planted home's
+  `launch.lock` with `fcntl.flock`, starts writing launch A, waits 1 s, starts writing launch B, checks that no CLI has
+  started while it holds the lock, then gives it back (well within `START_LOCK_WAIT_S`): the same judgement as above.
+- `test_s12_a_writer_and_a_read_only_auditor_launched_together_into_one_tree_both_start`: an engineer and an
+  `independent-auditor` started with no gap into the same tree both start (a guard that the fix does not count a
+  reviewer; green on the base).
+
+Red on the base (3 runs, each the same): the five writing-pair cases fail with "two writing launches into one worktree
+started 2 CLIs, not exactly one: both were admitted"; the auditor case passes.
 
 ## Open questions (returned to the lead as packages)
 
@@ -132,4 +159,7 @@ covers "another role's ticket".
 ## Green on the base
 
 `test_w2_60b_s7_s8_roles.py::test_s7_a_missing_role_file_of_one_of_the_five_roles_still_refuses_naming_it`: a guard
-that today's refusal of a missing role file stays (it must stay green). Every other case is red on the base.
+that today's refusal of a missing role file stays (it must stay green).
+`test_w2_60b_s10_s12_start_together.py::test_s12_a_writer_and_a_read_only_auditor_launched_together_into_one_tree_both_start`:
+a guard that a read-only reviewer started together with a writer is not refused (it must stay green). Every other case
+is red on the base.
