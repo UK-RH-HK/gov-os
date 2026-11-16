@@ -841,6 +841,23 @@ def _check_held_out(root: Path) -> dict:
     return {"status": "pass", "missing": False}
 
 
+def _check_templates(root: Path) -> dict:
+    """The role template copies under ``.claude/templates/`` against the kernel's templates (W2-153 S-ADOPTED,
+    DEC-1192 (2)); reads only. ``gov adapters generate`` writes them in an adopted repository."""
+    from gov.adapters import portability
+    if portability.kernel_templates(root) is None:
+        return {"status": "unmeasured", "reason": "no kernel templates/ folder: no template copy is compared"}
+    findings = portability._template_findings(root)
+    if not findings:
+        return {"status": "pass"}
+    missing = [f["file"] for f in findings if f["code"] == "TEMPLATE_COPY_MISSING"]
+    differing = [f["file"] for f in findings if f["code"] == "TEMPLATE_COPY_DIFFERS"]
+    named = "; ".join(filter(None, [f"missing: {', '.join(missing)}" if missing else "",
+                                    f"not a byte copy of the kernel's: {', '.join(differing)}" if differing else ""]))
+    return {"status": "drift", "missing": missing, "differing": differing,
+            "reason": f"role template copies {named}; gov adapters generate writes them"}
+
+
 def _part(name: str, check, *args) -> dict:
     """What the part ``check`` gives. An exception it raises ends doctor as a GovError naming the part, the exception
     and its text (I4 finding 5): an envelope with ok false, never a bare traceback, and never a pass."""
@@ -867,6 +884,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
             "isolation": _part("isolation", _check_isolation, root),
             "claude_code": _part("claude_code", _check_claude_code, root),
             "held_out": _part("held_out", _check_held_out, root),
+            "templates": _part("templates", _check_templates, root),
         }
     finally:
         _probe_deadline = None
