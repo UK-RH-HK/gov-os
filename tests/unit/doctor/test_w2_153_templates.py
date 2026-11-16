@@ -33,11 +33,11 @@ def test_all_copies_present_and_equal_pass(repo):
     assert doctor._check_templates(repo) == {"status": "pass"}
 
 
-def test_a_missing_and_a_differing_copy_drift_and_are_named(repo):
+def test_a_missing_and_a_differing_copy_are_reported_and_named(repo):
     (repo / rel("role-lead")).unlink()
     (repo / rel("role-engineer")).write_text("edited\n")
     part = doctor._check_templates(repo)
-    assert part["status"] == "drift"
+    assert part["status"] == "report"
     assert part["missing"] == [rel("role-lead")] and part["differing"] == [rel("role-engineer")]
     assert rel("role-lead") in part["reason"] and rel("role-engineer") in part["reason"]
     assert "gov adapters generate" in part["reason"]
@@ -49,16 +49,30 @@ def test_no_kernel_templates_folder_is_unmeasured(repo):
     assert part["status"] == "unmeasured" and isinstance(part["reason"], str) and part["reason"]
 
 
-def test_run_carries_the_part_and_fails_on_drift(repo, monkeypatch):
-    from gov.cli.errors import GovError
+def _stub_other_parts(monkeypatch):
     for name in ("_check_tools", "_check_hooks", "_check_path_compliance", "_check_index_freshness",
                  "_check_canaries", "_check_framework_lock", "_check_isolation", "_check_claude_code",
                  "_check_held_out"):
         monkeypatch.setattr(doctor, name, lambda root: {"status": "pass"})
     monkeypatch.setattr(doctor, "_check_path_map", lambda root, config: {"status": "pass"})
+
+
+def test_run_carries_the_part_and_a_missing_copy_leaves_doctor_healthy(repo, monkeypatch):
+    _stub_other_parts(monkeypatch)
     result = doctor.run(repo, None, {})
     assert result["templates"] == {"status": "pass"} and result["healthy"] is True
     (repo / rel("brief")).unlink()
-    with pytest.raises(GovError) as caught:
-        doctor.run(repo, None, {})
-    assert caught.value.code == "DOCTOR_UNHEALTHY" and "templates (" in str(caught.value)
+    result = doctor.run(repo, None, {})
+    assert result["healthy"] is True
+    assert result["templates"]["status"] == "report" and result["templates"]["missing"] == [rel("brief")]
+
+
+def test_run_on_a_project_with_the_kits_templates_and_no_copies_is_healthy_and_names_every_copy(repo, monkeypatch):
+    _stub_other_parts(monkeypatch)
+    shutil.rmtree(repo / ".claude" / "templates")
+    result = doctor.run(repo, None, {})
+    assert result["healthy"] is True
+    part = result["templates"]
+    assert part["status"] == "report" and part["differing"] == []
+    assert part["missing"] == [rel(stem) for stem in portability.TEMPLATE_COPIES]
+    assert all(rel(stem) in part["reason"] for stem in portability.TEMPLATE_COPIES)

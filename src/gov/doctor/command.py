@@ -843,7 +843,8 @@ def _check_held_out(root: Path) -> dict:
 
 def _check_templates(root: Path) -> dict:
     """The role template copies under ``.claude/templates/`` against the kernel's templates (W2-153 S-ADOPTED,
-    DEC-1192 (2)); reads only. ``gov adapters generate`` writes them in an adopted repository."""
+    DEC-1192 (2)); reads only. ``gov adapters generate`` writes them in an adopted repository. A missing or differing
+    copy is reported (status ``report``), never drift: a fresh copier project has no copies and stays healthy."""
     from gov.adapters import portability
     if portability.kernel_templates(root) is None:
         return {"status": "unmeasured", "reason": "no kernel templates/ folder: no template copy is compared"}
@@ -854,7 +855,7 @@ def _check_templates(root: Path) -> dict:
     differing = [f["file"] for f in findings if f["code"] == "TEMPLATE_COPY_DIFFERS"]
     named = "; ".join(filter(None, [f"missing: {', '.join(missing)}" if missing else "",
                                     f"not a byte copy of the kernel's: {', '.join(differing)}" if differing else ""]))
-    return {"status": "drift", "missing": missing, "differing": differing,
+    return {"status": "report", "missing": missing, "differing": differing,
             "reason": f"role template copies {named}; gov adapters generate writes them"}
 
 
