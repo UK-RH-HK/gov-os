@@ -19,8 +19,9 @@ from gov.util.digest import sha256
 from gov.util.gitenv import git_env
 
 FOLDER = "governance/adoption"  # the tool's own records: no artefact of the project, so not in its inventory
-STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8", "A9")
-TITLES = {"A0": "safety baseline", "A1": "inventory", "A2": "classification", "A3": "target path map",
+STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A8", "A9")
+TITLES = {"A0": "safety baseline", "A1": "inventory", "A2": "classification", "AS": "spec audit",
+          "A3": "target path map",
           "A4": "batched plan", "A5": "independent review of the path map", "A6": "controlled migration",
           "A8": "legacy import and retirement", "A9": "memory fabric"}
 MOVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT")  # the actions that take an artefact to another path

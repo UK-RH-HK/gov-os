@@ -18,7 +18,7 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
-from gov.adopt import lite_gates, project, safety
+from gov.adopt import lite_gates, project, safety, spec_audit
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
 from gov.guard import install
@@ -469,6 +469,7 @@ def _assessment(run: Run) -> dict:
 
 
 def a3(run: Run) -> dict:
+    spec_audit.gate(run)  # W2-192 S3: the AS record is complete and every gap asks its question, before any other check
     cited = _assessment(run)  # before anything is recorded
     _embedding_policies(run.config)
     proposal = _proposal(run.args.map)
@@ -709,5 +710,5 @@ def a8(run: Run) -> dict:
     return legacy.retire(run)
 
 
-STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
+STAGE = {"A0": a0, "A1": a1, "A2": a2, "AS": spec_audit.stage, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
          "A9": a9, "A10": lite_gates.gate, "MA": ma}
