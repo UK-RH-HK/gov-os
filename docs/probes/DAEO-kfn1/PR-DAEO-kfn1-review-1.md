@@ -1,3 +1,20 @@
+---
+type: probe
+task: DAEO-kfn1
+kind: "narrow independent check of the path case P-W2-189-P1 (a) and P2 (DEC-1156 (7)) and the FULL review, round 1 (DEC-1010)"
+reviewer_session: 77a43b09-6c18-41eb-a452-c3f3c70e0dba
+reviewer: "au-1, independent-auditor, claude-opus-5-5, effort high, C2, read-only"
+implementer_session: e684b43c-1127-4b3a-901d-54682e34bcb2
+implementers: ["en-1 e684b43c-1127-4b3a-901d-54682e34bcb2 (engineer, 77fd73836, 89455a578)", "en-2 d760ccaf-1907-4076-af4b-85143f38ded4 (engineer, aa923f739)", "td-1 abd4bacd-9ca7-44de-a7ba-46b3c751f7e3 (independent-test-designer, bf8c3c74d)", "td-2 c1c2fbc4-44ca-4907-98e7-3f4cb36303d1 (independent-test-designer, 819f5a47b)"]
+reviewer_wrote_nothing: true
+commissioned_by: orchestrator
+judged_by: orchestrator
+judgement: pass
+probed_commit: c512f982fa62877a66f0df9351e7fcdf82b306e9
+probed_range: 452354001..c512f982f
+date: 2026-11-16
+decisions_applied: [DEC-1197, DEC-1156, DEC-1010, DEC-1068, DEC-820]
+---
 # PR-DAEO-kfn1-review-1: W2-189 (DAEO-kfn1) narrow independent check of the path case (DEC-1156 (7)) and FULL review, round 1
 
 Reviewer: independent-auditor au-1 (claude-opus-5-5, effort high), fresh read-only session 77a43b09-6c18-41eb-a452-c3f3c70e0dba, launched by the ticket lead with brief au-1 on 2026-11-16 at 09:18 GMT; reviewed head c512f982f (diff 452354001..c512f982f, 15 files). Its return follows as it wrote it; the lead wrote nothing in it.
