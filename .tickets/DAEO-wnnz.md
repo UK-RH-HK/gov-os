@@ -1,6 +1,6 @@
 ---
 id: DAEO-wnnz
-status: closed
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -16,17 +16,9 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
-- src/gov/codeintel/__init__.py
-- src/gov/launch/launcher.py
-- src/gov/launch/sandbox.py
-- src/gov/launch/environ.py
-- tests/unit/launch/**
-- tests/unit/codeintel/**
-- docs/changes/W2-56-CIT-E.md
-- tests/unit/resources/test_w2_20_round3.py  # its stand-in CLI reads MARKS from the environment S5 now cleans: the value written into the stand-in (the engineer's P-2) [added, DEC-1112 (3)]
-- template/.rulesync/permissions.jsonc  # the rulesync source of S14's allow rule, so a regeneration keeps it (the engineer's P-3) [added, DEC-1112 (3)]
-- template/governance/kernel/settings.json  # S14's one allow rule, Bash(gov launch:*) (DEC-715), moved here from W2-21 S7 without its path [added, DEC-1083]
-- tests/conftest.py  # S1's one daemon folder per test session and the tool off PATH (the designer's D-1) [added, DEC-1099 (1)]; also the run folders' owner record and the next run's removal of a killed run's folders (review R3, a follow-up under S1) [widened, DEC-1112 (3)]
+- tests/acceptance/W2-56/test_w2_56_session_daemon.py
+- tests/acceptance/W2-56/w2_56_sandbox_support.py
+- docs/probes/DAEO-wnnz/**
 kpis:
   success:
   - 'A suite that builds the code graph uses one daemon folder per test session (DAEMON_BASE, src/gov/codeintel/__init__.py:35), cleaned when the session ends, so no daemon folder is left behind; the real code-graph daemon runs only in W1-16 and W1-20, and on a change under `src/gov/codeintel/**` or to the tool''s pin, and elsewhere the tool is off PATH (T-8); inside a launched, sandboxed worker the session''s daemon folder is under its own temporary folder, and the suite runs there [DEC-799 item 1, DEC-1052, P1-PLAN T-8, INVESTIGATION-1 T-8] [re-scoped, DEC-1083]'
@@ -193,3 +185,5 @@ tests `w2/W2-56-f-tests` (`473e8ad82`), engineer `w2/W2-56-f` (`bf13ef74f`, inte
   pass could follow a link swapped in after its check: a deliberate construction, Wave 3 hardening), F2 (a killed
   run's `gov-path-*` under a one-off `TMPDIR` waits for a run with the same temp root), F3 (killed runs'
   `gov-rebuild-<pid>-*.lock` files, W2-76's, not swept): F2 and F3 for the close review.
+
+**Reopened 2026-11-16 09:1x by the CTO (DEC-1156 (7), DEC-1157 (12); a path case from the 11-16 nightly triage; listed for the owner's reading):** S1's case `tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[*]` (5 roles) fails since W2-88's 4ea9bc194 (merged in 7659be86c): pytest's long temp root makes the session temp folder long enough that `gov.codeintel.daemon_dir` moves the code-index folder to `/tmp/gov-cbm-<uid>` (a socket path would pass 107 bytes, DEC-338); real launch folders (`/tmp/gov-launch-<role>-<8>`) are short, so real launches are unaffected. An independent test designer revises the case's set-up so the launched session's temp folder is as short as a real one; the assertion is unchanged; no product change. Allowed paths narrowed to this round (the earlier list is in git history at 1c02c490f). A narrow independent check (DEC-1154) judges the revision.
