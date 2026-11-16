@@ -183,3 +183,30 @@ def gov_select(project: Project) -> subprocess.CompletedProcess:
     env.update({k: v for k, v in os.environ.items() if k == "PYTHONUSERBASE"})
     return subprocess.run([sys.executable, "-m", "gov.cli.main", "close", "--select", TICKET, "--root",
                            str(project.root)], capture_output=True, text=True, env=env, cwd=str(project.root))
+
+
+# --- the close's run line (P-W2-191-1 (b)): what pytest collects with the arguments the close builds ---------------
+
+def relaxed_schema_files() -> dict:
+    """A project-local copy of the tree's test-map schema whose ``target`` takes any non-empty text. The loader reads
+    the project's own kernel schema before the tree's (``select._schema``), so a planted project with this file
+    reads a map naming targets outside ``tests/`` whatever the tree's kernel schema says of them (its new bytes come
+    by the owner's approval, not by the ticket's code): the run-line case is then judged on the run line alone."""
+    data = schema()
+    data.setdefault("$defs", {})["target"] = {"type": "string", "minLength": 1}
+    return {SCHEMA_PATH.relative_to(TREE).as_posix(): json.dumps(data, indent=2) + "\n"}
+
+
+def collected(project: Project, args: list[str]) -> list[str]:
+    """The project-relative node ids pytest collects, in the project's folder, from ``args`` (the arguments of the
+    close's regression run): ``pytest --collect-only -q`` as a process, importlib import mode so that two files of one
+    name (``tests/unit/test_records.py`` and ``governance/scripts/tests/test_records.py``) do not clash in the
+    observation. The run must collect without an error."""
+    env = {"PATH": "/usr/bin:/bin", "HOME": str(project.tmp), "PYTHONDONTWRITEBYTECODE": "1"}
+    env.update({k: v for k, v in os.environ.items() if k == "PYTHONUSERBASE"})
+    done = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider",
+                           "--import-mode=importlib", "--rootdir", str(project.root), *args],
+                          capture_output=True, text=True, env=env, cwd=str(project.root))
+    assert done.returncode == 0, f"collecting {args} failed ({done.returncode}):\n{done.stdout}\n{done.stderr}"
+    return sorted({line.strip() for line in done.stdout.splitlines()
+                   if "::" in line and not line.startswith(("=", "_", "ERROR", "FAILED"))})

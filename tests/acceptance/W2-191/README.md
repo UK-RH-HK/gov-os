@@ -15,9 +15,9 @@ project-relative test target, for 0.1.2. In the ticket's numbering: `success-1` 
       python3 -m pytest -p no:cacheprovider -o tmp_path_retention_policy=failed tests/acceptance/W2-191 -q \
       -m "not local_only" -k "not real and not green_here and not time_limit"
 
-About 3 s for the 27 cases, in process, no network, no model (one case starts `gov close --select` as a process, from
+About 4 s for the 28 cases, in process, no network, no model (one case starts `gov close --select` as a process, from
 the tree's own `src`). No case is marked `skip`, `xfail` or `flaky`, none is `local_only`, and no case name holds
-`real`, `green_here` or `time_limit`, so the whole-folder run selects all 27. No loop is a `parametrize` (the tree's
+`real`, `green_here` or `time_limit`, so the whole-folder run selects all 28. No loop is a `parametrize` (the tree's
 opt-in list keeps one row of one): a loop inside a case names the failing form in its assertion.
 
 ## The planted project (`w2_191_support.plant`)
@@ -56,7 +56,7 @@ the tree's own.
 
 ## KPI lines, cases and the outcome at the base (`dbaf4474e`)
 
-27 cases: **17 red, 10 green (guards)**. Every red fails on its own line's behaviour: the schema's `^tests/` refuses
+28 cases: **18 red, 10 green (guards)** (td-1's 27, then td-2's one). Every red fails on its own line's behaviour: the schema's `^tests/` refuses
 what the line says validates (`'governance/scripts/tests' does not match '^tests/'`), so `load_map` gives
 `TEST_MAP_UNREADABLE`, `scoped` raises `SelectionRefused` ("the test map ... cannot be read (TEST_MAP_UNREADABLE)"),
 `plan` goes `full` with `TEST_MAP_UNREADABLE`, and `gov close --select` exits 2; and, for the three escapes that begin
@@ -95,6 +95,7 @@ stay green.
 | success-2 | `test_w2_191_selection.py::test_s2_the_record_reading_set_of_a_reusing_close_holds_the_target_outside_tests` | red | the map is unreadable, so `reused_form` selects no record-reading target (`selected` is `[]`) |
 | success-2 | `test_w2_191_selection.py::test_s2_every_close_outside_tests_joins_a_change_holding_a_record_and_code` | red | `plan` is `full` (`TEST_MAP_UNREADABLE`) |
 | success-2 | `test_w2_191_selection.py::test_s2_targets_outside_tests_and_under_it_select_together` | red | `SelectionRefused` (`TEST_MAP_UNREADABLE`) |
+| success-2 | `test_w2_191_run_line.py::test_s2_the_strict_and_reused_close_run_line_collects_the_targets_outside_tests` | red | `command._scope_form` adds only `--ignore`/`--deselect`: `pytest <root>/tests --ignore <own> <options>` collects nothing of the selected `governance/scripts/tests`, `product/tests/test_a.py::test_case` (strict and reused form); the `tests/` side and the premise hold ("the strict close's run line collects outside tests/: []") |
 
 "The existing close selection cases (tests/unit/close) pass unchanged" (failure-1) is mapped in prose: it is the lead's
 run of `tests/unit/close` (the designer ran `tests/unit/close/test_select.py` and `tests/acceptance/W2-66`: 163 passed
@@ -102,13 +103,36 @@ on the base, the 65 `real`/`green_here`/`time_limit`/`local_only` cases left out
 absolute guard groups and the "names nothing" guards pass on the base for one reason, the schema's `^tests/` pattern,
 which the change replaces: they are the cases that hold the refusals once it does.
 
+## The run line (td-2, P-W2-191-1 (b), DEC-1156 (7))
+
+`test_w2_191_run_line.py` (one case, written by a second test designer on the ticket lead's brief td-2, from S2 as
+described behaviour): the strict close (`plan`, scoped) and the reusing close (`batch.reused_form`) run
+`pytest <root>/tests --ignore <own suite>` plus `gov.close.command._scope_form(root, scope, <own suite>)`, and a selected
+target outside `tests/` is not collected by `pytest tests`. The case builds that argument list as the close does and
+reads what `pytest --collect-only -q` collects with it, in the planted project's folder (importlib import mode, so two
+files of one name do not clash in the observation); the form of `_scope_form`'s arguments is not pinned.
+
+- **The scope** is a real `select.plan` (strict, scoped) and `batch.reused_form` of the planted project, not a
+  hand-built dict, from a project that carries a **project-local, relaxed copy of the test-map schema** (`target` any
+  non-empty text; `w2_191_support.relaxed_schema_files`): the loader reads the project's kernel schema before the
+  tree's, so the map naming outside targets is read on the base too, and the case is red for the run line, not for
+  the schema's `^tests/` (whose new bytes come by the owner's approval, CIT-P). The case asserts that premise first
+  (the plan is scoped and selects the outside targets).
+- **Asserted** (exact sets, not subsets): the strict run line collects, outside `tests/`, every case of the selected
+  folder `governance/scripts/tests` and the named node `product/tests/test_a.py::test_case` alone (not
+  `TestK::test_m`, not `checks/`); under `tests/`, exactly what it collected before (`tests/unit` and the selected node
+  of a partly selected suite; the file, node and suite left out are not collected). The reusing close's line collects
+  the record-reading set alone: the outside node and the one `tests/` node. A project with `tests/` targets only
+  collects as before (strict and reused).
+- **Red at the base:** the premise and the `tests/` side hold; the first failing assertion is the outside side:
+  "the strict close's run line collects outside tests/: []". Sanity: with a stand-in `_scope_form` that appends each
+  selected outside target as a positional argument (a throwaway, run from a scratch folder, not committed) the case
+  passes.
+
 ## Open
 
-- **S2's "record_reading targets outside tests/ run in the record-reading set".** Asserted at the selection: `scoped`
-  and `plan` name the target (RECORD_READING), and `reused_form` lists it and neither ignores nor deselects it. How the
-  close's strict or reused run turns a plan into its pytest line (`command.py` `_scope_form`, the `pytest tests` form
-  with `--ignore` and `--deselect`) is out of the ticket's paths and not asserted: a target outside `tests/` is not
-  reached by `pytest tests` unless the run line names it. Options: (a) leave as is, the selection being the ticket's
-  line (cost nil; risk: an outside record-reading target is selected and never run by the strict or reused close);
-  (b) a second ticket for `command.py` with a case that builds the run line (cost: one ticket, one case set).
-  Recommendation: (b), medium confidence.
+- **S2's "record_reading targets outside tests/ run in the record-reading set"** is now covered at the selection (td-1's
+  cases: `scoped`, `plan`, `reused_form`) and at the close's run line (td-2's case above), per P-W2-191-1 (b).
+- **Not covered:** the whole `_run_tests` (the parallel and serial-only forms, `--tb` and timeout options) is not run;
+  the case asserts the arguments `_scope_form` returns, as the ticket names it. A serial-only entry (`serial_only.entries`)
+  outside `tests/` is out of the ticket's lines and not asserted.
