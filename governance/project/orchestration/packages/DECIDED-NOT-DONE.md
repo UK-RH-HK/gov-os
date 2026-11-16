@@ -397,3 +397,5 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 242 | DEC-1191 (1): the EXAMIN CTO and the six W2-81 sessions switched to adopter.sh at their next stop | IN PROGRESS |
 | 243 | DEC-1191 (2): the operator job runner (routine, (O) ACTs, the re-pin), its rehearsal and review; the owner's install step and crontab line | IN PROGRESS: building |
 | 244 | DEC-1191 (3): ACT-DEADMAN-INBOX-1 built, rehearsed, reviewed; the owner's yes | IN PROGRESS: building |
+| 245 | DEC-1192 (1): the owner's operator copies the templates into the seven adopted repositories; the CTO resumes the sessions at A5 | IN PROGRESS: the operator runs it |
+| 246 | DEC-1192 (2): W2-153 reopened (S-adopted: gov adapters generate writes .claude/templates/ in an adopted repository; gov doctor names a missing copy), then release 0.1.1 | IN PROGRESS: next: the W2-153 lead brief |

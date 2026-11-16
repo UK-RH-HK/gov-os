@@ -15259,6 +15259,14 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 ~00:10: "yes P-SESSIONS-1 item 1 / yes P-SESSIONS-1 item 2 / yes P-SESSIONS-1 item 4b … Item 2, wider than drafted, as my decision: one operator for everything I approve …"
 - **Governing sources:** package `packages/P-SESSIONS-1.md` (2cc529166); DEC-1104 (2); DEC-998; DEC-1112 (3).
 
+### DEC-1192 — P-ADOPT-TEMPLATES (a): the role templates copied into each adopted repository's .claude/templates/ by the owner's operator tonight; W2-153 reopened so gov adapters generate writes them, in release 0.1.1
+- **Status:** ACCEPTED (owner, 2026-11-16 ~00:35, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1050, DEC-315, DEC-1188 (1), DEC-1178 (3)(c), DEC-1191
+- **Decision:**
+  - (1) **Tonight's interim:** the owner's operator runs `operator_templates.py` (sha256 336cf9a3…): in EXAMIN's copy and W2-81's six repositories the kit's `governance/kernel/templates/role-*.md` are copied byte for byte into `.claude/templates/`, one owner commit each (`Role: owner`), so `gov launch` (LAUNCH_NO_TEMPLATE in 0.1.0) can start workers there.
+  - (2) **W2-153 (DAEO-8s85) reopened within its purpose** ("the template copies generated and checked"): in an adopted repository `gov adapters generate` writes `.claude/templates/` from the kit's templates and `gov doctor` names a missing or differing copy; the fix goes into release 0.1.1 (the owner: "W2-153's product fix goes into 0.1.1").
+- **Basis:** the owner's message of 2026-11-16 ~00:35: "P-ADOPT-TEMPLATES (a); W2-153's product fix goes into 0.1.1."
+- **Governing sources:** package `packages/P-ADOPT-TEMPLATES.md` (0efec8ad7); W2-81's python-app F-009, rust-workspace F-004; DEC-1050; DEC-315.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15385,3 +15393,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.570 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1189 (W2-88-GITLEAKS-SHIP yes: W2-88 reopened within S24 for the shipped .gitleaks.toml, in 0.1.1; P-W2-81-FULLRUN (a): W2-81's full run on 0.1.0 tonight). Next free id: DEC-1190. |
 | 0.571 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1190 (the W2-81 adopter brief approved; EXAMIN's settings reshaped to Gov OS's standard; the product fix flag-not-drop). Next free id: DEC-1191. |
 | 0.572 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1191 (P-SESSIONS-1: adopting sessions headless; one operator job runner for everything the owner approves, (O) ACTs and the re-pin included; the sentinel's inbox rule by ACT). Next free id: DEC-1192. |
+| 0.573 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1192 (P-ADOPT-TEMPLATES (a): the role templates by the owner's operator tonight; W2-153 reopened for gov adapters generate to write them, in 0.1.1). Next free id: DEC-1193. |
