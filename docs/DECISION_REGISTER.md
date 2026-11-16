@@ -15335,6 +15335,16 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's messages of 2026-11-16 ~13:0x, ~13:4x, ~14:1x and ~14:3x ("EXAMIN, my direction for Wave 0 …", "The roles, from now on …", "residuals: R1 (a), R2 (b), R3 (a), R5 (b) …", "P-GUARD-FP-1 (a) and (b)", "P-JOBS-USER-1: (A-full) … Meanwhile, without the box: write each operator job as a file in a queue my operator reads …").
 - **Governing sources:** packages `P-JOBS-USER-1.md`, `P-GUARD-FP-1` (drafts/guard-fp), `P-EXAMIN-LEAD-1` (drafts/examin-lead), DESIGN-FREE-HAND.md; DEC-1195; DEC-1196 (5).
 
+### DEC-1200 — P-EXAMIN-LEAD-1 (a), (b), (c): the EXAMIN CTO's Wave 0 brief 0d96110c approved, a long-lived Remote Control session, the channel; P-ADOPT-SPEC-AUDIT-1 (a): stage AS standard, its ticket W2-192
+- **Status:** ACCEPTED (owner, 2026-11-16 ~14:4x, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1199 (1), DEC-1195, DEC-974
+- **Decision:**
+  - (1) **P-EXAMIN-LEAD-1 (a):** the EXAMIN CTO's brief for leading EXAMIN's Wave 0 is approved by its sha256 `0d96110c5d76f775d555f7a59e0ac12de0ce3b5d5016b354ce6278c0d38fd9b0` (`packages/EXAMIN-CTO-wave0-brief.approved-0d96110c.md`); it is in force once W2-27's adoption run is closed (the LITE ticket exa-g6db and items 13, 14 and 16 finished and reported).
+  - (2) **(b) yes:** the EXAMIN CTO becomes one long-lived interactive tmux session with Remote Control (`--resume` of its headless session), visible in the owner's app and woken by a cross-session message with tmux as the fallback; the headless runs stop; rehearsed on a scratch session before the switch (done 2026-11-16 14:44, `packages/P-EXAMIN-LEAD-1-rehearsal-b.md`: the trust prompt on a first start, a second Enter for a tmux wake, the cross-session name derived from the folder).
+  - (3) **(c) yes:** the channel, the same for every repository: the Gov OS CTO's REPLIES.md, the product CTO's REQUESTS.md, wakes by cross-session message, the operator's job queue (`~/gov-os-operator/queue/jobs/`, the owner's "run JOB-<id>" as the yes, results in `queue/jobs/results/`), the owner to each CTO in the app.
+  - (4) **P-ADOPT-SPEC-AUDIT-1 (a):** the spec audit becomes a standard adoption stage, AS, after A2 and before A3 (its record `governance/adoption/AS-spec-audit.md`, lite checks, the skill's text and CAP-44's line by CIT-P), for the release after 0.1.1; the owner's line is the P1 for its ticket, W2-192 (DAEO-mpq2). W2-191 (DAEO-v6pf) is DEC-1199 (2)'s F-023 ticket.
+- **Basis:** the owner's message of 2026-11-16 ~14:4x: "P-EXAMIN-LEAD-1 (a): yes EXAMIN-CTO-wave0-brief 0d96110c. (b) yes, rehearsed on a scratch session before the switch. (c) yes. P-ADOPT-SPEC-AUDIT-1 (a); this is my approval of its new ticket."
+- **Governing sources:** packages `P-EXAMIN-LEAD-1.md`, `EXAMIN-CTO-wave0-brief.approved-0d96110c.md`, `P-ADOPT-SPEC-AUDIT-1.md`; DEC-1199 (1).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15469,3 +15479,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.578 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1197 (P-W2-81-VERDICT-1 (a)(b)(c)). Next free id: DEC-1198. |
 | 0.579 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1198 (0.1.1 (a) and go; EXAMIN (i), F-021 (c), item 15 (a), TD tree (a); P-JOBS-USER-1 (B) and a Wave 3 row; W2-81-FIGURES (b); BATCH1-HELD (a); OPROOT (a); ACT-GUARD-FIX-7 with its follow-ups; a guard false-positive package). Next free id: DEC-1199. |
 | 0.580 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1199 (EXAMIN's CTO leads its Wave 0; F-022 (b), go LITE, F-023 (a); the freeze lifted; FREE-HAND D1-D7 on (A-full); an interim job queue; residuals; P-GUARD-FP-1 (a), (b)); DEC-1198 (3) changed. Next free id: DEC-1200. |
+| 0.581 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1200 (P-EXAMIN-LEAD-1 (a)(b)(c): the Wave 0 brief 0d96110c, the Remote Control session, the channel; P-ADOPT-SPEC-AUDIT-1 (a), W2-192). Next free id: DEC-1201. |

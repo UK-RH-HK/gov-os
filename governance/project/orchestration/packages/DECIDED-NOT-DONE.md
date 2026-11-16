@@ -420,3 +420,6 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 265 | DEC-1198 (4): legacy-docs' 5 % hit_at_5 diagnosed now, alongside the 0.1.1 re-run, without a new ticket | NOT STARTED |
 | 266 | DEC-1198 (6): ACT-GUARD-FIX-7 lands with its follow-ups (W2-111's 65 unit fixtures, W2-141's staged copy, DND 231's cases) in the same window, not after | NOT STARTED: after the re-pin |
 | 267 | DEC-1198 (7): a short package to cut the guard's false positives (150 of 270), the top classes first | NOT STARTED |
+| 268 | DEC-1199 (2): W2-191 (DAEO-v6pf), the test map accepts any project-relative test target (F-023), with the kernel schema's CIT-P | IN PROGRESS: lead W2-191-A5-tests (the owner's line 14:5x) |
+| 269 | DEC-1200 (4): W2-192 (DAEO-mpq2), adoption stage AS (the spec audit), with the adopt skill's and CAP-44's CIT-Ps | IN PROGRESS: lead W2-192-A5-tests (the owner's line 14:5x) |
+| 270 | DEC-1200 (2): the EXAMIN CTO switched to one long-lived tmux Remote Control session (--resume of 9d3404b0), its cross-session name recorded in a name file, the headless runs stopped; rehearsed 14:44 | NOT STARTED: when W2-27's run closes (with the brief 0d96110c) |
