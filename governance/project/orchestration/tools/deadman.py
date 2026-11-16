@@ -43,6 +43,26 @@ more than 5 minutes ahead of the clock is not believed (the mtime is read instea
 expired), so a note can never mute for good. Once it is expired the normal logic applies: the log's note carries
 `"standby": "expired (written <time> UTC, <n> min ago)"` and an ALERT line ends with the same words. A CTO that is still
 waiting renews the note by writing a new time into it.
+The inbox wake (ACT-DEADMAN-INBOX-1; DEC-1191 (3), P-SESSIONS-1 item 4b; review round 1's F1-F8 fixed): on each
+pass (each --watch tick and each plain run), when an item in the wake's inbox (the folder `inbox_dir` names) is unread
+past --wake-unread-s (600 s), or no process whose arguments hold the waiter guard's path has been seen for
+--guard-grace-s (300 s; the guard exits on purpose to wake the CTO; read from `ps -eo args=`, never signalled; a ps that
+cannot run reads as alive and is logged once, "ps unreadable"), it sends ONE cross-session wake to the CTO session:
+  - only when the state is the live one (a replay or test, with --state or --inbox elsewhere, never sends);
+  - to the name in log/cto-name.txt, which must match ^[a-z0-9][a-z0-9-]{0,63}$, else it is treated as missing;
+  - through a headless `claude -p` limited to the message's tools (`--tools ToolSearch,SendMessage`, the rest
+    disallowed, `--permission-mode default`, `--strict-mcp-config`, `--setting-sources user`), from a fresh 0700
+    folder in a 0700 `xwake-cwd/` beside the state (never /tmp), 60 s at most;
+  - with fixed words and numbers only, never a file name or any other inbox-derived text: "INBOX WAKE: <n> items
+    unread, oldest <m> min" and/or "no waiter guard alive for <k> min", then "re-arm the inbox waiter and the waiter
+    guard".
+A new cause while the incident lasts (another oldest item, the guard going) wakes again; the incident's first wake time
+is kept. If the incident still holds --push-after-s (600 s) after its first wake, an `INBOX-WAKE` ALERT (at most 200
+characters, numbers only) goes once to the owner: the watch exits 10 with it (the sentinel pushes it, as every ALERT), a
+plain run sends it on its channels. The CTO's own items (-spend-brake, -deadman-wake, -helper-watch; DEC-1089 (3))
+may wake the CTO but never cause the push. No valid CTO name: no cross-session wake, the ALERT at once (fail toward the
+owner). Any error in this code is caught: it is logged, and the ALERT goes once per error kind. Muted while a stand-by
+note is active; --dry sends nothing (and never writes the live key). The incident over, its key is cleared.
 ORCH (environment) moves the whole scratch root; --log, --state, --inbox, --session-file, --standby and --inbox-stale
 move each file, so a test or rehearsal never touches the live ones.
 """
@@ -74,6 +94,8 @@ DAY_LIMIT, NIGHT_LIMIT, REMIND = timedelta(minutes=60), timedelta(hours=2), time
 WAKE_LIMIT = timedelta(minutes=60)  # the wake, at any hour (DEC-1112 (3)); the push keeps the owner's limits above
 WAKE_ITEM = re.compile(r"-(?:deadman-wake|helper-watch|spend-brake)(?:-\d+)?\.txt$")  # the CTO's own wake items
 BRAKE_ITEM = re.compile(r"-spend-brake(?:-\d+)?\.txt$")  # never an alarm to the owner, stand-by or not (DEC-1089 (3))
+CTO_NAME_FILE = ORCH / "log/cto-name.txt"  # the CTO session's name for a cross-session message (ACT-DEADMAN-INBOX-1)
+WAITER_GUARD = ".gov-runtime/scratch/orchestrator/tools/waiter_guard.sh"  # the CTO's watch on its own watches
 STANDBY_MAX_S = 7200  # a stand-by note older than this no longer mutes (owner, 2026-11-10)
 STANDBY_SLACK = timedelta(minutes=5)  # a time this far ahead of the clock is clock skew, any more is not believed
 STANDBY_STAMP = re.compile(r"\s*(\d{4}-\d\d-\d\d)[ T](\d\d:\d\d:\d\d)Z?(?!\S)")  # the note's leading UTC time
@@ -239,6 +261,197 @@ def standby_state(path, max_s, now):
     return {"active": False, "text": text, "expired": why}
 
 
+NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")  # a CTO session name as the message tools list it
+PREFIX_RE = re.compile(r"^[A-Za-z0-9 :._-]{0,40}$")
+XWAKE_TOOLS = ["--tools", "ToolSearch,SendMessage", "--disallowedTools", "Bash", "Edit", "Write", "Read", "Glob", "Grep",
+               "WebFetch", "WebSearch", "NotebookEdit", "Task", "--permission-mode", "default", "--strict-mcp-config",
+               "--setting-sources", "user"]  # review F9: no project or local settings, hooks or CLAUDE.md of a folder
+
+
+def private_dir(parent):
+    """A fresh 0700 folder inside `parent`, which is created 0700 and must be this user's and not reachable by others
+    (review F9: the headless call must not start in a folder another session can write, such as /tmp). None if not."""
+    import tempfile
+    try:
+        parent = Path(parent)
+        parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        st = parent.stat()
+        if st.st_uid != os.getuid() or st.st_mode & 0o077:
+            os.chmod(parent, 0o700)
+            st = parent.stat()
+            if st.st_uid != os.getuid() or st.st_mode & 0o077:
+                return None
+        return Path(tempfile.mkdtemp(prefix="xwake-", dir=parent))
+    except OSError:
+        return None
+
+
+def xwake(name, text, cwd_parent):
+    """One cross-session message to the session `name`, through a headless `claude -p` limited to the message's tools,
+    with no project or local settings (`--setting-sources user`), from a fresh private folder in `cwd_parent`, 60 s at
+    most; returns a short result note. Refuses a name outside NAME_RE. `text` is built by inbox_wake from fixed words
+    and numbers only."""
+    import shutil
+    if not NAME_RE.match(name or ""):
+        return "xwake: refused (no valid name)"
+    cwd = private_dir(cwd_parent)
+    if cwd is None:
+        return "xwake: refused (no private working folder)"
+    try:
+        r = subprocess.run([str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-haiku-5-5",
+                            "--output-format", "json", *XWAKE_TOOLS, "--",
+                            "Load the SendMessage tool (ToolSearch select:SendMessage if deferred) and send ONE "
+                            f"cross-session message to the session named {name} with exactly this text: {text} . "
+                            "Then reply with only SENT or FAILED and the reason."],
+                           capture_output=True, text=True, timeout=60, cwd=str(cwd))
+    except (OSError, subprocess.SubprocessError) as exc:
+        return f"xwake: failed {exc.__class__.__name__}"
+    finally:
+        shutil.rmtree(cwd, ignore_errors=True)
+    res = ""
+    for chunk in r.stdout.splitlines():
+        if chunk.startswith("{"):
+            try:
+                res = json.loads(chunk).get("result", "")
+            except ValueError:
+                pass
+    return f"xwake: rc {r.returncode} {res[:120]}"
+
+
+def guard_alive(needle):
+    """(alive, readable): whether a process whose arguments hold `needle` runs (ps output only; nothing is signalled).
+    A ps that cannot run reads as alive (readable False): no guard wake from a broken ps; the inbox half still wakes."""
+    try:
+        out = subprocess.run(["ps", "-eo", "args="], capture_output=True, text=True, timeout=30).stdout
+    except (OSError, subprocess.SubprocessError):
+        return True, False
+    return any(needle in line and "deadman.py" not in line for line in out.splitlines()), True
+
+
+def _once(path, value):
+    """True the first time `value` is written to `path` (a marker); False when it is there already or cannot be written."""
+    try:
+        if path.is_file() and path.read_text(errors="replace") == value:
+            return False
+        path.write_text(value)
+        return True
+    except OSError:
+        return False
+
+
+def inbox_wake(a, sb):
+    """The inbox wake's pass, guarded (F5): any error becomes a note, and the ALERT once per error kind."""
+    try:
+        return _inbox_wake(a, sb)
+    except Exception as exc:  # noqa: BLE001 - the watch must never die of this code (review F5)
+        kind = exc.__class__.__name__
+        mark = Path(a.state).with_name("deadman-inbox-error-seen.txt")
+        line = f"P1 INBOX-WAKE | the inbox wake failed ({kind}) | check deadman.log and the inbox"
+        if not a.dry and _once(mark, kind):
+            return f"error {kind}", line[:200]
+        return f"error {kind}", None
+
+
+def _inbox_wake(a, sb):
+    """(note, alert line or None). The incident: the condition held without a break; its first wake time is kept."""
+    now = datetime.now(timezone.utc)
+    live = Path(a.state).resolve() == STATE.resolve() and not getattr(a, "inbox", None)
+    record = not (a.dry and live)  # a dry run never writes the live key
+    key_f = Path(a.state).with_name("deadman-inbox-wake-state.json")
+    box = inbox_dir(a)
+    old = []
+    if box.is_dir():
+        for p in box.glob("*.txt"):
+            try:
+                m = p.stat().st_mtime
+            except OSError:
+                continue
+            if time.time() - m > a.wake_unread_s:
+                old.append((m, p.name))
+    old.sort()
+    notes = []
+    gone_f = key_f.with_name("deadman-noguard-since.txt")
+    alive, readable = guard_alive(a.waiter_guard_needle)
+    if not readable and _once(key_f.with_name("deadman-ps-unreadable.txt"), "ps unreadable"):
+        notes.append("ps unreadable")
+    noguard_min = None
+    if alive:
+        if gone_f.is_file() and record:
+            gone_f.unlink(missing_ok=True)
+    else:
+        try:
+            since = float(gone_f.read_text().strip())
+        except (OSError, ValueError):
+            since = time.time()
+            if record:
+                gone_f.write_text(str(since))
+        if time.time() - since >= a.guard_grace_s:
+            noguard_min = int((time.time() - since) // 60)
+    if not old and noguard_min is None:
+        if key_f.is_file() and record:
+            key_f.unlink(missing_ok=True)  # the incident is over: the next one wakes again
+        return "; ".join(["none", *notes]), None
+    if sb and sb["active"]:
+        return "standby", None
+    parts = []
+    if old:
+        parts.append(f"{len(old)} items unread, oldest {int((time.time() - old[0][0]) // 60)} min")
+    if noguard_min is not None:
+        parts.append(f"no waiter guard alive for {noguard_min} min")
+    what = "; ".join(parts)
+    pushable = noguard_min is not None or any(not WAKE_ITEM.search(n) for _, n in old)  # DEC-1089 (3), the stale rule
+    key = ("items:" + old[0][1] if old else "") + ("|noguard" if noguard_min is not None else "")
+    try:
+        state = json.loads(key_f.read_text())
+        state = state if isinstance(state, dict) else {}
+    except (OSError, ValueError):
+        state = {}
+    try:
+        first = datetime.fromisoformat(state["woken"]) if state.get("woken") else None
+    except (TypeError, ValueError):
+        first = None
+    try:
+        raw = Path(a.cto_name_file).read_bytes().decode("utf-8", "replace").strip()
+    except OSError:
+        raw = ""
+    name = raw if NAME_RE.match(raw) else ""
+    if first is not None and state.get("key") == key:  # the same incident, the same cause
+        if not state.get("pushed") and not name and pushable:  # no name to wake: the owner at once (review F10)
+            first = now - timedelta(seconds=a.push_after_s)
+        if state.get("pushed") or now - first < timedelta(seconds=a.push_after_s):
+            return "; ".join(["woken already", *notes]), None
+        if not pushable:
+            return "; ".join(["woken already (own items only: no push, DEC-1089 (3))", *notes]), None
+        if record:
+            key_f.write_text(json.dumps({**state, "pushed": now.isoformat()}))
+        if not name:
+            line = f"P1 INBOX-WAKE | no valid CTO session name to wake: {what} | read it or restart the CTO"
+            return ("would push (no name)" if a.dry else "push (no name)"), line[:200]
+        line = f"P1 INBOX-WAKE | the CTO did not answer an inbox wake: {what} | read it or restart the CTO"
+        return ("would push" if a.dry else "push"), line[:200]
+    # a new incident, or a new cause in the same incident: wake again, keep the incident's first wake time
+    keep = first if first is not None and state.get("key") else None
+    if not name:
+        if record:  # `pushed` only when this branch pushes (review F10)
+            kept = {"pushed": state["pushed"]} if keep is not None and state.get("pushed") else {}
+            mark = {"pushed": now.isoformat()} if pushable else {}
+            key_f.write_text(json.dumps({"key": key, "woken": (keep or now).isoformat(), **kept, **mark}))
+        if not pushable:
+            return "; ".join(["no valid CTO name (own items only: no push, DEC-1089 (3))", *notes]), None
+        line = f"P1 INBOX-WAKE | no valid CTO session name to wake: {what} | read it or restart the CTO"
+        return ("would push (no name)" if a.dry else "push (no name)"), line[:200]
+    prefix = a.wake_prefix if PREFIX_RE.match(a.wake_prefix or "") else ""
+    text = f"{prefix}INBOX WAKE: {what} | re-arm the inbox waiter and the waiter guard"
+    if record:
+        kept = {"pushed": state["pushed"]} if keep is not None and state.get("pushed") else {}
+        key_f.write_text(json.dumps({"key": key, "woken": (keep or now).isoformat(), **kept}))
+    if a.dry:
+        return "; ".join([f"would wake {name}: {text}", *notes]), None
+    if not live:
+        return "; ".join([f"would wake {name} (not the live state: no send): {text}", *notes]), None
+    return "; ".join([f"woke {name}: {xwake(name, text, key_f.with_name('xwake-cwd'))}", *notes]), None
+
+
 def check(a, now_s, channels):
     """One look at the watched session; logs and returns the note (ALERT notes carry `line`)."""
     state_path = Path(a.state)
@@ -285,6 +498,9 @@ def check(a, now_s, channels):
             note["verdict"], note["line"], note["sent"] = "ALERT", line, send(channels, line, a.dry)
             if not a.dry:
                 state_path.write_text(json.dumps({"stall": stall, "alerted": now.isoformat()}))
+    note["inbox_wake"], inbox_line = inbox_wake(a, sb)
+    if inbox_line:
+        note["inbox_alert"] = inbox_line
     log = Path(a.log)
     log.parent.mkdir(parents=True, exist_ok=True)
     with open(log, "a") as f:
@@ -312,6 +528,12 @@ def main():
     ap.add_argument("--inbox", help="the wake's inbox (default: the live one for the live state, else beside --state)")
     ap.add_argument("--log", default=str(LOG), help="the decision log (a test or rehearsal names its own)")
     ap.add_argument("--stale-s", type=int, default=1800, help="the dispatcher's stale age for an unread item")
+    ap.add_argument("--wake-unread-s", type=int, default=600, help="the inbox wake: an item unread past this wakes the CTO")
+    ap.add_argument("--push-after-s", type=int, default=600, help="the inbox wake: still unread this long after it, the owner is pushed")
+    ap.add_argument("--cto-name-file", default=str(CTO_NAME_FILE), help="the CTO session's name for the cross-session wake")
+    ap.add_argument("--waiter-guard-needle", default=WAITER_GUARD, help="the waiter guard's path as ps shows it")
+    ap.add_argument("--guard-grace-s", type=int, default=300, help="the waiter guard missing this long counts (it exits on purpose to wake the CTO)")
+    ap.add_argument("--wake-prefix", default="", help="a prefix for the wake's text (a rehearsal names itself)")
     a = ap.parse_args()
     if a.watch:
         start, day0 = time.time(), datetime.now()
@@ -337,6 +559,9 @@ def main():
             if note.get("verdict") == "ALERT":
                 print("ALERT " + note["line"], flush=True)
                 sys.exit(10)
+            if note.get("inbox_alert"):
+                print("ALERT " + note["inbox_alert"], flush=True)
+                sys.exit(10)
             due = datetime.now().replace(hour=dh, minute=dm, second=0, microsecond=0)
             if day0 < due <= datetime.now():
                 print(f"DAILY CTO sentinel alive; the CTO session: {note.get('verdict')}", flush=True)
@@ -354,6 +579,8 @@ def main():
         print(json.dumps(note))
         return
     note = check(a, a.now, a.channel.split(','))
+    if note.get("inbox_alert"):
+        note["inbox_sent"] = send(a.channel.split(","), note["inbox_alert"], a.dry)
     print(json.dumps(note))
 
 
