@@ -4,7 +4,8 @@ Every stand-in is written in a temporary folder: a copy of a built repository's
 working tree (no .git) with the outputs an adoption would leave. No adoption runs.
 ``ALL`` treats every capability as built, so the READY path and each mutant are
 judged on the stand-in's provisional records. ``built=None`` is today's code, on
-which those handlings are NOT_BUILT.
+which those handlings are NOT_BUILT; A7 and A10 are built there (``gov.adopt.command.STAGES``
+lists them: S-STAGES, DEC-1197 (2)), so their records are measured.
 """
 
 from __future__ import annotations
@@ -22,6 +23,8 @@ from w2_81_secret import assert_absent
 ALL = set(judge.CAPABILITIES)
 FIGURES = {name: dict(standin.PERFECT_FIGURES) for name in (*build.SHAPES, build.CLEAN)}
 EXPECTED = (*build.SHAPES, build.CLEAN)
+LITE = ("A7", "A10")  # the lite gates' stages: built when gov.adopt.command.STAGES lists them (S-STAGES)
+MISSED_FORMS = ("ABSENT", "UNREADABLE", "MALFORMED")  # a stage's record states that show nothing (README)
 
 # One killed mutant per planted problem: each id below is missed alone, and the judge must name it (README).
 PLANTED_IDS = (
@@ -116,22 +119,45 @@ def test_on_todays_code_the_handlings_not_built_are_named_and_never_passed(groun
                 assert problem["status"] == judge.NOT_BUILT, problem
                 named = [s["field"] for s in problem["evidence"] if s["status"] == judge.NOT_BUILT]
                 assert set(named) <= set(judge.NEEDS[problem["kind"]]) and named, problem
-        for stage in ("A7", "A10", "VERDICT", "findings"):
+        for stage in ("VERDICT", "findings"):
             assert repository["stages"][stage]["status"] == judge.NOT_BUILT, (repository["repository"], stage)
-        assert {"A7", "A10", "VERDICT", "findings"} <= set(repository["not_built"])
-    assert any("stage A7 is NOT_BUILT" in r for r in result["reasons"])
+        for stage in LITE:  # S-STAGES: built today (gov.adopt.command.STAGES), so measured: the stand-in's record
+            assert repository["stages"][stage]["status"] == "PRESENT", (repository["repository"], stage)
+        assert {"VERDICT", "findings"} <= set(repository["not_built"])
+        assert not set(LITE) & set(repository["not_built"]), repository["repository"]
+    assert any("stage VERDICT is NOT_BUILT" in r for r in result["reasons"])
+    assert not [r for r in result["reasons"] for s in LITE if f"stage {s} is" in r], result["reasons"]
 
 
 def test_todays_built_capabilities_follow_the_code():
-    from gov.adopt import project
+    from gov.adopt import command, lite_gates, project
 
     today = judge.built_today()
     assert {"A2-namespace", "index", "A3", "A5", "A6"} <= today
     assert not today & {"A2-content-class", "findings", "A8-documents", "VERDICT"}
-    for stage in ("A7", "A10"):
-        assert (stage in today) == (stage in project.STAGES), stage
+    for stage in LITE:  # S-STAGES: the adoption command's own stage list decides, not project.STAGES
+        assert (stage in today) == (stage in command.STAGES), stage
+        assert stage in command.STAGES and stage not in project.STAGES, f"{stage}: today's code has moved"
+        assert stage in today, stage
+        assert judge.record_name(stage) == lite_gates.record_path(stage), stage  # the name the lite gate writes
     for stage in judge.BUILT_STAGES:
         assert judge.record_name(stage) == project.record_path(stage)
+
+
+def test_a7_and_a10_count_as_built_from_the_commands_stage_list_never_the_projects(monkeypatch):
+    """S-STAGES: each lite stage is built exactly when ``gov.adopt.command.STAGES`` lists it, whatever
+    ``gov.adopt.project.STAGES`` says (kills a judge that reads project.STAGES, or both lists, or neither)."""
+    from gov.adopt import command, project
+
+    monkeypatch.setattr(project, "STAGES", (*project.STAGES, "A7", "A10"))  # the project's list names both
+    monkeypatch.setattr(command, "STAGES", tuple(s for s in command.STAGES if s != "A7"))  # the command's, A10 only
+    today = judge.built_today()
+    assert "A7" not in today and "A10" in today, sorted(today & set(LITE))
+    monkeypatch.setattr(command, "STAGES", tuple(s for s in command.STAGES if s != "A10"))  # neither
+    assert not judge.built_today() & set(LITE)
+    monkeypatch.setattr(project, "STAGES", tuple(s for s in project.STAGES if s not in LITE))
+    monkeypatch.setattr(command, "STAGES", (*command.STAGES, "A7", "A10"))  # the command's names both again
+    assert set(LITE) <= judge.built_today()
 
 
 def test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository(ground, tmp_path):
@@ -142,7 +168,11 @@ def test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository(ground, t
         assert all(p["status"] in (judge.MISSED, judge.NOT_BUILT) for p in judgement["planted"]), name
         assert all(c["status"] == judge.CLEAN for c in judgement["controls"]), name
         assert all(v["status"] in ("ABSENT", judge.NOT_BUILT) for v in judgement["stages"].values()), name
-        assert _reasons(judgement, name)["verdict"] == judge.NOT_READY
+        for stage in LITE:  # S-STAGES: built today, so its absent record is the missed form, never NOT_BUILT
+            assert judgement["stages"][stage]["status"] == "ABSENT", (name, stage)
+        result = _reasons(judgement, name)
+        assert result["verdict"] == judge.NOT_READY
+        assert {f"{name}: stage {s} is ABSENT" for s in LITE} <= set(result["reasons"]), name
 
 
 # --------------------------------------------------------------------------
@@ -391,6 +421,80 @@ def test_an_absent_stage_is_named(ground, tmp_path):
     model["records"]["VERDICT"]["verdict"] = "FINE"
     judgement = _judge(built_repo, model, tmp_path / "verdict")
     assert judgement["stages"]["VERDICT"]["status"] == "MALFORMED"
+
+
+# --------------------------------------------------------------------------
+# S-STAGES (DEC-1197 (2)): A7 and A10 on today's code (built=None), built from gov.adopt.command.STAGES
+# --------------------------------------------------------------------------
+
+# How a lite record is spoiled, and the stage state the judge must give (the missed form, README "Today's list").
+SPOILED = {"absent": "ABSENT", "not-a-mapping": "UNREADABLE", "bad-yaml": "UNREADABLE", "no-front-matter": "UNREADABLE"}
+
+
+def _spoil(model, stage, how):
+    rel = judge.record_name(stage)
+    model["records"][stage] = None
+    if how == "not-a-mapping":
+        model["raw"][rel] = f"---\n- stage: {stage}\n- result: pass\n---\n".encode()
+    elif how == "bad-yaml":
+        model["raw"][rel] = f"---\nstage: {stage}\nresult: [pass\n---\n".encode()
+    elif how == "no-front-matter":
+        model["raw"][rel] = f"# ADOPT-{stage}\n\nstage: {stage}\nresult: pass\n".encode()
+
+
+@pytest.mark.parametrize("how", sorted(SPOILED))
+@pytest.mark.parametrize("stage", LITE)
+def test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built(ground, tmp_path,
+                                                                                               stage, how):
+    """Kills a judge that gives the lite stage NOT_BUILT on today's code (it reads project.STAGES), or passes it
+    PRESENT on a record that is missing or cannot be read, or leaves it out of the verdict's reasons."""
+    built_repo = ground["python-app"]
+    name = built_repo.name
+    whole = _judge(built_repo, standin.perfect(built_repo), tmp_path / "whole", built=None)
+    model = standin.perfect(built_repo)
+    _spoil(model, stage, how)
+    spoiled = _judge(built_repo, model, tmp_path / "spoiled", built=None)
+    status = spoiled["stages"][stage]["status"]
+    assert status == SPOILED[how] and status in MISSED_FORMS, (stage, how, status)  # never NOT_BUILT, never PRESENT
+    assert spoiled["stages"][stage]["record"] == judge.record_name(stage)
+    assert stage not in spoiled["not_built"], spoiled["not_built"]
+    assert whole["stages"][stage]["status"] == "PRESENT"
+    result, before = _reasons(spoiled, name), _reasons(whole, name)
+    assert result["verdict"] == judge.NOT_READY
+    added = [f"{name}: stage {stage} is {SPOILED[how]}"]
+    assert sorted(result["reasons"]) == sorted(before["reasons"] + added), result["reasons"]
+    other = next(s for s in LITE if s != stage)
+    assert spoiled["stages"][other]["status"] == "PRESENT", other  # the spoiled record names its own stage only
+    assert [(p["id"], p["status"]) for p in spoiled["planted"]] == [(p["id"], p["status"]) for p in whole["planted"]]
+
+
+@pytest.mark.parametrize("stage", LITE)
+def test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it(ground, tmp_path, stage):
+    """With every other capability given as built and every other record whole, the lite record absent is the one
+    reason: today's built set for the stage itself (built_today()), not ALL, decides that the stage is measured."""
+    built_repo = ground["python-app-clean"]
+    name = built_repo.name
+    others = (ALL - set(LITE)) | (judge.built_today() & set(LITE))  # the lite stages as today's code has them
+    model = standin.perfect(built_repo)
+    model["records"][stage] = None
+    result = _reasons(_judge(built_repo, model, tmp_path, built=others), name)
+    assert result["verdict"] == judge.NOT_READY
+    assert result["reasons"] == [f"{name}: stage {stage} is ABSENT"], result["reasons"]
+
+
+def test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present(ground, tmp_path):
+    """Both lite records as the stand-in writes them (the stages' front matter, at the names the lite gates write)
+    are PRESENT on today's code: the found form; kills a judge that still names them NOT_BUILT or cannot read them."""
+    built_repo = ground["secret-history"]
+    judgement = _judge(built_repo, standin.perfect(built_repo), tmp_path, built=None)
+    for stage in LITE:
+        rel = judge.record_name(stage)
+        front = judge.read_record(tmp_path / "adopted", rel, stage)
+        assert front.state == "PRESENT" and front.data["stage"] == stage, (stage, front.state, front.why)
+        assert judgement["stages"][stage] == {"status": "PRESENT", "record": rel}, judgement["stages"][stage]
+    assert not set(LITE) & set(judgement["not_built"]), judgement["not_built"]
+    reasons = _reasons(judgement, built_repo.name)["reasons"]
+    assert not [r for r in reasons for s in LITE if f"stage {s} is" in r], reasons
 
 
 def test_a_judge_error_is_an_error_never_ready(ground, tmp_path, monkeypatch):

@@ -9,8 +9,9 @@ each reason. It writes nothing and prints nothing.
 **What it reads (the adoption's outputs).** The adopted repository's working tree:
 
 - the stage records ``governance/adoption/<stage>-<title>.md`` (YAML front matter), named
-  as ``gov.adopt.project.record_path`` names them for the stages built, and as
-  ``PROVISIONAL`` names them for the stages not built yet (A7, A10, the lite verdict);
+  as ``gov.adopt.project.record_path`` names them for A0 to A6 and A8, and as
+  ``PROVISIONAL`` names them for A7 and A10 (the names the lite gates write; built when
+  ``gov.adopt.command.STAGES`` lists them) and the lite verdict (not built yet);
 - the findings ``governance/adoption/findings/*.md`` (CAP-44.g, not built: provisional form);
 - the project's path map ``governance/project/path-map.yaml`` (its namespaces' ``embedding_policy``);
 - the index ``.gov-runtime/store.db`` (``lexical_chunk.path``, ``semantic_vector.chunk_id``);
@@ -62,7 +63,8 @@ VERDICTS = ("ADOPTED_HEALTHY", "ADOPTED_WITH_ACCEPTED_EXCEPTIONS", "NOT_ADOPTED_
 LEAVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT", "RETIRE", "DELETE_FROM_ACTIVE_TREE")
 from w2_81_score import FLOORS  # noqa: E402 - CAP-10's floor; DEC-833's target, one constant each
 
-# The record names of the stages not built yet: the provisional form the stand-ins write (README, "The judge").
+# The record names of the stages project.record_path does not name: A7 and A10 as the lite gates write them
+# (gov.adopt.lite_gates.record_path), and the lite verdict, not built yet (README, "The judge").
 PROVISIONAL = {"A7": f"{FOLDER}/A7-independent-migration-verification.md",
                "A10": f"{FOLDER}/A10-independent-memory-verification.md",
                "VERDICT": f"{FOLDER}/VERDICT-lite.md"}
@@ -85,8 +87,12 @@ CAPABILITIES = {
     "A3": ("CAP-44.b", True, "A3 records the path map from the caller's proposal"),
     "A5": ("CAP-44.c", True, "A5 records the independent review of the path map"),
     "A6": ("CAP-44.d", True, "A6 executes the batches"),
-    "A7": ("CAP-44.f", False, "the lite A7 gate: independent migration verification"),
-    "A10": ("CAP-44.f", False, "the lite A10 gate: independent memory verification"),
+    # A7 and A10: built or not as gov.adopt.command.STAGES lists them (built_today(), S-STAGES); the flag here is
+    # not read for them.
+    "A7": ("CAP-44.f", False, "the lite A7 gate: independent migration verification "
+                              "(built when gov.adopt.command.STAGES lists A7)"),
+    "A10": ("CAP-44.f", False, "the lite A10 gate: independent memory verification "
+                               "(built when gov.adopt.command.STAGES lists A10)"),
     "VERDICT": ("CAP-44.h", False, "the lite adoption verdict"),
 }
 NEEDS = {"stale-spec": ("A2-content-class", "findings"),  # either one suffices
@@ -133,11 +139,14 @@ class JudgeError(Exception):
 
 
 def built_today():
-    """Today's built capabilities. A7 and A10 count as built once the adoption tool lists them as stages."""
+    """Today's built capabilities. A7 and A10 count as built exactly when the adoption command's own stage list,
+    ``gov.adopt.command.STAGES`` (what ``gov adopt --lite --stage`` accepts), names them; never from
+    ``gov.adopt.project.STAGES``, which lists only the stages whose records ``project.record_path`` names (S-STAGES,
+    DEC-1197 (2))."""
     built = {name for name, (_, is_built, _) in CAPABILITIES.items() if is_built}
-    from gov.adopt import project  # the code under test (DEC-732): this worktree's src/
+    from gov.adopt import command  # the code under test (DEC-732): this worktree's src/
 
-    built |= {stage for stage in ("A7", "A10") if stage in project.STAGES}
+    built |= {stage for stage in ("A7", "A10") if stage in command.STAGES}
     return built
 
 

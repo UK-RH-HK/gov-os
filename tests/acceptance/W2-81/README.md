@@ -267,8 +267,21 @@ its Contract id. It is never passed. A handling whose capability is built, but w
 MISSED.
 
 **Today's list.** I read it myself in `src/gov/adopt/` (`command.py`, `project.py`, `stages.py`, `legacy.py`; the same
-on `w2/integrate`) on 2026-10-31. `w2_81_judge.CAPABILITIES` holds it; `built_today()` reads A7 and A10 from
-`gov.adopt.project.STAGES`.
+on `w2/integrate`) on 2026-10-31, and A7 and A10 again on 2026-11-16 (`lite_gates.py`; S-STAGES, DEC-1197 (2)).
+`w2_81_judge.CAPABILITIES` holds it. **`built_today()` counts A7 and A10 as built from the adoption command's own stage
+list, `gov.adopt.command.STAGES`** (the list `gov adopt --lite --stage` accepts: A0 to A10 and MA), **never from
+`gov.adopt.project.STAGES`** (A0 to A6, A8, A9: the stages whose records `project.record_path` names). Each is built
+exactly when `command.STAGES` lists it; today it lists both. Their records keep the names the lite gates write
+(`lite_gates.record_path`, the same as `w2_81_judge.PROVISIONAL`):
+`governance/adoption/A7-independent-migration-verification.md` and `A10-independent-memory-verification.md`.
+
+**Found and missed, for a stage.** A stage's status is its record's state. **PRESENT** is the found form;
+**ABSENT**, **UNREADABLE** and **MALFORMED** are the missed form; NOT_BUILT is only for a stage today's code does not
+build. So with A7 and A10 built, a repository whose A7 or A10 record is absent is `stage A7 is ABSENT` (or A10), and
+one whose record is malformed (no front matter, front matter that is not a mapping, bad YAML, not UTF-8) is
+`stage A7 is UNREADABLE`: missed and named in the verdict's reasons, NOT_READY, never NOT_BUILT and never passed. The
+judge holds A7's and A10's fields to no rule of its own (it reads them as present when the stages' front matter
+parses), so a malformed lite record shows as UNREADABLE, not MALFORMED.
 
 | Capability | Contract | Built today | Why |
 |---|---|---|---|
@@ -278,7 +291,7 @@ on `w2/integrate`) on 2026-10-31. `w2_81_judge.CAPABILITIES` holds it; `built_to
 | `A8-documents` | CAP-44.e | **no** | A8 retires `rule-file`, `memory-store` and `chat-database` only (`legacy.KINDS`, `stages.KINDS`); it extracts or retires no legacy document, and A4 refuses EXTRACT as a content change |
 | `index` | CAP-44.d | yes | `gov rebuild` after A6 and A8 recreates `.gov-runtime/store.db`: `lexical_chunk.path`, and `semantic_vector.chunk_id` only for namespaces whose `embedding_policy` is `embedded` |
 | `A3`, `A5`, `A6` | CAP-44.b, .c, .d | yes | the A3 path map, the A5 review (`path_map_hash` = the sha256 of A3's record), the A6 batches |
-| `A7`, `A10` | CAP-44.f | **no** | the lite gates (W2-52, not merged) |
+| `A7`, `A10` | CAP-44.f | **yes**, built, from `command.STAGES` | the lite gates (W2-52, `gov.adopt.lite_gates`): `gov.adopt.command.STAGES` lists A7 and A10, and `built_today()` reads that list (not `project.STAGES`) |
 | `VERDICT` | CAP-44.h | **no** | the lite verdict (W2-52, not merged) |
 
 **On an adoption that ran nothing, at today's code and seed 8128,** every repository is NOT_READY:
@@ -292,7 +305,8 @@ on `w2/integrate`) on 2026-10-31. `w2_81_judge.CAPABILITIES` holds it; `built_to
 | secret-history | 3 NOT_BUILT | 2 CLEAN |
 | python-app-clean | none | 2 CLEAN |
 
-In every repository the stages are ABSENT, or NOT_BUILT for A7, A10, the verdict and the findings.
+In every repository the stages are ABSENT (A7 and A10 included: built today, so measured, and their absent records
+named), or NOT_BUILT for the verdict and the findings.
 
 ### What the judge reads, per kind
 
@@ -386,7 +400,9 @@ real forms when those land:
   - drift: `newer_source`.
 - **A8:** `documents: [{path, disposition: extracted | retired, into?}]`.
 - **A7, A10 and the lite verdict:** `governance/adoption/A7-independent-migration-verification.md`,
-  `A10-independent-memory-verification.md` and `VERDICT-lite.md`, with the stages' front matter. The verdict
+  `A10-independent-memory-verification.md` and `VERDICT-lite.md`, with the stages' front matter. A7 and A10 are
+  built now (S-STAGES): those two names are the ones the lite gates write (`gov.adopt.lite_gates.record_path`), and
+  the judge reads them as any built stage's record. The verdict
   holds `verdict` (one of `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS`, `NOT_ADOPTED_HEALTHY`), `lite: true`
   and `conditions_not_checked`.
 
@@ -395,7 +411,9 @@ real forms when those land:
 `w2_81_standin.perfect(built)` is a model of an adoption that handles every planted problem and flags no control,
 with both figures exactly at their floors. `render` writes it into a temporary copy of the built repository's
 working tree (no `.git`) and a folder beside it. On it, with every capability counted as built, the judge says
-READY. On today's code it says NOT_BUILT for each handling not built, and FOUND_AND_HANDLED for the large files.
+READY. On today's code it says NOT_BUILT for each handling not built, and FOUND_AND_HANDLED for the large files;
+the stages A7 and A10 are PRESENT (built today, from `gov.adopt.command.STAGES`), the verdict and the findings
+NOT_BUILT.
 
 **One killed mutant per planted problem (21).** `standin.miss` removes exactly one handling. The judge must say
 NOT_READY with exactly one reason, `<repository>: <id> is MISSED`:
@@ -436,6 +454,11 @@ finding, is FLAGGED too.
 - An unreadable A3 record flags the controls.
 - An unreadable finding, an unreadable output (a symbolic link), or no held value: each makes the secret MISSED.
 - A7's record absent is named; a verdict outside the vocabulary is MALFORMED.
+- **S-STAGES, on today's code (`built=None`):** A7 and A10 count as built exactly when `gov.adopt.command.STAGES`
+  lists them, whatever `project.STAGES` says; either lite record absent is ABSENT, and either one without front
+  matter, with front matter that is not a mapping, or with bad YAML is UNREADABLE: each is named as one more reason,
+  NOT_READY, never NOT_BUILT and never PRESENT, and changes no planted problem's status; both records as the stand-in
+  writes them (the stages' front matter) are PRESENT and named in no reason.
 - A missing manifest, a malformed one, or an exception: each is ERROR.
 - A repository not judged is NOT_READY.
 
@@ -767,8 +790,9 @@ folder.
 | **S10** Hermetic and bounded: stand-ins, no network, no model, no adoption; temporary folders only, removed; under 120 s alone and in parallel; none skipped; a missing tool fails naming it; no workbench, no dev tiers | `test_w2_81_hermetic.py` (all), the `this_repository_unchanged` tripwire, `_removed_after` in `test_w2_81_judge.py`; the timings in the return |
 | **S11** In each repository, a ticket closes with `gov close` at exit 0 on a pinned release | the runner's close step: `test_all_handled_and_both_figures_met_is_ready` (exit 0 recorded), `test_w2_81_runner.py::test_each_failure_is_not_ready_naming_it[close-fails-gov close PG-1 ended with exit 3]` and `[close-not-run]`. The real run is the orchestrator's, on W2-16's release |
 | **S12** The builders and question sets serve W2-88 read-only; the hidden half is W2-93's | this README ("What W2-88 and W2-93 may read"); `test_the_questions_resolve_at_another_seed` (the interface W2-88 calls) |
-| **F1** A planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases |
-| **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, the figure cases, `test_w2_81_score.py::test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready` |
+| **S13** S-STAGES: the judge counts A7 and A10 as built from `gov.adopt.command.STAGES`, never from `gov.adopt.project.STAGES`; its self-test and "Today's list" say so; a lite record absent or malformed is missed and named, never NOT_BUILT, never passed | `test_w2_81_judge.py::test_todays_built_capabilities_follow_the_code`, `test_w2_81_judge.py::test_a7_and_a10_count_as_built_from_the_commands_stage_list_never_the_projects`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built` (8: A7 and A10, each absent, without front matter, front matter not a mapping, bad YAML), `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it` (2), `test_w2_81_judge.py::test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`; this README ("Today's list", the capability row `A7`, `A10`: built, from `command.STAGES`) |
+| **F1** A planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built` |
+| **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it`, the figure cases, `test_w2_81_score.py::test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready` |
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
 | **S3, S4, S5, S6, S7, S9, F1, F2, F3, F4** Review batch 4, items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |
