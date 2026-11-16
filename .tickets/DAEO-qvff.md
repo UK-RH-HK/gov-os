@@ -1,6 +1,6 @@
 ---
 id: DAEO-qvff
-status: closed
+status: in_progress
 deps: [DAEO-nqa2]
 links: []
 created: 2026-10-31T21:53:25Z
@@ -95,3 +95,5 @@ The owner's D2 (a) on CAPACITY-1 (DEC-979, P-LATENCY-1): a fresh independent tes
 **Widened 2026-11-15 by the CTO (DEC-1156 (7), P-W2-111-R5-ROWS (a)):** `tests/acceptance/serial-only.txt`, so a test designer lists W2-111's five timing files as `serial: latency` (rv-3's F2: they red only inside lead_verify's parallel phase at load 10-20; alone and quiet 25/25 pass). rv-3's F1 (libyaml accepts tab and `? ` texts the pure SafeLoader refuses, so a malformed held-out.yaml no longer stops every call: fails open) is fixed in the same round by DEC-802 (engineer, product and live-hook diff, with a test-design batch giving it as a described behaviour), and F3's README line with it; then a narrow independent re-check at the new head (DEC-1154).
 
 **Widened 2026-11-15 by the owner (P-W2-111-YAML-REST (a)):** `src/gov/util/role_paths.py`. The fast YAML loader's fail-open class (rv-3's F1) also sits in the guard's other reads: `role_paths.py:85`, `:165`, `parts.py:234` and the live hook's `role_reads.py:111`, `:171` (in the diff). All are routed through the checked loader, with a planted-tab case each, before the narrow re-check; ACT-GUARD-FIX-7 and release 0.1.1 carry it.
+
+**Reopened 2026-11-16 by the CTO within purpose (DEC-1157 (12); DEC-1198 (6), DEC-1203 (b)): ACT-GUARD-FIX-7 follow-up 03.** ACT-GUARD-FIX-7 applies this ticket's live-hook diff to `.claude/hooks/`; after it, `tests/acceptance/W2-111/w2_111_live_hook.py`'s `_copy_hooks` would copy the already-patched tree and its 20 + 5 + 7 cases (DND 231) would judge the diff against the wrong bytes. An independent test designer applies the prepared patch (`.gov-runtime/scratch/orchestrator/drafts/act-guard-fix-7-followups/03-w2-111-acceptance-before-from-git.patch`): the before copy is read from git at ACT-GUARD-FIX-6's commit `fa6135903`, not from the tree, so the cases judge the same bytes before and after the apply. No other change; no KPI changes; closed again after the merge. Listed for the owner's reading.
