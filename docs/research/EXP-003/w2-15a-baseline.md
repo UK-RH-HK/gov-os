@@ -360,3 +360,42 @@ All under `docs/research/EXP-003/w2-15a/`:
   - `stack-q14.json` and `stack-q14-duplicates.txt`;
   - the rebuilds' outputs and `time -v` reports;
   - the visible diagnostics.
+
+## 11. The close run (2026-11-16): the measured record, and the close on a miss (DEC-1186 (3), DEC-1206)
+
+Both halves at one head, **commit `7041f086c2d4`** (section 2's metric, `28fef4a99`, and the refused probe,
+`6b6003af4`, are ancestors), gov 0.1.0 from the clone's `src/`, batch size 10, bundle budget 6000, stack budget
+24000 tokens, after the re-pin and never beside a store rebuild of the measured clone.
+
+- **Visible half (40):** the CTO's run, `drafts/w2-15a-close/visible_run.sh 7041f086c2d4` (clone and outputs under
+  `~/gov-os-runs/W2-00/w2-15a-close/`; `visible.log`, `out/measure-<mode>.txt`, `out/records-<mode>`); run twice the
+  same morning (two runs started 05:47:05 and 05:47:30, done 07:22:52 and 07:50:49), the same figures both times.
+- **Hidden half (39):** the owner's operator's walled run, JOB-20261116-02 (15:13:49 to 16:34:28 GMT, result
+  sha256 `8f4aecdf…`), `walled_hidden_counts.sh 7041f086c2d4 rerank lexical semantic fused`, counts only (Q3 (a)): no
+  hidden id, question, answer or text is in this record. Three adopter store rebuilds of other repositories ran
+  15:57 to 16:00 inside its semantic mode; every mode exited 0 and judged 39 of 39, so the counts stand.
+
+| mode | hit@5 visible | hit@5 hidden | full evidence visible | full evidence hidden | gold blocks unresolved (hidden) | pass line (rerank only: 34 of 39) |
+|---|---|---|---|---|---|---|
+| rerank (the shipped path) | 36 of 40 (90.0 %) | 29 of 39 (74.4 %) | 36 of 40 (90.0 %) | 26 of 39 (66.7 %) | 2 | **MISS** (29 against 34) |
+| fused | 36 of 40 (90.0 %) | 27 of 39 (69.2 %) | 36 of 40 (90.0 %) | 26 of 39 (66.7 %) | 2 | (none) |
+| lexical | 27 of 40 (67.5 %) | 24 of 39 (61.5 %) | 31 of 40 (77.5 %) | 25 of 39 (64.1 %) | 2 | (none) |
+| semantic | 25 of 40 (62.5 %) | 23 of 39 (59.0 %) | 31 of 40 (77.5 %) | 24 of 39 (61.5 %) | 2 | (none) |
+
+Floor 85 %, target 95 % (hit@5); target 99 % (full evidence). The lighter-reranker row stands as "not installed"
+(Q1 (a)). Visible rerank misses: hit@5 Q03 (first gold rank 6), Q08 (9), q35 (8), q31 (never retrieved); full
+evidence Q13, Q17, Q20 (1 of 2 pieces each), q31 (0 of 2).
+
+**Verdict:** the memory proof is **not met**: rerank's hidden hit@5 is 29 of 39 against 34 of 39, while the visible
+half is 36 of 40 at the same commit. Under the owner's Q2 (a) (DEC-1186 (3), confirmed by DEC-1206 (2)) W2-15a closes
+on this measured record; S1's memory clause reads "recorded against 34 of 39".
+
+**The gaps to W2-15b (DAEO-swdu), at most three:**
+1. **The hidden half's drop at the same commit** (rerank 74.4 % hidden against 90.0 % visible): first how much is
+   stale or unresolved gold (2 unresolved gold blocks in every mode; W2-61h's changed-gold list), then misses by
+   question kind and area on both halves. DEC-1206 (3)'s operator job measures it, ids and counts only; then the first
+   fresh 80 under DEC-1207 (3)'s rule is measured at once as Gov OS's real figure.
+2. **Gold ranked just past 5** (visible Q03, Q08, q35 at ranks 6 to 9; the hidden misses' ranks come from the job):
+   ranking (section 8's G2, ranked-lexical tuning and the rerank's depth).
+3. **Full evidence in the stacked context** (visible 90.0 %, hidden 66.7 %, against 99 %; second pieces missing on
+   Q13, Q17, Q20): the span and chunking (section 8's G1).
