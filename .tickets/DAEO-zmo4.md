@@ -5,7 +5,7 @@ title: An adopted repository's tickets get their Verify clauses by a checked pas
 type: task
 class: implementation
 role: engineer
-profile: FULL  # [changed, DEC-1188: it writes allowed_paths, a permission field]
+profile: FULL
 status: in_progress
 state_class: AUTHORITATIVE
 priority: 1
@@ -121,3 +121,5 @@ W2-27 stopped at A5 (EXAMIN's F-011): in an adopted repository nothing can write
 **Widened 2026-11-15 by the CTO (DEC-802, DEC-1189 (1)):** `pyproject.toml` and `src/gov/_shipped/template/governance/kernel/schemas/**`. r2's review F1: from a wheel install the apply's schema check finds no `ticket.schema.json`/`common.schema.json` and refuses every apply (`VERIFY_PASS_SCHEMA`), label-only ones included; the wheel ships every file the product reads (DEC-1189 (1)). Run r2b ships the two schemas, declares `jsonschema`, adds a wheel-installed test, then a narrow independent check (DEC-1154) before the land.
 
 **Widened 2026-11-15 by the CTO (DEC-1156 (7), P-W2-174-R2B-1 (A)):** `src/gov/adopt/fabric.py`, `tests/unit/adopt/test_w2_88_shipped.py` and `tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py`: W2-88's lists of the wheel's shipped files gain the two schemas r2b ships (DEC-1189 (1): the wheel ships every file the product reads), one line each; the acceptance file's edit is a test designer's.
+
+(The profile was changed from STANDARD to FULL by DEC-1188 (2): the apply writes allowed_paths, a permission field. The field stays bare; the launcher and the land read it raw.)
