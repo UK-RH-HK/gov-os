@@ -100,8 +100,6 @@ kpis:
 profile: FULL
 sources:
 - DEC-1189
-- W2-124  # [added 2026-11-15 by the CTO: cited in the KPI brackets (structural links notice after the land)]
-- W2-26  # [added 2026-11-15 by the CTO: the same]
 - DEC-1185
 - DEC-1183
 - DEC-1154
