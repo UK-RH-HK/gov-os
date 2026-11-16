@@ -6,6 +6,10 @@ its lines carry are returned. Whatever a log holds that no specimen shows makes 
 "not measured", with the reason named, at any version. A sub-agent's file belongs to the session (DEC-501).
 **Counts only, never content**: no text of a log line reaches a count's reason or a refusal, the Claude Code
 version excepted.
+
+W2-60b adds ``measure``: new readings only, for the session record (turns, compactions, rate-limit events, cost,
+effort, minutes, the models of the session and its sub-agents). ``find``, ``subagent_files`` and ``read`` are as
+W1-31 left them.
 """
 
 from __future__ import annotations

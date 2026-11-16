@@ -32,6 +32,13 @@ names one file in the session's temp folder, ``role-<role>.md``, composed of the
 them (the role file, then each named skill's ``SKILL.md``), then one blank line, then the template's bytes; the
 launch record's ``appended_sha256`` is that file's, and its ``template`` names the template's path and sha256.
 
+W2-60b: a worker role is launchable when its kernel role file says it is a worker (``_role_kind``); there is no fixed
+list of roles. A writing session is refused while another is live in its worktree, read from the session records
+(``gov.launch.session_record``). Each worker session gets one session record, written whole once its process has
+started and replaced whole after it ends, whatever its ending; a record that cannot be written leaves the exit code as
+it is, with one line on stderr. ``tests_worktree`` makes a ticket's tests worktree, ``<tree>-tests`` on
+``<branch>-tests`` at the tree's HEAD.
+
 No message of this module carries a held-out path.
 """
 
@@ -1062,6 +1069,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _role_kind(root, role)
     # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree, before anything is written
     session_record.check_one_writer(root, str(root), role)
+    session_record.make_folder(root)  # before the settings, so every launch's runtime rules are the same (W2-56 S3)
     settings = build_settings(root, role, ticket_id)
     faults = sandbox_faults(settings)
     if faults:

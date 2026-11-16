@@ -228,6 +228,18 @@ def finish(record: dict, exit_code, config: Path, result: dict | None = None) ->
     return ended
 
 
+def make_folder(root: Path) -> None:
+    """The records' folder, made before a launch's settings are built, so that the runtime rules (which name what
+    exists under ``.gov-runtime``) are the same on every launch (W2-56 S3). One that cannot be made is left to
+    ``write``, whose failure is S5's single stderr line: it never refuses the launch."""
+    try:
+        base = folder(root)
+        if not os.path.lexists(base.parent) or (base.parent.is_dir() and not base.parent.is_symlink()):
+            os.makedirs(base, exist_ok=True)
+    except (OSError, GovError):
+        pass
+
+
 def path_of(root: Path, session_id: str) -> Path:
     return folder(root) / f"{session_id}.json"
 
