@@ -29,6 +29,12 @@ Run 8 (DEC-1183, the owner's package 1 (a); run 8 interface items 3, 4 and 6): t
 ``SHIPPED_FILE_MISSING`` for the first met); the installed wheel's ``gov`` folder holds ``_shipped/`` with the three, byte for byte; and a file
 found nowhere names the shipped copy's place among those looked.
 
+Run 10, S29 (DEC-1189 (1), the owner's "W2-88-GITLEAKS-SHIP yes"; the lead's run 10 interface): the wheel ships at ``gov/_shipped/<rel>`` every
+rel the code passes to ``fabric.shipped``, the ``template/`` prefix kept (``template/.gitleaks.toml``, the retrieval and discovery skills,
+``brief.md``, ``role-cto.md``); the resolver's order is unchanged, so from a wheel those rels are the installed package's copy and no longer the
+project's, while a ``template/`` rel the wheel does not ship is still the project's copy (refused ``SHIPPED_FILE_MISSING`` where the project lacks
+it); and A0 from the wheel on a repository with no kit commits the template's ``.gitleaks.toml``.
+
 Everything is built in the case's tmp folders (the wheel, the venv, the clone, the projects); nothing is installed on the machine; no network.
 """
 
@@ -235,34 +241,96 @@ def test_s24_from_a_source_tree_shipped_is_that_trees_file(kit_project, pool_tre
     assert answer["exists"] is True
 
 
-@pytest.mark.parametrize("rel,placed", [
+def files_of(path: Path) -> dict:
+    """``{relative path: bytes}`` of a file (key ``""``) or of every file under a folder, caches left out."""
+    if path.is_file():
+        return {"": path.read_bytes()}
+    return {p.relative_to(path).as_posix(): p.read_bytes() for p in sorted(path.rglob("*"))
+            if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"}
+
+
+def change_projects_copy(place: Path) -> None:
+    """Make the project's copy at ``place`` differ from Gov OS's: a file is rewritten, a folder gets its first file rewritten and one file added."""
+    if place.is_file():
+        place.write_text("# the project's own copy, changed (run 10)\n", encoding="utf-8")
+        return
+    first = sorted(p for p in place.rglob("*") if p.is_file())
+    assert first, f"the plant: the project's copy {place} holds no file"
+    first[0].write_text("the project's own copy, changed (run 10)\n", encoding="utf-8")
+    (place / "PROJECT-ONLY.md").write_text("a file only the project's copy holds (run 10)\n", encoding="utf-8")
+
+
+S29_SHIPPED = [   # run 10 interface item 1: the template/ rels the wheel now ships, with where copier put the project's copy
     pytest.param("template/governance/kernel/skills/retrieval", "governance/kernel/skills/retrieval", id="a-skill-folder"),
     pytest.param("template/.gitleaks.toml", ".gitleaks.toml", id="the-secrets-configuration"),
     pytest.param("template/governance/kernel/templates/brief.md", "governance/kernel/templates/brief.md", id="a-template"),
+    pytest.param("template/governance/kernel/skills/discovery", "governance/kernel/skills/discovery", id="the-discovery-skill"),
+    pytest.param("template/governance/kernel/templates/role-cto.md", "governance/kernel/templates/role-cto.md", id="the-cto-role-template"),
+]
+
+
+@pytest.mark.parametrize("rel,placed", S29_SHIPPED)
+def test_s29_from_an_installed_wheel_a_shipped_template_file_is_the_installed_packages_copy_not_the_projects(release, kit_project, tmp_path,
+                                                                                                            rel, placed):
+    """success-S29 (DEC-1189 (1); run 10 interface items 1 and 2; revises run 7's S24 case, which answered the project's copy): gov run from the
+    wheel in the venv (no ``PYTHONPATH``, working folder in tmp; ``gov.__file__`` is in the venv) has no source tree, and the resolver's order is
+    unchanged, so a ``template/`` rel the wheel ships is answered by the installed package's copy, ``<gov package folder>/_shipped/<rel>``, which
+    exists and holds the bytes of this checkout's ``<rel>`` (for a folder, the same files and bytes). The project's copy (changed here, so the
+    case can tell) is never answered, nor the decoys where ``parents[3]`` of the installed ``fabric.py`` points."""
+    root = tmp_path / "project"
+    shutil.copytree(kit_project, root)
+    change_projects_copy(root / placed)
+    answer = resolve(release.python, rel, root, release.scratch)
+    assert answer.get("gov_file", "").startswith(str(release.venv)), f"gov ran from {answer.get('gov_file')}, not from the venv"
+    assert answer.get("ok") is True, f"fabric.shipped({rel!r}, root) did not answer: {answer}"
+    got = os.path.realpath(answer["path"])
+    package_copy = os.path.realpath(Path(answer["gov_file"]).parent / "_shipped" / rel)
+    assert got != os.path.realpath(root / placed), f"it answered the project's copy {root / placed}, not the installed package's {package_copy}"
+    assert got != os.path.realpath(release.decoy / rel), f"it answered the decoy {release.decoy / rel}"
+    assert got == package_copy, f"it answered {answer['path']}, expected the installed package's copy {package_copy}"
+    assert answer["exists"] is True
+    want, have = files_of(W.REPO_ROOT / rel), files_of(Path(got))
+    assert want, f"the plant: this checkout's {rel} holds no file"
+    assert have == want, (f"the installed package's copy of {rel} is not byte for byte this checkout's: missing {sorted(set(want) - set(have))}, "
+                          f"extra {sorted(set(have) - set(want))}, drifted {sorted(n for n in set(want) & set(have) if want[n] != have[n])}")
+
+
+@pytest.mark.parametrize("rel,placed", [
+    pytest.param("template/governance/kernel/skills/planning", "governance/kernel/skills/planning", id="an-unshipped-skill-folder"),
+    pytest.param("template/governance/kernel/templates/checkpoint.md", "governance/kernel/templates/checkpoint.md", id="an-unshipped-template"),
 ])
-def test_s24_from_an_installed_wheel_a_template_file_is_the_projects_copy_that_copier_installed(release, kit_project, rel, placed):
-    """success-S24 (item 1 (2), item 3): gov run from the wheel in the venv (no ``PYTHONPATH``, working folder in tmp; ``gov.__file__`` is in the venv)
-    has no source tree, so ``template/X`` is read as ``<root>/X``: the copy ``copier copy`` installed. Decoys stand where ``parents[3]`` of the installed
-    ``fabric.py`` points (a ``template/`` with another ``.gitleaks.toml`` and ``copier.yml``): they are never answered."""
+def test_s24_from_an_installed_wheel_a_template_file_the_wheel_does_not_ship_is_the_projects_copy_that_copier_installed(release, kit_project, rel,
+                                                                                                                       placed):
+    """success-S24 kept by success-S29 (run 10 interface item 2; item 1 (2) and item 3 of run 7): from the wheel, a ``template/`` rel the wheel does
+    not ship (no ``<gov package folder>/_shipped/<rel>``) is still read as ``<root>/X``: the copy ``copier copy`` installed. Decoys stand where
+    ``parents[3]`` of the installed ``fabric.py`` points (a ``template/`` with another ``.gitleaks.toml`` and ``copier.yml``): never answered."""
+    assert (kit_project / placed).exists(), f"the plant: copier installed no {placed}"
     answer = resolve(release.python, rel, kit_project, release.scratch)
     assert answer.get("gov_file", "").startswith(str(release.venv)), f"gov ran from {answer.get('gov_file')}, not from the venv"
+    assert not (Path(answer["gov_file"]).parent / "_shipped" / rel).exists(), f"the plant: the wheel ships {rel}, so this case tells nothing"
     assert answer.get("ok") is True, f"fabric.shipped({rel!r}, root) did not answer from the project's copy: {answer}"
     assert Path(answer["path"]).resolve() == (kit_project / placed).resolve(), f"it answered {answer['path']}, expected {kit_project / placed}"
     assert answer["exists"] is True
 
 
+UNSHIPPED_SKILL = "template/governance/kernel/skills/planning"   # run 10: a template/ folder the wheel does not ship (item 2)
+
+
 @pytest.mark.parametrize("rel", [
-    pytest.param("template/governance/kernel/skills/discovery", id="under-template-copy-removed"),
+    pytest.param(UNSHIPPED_SKILL, id="under-template-copy-removed"),
     pytest.param("governance/project/not-shipped-anywhere.yaml", id="not-under-template"),
 ])
 def test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_looked(release, kit_project, tmp_path, rel):
-    """success-S24 (item 1 (3)): from the wheel, a ``template/`` folder whose copy the project does not hold (the project's discovery skill removed), and a
-    path outside ``template/`` that nothing ships, are refused ``SHIPPED_FILE_MISSING``: the message names ``rel`` and each place looked; ``details.file``
-    is ``rel`` and ``details.looked`` lists the places (the project's copy among them for the first); no default is answered in its place.
-    Run 8 (item 4): the copy shipped inside the installed ``gov`` package, ``<gov package folder>/_shipped/<rel>``, is among the places looked."""
+    """success-S24 (item 1 (3)): from the wheel, a ``template/`` folder whose copy the project does not hold (the project's planning skill removed),
+    and a path outside ``template/`` that nothing ships, are refused ``SHIPPED_FILE_MISSING``: the message names ``rel`` and each place looked;
+    ``details.file`` is ``rel`` and ``details.looked`` lists the places (the project's copy among them for the first); no default is answered in its
+    place. Run 8 (item 4): the copy shipped inside the installed ``gov`` package, ``<gov package folder>/_shipped/<rel>``, is among the places looked.
+    Run 10 (success-S29, item 2): the first param was the discovery skill, which the wheel now ships; it is the planning skill, which it does not."""
     root = tmp_path / "project"
     shutil.copytree(kit_project, root)
-    shutil.rmtree(root / "governance/kernel/skills/discovery")
+    removed = root / UNSHIPPED_SKILL.removeprefix("template/")
+    assert removed.is_dir(), f"the plant: copier installed no {removed}"
+    shutil.rmtree(removed)
     answer = resolve(release.python, rel, root, release.scratch)
     assert answer.get("ok") is False, f"fabric.shipped({rel!r}, root) answered for a file shipped nowhere: {answer}"
     assert answer.get("code") == "SHIPPED_FILE_MISSING", f"the refusal is {answer.get('code')!r} ({answer.get('type')}): {answer.get('message')!r}"
@@ -279,7 +347,7 @@ def test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_loo
     assert any(os.path.realpath(str(p).rstrip("/")) == inside for p in looked), (
         f"the installed package's shipped copy {inside} is not among the places looked: {looked}")
     if rel.startswith("template/"):
-        expected = str(root / "governance/kernel/skills/discovery")
+        expected = str(root / rel.removeprefix("template/"))
         assert any(str(p) == expected or str(p).rstrip("/") == expected for p in looked), f"the project's copy {expected} is not among the places looked: {looked}"
 
 
@@ -385,11 +453,23 @@ def test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refus
     ``SHIPPED_FILE_MISSING``, ``details.file`` a ``rel`` the message names (the first shipped file it could not find: the discovery skill, or, while
     the wheel ships no pool (at 0821e8514), the pool: either is a shipped file found nowhere; run 8: the message names every place looked), and
     nothing is copied in its place: no ``.claude/skills/discovery``
-    and none of A9's copies in the tree or the index, HEAD unmoved, no A9 record, the tree clean."""
+    and none of A9's copies in the tree or the index, HEAD unmoved, no A9 record, the tree clean.
+    Run 10 (success-S29, item 2): the wheel now ships the discovery skill, which the resolver answers before the project's copy; so for the folder
+    to be found nowhere, the installed package's ``_shipped/template/governance/kernel/skills/discovery`` is also moved aside for this case (put
+    back after it), as the cron case does. Where the wheel ships none (this head), there is nothing to move."""
     def remove_discovery(project):
         shutil.rmtree(project / "governance/kernel/skills/discovery")
 
-    adoption, run, _out, start = installed_a9(worlds, release, "p1-missing", before=remove_discovery)
+    package_copy = installed_gov_folder(release) / "_shipped" / "template/governance/kernel/skills/discovery"
+    aside = package_copy.with_name(package_copy.name + ".w2-88-aside")
+    moved = package_copy.is_dir()
+    if moved:
+        package_copy.rename(aside)
+    try:
+        adoption, run, _out, start = installed_a9(worlds, release, "p1-missing", before=remove_discovery)
+    finally:
+        if moved:
+            aside.rename(package_copy)
     W.assert_refused(run, "SHIPPED_FILE_MISSING", "A9 run from a wheel where a shipped folder is found nowhere")
     error = run.error
     file = (error.get("details") or {}).get("file")
@@ -469,3 +549,36 @@ def test_s24_a9_from_an_installed_wheel_whose_cron_script_is_removed_is_refused_
     if act.is_file():
         assert "<path to Gov OS>" not in act.read_text(encoding="utf-8"), "an ACT.md with the slot <path to Gov OS> was written"
     assert W.head(adoption.project) == start, "A9 moved HEAD though it was refused"
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Run 10, S29 (DEC-1189 (1); run 10 interface item 3): A0 from an installed release on a repository with no kit
+# ------------------------------------------------------------------------------------------------------------
+
+GITLEAKS_REL = "template/.gitleaks.toml"
+
+
+def test_s29_a0_from_an_installed_wheel_on_a_repository_with_no_kit_commits_the_templates_gitleaks_toml(release, box, host):
+    """success-S29 (DEC-1189 (1), item 3; the defect W2-81's run met on release 0.1.0): a planted git repository (two commits, no kit, no
+    ``.gitleaks.toml``), A0 run by the wheel's gov (the suite's hermetic environment, no ``PYTHONPATH``, from the project) exits 0; the commit A0
+    made holds ``.gitleaks.toml`` with the bytes of this checkout's ``template/.gitleaks.toml``; the output names no ``SHIPPED_FILE_MISSING``."""
+    project = Path(box.base) / "no-kit"
+    project.mkdir(parents=True)
+    W.write(project, "README.md", "# Lighthouse\n\nA repository with no Gov OS kit, planted by the W2-88 tests (run 10).\n")
+    W.git(project, "init", "-q", "-b", "main")
+    W.commit_all(project, "the first commit")
+    W.write(project, "src/lamp.py", "def beam():\n    return 'on'\n")
+    W.commit_all(project, "the second commit")
+    assert not (project / ".gitleaks.toml").exists() and not (project / "governance").exists(), "the plant: the repository is not kit-free"
+    start = W.head(project)
+    adoption = W.Adoption(project, box, host)
+    done = run_installed(adoption, release, "A0")
+    output = (done.stdout or "") + (done.stderr or "")
+    assert "SHIPPED_FILE_MISSING" not in output, f"A0 from the wheel refused a shipped file found nowhere:\n{done.describe()}"
+    assert done.returncode == 0, f"A0 run by the wheel's gov did not exit 0\n{done.describe()}"
+    W.assert_ok(done, "A0 run by the wheel's gov on a repository with no kit")
+    commit = W.head(project)
+    assert commit != start, "A0 made no commit"
+    assert ".gitleaks.toml" in W.git(project, "diff", "--name-only", start, commit).split(), f"A0's commit {commit} does not add .gitleaks.toml"
+    shown = subprocess.run(["git", "-C", str(project), "show", f"{commit}:.gitleaks.toml"], capture_output=True, check=True).stdout
+    assert shown == (W.REPO_ROOT / GITLEAKS_REL).read_bytes(), f"the .gitleaks.toml A0 committed is not byte for byte this checkout's {GITLEAKS_REL}"

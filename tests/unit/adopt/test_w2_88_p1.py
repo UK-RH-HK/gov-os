@@ -264,11 +264,12 @@ from gov.cli.errors import GovError
 root = Path(sys.argv[1])
 seen = {"gov": gov.__file__, "tree": fabric._source_tree(), "attrs": [n for n in ("STANDARD", "GOV_OS") if n in vars(fabric)]}
 seen["copy"] = str(fabric.shipped("template/governance/kernel/skills/retrieval", root))
+seen["kit_only"] = str(fabric.shipped("template/governance/kernel/skills/planning", root))
 seen["package"] = str(fabric._package_copy())
 seen["three"] = {rel: str(fabric.shipped(rel, root)) for rel in fabric.PACKAGED}
 seen["pool"] = fabric.standard_of(root)["pool"]
 try:
-    fabric.shipped("template/.gitleaks.toml", root)
+    fabric.shipped("template/governance/kernel/skills/test-design", root)
 except GovError as exc:
     seen["refused"] = [exc.code, exc.details]
 print(json.dumps(seen))
@@ -296,20 +297,25 @@ def test_a_wheel_in_the_release_form_runs_a9s_reads_with_no_source_tree(tmp_path
                                capture_output=True, text=True, env=env, cwd=work)
     assert installed.returncode == 0, installed.stderr
     project = tmp_path / "project"
-    copy(REPO / f"{SKILLS}/retrieval", project / "governance/kernel/skills/retrieval")  # the kit copier installed
+    for name in ("retrieval", "planning"):  # the kit copier installed
+        copy(REPO / f"{SKILLS}/{name}", project / f"governance/kernel/skills/{name}")
     done = subprocess.run([str(venv / "bin/python"), "-c", PROBE, str(project)], capture_output=True, text=True, env=env,
                           cwd=work)
     assert done.returncode == 0, done.stderr
     seen = json.loads(done.stdout)
     assert seen["gov"].startswith(str(venv)) and seen["tree"] is None and seen["attrs"] == []
-    assert seen["copy"] == str(project / "governance/kernel/skills/retrieval")
     package = Path(seen["package"])  # run 8, package 1 (a): the three ship inside the wheel, read through step (2)
     assert str(package).startswith(str(venv)) and package.name == "_shipped"
+    # S29 (DEC-1189 (1)): a template/ rel the wheel ships is answered by the package's copy, before the project's;
+    # one it does not ship still falls through to the project's copy
+    assert seen["copy"] == str(package / f"{SKILLS}/retrieval")
+    assert seen["kit_only"] == str(project / "governance/kernel/skills/planning")
     for rel in fabric.PACKAGED:
         assert seen["three"][rel] == str(package / rel), rel
         for source in ([REPO / rel] if (REPO / rel).is_file() else sorted(p for p in (REPO / rel).iterdir() if p.is_file())):
             assert (package / source.relative_to(REPO)).read_bytes() == source.read_bytes(), source
     assert seen["pool"] == yaml.safe_load((REPO / fabric.RETRIEVAL).read_text())["pool"]
     # a file of the kit only (not in the wheel), the project's copy missing: refused naming all three places
-    assert seen["refused"][0] == "SHIPPED_FILE_MISSING" and seen["refused"][1]["file"] == "template/.gitleaks.toml"
-    assert seen["refused"][1]["looked"][1:] == [str(package / "template/.gitleaks.toml"), str(project / ".gitleaks.toml")]
+    gone = f"{SKILLS}/test-design"
+    assert seen["refused"][0] == "SHIPPED_FILE_MISSING" and seen["refused"][1]["file"] == gone
+    assert seen["refused"][1]["looked"][1:] == [str(package / gone), str(project / gone.removeprefix("template/"))]

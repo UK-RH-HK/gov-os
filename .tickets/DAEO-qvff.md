@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-nqa2
 allowed_paths:
+- src/gov/util/role_paths.py  # [added 2026-11-15, the owner's P-W2-111-YAML-REST (a): the guard's role_paths and front-matter reads through the checked loader]
 - tests/acceptance/serial-only.txt  # [added 2026-11-15 by the CTO, DEC-1156 (7), P-W2-111-R5-ROWS (a): the ticket's own five timing files as 'serial: latency' entries, beside W1-02's, W1-05's and W2-57's]
 - tests/acceptance/W1-02/test_w1_02_guard_hook.py
 - tests/acceptance/W1-02/README.md
@@ -92,3 +93,5 @@ The owner's D2 (a) on CAPACITY-1 (DEC-979, P-LATENCY-1): a fresh independent tes
 **Interface for S9's count case (the CTO, 2026-11-15, DEC-1157 (3), on the r5 lead's measure at 0e2cdf33e):** observed in the product hook's process as W1-02 runs it, by the YAML files opened under `governance/` and the number of parses through yaml's public load API: (1) a call refused before the held-out check (for example `dangerouslyDisableSandbox` set) parses no YAML file; (2) a write or edit, of any role, parses no `path-map.yaml`; (3) every call parses each YAML file it opens at most once. `held-out.yaml` stays read on every call past decide()'s early refusals (DEC-218: a broken held-out.yaml stops every call). Decisions and reasons are unchanged (the corpus).
 
 **Widened 2026-11-15 by the CTO (DEC-1156 (7), P-W2-111-R5-ROWS (a)):** `tests/acceptance/serial-only.txt`, so a test designer lists W2-111's five timing files as `serial: latency` (rv-3's F2: they red only inside lead_verify's parallel phase at load 10-20; alone and quiet 25/25 pass). rv-3's F1 (libyaml accepts tab and `? ` texts the pure SafeLoader refuses, so a malformed held-out.yaml no longer stops every call: fails open) is fixed in the same round by DEC-802 (engineer, product and live-hook diff, with a test-design batch giving it as a described behaviour), and F3's README line with it; then a narrow independent re-check at the new head (DEC-1154).
+
+**Widened 2026-11-15 by the owner (P-W2-111-YAML-REST (a)):** `src/gov/util/role_paths.py`. The fast YAML loader's fail-open class (rv-3's F1) also sits in the guard's other reads: `role_paths.py:85`, `:165`, `parts.py:234` and the live hook's `role_reads.py:111`, `:171` (in the diff). All are routed through the checked loader, with a planted-tab case each, before the narrow re-check; ACT-GUARD-FIX-7 and release 0.1.1 carry it.

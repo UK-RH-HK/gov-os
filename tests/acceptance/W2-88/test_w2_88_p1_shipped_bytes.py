@@ -9,6 +9,12 @@ any other file under ``_shipped/`` that is not a copy is an extra.
 
 Run 8b (the CTO's item on step 6, DEC-893; run 8b interface item 21): ``governance/project/orchestration/tools/memaudit_cron.sh`` is a fourth
 item, byte for byte (``the-cron-script``); the "only the copies" case lets it through as a copy.
+
+Run 10, S29 (DEC-1189 (1): "every file the shipped-file resolver is asked for is in the wheel"; run 10 interface item 1): five more items,
+each at its path in the Gov OS repository with the ``template/`` prefix kept: ``template/.gitleaks.toml`` (A0's and MA's read,
+``the-secrets-configuration``) and A9's kernel sources, the retrieval and discovery skills and the T-0 and T-8 templates (``brief.md``,
+``role-cto.md``). Both cases hold them as they hold the first four: each copy byte for byte, and the "only the copies" case accepts them and
+nothing else.
 """
 
 from __future__ import annotations
@@ -26,6 +32,12 @@ ITEMS = {
     "the-audit-briefs": "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs",
     # Run 8b (the CTO, DEC-893; run 8b interface item 21): step 6's cron script ships as a fourth item.
     "the-cron-script": "governance/project/orchestration/tools/memaudit_cron.sh",
+    # Run 10, S29 (DEC-1189 (1); run 10 interface item 1): every other rel the code passes to ``fabric.shipped``, the ``template/`` prefix kept.
+    "the-secrets-configuration": "template/.gitleaks.toml",
+    "the-retrieval-skill": "template/governance/kernel/skills/retrieval",
+    "the-discovery-skill": "template/governance/kernel/skills/discovery",
+    "the-brief-template": "template/governance/kernel/templates/brief.md",
+    "the-cto-role-template": "template/governance/kernel/templates/role-cto.md",
 }
 
 
@@ -59,8 +71,9 @@ def test_s24_each_shipped_copy_equals_its_source_byte_for_byte(rel):
 
 
 def test_s24_the_shipped_folder_holds_only_the_copies():
-    """success-S24 (run 8 item 5, an extra file in the copy): every file under ``src/gov/_shipped/`` is one of the three items' copies (or an
-    ``__init__.py`` above them, or a cache): a file shipped that is no copy of a source fails, naming it."""
+    """success-S24 (run 8 item 5, an extra file in the copy): every file under ``src/gov/_shipped/`` is one of the items' copies (or an
+    ``__init__.py`` above them, or a cache): a file shipped that is no copy of a source fails, naming it. Run 10 (success-S29): the five
+    ``template/`` items are copies too, and nothing else is."""
     assert SHIPPED.is_dir(), "src/gov/_shipped/ does not exist: the pool, the walls template and the audit briefs are not shipped inside the gov package"
     copies = set()
     for rel in ITEMS.values():

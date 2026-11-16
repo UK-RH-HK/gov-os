@@ -20,6 +20,11 @@ allowed_paths:
 - src/gov/adopt/facts.py  # the adoption's facts file (DEC-1148 (2), item 4 (a1))
 - tests/unit/adopt/test_w2_174*
 - docs/probes/DAEO-zmo4/**  # [added, DEC-1188: the FULL run's review record]
+- pyproject.toml  # [added 2026-11-15 by the CTO, DEC-802, DEC-1189 (1): r2's F1, the schemas in the wheel and jsonschema declared]
+- src/gov/_shipped/template/governance/kernel/schemas/**  # [added, the same]
+- src/gov/adopt/fabric.py  # [added 2026-11-15 by the CTO, DEC-1156 (7), P-W2-174-R2B-1 (A): the two schemas in PACKAGED]
+- tests/unit/adopt/test_w2_88_shipped.py  # [added, the same: THE_SHIPPED]
+- tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py  # [added, the same: ITEMS, a test designer's edit]
 reads:
 - src/gov/brief/build.py
 - src/gov/adopt/**
@@ -112,3 +117,7 @@ S5 (the adopt skill states the Verify pass) moved word for word to W2-88a (DAEO-
 ## Reopened 2026-11-15 by the owner (DEC-1188, P-W2-27-F011 (a))
 
 W2-27 stopped at A5 (EXAMIN's F-011): in an adopted repository nothing can write a ticket's role, allowed_paths and KPI lines (`tk create` has no option for them; the kit denies `Edit(.tickets/**)`), so A5's auditor cannot be launched with a report path, and the coordination ticket fails core-schema (F-012). S6, S7 and F4 extend the list and the apply to those fields and to reads, needs and waits_on; the kit's deny stays. Profile FULL (the apply writes a permission field). `gov brief`, A0 and the adopt skill are not changed here (DEC-1188 (3), rows). Shipped in release 0.1.1.
+
+**Widened 2026-11-15 by the CTO (DEC-802, DEC-1189 (1)):** `pyproject.toml` and `src/gov/_shipped/template/governance/kernel/schemas/**`. r2's review F1: from a wheel install the apply's schema check finds no `ticket.schema.json`/`common.schema.json` and refuses every apply (`VERIFY_PASS_SCHEMA`), label-only ones included; the wheel ships every file the product reads (DEC-1189 (1)). Run r2b ships the two schemas, declares `jsonschema`, adds a wheel-installed test, then a narrow independent check (DEC-1154) before the land.
+
+**Widened 2026-11-15 by the CTO (DEC-1156 (7), P-W2-174-R2B-1 (A)):** `src/gov/adopt/fabric.py`, `tests/unit/adopt/test_w2_88_shipped.py` and `tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py`: W2-88's lists of the wheel's shipped files gain the two schemas r2b ships (DEC-1189 (1): the wheel ships every file the product reads), one line each; the acceptance file's edit is a test designer's.
