@@ -394,3 +394,6 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 239 | DEC-1190 (2): EXAMIN's settings reshape by the operator (operator_settings.py), the EXAMIN CTO's restart with its tools at start, probes r3, then A5 | IN PROGRESS: the operator runs it |
 | 240 | DEC-1190 (2): the same settings reshape for EXAMIN's real repository at W2-29, judged again on its files | WAITS: W2-29 |
 | 241 | DEC-1190 (3) and the W2-27 product findings (F-000 to F-015, W81-1 to W81-3): one owner package after W2-27, flag-not-drop for the adapters and doctor | NOT STARTED: after W2-27 |
+| 242 | DEC-1191 (1): the EXAMIN CTO and the six W2-81 sessions switched to adopter.sh at their next stop | IN PROGRESS |
+| 243 | DEC-1191 (2): the operator job runner (routine, (O) ACTs, the re-pin), its rehearsal and review; the owner's install step and crontab line | IN PROGRESS: building |
+| 244 | DEC-1191 (3): ACT-DEADMAN-INBOX-1 built, rehearsed, reviewed; the owner's yes | IN PROGRESS: building |

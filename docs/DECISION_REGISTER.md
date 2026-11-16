@@ -15250,6 +15250,15 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-15 ~22:30: "yes W2-81-adopter-brief 65438a2e … as EXAMIN's owner I decide to reshape the copy's whole settings to Gov OS's standard … The product fix stays flag-not-drop … add F-014 and F-015 to the product findings package."
 - **Governing sources:** packages `P-W2-81-FULLRUN.md`, `P-W2-27-SETTINGS.md`; EXAMIN's FINDINGS F-000, F-002, F-014, F-015; DEC-313; DEC-315; DEC-158.
 
+### DEC-1191 — P-SESSIONS-1 items 1, 2 (widened) and 4b: adopting sessions headless; one operator job runner for everything the owner approves; the sentinel's inbox rule
+- **Status:** ACCEPTED (owner, 2026-11-16 ~00:10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1104 (2), DEC-1106, DEC-1157 (2), DEC-1180, DEC-998, DEC-1112 (3), DEC-1190 · **Changes:** none (P-EXAMIN-CTO-1's start and restart by the operator is replaced for the EXAMIN CTO by item 1)
+- **Decision:**
+  - (1) **Item 1:** the EXAMIN CTO and the six W2-81 adopting sessions run headless like leads (`tools/adopter.sh`: `claude -p` with the tools set at launch, no trust screen and no permission question); each is switched at its next stop for a reply; the CTO resumes each headless (`claude -p --resume <session>`) after writing its reply; no tmux typing.
+  - (2) **Item 2, widened by the owner:** one operator for everything the owner approves. The job runner, a plain script outside any Claude session, runs routine jobs, class (O) by-hand ACTs and the re-pin, each only on the owner's `yes JOB-<id> <sha8>` (or a standing rule the owner approved), each job's manifest naming the paths it may touch (including `~/.local` for a re-pin). Typing the release code, sudo and pushes stay the owner's. The CTO queues; the interactive Terminal Operator stays only as a fallback. Installed by the owner's one step and a crontab line.
+  - (3) **Item 4b:** ACT-DEADMAN-INBOX-1: the sentinel's dead-man watch messages the CTO's session when an inbox item is unread for more than 10 minutes or no waiter guard is alive, and pushes the owner if it is still unread 10 minutes later; by the ACT's review and the owner's yes.
+- **Basis:** the owner's message of 2026-11-16 ~00:10: "yes P-SESSIONS-1 item 1 / yes P-SESSIONS-1 item 2 / yes P-SESSIONS-1 item 4b … Item 2, wider than drafted, as my decision: one operator for everything I approve …"
+- **Governing sources:** package `packages/P-SESSIONS-1.md` (2cc529166); DEC-1104 (2); DEC-998; DEC-1112 (3).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15375,3 +15384,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.569 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1188 (P-W2-27-F011 (a): EXAMIN's review and coordination tickets by the owner's operator tonight; W2-174 reopened for the launch fields by its checked apply, in 0.1.1). Next free id: DEC-1189. |
 | 0.570 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1189 (W2-88-GITLEAKS-SHIP yes: W2-88 reopened within S24 for the shipped .gitleaks.toml, in 0.1.1; P-W2-81-FULLRUN (a): W2-81's full run on 0.1.0 tonight). Next free id: DEC-1190. |
 | 0.571 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1190 (the W2-81 adopter brief approved; EXAMIN's settings reshaped to Gov OS's standard; the product fix flag-not-drop). Next free id: DEC-1191. |
+| 0.572 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1191 (P-SESSIONS-1: adopting sessions headless; one operator job runner for everything the owner approves, (O) ACTs and the re-pin included; the sentinel's inbox rule by ACT). Next free id: DEC-1192. |
