@@ -15267,6 +15267,12 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 ~00:35: "P-ADOPT-TEMPLATES (a); W2-153's product fix goes into 0.1.1."
 - **Governing sources:** package `packages/P-ADOPT-TEMPLATES.md` (0efec8ad7); W2-81's python-app F-009, rust-workspace F-004; DEC-1050; DEC-315.
 
+### DEC-1193 — The sets-root file: the owner writes ~/.config/gov-os/sets-root once; an operator job that reads it reports only counts and ids to the CTO
+- **Status:** ACCEPTED (owner, 2026-11-16 ~00:45, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1191 (2), DEC-820 (d), DEC-1082 (3), DEC-1097 (2), DEC-953 item 2
+- **Decision:** the owner writes the evaluation sets' root once into `~/.config/gov-os/sets-root`. An operator job (DEC-1191 (2)) may read that file at run time, so its `job.sh`, written by the CTO, never names the sets root. Such a job is `report: summary-only`: its full output stays in the operator's log (`~/gov-os-operator/log/jobs/`, 0600), and only its `SUMMARY ` lines (counts and ids) reach the CTO in the job's result and inbox item. The CTO never reads the full log. Hidden-set steps (W2-81's read step and its summary, W2-15a's walled counts) can run this way on the owner's yes per job.
+- **Basis:** the owner's message of 2026-11-16 ~00:45: "sets-root: yes: I write ~/.config/gov-os/sets-root once. A job that reads it returns only counts and ids, its full output stays in the operator's log, and only its summary reaches you."
+- **Governing sources:** DEC-1191 (2); DEC-820 (d); DEC-1082 (3).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15394,3 +15400,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.571 | 2026-11-15 | Owner (recorded by the orchestrator, DEC-861): DEC-1190 (the W2-81 adopter brief approved; EXAMIN's settings reshaped to Gov OS's standard; the product fix flag-not-drop). Next free id: DEC-1191. |
 | 0.572 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1191 (P-SESSIONS-1: adopting sessions headless; one operator job runner for everything the owner approves, (O) ACTs and the re-pin included; the sentinel's inbox rule by ACT). Next free id: DEC-1192. |
 | 0.573 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1192 (P-ADOPT-TEMPLATES (a): the role templates by the owner's operator tonight; W2-153 reopened for gov adapters generate to write them, in 0.1.1). Next free id: DEC-1193. |
+| 0.574 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1193 (the sets-root file; summary-only operator jobs for hidden-set steps). Next free id: DEC-1194. |
