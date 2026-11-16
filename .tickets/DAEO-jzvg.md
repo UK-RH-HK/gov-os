@@ -19,11 +19,7 @@ depends_on:
 - DAEO-r9ss
 - DAEO-7rr2
 allowed_paths:
-- src/gov/close/**
-- src/gov/config/**
-- template/governance/kernel/schemas/path-map.schema.json
-- tests/unit/close/**
-- fixtures/lang/**
+- .gov-runtime/scratch/deferred/W2-19/**
 kpis:
   success:
   - 'A project declares its test commands (for example cargo test, npm test or vitest run, pytest), each with its own parallel option, its own result reader, and the input globs W2-66''s selection keys on (W2-48''s cache was withdrawn, DEC-880). gov
@@ -100,3 +96,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-19), as approved (DEC-729). The list row
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. S5 and S7 are lifted (under `kpis.lifted`).
 
 **Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-19 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
+
+**Paths cleared on its deferral (DEC-1201), 2026-11-16 15:1x, by the CTO (DND 273):** a scratch-only placeholder stands in (the schema needs one path); the list was `src/gov/close/**`, `src/gov/config/**`, `template/governance/kernel/schemas/path-map.schema.json`, `tests/unit/close/**`, `fixtures/lang/**`; it held W2-191 in gov plan (NEEDS_WHAT_WRITES on src/gov/close/select.py) though this ticket is deferred to Wave 3. Restored when Wave 3 plans it.
