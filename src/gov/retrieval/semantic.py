@@ -694,7 +694,9 @@ def _status(root: Path) -> str | None:
     """Why the vectors cannot be answered from as they stand (missing, empty or stale), or None. Writes nothing.
     Worked out once per store, tree and configuration in a process, keyed by their fingerprints, and again whenever a
     fingerprint changes or cannot be read (W2-108); the lexical index's freshness is kept the same way."""
-    tree, status, _ = lexical._checked(root)  # the store's and the tree's key, taken with the lexical answer
+    # the store's and the tree's key, taken with the lexical answer as a search without refresh has it (W2-189: an index
+    # that only lags the tracked files is answered from, the vectors of the paths that changed left out)
+    tree, status, _ = lexical.served_checked(root)
     if status != "fresh":
         return status
     config = lexical._stamps(Path(root) / PROJECT_DIR / name  # what ``_wanted``, ``_pin`` and ``_recipe`` read
@@ -807,7 +809,8 @@ def search(root: Path, query: str, refresh: bool = True, top_k: int | None = Non
         if vector is None:
             return _report(reason, hits=[], vector_cache=counts)
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
-        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, top_k or TOP_K))],
+        nearest = _NEAREST_LEFT if _leaving_out(connection, root) else _NEAREST
+        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(nearest, (vector, top_k or TOP_K))],
                        vector_cache=counts)
     finally:
         connection.close()
@@ -815,6 +818,17 @@ def search(root: Path, query: str, refresh: bool = True, top_k: int | None = Non
 
 _NEAREST_FILES = "SELECT path, vec_distance_cosine(embedding, ?) AS distance FROM semantic_file_vector " \
                  "ORDER BY distance, path LIMIT ?"
+# W2-189: the same without the chunks (files) of the paths a search left out (``left_out``, a function of the connection)
+_NEAREST_LEFT = _NEAREST.replace(" ORDER BY", " WHERE NOT left_out(c.path) ORDER BY", 1)
+_NEAREST_FILES_LEFT = _NEAREST_FILES.replace(" ORDER BY", " WHERE NOT left_out(path) ORDER BY", 1)
+
+
+def _leaving_out(connection: sqlite3.Connection, root: Path) -> bool:
+    """Gives ``connection`` the function ``left_out(path)``: whether a search without refresh leaves the path out
+    (``lexical.served``). True when some path is left out, so the query that uses it is the one to run."""
+    left = frozenset(lexical.served(root)[1])
+    connection.create_function("left_out", 1, lambda path: path in left, deterministic=True)
+    return bool(left)
 _BEST_OF_FILE = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, " \
                 "vec_distance_cosine(v.embedding, ?) AS distance FROM semantic_vector v " \
                 "JOIN lexical_chunk c ON c.chunk_id = v.chunk_id WHERE c.path = ? ORDER BY distance, c.chunk_id LIMIT ?"
@@ -844,7 +858,8 @@ def file_search(root: Path, query: str, refresh: bool = False) -> dict:
             return _report(reason, hits=[], vector_cache=counts)
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
         hits = []
-        for path, file_distance in connection.execute(_NEAREST_FILES, (vector, FILE_TOP)).fetchall():
+        nearest = _NEAREST_FILES_LEFT if _leaving_out(connection, root) else _NEAREST_FILES
+        for path, file_distance in connection.execute(nearest, (vector, FILE_TOP)).fetchall():
             hits += [{**dict(zip(keys, row)), "file_distance": file_distance}
                      for row in connection.execute(_BEST_OF_FILE, (vector, path, FILE_CHUNKS))]
         return _report(None, hits=hits, vector_cache=counts)

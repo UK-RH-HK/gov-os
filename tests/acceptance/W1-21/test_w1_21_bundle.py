@@ -65,15 +65,23 @@ def test_a_cited_chunk_is_a_chunk_of_the_index_with_the_hash_of_its_file(api, pr
 
 
 def test_a_file_changed_after_the_index_is_never_cited_at_its_old_bytes(api, repo, ollama):
-    """A citation whose sha256 does not match the cited bytes. The index is stale, which makes the route
-    unavailable (DEC-342): the bundle says so and cites nothing the working tree no longer holds."""
+    """A citation whose sha256 does not match the cited bytes. The store is behind by a commit, and the last good
+    store is answered from (DEC-1197 (2)(i)): the bundle cites nothing the working tree no longer holds, the changed
+    file is left out of its evidence and named in the store's stale list. The stopping reason is not asserted here."""
     api.build(repo, ollama.host)
     support.write(repo, support.PAGING[2], f"# Paging 3\n\nThe {support.PHRASE} was moved to the east pier.\n")
     support.commit(repo, "one file changes after the index was built")
     bundle = support.check_bundle(api.retrieve(repo, support.PHRASE, host=ollama.host,
                                                batch_size=support.BATCH_LARGE), root=repo)
-    assert bundle[support.K_REASON] == support.FACET_UNAVAILABLE, \
-        f"the index is stale and the bundle says {bundle[support.K_REASON]}"
+    # Rewrite-Reason: DEC-1197 (2)(i), P-W2-189-P3 (a) (the CTO, DEC-1156 (7)): it was ``FACET_UNAVAILABLE`` (a store
+    # behind by a commit was unavailable, DEC-342); now the changed file is not cited and is named in
+    # ``store_of(repo)["stale"]`` (the function's bundle has no ``store`` key). The stopping reason stays as the code
+    # gives it: it is review row B2, open for the CTO, and is not asserted.
+    assert support.PAGING[2] not in support.paths(bundle), \
+        f"{support.PAGING[2]} changed after the index was built and the bundle still cites it: {support.paths(bundle)}"
+    store = api.call(support.RETRIEVE, "store_of", support.path_arg(repo))
+    assert support.PAGING[2] in (store.get("stale") or []), \
+        f"store_of names no stale path although {support.PAGING[2]} changed since the store's commit: {store}"
 
 
 def test_two_runs_on_the_same_commit_and_store_give_the_same_bundle(api, project, ollama):

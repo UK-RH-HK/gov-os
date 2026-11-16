@@ -33,10 +33,13 @@ def test_the_command_returns_the_bundle_of_the_function(cli, api, project, ollam
     run = answered(cli.command(project, "--ticket", support.TICKET_IN_SCOPE, "--radius", "2", "--batch-size", "3",
                                "--bundle-budget", str(support.BUDGET_SMALL), support.PHRASE, host=ollama.host))
     bundle = support.check_bundle(run.bundle(), root=project)
-    # W2-138 S1 (dcda27011, DEC-1090 (3)): the command's result names the store it answered from, beside the
-    # bundle: ``store`` = {commit, root}; the function's bundle has no such key. The rest is the function's, whole.
+    # W2-138 S1 (dcda27011, DEC-1090 (3)) plus DEC-1197 (2)(i), W2-189 S2: the command's result names the store it
+    # answered from, beside the bundle: ``store`` = {commit, head, stale, root} (the commit it was built at, HEAD now,
+    # the tracked paths changed between the two, its folder); the function's bundle has no such key. The rest is the
+    # function's, whole.
+    # Rewrite-Reason: DEC-1197 (2)(i), P-W2-189-P3 (a) (the CTO, DEC-1156 (7)): the keys were {commit, root}.
     store = bundle.get("store")
-    assert isinstance(store, dict) and set(store) == {"commit", "root"}, f"result.store is {store!r}"
+    assert isinstance(store, dict) and set(store) == {"commit", "head", "stale", "root"}, f"result.store is {store!r}"
     assert re.fullmatch(r"[0-9a-f]{40}", str(store["commit"])), f"result.store.commit is {store['commit']!r}"
     assert Path(store["root"]).resolve() == Path(project).resolve(), f"result.store.root is {store['root']!r}"
     function = api.retrieve(project, support.PHRASE, host=ollama.host, ticket=support.TICKET_IN_SCOPE,

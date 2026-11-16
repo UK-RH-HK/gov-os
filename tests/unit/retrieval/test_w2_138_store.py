@@ -95,7 +95,8 @@ def test_s1_the_json_result_names_the_commit_the_store_was_built_at_and_its_fold
     _git(first, "commit", "-q", "--allow-empty", "-m", "the folder moves on after the build")
     assert _head(first) != built
     result = _cli(capsys, "--root", str(link), WORD)
-    assert result["store"] == {"commit": built, "root": str(first)}  # the fingerprint's head, the link resolved
+    # the fingerprint's head, the link resolved; the folder moved on by an empty commit, which changes no path
+    assert result["store"] == {"commit": built, "root": str(first), "head": _head(first), "stale": []}
     assert result["evidence"], "premise: the planted search finds evidence"
 
 
@@ -114,7 +115,8 @@ def test_s1_the_session_variable_form_names_the_store_too(stores, capsys, monkey
     worktree = tmp_path / "worktree"
     worktree.mkdir()
     monkeypatch.chdir(worktree)
-    assert _cli(capsys, WORD)["store"] == {"commit": _head(first), "root": str(first)}
+    assert _cli(capsys, WORD)["store"] == {"commit": _head(first), "root": str(first), "head": _head(first),
+                                           "stale": []}
 
 
 def test_s1_the_stated_gap_names_the_store(stores, capsys):
@@ -123,8 +125,13 @@ def test_s1_the_stated_gap_names_the_store(stores, capsys):
     assert result["stopping_reason"] == "UNRESOLVED_IDS" and result["store"]["commit"] == _head(first)
 
 
-def test_s1_a_folder_with_no_store_names_no_commit(tmp_path):
-    assert retrieve.store_of(tmp_path) == {"commit": None, "root": str(tmp_path)}
+def test_s1_a_folder_with_no_store_names_no_commit(tmp_path, monkeypatch):
+    # git must find no repository around the folder, wherever pytest's temporary folder lies (it can lie inside a
+    # worktree): ``git_env`` clears every GIT_* variable, so the ceiling is added to the environment it hands to git.
+    plain = lexical.git_env
+    monkeypatch.setattr(lexical, "git_env", lambda *a, **k: {**plain(*a, **k),
+                                                              "GIT_CEILING_DIRECTORIES": str(tmp_path.parent)})
+    assert retrieve.store_of(tmp_path) == {"commit": None, "root": str(tmp_path), "head": None, "stale": []}
 
 
 # S2: one folder per search -------------------------------------------------------------------------------------------
@@ -159,7 +166,7 @@ def test_s2_every_facet_reads_the_folder_resolved_at_the_start_across_a_switch(s
     assert opened == [("lexical", str(first)), ("semantic", str(first))]
     assert os.path.realpath(link) == str(second)  # the switch happened
     if form != "direct":  # the command names the store; a direct call's bundle is today's
-        assert result["store"] == {"commit": _head(first), "root": str(first)}
+        assert result["store"] == {"commit": _head(first), "root": str(first), "head": _head(first), "stale": []}
     assert result["evidence"]
 
 
