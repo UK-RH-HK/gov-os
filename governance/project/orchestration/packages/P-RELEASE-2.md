@@ -37,7 +37,7 @@ From my message "release ready at C" until you say "done" after the re-pin, noth
 `w2/integrate` but your bump, your record commit and your registry commit (memory rule; RL-3). Leads keep running;
 their lands wait. I write `log/act-in-progress.txt` at the hand-over.
 
-## 4. Your steps (copied word for word from the reviewed bundle README part 1, BUNDLE.sha256 dd201943; review READY, narrow re-check READY)
+## 4. Your steps (copied word for word from the reviewed bundle README part 1, BUNDLE.sha256 7c5802c2 (dd201943 reviewed; since then only rehearse_rel.sh changed, two rehearsal fixes); review READY, narrow re-check READY)
 
 1. Open a plain terminal.
    ```
