@@ -20,6 +20,10 @@ W2-174 (DAEO-zmo4; DEC-1189 (1), DEC-1156 (7), the CTO's answer (A) to P-W2-174-
 schema and its common schema, so two more items ship, one per file, the ``template/`` prefix kept:
 ``template/governance/kernel/schemas/ticket.schema.json`` (``the-ticket-schema``) and ``.../common.schema.json`` (``the-common-schema``).
 Not the whole ``schemas/`` folder: a kernel schema the product does not read is still an extra to the "only the copies" case.
+
+W2-195 (DAEO-d8df; DEC-1204 (5), S4 "the shipped-folder lists include it exactly"; the lead's interface item 7): the kernel skill
+``judging-work`` ships, so ``template/governance/kernel/skills/judging-work`` is one more item (``the-judging-work-skill``), the
+``template/`` prefix kept; both cases hold it as they hold the others. Mapped in ``tests/acceptance/W2-195/README.md``.
 """
 
 from __future__ import annotations
@@ -47,6 +51,8 @@ ITEMS = {
     # per file (never the whole ``schemas/`` folder: a kernel schema the product does not read stays an extra).
     "the-ticket-schema": "template/governance/kernel/schemas/ticket.schema.json",
     "the-common-schema": "template/governance/kernel/schemas/common.schema.json",
+    # W2-195 (DAEO-d8df; DEC-1204 (5), S4): the judging-work kernel skill ships in the wheel.
+    "the-judging-work-skill": "template/governance/kernel/skills/judging-work",
 }
 
 
