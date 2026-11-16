@@ -12,9 +12,10 @@ They met four product defects, now fixed and landed on `w2/integrate`:
 | W2-174 (DAEO-zmo4) | the Verify pass also writes the launch fields `tk` cannot (role, allowed_paths, kpis, …), and the wheel ships the ticket and common schemas | EXAMIN F-011, F-018 (your operator wrote them by hand: DEC-1188) |
 | W2-153 (DAEO-8s85) | `gov adapters generate` writes `.claude/templates/` in an adopted repository; doctor names a missing copy | W2-81 and EXAMIN: A5 `LAUNCH_NO_TEMPLATE` (DEC-1192) |
 | W2-111 (DAEO-qvff) | the guard hook's import cut (S9), the live-hook diff for ACT-GUARD-FIX-7 (S10), malformed YAML fails closed | DEC-1187, P-W2-111-YAML-REST |
+| W2-190 (DAEO-6oj6, landed ef4d79693 this morning) | A3 refuses deleting a file another tracked file names (`DELETE_REFERENCED`) or one classed superseded (`DELETE_SUPERSEDED`) | W2-81: secret-history's two MISHANDLED deletes (DEC-1197 (2)(ii)) |
 
 Also in since 0.1.0: W2-178 (the auditor's copy of a set without its dropped questions), W2-60a (role, skills, model and
-effort loaded at launch; the launch record), W2-94's re-anchor flow, W2-88 S27 (folder mode). In all: 9 merges, 22 files
+effort loaded at launch; the launch record), W2-94's re-anchor flow, W2-88 S27 (folder mode). In all: 10 merges (with W2-190), 23 files
 under `src/` and `pyproject.toml` (adopt 4, guard 3, adapters 3, the shipped template 7, util 2, doctor 1, secrets 1),
 no kernel file. Every one landed through the merge queue with its review.
 
@@ -37,7 +38,7 @@ From my message "release ready at C" until you say "done" after the re-pin, noth
 `w2/integrate` but your bump, your record commit and your registry commit (memory rule; RL-3). Leads keep running;
 their lands wait. I write `log/act-in-progress.txt` at the hand-over.
 
-## 4. Your steps (copied word for word from the reviewed bundle README part 1, BUNDLE.sha256 7c5802c2 (dd201943 reviewed; since then only rehearse_rel.sh changed, two rehearsal fixes); review READY, narrow re-check READY)
+## 4. Your steps (copied word for word from the reviewed bundle README part 1, BUNDLE.sha256 54e1a619 (dd201943 reviewed; since then D18 rel_checks.sh accept list by name, D19-D20 rehearsal fixes: narrow re-check running); review READY, narrow re-check READY)
 
 1. Open a plain terminal.
    ```
