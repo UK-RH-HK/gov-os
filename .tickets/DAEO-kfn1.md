@@ -56,7 +56,7 @@ kpis:
   - line: "F3 An answer from a store whose commit is not HEAD that does not name both commits, or a change to what any role may read: the stale path list is computed from tracked paths only and a search still applies the path map's walls and hidden sets as before [DEC-820, DEC-1197 (2)(i)]"
     verify: "tests/unit/retrieval/test_w2_189_store_named.py: the moved-head result always carries commit, head and stale; the existing retrieval wall cases (tests/unit/retrieval, tests/acceptance/W2-138) pass unchanged"
 non_goals:
-- no refresh hook installed by this ticket: installing the after-commit refresh is the operator's under ACT-WALLS (memory-audit), as EXAMIN's A9 records
+- "no refresh hook installed by this ticket: installing the after-commit refresh is the operator's under ACT-WALLS (memory-audit), as EXAMIN's A9 records"
 - no change to gov rebuild, the stores' format or the double-buffered store halves
 - no change to the retrieval skill's text (a kernel path); a skill line, if wanted, comes back as a package
 - no change to the guard, the path map or the hidden sets
