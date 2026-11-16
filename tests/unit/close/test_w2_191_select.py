@@ -26,7 +26,7 @@ def test_s2_a_change_a_coupling_maps_to_an_outside_suite_selects_that_folder(rep
     assert found[OUTSIDE_SUITE] == ["COUPLING"]
     assert found[OUTSIDE_CASE] == ["RECORD_READING"]  # record_reading joins every selection
     assert found["tests/acceptance/W1-own/"] == ["OWN"] and found["tests/unit"] == ["UNIT"]
-    assert "governance/scripts/tests/test_tool.py" not in found  # every_close: no record in this change
+    assert found["governance/scripts/tests/test_tool.py"] == ["EVERY_CLOSE"]  # the green night's record is in it
     coupling = next(e for e in plan["selected"] if e["target"] == OUTSIDE_SUITE)["why"][0]
     assert coupling["paths"] == ["governance/scripts/tool.py"]
 
@@ -76,7 +76,8 @@ def test_f1_an_outside_case_that_names_nothing_widens_with_case_gone(repo):
 
 def test_f1_a_project_with_tests_targets_alone_selects_as_it_did(repo):
     """The selection of a ``tests/``-only map does not depend on this ticket: the schema planted is the new one."""
-    data = {"version": 1, "shared_core": ["src/core/**"], "record_only": [".tickets/**.md", "docs/**.md"],
+    data = {"version": 1, "shared_core": ["src/core/**"], "record_only": [".tickets/**.md", "docs/**.md",
+                                                                  "docs/close/nightly/*.json"],
             "record_reading": ["tests/unit/test_u.py::test_u"], "every_close": [],
             "couplings": [{"paths": ["product/**"], "suites": ["tests/acceptance/W1-own/"], "why": "w"}]}
     support.project(repo, data)
@@ -96,7 +97,10 @@ def test_s2_scoped_names_the_outside_suite_a_coupling_maps_the_change_to(repo):
     chosen = select.scoped(repo.root, "P-W1-own")
     assert OUTSIDE_SUITE in chosen["suites"] and OUTSIDE_CASE in chosen["suites"]
     assert chosen["why"][OUTSIDE_SUITE] == ["COUPLING governance/scripts/tool.py"]
-    assert OUTSIDE_CASE not in chosen["suites"]  # record_reading needs a record in the change
+    # the green night's record is in the change: record_reading joins, and every_close (a code path is too), whose
+    # file the outside folder holds
+    assert chosen["why"][OUTSIDE_CASE] == ["RECORD_READING"]
+    assert "governance/scripts/tests/test_tool.py" not in chosen["suites"]
 
 
 def test_s2_scoped_with_records_alone_runs_the_outside_record_reading_target(repo):

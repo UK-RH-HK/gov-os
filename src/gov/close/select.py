@@ -84,7 +84,35 @@ def load_map(root: Path) -> tuple[dict | None, str | None]:
         jsonschema.Draft202012Validator(schema).validate(data)
     except Exception:  # noqa: BLE001 - an invalid map, or a schema that cannot judge it: both run everything
         return None, "TEST_MAP_UNREADABLE"
+    # DEC-1199 (2): a target is any project-relative path; a project may carry an older or edited schema copy, so
+    # the loader refuses one that leaves the project whatever the schema says
+    if any(escapes(root, target) for target in map_targets(data)):
+        return None, "TEST_MAP_UNREADABLE"
     return data, None
+
+
+def map_targets(test_map: dict) -> list[str]:
+    """Every target the map names: ``record_reading``, ``every_close`` and each coupling's ``suites``."""
+    found = list(test_map.get("record_reading") or []) + list(test_map.get("every_close") or [])
+    for coupling in test_map.get("couplings") or []:
+        found += list(coupling.get("suites") or []) if isinstance(coupling, dict) else []
+    return found
+
+
+def escapes(root: Path, target: str) -> bool:
+    """Whether a map target (its path part, before ``::``) is not a path inside the project: absolute, holding a
+    ``..`` segment, or resolving, through any link on the way, to a place outside the project's root. A target
+    that names nothing is no escape here: ``unresolved`` refuses it at the selection."""
+    if not isinstance(target, str):  # a schema copy that judges no type: nothing to resolve is no target
+        return True
+    path = target.partition("::")[0]
+    if path.startswith(("/", "\\")) or re.match(r"[A-Za-z]:", path) or ".." in re.split(r"[/\\]", path):
+        return True
+    try:
+        Path(root).resolve().joinpath(path).resolve().relative_to(Path(root).resolve())
+    except (OSError, ValueError, RuntimeError):  # outside the root, or a path that cannot be resolved
+        return True
+    return False
 
 
 def settings(test_map: dict | None) -> tuple[float, str]:
