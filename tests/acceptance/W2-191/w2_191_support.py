@@ -213,6 +213,40 @@ def parent_pytest_folders() -> list[str]:
     return folders
 
 
+# --- the review's findings F1 and F2 (PR-DAEO-v6pf-r1): a project without tests/, the strict close's own run --------
+
+def plant_without_tests(tmp_path: Path, test_map: dict, extra: dict | None = None) -> Project:
+    """The planted project of ``plant`` with no ``tests/`` folder at all (every suite is outside it), committed at its
+    base. ``extra`` is added to the files (it must name none under ``tests/``)."""
+    project = Project(tmp_path)
+    files = {rel: text for rel, text in plant_files(test_map).items() if not rel.startswith("tests/")}
+    project.commit("base", files={**files, **(extra or {})})
+    return project
+
+
+def child_pytest_files() -> dict:
+    """``src/sitecustomize.py`` for a planted project. The close starts its test run with ``PYTHONPATH`` set to the
+    project's own ``src`` alone, so a pytest that the parent has from its own ``PYTHONPATH`` (or a user site the
+    child's environment does not name) is not found by it: this file, which the child's interpreter imports at its
+    start from that ``src``, puts the folders of the parent's pytest (``parent_pytest_folders``) at the end of the
+    child's import path. Neither ``PYTHONUSERBASE`` nor HOME is relied on."""
+    code = ("import sys\n"
+            f"for _folder in {parent_pytest_folders()!r}:\n"
+            "    if _folder not in sys.path:\n"
+            "        sys.path.append(_folder)\n")
+    return {"src/sitecustomize.py": code}
+
+
+def strict_scope(project: Project, plan: dict) -> dict:
+    """The ``scope`` ``command._scope`` gives a strict close's runs, from ``plan`` (a real ``select.plan``): the plan's
+    keys and the folder of the JUnit XML, no check result, no run yet, nothing reused, and an empty per-test limit
+    (``_scope_limit`` then starts no process to ask for pytest-timeout)."""
+    folder = ".gov-runtime/junit/" + TICKET + "/20261116T000000000000Z"
+    (project.root / folder).mkdir(parents=True, exist_ok=True)
+    return {**plan, "folder": folder, "check_result": None, "runs": [], "junit_xml": [], "limit": [],
+            "reused": None, "fingerprints": None}
+
+
 def collected(project: Project, args: list[str]) -> list[str]:
     """The project-relative node ids pytest collects, in the project's folder, from ``args`` (the arguments of the
     close's regression run): ``pytest --collect-only -q`` as a process, importlib import mode so that two files of one
