@@ -8,6 +8,7 @@ therefore green before the kernel's new bytes land and after."""
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import yaml
 
@@ -17,7 +18,7 @@ from .conftest import REPO_ROOT, Repo
 
 KERNEL_SCHEMA = REPO_ROOT / "template" / "governance" / "kernel" / "schemas" / select.SCHEMA_NAME
 PLANTED_SCHEMA_REL = f"governance/kernel/schemas/{select.SCHEMA_NAME}"
-TARGET_PATTERN = r"^(?![/\\])(?![A-Za-z]:)(?!(.*[/\\])?\.\.([/\\]|::|$))[^\\]+$"
+TARGET_PATTERN = (r"^(?![/\\])(?![A-Za-z]:)(?!(?:(?:(?!::)[\s\S])*[/\\])?\.\.(?:[/\\]|::|$))[^\\]+$")
 TICKET_TEXT = "---\nid: P-{wbs}\nwbs_id: {wbs}\nallowed_paths:\n{paths}---\n"
 
 OUTSIDE_SUITE = "governance/scripts/tests"
@@ -90,3 +91,19 @@ def project(repo: Repo, test_map: dict | None = None, schema: dict | None = None
 
 def targets(plan: dict) -> dict:
     return {entry["target"]: [why["reason"] for why in entry["why"]] for entry in plan["selected"]}
+
+
+def parent_pytest_folder() -> str:
+    """The folder that holds the running ``pytest`` package: a child process is given it explicitly, so no test
+    here depends on ``PYTHONUSERBASE`` or ``HOME`` to find the runner."""
+    import pytest
+
+    return str(Path(pytest.__file__).resolve().parent.parent)
+
+
+def plant_runner(root: Path) -> None:
+    """Make ``root/src/sitecustomize.py``: the run's ``PYTHONPATH`` is the project's ``src/`` (``_run_tests``), so a
+    child pytest there imports the parent's pytest from the folder ``parent_pytest_folder`` names."""
+    (root / "src").mkdir(parents=True, exist_ok=True)
+    (root / "src" / "sitecustomize.py").write_text(
+        f"import sys\nsys.path.append({parent_pytest_folder()!r})\n", encoding="utf-8")

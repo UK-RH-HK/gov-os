@@ -15,9 +15,10 @@ from .conftest import Repo
 
 GOOD = ["governance/scripts/tests", "governance/scripts/tests/", "product/tests/test_a.py",
         "product/tests/test_x.py::case", "product/tests/test_x.py::TestC::test_m[a-b]", "tests/unit",
-        "tests/acceptance/W1-own/", "a"]
+        "tests/acceptance/W1-own/", "a", "f.py::test[a/../b]", "f.py::test_x[..]", "a..b/test_x.py"]
 BAD = ["/etc/passwd", "/abs/tests", "../outside", "..", "tests/../../x", "a/../b", "a/..", "../x.py::case",
-       "C:/tests", "c:x", "\\\\host\\share", "a\\b", "\\abs"]
+       "C:/tests", "c:x", "\\\\host\\share", "a\\b", "\\abs",
+       "ab:c/../../x", "x/ab:c/../y", "x\n/../../o", "x\n/..", "x/../f.py::case"]
 
 
 def _validator(pattern=support.TARGET_PATTERN):
