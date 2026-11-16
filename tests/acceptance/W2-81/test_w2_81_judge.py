@@ -482,6 +482,44 @@ def test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it(ground
     assert result["reasons"] == [f"{name}: stage {stage} is ABSENT"], result["reasons"]
 
 
+# A lite gate commits its record even when it fails, with `result: fail` (S-STAGES: a failed gate is never passed).
+# How the record's `result` is spoiled: the value written, or None for the field removed. Each is MALFORMED.
+GATE_RESULT = {"fail": "fail", "removed": None, "other": "met"}
+
+
+@pytest.mark.parametrize("how", sorted(GATE_RESULT))
+@pytest.mark.parametrize("stage", LITE)
+def test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named(ground, tmp_path,
+                                                                                           stage, how):
+    """A lite record whose front matter parses but whose `result` is not exactly `pass` (a failed gate's record, the
+    field removed, another word) is MALFORMED: missed and named, NOT_READY, never PRESENT and never NOT_BUILT, and
+    every other status unchanged. Kills a judge that counts a failed A7 or A10 gate's record as found."""
+    built_repo = ground["python-app"]
+    name = built_repo.name
+    whole = _judge(built_repo, standin.perfect(built_repo), tmp_path / "whole", built=None)
+    model = standin.perfect(built_repo)
+    if GATE_RESULT[how] is None:
+        del model["records"][stage]["result"]
+    else:
+        model["records"][stage]["result"] = GATE_RESULT[how]
+    spoiled = _judge(built_repo, model, tmp_path / "spoiled", built=None)
+    rel = judge.record_name(stage)
+    front = judge.read_record(tmp_path / "spoiled" / "adopted", rel, stage)
+    assert front.state == "MALFORMED" and front.data["stage"] == stage, (stage, how, front.state, front.why)
+    assert "result" in front.why and "pass" in front.why, front.why  # the why names the gate's own result
+    assert whole["stages"][stage] == {"status": "PRESENT", "record": rel}, whole["stages"][stage]
+    assert spoiled["stages"][stage] == {"status": "MALFORMED", "record": rel}, spoiled["stages"][stage]
+    assert stage not in spoiled["not_built"], spoiled["not_built"]
+    result, before = _reasons(spoiled, name), _reasons(whole, name)
+    assert result["verdict"] == judge.NOT_READY
+    assert sorted(result["reasons"]) == sorted(before["reasons"] + [f"{name}: stage {stage} is MALFORMED"]), \
+        result["reasons"]
+    assert {s: v for s, v in spoiled["stages"].items() if s != stage} == \
+        {s: v for s, v in whole["stages"].items() if s != stage}  # every other stage unchanged
+    assert [(p["id"], p["status"]) for p in spoiled["planted"]] == [(p["id"], p["status"]) for p in whole["planted"]]
+    assert [(c["id"], c["status"]) for c in spoiled["controls"]] == [(c["id"], c["status"]) for c in whole["controls"]]
+
+
 def test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present(ground, tmp_path):
     """Both lite records as the stand-in writes them (the stages' front matter, at the names the lite gates write)
     are PRESENT on today's code: the found form; kills a judge that still names them NOT_BUILT or cannot read them."""
@@ -491,6 +529,7 @@ def test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present
         rel = judge.record_name(stage)
         front = judge.read_record(tmp_path / "adopted", rel, stage)
         assert front.state == "PRESENT" and front.data["stage"] == stage, (stage, front.state, front.why)
+        assert front.data["result"] == "pass", (stage, front.data)  # the gate's own word: the found form needs it
         assert judgement["stages"][stage] == {"status": "PRESENT", "record": rel}, judgement["stages"][stage]
     assert not set(LITE) & set(judgement["not_built"]), judgement["not_built"]
     reasons = _reasons(judgement, built_repo.name)["reasons"]

@@ -232,7 +232,8 @@ repository. `judge_repository` judges one repository. The judge writes and print
   (`record`, `field`, `said`);
 - each control is **CLEAN** or **FLAGGED**;
 - each stage (A0 to A6, A8, A7, A10, the lite verdict, and the findings) is **PRESENT**, **ABSENT**, **UNREADABLE**,
-  **MALFORMED** or **NOT_BUILT**.
+  **MALFORMED** or **NOT_BUILT**. A lite A7 or A10 record is PRESENT only when its front matter's `result` is exactly
+  `pass` (the gate's own word); one that says otherwise (`fail`, no `result`, any other value) is MALFORMED.
 
 Where several apply to one problem, MISHANDLED comes first, then NOT_BUILT, then MISSED. A secret's value found in
 an output is MISHANDLED even if its stage is not built.
@@ -274,14 +275,18 @@ list, `gov.adopt.command.STAGES`** (the list `gov adopt --lite --stage` accepts:
 exactly when `command.STAGES` lists it; today it lists both. Their records keep the names the lite gates write
 (`lite_gates.record_path`, the same as `w2_81_judge.PROVISIONAL`):
 `governance/adoption/A7-independent-migration-verification.md` and `A10-independent-memory-verification.md`.
+A lite gate commits its record **whether it passes or fails** (`lite_gates.gate`: `result: pass` or `result: fail` in
+the front matter, then `GATE_NOT_PASSED` when it failed), so a lite record counts as found only with `result: pass`,
+the gate's own word.
 
 **Found and missed, for a stage.** A stage's status is its record's state. **PRESENT** is the found form;
 **ABSENT**, **UNREADABLE** and **MALFORMED** are the missed form; NOT_BUILT is only for a stage today's code does not
 build. So with A7 and A10 built, a repository whose A7 or A10 record is absent is `stage A7 is ABSENT` (or A10), and
 one whose record is malformed (no front matter, front matter that is not a mapping, bad YAML, not UTF-8) is
-`stage A7 is UNREADABLE`: missed and named in the verdict's reasons, NOT_READY, never NOT_BUILT and never passed. The
-judge holds A7's and A10's fields to no rule of its own (it reads them as present when the stages' front matter
-parses), so a malformed lite record shows as UNREADABLE, not MALFORMED.
+`stage A7 is UNREADABLE`, and one whose front matter parses but whose `result` is not exactly `pass` (a failed
+gate's `result: fail`, no `result`, any other value) is `stage A7 is MALFORMED` (its `why`: the gate's own result is
+not `pass`): each missed and named in the verdict's reasons, NOT_READY, never NOT_BUILT and never passed. So a run
+never reaches READY on a failed A7 or A10 gate. The judge holds A7's and A10's other fields to no rule of its own.
 
 | Capability | Contract | Built today | Why |
 |---|---|---|---|
@@ -402,7 +407,9 @@ real forms when those land:
 - **A7, A10 and the lite verdict:** `governance/adoption/A7-independent-migration-verification.md`,
   `A10-independent-memory-verification.md` and `VERDICT-lite.md`, with the stages' front matter. A7 and A10 are
   built now (S-STAGES): those two names are the ones the lite gates write (`gov.adopt.lite_gates.record_path`), and
-  the judge reads them as any built stage's record. The verdict
+  the judge reads them as any built stage's record, with one rule of its own: a lite record counts as found
+  (PRESENT) only when its `result` is exactly `pass`, the gate's own word (a gate commits its record when it fails
+  too, with `result: fail`); MALFORMED names one that says otherwise (`fail`, no `result`, any other value). The verdict
   holds `verdict` (one of `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS`, `NOT_ADOPTED_HEALTHY`), `lite: true`
   and `conditions_not_checked`.
 
@@ -456,9 +463,11 @@ finding, is FLAGGED too.
 - A7's record absent is named; a verdict outside the vocabulary is MALFORMED.
 - **S-STAGES, on today's code (`built=None`):** A7 and A10 count as built exactly when `gov.adopt.command.STAGES`
   lists them, whatever `project.STAGES` says; either lite record absent is ABSENT, and either one without front
-  matter, with front matter that is not a mapping, or with bad YAML is UNREADABLE: each is named as one more reason,
-  NOT_READY, never NOT_BUILT and never PRESENT, and changes no planted problem's status; both records as the stand-in
-  writes them (the stages' front matter) are PRESENT and named in no reason.
+  matter, with front matter that is not a mapping, or with bad YAML is UNREADABLE, and either one whose front matter
+  parses but whose `result` is `fail`, removed, or another word (`met`) is MALFORMED: each is named as one more
+  reason, NOT_READY, never NOT_BUILT and never PRESENT, and changes no planted problem's status (nor, for MALFORMED,
+  any other stage's or control's); both records as the stand-in writes them (the stages' front matter, `result:
+  pass`) are PRESENT and named in no reason.
 - A missing manifest, a malformed one, or an exception: each is ERROR.
 - A repository not judged is NOT_READY.
 
@@ -790,9 +799,9 @@ folder.
 | **S10** Hermetic and bounded: stand-ins, no network, no model, no adoption; temporary folders only, removed; under 120 s alone and in parallel; none skipped; a missing tool fails naming it; no workbench, no dev tiers | `test_w2_81_hermetic.py` (all), the `this_repository_unchanged` tripwire, `_removed_after` in `test_w2_81_judge.py`; the timings in the return |
 | **S11** In each repository, a ticket closes with `gov close` at exit 0 on a pinned release | the runner's close step: `test_all_handled_and_both_figures_met_is_ready` (exit 0 recorded), `test_w2_81_runner.py::test_each_failure_is_not_ready_naming_it[close-fails-gov close PG-1 ended with exit 3]` and `[close-not-run]`. The real run is the orchestrator's, on W2-16's release |
 | **S12** The builders and question sets serve W2-88 read-only; the hidden half is W2-93's | this README ("What W2-88 and W2-93 may read"); `test_the_questions_resolve_at_another_seed` (the interface W2-88 calls) |
-| **S13** S-STAGES: the judge counts A7 and A10 as built from `gov.adopt.command.STAGES`, never from `gov.adopt.project.STAGES`; its self-test and "Today's list" say so; a lite record absent or malformed is missed and named, never NOT_BUILT, never passed | `test_w2_81_judge.py::test_todays_built_capabilities_follow_the_code`, `test_w2_81_judge.py::test_a7_and_a10_count_as_built_from_the_commands_stage_list_never_the_projects`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built` (8: A7 and A10, each absent, without front matter, front matter not a mapping, bad YAML), `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it` (2), `test_w2_81_judge.py::test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`; this README ("Today's list", the capability row `A7`, `A10`: built, from `command.STAGES`) |
-| **F1** A planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built` |
-| **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it`, the figure cases, `test_w2_81_score.py::test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready` |
+| **S13** S-STAGES: the judge counts A7 and A10 as built from `gov.adopt.command.STAGES`, never from `gov.adopt.project.STAGES`; its self-test and "Today's list" say so; a lite record absent or malformed is missed and named, never NOT_BUILT, never passed | `test_w2_81_judge.py::test_todays_built_capabilities_follow_the_code`, `test_w2_81_judge.py::test_a7_and_a10_count_as_built_from_the_commands_stage_list_never_the_projects`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built` (8: A7 and A10, each absent, without front matter, front matter not a mapping, bad YAML), `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it` (2), `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named` (6: A7 and A10, each `result: fail`, `result` removed, `result: met`: MALFORMED, a failed gate never found), `test_w2_81_judge.py::test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`; this README ("Today's list", the capability row `A7`, `A10`: built, from `command.STAGES`) |
+| **F1** A planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named` |
+| **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named`, the figure cases, `test_w2_81_score.py::test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready` |
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
 | **S3, S4, S5, S6, S7, S9, F1, F2, F3, F4** Review batch 4, items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |

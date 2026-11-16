@@ -11,7 +11,8 @@ each reason. It writes nothing and prints nothing.
 - the stage records ``governance/adoption/<stage>-<title>.md`` (YAML front matter), named
   as ``gov.adopt.project.record_path`` names them for A0 to A6 and A8, and as
   ``PROVISIONAL`` names them for A7 and A10 (the names the lite gates write; built when
-  ``gov.adopt.command.STAGES`` lists them) and the lite verdict (not built yet);
+  ``gov.adopt.command.STAGES`` lists them; found only with ``result: pass``, the gate's own
+  word, since a gate commits its record when it fails too) and the lite verdict (not built yet);
 - the findings ``governance/adoption/findings/*.md`` (CAP-44.g, not built: provisional form);
 - the project's path map ``governance/project/path-map.yaml`` (its namespaces' ``embedding_policy``);
 - the index ``.gov-runtime/store.db`` (``lexical_chunk.path``, ``semantic_vector.chunk_id``);
@@ -211,6 +212,9 @@ def read_record(root, rel, stage=None):
         return Record(rel, "MALFORMED", data, raw, why="a class outside the vocabulary")
     if stage == "VERDICT" and data.get("verdict") not in VERDICTS:
         return Record(rel, "MALFORMED", data, raw, why="`verdict` is none of " + ", ".join(VERDICTS))
+    if stage in ("A7", "A10") and data.get("result") != "pass":
+        # A lite gate commits its record when it fails too (`result: fail`): only its own `pass` is found (S-STAGES).
+        return Record(rel, "MALFORMED", data, raw, why=f"the gate's own `result` is {data.get('result')!r}, not `pass`")
     return Record(rel, "PRESENT", data, raw)
 
 
