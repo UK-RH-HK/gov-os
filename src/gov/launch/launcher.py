@@ -32,6 +32,13 @@ names one file in the session's temp folder, ``role-<role>.md``, composed of the
 them (the role file, then each named skill's ``SKILL.md``), then one blank line, then the template's bytes; the
 launch record's ``appended_sha256`` is that file's, and its ``template`` names the template's path and sha256.
 
+W2-60b: a worker role is launchable when its kernel role file says it is a worker (``_role_kind``); there is no fixed
+list of roles. A writing session is refused while another is live in its worktree, read from the session records
+(``gov.launch.session_record``). Each worker session gets one session record, written whole once its process has
+started and replaced whole after it ends, whatever its ending; a record that cannot be written leaves the exit code as
+it is, with one line on stderr. ``tests_worktree`` makes a ticket's tests worktree, ``<tree>-tests`` on
+``<branch>-tests`` at the tree's HEAD.
+
 No message of this module carries a held-out path.
 """
 
@@ -41,6 +48,7 @@ import io
 import json
 import os
 import re
+import select
 import shutil
 import signal
 import subprocess
@@ -59,15 +67,23 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
-from gov.launch import criticality as crit, environ, record, role as roles, sandbox
+from gov.launch import criticality as crit, environ, record, role as roles, sandbox, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
+from gov.util.gitenv import git_binary, git_env
 
-# DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
-WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
-# Open package DP-8: these roles need a ticket whose ``role`` is their own; the
-# two independent roles may be launched on any ``in_progress`` ticket.
-OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
+# W2-60b S7, S8 (DEC-946 (W3-P09), DEC-826 Q1): the launchable roles and their own-ticket rule are read from the
+# kernel's role files (``_role_kind``), so a new role is a file, not a code change. A role file is a worker's unless it
+# says otherwise: its ``Authority level`` line names another level (the CTO's, the Senior Engineer's and the ticket
+# lead's say ``coordinator``) or its ``Network`` line says the launcher gives it no profile. A worker keeps to a ticket
+# whose ``role`` is its own (open package DP-8) unless it is independent: its ``Authority level`` line says
+# "independent of", or its name begins ``independent-`` (the kernel's naming of its independent roles); an independent
+# role may be launched on any ``in_progress`` ticket. A role with no role file, or one that cannot be read, refuses.
+ROLE_NAME = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+AUTHORITY_HEAD, NETWORK_HEAD = "- **Authority level:**", "- **Network:**"
+WORKER_LEVEL, NO_PROFILE = "worker", "no profile from the launcher"
+INDEPENDENT, INDEPENDENT_PREFIX = "independent of", "independent-"
+TESTS_SUFFIX = "-tests"  # W2-60b S10: the tests worktree and its branch are the ticket tree's and branch's names + this
 # W2-136 S9: a lead is a session of GOV_ROLE orchestrator with a GOV_TICKET, launched as ``orchestrator`` or ``lead``
 # (W2-121's name for it). Only the launched role and ticket are checked against the plan, never the caller's own
 # environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
@@ -84,6 +100,9 @@ ROLE_TEMPLATES = {
     "lead": "role-lead",
     "orchestrator": "role-lead",
 }
+# A role the map does not name has the template ``role-<role>.md`` (W2-60b): a new role is its role file and its
+# template, with no code change.
+TEMPLATE_STEM = "role-{role}"
 TEMPLATES_REL = ".claude/templates"  # the generated copies, written only by an ACT (DEC-315)
 TEMPLATE_FLAG = "--append-system-prompt-file"
 CLI_REL = ".local/bin/claude"
@@ -149,6 +168,16 @@ TRIAL_KEYS = frozenset({"role", "criticality", "model", "effort", "tickets", "re
 FLOOR = "high"  # DEC-1120 (3): when the table's effort is high or above, the launch's own choice is not below it
 BELOW_FLOOR = ("low", "medium")
 AUDITOR = "independent-auditor"
+
+
+def __getattr__(name: str):
+    """W2-60b F1 (DEC-946 (W3-P09)): no list of launchable roles is held in this module. ``WORKER_ROLES`` is served by
+    name (PEP 562) for W2-153's and W1-50's readers only: the template map's worker entries (its five, the lead names
+    left out), worked out when read. No launch reads it to decide anything; what a launch admits is whatever role file
+    ``_role_kind`` admits (W2-60b S7)."""
+    if name == "WORKER_ROLES":
+        return tuple(role for role in ROLE_TEMPLATES if role not in LEAD_ROLES)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def _refuse(reason: str) -> GovError:
@@ -290,8 +319,36 @@ def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
         raise _refuse(f"unknown ticket '{ticket_id}'")
     if ticket.get("status") != "in_progress":
         raise _refuse(f"ticket '{ticket_id}' is not in_progress (status: {ticket.get('status')})")
-    if role in OWN_TICKET_ROLES and ticket.get("role") != role:
+    # W2-60b: whether the role keeps to its own ticket is read from its role file, only when the ticket is another's
+    if ticket.get("role") != role and _role_kind(root, role)["own_ticket"]:
         raise _refuse(f"ticket '{ticket_id}' is a ticket of another role ('{ticket.get('role')}'), not of '{role}'")
+
+
+def _role_kind(root: Path, role: str) -> dict:
+    """W2-60b S7, S8: the role file's path and whether the role keeps to its own ticket, read from the kernel role file
+    ``gov.launch.role`` reads; refused, naming the role, when the name is not a plain role name, the file is missing or
+    cannot be read, holds its ``Authority level`` or ``Network`` line more than once, or says it is no worker."""
+    _check_worker_role(role)
+    try:
+        rel, _, lines = roles._role_file(root, role)
+    except GovError as error:
+        raise _refuse(f"'{role}' is not a worker role: {error.message} (DEC-946 (W3-P09))") from None
+    stated = {}
+    for head in (AUTHORITY_HEAD, NETWORK_HEAD):
+        found = [line.strip()[len(head):].strip() for line in lines if line.lstrip().startswith(head)]
+        if len(found) > 1:
+            raise _refuse(f"'{role}': the role file {rel} holds its line '{head}' more than once, so it cannot be told "
+                          f"whether gov launch starts it (DEC-946 (W3-P09))")
+        stated[head] = found[0] if found else None
+    level, network = stated[AUTHORITY_HEAD], stated[NETWORK_HEAD]
+    word = re.split(r"[\s,.;:]", level, maxsplit=1)[0] if level is not None else None
+    if word is not None and word != WORKER_LEVEL:
+        raise _refuse(f"'{role}' is not a worker role: its role file {rel} gives the authority level '{word}', and "
+                      f"gov launch starts workers only (a lead is launched as {' or '.join(LEAD_ROLES)})")
+    if network is not None and network.startswith(NO_PROFILE):
+        raise _refuse(f"'{role}' is not a worker role: its role file {rel} says it has {NO_PROFILE}")
+    independent = (level is not None and INDEPENDENT in level) or role.startswith(INDEPENDENT_PREFIX)
+    return {"rel": rel, "own_ticket": not independent}
 
 
 def _guard_wired(settings: dict) -> bool:
@@ -401,7 +458,7 @@ def _check_cli_args(cli_args: list[str]) -> None:
 def template_args(root: Path, role: str) -> list[str]:
     """The flag that gives the session its role template, by absolute path; refused when the file is missing, so no
     session starts without its template (W2-153 S1, F1)."""
-    path = root / TEMPLATES_REL / f"{ROLE_TEMPLATES[role]}.md"
+    path = root / TEMPLATES_REL / f"{ROLE_TEMPLATES.get(role) or TEMPLATE_STEM.format(role=role)}.md"
     if not path.is_file():
         raise GovError("LAUNCH_NO_TEMPLATE", f"the role template {path} is missing: no '{role}' session starts "
                                              f"without it (DEC-1050)")
@@ -911,9 +968,46 @@ def _cli() -> Path:
 
 
 def _check_worker_role(role: str) -> None:
-    if role not in WORKER_ROLES:
-        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
-                      f"or a lead role ({', '.join(LEAD_ROLES)})")
+    """The role's name only, before anything is read (W2-60b): a plain role name, the stem of a role file. Whether it
+    is a worker is its role file's to say (``_role_kind``)."""
+    if not isinstance(role, str) or not ROLE_NAME.fullmatch(role):
+        raise _refuse(f"'{role}' is not a worker role: a role is the name of its role file (lower-case letters, digits "
+                      f"and '-'), and a lead role is {' or '.join(LEAD_ROLES)}")
+
+
+def tests_worktree(root: Path, role: str, ticket_id: str) -> int:
+    """W2-60b S10 (DEC-847, DEC-963, DEC-982): ``gov launch independent-test-designer <ticket> --tests-worktree``, run
+    in the ticket's worktree, makes the tests worktree ``<tree>-tests`` on a new branch ``<tree's branch>-tests`` at the
+    tree's ``HEAD``, prints its path and returns 0. No session starts, nothing is recorded or gated. An existing path or
+    branch, a tree on no branch, or a ticket that is unknown or not ``in_progress`` refuses."""
+    root = Path(os.path.realpath(root))
+    if role != "independent-test-designer":
+        raise _refuse(f"--tests-worktree makes the independent test designer's own tree, not one for '{role}' "
+                      f"(DEC-963)")
+    ticket = _load_ticket(str(root), ticket_id)
+    if ticket is None:
+        raise _refuse(f"unknown ticket '{ticket_id}'")
+    if ticket.get("status") != "in_progress":
+        raise _refuse(f"ticket '{ticket_id}' is not in_progress (status: {ticket.get('status')})")
+    git, env = git_binary() or "git", git_env(root)
+
+    def run(*argv: str) -> subprocess.CompletedProcess:
+        return subprocess.run([git, "-C", str(root), *argv], capture_output=True, text=True, env=env, check=False)
+
+    head = run("symbolic-ref", "--quiet", "--short", "HEAD")
+    if head.returncode != 0 or not head.stdout.strip():
+        raise _refuse(f"the tree {root} is on no branch, so its tests branch cannot be named")
+    branch, path = head.stdout.strip() + TESTS_SUFFIX, Path(f"{root}{TESTS_SUFFIX}")
+    if os.path.lexists(path):
+        raise _refuse(f"the tests worktree's path {path} is already there")
+    if run("show-ref", "--verify", "--quiet", f"refs/heads/{branch}").returncode == 0:
+        raise _refuse(f"the tests worktree's branch {branch} is already there")
+    made = run("worktree", "add", "-b", branch, str(path), "HEAD")
+    if made.returncode != 0:
+        why = (made.stderr.strip().splitlines() or ["no message"])[-1]
+        raise _refuse(f"git could not make the tests worktree {path} on the branch {branch}: {why}")
+    print(path)
+    return 0
 
 
 def plan(root: Path, role: str, ticket_id: str) -> int:
@@ -923,7 +1017,7 @@ def plan(root: Path, role: str, ticket_id: str) -> int:
     root = Path(os.path.realpath(root))
     if role in LEAD_ROLES:
         raise _refuse(f"a '{role}' session is started without a role file's default line, so it has no plan")
-    _check_worker_role(role)
+    _role_kind(root, role)
     _check_ticket(root, role, ticket_id)
     model, effort = roles.launch_default(root, role)
     print(f"model {model}, effort {effort}")
@@ -975,8 +1069,16 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _check_options(reason, trial, owner_named)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
+    if role not in ROLE_TEMPLATES:  # W2-60b S8: a new role's file before its template is looked for
+        _role_kind(root, role)
     template = template_args(root, role)
     cli = _cli()
+    # W2-60b S7: the role file says the role is a worker; today's refusals above come first (W2-60a Behaviour 10)
+    _role_kind(root, role)
+    # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree. Here, a planted or long-live
+    # writer refuses before anything is written; the check that decides is made again under the start lock below.
+    session_record.check_one_writer(root, str(root), role)
+    session_record.make_folder(root)  # before the settings, so every launch's runtime rules are the same (W2-56 S3)
     settings = build_settings(root, role, ticket_id)
     faults = sandbox_faults(settings)
     if faults:
@@ -992,6 +1094,11 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
                       f"({error.strerror or error}) (DEC-402)") from None
     lock = StartLock()
     try:
+        # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start
+        # record (Keeper.begin, in _run) before it gives the lock back, so a launch that takes the lock after it sees
+        # it live; two launches that start together, or wait together on a lock a third party holds, are judged one
+        # after the other. A refusal here starts no CLI and writes no record of its own.
+        session_record.check_one_writer(root, str(root), role)
         _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
         # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
         # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
@@ -1019,7 +1126,9 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
     just before the session starts, and the record is removed when it cannot be started."""
     from gov.resources import registry
 
-    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None}
+    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None}
+    keeper = None  # W2-60b: the session record's two calls, for a worker session with its launch record
+    relay = None  # W2-60b S2: the session's stdout relayed, for its result line, when it runs --output-format json
 
     def end(signum=None, frame=None):
         """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session's whole process group (W2-56 S12). It is asked
@@ -1058,13 +1167,22 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             if worker is not None:  # W2-60a: the record before the session starts; the appended file last (W2-153)
                 head, tail, written = _launch_line(worker, tmpdir, cli)
             terminal = _terminal()
+            piped = _relays(worker, cli_args)
             try:  # W2-56 S12: the session leads a process group of its own, which the ending signals reach
                 state["session"] = _start([str(cli), "--settings", json.dumps(settings), *head, *cli_args, *tail],
-                                          root, env, terminal)
+                                          root, env, terminal, piped)
             except (OSError, SubprocessError):
                 if written is not None:
                     record.remove(written)
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+            if written is not None:  # W2-60b S1: the session record, whole, once the session's process has started,
+                # and first, before the start lock can be given back by any path (review round 1, F1)
+                keeper = session_record.Keeper(root, written, worktree=str(root), pid=os.getpid(), say=_say,
+                                               config=session_record.config_folder())
+                keeper.begin()
+            source = getattr(state["session"], "stdout", None) if piped else None
+            if source is not None:  # a stand-in that starts no process has no pipe: nothing to relay
+                relay = _Relay(source.fileno())
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:
@@ -1077,10 +1195,15 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 lock.release()
             if state["ended"]:  # a signal that came while the session was started
                 end()
+            if relay is not None:  # relayed through DEC-392's endings too: the handler never stops it
+                relay.pump(lambda: state["session"].poll() is None)
             code = state["session"].wait()
             _end_group(state)  # W2-56 S12: what the session left in its group ends with it
+            if relay is not None:  # what the session wrote before it ended, to the pipe's end
+                relay.drain(END_WAIT_S)
             if state["ended"]:
                 code = INTERRUPT_EXIT
+            state["code"] = code
         return code
     finally:
         session = state["session"]
@@ -1089,6 +1212,16 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             session.wait()
         if session is not None and _group_alive(session):
             _signal_session(session, signal.SIGKILL)
+        if relay is not None:  # W2-60b S2: the last line, and the pipe given back; the result line for the record
+            try:
+                relay.close()
+                session.stdout.close()
+            except (OSError, ValueError, AttributeError):
+                pass
+            if keeper is not None:
+                keeper.result = relay.result
+        if keeper is not None:  # W2-60b S1, S5: replaced whole by every ending; it never changes the exit code
+            keeper.end(state["code"] if state["code"] is not None else getattr(session, "returncode", None))
         if terminal is not None:
             _take_terminal(terminal)
         if state["registered"] is not None:
@@ -1106,6 +1239,127 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             signal.signal(number, handler or signal.SIG_DFL)
         signal.alarm(0)
         signal.signal(signal.SIGALRM, alarm or signal.SIG_DFL)
+
+
+OUTPUT_FORMAT = "--output-format"
+RELAY_CHUNK = 65536
+RESULT_LINE_MAX = 64 * 1024 * 1024  # a longer line is relayed whole but not parsed: its result is not measured
+
+
+def _json_output(cli_args: list[str]) -> bool:
+    """W2-60b S2: the session runs with ``--output-format json`` (spaced or ``=`` form; the last one given counts, as
+    the CLI takes it)."""
+    value = None
+    for index, arg in enumerate(cli_args):
+        if arg == OUTPUT_FORMAT:
+            value = cli_args[index + 1] if index + 1 < len(cli_args) else None
+        elif arg.startswith(OUTPUT_FORMAT + "="):
+            value = arg.split("=", 1)[1]
+    return value == "json"
+
+
+def _relays(worker: dict | None, cli_args: list[str]) -> bool:
+    """A worker session (which has a session record to read the result line into) run with ``--output-format json``.
+    A lead's stdout, and every other run's, stays inherited as before (S7)."""
+    return worker is not None and _json_output(cli_args)
+
+
+class _Relay:
+    """W2-60b S2 (the result line when the session ran with ``--output-format json``): every byte the session writes
+    to its stdout pipe goes, unchanged and in order, to the launcher's own stdout (``out``) as it arrives; the last
+    complete line that parses as a JSON object of ``"type": "result"`` is kept in ``result`` (a last line with no
+    newline counts when it parses whole). Nothing is added, dropped or reordered. When ``out`` cannot be written, one
+    line is said and the pipe is still read to its end, so the session is never blocked and its exit code is its own;
+    when the pipe cannot be read, one line is said and the relay stops. The result line's text never leaves here but
+    as ``result``, which the session record reads counts from (S3)."""
+
+    def __init__(self, source: int, out: int = 1, say=None):
+        self.source, self.out, self.say = source, out, say or _say
+        self.partial, self.overlong, self.result = bytearray(), False, None
+        self.writable, self.done, self.said = True, False, False
+        try:
+            sys.stdout.flush()  # what the launcher printed itself goes first
+        except (OSError, ValueError, AttributeError):
+            pass
+
+    def _fail(self, what: str, error: BaseException) -> None:
+        if not self.said:
+            self.said = True
+            why = " ".join(str(getattr(error, "strerror", None) or error).split()) or type(error).__name__
+            self.say(f"gov launch: the session's stdout {what} ({why}); the session's exit code is kept (DEC-392)\n")
+
+    def _write(self, data: bytes) -> None:
+        view = memoryview(data)
+        while view and self.writable:
+            try:
+                view = view[os.write(self.out, view):]
+            except BlockingIOError:  # a non-blocking stdout: wait until it takes more
+                select.select([], [self.out], [], 1.0)
+            except (OSError, ValueError) as error:
+                self.writable = False
+                self._fail("cannot be relayed to the launcher's stdout, and the rest of it is lost", error)
+
+    def _consider(self, line: bytes) -> None:
+        line = line.strip()
+        if not line.startswith(b"{") or b'"result"' not in line:
+            return
+        try:
+            value = json.loads(line)
+        except (ValueError, RecursionError):  # deep nesting raises RecursionError: no result, the relay goes on
+            return
+        if isinstance(value, dict) and value.get("type") == "result":
+            self.result = value
+
+    def _feed(self, data: bytes) -> None:
+        self._write(data)
+        start = 0
+        while (end := data.find(b"\n", start)) != -1:
+            if not self.overlong:
+                self._consider(bytes(self.partial) + data[start:end])
+            self.partial.clear()
+            self.overlong, start = False, end + 1
+        rest = data[start:]
+        if not self.overlong:
+            if len(self.partial) + len(rest) > RESULT_LINE_MAX:
+                self.partial.clear()
+                self.overlong = True
+            else:
+                self.partial += rest
+
+    def _step(self, timeout: float) -> bool:
+        """Read what is ready within ``timeout``; False once the pipe has ended or cannot be read."""
+        try:
+            ready, _, _ = select.select([self.source], [], [], timeout)
+            if not ready:
+                return True
+            data = os.read(self.source, RELAY_CHUNK)
+        except (OSError, ValueError) as error:
+            self._fail("cannot be read to relay it", error)
+            self.done = True
+            return False
+        if not data:
+            self.done = True
+            return False
+        self._feed(data)
+        return True
+
+    def pump(self, running) -> None:
+        """Relay while the session's leader runs (``running()``); what is left is ``drain``'s, after its group ends."""
+        while not self.done and running():
+            self._step(0.1)
+
+    def drain(self, seconds: float) -> None:
+        """Relay what is left until the pipe ends; at most ``seconds`` more, for a process that left the session's
+        group and still holds the pipe."""
+        deadline = time.monotonic() + seconds
+        while not self.done and (left := deadline - time.monotonic()) > 0:
+            self._step(min(left, 0.1))
+
+    def close(self) -> None:
+        if self.partial and not self.overlong:
+            self._consider(bytes(self.partial))
+        self.partial.clear()
+        self.done = True
 
 
 def _terminal() -> int | None:
@@ -1133,11 +1387,13 @@ def _group_options(terminal: int | None) -> dict:
     return {"preexec_fn": foreground}
 
 
-def _start(argv: list[str], root: Path, env: dict, terminal: int | None):
-    """The session, started as the leader of its own process group. A ``Popen`` put in the real one's place that
-    takes no process options (the suites' in-process stand-ins) is called without them: it starts no process."""
+def _start(argv: list[str], root: Path, env: dict, terminal: int | None, relay: bool = False):
+    """The session, started as the leader of its own process group; with ``relay`` (W2-60b S2), its stdout on a pipe
+    the launcher relays, else inherited. A ``Popen`` put in the real one's place that takes no process options (the
+    suites' in-process stand-ins) is called without them: it starts no process."""
+    piped = {"stdout": subprocess.PIPE} if relay else {}
     try:
-        return subprocess.Popen(argv, cwd=root, env=env, **_group_options(terminal))
+        return subprocess.Popen(argv, cwd=root, env=env, **_group_options(terminal), **piped)
     except TypeError as error:
         if "unexpected keyword argument" not in str(error):
             raise

@@ -6,6 +6,10 @@ its lines carry are returned. Whatever a log holds that no specimen shows makes 
 "not measured", with the reason named, at any version. A sub-agent's file belongs to the session (DEC-501).
 **Counts only, never content**: no text of a log line reaches a count's reason or a refusal, the Claude Code
 version excepted.
+
+W2-60b adds ``measure``: new readings only, for the session record (turns, compactions, rate-limit events, cost,
+effort, minutes, the models of the session and its sub-agents). ``find``, ``subagent_files`` and ``read`` are as
+W1-31 left them.
 """
 
 from __future__ import annotations
@@ -319,3 +323,133 @@ def read(path: Path, session: str) -> dict:
     return {"usage": tuple(sum(each[at] for each in usage.values()) for at in range(len(USAGE))),
             "models": models, "counts": counts, "notes": notes, "missing": missing, "duration": duration,
             "versions": versions}
+
+
+# -- W2-60b: the new readings, for the session record (DEC-838 item 3, DEC-655, DEC-495) ----------------------------
+
+# The forms these readings take, from the specimens and the W2-60b brief's forms of Claude Code 2.1.31x-2.1.32x: a
+# compaction is a ``system`` line of subtype ``compact_boundary``; the effort is an assistant line's ``perTurnEffort``;
+# a rate-limit event is a ``system`` line of subtype ``api_error`` whose ``error.status`` is 429, or an assistant line
+# with ``isApiErrorMessage`` true and ``error`` ``rate_limit`` (each such line once); the cost is the last
+# ``cost-state`` line's ``totalCostUSD``. Nothing else of a line is given out: a model name, an effort and a
+# timestamp only when they are of their plain form, so that no text of the log can pass as one.
+COMPACTION, API_ERROR, RATE_LIMIT_STATUS, RATE_LIMIT = "compact_boundary", "api_error", 429, "rate_limit"
+SYNTHETIC = "<synthetic>"  # the model of a message the harness wrote itself (an API error's), no model's turn
+EFFORTS = ("low", "medium", "high", "xhigh", "max")
+MODEL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:\[\]-]{0,99}")
+TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})")
+
+
+def _seconds(stamp: str) -> float:
+    from datetime import datetime
+    return datetime.fromisoformat(stamp.replace("Z", "+00:00")).timestamp()
+
+
+def _rate_limited(line: dict) -> bool:
+    error = line.get("error")
+    if line.get("type") == "system" and line.get("subtype") == API_ERROR:
+        return isinstance(error, dict) and error.get("status") == RATE_LIMIT_STATUS
+    return line.get("type") == "assistant" and line.get("isApiErrorMessage") is True and error == RATE_LIMIT
+
+
+def _lines(file: Path, session: str, side: bool) -> list[dict]:
+    """The JSON objects of one file; refused, naming no text of it, when it cannot be read, a line is no JSON object
+    or a line is of another session (W1-31's refusals)."""
+    where = "a sub-agent's file, line" if side else "line"
+    try:
+        raw = Path(file).read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        raise GovError("SESSION_LOG_UNREADABLE", f"the log of session {session} cannot be read: the session was not "
+                       "measured", {"session": session}) from None
+    lines = []
+    for number, text in enumerate(raw, 1):
+        try:
+            line = json.loads(text)
+        except ValueError:
+            line = None
+        if not isinstance(line, dict) or line.get("sessionId") not in (None, session):
+            raise GovError("SESSION_LOG_FORM", f"the log of session {session} is not in a form the specimens show "
+                           f"({where} {number} is no JSON object of the session): the session was not measured",
+                           {"session": session})
+        lines.append(line)
+    return lines
+
+
+def _model(line: dict):
+    message = line.get("message")
+    model = message.get("model") if isinstance(message, dict) else None
+    return None if line.get("isApiErrorMessage") is True or model == SYNTHETIC else model
+
+
+def measure(path: Path, session: str) -> dict:
+    """W2-60b: what the session record reads from the log ``path`` of ``session`` beside ``read``'s tokens, each a
+    count or a plain value, ``None`` where the log does not give it in a form shown (never 0 for that):
+
+    - ``models``: the models of the session's own assistant lines, each once in order (a harness-written message's
+      ``<synthetic>`` left out); ``None`` when one is not of a model name's plain form;
+    - ``efforts``: their ``perTurnEffort`` values that are an effort (``low`` .. ``max``), each once in order;
+    - ``turns``: the session's own assistant messages (message ids), each once, harness-written ones left out;
+    - ``compactions``: the session's own ``compact_boundary`` lines;
+    - ``rate_limits``: the timestamp of each rate-limit line of the session and its sub-agents, in order; ``None``
+      when such a line has no timestamp of the plain form;
+    - ``cost``: the last ``cost-state`` line's ``totalCostUSD`` of the session's own file, a number of 0 or more;
+    - ``minutes``: from the first to the last timestamp of the session's own file;
+    - ``subagents``: one model per sub-agent file (its first model; ``None`` when it has none of a plain form);
+    - ``versions``: the Claude Code versions the lines carry, each once in order.
+    Refuses, as ``read`` does, a file that cannot be read, a line that is no JSON object or of another session."""
+    found = {"models": [], "efforts": [], "turns": set(), "compactions": 0, "rate_limits": [], "cost": None,
+             "minutes": None, "subagents": [], "versions": []}
+    stamps, odd_model, odd_stamp, cost = [], False, False, None
+    files = [path, *subagent_files(path, session)]
+    for file in files:
+        side = file != path
+        first_model = None
+        for line in _lines(file, session, side):
+            version, stamp = line.get("version"), line.get("timestamp")
+            if isinstance(version, str) and VERSION.fullmatch(version) and version not in found["versions"]:
+                found["versions"].append(version)
+            good_stamp = isinstance(stamp, str) and TIMESTAMP.fullmatch(stamp) is not None
+            if _rate_limited(line):
+                if good_stamp:
+                    found["rate_limits"].append(stamp)
+                else:
+                    odd_stamp = True
+            model = _model(line) if line.get("type") == "assistant" else None
+            if side:
+                if first_model is None and isinstance(model, str) and MODEL_NAME.fullmatch(model):
+                    first_model = model
+                continue
+            if stamp is not None:
+                if good_stamp:
+                    stamps.append(_seconds(stamp))
+                else:
+                    found["minutes"] = "odd"
+            kind = line.get("type")
+            if kind == "system" and line.get("subtype") == COMPACTION:
+                found["compactions"] += 1
+            elif kind == "cost-state":
+                total = line.get("totalCostUSD")
+                cost = total if isinstance(total, (int, float)) and not isinstance(total, bool) and total >= 0 \
+                    else None
+            elif kind == "assistant" and model is not None:
+                message = line.get("message")
+                if isinstance(message, dict) and isinstance(message.get("id"), str):
+                    found["turns"].add(message["id"])
+                if not isinstance(model, str) or not MODEL_NAME.fullmatch(model):
+                    odd_model = True
+                elif model not in found["models"]:
+                    found["models"].append(model)
+                effort = line.get("perTurnEffort")
+                if effort in EFFORTS and effort not in found["efforts"]:
+                    found["efforts"].append(effort)
+        if side:
+            found["subagents"].append(first_model)
+    found["turns"] = len(found["turns"])
+    found["cost"] = cost
+    found["models"] = None if odd_model else found["models"]
+    found["rate_limits"] = None if odd_stamp else found["rate_limits"]
+    if found["minutes"] == "odd" or not stamps:
+        found["minutes"] = None
+    else:
+        found["minutes"] = round((max(stamps) - min(stamps)) / 60, 2)
+    return found

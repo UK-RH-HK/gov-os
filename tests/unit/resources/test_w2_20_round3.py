@@ -18,6 +18,7 @@ import fcntl
 import json
 import os
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -90,6 +91,12 @@ def test_f1_launches_started_together_admit_only_those_the_memory_rule_admits(pl
     the lock all six would read no session and start."""
     monkeypatch.setenv("GOV_RESOURCES_PROC", "/proc")  # real sessions: their pids are alive
     project = _quiet_launch_checks(planted, monkeypatch)
+    # Set-up only, under the W2-60b one-writer rule (DEC-963), the CTO's path case P2 (a), DEC-1156 (7): a second
+    # writing launch into one worktree is refused for the one writer, so each of the six engineer launches gets its
+    # own project folder (a copy of the one made above, before any launch), all reading the one planted machine's
+    # resource config and memory. The role stays a writer, so the six still contend for room for three under the
+    # start lock, and the memory rule is again what refuses three.
+    projects = [shutil.copytree(project, project.with_name(f"project-{i}")) for i in range(6)]
     planted.config(memory_floor_bytes=3 * GIB, working_size_bytes=2 * GIB)
     planted.memory(available=9 * GIB)  # 9 + the stand-ins' few MiB: n=2 needs 9 (opens), n=3 needs 11 (shuts)
     marks = planted.root / "marks"
@@ -115,7 +122,7 @@ def test_f1_launches_started_together_admit_only_those_the_memory_rule_admits(pl
             if pid == 0:  # pragma: no cover - the child
                 code = 4
                 try:
-                    launcher.launch(project, "engineer", f"T-{i}", [])
+                    launcher.launch(projects[i], "engineer", f"T-{i}", [])  # W2-60b P2 (a): its own folder
                     code = 0
                 except GovError as error:
                     (marks / f"refused-{i}").write_text(error.message)
