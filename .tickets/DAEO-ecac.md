@@ -1,6 +1,6 @@
 ---
 id: DAEO-ecac
-status: open
+status: in_progress
 deps: [DAEO-cv58, DAEO-r9ss]
 links: []
 created: 2026-10-29T15:55:51Z
@@ -72,6 +72,14 @@ list_rows:
 - W3-P09
 ---
 # W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents
+
+**Claimed 2026-11-16 05:33 (the CTO, DEC-1157: merged dependencies met; the interface stated at claim).** It starts now because EXAMIN's copy has started (W2-27 in progress since 11-15), the condition that moved it after the copy's start (DEC-1167 (3), the 18-November cuts under DEC-946 (7)). Class C3 (`src/gov/guard/decide.py` is a guard path in `governance/project/criticality.yaml`), so every worker runs on Opus.
+
+**Interface (at claim):**
+- **The record:** one JSON file per launched session, `.gov-runtime/sessions/<session id>.json` in the repository's main checkout, beside W2-60a's `.gov-runtime/launches/`; written whole (temporary file and rename) after the session ends; the keys are the S1 and S11 keys, each value an object `{value, source}` or `{value: null, not_measured: <reason>}`; `role`, `ticket`, `task_class`, `criticality` and `promotion` copied from the session's launch record. The CIT-E (`docs/changes/W2-60b-CIT-E.md`) states the path and keys, and a reader `read_record(root, ticket, session_id)` in `session_record.py` returns it (S6).
+- **The launcher:** one call after the session ends (every exit path, DEC-392's signals included); a record failure prints one stderr line and never changes the exit code (S5). The launchable roles are read from the kernel role files that `gov.launch.role` already reads; the five worker roles and their own-ticket rule launch exactly as today, and the CTO's, the Senior Engineer's and the ticket lead's files do not become launchable by `gov launch`. If saying which files are launchable needs a change to a kernel role file (`template/governance/kernel/**`, outside this ticket's paths and behind the kernel gate), the lead returns PACKAGES with the bytes, and never edits the kernel.
+- **One writer per worktree (S10, S12):** a live writing session is one whose record has a start and no end and whose process is alive; reviewers, the QA engineer and the independent auditor are not counted.
+- **The guard:** `qa-engineer` joins `KNOWN_ROLES` and the reviewer set only; the live hook's reviewer line is an owner ACT drafted beside it, named in the return.
 
 **DEC-959 (2026-10-30):** `qa-engineer` joins KNOWN_ROLES and the reviewer set (item 3; ROLES-RESEARCH-1 §5.3 item 2). `src/gov/guard/decide.py` is added for the KNOWN_ROLES set only. The repository's own hook (`.claude/hooks/pretooluse.py`, its REVIEWERS line) is the owner's ACT, prepared with this ticket.
 
