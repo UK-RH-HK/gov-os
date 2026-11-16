@@ -15311,6 +15311,19 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 ~01:38: "P-W2-81-VERDICT-1 (a) … (b): fix the runner's stage list inside W2-81, as its own test code. File now: the store fresh after adoption, and A3 refusing to delete a document its successor still references. The lite verdict and findings stage: a Wave 3 row … (c) yes …"
 - **Governing sources:** package `packages/P-W2-81-VERDICT-1.md` (d05949e43); DEC-1189 (2); DEC-1195.
 
+### DEC-1198 — P-RELEASE-2 (a), EXAMIN (i), go 0.1.1; EXAMIN F-021 (c), item 15 (a), TD tree (a); P-JOBS-USER-1 (B) with a Wave 3 row for OS-level separation; W2-81-FIGURES (b); BATCH1-HELD (a); OPROOT (a); ACT-GUARD-FIX-7 lands with its follow-ups; a guard false-positive package
+- **Status:** ACCEPTED (owner, 2026-11-16 ~12:1x, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-772, DEC-1089, DEC-1178 (3), DEC-1191 (2), DEC-1196, DEC-1197, DEC-1156 (7), DEC-954, DEC-1142 (8), DEC-1195
+- **Decision:**
+  - (1) **P-RELEASE-2 (a):** release 0.1.1 at C = the owner's commit raising `pyproject.toml`'s version to 0.1.1; the owner's sitting now, by P-RELEASE-2 section 4; the re-pin after it from the reviewed bundle (BUNDLE 54e1a619). **EXAMIN (i):** EXAMIN's copy stays on 0.1.0 until its adoption run ends.
+  - (2) **EXAMIN:** F-021 (c), a scoped close of `exa-dt1z` as the first green base; item 15 (a), a `.venv` in the clone with `pip install -e 'product[dev]'` and network (no sudo; Tesseract and Poppler stay absent); the test designer's worktree at `~/gov-os-runs/W2-27/examin-tests`.
+  - (3) **P-JOBS-USER-1 (B):** the CTO's, the leads' and the adopting sessions start inside an OS sandbox (SANDBOX-1's form) in which keys, credentials and the held-out set are not mounted; built and rehearsed on copies first, then reviewed; the job runner stays paused and uninstalled until then. **Wave 3 row:** the agent-to-agent layer (DEC-1195) gets OS-level separation in (A)'s form: the operator and each product's agents as separate users or containers, so every adopted repository inherits a real wall.
+  - (4) **W2-81-FIGURES (b):** the 0.1.1 re-run measures memory again first; legacy-docs' 5 % is diagnosed now, alongside the re-run, without a new ticket.
+  - (5) **BATCH1-HELD (a):** W2-17, W2-18, W2-19, W2-34 stay deferred (DEC-954), W2-115b, W2-121c parked (DEC-1142 (8)). **OPROOT (a):** `operator_run.py` passes apply.sh its cwd as the root, riding with act-O.
+  - (6) **ACT-GUARD-FIX-7:** its follow-ups (the 65 W2-111 unit fixtures that error after the apply, W2-141's staged copy, DND 231's cases) land with it, not after.
+  - (7) **The guard's false positives** (150 of 270 refusals since its first ACT): a short package to cut them, starting with the top classes.
+- **Basis:** the owner's message of 2026-11-16 ~12:1x: "P-RELEASE-2 (a), EXAMIN (i). go 0.1.1 … F-021 (c), item 15 (a), TD tree (a). P-JOBS-USER-1 (B) now, rehearsed on copies first … Record a Wave 3 row too … W2-81-FIGURES (b). Diagnose legacy-docs' 5 % now … BATCH1-HELD (a). OPROOT (a). ACT-GUARD-FIX-7: bring its follow-ups … to land with it, not after. The guard's false positives … Bring a short package to cut them …"
+- **Governing sources:** packages `P1-MORNING-20261116.md`, `P-RELEASE-2.md`, `P-JOBS-USER-1.md`; DEC-1196 (5).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15443,3 +15456,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.576 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1195 (Wave 3 row: the agent-to-agent layer productised for every adopted repository; tonight's lessons in DND 249). Next free id: DEC-1196. |
 | 0.577 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1196 (the undo; (O) by hand until act-O; routine jobs R1-R3 with R3 by independent review; when the owner's yes is needed; no rehearsal against a live path). Next free id: DEC-1197. |
 | 0.578 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1197 (P-W2-81-VERDICT-1 (a)(b)(c)). Next free id: DEC-1198. |
+| 0.579 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1198 (0.1.1 (a) and go; EXAMIN (i), F-021 (c), item 15 (a), TD tree (a); P-JOBS-USER-1 (B) and a Wave 3 row; W2-81-FIGURES (b); BATCH1-HELD (a); OPROOT (a); ACT-GUARD-FIX-7 with its follow-ups; a guard false-positive package). Next free id: DEC-1199. |
