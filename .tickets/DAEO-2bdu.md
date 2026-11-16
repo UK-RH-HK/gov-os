@@ -1,6 +1,6 @@
 ---
 id: DAEO-2bdu
-status: closed
+status: in_progress
 deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 links: []
 created: 2026-10-30T22:14:08Z
@@ -24,35 +24,9 @@ depends_on:
 - DAEO-k1e2  # W2-171: the audit's measure and pool, called by memory_sets.py (S20) [added, DEC-1101 (1), DEC-1125 (2)]
 - DAEO-p8tv  # W2-172: the audit's driver and schedule rule (S18) [added, DEC-1101 (1), DEC-1125 (2)]
 allowed_paths:
-- src/gov/adopt/assess.py
-- src/gov/adopt/refactor_plan.py
-- src/gov/adopt/fabric.py
-- src/gov/adopt/command.py
-- src/gov/adopt/project.py
-- src/gov/adopt/stages.py
-- src/gov/rebuild/command.py
-- src/gov/store/layout.py
-- src/gov/store/loader.py
-- docs/changes/W2-88-evidence.md  # its measurements and proof (a)'s record (DEC-996 (3) A; DEC-1150 (1))
-- tests/unit/adopt/test_w2_88*
-- tests/unit/rebuild/test_w2_88*
-- docs/changes/W2-88-CIT-P.md
-- src/gov/adopt/memory_sets.py  # [added, DEC-1099 (2)] the set tools: pre-flight, USED, resume, figures (its tests under tests/unit/adopt/test_w2_88*)
-- docs/probes/DAEO-2bdu/**  # the probe record (the CTO, 2026-11-12)
-- src/gov/adopt/safety.py  # [added, DEC-1178 (P-1): its parents[3] read]
-- src/gov/secrets/__init__.py  # [added, DEC-1178: the secret scan's speed]
-- tests/unit/secrets/test_w2_88*  # [added, DEC-1178]
-- tests/unit/secrets_check/test_dec1045_switch.py  # [added, DEC-1156 (7): run 9's P-1 path case, routed by the CTO]
-- pyproject.toml  # [added, DEC-1183 (1): package 1 (a), the shipped copies as package data]
-- src/gov/_shipped/**  # [added, DEC-1183 (1): package 1 (a)]
-- src/gov/codeintel/__init__.py  # [added, DEC-1183 (1): package 2 (a), the graph read in pages]
-- src/gov/retrieval/code_route.py  # [added, DEC-1183 (1): package 2 (a), only if the reader lives there]
-- tests/unit/adopt/test_safety.py  # [added, DEC-1183: package 3, S26 refuses first]
-- tests/unit/codeintel/test_w2_88*  # [added, DEC-1183 (1)]
-- tests/acceptance/W2-187/test_w2_187_s11_cron.py  # [added, the CTO's path case DEC-1156 (7) under DEC-893 and DEC-1185: S11's none-on-path case revised to GITLEAKS_MISSING (no placeholder), by W2-88's test designer]
-- tests/unit/adopt/test_w2_187_walls_act.py  # [added, the CTO's path case DEC-1156 (7), DEC-893: the no-scanner case revised to GITLEAKS_MISSING with no slot (R8-1)]
-- tests/unit/codeintel/test_codeintel.py  # [added, the CTO's path case DEC-1156 (7) under DEC-338: placement fixtures set SOCKET_MAX for placement-only cases]
-- tests/unit/codeintel/test_w2_56_nested_daemon.py  # [added, the same path case]
+- src/gov/secrets/__init__.py
+- tests/unit/secrets/test_w2_88_s27_bound*
+- docs/probes/DAEO-2bdu/**
 kpis:
   success:
   - 'The assessment: before the target path map (A3), adoption writes a memory-assessment record for the repository. It holds tracked files and bytes, languages, commits, the largest files, binaries, generated, minified and vendored candidates (by name, header and folder), the files the secrets filter refuses (by rule id, never the value), the files no route can take (a language the code graph does not read, a file over the chunker''s limit), and the estimated index time, peak RSS and disk against DEC-078''s envelope and the machine''s free memory and disk. It streams the tree and never loads it whole: on the largest proof repository its peak RSS is recorded and stays under the resource gate''s per-session figure. The repository''s tree, index and history are byte-identical before and after. Verify: on a planted repository (a vendored folder, a generated file, a minified file, a binary, a file over the chunker''s limit, a secret in a tracked file, a language the code graph does not read) the memory-assessment record is written before A3 and holds every field named above, each planted item under its category and the secret by rule id only (a grep of every output for the planted secret''s value finds 0 hits); a hash of the planted repository''s tree, index and history before and after is identical; on the largest proof repository the recorded peak RSS is under the resource gate''s per-session figure [DEC-954 Q9f, DEC-078, CAP-44.b]'
@@ -84,6 +58,7 @@ kpis:
   - 'S27 (the secret scan''s speed, DEC-1178) The scan judges many texts per gitleaks process (as assess.py:158 already does) and runs its batches in parallel within the CPU set and the slot''s thread budget (W2-20 S18), so a 36,000-file repository is scanned at least 10 times faster than one process per file, with the same findings. Verify: tests/acceptance/W2-88/test_w2_88_scan*.py: the same verdict per file as the one-per-file form on a planted set with planted secrets, and the measured files per second before and after on a planted 5,000-file tree, recorded in docs/changes/W2-88-evidence.md; if 10 times cannot be reached in these paths, the lead returns PACKAGES with what it would take [DEC-1178]'
   - 'S28 (DEC-1185) The code graph is read in bounded pieces for any repository size: keyset pages in a fixed order, each the next block of at most 100,000 links after the last one read, grouped by the link''s source file (and, inside one file holding more than 100,000 links, by a fixed key within the file); each link is read exactly once, the pieces'' counts summing to the tool''s total; a refresh re-reads only the links of files changed since the last read. A single link type over 100,000 is read. A graph the tool cannot page soundly refuses by name, never a partial read. Its time on the redis copy is recorded. Verify: planted graphs (the tool''s stand-in) with one link type of 250,000 links and one source file of 120,000 links are read whole, no page over 100,000, no link twice, counts equal; a planted refresh after 3 changed files issues reads only for those files'' links; on the redis copy under ~/gov-os-runs/W2-88/, A9 reads its links with counts equal to the tool''s, and the read''s wall time is in the run record. [DEC-1185, DEC-1183 (1)]'
   - 'S29 (DEC-1189 (1)) Every file the shipped-file resolver (`fabric.shipped`) is asked for is in the wheel: `template/.gitleaks.toml` is shipped as `gov/_shipped/template/.gitleaks.toml` with its package-data line, so A0 and MA find it from an installed release on a repository without the kit. Verify: a unit test lists every constant passed to `fabric.shipped` and finds each in `pyproject.toml`''s package data and under `src/gov/_shipped/`, byte-identical to its source; A0 run by a gov installed from a wheel built in the release form, on a planted repository with no kit and no `.gitleaks.toml`, exits 0 and commits the template''s copy [DEC-1189 (1)]'
+  - 'S27-W (DEC-1156 (7), the 11-16 nightly) The scan keeps S27''s bound of at least 10 texts per gitleaks process on average (both rule sets counted) whatever the worker width: a wide CPU set or slot budget never splits the texts into smaller batches than the bound allows. Verify: tests/acceptance/W2-88/test_w2_88_scan_speed.py::test_s27_many_texts_are_judged_per_gitleaks_process passes without a slot budget on a 20-CPU machine, and tests/unit/secrets/test_w2_88_s27_bound*.py checks the batch count for widths 1, 3, 20 and 64'
   failure:
   - 'S28''s failure: a link read twice or missed, a page over 100,000 links, a graph the paging can read refused, or a refresh that re-reads unchanged files'' links. Verify: S28''s planted graphs and refresh.'
   - 'Anything written, moved, committed or deleted in a repository by the assessment or the refactoring plan; a proposed ticket created with tk or applied without the owner. Verify: a hash of a planted repository''s tree, index and history and its `tk` ticket list before and after the assessment and the plan are identical; no tk create or apply call appears in the call log; any difference is a failure'
@@ -386,3 +361,5 @@ This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill
 **Widened 2026-11-15 by the CTO under DEC-1156 (7) (run 9's P-1 (a)):** `tests/unit/secrets_check/test_dec1045_switch.py` only. Its case `test_on_the_filter_gives_every_governance_file_to_gitleaks` records `_holds_secret`, which folder mode's `indexable` no longer calls; the recorder is re-pointed at folder mode's batch (the verdict and intent it asserts unchanged), `Rewrite-Reason: DEC-1183 (2), DEC-1156 (7)`, then a narrow independent check (DEC-1154) and the land.
 
 **Reopened 2026-11-15 by the owner (DEC-1189 (1), W2-88-GITLEAKS-SHIP yes):** W2-81's run on release 0.1.0 refused `SHIPPED_FILE_MISSING: template/.gitleaks.toml` at A0 in all six repositories (no kit). S24 routed A0's and MA's read through `fabric.shipped` but the file was never in the wheel. S29 ships it and holds every resolver read to the package data. STANDARD-sized, run under the ticket's FULL profile with a narrow independent check (DEC-1154); shipped in release 0.1.1.
+
+**Reopened 2026-11-16 09:1x by the CTO (DEC-1156 (7), DEC-1157 (12); a path case from the 11-16 nightly triage; listed for the owner's reading):** S27's case `tests/acceptance/W2-88/test_w2_88_scan_speed.py::test_s27_many_texts_are_judged_per_gitleaks_process` (at most one gitleaks process per 10 files asked, both rule sets counted: DEC-1183 (2), run 9) fails alone without a slot budget: `_batches` (src/gov/secrets/__init__.py:440) sizes batches by `ceil(texts/width)` with width the CPU count, so on 20 CPUs 300 files over 2 rule sets start 40 processes against the bound of 30; inside a heavy slot it passes. The bound is the decided behaviour: an engineer makes the scan keep it whatever the width (the case is not changed), with a unit test beside it. Allowed paths narrowed to this round (the earlier list is in git history at cacfea453). A narrow independent check (DEC-1154) judges the change.
