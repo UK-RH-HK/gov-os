@@ -1,6 +1,6 @@
 ---
 id: DAEO-2keg
-status: open
+status: deferred
 deps: [DAEO-g0ip, DAEO-lrre, DAEO-yadm]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-35
-tags: [wave-2, implementation, standard, wave-3, deferred]
+tags: [implementation, standard, wave-3, deferred]
 wbs_id: W2-35
 title: 'The UX readiness row: approved wireframes, visual checks'
 class: implementation
@@ -53,3 +53,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-35), as approved (DEC-729). The list row
 - **KPIs:** for a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved, and its acceptance tests include visual checks against them [CAP-30.g, DEC-104]. A visual-testing tool is installed under DEC-083 when first needed (queued).
 
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-35 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.

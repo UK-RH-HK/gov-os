@@ -1,6 +1,6 @@
 ---
 id: DAEO-fau3
-status: open
+status: deferred
 deps: [DAEO-g0ip, DAEO-cuao]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-42
-tags: [wave-2, implementation, full, wave-3, deferred]
+tags: [implementation, full, wave-3, deferred]
 wbs_id: W2-42
 title: 'Guard: missing role, links, late paths, atomic saves'
 class: implementation
@@ -98,3 +98,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-42), as approved (DEC-729). The list row
   - A quoted `$NAME` target is judged as the literal the shell writes [W2-M019].
 
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. Its S3, atomic saves, comes first.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-42 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.

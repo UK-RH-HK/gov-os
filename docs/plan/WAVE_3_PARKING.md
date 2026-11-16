@@ -41,3 +41,24 @@ Every new idea, the owner's or the orchestrator's, comes here unless it blocks E
 | W3-P35 | gov launch's plan check (`src/gov/launch/plan_check.py`) reads a dependency merged into w2/integrate as met for starting (closing still waits for it closed); in Wave 2 the per-ticket `plan_override: DEC-1157` serves | the owner, 2026-11-13 (DEC-1157 (9)): no new ticket; parked | 2026-11-13 |
 
 Not parked: the mutation-testing trial after W2-11 is already decided (DEC-941 item 6) and stays in Wave 2.
+
+## Moved from Wave 2 (DEC-1201, the owner, 2026-11-16)
+Wave 2's tickets deferred or parked to Wave 3 leave Wave 2's list; each keeps its ticket file (status `deferred`, tag
+`wave-3`, no `wave-2`), not closed and not done; `gov plan` no longer offers them.
+
+| Ticket | Title | Why it was already Wave 3 |
+|---|---|---|
+| W2-17 (DAEO-sdhj) | gov update | deferred, DEC-953/954 |
+| W2-18 (DAEO-057v) | Pinned install: a product repository runs a fixed release | deferred, DEC-953/954 (DEC-1089 (2)) |
+| W2-19 (DAEO-jzvg) | Language-agnostic test commands | deferred, DEC-953/954 |
+| W2-34 (DAEO-yadm) | gov readiness --generate | deferred, DEC-953/954 |
+| W2-35 (DAEO-2keg) | The UX readiness row | deferred, DEC-953 item 10b / DEC-954 |
+| W2-36 (DAEO-w19l) | gov discover | deferred, DEC-953 item 10b / DEC-954 |
+| W2-42 (DAEO-fau3) | Guard: missing role, links, late paths, atomic saves | deferred, DEC-953 item 10b / DEC-954 |
+| W2-115b (DAEO-j9z6) | gov queue, the product's merge queue | parked, DEC-1142 (8), W3-P32 |
+| W2-121c (DAEO-5rgj) | gov dispatch, part c | parked, DEC-1142 (8), W3-P33 |
+| W2-121d (DAEO-6w5n) | gov dispatch, part d | parked, DEC-1142 (8), W3-P34 |
+
+W2-27 to W2-30 (EXAMIN's adoption and its verdicts) also left Wave 2 by DEC-1201 (4), to EXAMIN's Wave 0 (filed by the
+EXAMIN CTO in the clone), not to Wave 3.
+

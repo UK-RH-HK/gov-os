@@ -1,6 +1,6 @@
 ---
 id: DAEO-60rw
-status: open
+status: moved
 deps: [DAEO-g0ip, DAEO-b926]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: independent-auditor
 external-ref: W2-30
-tags: [wave-2, audit, full]
+tags: [audit, full, examin-wave0]
 wbs_id: W2-30
 title: Healthy-adoption verdict on the real repository
 class: audit
@@ -39,3 +39,5 @@ list_rows: []
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-30), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
 - A fresh auditor gives the real repository's verdict. **Track B ends with ADOPTED_HEALTHY** (exit criterion 6).
+
+**Moved out of Wave 2 2026-11-16 by the owner (DEC-1201 (4)):** W2-30 is EXAMIN's adoption or refactor work, so it becomes part of EXAMIN's Wave 0, filed by the EXAMIN CTO in the clone once its plan is approved (DEC-1199 (1), DEC-1200); Wave 2 keeps only Gov OS's own work. Status `moved`, tag `wave-2` removed; not closed and not done here.

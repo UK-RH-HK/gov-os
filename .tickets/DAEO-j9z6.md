@@ -1,6 +1,6 @@
 ---
 id: DAEO-j9z6
-status: open
+status: deferred
 deps: [DAEO-emq1]
 links: [DAEO-emq1]
 created: 2026-11-11T23:59:00Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-115b
-tags: [wave-2, close, queue, full, wave-3, deferred]
+tags: [close, queue, full, wave-3, deferred]
 wbs_id: W2-115b
 title: 'gov queue, the product''s merge queue: the queue lines of W2-115, split by its P1 (b)'
 class: implementation
@@ -50,3 +50,5 @@ as the reference. Runs after W2-115 (the close it lands through). Class C3 (the 
 ## Parked (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
 
 Parked in docs/plan/WAVE_3_PARKING.md as W3-P32: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-115b leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
