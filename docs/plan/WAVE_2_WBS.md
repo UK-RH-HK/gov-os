@@ -9,6 +9,11 @@ decisions: [DEC-078, DEC-083, DEC-086, DEC-096, DEC-104, DEC-105, DEC-136, DEC-1
 
 # Wave 2 (Strengthen) — work breakdown (revision 4)
 
+> **DEC-1201 (the owner, 2026-11-16):** Wave 2 keeps only Gov OS's own work. W2-17, W2-18, W2-19, W2-34, W2-35, W2-36,
+> W2-42, W2-115b, W2-121c and W2-121d moved to Wave 3's list (`docs/plan/WAVE_3_PARKING.md`, "Moved from Wave 2");
+> W2-27, W2-28, W2-29 and W2-30 moved to EXAMIN's Wave 0 (filed by the EXAMIN CTO in its clone). Their rows below are
+> kept for the record.
+
 > **Revision 4 (DEC-953, DEC-954; owner, 2026-10-30).**
 >
 > DEC-953 lifts every Gov OS feature as a gate on this repository's own development. Tickets close on the audit's 10 practices. The proof of `gov close` moves to the proving ground (W2-81) and EXAMIN's copy.

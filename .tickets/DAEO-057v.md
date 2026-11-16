@@ -1,6 +1,6 @@
 ---
 id: DAEO-057v
-status: open
+status: deferred
 deps: [DAEO-g0ip, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-18
-tags: [wave-2, implementation, standard, wave-3, deferred]
+tags: [implementation, standard, wave-3, deferred]
 wbs_id: W2-18
 title: 'Pinned install: a product repository runs a fixed release, never the development copy'
 class: implementation
@@ -76,3 +76,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-18), as approved (DEC-729). The list row
 - **KPIs, failure:** a product session that imports this repository's `src/gov` is refused by doctor and reported.
 
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-18 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.

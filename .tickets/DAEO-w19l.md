@@ -1,6 +1,6 @@
 ---
 id: DAEO-w19l
-status: open
+status: deferred
 deps: [DAEO-g0ip, DAEO-yadm]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-36
-tags: [wave-2, implementation, standard, wave-3, deferred]
+tags: [implementation, standard, wave-3, deferred]
 wbs_id: W2-36
 title: gov discover
 class: implementation
@@ -50,3 +50,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-36), as approved (DEC-729). The list row
 - **KPIs:** `gov discover <question or feature>` opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records back the answer. The same request in plain language works the same way [CAP-32.d, DEC-166, W2-M284].
 
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. First in line in Wave 3 (the discovery agents, aim 2).
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-36 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.

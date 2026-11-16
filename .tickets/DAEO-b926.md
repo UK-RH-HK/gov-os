@@ -1,6 +1,6 @@
 ---
 id: DAEO-b926
-status: open
+status: moved
 deps: [DAEO-g0ip, DAEO-csj8, DAEO-swdu, DAEO-49o5, DAEO-ylsh]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: orchestrator
 external-ref: W2-29
-tags: [wave-2, integration, full]
+tags: [integration, full, examin-wave0]
 wbs_id: W2-29
 title: EXAMIN adoption on the real repository
 class: integration
@@ -52,3 +52,5 @@ EXAMIN's real repository carries 9 uncommitted entries (6 modified, 3 untracked;
 - Modified (6): `.gitignore`, `CLAUDE.md`, `archive/plans/PLAN_C.md`, `archive/plans/PLAN_D.md`, `archive/plans/PLAN_V3.md`, `product/data/cpc_subclasses.txt`.
 - Untracked (3): `AGENTS.md`, `TRANSFER-2026-09-18.md`, `spec/audits/`.
 - Note for the package: `CLAUDE.md` (modified) and `AGENTS.md` (untracked) are files the adoption's generation must preserve (W2-H050, W2-23).
+
+**Moved out of Wave 2 2026-11-16 by the owner (DEC-1201 (4)):** W2-29 is EXAMIN's adoption or refactor work, so it becomes part of EXAMIN's Wave 0, filed by the EXAMIN CTO in the clone once its plan is approved (DEC-1199 (1), DEC-1200); Wave 2 keeps only Gov OS's own work. Status `moved`, tag `wave-2` removed; not closed and not done here.

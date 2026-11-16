@@ -1,6 +1,6 @@
 ---
 id: DAEO-csj8
-status: open
+status: moved
 deps: [DAEO-g0ip, DAEO-h4rh, DAEO-g87r, DAEO-zmo4, DAEO-6y0x]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: independent-auditor
 external-ref: W2-28
-tags: [wave-2, audit, full]
+tags: [audit, full, examin-wave0]
 wbs_id: W2-28
 title: Independent verdict on the copy
 class: audit
@@ -44,3 +44,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-28), as approved (DEC-729). The list row
 
 - A fresh auditor gives the copy's verdict against the lite conditions of Contract v4.2's CAP-44.h: ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY. Anything short of ADOPTED_HEALTHY goes to the owner before W2-29.
 - The verdict checks that nothing of the owner's was lost from EXAMIN's own `CLAUDE.md`, `AGENTS.md` and `.claude/commands/`. Each is migrated into EXAMIN's rulesync sources or kept in place, never silently overwritten [DEC-736].
+
+**Moved out of Wave 2 2026-11-16 by the owner (DEC-1201 (4)):** W2-28 is EXAMIN's adoption or refactor work, so it becomes part of EXAMIN's Wave 0, filed by the EXAMIN CTO in the clone once its plan is approved (DEC-1199 (1), DEC-1200); Wave 2 keeps only Gov OS's own work. Status `moved`, tag `wave-2` removed; not closed and not done here.

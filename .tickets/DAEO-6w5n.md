@@ -1,6 +1,6 @@
 ---
 id: DAEO-6w5n
-status: open
+status: deferred
 deps: [DAEO-cb2b]
 links: [DAEO-cb2b]
 created: 2026-11-12T01:50:00Z
@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-121d
-tags: [wave-2, dispatch, full, wave-3, deferred]
+tags: [dispatch, full, wave-3, deferred]
 wbs_id: W2-121d
 title: "gov dispatch, part d: watch and launch lead: gov watch wakes on key results, merges from integration never wake, gov launch lead builds the invocation"
 class: implementation
@@ -46,3 +46,5 @@ Split from W2-121 (DAEO-cb2b) by the CTO's delegated decision on its run 1's P-W
 ## Parked (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
 
 Parked in docs/plan/WAVE_3_PARKING.md as W3-P34: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
+
+**Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-121d leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
