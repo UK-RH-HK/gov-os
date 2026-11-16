@@ -15279,6 +15279,18 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 ~00:58: "P-W2-27-F016 (a)."
 - **Governing sources:** package `packages/P-W2-27-F016.md` (13a25081b); EXAMIN's F-016, F-007.
 
+### DEC-1195 — Wave 3: Gov OS's agent-to-agent layer, productised from tonight's prototype and inherited by every adopted repository through the kit and the release
+- **Status:** ACCEPTED (owner, 2026-11-16 ~01:10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1191, DEC-1193, DEC-1104 (2), DEC-998, DEC-1112 (3), CAP-33
+- **Decision:** a Wave 3 row: tonight's pieces become a product layer, shipped in the kit and the release, so every adopted repository inherits it:
+  - the operator job runner, with its standing rules (routine classes) and the owner's yes lines;
+  - headless sessions, resumed by the CTO;
+  - the inbox wake;
+  - the dead-man check.
+
+  One operator and one CTO per product; approvals read only from that product's CTO session. The row records what tonight's prototype taught (DND 249). Its work is planned in Wave 3 under the change workflow (CAP-33), not started now.
+- **Basis:** the owner's message of 2026-11-16: "Record a Wave 3 row, as my decision: productise tonight's pieces as Gov OS's agent-to-agent layer, inherited by every adopted repository through the kit and the release … One operator and one CTO per product, approvals read from that product's CTO. Note in the row what tonight's prototype taught us."
+- **Governing sources:** packages `P-SESSIONS-1.md`, `P-JOBS-ROUTINE-1.md`; DEC-1191; DEC-1193.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15408,3 +15420,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.573 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1192 (P-ADOPT-TEMPLATES (a): the role templates by the owner's operator tonight; W2-153 reopened for gov adapters generate to write them, in 0.1.1). Next free id: DEC-1193. |
 | 0.574 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1193 (the sets-root file; summary-only operator jobs for hidden-set steps). Next free id: DEC-1194. |
 | 0.575 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1194 (P-W2-27-F016 (a): EXAMIN's three command front matters quoted by the owner's commit). Next free id: DEC-1195. |
+| 0.576 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1195 (Wave 3 row: the agent-to-agent layer productised for every adopted repository; tonight's lessons in DND 249). Next free id: DEC-1196. |
