@@ -1,6 +1,6 @@
 ---
 id: DAEO-2bdu
-status: in_progress
+status: closed
 deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 links: []
 created: 2026-10-30T22:14:08Z
@@ -42,6 +42,7 @@ allowed_paths:
 - src/gov/adopt/safety.py  # [added, DEC-1178 (P-1): its parents[3] read]
 - src/gov/secrets/__init__.py  # [added, DEC-1178: the secret scan's speed]
 - tests/unit/secrets/test_w2_88*  # [added, DEC-1178]
+- tests/unit/secrets_check/test_dec1045_switch.py  # [added, DEC-1156 (7): run 9's P-1 path case, routed by the CTO]
 - pyproject.toml  # [added, DEC-1183 (1): package 1 (a), the shipped copies as package data]
 - src/gov/_shipped/**  # [added, DEC-1183 (1): package 1 (a)]
 - src/gov/codeintel/__init__.py  # [added, DEC-1183 (1): package 2 (a), the graph read in pages]
@@ -82,6 +83,7 @@ kpis:
   - 'S26 (F-3, DEC-1178; the CTO''s choice (b)) Ignore rules found at the start: stage MA (and A0 if MA is skipped) checks the repository''s ignore rules (`git check-ignore`) against every path gov adopt will write and commit, and refuses at once with a named code, each path and the rule''s file and line, before any long stage; it never force-adds and never edits the repository''s ignore files. Verify: tests/acceptance/W2-88/test_w2_88_f3*.py on a planted repository whose .gitignore ignores .claude/skills/* [DEC-1178]'
   - 'S27 (the secret scan''s speed, DEC-1178) The scan judges many texts per gitleaks process (as assess.py:158 already does) and runs its batches in parallel within the CPU set and the slot''s thread budget (W2-20 S18), so a 36,000-file repository is scanned at least 10 times faster than one process per file, with the same findings. Verify: tests/acceptance/W2-88/test_w2_88_scan*.py: the same verdict per file as the one-per-file form on a planted set with planted secrets, and the measured files per second before and after on a planted 5,000-file tree, recorded in docs/changes/W2-88-evidence.md; if 10 times cannot be reached in these paths, the lead returns PACKAGES with what it would take [DEC-1178]'
   - 'S28 (DEC-1185) The code graph is read in bounded pieces for any repository size: keyset pages in a fixed order, each the next block of at most 100,000 links after the last one read, grouped by the link''s source file (and, inside one file holding more than 100,000 links, by a fixed key within the file); each link is read exactly once, the pieces'' counts summing to the tool''s total; a refresh re-reads only the links of files changed since the last read. A single link type over 100,000 is read. A graph the tool cannot page soundly refuses by name, never a partial read. Its time on the redis copy is recorded. Verify: planted graphs (the tool''s stand-in) with one link type of 250,000 links and one source file of 120,000 links are read whole, no page over 100,000, no link twice, counts equal; a planted refresh after 3 changed files issues reads only for those files'' links; on the redis copy under ~/gov-os-runs/W2-88/, A9 reads its links with counts equal to the tool''s, and the read''s wall time is in the run record. [DEC-1185, DEC-1183 (1)]'
+  - 'S29 (DEC-1189 (1)) Every file the shipped-file resolver (`fabric.shipped`) is asked for is in the wheel: `template/.gitleaks.toml` is shipped as `gov/_shipped/template/.gitleaks.toml` with its package-data line, so A0 and MA find it from an installed release on a repository without the kit. Verify: a unit test lists every constant passed to `fabric.shipped` and finds each in `pyproject.toml`''s package data and under `src/gov/_shipped/`, byte-identical to its source; A0 run by a gov installed from a wheel built in the release form, on a planted repository with no kit and no `.gitleaks.toml`, exits 0 and commits the template''s copy [DEC-1189 (1)]'
   failure:
   - 'S28''s failure: a link read twice or missed, a page over 100,000 links, a graph the paging can read refused, or a refresh that re-reads unchanged files'' links. Verify: S28''s planted graphs and refresh.'
   - 'Anything written, moved, committed or deleted in a repository by the assessment or the refactoring plan; a proposed ticket created with tk or applied without the owner. Verify: a hash of a planted repository''s tree, index and history and its `tk` ticket list before and after the assessment and the plan are identical; no tk create or apply call appears in the call log; any difference is a failure'
@@ -97,6 +99,9 @@ kpis:
   - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved to W2-124, DEC-1083] (was S5)'
 profile: FULL
 sources:
+- DEC-1189
+- W2-124  # [added 2026-11-15 by the CTO: cited in the KPI brackets (structural links notice after the land)]
+- W2-26  # [added 2026-11-15 by the CTO: the same]
 - DEC-1185
 - DEC-1183
 - DEC-1154
@@ -379,3 +384,7 @@ This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill
 **The short runtime fallback (the CTO's P2 under DEC-338, 2026-11-15, listed for the owner's reading):** S25's real-redis case failed in the test box because the code-graph tool's runtime socket path passed the 108-byte AF_UNIX limit (W2-88's own harness puts CODEINTEL_DAEMON_BASE deep in the pytest box). `gov.codeintel` now uses a short per-session folder `/tmp/gov-cbm-<uid>/<12 hex>` (0700) only when the socket path would pass 107 bytes (counting `.sock.pending`, as W2-56's tests do), and refuses `CODEGRAPH_RUNTIME_PATH_TOO_LONG` by name otherwise; paths under the limit are unchanged. Path case: W2-56's placement fixtures in `tests/unit/codeintel/test_codeintel.py` and `test_w2_56_nested_daemon.py` set `SOCKET_MAX` high for placement-only cases (the length rule has its own cases in `test_w2_88_runtime_path.py`); allowed_paths widen to those two files.
 
 **Landed and queue-closed 2026-11-15 05:20 (a9045e382, run 8b at 54c96c9c40e5); reopened at once by the CTO (DEC-1183 (2)):** W2-88 stays open for S27's folder mode as its own round (each batch's files written to a private temporary folder outside the repository, one `gitleaks dir` per batch, each finding naming its own file). That round changes `src/`, so it starts only after release 0.1.0's re-pin is done (the release hold keeps `src/` at C). Residuals for the rows: R8-3, N1-N5 (N3: the sandbox profile allows the short runtime root /tmp/gov-cbm-<uid>), the refresh's full re-read on the real tool (record_stale with short pieces, fail-closed), the briefs' rule that workers run tests in the foreground.
+
+**Widened 2026-11-15 by the CTO under DEC-1156 (7) (run 9's P-1 (a)):** `tests/unit/secrets_check/test_dec1045_switch.py` only. Its case `test_on_the_filter_gives_every_governance_file_to_gitleaks` records `_holds_secret`, which folder mode's `indexable` no longer calls; the recorder is re-pointed at folder mode's batch (the verdict and intent it asserts unchanged), `Rewrite-Reason: DEC-1183 (2), DEC-1156 (7)`, then a narrow independent check (DEC-1154) and the land.
+
+**Reopened 2026-11-15 by the owner (DEC-1189 (1), W2-88-GITLEAKS-SHIP yes):** W2-81's run on release 0.1.0 refused `SHIPPED_FILE_MISSING: template/.gitleaks.toml` at A0 in all six repositories (no kit). S24 routed A0's and MA's read through `fabric.shipped` but the file was never in the wheel. S29 ships it and holds every resolver read to the package data. STANDARD-sized, run under the ticket's FULL profile with a narrow independent check (DEC-1154); shipped in release 0.1.1.

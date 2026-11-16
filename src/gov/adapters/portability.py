@@ -208,6 +208,12 @@ def _skills_difference(role: str, front: object) -> str:
     return f"the source lists {listed!r} under claudecode, the role's are {expected!r}"
 
 
+def kernel_templates(root: Path) -> Path | None:
+    """The kernel's ``templates/`` folder (the kit's, in an adopted repository), or None where there is none."""
+    kernel = _kernel(root)
+    return kernel / "templates" if kernel is not None and (kernel / "templates").is_dir() else None
+
+
 def _template_findings(root: Path) -> list[dict]:
     """W2-153 S4: each kernel template of ``TEMPLATE_COPIES`` has a byte copy under ``.claude/templates/``; a copy
     missing or differing is a finding naming it. None where the kernel holds no templates."""

@@ -81,8 +81,10 @@ def section(tree) -> dict | None:
     if block is None:
         return None
     import yaml
+
+    from gov.util.parts import load_yaml  # libyaml only where the pure loader reads the same (P-W2-111-YAML-REST)
     try:
-        doc = yaml.load(block, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader)) or {}
+        doc = load_yaml(block) or {}
     except yaml.YAMLError:
         raise RolePathsError(f"{PATH_MAP_REL}: {KEY} cannot be read") from None
     found = doc.get(KEY) if isinstance(doc, dict) else None
@@ -139,7 +141,10 @@ def _ticket(root: str, ticket_id: str | None) -> tuple[set, str | None]:
 
 
 def ticket_front(root: str, ticket_id: str | None) -> dict:
-    """The session ticket's front matter (its file, else the file whose wbs_id is the id); {} with no such ticket."""
+    """The session ticket's front matter (its file, else the file whose wbs_id is the id); {} with no such ticket or
+    no front matter. Front matter the pure-Python SafeLoader refuses raises ``RolePathsError`` (fail closed: an empty
+    front would hand a test designer the engineer's code; P-W2-111-YAML-REST-FRONT (a)); libyaml parses it only where
+    the pure loader reads the same (``gov.util.parts.load_yaml``)."""
     from gov.util import parts as reads
     if not ticket_id or "/" in ticket_id:
         return {}
@@ -160,11 +165,10 @@ def ticket_front(root: str, ticket_id: str | None) -> dict:
     except (OSError, reads.PolicyError):
         raise RolePathsError("the session's ticket file cannot be read") from None
     head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else ""
-    import yaml
     try:
-        front = yaml.load(head, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+        front = reads.load_yaml(head)
     except Exception:
-        front = None
+        raise RolePathsError("the session's ticket file cannot be read: its front matter is not YAML") from None
     return front if isinstance(front, dict) else {}
 
 
@@ -428,7 +432,10 @@ def judges(sec, roles, root, ticket_id, trees, main=None, links=None) -> list:
         globs = entry["reads_denied"]
         if any("{ticket_" in g for g in globs) and front is None:
             names, wbs = _ticket(root, ticket_id)
-            front = ticket_front(root, ticket_id) if any("{ticket_impl" in g for g in globs) else {}
+            # read for every role the ticket fills, so that front matter the pure loader refuses refuses here, never
+            # later as "no links" (the own folder only) (P-W2-111-YAML-REST-FRONT (a)); kept only for {ticket_impl}
+            read = ticket_front(root, ticket_id)
+            front = read if any("{ticket_impl" in g for g in globs) else {}
             if not wbs and isinstance(front.get("wbs_id"), str):
                 wbs = front["wbs_id"]
         allowed = front.get("allowed_paths") if isinstance(front, dict) else None

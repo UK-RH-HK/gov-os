@@ -38,20 +38,99 @@ class PolicyError(Exception):
     (fail closed).  The text is fixed: it carries nothing of a file."""
 
 
-def load_yaml_unique(stream):
-    """yaml.safe_load that refuses a mapping with a key written twice:
-    a reader that kept the last value would drop the first without a word."""
+_LOADERS: dict = {}  # the duplicate-key Loader made once for each base class
+
+
+def _unique_loader(yaml, base):
+    """*base* (SafeLoader, or libyaml's CSafeLoader) refusing a mapping with
+    a key written twice."""
+    loader = _LOADERS.get(base)
+    if loader is None:
+        class Loader(base):
+            def construct_mapping(self, node, deep=False):
+                mapping = super().construct_mapping(node, deep=deep)
+                if len(mapping) != len(node.value):
+                    raise yaml.constructor.ConstructorError(
+                        None, None, "a key is written twice", node.start_mark)
+                return mapping
+        loader = _LOADERS[base] = Loader
+    return loader
+
+
+def libyaml_reads_as_python(text) -> bool:
+    """Whether libyaml's parser is taken for *text* (W2-111, P-W2-111-R5-ROWS
+    (a)): a str with no tab, no ``?`` and no BOM after its first character.
+
+    libyaml reads three kinds of text that the pure-Python parser refuses
+    (rv-3 F1): a tab as a separator (inside or after a value, after
+    ``key:``), a ``?`` inside a flow item (``[a? b]``, ``[a?b]``: in a flow
+    the pure scanner ends a plain scalar at any ``?`` and takes it as a key
+    indicator) and a BOM at the start of a later line (libyaml skips it;
+    the pure scanner skips one only at the first character).  Whether a
+    ``?`` lies in a flow cannot be told without scanning, so any ``?``
+    takes the pure parser; so does a byte string (its encoding is the
+    parser's to work out)."""
+    return (isinstance(text, str) and "\t" not in text and "?" not in text
+            and "﻿" not in text[1:])
+
+
+def load_yaml(text):
+    """yaml.safe_load's answer for the str *text*, the pure-Python
+    SafeLoader's data or its refusal (W2-111, P-W2-111-YAML-REST (a)): the
+    path map's ``role_paths:`` block and a ticket's front matter.  libyaml's
+    CSafeLoader parses *text* only when it is installed and
+    ``libyaml_reads_as_python`` passes it (SafeLoader's own constructor and
+    resolver over the C parser); any other text, and any text whose libyaml
+    parse raises, is parsed by the pure-Python SafeLoader, so every refusal
+    is the pure loader's own (rv-3 F1)."""
     import yaml
 
-    class Loader(yaml.SafeLoader):
-        def construct_mapping(self, node, deep=False):
-            mapping = super().construct_mapping(node, deep=deep)
-            if len(mapping) != len(node.value):
-                raise yaml.constructor.ConstructorError(
-                    None, None, "a key is written twice", node.start_mark)
-            return mapping
+    fast = getattr(yaml, "CSafeLoader", None)
+    if fast is not None and libyaml_reads_as_python(text):
+        try:
+            return yaml.load(text, Loader=fast)
+        except Exception:
+            pass  # SafeLoader's own answer, or its own error, below
+    return yaml.load(text, Loader=yaml.SafeLoader)
 
-    return yaml.load(stream, Loader=Loader)
+
+def _as_stream(text, stream):
+    """*text*, read from *stream*, as a stream again under *stream*'s name:
+    the pure loader names a stream's file in its error's mark (and quotes
+    no line of it), so its refusal is the one it gives for *stream*."""
+    import io
+
+    again = io.BytesIO(text) if isinstance(text, bytes) else io.StringIO(text)
+    if hasattr(stream, "name"):
+        again.name = stream.name
+    return again
+
+
+def load_yaml_unique(stream):
+    """yaml.safe_load that refuses a mapping with a key written twice:
+    a reader that kept the last value would drop the first without a word.
+
+    W2-111 (DEC-1187, P-W2-111-R5-ROWS (a)): every answer is the pure-Python
+    SafeLoader's, the same data or the same refusal with its text.  A text
+    ``libyaml_reads_as_python`` passes is parsed by libyaml's CSafeLoader
+    when it is installed (SafeLoader's own constructor and resolver over the
+    C parser; the pure-Python parser took most of a guard call); any other
+    text, and any text whose libyaml parse raises, is parsed by the
+    pure-Python SafeLoader, so every refusal is the pure loader's own.  A
+    stream is read first, and given to the pure loader as a stream of the
+    same name and text."""
+    import yaml
+
+    text = stream.read() if hasattr(stream, "read") else stream
+    fast = getattr(yaml, "CSafeLoader", None)
+    if fast is not None and libyaml_reads_as_python(text):
+        try:
+            return yaml.load(text, Loader=_unique_loader(yaml, fast))
+        except Exception:
+            pass  # SafeLoader's own answer, or its own error, below
+    if text is not stream:
+        text = _as_stream(text, stream)
+    return yaml.load(text, Loader=_unique_loader(yaml, yaml.SafeLoader))
 
 
 class _Glob:
@@ -227,12 +306,13 @@ def _read_text(path: str) -> str:
 
 def _front(text: str) -> tuple[str | None, str | None]:
     """A ticket file's WBS id and id; one that cannot be read for them
-    refuses (fail closed)."""
+    refuses (fail closed).  The front matter is parsed by ``load_yaml``:
+    libyaml only for a text the pure-Python SafeLoader reads the same, so a
+    front it refuses goes to the line reader as with libyaml absent (W2-111,
+    P-W2-111-YAML-REST (a))."""
     head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
     try:
-        import yaml  # the C parser when there is one: the guard runs on every call
-        ticket = (yaml.load(head, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
-                  if head is not None else None)
+        ticket = load_yaml(head) if head is not None else None
     except Exception:
         ticket = None
     if not isinstance(ticket, dict):
@@ -329,11 +409,27 @@ def evaluation_sets(root: str) -> dict:
         end = next((j for j in range(at[0] + 1, len(lines))
                     if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
         text = "".join(lines[at[0]:end])
-    try:
-        data = load_yaml_unique(text)
-    except Exception:
-        raise PolicyError(f"{PATH_MAP_REL} cannot be read") from None
-    block = data.get(SETS_KEY, {}) if isinstance(data, dict) else None
-    if not isinstance(block, dict):
-        raise PolicyError(f"{PATH_MAP_REL}: {SETS_KEY} is not a map of sets")
-    return block
+    # W2-111 (DEC-1187): parsed once in the process for the same file and
+    # text; a changed text is parsed again, and a text that refuses is not
+    # kept (it refuses each time).  Each caller gets its own copy.
+    key = (path, text)
+    block = _SETS_PARSED.get(key)
+    if block is None:
+        try:
+            data = load_yaml_unique(text)
+        except Exception:
+            raise PolicyError(f"{PATH_MAP_REL} cannot be read") from None
+        block = data.get(SETS_KEY, {}) if isinstance(data, dict) else None
+        if not isinstance(block, dict):
+            raise PolicyError(f"{PATH_MAP_REL}: {SETS_KEY} is not a map of sets")
+        if len(_SETS_PARSED) >= _MOST_KEPT:
+            _SETS_PARSED.clear()
+        _SETS_PARSED[key] = block
+    import copy
+    return copy.deepcopy(block)
+
+
+# W2-111 (DEC-1187): the evaluation sets parsed in this process, by the path
+# map's path and the text parsed; in memory only, never on disk.
+_SETS_PARSED: dict = {}
+_MOST_KEPT = 16

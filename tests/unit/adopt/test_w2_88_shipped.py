@@ -1,5 +1,7 @@
 """W2-88 run 8, package 1 (a) (the owner's answer to be recorded as DEC-1183): the three files A9 needs ship inside the
 wheel, under ``src/gov/_shipped/`` at their paths in the Gov OS repository, and ``fabric.shipped`` looks there second.
+Since S29 (DEC-1189 (1)) the set is every rel the resolver is asked for, the ``template/`` ones included (nine); since
+W2-174, also the two ticket schemas its Verify pass reads (eleven).
 
 Regression evidence only (DEC-136). Each shipped copy equals its source bytes in this tree (no drift, nothing missing
 from either side, nothing extra in the copy); ``shipped`` finds a ``rel`` in the installed package's ``_shipped/`` when
@@ -16,7 +18,14 @@ from gov.cli.errors import GovError
 
 REPO = Path(__file__).resolve().parents[3]
 PACKAGE = REPO / "src/gov/_shipped"
-THE_THREE = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON)  # four since run 8b (item 21)
+SKILLS = "template/governance/kernel/skills"
+TEMPLATES = "template/governance/kernel/templates"
+SCHEMAS = "template/governance/kernel/schemas"
+# Four since run 8b (item 21); nine since S29 (DEC-1189 (1)): every rel the resolver is asked for, template/ ones too;
+# eleven since W2-174: the two ticket schemas its Verify pass reads (through its own lookup, DEC-1189 (1)).
+THE_SHIPPED = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, "template/.gitleaks.toml",
+               f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{TEMPLATES}/brief.md", f"{TEMPLATES}/role-cto.md",
+               f"{SCHEMAS}/ticket.schema.json", f"{SCHEMAS}/common.schema.json")
 
 
 def _files(base: Path, rel: str) -> dict[str, bytes]:
@@ -28,13 +37,13 @@ def _files(base: Path, rel: str) -> dict[str, bytes]:
             if path.is_file() and "__pycache__" not in path.parts}
 
 
-def test_the_three_are_named_once_in_the_code():
-    assert fabric.PACKAGED == THE_THREE
+def test_the_shipped_set_is_named_once_in_the_code():
+    assert fabric.PACKAGED == THE_SHIPPED
 
 
 def test_each_shipped_copy_equals_its_source_bytes():
-    # one case for the three (no parametrised rows: an opt-in list's ``rep:`` would keep only the first in a run)
-    for rel in THE_THREE:
+    # one case for the set (no parametrised rows: an opt-in list's ``rep:`` would keep only the first in a run)
+    for rel in THE_SHIPPED:
         source, copy = _files(REPO, rel), _files(PACKAGE, rel)
         assert source, f"{rel}: no source in the Gov OS tree"
         assert sorted(copy) == sorted(source), f"{rel}: a file missing from one side, or extra in the copy"
@@ -42,10 +51,10 @@ def test_each_shipped_copy_equals_its_source_bytes():
             assert copy[name] == source[name], f"{name}: the shipped copy has drifted from its source"
 
 
-def test_the_package_ships_nothing_but_the_three():
+def test_the_package_ships_nothing_but_the_shipped_set():
     shipped = {path.relative_to(PACKAGE).as_posix() for path in PACKAGE.rglob("*")
                if path.is_file() and "__pycache__" not in path.parts}
-    wanted = {name for rel in THE_THREE for name in _files(REPO, rel)}
+    wanted = {name for rel in THE_SHIPPED for name in _files(REPO, rel)}
     assert shipped == wanted
 
 
@@ -53,6 +62,8 @@ def test_the_walls_and_briefs_are_whole_in_the_copy():
     assert sorted(_files(PACKAGE, memory_sets.BRIEFS)) == [f"{memory_sets.BRIEFS}/{name}" for name in
                                                           ("auditor.md", "checker.md", "writer.md")]
     assert f"{memory_sets.WALLS}/README.md" in _files(PACKAGE, memory_sets.WALLS)
+    for name in ("retrieval", "discovery"):  # S29: the kernel skill folders A9 copies, whole
+        assert sorted(_files(PACKAGE, f"{SKILLS}/{name}")) == sorted(_files(REPO, f"{SKILLS}/{name}"))
 
 
 def test_the_package_copy_is_the_gov_packages_own_shipped_folder():

@@ -15,6 +15,8 @@ import w2_174_support as s
 
 FORBIDDEN_IMPORTS = {"socket", "http", "urllib", "requests", "httpx", "anthropic", "openai", "subprocess"}
 CODE_SUFFIXES = (".py", ".pyc", ".so", ".pyd")
+# L15 (DEC-1188): the pass also reads the kernel's ticket schema shipped with gov (this tree's, never a copy in the repository)
+SHIPPED = (s.SCHEMAS.resolve(), (s.REPO / "governance/kernel/schemas").resolve())
 GUARDED = ("src/gov/brief/", "template/governance/kernel/templates/", "template/governance/kernel/schemas/")
 UNCHANGED = ("src/gov/adopt/stages.py", "tests/acceptance/W2-152/")
 
@@ -30,11 +32,20 @@ def _names_changed_since_base() -> list[str]:
     top = _git("rev-parse", "--show-toplevel")
     if top.returncode != 0 or Path(top.stdout.strip()).resolve() != s.REPO.resolve():
         pytest.skip(f"{s.REPO} is not the top of a git checkout: the close's diff cannot be taken")
-    base = os.environ.get("W2_174_BASE", s.BASE_COMMIT)
+    override = os.environ.get("W2_174_BASE")
+    base = override or s.BASE_COMMIT
     if _git("cat-file", "-e", f"{base}^{{commit}}").returncode != 0:
         pytest.skip(f"the base commit {base} is not in this checkout: the close's diff cannot be taken")
-    names = set(_git("diff", "--name-only", base, "HEAD").stdout.split())
-    names |= set(_git("diff", "--name-only", base).stdout.split())  # tracked changes not yet committed
+    if override:
+        # a base named by hand: everything that differs from it, as before
+        names = set(_git("diff", "--name-only", base, "HEAD").stdout.split())
+        names |= set(_git("diff", "--name-only", base).stdout.split())  # tracked changes not yet committed
+    else:
+        # this ticket's own change: the files named by its own commits (any role) since its first base, so another
+        # ticket's files that integrate gained since that base (W2-88's stages.py) are never this ticket's
+        own = _git("log", "--no-merges", "--format=", "--name-only", f"--grep=^Task: {s.TICKET_ID}$", f"{base}..HEAD")
+        names = set(own.stdout.split())
+        names |= set(_git("diff", "--name-only", "HEAD").stdout.split())  # tracked changes not yet committed
     names |= {line[3:].split(" -> ")[-1] for line in _git("status", "--porcelain").stdout.splitlines()}
     return sorted(names)
 
@@ -157,7 +168,7 @@ def _stray_opens(events, allowed: list[Path], allowed_folder: Path) -> tuple[lis
         path = (path if path.is_absolute() else Path.cwd() / path).resolve()
         if path.suffix in CODE_SUFFIXES:
             continue
-        if path in allowed or allowed_folder in path.parents:
+        if path in allowed or allowed_folder in path.parents or any(folder in path.parents for folder in SHIPPED):
             inside.append(path)
         else:
             stray.append((mode, str(path)))

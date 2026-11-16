@@ -23,7 +23,7 @@ import shlex
 import stat
 import subprocess
 
-from gov.guard import bash_writes, runs
+from gov.guard import runs  # bash_writes: imported by the Bash call that reads with it (W2-111, DEC-1187)
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _line_write_targets,
                               _get_allowed_paths, _has_glob, _is_punct,
@@ -205,6 +205,61 @@ class _Runs(_Part):
         return self._walked[start]
 
 
+class _TreePart(_Part):
+    """W2-111 (DEC-1184 (3)): one tree's hidden part, made when a path at,
+    in or above the tree is judged; a path elsewhere is answered by the
+    tree's root alone, as the part made at once answers it.  Every answer
+    is that part's: one per tree, in the same place, so the trees a call
+    is judged against are those its targets lie in or above."""
+
+    def __init__(self, root: str, globs: list[str], reason: str):  # no _Part set-up yet
+        self.root, self.globs, self.reason, self.base = root, globs, reason, None
+        self.strict = reason == HIDDEN_REFUSAL
+        self._made: _Part | None = None
+
+    def made(self) -> _Part:
+        """The tree's part, made once."""
+        if self._made is None:
+            self._made = _Part(self.root, self.globs, self.reason)
+        return self._made
+
+    @property
+    def lead(self) -> list[str]:
+        return self.made().lead
+
+    @property
+    def rx(self) -> list:
+        return self.made().rx
+
+    @property
+    def literals(self) -> list[str]:
+        return self.made().literals
+
+    def inside(self, path: str) -> bool:
+        # rel() is None for a path not below the root: match(None) is False.
+        return self.rel(path) is not None and self.made().inside(path)
+
+    def match(self, rel: str | None) -> bool:
+        return self.made().match(rel)
+
+    def under(self, path: str) -> bool:
+        # A path at or above a literal folder (at or below the root) is at,
+        # in or above the root.
+        return _related(path, self.root) and self.made().under(path)
+
+    def held(self) -> bool:
+        return self.made().held()
+
+    @property
+    def files(self) -> list[str]:
+        return self.made().files
+
+    def below(self, folder: str | None) -> list[str]:
+        if not folder or (self.strict and not _related(folder, self.root)):
+            return []
+        return self.made().below(folder)
+
+
 def _blob_ref(word: str) -> tuple[str, str] | None:
     """A revision-colon-path's revision and path (``<rev>:<path>``, the
     index's ``:<path>`` and ``:<n>:<path>``), or None: no colon, an empty
@@ -310,8 +365,31 @@ def _worktrees(at: str, fault: str) -> list[str]:
         raise PolicyError(fault) from None
     if out.returncode:
         raise PolicyError(fault)
-    return [os.path.realpath(f[9:]) for f in out.stdout.split("\0")
-            if f.startswith("worktree ")]
+    return _realpaths([f[9:] for f in out.stdout.split("\0") if f.startswith("worktree ")])
+
+
+def _realpaths(paths: list[str]) -> list[str]:
+    """``os.path.realpath`` of each path, the folders they share resolved
+    once (W2-111, DEC-1184 (3)): an absolute, normal path whose last name
+    is no link is its folder's real path and that name, as realpath walks
+    it (a name it cannot stat is no link); any other is realpath's own."""
+    seen: dict[str, str] = {}
+
+    def real(path: str) -> str:
+        if path not in seen:
+            folder, name = os.path.split(path)
+            if (not name or name in (".", "..") or not os.path.isabs(path)
+                    or os.path.normpath(path) != path):
+                seen[path] = os.path.realpath(path)
+            else:
+                at = os.path.join(real(folder), name)
+                try:
+                    link = stat.S_ISLNK(os.lstat(at).st_mode)
+                except OSError:
+                    link = False
+                seen[path] = os.path.realpath(path) if link else at
+        return seen[path]
+    return [real(p) for p in paths]
 
 
 def _clone_trees(own: str) -> list[str]:
@@ -384,7 +462,8 @@ def parts(root: str, role: str, ticket_id: str | None,
         if "trees" not in found:
             found["trees"] = _trees(root)
         trees, names, entries = found["trees"]
-        out += [_Part(t, hidden, HIDDEN_REFUSAL) for t in trees]
+        # W2-111: each tree's part is made when a path at, in or above it is judged.
+        out += [_TreePart(t, hidden, HIDDEN_REFUSAL) for t in trees]
         if names:
             out.append(_Runs(names, hidden, entries))
     return out
@@ -1385,6 +1464,7 @@ class _Judge:
                 why = self._tool(tool_name, dict(tool_input, command=whole.replace("\\\n", "")), cwd)
                 if why:
                     return why
+            from gov.guard import bash_writes  # W2-111: only a Bash call pays for the shell parser
             command, codes = bash_writes.read_view(whole)
             for code in codes:
                 for piece in _CODE_PIECE_RE.split(code):

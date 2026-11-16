@@ -5,7 +5,7 @@ title: An adopted repository's tickets get their Verify clauses by a checked pas
 type: task
 class: implementation
 role: engineer
-profile: STANDARD
+profile: FULL
 status: closed
 state_class: AUTHORITATIVE
 priority: 1
@@ -19,6 +19,12 @@ allowed_paths:
 - src/gov/adopt/command.py
 - src/gov/adopt/facts.py  # the adoption's facts file (DEC-1148 (2), item 4 (a1))
 - tests/unit/adopt/test_w2_174*
+- docs/probes/DAEO-zmo4/**  # [added, DEC-1188: the FULL run's review record]
+- pyproject.toml  # [added 2026-11-15 by the CTO, DEC-802, DEC-1189 (1): r2's F1, the schemas in the wheel and jsonschema declared]
+- src/gov/_shipped/template/governance/kernel/schemas/**  # [added, the same]
+- src/gov/adopt/fabric.py  # [added 2026-11-15 by the CTO, DEC-1156 (7), P-W2-174-R2B-1 (A): the two schemas in PACKAGED]
+- tests/unit/adopt/test_w2_88_shipped.py  # [added, the same: THE_SHIPPED]
+- tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py  # [added, the same: ITEMS, a test designer's edit]
 reads:
 - src/gov/brief/build.py
 - src/gov/adopt/**
@@ -47,6 +53,10 @@ kpis:
     verify: "tests/unit/adopt/test_w2_174_checks.py: one case per refusal (unknown ticket, closed ticket, unknown label, an unanswered line, an empty clause, a `TBD` clause), each refused with a named code and nothing written"
   - line: "`gov adopt` writes `governance/project/facts.yaml` when the repository has none: it validates against `template/governance/kernel/schemas/facts.schema.json`, `ready.new_since` is the adoption's UTC date as a quoted ISO string, and every other key holds a product default (gov commands only, nothing of this repository); a command with no product equivalent (`lead_verify`, and `wait_for` until `gov wait` lands) is written as a named placeholder that `gov brief` refuses by name; an existing facts file is left byte for byte [DEC-1148 (2), DEC-1147, DEC-1088 (3)]"
     verify: "tests/unit/adopt/test_w2_174_facts.py: a fixture repository without a facts file has, after the adoption step, a file that validates against the kernel schema and carries ready.new_since equal to the step's date, and `gov brief` there no longer answers BRIEF_FACTS_MISSING (it names the placeholder commands instead); a fixture with its own facts file keeps it byte-identical"
+  - line: "S6 (DEC-1188) `gov adopt --verify-list --root <repo>` also prints, for each open or in-progress ticket, each of role, allowed_paths, kpis, reads, needs and waits_on that it lacks, and `--verify-apply <answers-file>` writes those fields from the answers file, so the ticket validates against `ticket.schema.json` and `ready_check` gives no refusal; the coordination ticket is fixed the same way"
+    verify: "tests/unit/adopt/test_w2_174_fields.py: a fixture repository with a coordination ticket and a review ticket each lacking the six fields lists exactly those; after apply both validate against the kernel's ticket schema and `ready_check` returns no refusal, and `gov brief independent-auditor <review ticket>` exits 0 on the fixture with its facts file filled [DEC-1188 (2)]"
+  - line: "S7 (DEC-1188) The fields are checked by code before anything is written: role is a known role, allowed_paths a non-empty list of strings with none under `tests/acceptance/` unless the role is independent-test-designer, every KPI line with a verify, reads, needs and waits_on lists; a field the ticket already has is refused, never overwritten"
+    verify: "tests/unit/adopt/test_w2_174_fields.py: one case per refusal (unknown role, empty allowed_paths, an acceptance path for an engineer, a KPI line without verify, a field already set), each leaving the tree byte-identical [DEC-1188 (2)]"
   failure:
   - line: "The apply never writes anything if one entry is refused (all or nothing), never edits a ticket the answers file does not name, never edits a closed ticket, and never marks a ticket `verify_pass` while one of its lines still has no verify [DEC-1130]"
     verify: "tests/unit/adopt/test_w2_174_checks.py: a file with nine good entries and one bad one leaves the whole tree byte-identical; a ticket with one line unanswered is refused and unmarked"
@@ -54,13 +64,15 @@ kpis:
     verify: "the close's diff against the base names no file under `src/gov/brief/`, `template/governance/kernel/templates/` or `template/governance/kernel/schemas/`; `tests/acceptance/W2-152` still passes unchanged"
   - line: "The tool never reads or writes outside `<repo>/.tickets/` and the answers file it is given, and never calls a model or the network [DEC-1130]"
     verify: "tests/unit/adopt/test_w2_174_scope.py: a fixture repository with a decoy file outside `.tickets/` is byte-identical after list and apply; the module imports no network or model package"
+  - line: "F4 (DEC-1188) An apply that overwrites a field the ticket has, writes a field the answers file did not name, or leaves a ticket that fails the ticket schema"
+    verify: "tests/unit/adopt/test_w2_174_fields.py: the planted cases are refused and the tree is byte-identical [DEC-1188 (2)]"
 non_goals:
 - no change to `gov brief` or its ready check (option (c), reading the acceptance folder, is not built here; it is a recorded option for after EXAMIN's copy)
 - 'no tracker importer, and no writing of the clauses by the tool: a product-spec session writes them, the tool checks and applies'
 - no change to the ticket template or schema; the marker is one extra front-matter line the schema already allows
 - no change to W2-88's refactoring-plan text (the CTO's one-line note, below)
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh, DEC-1147, DEC-1148]
+sources: [DEC-1188, DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh, DEC-1147, DEC-1148]
 acceptance_tests: {path: tests/acceptance/W2-174/}
 ---
 
@@ -101,3 +113,13 @@ One KPI line (the last success line) and `src/gov/adopt/facts.py`: the adoption 
 ## Its skill line moved (the owner, DEC-1150 (1), 2026-11-12)
 
 S5 (the adopt skill states the Verify pass) moved word for word to W2-88a (DAEO-pg6i, product-spec), with the three skill paths: one ticket of one role writes the adopt skill once, under one CIT-P (DEC-995).
+
+## Reopened 2026-11-15 by the owner (DEC-1188, P-W2-27-F011 (a))
+
+W2-27 stopped at A5 (EXAMIN's F-011): in an adopted repository nothing can write a ticket's role, allowed_paths and KPI lines (`tk create` has no option for them; the kit denies `Edit(.tickets/**)`), so A5's auditor cannot be launched with a report path, and the coordination ticket fails core-schema (F-012). S6, S7 and F4 extend the list and the apply to those fields and to reads, needs and waits_on; the kit's deny stays. Profile FULL (the apply writes a permission field). `gov brief`, A0 and the adopt skill are not changed here (DEC-1188 (3), rows). Shipped in release 0.1.1.
+
+**Widened 2026-11-15 by the CTO (DEC-802, DEC-1189 (1)):** `pyproject.toml` and `src/gov/_shipped/template/governance/kernel/schemas/**`. r2's review F1: from a wheel install the apply's schema check finds no `ticket.schema.json`/`common.schema.json` and refuses every apply (`VERIFY_PASS_SCHEMA`), label-only ones included; the wheel ships every file the product reads (DEC-1189 (1)). Run r2b ships the two schemas, declares `jsonschema`, adds a wheel-installed test, then a narrow independent check (DEC-1154) before the land.
+
+**Widened 2026-11-15 by the CTO (DEC-1156 (7), P-W2-174-R2B-1 (A)):** `src/gov/adopt/fabric.py`, `tests/unit/adopt/test_w2_88_shipped.py` and `tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py`: W2-88's lists of the wheel's shipped files gain the two schemas r2b ships (DEC-1189 (1): the wheel ships every file the product reads), one line each; the acceptance file's edit is a test designer's.
+
+(The profile was changed from STANDARD to FULL by DEC-1188 (2): the apply writes allowed_paths, a permission field. The field stays bare; the launcher and the land read it raw.)

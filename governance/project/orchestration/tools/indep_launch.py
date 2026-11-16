@@ -15,6 +15,7 @@ Standard library, PyYAML and git; no gov import. The CTO runs it, from the repos
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/sgx1/labeller-2.md --brief-sha256 e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904 --commit 6ff398a28 --set held-out --round 2
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --brief governance/project/indep-briefs/sgx1/overlap-auditor.md --brief-sha256 b212a424062e402b0a25ee4a157ae14a0af798d0ad973aa33dacd730782be6ab --commit 6ff398a28 --set held-out --audit sgx1-overlap
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/examin-sets/EXAMIN-writer-q02-fix.md --brief-sha256 0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173 --commit 6ff398a28 --set examin --round 2 --fix q02 --reason ANSWER_NOT_IN_SPANS
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/examin-sets/EXAMIN-writer-reanchor.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set examin --round 2 --reanchor 2026-W47
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --run 20261109T120000Z-memory-recall-3-r1 --counts-only
 
 The line names only --sets-root <root>: never a folder under it (the guard's line rule, DEC-1097 (2)); the script
@@ -45,6 +46,27 @@ together on the writer's round 2 (the usage line above). It stages `input/<id>.y
 archive), and no other file of the set. A brief's front matter need not name `sample:`. At delivery only
 `hidden/<id>.yaml` is replaced, by `out/<id>.yaml`, the old file packed into the run's tar; the result adds `action`
 (`corrected` or `replaced`) and its counts must sum to 1. The counts carry `fix` {id, code, action}.
+
+The weekly re-anchoring flow (ACT-WALLS-REANCHOR-1; DEC-1179 (6), DEC-1178 (1)): one flag, the ISO week of the request
+that `gov.memaudit maintain` wrote, given on the writer's round 2 (the re-anchoring usage line above, whose brief and
+hashes are an example: the re-anchoring brief is the owner's, approved before the first run; never with the fix flow's
+pair). The commit is the request's audit_commit. It reads runs/<set>/REANCHOR-<week>.json under the sets root in its own code, checks its fixed form (week,
+audit_commit, set, changed, count; a question id and an entry number per row, nothing else) and that its audit_commit is
+the commit the tree is built at (14), and stages `input/<stem>.yaml` (a byte copy of the set's top-level
+`hidden/<stem>.yaml`, the stem matching a requested id case-insensitively and kept in the set's own spelling: a request
+naming q01 for a set holding Q01.yaml stages input/Q01.yaml) for each requested id that has one, with
+`input/reanchor.json` (the same ids and entry numbers, nothing else). An id with no hidden file is counted as absent and
+not staged; none staged, or two hidden files for one id, refuses 10. The template's kinds.yaml must declare
+`input_reanchor: [questions, reanchor]` for the writer kind (11 when it does not), so the owner's approval of that file
+is what opens the input. Because --commit must equal the request's audit_commit, the commit carrying the approved
+kinds.yaml line and the brief must be at or before the audit commit that wrote the request (else 11 or 10). At delivery
+each `out/<stem>.yaml` must equal its staged copy but for the named entries' `path`, `lines`, `heading` and `commit` and
+an optional top-level `replace_reason` on either side (a delivered one a non-empty string; else 20). The comparison
+uses the launcher's own reading, never the wall's input/: the named entries as planned, and the hidden file's bytes,
+which must still hash to what was staged (else 20, nothing replaced); then only the staged stems' `hidden/<stem>.yaml`
+are replaced, all or nothing, the old files packed into the run's tar. The result adds `corrected` and `replaced` (counts summing to
+`questions`, the number of staged ids). The counts carry `reanchor` {week, entries, ids, absent, corrected, replaced},
+numbers only.
 
 Exit codes: 0 delivered or dry; 10 brief; 11 template; 12 wall or tree exists; 13 seed not first; 14 commit; 15 file
 budget; 16 canary; 17 argument; 18 the rule script; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is
@@ -91,6 +113,14 @@ FIX_RX = re.compile(r"q[0-9]{2}")  # the one-question fix flow's id and its reas
 FIX_CODES = ("SOURCE_IS_SCAFFOLD", "SOURCE_PATH_ABSENT", "SOURCE_NOT_TEXT", "SPAN_OUT_OF_FILE", "HEADING_NOT_FOUND",
              "ANSWER_NOT_IN_SPANS", "NONEXISTENT_NAME_FOUND", "NONEXISTENT_NO_NAME")
 FIX_ACTIONS = ("corrected", "replaced")
+# The weekly re-anchoring flow (ACT-WALLS-REANCHOR-1): the week as the memory audit names it (layout.WEEK_RE), a question's
+# id (a file's stem under hidden/, matched case-insensitively: Q01 and q01 are one id), the inputs kinds.yaml's
+# `input_reanchor` may name, the most entries in one request, and the keys a named entry's alternative may change.
+REANCHOR_WEEK_RX = re.compile(r"[0-9]{4}-W[0-9]{2}")
+REANCHOR_ID_RX = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,31}")
+REANCHOR_INPUTS = ("questions", "reanchor")
+REANCHOR_MOST = 400
+REANCHOR_FREE = ("path", "lines", "heading", "commit")
 RUN_RX = re.compile(r"[0-9]{8}T[0-9]{6}Z-[a-z0-9][a-z0-9-]*-r[12]")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
@@ -520,7 +550,8 @@ def parse_args(argv):
                description=__doc__.split("\n\n")[0],
                epilog="The documented lines (the CTO's, from the repository):\n\n"
                       + "\n".join(x.strip() for x in __doc__.splitlines()
-                                  if x.strip().startswith("python3 ") and "--fix" not in x.split())
+                                  if x.strip().startswith("python3 ") and "--fix" not in x.split()
+                                  and "--reanchor" not in x.split())
                       + "\n\n--dry belongs on planted sets roots only: it leaves its wall and tree in place for "
                         "inspection.\nNo option takes a path list; the content is chosen by rule from the seed.")
     p.add_argument("--sets-root", help="the sets root (its real path); no folder under it is ever named")
@@ -538,6 +569,7 @@ def parse_args(argv):
     # the fix flow's pair is documented in the docstring's usage line, not in the option list (W2-149's pinned list)
     p.add_argument("--fix", help=argparse.SUPPRESS)
     p.add_argument("--reason", help=argparse.SUPPRESS)
+    p.add_argument("--reanchor", help=argparse.SUPPRESS)  # the weekly re-anchoring flow's week, documented in the docstring only
     return p.parse_args(argv)
 
 
@@ -559,7 +591,7 @@ def check_args(o, st, cwd, home):
         st.counts["approved_sha256"] = sha_file(approved)
     if o.counts_only:
         if any(v is not None for v in (o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed, o.fix,
-                                       o.reason)) or o.dry:
+                                       o.reason, o.reanchor)) or o.dry:
             raise Refuse(17, "counts_only")
         if not full(RUN_RX, o.run):
             raise Refuse(17, "run")
@@ -584,7 +616,13 @@ def check_args(o, st, cwd, home):
             if (o.kind != "writer" or o.round != "2" or not full(FIX_RX, o.fix) or o.reason not in FIX_CODES):
                 raise Refuse(17, "fix")
             st.counts["fix"] = {"id": o.fix, "code": o.reason, "action": None}
-    for v in (o.kind, o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed, o.run):
+        if o.reanchor is not None:  # the week alone, the writer's round 2 only, never with the fix flow's pair
+            if (o.kind != "writer" or o.round != "2" or not full(REANCHOR_WEEK_RX, o.reanchor)
+                    or o.fix is not None or o.reason is not None):
+                raise Refuse(17, "reanchor")
+            st.counts["reanchor"] = {"week": o.reanchor, "entries": None, "ids": None, "absent": None,
+                                     "corrected": None, "replaced": None}
+    for v in (o.kind, o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed, o.run, o.reanchor):
         if v is None:
             continue
         p = os.path.normpath(os.path.join(cwd, os.path.expanduser(v)))
@@ -670,6 +708,10 @@ def load_kinds(data):
                 and is_number(spec.get("timeout_s")) and spec["timeout_s"] > 0):
             return None
         if "model" in spec and not full(MODEL_RX, spec["model"]):
+            return None
+        rea = spec.get("input_reanchor")  # the inputs the weekly re-anchoring flow may stage (ACT-WALLS-REANCHOR-1)
+        if "input_reanchor" in spec and not (isinstance(rea, list) and rea
+                                             and all(isinstance(x, str) and x in REANCHOR_INPUTS for x in rea)):
             return None
     return kinds
 
@@ -876,6 +918,84 @@ def plan_fix(root, walls, runs_indep, set_name, fix_id, code):
     staged = {"input/verdict.txt": f"{fix_id} {code}\n".encode("utf-8"),
               "input/sample.json": (json.dumps({"sample": sample}, indent=1) + "\n").encode("utf-8")}
     return [(src, f"input/{fix_id}.yaml")], staged
+
+
+def plan_reanchor(root, set_name, week, commit):
+    """ACT-WALLS-REANCHOR-1: the weekly re-anchoring flow's inputs, read and checked before anything is written:
+    (plan, staged, info). The request is runs/<set>/REANCHOR-<week>.json under the root, in the memory audit's fixed
+    form (week, audit_commit, set, changed, count; each row a question id and an entry number); its audit_commit must be
+    the commit the tree is built at (14). Ids are matched case-insensitively (W2-94 F3): each requested id's question is
+    the top-level hidden/<stem>.yaml whose stem equals it so, staged as a byte copy at input/<stem>.yaml in the set's own
+    spelling; an id with none is counted as absent; two such files for one id, one that is not a plain file, a form that
+    is not the fixed one, or no id staged: 10. info: entries, ids, absent and present (the staged stems, sorted), and,
+    as attributes for the delivery only (never printed or counted), .named ({stem: sorted entry numbers}) and .sha256
+    ({stem: the staged file's sha256}), so the delivery compares against the launcher's own reading, never the wall's
+    input/."""
+    path = os.path.join(root, "runs", set_name, f"REANCHOR-{week}.json")
+    data = read_plain(path, root)
+    if data is None or len(data) > MOST_RESULT_BYTES:
+        raise Refuse(10, "input")
+    try:
+        req = load_json_strict(data.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError, RecursionError):
+        raise Refuse(10, "input")
+    if not isinstance(req, dict) or set(req) != {"week", "audit_commit", "set", "changed", "count"}:
+        raise Refuse(10, "input")
+    rows = req["changed"]
+    if (req["week"] != week or req["set"] != set_name or not full(HEX40, req["audit_commit"])
+            or not isinstance(rows, list) or not 0 < len(rows) <= REANCHOR_MOST or not is_count(req["count"])
+            or req["count"] != len(rows)):
+        raise Refuse(10, "input")
+    by_id = {}  # the case-folded id -> its entry numbers
+    for row in rows:
+        if not (isinstance(row, dict) and set(row) == {"id", "entry"} and full(REANCHOR_ID_RX, row["id"])
+                and is_count(row["entry"]) and row["entry"] >= 1) or row["entry"] in by_id.get(row["id"].lower(), ()):
+            raise Refuse(10, "input")
+        by_id.setdefault(row["id"].lower(), set()).add(row["entry"])
+    if req["audit_commit"] != commit:  # a well-formed request only
+        raise Refuse(14, "reanchor_commit")  # the lines were listed at another commit than the tree's
+    hidden = os.path.join(root, "fixtures", "evaluation", set_name, "hidden")
+    try:
+        names = os.listdir(hidden) if os.path.isdir(hidden) else []
+    except OSError:
+        raise Refuse(10, "input")
+    stems = {}  # the case-folded id -> the top-level hidden stems that match it (ASCII stems only)
+    for name in names:
+        stem = name[:-len(".yaml")]
+        if name.endswith(".yaml") and stem.isascii() and stem.lower() in by_id:
+            stems.setdefault(stem.lower(), []).append(stem)
+    plan, present, changed, named, shas = [], [], [], {}, {}
+    for key in sorted(by_id):
+        found = stems.get(key, [])
+        if not found:
+            continue  # absent: counted, not staged
+        src = os.path.join(hidden, f"{found[0]}.yaml")
+        if len(found) > 1 or not real_inside(src, root) or not regular(src):
+            raise Refuse(10, "input")
+        data = read_plain(src, root)
+        if data is None:
+            raise Refuse(10, "input")
+        plan.append((src, f"input/{found[0]}.yaml"))
+        present.append(found[0])
+        changed += [{"id": found[0], "entry": n} for n in by_id[key]]
+        named[found[0]], shas[found[0]] = sorted(by_id[key]), sha_bytes(data)
+    if not present:
+        raise Refuse(10, "input")
+    plan.sort(key=lambda p: p[1])
+    present.sort()
+    request = {"week": week, "changed": sorted(changed, key=lambda r: (r["id"], r["entry"]))}
+    staged = {"input/reanchor.json": (json.dumps(request, indent=1) + "\n").encode("utf-8")}
+    return plan, staged, ReanchorInfo({"entries": len(rows), "ids": len(present), "absent": len(by_id) - len(present),
+                                       "present": present}, named, shas)
+
+
+class ReanchorInfo(dict):
+    """plan_reanchor's info: the public keys as the mapping; named and sha256 as attributes, kept for the delivery
+    only (never printed or counted, and outside the mapping's equality)."""
+
+    def __init__(self, public, named, sha256):
+        super().__init__(public)
+        self.named, self.sha256 = named, sha256
 
 
 # -- set-up A's inputs (S20, S24, S27): read and checked before anything is written ---------------------------------
@@ -1887,6 +2007,127 @@ def deliver_fix(st, ctx):
     st.counts["delivered"].update(files=1, sha256=h, to="set")
 
 
+def same_value(a, b):
+    """Equal, and of the same type all the way down (YAML's 1, 1.0 and true are three values)."""
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, dict):
+        return set(a) == set(b) and all(same_value(a[k], b[k]) for k in a)
+    if isinstance(a, list):
+        return len(a) == len(b) and all(same_value(x, y) for x, y in zip(a, b))
+    if isinstance(a, float) and math.isnan(a):
+        return math.isnan(b)
+    return a == b
+
+
+def reanchor_same(staged, got, named):
+    """W2-94 S15: a delivered question against its staged copy. With an optional top-level `replace_reason` removed from
+    both mappings (the staged one may be kept, changed or dropped; a delivered one must be a non-empty string), the two
+    have the same top-level keys and equal values for every key but `sources`; `sources` has the same length; every
+    entry not in *named* (1-based indexes) is equal; a named entry keeps its shape (a mapping, or a list of the same
+    length of mappings), and each of its alternatives differs at most in REANCHOR_FREE (each may be added, changed or
+    removed)."""
+    if not isinstance(staged, dict) or not isinstance(got, dict):
+        return False
+    staged, got = dict(staged), dict(got)
+    staged.pop("replace_reason", None)
+    if "replace_reason" in got:
+        if not (isinstance(got["replace_reason"], str) and got["replace_reason"]):
+            return False
+        del got["replace_reason"]
+    if set(got) != set(staged) or not all(same_value(staged[k], got[k]) for k in staged if k != "sources"):
+        return False
+    if "sources" not in staged:
+        return True
+    old, new = staged["sources"], got["sources"]
+    if not (isinstance(old, list) and isinstance(new, list)):
+        return same_value(old, new)
+    if len(old) != len(new):
+        return False
+
+    def alternative_ok(a, b):
+        return (isinstance(a, dict) and isinstance(b, dict)
+                and all(k in a and k in b and same_value(a[k], b[k])
+                        for k in set(a) | set(b) if k not in REANCHOR_FREE))
+
+    for n, (a, b) in enumerate(zip(old, new), 1):
+        if n not in named:
+            ok = same_value(a, b)
+        elif isinstance(a, list):
+            ok = isinstance(b, list) and len(a) == len(b) and all(alternative_ok(x, y) for x, y in zip(a, b))
+        elif isinstance(a, dict):
+            ok = alternative_ok(a, b)
+        else:
+            ok = same_value(a, b)
+        if not ok:
+            return False
+    return True
+
+
+def deliver_reanchor(st, ctx):
+    """ACT-WALLS-REANCHOR-1: the weekly re-anchoring flow's delivery. out/ holds exactly out/<stem>.yaml for each staged
+    stem and out/result.json; each hidden/<stem>.yaml must still hash to the sha256 plan_reanchor recorded (else 20
+    destination); each YAML is a mapping that differs from those hidden bytes only where reanchor_same allows, the
+    named entries being plan_reanchor's own (W2-94 S15; else 20 reanchor_changed). Nothing is read back from the wall's
+    input/, which the session can write. Every check first, then only the staged stems' hidden/<stem>.yaml are
+    replaced, all or nothing (the old files kept for the run's tar as replaced-hidden/<stem>.yaml). Any refusal leaves
+    the set unchanged: 20."""
+    rea = ctx["reanchor"]
+    ids, out = rea["present"], os.path.join(st.wall, "out")
+    hidden = os.path.join(ctx["root"], "fixtures", "evaluation", ctx["set"], "hidden")
+    try:
+        entries = sorted(os.listdir(out))
+    except OSError:
+        raise Refuse(20, "missing")
+    if entries != sorted([f"{q}.yaml" for q in ids] + ["result.json"]):
+        raise Refuse(20, "entries")
+    land, new, old, shas = Landing(ctx["root"]), {}, {}, []
+    try:
+        for qid in ids:
+            name, dst = f"{qid}.yaml", os.path.join(hidden, f"{qid}.yaml")
+            data = read_plain(os.path.join(out, name), out)
+            if data is None or len(data) > MOST_RESULT_BYTES:
+                raise Refuse(20, "missing")
+            try:
+                q = yaml.safe_load(data.decode("utf-8"))
+            except (UnicodeDecodeError, yaml.YAMLError, RecursionError):
+                raise Refuse(20, "yaml")
+            if not isinstance(q, dict):
+                raise Refuse(20, "yaml")
+            # the staged side: the hidden file as the launcher reads it now, unchanged since plan_reanchor hashed it
+            if not real_inside(dst, ctx["root"]) or not regular(dst):
+                raise Refuse(20, "destination")
+            before = read_plain(dst, hidden)
+            if before is None or sha_bytes(before) != rea.sha256[qid]:
+                raise Refuse(20, "destination")
+            try:
+                was = yaml.safe_load(before.decode("utf-8"))
+            except (UnicodeDecodeError, yaml.YAMLError, RecursionError):
+                raise Refuse(20, "reanchor_changed")
+            try:
+                kept_form = reanchor_same(was, q, set(rea.named[qid]))
+            except RecursionError:  # a self-referring YAML alias
+                kept_form = False
+            if not kept_form:
+                raise Refuse(20, "reanchor_changed")
+            old[name] = before
+            new[name] = (dst, data)
+        kept = st.wall + ".replaced"
+        os.mkdir(kept, 0o700)
+        st.replaced = kept
+        for name in sorted(new):
+            write_new(os.path.join(kept, name), old[name], 0o400)
+            shas.append((name, land.add(new[name][0], new[name][1], replace=True)))
+        land.commit()
+    except BaseException:
+        land.abort()
+        if st.replaced:
+            remove_tree(st.replaced)
+            st.replaced = None
+        raise
+    st.counts["delivered"].update(files=len(ids), sha256=delivered_sha(shas), to="set")
+
+
 # -- set-up A's deliveries (S16, S26, S27): every check first, then a temporary name, hashed, renamed; all or nothing --
 class Landing:
     """New files (an existing one refuses 20) and replaced files (the auditor's labels.jsonl and owner.jsonl), each
@@ -2179,6 +2420,13 @@ def check_result(st, ctx):
                     or sum(res["by_kind"].values()) != 1 or sum(res["by_area"].values()) != 1):
                 raise Refuse(20, "fix_result")
             st.counts["fix"]["action"] = res["action"]
+        if ctx.get("reanchor"):  # the staged ids' count, and `corrected` and `replaced` summing to it
+            n = len(ctx["reanchor"]["present"])
+            if (res["questions"] != n or sum(res["by_kind"].values()) != n or sum(res["by_area"].values()) != n
+                    or not is_count(res.get("corrected")) or not is_count(res.get("replaced"))
+                    or res["corrected"] + res["replaced"] != n):
+                raise Refuse(20, "reanchor_result")
+            st.counts["reanchor"].update(corrected=res["corrected"], replaced=res["replaced"])
     st.counts["out"]["schema_ok"] = True
     st.log("result", "schema", "ok")
 
@@ -2373,6 +2621,8 @@ def build_and_run(st, o, root, over, cwd, home):
     if kinds is None or kind not in kinds or briefs is None:
         raise Refuse(11, "kinds")
     spec = kinds[kind]
+    if o.reanchor is not None and "reanchor" not in spec.get("input_reanchor", ()):
+        raise Refuse(11, "kinds")  # the approved template does not declare the re-anchoring input for this kind
     ex_globs = excludes_of(tmpl["tree-exclude.txt"])
     excluded = excluded_by(ex_globs)  # the selection's rule (S5): less tree-exclude.txt only
     c["template_ok"] = True
@@ -2393,7 +2643,8 @@ def build_and_run(st, o, root, over, cwd, home):
     if fm is None or fm.get("kind") != kind:
         raise Refuse(10, "front_matter")
     fix = (o.fix, o.reason) if o.fix is not None else None  # W2-94: validated by check_args (17)
-    model, schema_name, sample_n, brief_id, entry = resolve_brief(fm, kind, spec, briefs, fix is not None)
+    rea = o.reanchor is not None  # ACT-WALLS-REANCHOR-1: validated by check_args (17)
+    model, schema_name, sample_n, brief_id, entry = resolve_brief(fm, kind, spec, briefs, fix is not None or rea)
     effort = fm.get("effort")
     if "effort" in fm and not (isinstance(effort, str) and effort in EFFORTS):
         raise Refuse(10, "effort")  # (W2-173 S1) one of the five, or no line at all
@@ -2420,6 +2671,10 @@ def build_and_run(st, o, root, over, cwd, home):
     elif fix:
         plan, fix_staged = plan_fix(root, walls, runs_indep, set_name, *fix)
         tree_ex = excluded
+    elif rea:
+        plan, fix_staged, rea_info = plan_reanchor(root, set_name, o.reanchor, commit)
+        c["reanchor"].update({k: rea_info[k] for k in ("entries", "ids", "absent")})
+        tree_ex = excluded
     else:
         plan = plan_inputs(kind, rnd, root, set_name, o.audit)
         tree_ex = excluded
@@ -2445,7 +2700,7 @@ def build_and_run(st, o, root, over, cwd, home):
     globs = hidden_globs(pm) if pm is not None else None
     if globs is None:
         raise Refuse(15, "path_map")
-    expected = (WALL_FIXED + len(plan) + RUN_EXTRA + (len(fix_staged) if fix else 0)) if not sgx \
+    expected = (WALL_FIXED + len(plan) + RUN_EXTRA + (len(fix_staged) if fix or rea else 0)) if not sgx \
         else sgx_expected(sgx, rnd)
     if hidden_count(root, globs) + expected > FILE_BUDGET:
         raise Refuse(15, "budget")
@@ -2527,7 +2782,7 @@ def build_and_run(st, o, root, over, cwd, home):
     selection = {"commit": commit, "last_audit": last, "seed_sha256": seed_sha, "changed": changed,
                  "sample": sample}
     sel_counts = {"changed": len(changed), "sample": len(sample), "overlap": 0}
-    staged = dict(fix_staged) if fix else {}  # set-up A's files (or the fix flow's): wall-relative path -> bytes
+    staged = dict(fix_staged) if fix or rea else {}  # set-up A's files (or a fix flow's): wall-relative path -> bytes
     if sgx:
         staged = stage_sgx(sgx, rnd, seed, commit)
         if kind == "writer":
@@ -2607,7 +2862,7 @@ def build_and_run(st, o, root, over, cwd, home):
     ctx = {"root": root, "trees": trees, "runs": runs, "runs_indep": runs_indep, "repo": repo, "home": home,
            "tools": list(spec["tools"]), "model": model, "effort": effort, "budget": budget, "timeout": timeout_s,
            "result_schema": result_schema, "set": set_name, "round": rnd, "audit": o.audit, "commit": commit,
-           "sgx": sgx, "brief_id": brief_id, "fix": fix}
+           "sgx": sgx, "brief_id": brief_id, "fix": fix, "reanchor": rea_info if rea else None}
     # the canary, then the session
     st.stage = 16
     hook(st, "before_canary")
@@ -2632,6 +2887,8 @@ def build_and_run(st, o, root, over, cwd, home):
                 deliver_sgx(st, ctx)
             elif fix:
                 deliver_fix(st, ctx)
+            elif rea:
+                deliver_reanchor(st, ctx)
             else:
                 deliver(st, ctx)
             c["status"] = "delivered"

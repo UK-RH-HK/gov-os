@@ -541,7 +541,8 @@ cases that pass on the old code are the ones that state what must stay the same)
 
 ### S27: its next round (DEC-1183)
 
-- **S27 is not delivered in this land.** The section "Run 7: the secret scan's speed (S27)" above records what was built
+- **S27 was not delivered in run 8's land; it is delivered in run 9 by folder mode: see "Run 9: S27's folder mode
+  (DEC-1183 (2))" below** (what follows describes run 8's state). The section "Run 7: the secret scan's speed (S27)" above records what was built
   and measured in run 7; that code is gone. `src/gov/secrets/__init__.py` is back to the one-file-at-a-time scan of
   `a23678e27` (each file's text read by gitleaks processes of its own, one per rule set; the same findings as before S27);
   `indexable`, `path_holds_secret`, `pool_size` and `scan_counts` keep their signatures and meaning. The batched path is
@@ -733,3 +734,173 @@ cases that pass on the old code are the ones that state what must stay the same)
   sockets pass 107 bytes. They expect the long folder as given, so under the decided behaviour they are red: their
   folders now move to `/tmp/gov-cbm-<uid>`, which is read-only in the sandbox. Their fixtures need a short base, or
   `SHORT_BASE` set to a test folder, or `SOCKET_MAX` raised for placement-only cases. That change belongs to the lead.
+
+## Run 9: S27's folder mode (DEC-1183 (2))
+
+Base 301708296 (release 0.1.0 re-pinned); the lead's interface `.gov-runtime/scratch/brief/run9-interface.md`. The
+probes ran with real gitleaks 8.30.1 (`/home/usain/.local/bin/gitleaks`) in the engineer's sandbox, under its own
+TMPDIR (scripts `s27p/p1_paths.py`, `p2_edges.py`, `p3_sniff.py`, `p3b_link.py`, `p4_batch.py`, `measure.py`); the
+rules were the template's `.gitleaks.toml` as `gov.secrets._rules` reads it (two rule sets: with gitleaks' defaults,
+and the file's own rules alone). Every planted secret was built from parts at run time; no value was printed.
+
+### What was built
+
+- **One private core in `gov.secrets`: `_Folder`** (`src/gov/secrets/__init__.py`). A batch's folder is made by
+  `tempfile.mkdtemp(prefix="gov-secrets-")` (0700) in the temporary folder, which must resolve outside the root being
+  scanned (else `RuntimeError` naming it, and nothing is made there). Each text is written as it is added to a file
+  named by its number in the batch only (`0`, `1`, ...; `O_CREAT|O_EXCL|O_NOFOLLOW`, 0600), holding exactly what the
+  one-per-file form gives gitleaks on standard input (the leading newline, each piece of each form followed by a blank
+  line; `_pieces` and `_forms` unchanged). The number -> text map is in memory. `judge(rules)` runs one
+  `gitleaks dir . --no-banner --report-format json --report-path - --ignore-gitleaks-allow --gitleaks-ignore-path
+  /dev/null --log-level error --exit-code 3` per rule set, the rules by `GITLEAKS_CONFIG_TOML` as before, the time limit
+  `_TIMEOUT_S` plus the batch's bytes at `_FLOOR`; each finding is put on the text its `File` names. The folder is
+  removed on leaving (a `with` block, or `close`), also when gitleaks fails, times out or the process raises.
+- **The verdict per text** (`_held`): a text holds a secret unless every finding on it, by every rule set, is a row
+  W2-L423 commit hash that git confirms (`_hash`, `_commits`, as `_scan` judges). Only rule ids and possible commit
+  hashes are kept from a report.
+- **`indexable`** judges file contents through the core only: the namespace check and the link resolution as before,
+  then the candidates in batches (`_batches`), at most `_workers()` batches at once (one gitleaks at a time in each, so
+  at most `_workers()` gitleaks processes), each batch reading its files one at a time (a text the record holds clean
+  is answered and counted `remembered`; every text written to the folder is counted `scanned`; only a text with no
+  finding at all by any rule set is remembered). Results in the order asked, repeats once, a missing or outside path
+  left out, a link judged by what it points to. With the scan off: the namespace filter and whether the file opens, no
+  gitleaks.
+- **`assess.py`'s `_Scan`** uses the same core: each added text is written at once to the open batch's folder (memory
+  follows one text), a flush judges the batch and removes the folder, `assess()` closes an open batch in its `finally`.
+  A finding names its own file and rule; a report that cannot be placed names every file of the batch (rule
+  `unreadable-report`; before, it was put on the batch's first file only); a scan that cannot decide is
+  `ASSESS_SCAN_FAILED`; a row W2-L423 hash is no finding there, as before. The assessment's joined `gitleaks stdin`
+  input is gone: run 9's red run showed it missed P1R-1's curl pair end to end (`docs/b.sh` after `docs/a.md`).
+- **No code path joins two texts into one gitleaks input:** `grep '"stdin"\|_scan(\|_holds_secret(' src` finds only
+  `_scan` itself, `_holds_secret` (used by `path_holds_secret`: one path's names as one text) and `stores_with_secrets`
+  (one store as one text), the two the interface lets keep one text per process; the other gitleaks callers in `src/`
+  run `gitleaks git` or only look the binary up.
+- **`_FORM` is 7:** no record forms 4, 5 or 6 wrote is reused (a unit case plants a form-6 record of a held text).
+
+### How `gitleaks dir` reads a file differently from `gitleaks stdin`, and how each is closed
+
+| difference (probe) | what was seen | closed by |
+|---|---|---|
+| `File` is the path given plus the name (p1) | `<folder>/0` with the folder as the argument; `0` when gitleaks runs in the folder on `.` | gitleaks runs with the folder as its working directory on `.`: `File` is the number alone |
+| path allowlists apply to the folder's own path (p1) | the default rule set reported **nothing** (exit 0) for a canary and a generic key under a folder path holding `node_modules`, `venv/lib` or `gitleaks.toml`; the file-only rule set still saw the canary | the same: the path matched is the number, which no default path pattern (`(?:^|/)node_modules`, `\.png$`, ...) matches; a unit case puts the temporary folder under each of the three |
+| a `.gitleaksignore` in the folder is read even with `--gitleaks-ignore-path /dev/null` (p3, p3b) | a `.gitleaksignore` naming `0:gov-canary:2` dropped that finding (exit 0) while the other file's stood | the folder is private (0700) and fresh; before each run its listing must be exactly the batch's numbers, else `RuntimeError` (unit case plants one) |
+| a `.gitleaks.toml` in the folder (p3) | ignored when `GITLEAKS_CONFIG_TOML` is set (the env rules found the canary) | env rules as before; no such name can be written (numbers only) |
+| links, subfolders, hidden names (p3b) | a link is not followed (no `--follow-symlinks`); `sub/2` and `.3` are scanned | only regular numbered files are written (`O_EXCL|O_NOFOLLOW`); the listing check refuses anything else |
+| how a large file is cut into reads (p2) | 523 texts, three fillers (lines; a blob with no space or newline, cut inside words; runs of blank lines), three secrets (canary, generic key, a 1.6 KB PEM key), 28 with a copy of the secret straddling a 100,000-byte multiple of the folder's file, 216 near `_PIECE` multiples, 279 spread to 400 KB: **523 of 523 the same verdict** as the one-per-file form; unframed files (leading newline only) lost none either | no change needed: the pieces end at a blank line within gitleaks' 25,000-byte peek in both modes; a unit case plants secrets at 99,990, 199,985, `_PIECE - 9`, `3 * _PIECE + 3` and 300,000 |
+| binary and archive sniffing (p3) | with the leading newline, **52 of 52** texts the same verdict (gzip, zip, `PK`, ELF, PDF, PNG heads; NUL bytes; UTF-16 LE/BE with and without BOM; UTF-8 BOM; Latin-1; invalid UTF-8; CR-only; CRLF; a form feed; 20 more magic numbers (MZ, bzip2, 7z, xz, rar, ogg, ID3, GIF, JPEG, WOFF, wasm, SQLite, RTF, XML, `#!`, Mach-O, zstd, lz4, ar); tar/ftyp/DICM/mobi/ISO signatures at their offsets); without it, gitleaks dir skipped 18 of those texts holding a secret | the leading newline is kept in every file |
+| size limits | `--max-target-megabytes` defaults to 0 (no limit) and is not passed; the time limit grows with the batch's bytes | — |
+| identical files (p3) | each of two files with the same bytes is reported (no merging across files) | — |
+| the report at exit 0 (p4) | `[]` and a newline, also for an empty folder | exit 0 with anything but an empty list raises |
+| a project rule with a `path` | the path is the number in dir mode, the empty string on stdin: a rule whose path matches a bare number but not the empty string fires only in folder mode (more held: fails closed); one matching the empty string but not a number is not a real pattern | — (named here) |
+| which binary runs | a bare `gitleaks` with the folder as working directory would look a relative `PATH` entry up from inside the folder | `shutil.which("gitleaks")` (the binary the record's fingerprint names) is run as the executable, `argv[0]` still `gitleaks`; none on `PATH` raises |
+
+**Found in both forms, not a folder difference (a package for the lead, outside S27):** gitleaks skips a text whose
+bytes at text offset 256 read `ustar` (a tar header, file offset 257 after the leading newline) or at 127 read `DICM`
+(DICOM), by `stdin` and by `dir` alike (p3: both `tar@256` and `dicm@127` held a planted canary; both forms judged them
+clean). The one-per-file form at 301708296 has the same gap; folder mode keeps its verdicts, as S27 asks.
+
+### Fail closed (interface item 7)
+
+An exit other than 0 or 3, a time-out, an `OSError` from the run, or no gitleaks on `PATH`: the batch raises
+`RuntimeError`, nothing of it is let through or remembered, the rest of the batches not yet started are cancelled. Exit 3
+whose report cannot be read, is no list, holds a non-finding, or holds a finding whose `File` is not exactly one of the
+batch's numbers (`99`, `../0`): every text of the batch holds a secret (left out, never remembered). Exit 0 with a report
+that is not an empty list (a finding, or junk), or exit 3 with an empty list: raises. Each is a unit case with a
+gitleaks stand-in, and each checks the folder is gone afterwards.
+
+### The batch figures
+
+- `_BATCH_TEXTS` 1,000 texts and `_BATCH_BYTES` 8 MiB of content per batch; one text larger than 8 MiB is a batch of
+  its own. A batch is also no larger than `ceil(texts / _workers())`, so every worker has a batch on a small list.
+- Why (p4, small framed texts of about 3 KB, both rule sets, one slot of 7 CPUs): a batch of 1 took 0.66 s, 50 0.68 s,
+  200 0.69 s, 500 0.72 s, 1,000 0.81 s, 2,000 0.95 s: about 0.33 s a gitleaks process plus about 2,000 texts a second,
+  so 1,000 texts keep the fixed cost under half the batch's time. The byte cap bounds the folder's disk (a tmpfs is
+  memory: at most `_workers()` folders of about 8 MiB of content, framed somewhat larger) and the run's time limit.
+- On the 5,000-file tree: at budget 1, 5 batches of 1,000 (10 gitleaks processes); at the slot's budget of 7, 7 batches
+  of 715 (14 processes).
+
+### The measure (S27)
+
+`indexable` over every file of a planted tree: 5,000 small texts in 50 folders (1 to 12 lines each), every 97th (52)
+holding a planted secret, in turn a canary, a generic key and P1R-1's curl `-u` credential (the file before each holding
+P1R-1's neighbour, a last-line `curl` with no `-u`); `GOV_SECRETS_CACHE` empty, so no clean result is reused; one heavy
+slot, CPU set 13-19 (7 CPUs), the machine shared with other slots; the old form is `git archive 301708296 src` on
+`PYTHONPATH` (one gitleaks per file and rule set), on every 10th file (500 files, 6 planted).
+
+| form | thread budget (workers) | files | seconds | files per second | left out |
+|---|---|---|---|---|---|
+| one gitleaks per file (301708296) | 1 | 500 (every 10th) | 302.4 | 1.7 | 6 = the planted 6 |
+| one gitleaks per file (301708296) | 7 (the slot's) | 500 (every 10th) | 60.1 | 8.3 | 6 = the planted 6 |
+| folder mode (this change) | 1 | 5,000 | 4.2, 4.1 (two runs) | 1,201.2, 1,219.2 | 52 = the planted 52 |
+| folder mode (this change) | 7 (the slot's) | 5,000 | 3.9 | 1,267.1 | 52 = the planted 52 |
+| folder mode (this change) | 1 / 7 | 500 (every 10th) | 0.7 / 1.1 | 672.5 / 463.0 | 6 = the planted 6 |
+
+- **Ratio:** about **700 times** at budget 1 (1,201 against 1.7 files a second) and about **150 times** at the slot's
+  budget of 7 (1,267 against 8.3). S27's line is at least 10 times: met.
+- **The same verdicts:** on the 500 sampled files both forms leave out exactly the same 6 files (at both budgets); the
+  full folder-mode run leaves out exactly the 52 planted files, and its verdicts restricted to the sample equal the old
+  form's. P1R-1's curl pair (neighbour then credential, in path order) is caught in every run.
+- **What the figures say:** the scan now costs gitleaks' own time on the bytes and about 0.33 s per batch, not a process
+  per file; more workers add little on small files (1,201 to 1,267). A 36,000-file repository of the same shape is
+  about 36 batches at budget 1: roughly 30 seconds here, against about 6 hours one process per file at 1.7 a second.
+  `path_holds_secret` still runs one gitleaks per path on a cold record (`gov.codeintel` calls it per allowed path),
+  as the interface allows; batching those calls would change `gov.codeintel`, outside these paths.
+
+### Unit tests
+
+- `tests/unit/secrets/test_w2_88_folder.py` (new, 31 cases): P1R-1's curl pair and private-key pair in one batch, in
+  both orders and inside a batch of 16, against the one-per-file form; a collision pair (identical bytes, and repository
+  files named `0` and `1`, in either order); names with spaces and a newline never reach gitleaks (argument `.`, digits
+  only); the folder 0700, files 0600, numbered from 0, outside the root, removed; each file's bytes equal to the
+  one-per-file form's standard input (plain, UTF-16, a large text with a key block, blank lines, empty); a temporary
+  folder inside the root refused with nothing written; a temporary folder under `node_modules`, `venv/lib`,
+  `gitleaks.toml.d` still finds the secret; any other entry in the folder refuses; a stand-in failing inside the second
+  of three batches raises and that batch is not remembered; exit 3 with an unreadable report, no list, a file not in the
+  folder, another spelling, a non-finding holds every text and remembers none; exit 0 with a finding or junk, exit 3
+  with none, exits 1 and 2 raise; a time-out raises; no gitleaks raises; a finding on one file holds that text alone;
+  one gitleaks dir per batch and rule set and no stdin; a text over the byte cap alone; at most the workers at once;
+  counts and the record; form 7 and a form-6 record not reused; a large file with secrets across read edges; the order
+  asked, repeats, missing paths and links; no code path joins two texts.
+- `tests/unit/adopt/test_w2_88_folder_assess.py` (new, 6 cases): the curl pair in one assessment batch in both orders
+  (only `dir` runs, digit names, folders removed); a finding names its own file and rule; an unplaced report names every
+  file of the batch; a scan that cannot decide is `ASSESS_SCAN_FAILED` with the folder removed; the batch caps and
+  `close`; `assess` end to end names the curl credential and a token in a file with a space, leaving no folder.
+- `tests/unit/secrets/test_w2_88_scan.py` (run 8's, revised, `Rewrite-Reason: DEC-1183 (2)`): the per-process check
+  ("one gitleaks process per file and rule set, each input one file's marker") is now per batch (one `gitleaks dir` per
+  batch and rule set; each file of the folder holds exactly one marker; no input joins two texts); the module check keeps
+  every batched stdin name out (`_BATCH_BYTES` is folder mode's cap now, so it left the list); form 7, with form 6 added
+  to the records not reused. No assertion removed.
+- Red first: against 301708296's code 32 of the 37 new cases failed, all 6 of the assessment's among them (its curl
+  case end to end on the old joined input). The 5 that passed hold for the one-per-file form too: the collision pair,
+  the temporary folder under an allowlisted path (the old form makes none), counts and the record, a large file across
+  read edges, and the order asked with links.
+- **Open, outside this run's paths (a path case for the lead):** `tests/unit/secrets_check/test_dec1045_switch.py::
+  test_on_the_filter_gives_every_governance_file_to_gitleaks` (DEC-1045's switch) replaces `_holds_secret` and `_scan`
+  with recorders and asserts that `indexable`, with the scan on, gives `("content", <the file's bytes>)` to
+  `_holds_secret`. In folder mode `indexable` no longer calls `_holds_secret` (the interface: it judges contents through
+  the core), so the case is red: the verdict it asserts (`["notes/a.md"]`) holds, its recorder sees nothing. Its
+  intent (on: every governance file is given to gitleaks; off: none) holds; the recorder needs to watch `_Folder.add`
+  (or the folder's files) instead. Every other case of `tests/unit/secrets_check` passes.
+- **The runs** (through heavy_slot, `-m "not local_only" -k "not real and not green_here and not time_limit"`, HOME an
+  empty folder): `tests/unit/secrets tests/unit/secrets_check --optin lifted,breadth`: 160 passed, 1 failed (the case
+  above), 1 deselected by the filter (`test_w2_20_pool.py::test_a_real_cpu_set_bounds_the_width`); without the opt-in
+  the project's lists leave 91 of `secrets_check` out (70 passed, the same 1 failed). `tests/unit/adopt -k w2_88
+  --optin lifted,breadth`: 128 passed (the filter leaves none of them out). The suites around `indexable`
+  (`retrieval/test_lexical.py`, `semantic/test_semantic.py`, `impact/test_impact.py`, `gitenv/test_lexical_pinned.py`,
+  `rebuild/test_w2_116_integration.py`, `rebuild/test_w2_122_seed.py`, `context/test_bounded.py`): 128 passed.
+
+### The lead's checks of run 9 (2026-11-15, outside the sandbox)
+
+- **The 36,000-file timing** (`.gov-runtime/scratch/lead/time36k.py`): a planted tree of 36,000 small texts in 100
+  folders, every 97th (371) holding a planted secret (W2-81's builders, values built at run time), the record of clean
+  results off, one heavy slot (pool 1). Folder mode at `767e3e87a`: **36,000 files in 37.3 s, 966.0 files a second**,
+  every planted secret file left out, no clean file left out. The one-per-file form (`301708296`): 1,000 sampled files
+  (every 36th) in 608.3 s, 1.64 files a second. **Ratio 587.7**, with the same verdict per file on the sample.
+- **The acceptance cases** of S27 at `d26814f32a0a` (td-19's and td-20's): 38 passed; the 5,000-file case printed 9.4
+  files a second before (500 paths) and 1,421.3 after (5,000 paths), ratio 151.5, pool 6. `gov accept W2-88`: 311
+  passed, 0 failed, 0 skipped; every mapped line pass.
+- **Interface item 5b** (the lead, after the engineer's probe): gitleaks runs in the batch's folder on `.`, because with
+  the folder given as a path the default allowlist dropped every finding under a temporary folder whose path held
+  `node_modules/` or `venv/lib` (exit 0). td-20's case plants exactly that and passes.
+- **The review:** `docs/probes/DAEO-2bdu/PR-DAEO-2bdu-s27.md` (PASS; S27-1, a batch folder left by a scan ended by
+  SIGTERM or SIGKILL, consequence other, brought as a package; R-1 and R-2 proposed as rows).

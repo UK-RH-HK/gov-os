@@ -7,7 +7,7 @@ name = "gov"
 version = "0.1.0"
 description = "Governance OS command line"
 requires-python = ">=3.11"
-dependencies = ["PyYAML>=6"]
+dependencies = ["PyYAML>=6", "jsonschema>=4.10"]
 
 [project.scripts]
 gov = "gov.cli.main:main"
@@ -17,9 +17,19 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "gov.retrieval" = ["retrieve_baseline.yaml"]
-# The files A9 needs that are not under template/, byte for byte at their paths in the Gov OS repository
-# (gov.adopt.fabric.PACKAGED, read through fabric.shipped's step (2)).
-"gov" = ["_shipped/governance/project/retrieval.yaml",
+# Every file the shipped-file resolver (gov.adopt.fabric.shipped) is asked for, byte for byte at its path in the Gov OS
+# repository, the template/ prefix kept (gov.adopt.fabric.PACKAGED, read through fabric.shipped's step (2)): the files
+# A9 needs that are not under template/, and, under template/ (W2-88 S29, DEC-1189 (1)), A0's and MA's .gitleaks.toml
+# and A9's kernel sources, so an installed release finds them in a repository without the kit.
+"gov" = ["_shipped/template/.gitleaks.toml",
+         "_shipped/template/governance/kernel/skills/retrieval/SKILL.md",
+         "_shipped/template/governance/kernel/skills/discovery/SKILL.md",
+         "_shipped/template/governance/kernel/templates/brief.md",
+         "_shipped/template/governance/kernel/templates/role-cto.md",
+         # the ticket schema the Verify pass validates against (gov.adopt.verify_pass._validator; W2-174, DEC-1189 (1))
+         "_shipped/template/governance/kernel/schemas/ticket.schema.json",
+         "_shipped/template/governance/kernel/schemas/common.schema.json",
+         "_shipped/governance/project/retrieval.yaml",
          "_shipped/governance/project/indep-walls/CLAUDE.md.tmpl",
          "_shipped/governance/project/indep-walls/README.md",
          "_shipped/governance/project/indep-walls/kinds.yaml",

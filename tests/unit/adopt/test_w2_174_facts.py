@@ -19,7 +19,7 @@ DATE = datetime.date(2026, 11, 13)
 
 
 def fixture(tmp_path, name="adopted-project-x"):
-    root = repo_with(tmp_path, {"DAEO-a1": ticket("DAEO-a1", success=[DONE], failure=[DONE])}, name=name)
+    root = repo_with(tmp_path, {"DAEO-aa11": ticket("DAEO-aa11", success=[DONE], failure=[DONE])}, name=name)
     shutil.copytree(TEMPLATES, root / "template/governance/kernel/templates")
     return root
 
@@ -86,20 +86,20 @@ def test_the_defaults_cover_every_command_and_step_the_kernel_templates_name(tmp
 
 def test_gov_brief_no_longer_answers_facts_missing_and_names_the_placeholder_commands(tmp_path):
     root = fixture(tmp_path)
-    code, _, err = gov("brief", "engineer", "DAEO-a1", "--root", str(root))
+    code, _, err = gov("brief", "engineer", "DAEO-aa11", "--root", str(root))
     assert code == 1 and "BRIEF_FACTS_MISSING" in err
     gov("adopt", "--facts", "--root", str(root))
-    code, _, err = gov("brief", "engineer", "DAEO-a1", "--root", str(root))
+    code, _, err = gov("brief", "engineer", "DAEO-aa11", "--root", str(root))
     assert code == 1 and "BRIEF_FACTS_MISSING" not in err and "BRIEF_NOT_READY" in err
     assert re.search(r"PLACEHOLDER_LEFT UNSET_[A-Z_]+", err)
-    code, _, err = gov("brief", "lead", "DAEO-a1", "--run", "build", "--root", str(root))
+    code, _, err = gov("brief", "lead", "DAEO-aa11", "--run", "build", "--root", str(root))
     assert code == 1 and "PLACEHOLDER_LEFT UNSET_LEAD_VERIFY" in err and "BRIEF_FACTS_MISSING" not in err
 
 
 def test_the_ready_check_has_nothing_to_say_of_the_defaults_themselves(tmp_path):
     root = fixture(tmp_path)
     gov("adopt", "--facts", "--root", str(root))
-    _, _, err = gov("brief", "engineer", "DAEO-a1", "--root", str(root))
+    _, _, err = gov("brief", "engineer", "DAEO-aa11", "--root", str(root))
     assert "READY_NEW_SINCE" not in err and "KPI_NO_VERIFY" not in err and "FACTS_UNREADABLE" not in err
 
 
