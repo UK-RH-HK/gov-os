@@ -26,7 +26,7 @@ specification change, CAP-44.m, as Contract version 4.4. The owner may approve e
 | # | Trigger | Source | State before |
 |---|---|---|---|
 | T1 | The spec audit becomes a standard adoption stage, AS, after A2 and before A3: its record, lite checks, the skill's text and CAP-44's line by CIT-P | DEC-1200 (4); `packages/P-ADOPT-SPEC-AUDIT-1.md` §2 | The adopt skill lists A0-A10 and MA; CAP-44 has no spec-to-code stage (A11's full audit is CAP-44.k, Wave 3) |
-| T2 | The product now offers the stage: `gov adopt --lite --stage AS`; A3 refuses (`ADOPT_STAGE_MISSING`) until it is recorded; the lite checks are `ADOPT_SPEC_AUDIT_INCOMPLETE` and `ADOPT_GAP_WITHOUT_QUESTION` | W2-192 commit `6fc08f430a69` (`src/gov/adopt/spec_audit.py`) | Built on the ticket branch; the acceptance suite (30 cases) green |
+| T2 | The product now offers the stage: `gov adopt --lite --stage AS`; A3 refuses (`ADOPT_STAGE_MISSING`) until it is recorded; the lite checks are `ADOPT_SPEC_AUDIT_INCOMPLETE` and `ADOPT_GAP_WITHOUT_QUESTION` | W2-192 commits `6fc08f430a69` and `5ba664e6364b` (`src/gov/adopt/spec_audit.py`): AS is a side record of the chain (its own chain A0-A2, standing on A2's record); A3 requires it and records its sha256 (`spec_audit`); the stages after A3 and the gates never read it, so an adoption recorded before AS goes on | Built on the ticket branch; `gov accept W2-192` 30/30 green |
 | T3 | A contradiction against a closed specification comes with three costed options | DEC-105 | — |
 
 ## 2. Part A: the adopt skill (kernel)
@@ -57,7 +57,7 @@ specification change, CAP-44.m, as Contract version 4.4. The owner may approve e
  
 +## Stage AS: the spec audit (DEC-1200 (4))
 +
-+After A2 and before A3, `gov adopt --lite --stage AS` audits the repository's specs against its code, so that the path map and A5's review see which specs are alive. It reads A1's inventory and A2's classes and commits `governance/adoption/AS-spec-audit.md`; A3 refuses to run before that record is committed.
++After A2 and before A3, `gov adopt --lite --stage AS` audits the repository's specs against its code, so that the path map and A5's review see which specs are alive. It reads A1's inventory and A2's classes and commits `governance/adoption/AS-spec-audit.md`, which stands on A2's record. A3 refuses to run before that record is committed, or when it no longer stands on A2's record as that record now is, and A3's record names the AS record it read. AS is a side record of the chain: the stages after A3 do not read it, so an adoption recorded before AS existed goes on, and AS can be run there at any time after A2.
 +
 +- **The record** lists every spec found (path, title, its stated wave or status); each spec built, partly built or not built, with its evidence (code paths, tests, commits); the tickets found, done or not, by wave; the specs with no code; the code with no spec (the top-level code modules no spec names); and each gap as one question to the owner, with a place for the answer.
 +- **Built or not** is judged from code paths, tests and commits only, never by a model.
@@ -80,9 +80,9 @@ specification change, CAP-44.m, as Contract version 4.4. The owner may approve e
 
 | File | Before (base `847619089c15`) | After | Lines |
 |---|---|---|---|
-| `template/governance/kernel/skills/adopt/SKILL.md` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | `a309008c3492d3eb830423dfc9956149f4cc05a1c20d8b84ff7e8a3ffb1ddbc2` | 76 → 86 |
-| `.rulesync/skills/adopt/SKILL.md` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | `a309008c3492d3eb830423dfc9956149f4cc05a1c20d8b84ff7e8a3ffb1ddbc2` | 76 → 86 |
-| `template/.rulesync/skills/adopt/SKILL.md` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | `a309008c3492d3eb830423dfc9956149f4cc05a1c20d8b84ff7e8a3ffb1ddbc2` | 76 → 86 |
+| `template/governance/kernel/skills/adopt/SKILL.md` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | `d331bbd25f2f9dedf0e19328ae1b2fe9033b248597b42c9a4cc201d7d41f592b` | 76 → 86 |
+| `.rulesync/skills/adopt/SKILL.md` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | `d331bbd25f2f9dedf0e19328ae1b2fe9033b248597b42c9a4cc201d7d41f592b` | 76 → 86 |
+| `template/.rulesync/skills/adopt/SKILL.md` | `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489` | `d331bbd25f2f9dedf0e19328ae1b2fe9033b248597b42c9a4cc201d7d41f592b` | 76 → 86 |
 
 ## 3. Part B: CAP-44 (Contract v4, version 4.3 → 4.4)
 
