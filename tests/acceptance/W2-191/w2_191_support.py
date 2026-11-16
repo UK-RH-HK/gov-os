@@ -197,12 +197,29 @@ def relaxed_schema_files() -> dict:
     return {SCHEMA_PATH.relative_to(TREE).as_posix(): json.dumps(data, indent=2) + "\n"}
 
 
+def parent_pytest_folders() -> list[str]:
+    """The folders that hold the pytest the parent runs (and the packages it needs), for the child's ``PYTHONPATH``:
+    the child's HOME is the planted project's, so a user site found through the real HOME (where pytest may be
+    installed) is not found by the child; the same folders serve whether or not the parent has ``PYTHONUSERBASE``."""
+    import importlib.util
+    folders: list[str] = []
+    for name in ("pytest", "_pytest", "pluggy", "iniconfig", "packaging", "exceptiongroup", "tomli"):
+        spec = importlib.util.find_spec(name)
+        if spec is None or not spec.origin or not Path(spec.origin).is_absolute():
+            continue
+        where = str(Path(spec.origin).resolve().parent.parent)
+        if where not in folders:
+            folders.append(where)
+    return folders
+
+
 def collected(project: Project, args: list[str]) -> list[str]:
     """The project-relative node ids pytest collects, in the project's folder, from ``args`` (the arguments of the
     close's regression run): ``pytest --collect-only -q`` as a process, importlib import mode so that two files of one
     name (``tests/unit/test_records.py`` and ``governance/scripts/tests/test_records.py``) do not clash in the
     observation. The run must collect without an error."""
-    env = {"PATH": "/usr/bin:/bin", "HOME": str(project.tmp), "PYTHONDONTWRITEBYTECODE": "1"}
+    env = {"PATH": "/usr/bin:/bin", "HOME": str(project.tmp), "PYTHONDONTWRITEBYTECODE": "1",
+           "PYTHONPATH": os.pathsep.join(parent_pytest_folders())}
     env.update({k: v for k, v in os.environ.items() if k == "PYTHONUSERBASE"})
     done = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider",
                            "--import-mode=importlib", "--rootdir", str(project.root), *args],
