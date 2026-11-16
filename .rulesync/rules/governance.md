@@ -34,6 +34,16 @@ Here the live hook (`.claude/hooks/pretooluse.py`) keeps five rules (DEC-953 ite
 
 Kernel method skills (`template/governance/kernel/skills/`, generated as `.claude/skills/`) define how work is done: planning, discovery, retrieval, checkpoint, change, audit, test design and adoption. Skills follow the Contract and the decision register; they grant no permissions on their own authority (CAP-24.b).
 
+## Golden rule: how work is judged (DEC-1204)
+
+Every review, audit, probe, QA check and moderation judges work by one standing rule (DEC-1204; it merges ADR-0001 / DEC-039, DEC-801 and DEC-1010 item 1):
+
+- **Threat model:** honest agent mistakes, plausible accidents and drift in ordinary work, not a same-privilege adversary; the hard boundary is git history, protected-branch CI and the owner's signed approvals.
+- **What may block:** only a finding within the change's scope that an honest agent can hit in ordinary work and that fails open or loses work. A finding that needs a deliberate construction (decoys, booby-traps, planted links, hand-set git environment or replace refs, chained escapes) is a Wave 3 row, never a new round.
+- **How reviews converge:** a moderator triages every finding against the change's scope; at most two rounds, then the owner once with options; no extra round on its own; READY is computed by code from each reviewer's structured verdict.
+- **Scope:** every review, the ACTs, the job runner and the box included.
+- **Every brief carries it:** each reviewer, auditor, probe, QA and moderator brief states this rule: by the kernel skill `judging-work`, put in by `gov brief`, once it lands; by hand until then.
+
 ## Proposing changes
 
 Changes follow the CIT-P/CIT-E workflow: evidence, corroboration, proposal, independent review, owner approval and versioned promotion (CAP-33). A contradiction against a closed specification presents three costed options: apply now, defer or re-baseline (DEC-105).
