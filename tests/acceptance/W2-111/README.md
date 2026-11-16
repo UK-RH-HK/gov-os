@@ -72,6 +72,8 @@ per round; the PATH entry count; the tree count); `-s` or `-rA` shows them.
 | success-9 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded`, `test_w2_111_yaml_parity.py::test_the_product_loader_answers_each_text_as_the_pure_safe_loader_does` | The count cases: **none, green before the change** (35 passed at `00c9327e0`): they pin behaviours 1, 2 and 3 and DEC-218; behaviour 3 was expected red and is not (see "Before the change, S9"). The live-hook case (S9 as amended, P-W2-111-S9-DROP (a): every mapped case within 100 ms at p95, quiet, paired; decisions unchanged; the drop recorded): `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (20 of 20). The product loader's parity (F1, rv-3): on the ticket branch before the fix, the class texts red, `<text> (<form>): gov.util.parts.load_yaml_unique read the text that the pure SafeLoader refuses`; on the tests branch green (its loader is the pure one): see "F1 (rv-3)". |
 | success-10 | `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` | the diff is absent (the same text, 20 of 20). |
 | failure-4 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded`, `test_w2_111_yaml_parity.py::test_the_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, `test_w2_111_yaml_parity.py::test_the_product_loader_answers_each_text_as_the_pure_safe_loader_does`, `test_w2_111_yaml_parity.py::test_the_live_hook_s_patched_copy_decides_each_held_out_text_as_the_applied_copy_does` | the count cases' decisions: none, green before (today's decisions, pinned); the live-hook case: the diff is absent. After the change, red if a decision differs from today's (the count cases) or between the two copies or from `measure.py`'s record (the live-hook case). F1 (rv-3): the fixture case none, green everywhere (it checks the texts); the product parity as in success-9's row; the live-hook parity, on the tests branch `the live hook's diff ... is absent` (7 of 7), and on the ticket branch before the fix, the class texts red, `<text>: a Read of an ordinary file of the project was decided allow by the patched copy and deny by the applied copy (the pure loader's)`. See "F1 (rv-3)". |
+| success-9, failure-4 | `test_w2_111_yaml_rest.py::test_yaml_rest_role_paths_block_is_read_by_the_role_filter_as_the_pure_loader_reads_it`, `test_w2_111_yaml_rest.py::test_yaml_rest_role_paths_ticket_front_matter_is_read_by_the_role_filter_as_the_pure_loader_reads_it`, `test_w2_111_yaml_rest.py::test_yaml_rest_product_hook_reads_the_ticket_front_matter_as_the_pure_loader_reads_it` | YAML-REST (P-W2-111-YAML-REST (a)), the product's three reads; the class texts red here (the base's `role_paths.py` and `parts.py` read with libyaml), the clean controls green: the block, `role_paths.caller (the engineer, the path map's role_paths: block) <text>: decided from a text the pure SafeLoader refuses: it answered ('filter', ...); with the pure loader the call is refused: ('refused', 'RolePathsError', ...)` (4); the role filter's front matter, `... <text>: decided from front matter the pure SafeLoader refuses: it answered ('filter', {..., 'src/app/new.py': True}) (the engineer's new code src/app/new.py withheld); the call must be refused (fail closed) ...` (5); the product hook, `the product hook, the engineer's Read of docs/notes.md (the ticket's front matter) <text>: decided ('allow', None) from front matter the pure SafeLoader refuses; with the pure loader the call is refused: ('deny', "the session's ticket file cannot be read for its WBS id ...")` (5). See "YAML-REST (P-W2-111-YAML-REST)". |
+| failure-4 | `test_w2_111_yaml_rest.py::test_yaml_rest_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, `test_w2_111_yaml_rest.py::test_yaml_rest_live_hook_patched_copy_refuses_calls_on_a_role_paths_block_the_pure_loader_refuses`, `test_w2_111_yaml_rest.py::test_yaml_rest_live_hook_patched_copy_refuses_calls_on_ticket_front_matter_the_pure_loader_refuses` | YAML-REST: the fixture case none, green everywhere (it checks the texts, 17); the live hook's two reads, `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (11 of 11, the clean controls too). See "YAML-REST (P-W2-111-YAML-REST)". |
 
 ## The cases
 
@@ -431,3 +433,92 @@ parallel phase (load 10 to 20), while alone and quiet they passed 25 of 25. They
 `test_w2_111_live_hook_diff_p95.py` and `test_w2_111_live_hook_slow_hook.py`. The close leaves them out of its parallel
 phase and runs each alone afterwards; the nightly runs them alone too. No case, bound or round was changed.
 `gov_close_serial_only.entries` reads all five.
+
+## YAML-REST (P-W2-111-YAML-REST): the guard's other YAML reads answer as the pure SafeLoader does (`test_w2_111_yaml_rest.py`, 45 cases; support `w2_111_yaml_rest.py`)
+
+`Rewrite-Reason: P-W2-111-YAML-REST (a), DEC-136`. Written by a fresh independent test designer (brief td-8) from the
+owner's P-W2-111-YAML-REST (a) given as a described behaviour, without reading the engineer's work or the diff
+(DEC-820): the diff is used by its path at run time, never opened.
+
+**The behaviour.** A `role_paths:` block of the path map, or a session ticket's front matter, holding a tab inside or
+after a plain value (or after `key:`), a `? ` inside a flow item, or a BOM after a line break is read as the pure-Python
+`yaml.SafeLoader` reads it. Where the pure loader refuses the text, the role-checked call decided from it is refused
+(fail closed); where it reads it, the decision is the pure loader's. Before the fix libyaml's `CSafeLoader` reads these
+texts, so a call is decided from a block or front matter the pure parser refuses: **fails open** (rv-3's F1 class).
+
+**The five reads and how each is reached.**
+
+| read | interface | role-checked call |
+|---|---|---|
+| `gov.util.role_paths`, the `role_paths:` block | `role_paths.caller(root)`, the role filter of `gov retrieve` and `gov context`, in a fresh interpreter (`GOV_ROLE`, `GOV_TICKET`, `HOME` planted); answer: `RolePathsError` and its text, or which probe paths it withholds | the engineer's search of a planted repository (probes `docs/notes.md`, its ticket's `tests/acceptance/W2-988/test_fixture.py`) |
+| `gov.util.role_paths`, the ticket's front matter | the same | the test designer's search of the engineer's tree `<HOME>/gov-os-worktrees/W2-988` (a repository whose branch `w2/W2-988` adds `src/app/new.py` under the ticket's allowed_paths, against `w2/integrate`) |
+| `gov.util.parts`, the ticket's front matter | the product hook as W1-02 runs it, in W1-02's project with the session ticket `DAEO-zz88` added | the engineer's and the test designer's Read of `docs/notes.md` |
+| the live hook's `role_reads.py`, the block | the patched copy (`w2_111_live_hook.make_copies`), run as settings.json's command runs it (the pinned interpreter, `-E`), `CLAUDE_PROJECT_DIR` a planted repository, `HOME` planted | the engineer's Read of an ordinary file and of its ticket's acceptance test; the test designer's Read of an ordinary file and of the engineer's code (`<HOME>/gov-os-worktrees/W2-988/src/app/main.py`) |
+| the live hook's `role_reads.py`, the front matter | the same | the test designer's two Reads (only a role whose globs hold `{ticket_impl}` reads the front matter there) |
+
+The product's hook does not import `gov.util.role_paths` (it is memory's role filter, W2-150): its two reads are
+reached through `caller`, the module's documented entry, as `gov retrieve` calls it (no store, no model).
+
+**The oracle.** For the product, the same code run with libyaml's binding absent (`sys.modules["yaml._yaml"] = None`
+before PyYAML is imported: PyYAML then has no `CSafeLoader`, every loader is its pure-Python one). For the role filter a
+second interpreter; for the product hook a planted wrapper in place of the installed hook that runs the product hook
+beside it as `__main__` (its forked decision process inherits it; as `test_w2_111_slow_hook.py` plants its hook). Each
+product case asserts the answer (the refusal and its text, the filter, or the decision and its reason) equals the
+oracle's, and, for a class text, that it is a refusal. **For the live hook the applied copy is not the oracle**: it
+reads both places with libyaml too. The patched copy must refuse each call that reads a class text; the clean control
+must be decided alike by both copies, as the role rule has it (allow, deny, allow, deny).
+
+**The texts.** The block in the repository's own form (`reads_denied: ["{ticket_tests}", docs/private/**]` for the
+engineer, `["{ticket_impl}"]` for the test designer), the class text on the engineer's entry: a tab inside an entry
+(`- docs/private<TAB>notes/**`), a tab after an entry, a tab after `engineer:`, `[..., docs/private? notes/**]`, and the
+clean control. The front matter in the Wave tickets' shape, the class text on its `tags` line: `- guard<TAB>fixture`,
+`- guard<TAB>`, `tags:<TAB>[wave-2, guard]`, `[wave-2, guard? fixture]`, a BOM after a line break (`tags:` then
+`<BOM>- guard`), and the clean `tags: [wave-2, guard]`. libyaml reads each class text to data that passes the guard's
+checks (asserted by hand, printed by the fixture case). **No BOM in the block:** a BOM after a line break stands at the
+start of its line, and the block reader ends the `role_paths:` block at the first line that does not start with a
+space, a tab, a `#` or a line break, so neither parser sees it (checked: green before the fix, so not a case).
+
+**The product hook's front matter, its WBS id quoted** (`wbs_id: 'W2-988'`, a form the guard's own `wbs_id` pattern
+allows). When the YAML cannot be read, `parts` takes the guard's line reader, which reads an unquoted WBS id alike, so
+both parsers would give the same decision: no red. Quoted, the line reader cannot read it, and the pure path refuses
+(`the session's ticket file cannot be read for its WBS id: the call is refused (fail closed, DEC-820)`): the decision
+then depends on the YAML read alone. The role filter's front-matter case keeps the WBS id unquoted so that `parts`'
+read (which the filter also calls) cannot refuse, and the refusal can only come from `role_paths`' own read.
+
+**The cases.**
+
+- **The fixture** (`test_yaml_rest_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, 17: the 5 block
+  texts, the 6 front-matter texts unquoted and quoted): the pure SafeLoader refuses each class text and reads the clean
+  ones (both roles in the block; the WBS id and allowed_paths in the front matter). Green everywhere.
+- **The block, the role filter** (`test_yaml_rest_role_paths_block_is_read_by_the_role_filter_as_the_pure_loader_reads_it`,
+  5): refused, `RolePathsError` with the oracle's text, for each class text; the clean block withholds the ticket's test
+  and not `docs/notes.md`. (success-9, failure-4.)
+- **The front matter, the role filter**
+  (`test_yaml_rest_role_paths_ticket_front_matter_is_read_by_the_role_filter_as_the_pure_loader_reads_it`, 6): refused
+  (`RolePathsError`) for each class text, and equal to the oracle; the clean front matter withholds `src/app/new.py`
+  and not `docs/notes.md`. (success-9, failure-4.)
+- **The product hook** (`test_yaml_rest_product_hook_reads_the_ticket_front_matter_as_the_pure_loader_reads_it`, 6):
+  both Reads refused for each class text, with the oracle's reason; both allowed for the clean one. (success-9,
+  failure-4.)
+- **The live hook, the block**
+  (`test_yaml_rest_live_hook_patched_copy_refuses_calls_on_a_role_paths_block_the_pure_loader_refuses`, 5) and **the
+  front matter** (`test_yaml_rest_live_hook_patched_copy_refuses_calls_on_ticket_front_matter_the_pure_loader_refuses`,
+  6): each call reading a class text refused by the patched copy; the clean control alike in both copies. (failure-4.)
+
+**Fail closed for the front matter, said plainly.** Today both `role_paths`' and `role_reads.py`'s front-matter reads
+answer `{}` (no front matter) when their YAML read raises. With only the loader swapped, a class text then gives the
+test designer no `{ticket_impl}`: its search or Read of the engineer's code is **handed out** (checked by hand on the
+applied live copy run with libyaml absent: the test designer's Read of the engineer's code allowed, where the clean
+text refuses it). The behaviour states the call is refused (fail closed), and these cases hold it so; a fix that only
+swaps the loader fails the role filter's front-matter case and the live front-matter case.
+
+**Before the fix** (this tests branch at `8634b4d21b89` plus these files; the launched session, empty `HOME`, the
+whole-folder filter): 25 failed, 20 passed, 3.9 s. Red: the 14 product class cases, for the reasons in the map; the
+11 live cases, `the live hook's diff ... is absent`. Green: the 17 fixture cases and the 3 product clean controls (by
+design). The harness checked by hand (scratch runs, not cases): the applied live copy decides the class texts as the
+clean one (allow, deny, allow, deny), so a patched copy that changes nothing fails each class case on a call that must
+be refused; the applied copy run with libyaml absent refuses every call on a class block (`could not decide:
+governance/project/path-map.yaml: role_paths cannot be read; refused`).
+
+**Kinds.** Acceptance cases, about 4 s for the 45. Not timing cases, so not in `serial-only.txt`. No marker; no name,
+id or file holds `real`, `green_here` or `time_limit`, so the whole-folder filter selects all 45.
