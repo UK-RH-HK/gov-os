@@ -1389,7 +1389,12 @@ def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
 
 def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
     """The regression run's ``--ignore`` and ``--deselect`` options; none for the acceptance run. A node id is
-    given as the project's and as the ``tests`` folder's, the run's root folder where the project names none."""
+    given as the project's and as the ``tests`` folder's, the run's root folder where the project names none.
+
+    W2-191 (DEC-1199 (2)): the run is ``pytest tests``, which never reaches a selected target outside ``tests/``
+    (the test map takes any project-relative target); each is given after the options as a positional target of
+    its own (the folder or file whole, a node id that node), the reusing close's record-reading ones among them
+    (its ``selected``). One the run ignores (the ticket's own suite, which the acceptance run holds) is not."""
     if ignore is None:
         return []
     form = [f"--ignore={root / rel}" for rel in scope["ignore"] if (root / rel).resolve() != Path(ignore).resolve()]
@@ -1397,6 +1402,16 @@ def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
         form.append(f"--deselect={node}")
         if node.startswith("tests/"):
             form.append(f"--deselect={node[len('tests/'):]}")
+    skipped = [Path(ignore).resolve()] + [(root / rel).resolve() for rel in scope["ignore"]]
+    for entry in scope.get("selected") or []:
+        path, sep, case = entry["target"].partition("::")
+        if path.rstrip("/") == _select.FULL_TARGET or path.startswith(_select.FULL_TARGET + "/"):
+            continue  # under tests/, the run collects it already
+        place = root / path
+        if any(place.resolve() == s or s in place.resolve().parents for s in skipped):
+            continue
+        if (target := f"{place}{sep}{case}") not in form:
+            form.append(target)
     return form
 
 

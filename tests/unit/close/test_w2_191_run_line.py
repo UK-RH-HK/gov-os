@@ -42,7 +42,7 @@ def test_the_options_come_first_then_the_outside_targets_in_the_order_selected()
     form = _scope_form(ROOT, scope, ROOT / OWN)
     assert form == ["--ignore=/p/tests/unit", "--deselect=tests/acceptance/W1-rr/test_rr.py::test_other",
                     "--deselect=acceptance/W1-rr/test_rr.py::test_other", "/p/product/tests/test_a.py",
-                    "/p/governance/scripts/tests/"]
+                    "/p/governance/scripts/tests"]
 
 
 def test_the_reused_form_collects_its_outside_record_reading_targets():
@@ -65,3 +65,34 @@ def test_the_full_scope_names_nothing_beyond_tests():
 def test_a_folder_named_like_tests_but_elsewhere_is_outside():
     scope = _scope("tests_extra/test_a.py", "testsuite", "tests")
     assert _scope_form(ROOT, scope, ROOT / OWN) == ["/p/tests_extra/test_a.py", "/p/testsuite"]
+
+
+# --- the run itself ---------------------------------------------------------------
+
+def test_the_regression_run_collects_a_selected_outside_suite_and_nothing_it_leaves_out(tmp_path):
+    """A real pytest run of the form: the selected outside folder runs whole, the selected node id of another
+    outside file runs that case alone, and an outside file nothing selects stays out."""
+    from functools import partial
+
+    from gov.close import command
+
+    files = {"tests/unit/test_u.py": "def test_u():\n    pass\n",
+             "governance/scripts/tests/test_s.py": "def test_s1():\n    pass\n\n\ndef test_s2():\n    pass\n",
+             "product/tests/test_a.py": "def test_a():\n    pass\n\n\ndef test_b():\n    assert False\n",
+             "product/tests/test_left_out.py": "def test_left():\n    assert False\n"}
+    for rel, text in files.items():
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text(text, encoding="utf-8")
+    (tmp_path / "tests/acceptance/W1-own").mkdir(parents=True)
+    (tmp_path / ".gov-runtime/j").mkdir(parents=True)
+    scope = {"scope": "scoped", "selected": [{"target": "tests/unit", "why": []},
+                                             {"target": "governance/scripts/tests", "why": []},
+                                             {"target": "product/tests/test_a.py::test_a", "why": []}],
+             "ignore": ["tests/acceptance/W1-own/"], "deselect": [], "check_result": None, "limit": [],
+             "folder": ".gov-runtime/j", "junit_xml": [], "runs": [], "per_test_timeout": 60,
+             "tmp_path_retention_policy": "failed", "distribution": "load"}
+    stated: list = []
+    findings, counts = partial(command._run_tests, workers=1)(
+        tmp_path, tmp_path / "tests", 180, ignore=tmp_path / "tests/acceptance/W1-own", none_collected_ok=True,
+        stated=stated, scope=scope)
+    assert findings == [] and counts["passed"] == 4 and counts["failed"] == 0, (findings, counts)
