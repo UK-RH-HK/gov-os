@@ -448,3 +448,7 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 293 | DEC-1209 (2): the list of what stopped where (each running lead stopped at its current step, tools/emergency_stop_watch.sh, log/emergency-stop.log) to the owner | IN PROGRESS: the watch running |
 | 294 | DEC-1209 (3), (4), (7): the retrospective combined (reviews/retro-2026-11-SHORT-LIST.md) and the rubric research (reviews/rubric-research.md), each handed to the owner when done | IN PROGRESS: both auditors running |
 | 295 | DEC-1209 (6): the owner's PC steps for GF-8, GF-9, the box switch and its start lines, and OWNER-OPERATOR-FULL-1, together and rehearsed | IN PROGRESS |
+| 296 | DEC-1210 (8): reopen W2-187 (the weekly audit as the fresh cycle, A9, A17) and W2-188 (the adopt skill's step 6 and the practice record by CIT-P, A10) when the owner lifts the emergency (DEC-1209) | WAITING: the emergency |
+| 297 | DEC-1210 (5): EXAMIN's Wave 0 brief amended for the fresh 80 measured end to end (A12): the new sha to the owner for a yes, then to the EXAMIN CTO by its REPLIES | NOT STARTED |
+| 298 | DEC-1210 (9): the first fresh 80 (JOB-20261116-15): filled, read by the CTO, queued; the owner says "run JOB-20261116-15"; its counts read and brought to the owner | IN PROGRESS: filled, to be queued |
+| 299 | DEC-1210 (4): W2-15b's (DAEO-swdu) measure lines amended (A11) | DONE in the DEC-1210 commit |
