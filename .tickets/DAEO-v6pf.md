@@ -2,7 +2,7 @@
 id: DAEO-v6pf
 wbs_id: W2-191
 external-ref: W2-191
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-11-16T14:45:01Z
