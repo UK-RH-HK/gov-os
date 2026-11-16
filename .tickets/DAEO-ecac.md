@@ -23,6 +23,8 @@ allowed_paths:
 - tests/unit/telemetry/test_sessionlog*
 - docs/changes/W2-60b-CIT-E.md
 - src/gov/guard/decide.py
+- src/gov/launch/command.py
+- tests/unit/resources/test_w2_20_round3.py
 kpis:
   success:
   - 'When a launched session ends, whatever its exit (DEC-392''s signals included), the launcher writes one record keyed by its session id: model (the main session''s and each subagent''s), effort, window, tokens (input, output, cache creation, cache read), cost, minutes, turns, subagents (count and model) and every rate-limit event; role, ticket and task class come from W2-60a''s launch record Verify: planted launches that end by exit 0, by a non-zero exit and by DEC-392''s signal: each leaves one record keyed by its session id holding every listed key (a planted rate-limit event included), with role, ticket and task class taken from W2-60a''s launch record [CAP-36.a lite, DEC-838 item 3, lens F R6]'
@@ -97,3 +99,5 @@ Card: the draft card `W2-60` (W2-60b part), from the accepted plan (`docs/plan/W
 - **Place:** starts after W2-60a merges (the launch record and the session id it gives), and after W2-07 (`DAEO-r9ss`, in its close) closes, since W2-07 holds `src/gov/telemetry/**`. W2-07 adds pass or fail and the repair count from the close.
 - **Paths:** `launcher.py` for the one call after the session ends only; `sessionlog.py` for new readings only (turns, compactions, rate-limit events, cost), under W1-31's rules (a form no specimen shows is "not measured", DEC-655).
 - **The test designer's files** (MR-3): `tests/acceptance/W2-60b/**`.
+
+**Path case 2026-11-16 11:1x (P-W2-60B-P1 (a), P-W2-60B-P2 (a); the CTO, DEC-1156 (7); listed for the owner's reading):** build run 1 returned PACKAGES (53 of 55 acceptance cases; review round 2 pass, 0 blocking, 84b267971). (P1) S10's `--tests-worktree` half needs a flag in `src/gov/launch/command.py`: the ticket gains that file, for CIT-E §7's 11-line diff only. (P2) `tests/unit/resources/test_w2_20_round3.py:118, 136` launch six `engineer` sessions into one project and expect three to start; this ticket's decided one-writer rule (S10, S12; round 1's F1 fail-open closed) starts one: the ticket gains that file, and the engineer revises the set-up (six worktrees, or launches as the read-only `independent-auditor`) with the memory rule's assertion unchanged. A narrow independent check of both. The live hook's `REVIEWERS` line gaining `"qa-engineer"` (CIT-E §6) is a guard-hook change: the CTO brings it as its own ACT after ACT-GUARD-FIX-7, not in this ticket.
