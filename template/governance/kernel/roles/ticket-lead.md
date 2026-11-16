@@ -4,7 +4,7 @@ Made from the section that the orchestrator role file held until then (DEC-236, 
 
 - **Version:** 1.0.0
 - **Launch default:** model claude-opus-5-5, effort high
-- **Skills:** orchestration, checkpoint, retrieval
+- **Skills:** orchestration, checkpoint, retrieval, judging-work
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
 - **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.

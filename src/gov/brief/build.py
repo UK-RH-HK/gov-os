@@ -12,7 +12,7 @@ import datetime
 import re
 from pathlib import Path
 
-from gov.brief import ROLE_TEMPLATES
+from gov.brief import ROLE_TEMPLATES, judging
 from gov.cli.errors import GovError
 from gov.util.frontmatter import FrontmatterError, ids, parse, with_body
 
@@ -339,6 +339,8 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
     _, t0, t0_text = _template(folder, "brief")
     role_front, role_body, role_text = _template(folder, ROLE_TEMPLATES[role])
     lead_lines = run_section(role_body, run) if run else []
+    # W2-195 (DEC-1204 (5)): a brief that judges work carries the installed skill's sections 1 to 3, or is refused
+    judging_block = judging.block(root) if judging.judges(role, run) else None
     part_text, repair_text = _flag_file(part, "--part"), _flag_file(repair, "--repair")
 
     ready = facts.get("ready")
@@ -360,6 +362,8 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
     brief = filler.lines(t0).rstrip("\n") + "\n"
     if lead_lines:
         brief += "\n" + filler.lines("\n".join(lead_lines)) + "\n"
+    if judging_block is not None:  # after the filling: the skill's bytes are never filled, edited or scanned
+        brief += "\n" + judging_block
     findings = refuse + [_finding("PLACEHOLDER_LEFT", key) for key in filler.left]
     return {"brief": brief, "warnings": warnings, "findings": findings, "size": prose_size(brief),
             "budget": budgets.get("brief"), "ticket": str(front.get("id", ticket_ref))}
