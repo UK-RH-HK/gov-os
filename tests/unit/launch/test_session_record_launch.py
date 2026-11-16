@@ -196,10 +196,33 @@ def test_a_session_that_cannot_start_leaves_no_session_record(project, monkeypat
 
 # -- the launchable roles read from the role files (S7, S8, F1) ----------------------------------------------------
 
+def _assigned_names(source: str) -> set[str]:
+    import ast
+    names = set()
+    for node in ast.walk(ast.parse(source)):
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target] \
+            if isinstance(node, (ast.AnnAssign, ast.AugAssign)) else []
+        for target in targets:
+            for leaf in ast.walk(target):
+                if isinstance(leaf, ast.Name):
+                    names.add(leaf.id)
+    return names
+
+
 def test_no_fixed_role_tuple_is_left_in_the_launcher():
+    """F1: no assignment of WORKER_ROLES or OWN_TICKET_ROLES (annotated too) stays in launcher.py."""
     source = Path(launcher.__file__).read_text(encoding="utf-8")
-    assert not re.search(r"^WORKER_ROLES\s*=\s*\(", source, re.M)
-    assert "OWN_TICKET_ROLES" not in source
+    assert not {"WORKER_ROLES", "OWN_TICKET_ROLES"} & _assigned_names(source)
+    assert not re.search(r"^\s*(WORKER_ROLES|OWN_TICKET_ROLES)\s*(:[^=]*)?=", source, re.M)
+
+
+def test_worker_roles_is_still_served_for_w2_153_s_readers():
+    """The template map's five worker entries, served by name (PEP 562) for W2-153's and W1-50's readers."""
+    from gov.launch.launcher import WORKER_ROLES
+    assert WORKER_ROLES == ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research")
+    assert launcher.WORKER_ROLES == WORKER_ROLES and "ticket-lead" not in WORKER_ROLES
+    with pytest.raises(AttributeError):
+        launcher.NO_SUCH_NAME  # noqa: B018
 
 
 def test_a_sixth_worker_role_file_launches_with_no_code_change(project):
@@ -304,14 +327,24 @@ def test_the_plan_reads_a_sixth_role(project, capsys):
 
 # -- one writer per worktree (S10, S12) ----------------------------------------------------------------------------
 
-def _plant_live(project, role="engineer", sid="33333333-3333-4333-8333-333333333333"):
+def _plant_live(project, role="engineer", sid="33333333-3333-4333-8333-333333333333", started=None):
     folder = project / ".gov-runtime" / "sessions"
     folder.mkdir(parents=True, exist_ok=True)
     (folder / f"{sid}.json").write_text(json.dumps({
         "record": "gov-session", "format": 1, "session_id": sid, "worktree": str(project), "pid": os.getpid(),
-        "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "ended_at": None, "exit_code": None,
-        "role": {"value": role, "source": "launch record"}}), encoding="utf-8")
+        "started_at": started or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "ended_at": None,
+        "exit_code": None, "role": {"value": role, "source": "launch record"}}), encoding="utf-8")
     return sid
+
+
+def test_a_live_writer_with_an_earlier_fixed_start_stamp_refuses_the_second_writer(project):
+    """The interface's planted form: a fixed stamp earlier than the live process's start. Alive is live (no pid-reuse
+    discount): the launch is refused, naming the session and the worktree, and nothing is started or recorded."""
+    sid = _plant_live(project, started="2026-11-16T05:00:00Z")
+    with pytest.raises(GovError) as raised:
+        launcher.launch(project, "engineer", TICKET, [])
+    assert sid in raised.value.message and str(project) in raised.value.message
+    assert Session.made == [] and [p.stem for p in _records(project)] == [sid]
 
 
 def test_a_second_writer_in_a_worktree_with_a_live_writer_is_refused(project):

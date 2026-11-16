@@ -102,9 +102,6 @@ ROLE_TEMPLATES = {
 # A role the map does not name has the template ``role-<role>.md`` (W2-60b): a new role is its role file and its
 # template, with no code change.
 TEMPLATE_STEM = "role-{role}"
-# The worker roles the template map names (W2-153), kept for the callers that read the name; what a launch admits is
-# not this but whatever role file ``_role_kind`` admits (W2-60b S7).
-WORKER_ROLES = tuple(role for role in ROLE_TEMPLATES if role not in LEAD_ROLES)
 TEMPLATES_REL = ".claude/templates"  # the generated copies, written only by an ACT (DEC-315)
 TEMPLATE_FLAG = "--append-system-prompt-file"
 CLI_REL = ".local/bin/claude"
@@ -170,6 +167,16 @@ TRIAL_KEYS = frozenset({"role", "criticality", "model", "effort", "tickets", "re
 FLOOR = "high"  # DEC-1120 (3): when the table's effort is high or above, the launch's own choice is not below it
 BELOW_FLOOR = ("low", "medium")
 AUDITOR = "independent-auditor"
+
+
+def __getattr__(name: str):
+    """W2-60b F1 (DEC-946 (W3-P09)): no list of launchable roles is held in this module. ``WORKER_ROLES`` is served by
+    name (PEP 562) for W2-153's and W1-50's readers only: the template map's worker entries (its five, the lead names
+    left out), worked out when read. No launch reads it to decide anything; what a launch admits is whatever role file
+    ``_role_kind`` admits (W2-60b S7)."""
+    if name == "WORKER_ROLES":
+        return tuple(role for role in ROLE_TEMPLATES if role not in LEAD_ROLES)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def _refuse(reason: str) -> GovError:

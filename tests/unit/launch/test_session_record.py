@@ -278,10 +278,27 @@ def test_a_dead_pid_is_not_live(tmp_path):
     sr.check_one_writer(tmp_path, str(tmp_path), "engineer")
 
 
-def test_a_reused_pid_is_not_live(tmp_path):
-    """The pid names a process that started after the record's session started: another process than the launcher."""
-    _plant(tmp_path, started="2020-01-01T00:00:00Z")
-    sr.check_one_writer(tmp_path, str(tmp_path), "engineer")
+def test_a_live_pid_is_live_whatever_its_process_start(tmp_path):
+    """The interface: a record with no end whose process is alive is live. A pid whose process began after the
+    record's start (a reused pid, or a stamp written earlier) is not discounted: a false refusal names the record (fail
+    closed), where a guess would let a second writer in (fail open)."""
+    sid = _plant(tmp_path, started="2020-01-01T00:00:00Z")
+    with pytest.raises(GovError) as raised:
+        sr.check_one_writer(tmp_path, str(tmp_path), "engineer")
+    assert sid in raised.value.message
+
+
+def test_a_live_pid_of_the_interface_s_planted_form_is_live(tmp_path):
+    """The acceptance form: a fixed stamp earlier than this process's start, this process's own pid."""
+    sid = _plant(tmp_path, started="2026-11-16T05:00:00Z")
+    with pytest.raises(GovError) as raised:
+        sr.check_one_writer(tmp_path, str(tmp_path), "engineer")
+    assert sid in raised.value.message and str(tmp_path) in raised.value.message
+
+
+def test_a_pid_that_cannot_be_signalled_counts_as_alive():
+    """``kill(pid, 0)`` refused with EPERM: another user's live process, so the record stays live."""
+    assert sr.alive(1) is True or os.geteuid() == 0
 
 
 def test_a_session_in_another_worktree_is_not_counted(tmp_path):

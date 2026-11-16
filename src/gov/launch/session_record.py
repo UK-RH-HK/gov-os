@@ -16,7 +16,7 @@ excepted. Pass or fail and the repair count are the close's (W2-07), not the rec
 
 One writer per worktree (S10, S12; DEC-847, DEC-963, DEC-1156 (3)): a record whose
 ``worktree`` is a launch's tree, whose ``ended_at`` is null and whose ``pid`` is alive
-(and not a later process that took a dead launcher's pid) is a live writing session
+(no pid-reuse guess: a doubt refuses, naming the record) is a live writing session
 unless its role is in ``REVIEWERS``. A record that cannot be read refuses the launch:
 it could hide a live writer.
 """
@@ -28,7 +28,7 @@ import os
 import re
 import secrets
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -48,7 +48,6 @@ STAMP = "%Y-%m-%dT%H:%M:%SZ"
 CONFIG_ENV = "CLAUDE_CONFIG_DIR"
 NO_WINDOW = ("the session log states no window in a form the specimens show, and no --output-format json result "
              "line (modelUsage.<model>.contextWindow) was read")
-REUSED_SLACK_S = 2  # a process that started this long after the record's start is not the launcher that wrote it
 
 LOG = "session log"
 SOURCES = {
@@ -339,35 +338,18 @@ class Keeper:
 
 # -- one writer per worktree -------------------------------------------------------------------------------------
 
-def _started_epoch(pid: int) -> float | None:
-    """When the process ``pid`` started, in seconds since the epoch, from ``/proc``; ``None`` when it cannot be read."""
-    try:
-        with open(f"/proc/{pid}/stat", encoding="utf-8") as handle:
-            ticks = int(handle.read().rsplit(")", 1)[1].split()[19])
-        with open("/proc/stat", encoding="utf-8") as handle:
-            boot = next(int(line.split()[1]) for line in handle if line.startswith("btime "))
-        return boot + ticks / os.sysconf("SC_CLK_TCK")
-    except (OSError, ValueError, IndexError, StopIteration):
-        return None
-
-
-def alive(pid: int, started_at: str) -> bool:
-    """True while ``pid`` is the process that wrote a record started at ``started_at``: it runs, and it did not start
-    after the record's session did (a later process given a dead launcher's pid). What cannot be told counts as
-    alive, so that a doubt never lets a second writer in."""
+def alive(pid: int) -> bool:
+    """True while a process of the id ``pid`` runs (the interface: a record "whose process is alive"). No pid-reuse
+    guess discounts it: a reused pid can at worst refuse a launch falsely, naming the record (fail closed), where a
+    guess could let a second writer in (fail open). Only "no such process" is dead; ``EPERM`` (another user's process)
+    and any other doubt count as alive."""
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
         return False
-    except PermissionError:
-        pass
-    except OSError:
+    except OSError:  # PermissionError included: the process exists
         return True
-    began = _started_epoch(pid)
-    if began is None:
-        return True
-    record_start = datetime.strptime(started_at, STAMP).replace(tzinfo=timezone.utc).timestamp()
-    return began <= record_start + REUSED_SLACK_S
+    return True
 
 
 def _shape(data) -> bool:
@@ -407,7 +389,7 @@ def live_writers(root: Path, worktree: str) -> list[dict]:
                           f"shown that no writing session is live in the worktree {worktree} (DEC-847)")
         if os.path.realpath(data["worktree"]) != tree or data["ended_at"] is not None:
             continue
-        if data["role"]["value"] in REVIEWERS or not alive(data["pid"], data["started_at"]):
+        if data["role"]["value"] in REVIEWERS or not alive(data["pid"]):
             continue
         found.append(data)
     return found
