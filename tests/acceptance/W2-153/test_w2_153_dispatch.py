@@ -63,10 +63,24 @@ def _without_add_dirs(argv: list[str]) -> list[str]:
 
 
 def test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag(bed):
-    ours = _started(bed.run(support.current_dispatch_script()))
+    script = support.current_dispatch_script()
+    run = bed.run(script)
+    ours = _started(run)
     theirs = _started(bed.run(support.baseline_dispatch_script()))
     assert ours["cwd"] == theirs["cwd"], f"the lead starts in {ours['cwd']}, integrate's in {theirs['cwd']}"
-    mine = support.without_flag(_without_add_dirs(ours["argv"]))
+    argv = list(_without_add_dirs(ours["argv"]))
+    if "session_start.sh" in script:
+        # DEC-1207 (b), DEC-1205 (2)(iii): started through the box, whose CLI runs with the decided permission mode
+        box = run["box"]
+        assert box, "the script names the box but the stand-in box was not started"
+        assert box[box.index("--scope") + 1] == "tree", f"the box was not started with --scope tree: {box}"
+        assert box[box.index("--ticket") + 1] == support.DISPATCH_TICKET, f"the box's --ticket is not the bed's: {box}"
+        rw = [box[i + 1] for i, arg in enumerate(box[:-1]) if arg == "--rw"]
+        assert str(bed.tree) in rw, f"the lead tree {bed.tree} is not among the box's --rw folders: {rw}"
+        for i, arg in enumerate(argv[:-1]):
+            if arg == "--permission-mode" and argv[i + 1] == "bypassPermissions":
+                argv[i + 1] = "acceptEdits"
+    mine = support.without_flag(argv)
     assert mine == theirs["argv"], f"the lead line changed beyond the one flag\nthis tree: {mine}\nintegrate: {theirs['argv']}"
 
 
