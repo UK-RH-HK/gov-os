@@ -70,6 +70,7 @@ from gov.guard import runs
 from gov.launch import criticality as crit, environ, record, role as roles, sandbox, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
+from gov.spend import brake as spend_brake
 from gov.util.gitenv import git_binary, git_env
 
 # W2-60b S7, S8 (DEC-946 (W3-P09), DEC-826 Q1): the launchable roles and their own-ticket rule are read from the
@@ -537,6 +538,13 @@ def _check_options(reason: str | None, trial: str | None, owner_named: str | Non
         raise _refuse(f"--owner-named takes a decision id (DEC-<number>), not {owner_named!r}")
 
 
+def _check_projection(projection_usd) -> None:
+    """W2-156: ``--projection-usd`` is a number above 0 (the runaway brake's projection), before anything is read."""
+    if projection_usd is not None and (isinstance(projection_usd, bool) or not isinstance(projection_usd, (int, float))
+                                       or not 0 < projection_usd < float("inf")):
+        raise _refuse(f"--projection-usd takes a number above 0, not {projection_usd!r}")
+
+
 def _ticket_names(ticket_id: str, ticket: dict) -> list[str]:
     """The names one ticket goes by: the id the launch was given, and the ticket's own ``id`` and ``wbs_id``."""
     names = [ticket_id] + [ticket.get(key) for key in ("id", "wbs_id")]
@@ -823,7 +831,7 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
 
 
 def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: list[str], settings: dict,
-                 options: tuple = (None, None, None)) -> dict:
+                 options: tuple = (None, None, None), projection_usd: float | None = None) -> dict:
     """W2-60a, before the gate: the role read once, its model and effort, the resumed session's record, and the
     settings a worker session gets on top of ``build_settings`` (the record folder's deny rules, the user's ask and
     deny rules, no model-side memory, the subagent model in its env). What ``_launch_line`` needs once the session's
@@ -857,7 +865,7 @@ def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: l
                          "appended_sha256": roles.sha256(composed), "template": template_entry}
     return {"role": role, "ticket": ticket_id, "root": root, "given": given, "model": model, "effort": effort,
             "ticket_class": ticket_class, "chosen": chosen, "records": records, "resumed": resumed is not None, "origin": origin,
-            "composed": composed}
+            "composed": composed, "projection_usd": projection_usd}
 
 
 def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
@@ -869,7 +877,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
     appended.write_bytes(plan["composed"])
     session_id = str(uuid.uuid4())
     origin = plan["origin"]
-    written = record.write(plan["records"], {
+    data = {
         "record": "gov-launch", "format": record.FORMAT, "session_id": session_id,
         "resumes": given["resume"], "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "root": str(plan["root"]), "role": plan["role"], "ticket": plan["ticket"], "ticket_class": plan["ticket_class"],
@@ -880,8 +888,11 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "subagent_model": model, "compaction_threshold": "none",
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
-        "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}})
-    head = [*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
+        "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}}
+    if plan.get("projection_usd") is not None:  # W2-156: the runaway brake's projection; absent, the key is absent
+        data["projection_usd"] = plan["projection_usd"]
+    written = record.write(plan["records"], data)
+    head =[*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
@@ -1026,8 +1037,11 @@ def plan(root: Path, role: str, ticket_id: str) -> int:
 
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
            gpu_need_mib: int | None = None, *, reason: str | None = None, trial: str | None = None,
-           owner_named: str | None = None) -> int:
+           owner_named: str | None = None, projection_usd: float | None = None) -> int:
     """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
+
+    A worker's ``projection_usd`` (``--projection-usd``, W2-156) is recorded on its launch record: the runaway brake's
+    projection. A braked ticket's launch is refused (``SPEND_BRAKED``) after the gate's check; a lead takes no projection.
 
     Only a lead (``role`` in ``LEAD_ROLES``) is checked against the plan; a worker launch never is, whoever calls.
     Every launch, lead or worker, passes the resource gate (W2-20 S19), unless ``gate_override`` (a decision id)
@@ -1049,6 +1063,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         if given:
             raise _refuse(f"a lead launch ({role}) takes none of --reason, --trial and --owner-named; given: "
                           f"{', '.join(given)}")
+        if projection_usd is not None:  # W2-156: a lead writes no launch record, so it has nowhere to keep one
+            raise _refuse(f"a lead launch ({role}) takes no --projection-usd: it writes no launch record to hold one")
         plan_override = _admit_lead(root, ticket_id)
         _check_cli_args(cli_args)
         _check_repository_settings(root, False)  # a lead has no sandbox: the guard is its only fence
@@ -1067,6 +1083,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _check_cli_args(cli_args)
     given = _check_own_args(cli_args)
     _check_options(reason, trial, owner_named)
+    _check_projection(projection_usd)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
     if role not in ROLE_TEMPLATES:  # W2-60b S8: a new role's file before its template is looked for
@@ -1084,7 +1101,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
     # W2-60a: the role read once; W2-184: the session's model and effort are RUBRIC-2's for its role and criticality.
-    plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+    plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd)
     # W2-56 S4 (DEC-402): the names the sandbox puts placeholders at are kept out of git's way, for the session and
     # for its caller in the same worktree; a repository whose exclude file cannot be written is not launched into.
     try:
@@ -1100,6 +1117,9 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         # after the other. A refusal here starts no CLI and writes no record of its own.
         session_record.check_one_writer(root, str(root), role)
         _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
+        braked = spend_brake.refusal(root, ticket_id)  # W2-156 (DEC-1091 (2)): after the gate, before anything starts
+        if braked is not None:
+            raise GovError("SPEND_BRAKED", braked)
         # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
         # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
         # folder made here is marked as this repository's; a folder that is there without this repository's marker,
