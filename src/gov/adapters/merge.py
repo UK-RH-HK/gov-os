@@ -11,7 +11,11 @@ its settings as the adapter check applies it (DEC-635); then:
   generated keys and entries (hooks among them) after, and an ``env`` block merged the same way (no ``env`` key is
   added when neither side holds one);
 - every other generated file is written where the project has none; one that differs from the project's own is
-  kept as it is and named (``kept``).
+  kept as it is and named (``kept``);
+- in an adopted repository (not Gov OS's own source tree) whose kernel holds a ``templates/`` folder, the eight role
+  template copies under ``.claude/templates/`` are written byte for byte from it: an absent copy written, a differing
+  one replaced, an equal one left alone (``templates``; W2-153 S-ADOPTED, DEC-1192 (2)). In Gov OS's own repository
+  an ACT writes them (DEC-315) and generate does not.
 """
 
 from __future__ import annotations
@@ -100,6 +104,40 @@ def _read(path: Path) -> str | None:
         raise _refuse("FILE_UNREADABLE", f"{path} cannot be read ({exc}): nothing is written") from None
 
 
+def _is_source_tree(root: Path) -> bool:
+    """True when ``root`` is Gov OS's own source tree: it holds every marker ``fabric.shipped`` looks for."""
+    from gov.adopt.fabric import MARKERS
+    return all((root / marker).exists() for marker in MARKERS)
+
+
+def _template_copies(root: Path) -> tuple[dict[str, bytes], list[str], list[str]] | None:
+    """``(writes, written, replaced)`` for the template copies of an adopted repository, or None where there is no
+    step (Gov OS's own source tree, or a kernel without a ``templates/`` folder). Refuses a kit that lacks one of the
+    eight, and a copy's path that is not a file."""
+    from gov.adapters import portability
+    if _is_source_tree(root):
+        return None
+    folder = portability.kernel_templates(root)
+    if folder is None:
+        return None
+    missing = [str((folder / f"{stem}.md").relative_to(root)) for stem in portability.TEMPLATE_COPIES
+               if not (folder / f"{stem}.md").is_file()]
+    if missing:
+        raise _refuse("TEMPLATE_MISSING", f"the kit's templates lack {', '.join(missing)}: nothing is written",
+                      missing=missing)
+    state = {finding["file"]: finding["code"] for finding in portability._template_findings(root)}
+    writes, written, replaced = {}, [], []
+    for stem in portability.TEMPLATE_COPIES:
+        rel = f"{portability.TEMPLATES_REL}/{stem}.md"
+        if rel not in state:
+            continue
+        if os.path.lexists(root / rel) and not (root / rel).is_file():
+            raise _refuse("TEMPLATE_COPY_UNWRITABLE", f"{rel} exists and is not a file: nothing is written")
+        writes[rel] = (folder / f"{stem}.md").read_bytes()
+        (written if state[rel] == "TEMPLATE_COPY_MISSING" else replaced).append(rel)
+    return writes, sorted(written), sorted(replaced)
+
+
 def generate(root: Path) -> dict:
     """Generate, merge, write. Everything is merged before anything is written."""
     with tempfile.TemporaryDirectory(prefix="gov-adapters-") as fresh:
@@ -130,10 +168,16 @@ def generate(root: Path) -> dict:
             written.append(rel)
         elif not path.is_file() or path.read_bytes() != data:
             kept.append(rel)
+    copies = _template_copies(root)
+    if copies is not None:
+        writes.update(copies[0])
     for rel, content in writes.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         if isinstance(content, bytes):
             (root / rel).write_bytes(content)
         else:
             (root / rel).write_text(content, encoding="utf-8")
-    return {"merged": merged, "written": sorted(written), "kept": sorted(kept)}
+    result = {"merged": merged, "written": sorted(written), "kept": sorted(kept)}
+    if copies is not None:
+        result["templates"] = {"written": copies[1], "replaced": copies[2]}
+    return result

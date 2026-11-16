@@ -2,6 +2,8 @@
 
 Generates the adapters from the project's ``.rulesync/`` and merges ``CLAUDE.md``, ``AGENTS.md`` and
 ``.claude/settings.json`` into the programme's own files instead of writing over them (``gov.adapters.merge``).
+In an adopted repository it also writes the role template copies ``gov launch`` reads, ``.claude/templates/<role>.md``,
+byte for byte from the kit's ``governance/kernel/templates/`` (W2-153 S-ADOPTED).
 """
 
 from __future__ import annotations
