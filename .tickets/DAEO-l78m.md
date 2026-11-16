@@ -1,6 +1,6 @@
 ---
 id: DAEO-l78m
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-29T15:55:51Z
