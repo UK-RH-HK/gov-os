@@ -179,8 +179,7 @@ def _changed_since(root, commit: str | None, head: str | None) -> list[str]:
         if commit == head:
             return []
         try:
-            out = lexical._git(Path(root), "diff", "--name-only", "--no-renames", "--no-ext-diff", "-z", commit, head)
-            return sorted({os.fsdecode(name) for name in out.split(b"\0") if name})
+            return sorted(lexical.changed_between(Path(root), commit, head))
         except GovError:
             pass
     try:
@@ -820,7 +819,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "expansions": expansions, "repeats": repeats, "gaps": gaps, "facets": facets,
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
-              "continuation": token, "store": store}
+              "continuation": token}
     if any(route_settings.values()):  # W2-32 S8: what the routing moved ahead, per half that is on
         bundle["routing"] = {**{half: [] for half, key in ((routing.CODE, "code_first"), (routing.NAMED, "named_first"))
                                 if route_settings[key]}, **routed,

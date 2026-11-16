@@ -535,10 +535,12 @@ def served_checked(root: Path) -> tuple[tuple | None, str, list[str]]:
 def served(root: Path) -> tuple[str, list[str]]:
     """What a search without refresh answers from (W2-189, DEC-1197 (2)(i)): the status, and the paths left out of its
     answer. An index that only lags the tracked files (the stored blob of a path differs from the tracked file's, or the
-    path is tracked and not stored, or stored and no longer tracked) and whose methods are ``rebuild.yaml``'s is
-    ``fresh`` and the paths that differ are left out, whole: a path's old text is never served as current (DEC-342).
-    Any other index keeps its status, as ``freshness`` gives it: missing, empty, built with other methods (``stale``),
-    or built before W2-13 (``stale``); one that cannot be read raises. Writes nothing."""
+    path is tracked and not stored, or stored and no longer tracked), every such path changed by the commits since the
+    store was built (``_committed_changes``), and whose methods are ``rebuild.yaml``'s, is ``fresh`` and the paths that
+    differ are left out, whole: a path's old text is never served as current (DEC-342). Any other index keeps its
+    status, as ``freshness`` gives it: missing, empty, built with other methods (``stale``), built before W2-13
+    (``stale``), or lagging a change no commit explains (an uncommitted edit: ``stale``); one that cannot be read
+    raises. Writes nothing."""
     _, status, left = served_checked(root)
     return status, left
 
@@ -549,6 +551,33 @@ def freshness(root: Path) -> dict:
     (W2-108)."""
     _, status, stale = _checked(root)
     return {"status": status, "stale": stale}
+
+
+def changed_between(root: Path, commit: str, head: str) -> frozenset[str]:
+    """W2-189: the tracked paths that differ between two commits, as git lists them: a path added, removed or changed,
+    both sides of a rename; never a file that is untracked or ignored. ``GovError`` where git cannot compare them (a
+    commit that is not this folder's)."""
+    out = _git(Path(root), "diff", "--name-only", "--no-renames", "--no-ext-diff", "-z", commit, head)
+    return frozenset(os.fsdecode(name) for name in out.split(b"\0") if name)
+
+
+def _committed_changes(root: Path) -> frozenset[str] | None:
+    """The tracked paths the commits since the store was built changed (``changed_between`` the commit its fingerprints
+    row names and HEAD; empty when they are one); None where either cannot be had (a store built before W2-68, or one
+    that cannot be read, or no HEAD), so that nothing is taken as explained by commits."""
+    from gov.store import loader  # here: the loader imports this module
+    try:
+        connection = loader.connect(root)
+        try:
+            commit = (loader.fingerprints(connection) or {}).get("head")
+        finally:
+            connection.close()
+        if not commit:
+            return None
+        head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
+        return frozenset() if commit == head else changed_between(root, commit, head)
+    except (GovError, sqlite3.Error, OSError, UnicodeDecodeError):
+        return None
 
 
 def _freshness(root: Path) -> tuple[str, list[str], bool]:
@@ -568,8 +597,9 @@ def _freshness(root: Path) -> tuple[str, list[str], bool]:
             indexed = [rel for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = 1")]
             switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
             return "stale", sorted(set(stale) | _affected(switched, indexed, _register(Path(root)))), False
-        if stale:
-            return "stale", stale, not _empty(connection)  # an index with no chunk has nothing to answer from
+        if stale:  # answered from only where commits explain every path that differs, and the index holds a chunk
+            explained = _committed_changes(Path(root))
+            return "stale", stale, explained is not None and set(stale) <= explained and not _empty(connection)
         return "empty" if _empty(connection) else "fresh", stale, False
     finally:
         connection.close()

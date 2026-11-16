@@ -96,6 +96,13 @@ def _move_on(root: Path) -> None:
     _git(root, "commit", "-q", "-m", "a rename")
 
 
+def _run(root: Path, query: str, **more) -> dict:
+    """The result of ``gov retrieve`` for ``query`` (the command's own result: the bundle and its ``store``)."""
+    args = argparse.Namespace(**{"ticket": None, "ids": [], "radius": 0, "batch_size": None, "bundle_budget": None,
+                                 "continuation": None, "query": query, "root": str(root), "role": None, **more})
+    return command.run(root, args, {})
+
+
 def _paths(bundle) -> set:
     return {item["path"] for item in bundle["evidence"]}
 
@@ -167,11 +174,12 @@ def test_the_ranked_cut_is_filled_from_chunks_that_are_not_stale(repo):
 def test_retrieve_at_a_moved_head_returns_the_unchanged_file_and_names_the_store(repo):
     built = _head(repo)
     _move_on(repo)
-    bundle = retrieve.retrieve(repo, WORDS["keep"], reranker=lambda: None)
+    bundle = _run(repo, WORDS["keep"])
     assert bundle["stopping_reason"] != "FACET_UNAVAILABLE" and bundle["facets"]["lexical"]["available"] is True
     assert KEEP in _paths(bundle)
     assert bundle["store"]["commit"] == built and bundle["store"]["head"] == _head(repo)
     assert bundle["store"]["stale"] == retrieve.store_of(repo)["stale"]
+    assert retrieve.retrieve(repo, WORDS["keep"], reranker=lambda: None)["evidence"]  # the function answers too
 
 
 @pytest.mark.parametrize("name", ["changing", "gone", "moved"])
@@ -184,15 +192,23 @@ def test_a_path_changed_deleted_or_renamed_since_the_commit_is_never_returned(re
 
 def test_a_phrase_planted_only_after_the_build_is_returned_from_no_file(repo):
     _commit(repo, "a phrase planted later", {KEEP: FILES[KEEP] + "\nThe zymurgy phrase arrives later.\n"})
-    bundle = retrieve.retrieve(repo, "zymurgy", reranker=lambda: None)
+    bundle = _run(repo, "zymurgy")
     assert not bundle["evidence"] and KEEP in bundle["store"]["stale"]
 
 
 def test_an_uncommitted_change_does_not_serve_the_old_text_as_current(repo):
     (repo / CHANGING).write_text("# Changing\n\nRewritten and not committed.\n", encoding="utf-8")
-    bundle = retrieve.retrieve(repo, WORDS["changing"], reranker=lambda: None)
-    assert CHANGING not in _paths(bundle)
+    bundle = _run(repo, WORDS["changing"])
+    assert CHANGING not in _paths(bundle) and not bundle["evidence"]
     assert bundle["store"]["stale"] == []  # the store follows commits: nothing added for the working tree
+    assert lexical.search(repo, WORDS["changing"], refresh=False)["reason"] == "stale"  # as before W2-189
+
+
+def test_a_change_no_commit_explains_keeps_the_index_stale_even_at_a_moved_head(repo):
+    _move_on(repo)
+    (repo / KEEP).write_text("# Keep\n\nThe quillwort rule is edited and not committed.\n", encoding="utf-8")
+    found = lexical.search(repo, WORDS["keep"], refresh=False)
+    assert found["available"] is False and found["reason"] == "stale" and not found["hits"]
 
 
 def test_the_moved_head_through_the_command_names_the_store_in_its_result(repo):
@@ -219,11 +235,12 @@ def test_a_continuation_at_a_moved_head_is_taken_by_the_commit_not_the_head(repo
     lexical.refresh(repo)
     store.load(repo)
     _commit(repo, "the head moves")
-    first = retrieve.retrieve(repo, "rule marker", batch_size=2, reranker=lambda: None)
+    first = _run(repo, "rule marker", batch_size=2)
     assert first["continuation"] is not None
-    second = retrieve.retrieve(repo, "rule marker", batch_size=2, continuation=first["continuation"],
-                               reranker=lambda: None)
-    assert second["store"]["commit"] == first["store"]["commit"]
+    second = _run(repo, "rule marker", batch_size=2, continuation=first["continuation"])
+    assert second["store"]["commit"] == first["store"]["commit"] != second["store"]["head"]
+    assert second["evidence"] and {e["chunk_id"] for e in second["evidence"]}.isdisjoint(
+        {e["chunk_id"] for e in first["evidence"]})
 
 
 # F2: the stores that stay unavailable ----------------------------------------------------------------------------------
@@ -263,7 +280,7 @@ def test_a_recipe_changed_store_stays_stale_and_names_the_store(repo, committed)
         _commit(repo, "the head moves")
     found = lexical.search(repo, "quillwort", refresh=False)
     assert found["available"] is False and found["reason"] == "stale" and not found["hits"]
-    bundle = retrieve.retrieve(repo, "quillwort", reranker=lambda: None)
+    bundle = _run(repo, "quillwort")
     assert bundle["stopping_reason"] == "FACET_UNAVAILABLE" and not bundle["evidence"]
     assert bundle["store"]["commit"] == built and bundle["store"]["head"] == _head(repo)
 
@@ -294,7 +311,8 @@ def test_the_semantic_status_follows_the_lexical_one_at_a_moved_head(tmp_path, m
     _git(tmp_path, "init", "-q", "-b", "main")
     _commit(tmp_path, "planted", {".gitignore": ".gov-runtime/\n", MAP_REL: path_map, "open/pear.md": "pear trees\n",
                                   "open/plum.md": "plum trees\n"})
-    assert semantic.refresh(tmp_path)["available"] is True
+    store.load(tmp_path)  # the commit the stores were built at
+    assert semantic.refresh(tmp_path)["available"] is True  # the vectors
     lexical._FRESHNESS.clear()
     semantic._STATUS.clear()
     _commit(tmp_path, "the head moves and a file changes", {"open/plum.md": "plum orchards\n", "open/new.md": "kiwi\n"})
@@ -335,9 +353,10 @@ def test_a_stale_path_the_role_is_walled_from_is_not_named_but_counted(tmp_path,
     monkeypatch.setenv("GOV_ROLE", "engineer")
     named = retrieve.store_of(tmp_path)
     assert WALLED not in named["stale"] and CHANGING in named["stale"] and named["stale_walled"] == 1
-    bundle = retrieve.retrieve(tmp_path, WORDS["keep"], reranker=lambda: None)
+    bundle = _run(tmp_path, WORDS["keep"])
     assert WALLED not in bundle["store"]["stale"] and bundle["store"]["stale_walled"] == 1
     assert WALLED not in str(bundle["store"])
+    assert WALLED not in str(bundle["evidence"]) and "wagtail" not in str(bundle["evidence"])
 
 
 def test_the_role_given_beside_the_environment_walls_the_stale_names_too(tmp_path, monkeypatch):
@@ -346,9 +365,9 @@ def test_the_role_given_beside_the_environment_walls_the_stale_names_too(tmp_pat
     assert retrieve.store_of(tmp_path)["stale"].count(WALLED) == 1  # no role: nothing is walled
     named = retrieve.store_of(tmp_path, "engineer")
     assert WALLED not in named["stale"] and named["stale_walled"] == 1
-    again = retrieve.retrieve(tmp_path, WORDS["keep"], role="engineer", store=retrieve.store_of(tmp_path),
-                              reranker=lambda: None)  # a store named without the role is walled again at the result
-    assert WALLED not in again["store"]["stale"] and again["store"]["stale_walled"] == 1
+    again = retrieve._walled(retrieve.store_of(tmp_path), retrieve.role_filter(tmp_path, "engineer"))
+    assert WALLED not in again["stale"] and again["stale_walled"] == 1  # a store named without the role, walled after
+    assert retrieve._walled(again, retrieve.role_filter(tmp_path, "engineer")) == again  # and once is enough
 
 
 def test_a_role_with_no_wall_sees_every_stale_path_and_no_count_of_withheld_ones(tmp_path, monkeypatch):
