@@ -12,6 +12,8 @@ and starts nothing: no session, no record, no gate; it refuses as a launch does 
 ``--reason``, ``--trial`` and ``--owner-named`` (W2-184, RUBRIC-2, DEC-1120) go to ``launcher.launch`` as the keywords
 ``reason``, ``trial`` and ``owner_named``; ``--plan`` does not read them, and written after ``--`` they are CLI arguments.
 A lead (``orchestrator``, ``lead``) given any of them is refused here with exit 2, before the launcher (W2-184 R1).
+``--projection-usd N`` (W2-156; a number above 0) goes to ``launcher.launch`` as ``projection_usd``, recorded on the launch
+record for ``gov spend``'s brake; a lead writes no launch record, so it is refused there likewise.
 """
 
 from __future__ import annotations
