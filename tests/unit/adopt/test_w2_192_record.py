@@ -156,4 +156,4 @@ def test_an_incomplete_record_is_never_committed_by_as(repo, monkeypatch):  # no
     monkeypatch.setattr(spec_audit, "find_modules", lambda paths: ["src/alpha.py"])
     monkeypatch.setattr(spec_audit, "audit", fewer)
     refusal(repo, "AS", "SPEC_AUDIT_INCOMPLETE")
-    assert sh(repo, "rev-parse", "HEAD") == head and not (repo / project.record_path("AS")).exists()
+    assert sh(repo, "rev-parse", "HEAD") == head and not (repo / spec_audit.RECORD).exists()

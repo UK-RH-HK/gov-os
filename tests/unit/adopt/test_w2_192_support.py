@@ -77,7 +77,8 @@ def audited(root, conf=None):
 
 
 def record(root, name="AS") -> dict:
-    return project.frontmatter((root / project.record_path(name)).read_text(encoding="utf-8"))
+    rel = spec_audit.RECORD if name == "AS" else project.record_path(name)
+    return project.frontmatter((root / rel).read_text(encoding="utf-8"))
 
 
 def refusal(root, name, code, conf=None, **more) -> GovError:
@@ -99,7 +100,7 @@ def rewrite(root, change) -> None:
     for key in ("id", "type", "status", "state_class", "stage"):
         head.pop(key)
     change(head)
-    (root / project.record_path("AS")).write_text(project.record_text("AS", head), encoding="utf-8")
+    (root / spec_audit.RECORD).write_text(spec_audit.record_text(head), encoding="utf-8")
     commit(root, "edit the AS record")
 
 

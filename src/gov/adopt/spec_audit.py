@@ -1,5 +1,8 @@
 """Stage AS of ``gov adopt --lite``: the spec audit (W2-192; DEC-1200 (4), P-ADOPT-SPEC-AUDIT-1 section 2).
 
+AS is a side record of the chain, not a link in it: its own chain is A0, A1, A2 and its record stands on A2's record;
+A3 requires it (``gate``) and its record cites the AS record's sha256, but every stage after A3 and the gates never
+read it, so an adoption recorded before AS existed goes on, and AS can be run there at any later time.
 AS follows A2 and precedes A3. It reads A1's inventory (path and blob of each tracked file), A2's classes (path and
 namespace), the files' bytes by their inventory blob ids and git history, and records ``governance/adoption/
 AS-spec-audit.md``. It reads nothing outside the repository, uses no network and no model, changes no file outside
@@ -39,10 +42,14 @@ from __future__ import annotations
 import re
 from pathlib import PurePosixPath
 
+import yaml
+
 from gov.adopt import project
 from gov.adopt.project import refuse
 from gov.cli.errors import GovError
 
+TITLE = "spec audit"
+RECORD = f"{project.FOLDER}/AS-spec-audit.md"
 SPEC_SUFFIXES = (".md", ".markdown")
 CODE_SUFFIXES = (".py", ".js", ".jsx", ".ts", ".tsx", ".go", ".rs", ".java", ".kt", ".rb", ".sh", ".c", ".h", ".cc",
                  ".cpp", ".cs", ".php", ".swift", ".scala")
@@ -266,7 +273,7 @@ def check(record: dict, spec_paths, module_paths) -> None:
     gap without a question: ``ADOPT_SPEC_AUDIT_INCOMPLETE`` and ``ADOPT_GAP_WITHOUT_QUESTION``, each naming them."""
     specs = sorted(set(spec_paths) - _recorded(record, "specs", "path"))
     modules = sorted(set(module_paths) - _recorded(record, "modules", None))
-    rel = project.record_path("AS")
+    rel = RECORD
     if specs or modules:
         raise refuse("SPEC_AUDIT_INCOMPLETE", f"{rel} leaves out " + "; ".join(
             part for part in (("the spec(s) " + ", ".join(specs)) if specs else "",
@@ -282,21 +289,50 @@ def check(record: dict, spec_paths, module_paths) -> None:
                      + ": each gap is one question; run AS again", gaps=bare)
 
 
-def gate(run) -> None:
-    """A3's first check: the committed AS record (``run.records["AS"]``) is complete for the A1 inventory."""
+def chain(root, tracked) -> tuple[dict, dict]:
+    """AS's own chain: the records and hashes of A0, A1 and A2 (AS is in ``project.STAGES`` nowhere)."""
+    try:
+        return project.chain(root, tracked, "A3")
+    except GovError as error:
+        lead = "stage A3 stands on"
+        if error.message.startswith(lead):
+            raise GovError(error.code, "stage AS stands on" + error.message[len(lead):], error.details) from None
+        raise
+
+
+def record_text(data: dict) -> str:
+    """The AS record's text, as ``project.record_text`` writes every stage's (AS is not in its ``TITLES``)."""
+    head = {"id": "ADOPT-AS", "type": "evidence", "status": "RECORDED", "state_class": "EVIDENCE", "stage": "AS", **data}
+    return ("---\n" + yaml.safe_dump(head, sort_keys=False, allow_unicode=True, width=120)
+            + f"---\n\n# ADOPT-AS: {TITLE}\n\nWritten by `gov adopt --lite --stage AS`.\n")
+
+
+def gate(run) -> str:
+    """A3's first check, after the chain: the committed AS record exists, stands on A2's record as it is now, and is
+    complete for the A1 inventory. Returns the sha256 of the record it read (A3's record cites it)."""
+    if RECORD not in run.tracked:
+        raise refuse("STAGE_MISSING", f"stage {run.stage} stands on stage AS, which left no committed record ({RECORD}): "
+                                      "run AS first (the A5 verdict comes before any move)", stage="AS")
+    head, data = project.read_record(run.root, run.tracked, RECORD)
+    if head.get("stage") != "AS" or head.get("stands_on") != run.hashes["A2"]:
+        raise refuse("CHAIN_BROKEN", f"{RECORD} does not stand on the record of A2 as that record is now: run AS again",
+                     stage="AS")
     inventory = inventory_of(run.records)
     specs = find_specs(Reader(run.root, inventory), classes_of(run.records))
-    check(run.records["AS"], [spec["path"] for spec in specs], find_modules(inventory))
+    check(head, [spec["path"] for spec in specs], find_modules(inventory))
+    return project.sha256(data)
 
 
 def stage(run) -> dict:
     """Stage AS: record the audit of the inventory's specs; the record is checked as A3 will check it before it is
-    committed."""
+    committed. It stands on A2's record."""
     inventory = inventory_of(run.records)
     classes = classes_of(run.records)
     reader = Reader(run.root, inventory)
     specs, modules = find_specs(reader, classes), find_modules(inventory)
     data = audit(run.root, reader, classes, specs, modules)
     check(data, [spec["path"] for spec in specs], modules)
-    return run.finish(data, specs=len(data["specs"]), modules=len(modules), tickets=len(data["tickets"]),
-                      gaps=len(data["gaps"]))
+    text = record_text({"session": run.args.session, "stands_on": run.hashes["A2"], **data})
+    project.commit(run.root, f"gov adopt --lite AS: {TITLE}", {RECORD: text})
+    return {"stage": "AS", "record": RECORD, "specs": len(data["specs"]), "modules": len(modules),
+            "tickets": len(data["tickets"]), "gaps": len(data["gaps"])}

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gov.adopt import project
+from gov.adopt import project, spec_audit
 
 from .test_adopt import sh
 from .test_w2_192_support import audited, record, repo, stage, through_a2, keep_all  # noqa: F401
@@ -27,7 +27,7 @@ def test_as_changes_no_byte_outside_governance_adoption(repo):  # noqa: F811
     stage(repo, "AS")
     assert outside(repo) == before and head_outside(repo) == tree
     assert [line for line in sh(repo, "status", "--porcelain").splitlines()] == []
-    assert sh(repo, "show", "--name-only", "--format=", "HEAD").split() == [project.record_path("AS")]
+    assert sh(repo, "show", "--name-only", "--format=", "HEAD").split() == [spec_audit.RECORD]
 
 
 def test_every_gap_answer_is_empty_after_as_and_after_a3(repo):  # noqa: F811

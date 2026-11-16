@@ -5,7 +5,8 @@ of the adoption of the project, which commits its evidence record under ``govern
 the record of the stage before it. ``gov adopt`` without ``--lite`` stays reserved: the full transaction is Wave 3.
 
 W2-192: ``AS`` is the spec audit (DEC-1200), after A2 and before A3: ``AS-spec-audit.md`` lists the specs, what is
-built of each, the tickets, and each gap as a question to the owner; A3 refuses without it (``spec_audit``).
+built of each, the tickets, and each gap as a question to the owner; A3 refuses without it (``spec_audit``). AS is a
+side record: its chain is A0-A2 and it stands on A2's record; no stage after A3 reads it.
 
 W2-88: ``MA --out <folder>`` is the memory assessment and the refactoring plan (files under ``<folder>`` outside the
 project, none in it); A3 takes ``--assessment <folder>`` and cites that assessment; ``A9 --out <folder> [--decision
