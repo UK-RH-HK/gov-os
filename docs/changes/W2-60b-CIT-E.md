@@ -6,7 +6,7 @@ date: 2026-11-16
 branch: w2/W2-60b
 base: 4bc0399fb
 ticket: DAEO-ecac (W2-60b)
-author: engineer (DAEO-ecac), briefs en-1 and en-2
+author: engineer (DAEO-ecac), briefs en-1, en-2 and en-3b
 decisions_recorded: [DEC-946, DEC-838, DEC-839, DEC-826, DEC-655, DEC-495, DEC-392, DEC-959, DEC-963, DEC-847, DEC-983, DEC-982, DEC-1120, DEC-1156]
 state_class: EVIDENCE
 ---
@@ -27,7 +27,7 @@ ticket's paths. They are drafted below and not applied: the live hook's reviewer
 |---|---|---|---|
 | 1 | `src/gov/launch/session_record.py` (new) | The record: `begin`, `finish`, `measures`, `write` (temporary file and rename), `read_record`, `Keeper` (the launcher's two calls, one stderr line), `live_writers` / `check_one_writer`, `REVIEWERS` | `tests/unit/launch/test_session_record.py` |
 | 2 | `src/gov/telemetry/sessionlog.py` | New reading only: `measure(path, session)` (turns, compactions, rate-limit events, cost, effort, minutes, the main session's models, one model per sub-agent, versions). `find`, `subagent_files` and `read` are not changed. | `tests/unit/telemetry/test_sessionlog_w2_60b.py` (one case checks that `read` is unchanged for a 429 line) |
-| 3 | `src/gov/launch/launcher.py` | (a) The `Keeper`'s `begin` once the session's process has started and its `end` in `_run`'s `finally`, on every exit path. (b) `_role_kind`: the launchable roles and the own-ticket rule, read from the role files. `OWN_TICKET_ROLES` and the `WORKER_ROLES` assignment are removed (§4). (c) `check_one_writer` before anything is written. (d) `tests_worktree()`. (e) A new role's template is found by name (§5). (f) en-2: a `--output-format json` worker session's stdout relayed, and its result line given to the record (§2a). | `tests/unit/launch/test_session_record_launch.py`, `tests/unit/launch/test_session_record_relay.py` |
+| 3 | `src/gov/launch/launcher.py` | (a) The `Keeper`'s `begin` once the session's process has started and its `end` in `_run`'s `finally`, on every exit path. (b) `_role_kind`: the launchable roles and the own-ticket rule, read from the role files. `OWN_TICKET_ROLES` and the `WORKER_ROLES` assignment are removed (§4). (c) `check_one_writer` before anything is written, and again under the start lock (en-3, review round 1 F1, §3); the start record is written straight after the CLI's start. (d) `tests_worktree()`. (e) A new role's template is found by name (§5). (f) en-2: a `--output-format json` worker session's stdout relayed, and its result line given to the record (§2a). | `tests/unit/launch/test_session_record_launch.py`, `tests/unit/launch/test_session_record_relay.py` |
 | 4 | `src/gov/guard/decide.py` | `"qa-engineer"` added to `KNOWN_ROLES`, and nothing else in the file. | `test_session_record_launch.py` (the guard cases) |
 
 `git diff 4bc0399fb -- src/gov/guard/decide.py` shows one added line, and `.claude/hooks/pretooluse.py` is unchanged.
@@ -156,10 +156,62 @@ truncated line not taken; a line nested 200,000 deep; the exit code unchanged (3
 the result recorded; an unwritable stdout; an interactive run inherited; and `gov launch` run as its own process,
 its stdout compared byte for byte.
 
+**The signal cases in the lead's loaded run (en-3b).** At 2d1e751d4 two cases failed in the lead's parallel run:
+`launch` returned `None` for SIGINT, and the relay case returned 0. The load was not the cause; a `SIG_IGN` the
+cases inherited was. A job started with `&` by a non-interactive shell (no job control) inherits SIGINT and SIGQUIT
+ignored (`SigIgn: 0x6`). `_run` keeps a signal its caller ignores ignored (W2-56), so the SIGINT never reached the
+launcher:
+- the stand-in session's `plan` passed `raise_signal`'s `None` as its return code;
+- the relay case's stand-in CLI slept its 30 s and exited 0.
+
+Both failures come back on an idle machine with `bash -c '<pytest> & wait'`.
+
+**No path of `launch` or `_run` returns `None` or changes the session's code.** A real `Popen.wait()` returns an int,
+and `code` starts at `INTERRUPT_EXIT`. Each path ends in one of these ways:
+- a signal before the CLI starts returns 130 and starts nothing;
+- a signal after the start, during the lock, the keeper's begin or end, or the relay, gives 130 through `end`, which
+  raises nothing;
+- otherwise the session's own code is returned;
+- a refusal is raised, not returned.
+
+A SIGINT while the start lock is awaited, before `_run` installs its handler, raises `KeyboardInterrupt` with no
+session started, as before this ticket.
+
+The cases now set the caller's handler themselves, as `test_w1_32.py` does, and the stand-in returns an int.
+`test_a_signal_the_caller_ignores_stays_ignored_and_the_session_s_own_code_is_returned` pins the ignored path: the
+session's own int code, recorded, and the caller's `SIG_IGN` given back. Each ordering rests on signals and pipes,
+never on a sleep. All of them were green 20 runs of 20, in the foreground and as a `&` job.
+
 ## 3. One writer per worktree (S10, S12)
 
-`gov launch` of a writing role reads the session records after today's checks and the role check, and before
-anything is written (the launch record's folder, the placeholders, the temp folder).
+`gov launch` of a writing role reads the session records twice:
+- **Before anything is written** (the launch record's folder, the placeholders, the temp folder), after today's
+  checks and the role check. A planted or long-running writer is refused here, at no cost.
+- **Under the machine-wide start lock** (`StartLock`, W2-20), straight after the lock is taken and before the gate's
+  check (`_admit_start`, unchanged). This is the check that decides. A writing launch writes its start record
+  (`Keeper.begin`) straight after its CLI's process has started, before any other step, and keeps the lock until the
+  session is in the registry (`_run`'s `lock.release()`). So a launch that takes the lock after it always finds that
+  record. Every path that gives the lock back has written the start record first, or has started no CLI: a refusal
+  before the CLI starts, a signal that came first, or a CLI that could not be started.
+
+**Review round 1, F1 (answered by en-3):** at 2d1e751d4 the check came before `StartLock()` and the start record only
+after the CLI's start. Two launches inside that window both passed. The window was about 0.1 s, or the whole lock
+wait while a third party held the lock, as it does in any fan-out. Both writers started. Now, of two writing launches
+into one worktree, exactly one starts its CLI, however close together they start and whether or not a third party
+holds the lock while they wait. The other gets `LAUNCH_REFUSED` and a non-zero exit, starts no CLI, and writes no
+launch record and no session record. Its message names the first's session id and the worktree. A reviewer launched
+together with a writer still starts.
+Unit cases (`test_session_record_launch.py`):
+- `test_two_writers_launched_together_start_one_cli_and_refuse_the_other_naming_it[barrier]` and `[held]`;
+- `test_a_reviewer_launched_together_with_a_writer_still_starts`.
+
+They run two real `gov launch` processes. Each says so on a FIFO as it reaches the start lock, so both are past
+every earlier check before either can take the lock. They then contend together (`barrier`), or wait while the test
+holds the lock itself (`held`). A planted CLI reports its start on the FIFO and runs until the test closes a pipe.
+Every wait is on an event (a pipe or a process's end), never on a sleep. The reviewer case passed before the change
+too; the two writer cases were red at 2d1e751d4 (both
+writers started, in both modes) and red again with only the check under the lock taken out. They were green 20 runs
+of 20, in the foreground and as a `&` job.
 
 **A live writing session** is a record that meets all of these:
 - its `worktree` (as a real path) is this launch's tree;
