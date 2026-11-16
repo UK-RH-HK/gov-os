@@ -363,12 +363,26 @@ def drops_proposal():
 
 
 class Adoption:
+    """Stage AS (the spec audit, DEC-1200) stands after A2 and before A3: ``gov adopt --lite --stage A3`` refuses with
+    ``ADOPT_STAGE_MISSING`` until AS's record is committed. So that every case reaches what it checks, ``run`` runs AS at
+    once after an A2 that succeeded, where the head offers it (so ``ok``, ``through`` and a direct ``run("A3", ...)``
+    are all covered, and a HEAD a case records after A2 already holds AS's commit). Where the head does not offer AS
+    (argparse: invalid choice, exit 2) nothing else changes. The AS run is kept in ``as_run``, never in ``results``.
+    W2-190's ``prepare`` and the other suites that reuse this class get AS from here. A suite that must see A3 without
+    AS sets ``run_as_after_a2 = False`` on a subclass (W2-192's own suite does)."""
+
+    run_as_after_a2 = True
+
     def __init__(self, root, box):
         self.root, self.box, self.results = Path(root), box, {}
+        self.as_run = None      # the AS run, once it was tried (a refusal or "not offered" included)
 
     def run(self, stage, *extra):
-        return run_gov(self.root, self.box, "adopt", "--lite", "--stage", stage, *extra, "--json",
+        done = run_gov(self.root, self.box, "adopt", "--lite", "--stage", stage, *extra, "--json",
                        "--session", ADOPTER)
+        if stage == "A2" and done.returncode == 0 and self.run_as_after_a2 and self.as_run is None:
+            self.as_run = self.run("AS")      # not asserted here: a refused or missing AS shows as A3's own refusal
+        return done
 
     def ok(self, stage, *extra):
         done = self.run(stage, *extra)
