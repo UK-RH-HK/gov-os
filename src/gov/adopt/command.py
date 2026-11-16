@@ -38,9 +38,10 @@ def add_arguments(parser) -> None:
     parser.add_argument("--questions", metavar="<file>", help="A9: the questions to run end to end (w2-88-questions/1)")
     parser.add_argument("--budget-ms", type=int, metavar="<N>", help="A9: the vector scan's budget in milliseconds "
                                                                       "(default: fabric.RETRIEVE_BUDGET_MS)")
-    parser.add_argument("--verify-list", action="store_true", help="W2-174: the open tickets' KPI lines with no verify")
+    parser.add_argument("--verify-list", action="store_true", help="W2-174: the open tickets' KPI lines with no verify "
+                                                                       "and the launch fields they lack")
     parser.add_argument("--verify-apply", metavar="<answers-file>", help="W2-174: append the answers file's Verify "
-                                                                         "clauses (needs --session)")
+                                                                         "clauses and write its launch fields (needs --session)")
     parser.add_argument("--facts", action="store_true", help="W2-174: write governance/project/facts.yaml if absent")
 
 
@@ -59,8 +60,8 @@ def _steps(root: Path, args) -> dict:
     from gov.adopt import verify_pass
     if args.verify_list:
         found = verify_pass.missing(root)
-        return {"missing": found, "text": "\n".join(f"{item['ticket']} {' '.join(item['labels'])}" for item in found)
-                or "none"}
+        return {"missing": found, "text": "\n".join(" ".join([item["ticket"], *item["labels"], *item["fields"]])
+                                                   for item in found) or "none"}
     if not args.session:
         _parser.error("--verify-apply needs --session <id>: the marker line carries it")
     return {"changed": verify_pass.apply(root, args.verify_apply, args.session, today)}

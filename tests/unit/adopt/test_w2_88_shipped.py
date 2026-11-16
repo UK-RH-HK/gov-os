@@ -1,6 +1,7 @@
 """W2-88 run 8, package 1 (a) (the owner's answer to be recorded as DEC-1183): the three files A9 needs ship inside the
 wheel, under ``src/gov/_shipped/`` at their paths in the Gov OS repository, and ``fabric.shipped`` looks there second.
-Since S29 (DEC-1189 (1)) the set is every rel the resolver is asked for, the ``template/`` ones included (nine).
+Since S29 (DEC-1189 (1)) the set is every rel the resolver is asked for, the ``template/`` ones included (nine); since
+W2-174, also the two ticket schemas its Verify pass reads (eleven).
 
 Regression evidence only (DEC-136). Each shipped copy equals its source bytes in this tree (no drift, nothing missing
 from either side, nothing extra in the copy); ``shipped`` finds a ``rel`` in the installed package's ``_shipped/`` when
@@ -19,9 +20,12 @@ REPO = Path(__file__).resolve().parents[3]
 PACKAGE = REPO / "src/gov/_shipped"
 SKILLS = "template/governance/kernel/skills"
 TEMPLATES = "template/governance/kernel/templates"
-# Four since run 8b (item 21); nine since S29 (DEC-1189 (1)): every rel the resolver is asked for, template/ ones too.
+SCHEMAS = "template/governance/kernel/schemas"
+# Four since run 8b (item 21); nine since S29 (DEC-1189 (1)): every rel the resolver is asked for, template/ ones too;
+# eleven since W2-174: the two ticket schemas its Verify pass reads (through its own lookup, DEC-1189 (1)).
 THE_SHIPPED = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, "template/.gitleaks.toml",
-               f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{TEMPLATES}/brief.md", f"{TEMPLATES}/role-cto.md")
+               f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{TEMPLATES}/brief.md", f"{TEMPLATES}/role-cto.md",
+               f"{SCHEMAS}/ticket.schema.json", f"{SCHEMAS}/common.schema.json")
 
 
 def _files(base: Path, rel: str) -> dict[str, bytes]:

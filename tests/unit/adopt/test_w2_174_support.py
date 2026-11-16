@@ -18,12 +18,11 @@ DONE = '{line: "an outcome already verified", verify: "tests/unit/x.py: shows it
 def ticket(ticket_id="DAEO-aaa1", status="open", success=(DONE,), failure=(), extra="", kpis_comment=""):
     """The text of a ticket file: each KPI item is its YAML text after ``- ``; comments sit where a hand puts them."""
     lines = ["---", f"id: {ticket_id}   # the tk id", f"title: Ticket {ticket_id}", f"status: {status}",
-             "# kept: this comment and the key order below", "type: task", "role: engineer",
+             "# kept: this comment and the key order below", "type: task", "state_class: AUTHORITATIVE", "role: engineer",
              "created: 2026-01-01 10:00:00+00:00", "allowed_paths:", "- src/x.py   # one path",
              "kpis:" + kpis_comment, "  success:", *[f"  - {item}" for item in success]]
-    if failure:
-        lines += ["  failure:", *[f"  - {item}" for item in failure]]
-    lines += ["non_goals:", "- nothing", "done_when: [DOD-1]", extra.rstrip("\n") if extra else "# end of the keys", "---", "",
+    lines += ["  failure:", *[f"  - {item}" for item in failure]] if failure else ["  failure: []"]  # the schema requires it
+    lines += ["reads: []", "needs: []", "waits_on: []", "non_goals:", "- nothing", "done_when: [DOD-1]", extra.rstrip("\n") if extra else "# end of the keys", "---", "",
               f"# {ticket_id}", "", "Body text.", ""]
     return "\n".join(lines)
 

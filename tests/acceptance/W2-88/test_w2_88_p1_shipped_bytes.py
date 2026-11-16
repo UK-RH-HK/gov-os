@@ -15,6 +15,11 @@ each at its path in the Gov OS repository with the ``template/`` prefix kept: ``
 ``the-secrets-configuration``) and A9's kernel sources, the retrieval and discovery skills and the T-0 and T-8 templates (``brief.md``,
 ``role-cto.md``). Both cases hold them as they hold the first four: each copy byte for byte, and the "only the copies" case accepts them and
 nothing else.
+
+W2-174 (DAEO-zmo4; DEC-1189 (1), DEC-1156 (7), the CTO's answer (A) to P-W2-174-R2B-1): W2-174's Verify pass reads the kernel's ticket
+schema and its common schema, so two more items ship, one per file, the ``template/`` prefix kept:
+``template/governance/kernel/schemas/ticket.schema.json`` (``the-ticket-schema``) and ``.../common.schema.json`` (``the-common-schema``).
+Not the whole ``schemas/`` folder: a kernel schema the product does not read is still an extra to the "only the copies" case.
 """
 
 from __future__ import annotations
@@ -38,6 +43,10 @@ ITEMS = {
     "the-discovery-skill": "template/governance/kernel/skills/discovery",
     "the-brief-template": "template/governance/kernel/templates/brief.md",
     "the-cto-role-template": "template/governance/kernel/templates/role-cto.md",
+    # W2-174 (DAEO-zmo4; DEC-1189 (1), DEC-1156 (7)): the Verify pass reads the kernel's ticket and common schemas, so both ship, one item
+    # per file (never the whole ``schemas/`` folder: a kernel schema the product does not read stays an extra).
+    "the-ticket-schema": "template/governance/kernel/schemas/ticket.schema.json",
+    "the-common-schema": "template/governance/kernel/schemas/common.schema.json",
 }
 
 

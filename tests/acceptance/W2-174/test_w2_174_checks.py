@@ -138,7 +138,7 @@ def _ten(repo) -> dict:
     returned answers file answers the ten, in order."""
     answers = {}
     for n in range(1, 11):
-        ticket = f"DAEO-t{n:02d}"
+        ticket = f"DAEO-t{n:03d}"
         repo.ticket(ticket, f"W2-{920 + n}", "open", [s.lacking(f"Ticket {n} has a line [DEC-1].")],
                     [s.verified(f"Ticket {n} never crashes [DEC-1].")])
         answers[ticket] = {"S1": f"{CLAUSE} (ticket {n})"}
@@ -202,10 +202,10 @@ def test_f1_a_ticket_the_answers_file_does_not_name_is_never_edited(repo):
 
 def test_f1_the_function_never_edits_an_unnamed_ticket_either(repo):
     answers = _ten(repo)
-    answers = {k: v for k, v in answers.items() if k in ("DAEO-t01", "DAEO-t02")}
+    answers = {k: v for k, v in answers.items() if k in ("DAEO-t001", "DAEO-t002")}
     others = {p.name: p.read_bytes() for p in repo.tickets.glob("*.md") if p.stem not in answers}
     changed = s.verify_pass().apply(repo.root, repo.answers(answers), s.SESSION, s.TODAY)
-    assert sorted(changed) == ["DAEO-t01", "DAEO-t02"]
+    assert sorted(changed) == ["DAEO-t001", "DAEO-t002"]
     assert {p.name: p.read_bytes() for p in repo.tickets.glob("*.md") if p.stem not in answers} == others
 
 

@@ -7,7 +7,7 @@ name = "gov"
 version = "0.1.0"
 description = "Governance OS command line"
 requires-python = ">=3.11"
-dependencies = ["PyYAML>=6"]
+dependencies = ["PyYAML>=6", "jsonschema>=4.10"]
 
 [project.scripts]
 gov = "gov.cli.main:main"
@@ -26,6 +26,9 @@ where = ["src"]
          "_shipped/template/governance/kernel/skills/discovery/SKILL.md",
          "_shipped/template/governance/kernel/templates/brief.md",
          "_shipped/template/governance/kernel/templates/role-cto.md",
+         # the ticket schema the Verify pass validates against (gov.adopt.verify_pass._validator; W2-174, DEC-1189 (1))
+         "_shipped/template/governance/kernel/schemas/ticket.schema.json",
+         "_shipped/template/governance/kernel/schemas/common.schema.json",
          "_shipped/governance/project/retrieval.yaml",
          "_shipped/governance/project/indep-walls/CLAUDE.md.tmpl",
          "_shipped/governance/project/indep-walls/README.md",
