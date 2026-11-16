@@ -42,6 +42,11 @@ kpis:
   - 'A value the log does not hold reported as measured; a zero for not measured; log text in a record. Verify: planted logs with no cost value and with a log sentence: the record shows not measured (no 0 for it) and holds 0 hits of the sentence'
   - 'A changed exit code; a session that started with no record. Verify: a planted record-write failure leaves the session''s exit code as it was; after each planted launch (one ended early included) a record exists for its session id'
 profile: STANDARD
+non_goals:
+- no edit of this repository's live hook (.claude/hooks/pretooluse.py) or its settings; the reviewer line is drafted for the owner's ACT
+- no edit of a kernel file under template/governance/kernel/ (role files included); a needed one comes back as a package
+- no pass or fail and no repair count in the record (they stay W2-07's close); no usage report or routing built on the records (Wave 3)
+- no session text in a record, the Claude Code version excepted
 sources:
 - DEC-946
 - DEC-838
