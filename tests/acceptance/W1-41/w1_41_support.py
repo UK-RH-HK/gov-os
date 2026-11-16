@@ -537,7 +537,15 @@ class Stage:
 
 @dataclass
 class Adoption:
-    """One adoption of one temporary project: runs stages and keeps what each left."""
+    """One adoption of one temporary project: runs stages and keeps what each left.
+
+    Stage AS (the spec audit, DEC-1200) stands after A2 and before A3: ``gov adopt --lite --stage A3`` refuses with
+    ``ADOPT_STAGE_MISSING`` until AS's record is committed. So that every case reaches what it checks, AS is run at
+    once after an A2 that succeeded, where the head offers it (``after_a2``: from ``run`` and from ``ok``, so a direct
+    ``run("A3", ...)`` or ``ok("A3", ...)`` and ``through(...)`` are all covered, and a HEAD a case records after A2
+    already holds AS's commit). Where the head does not offer AS (argparse: invalid choice) nothing changes. The AS run
+    is kept in ``as_run``, never in ``stages`` (``stages`` names the stages of ``STAGES`` only). A suite that must see
+    A3 without AS sets ``run_as_after_a2 = False`` on a subclass (W2-192's own suite does)."""
     project: Path
     sandbox: object
     interface: object
@@ -545,13 +553,25 @@ class Adoption:
     stages: dict = field(default_factory=dict)
     proposal: Path | None = None
 
+    run_as_after_a2 = True      # not annotated: a class attribute, no dataclass field (the positional order stays)
+    as_run = None               # the AS run, once it was tried (a refusal or "not offered" included)
+
     def run(self, stage, *extra, without=(), session=None):
-        return run_gov(self.project, self.sandbox, "adopt", "--lite", "--stage", stage, *extra, "--json",
+        done = run_gov(self.project, self.sandbox, "adopt", "--lite", "--stage", stage, *extra, "--json",
                        "--session", session or self.session, without=without)
+        self.after_a2(stage, done, without=without, session=session)
+        return done
+
+    def after_a2(self, stage, done, without=(), session=None):
+        """Run AS once, at once after an A2 that succeeded, where the head offers it; its outcome is not asserted
+        here (a refused or missing AS shows as A3's own ``ADOPT_STAGE_MISSING``)."""
+        if stage == "A2" and done.returncode == 0 and self.run_as_after_a2 and self.as_run is None:
+            self.as_run = self.run("AS", without=without, session=session)
 
     def ok(self, stage, *extra, without=()):
         """Run the stage; it must succeed and leave its evidence record, committed, in a clean tree."""
         run = self.run(stage, *extra, without=without)
+        self.after_a2(stage, run, without=without)      # a subclass whose ``run`` is its own (W2-52's) is covered too
         if not_built(run):
             raise AssertionError(f"gov adopt --lite is not built (stage {stage}): it answers that it is reserved\n"
                                  f"{run.describe()}")

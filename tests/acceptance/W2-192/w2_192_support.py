@@ -29,6 +29,15 @@ if str(_W2_23) not in sys.path:
 
 import w2_23_support as base  # noqa: E402  (W2-23's support: reused by import)
 
+
+class Adoption(base.Adoption):
+    """W2-23's adoption driver without the step the other suites take: ``base.Adoption`` runs AS at once after an A2 that
+    succeeded (so their A3 cases reach what they check), and this suite must see A3 *without* AS (its cases run AS themselves
+    and assert that A3 before AS is refused). Every ``Adoption`` of this suite is this class."""
+
+    run_as_after_a2 = False
+
+
 AS_RECORD = f"{base.ADOPTION}/AS-spec-audit.md"
 A3_RECORD = base.RECORD["A3"]
 FOLDER = base.ADOPTION
@@ -109,7 +118,7 @@ def prepare(base_dir):
     """The planted project with A0, A1 and A2 run: what every case copies. Returns the project's path."""
     box = base.make_box(Path(base_dir) / "prepare-box")
     project = plant(Path(base_dir) / "project")
-    adoption = base.Adoption(project, box)
+    adoption = Adoption(project, box)
     for stage in ("A0", "A1", "A2"):
         adoption.ok(stage)
     assert adoption.results["A2"].get("unknown") == [], \
@@ -174,7 +183,7 @@ def run_as(prepared, base_dir):
     root = copy_of(prepared, base_dir / "project")
     box = base.make_box(base_dir / "box")
     before = (base.head(root), snapshot(root), tracked_outside(root))
-    done = base.Adoption(root, box).run("AS")
+    done = Adoption(root, box).run("AS")
     return Audited(root, box, done, *before)
 
 

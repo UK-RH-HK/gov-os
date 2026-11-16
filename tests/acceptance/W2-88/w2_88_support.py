@@ -449,16 +449,32 @@ def harbour_secret():
 class Adoption(S124.Adoption):
     """W2-124's adoption driver with this suite's environment; ``chain`` runs A0..A8 and, before A3, the memory
     assessment (MA) into ``out`` where the head offers the stage (else A3 runs as it does today, so a case still reaches
-    what it checks and the missing stage is that case's own red reason)."""
+    what it checks and the missing stage is that case's own red reason).
+
+    Stage AS (the spec audit, DEC-1200) stands after A2 and before A3 (``gov adopt --lite --stage A3`` refuses with
+    ``ADOPT_STAGE_MISSING`` until AS's record is committed). ``run`` runs AS once, at once after an A2 that succeeded, where
+    the head offers it (so ``chain`` and a case's own ``run("A2")`` loop are both covered, and a HEAD or a state a case records
+    after A2 already holds AS's commit; MA, A3 and the later stages follow it). Where the head does not offer AS (argparse:
+    invalid choice, exit 2) nothing else changes. The AS run is kept in ``as_run`` and ``runs["AS"]``. A suite that must see
+    A3 without AS sets ``run_as_after_a2 = False`` on a subclass."""
+
+    run_as_after_a2 = True
 
     def __init__(self, project, box, host, *, tools=(), code_graph=False, extra_env=None):
         super().__init__(project, box, host)
         self.tools, self.code_graph, self.extra_env = tools, code_graph, dict(extra_env or {})
         self.out = Path(box.base) / "memory-out"
         self.ma_run = None
+        self.as_run = None      # the AS run, once it was tried (a refusal or "not offered" included)
 
     def env(self):
         return env(self.box, self.host, tools=self.tools, code_graph=self.code_graph, **self.extra_env)
+
+    def run(self, stage, *extra):
+        done = super().run(stage, *extra)
+        if stage == "A2" and done.returncode == 0 and self.run_as_after_a2 and self.as_run is None:
+            self.as_run = super().run("AS")     # not asserted here: a refused or missing AS shows as A3's own refusal
+        return done
 
     def chain(self, last: str = "A8"):
         """Run A0..``last``; the first run that did not succeed (None when every one did)."""

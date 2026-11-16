@@ -31,7 +31,7 @@ def audited(prepared, tmp_path_factory):
 def adoption(prepared, tmp_path):
     """An ``Adoption`` on a copy of the prepared project (A0, A1, A2 done; AS not run), with a box of its own."""
     root = support.copy_of(prepared, tmp_path / "project")
-    return support.base.Adoption(root, support.base.make_box(tmp_path / "box"))
+    return support.Adoption(root, support.base.make_box(tmp_path / "box"))
 
 
 @pytest.fixture
@@ -39,6 +39,6 @@ def after_as(audited, tmp_path):
     """An ``Adoption`` on a copy of the project after AS ran. The AS run's outcome is not asserted here (a fixture that
     asserts errors instead of failing): ``adoption.as_done`` holds it, and a case that needs it calls ``support.as_ran``."""
     root = support.copy_of(audited.root, tmp_path / "project")
-    adoption = support.base.Adoption(root, support.base.make_box(tmp_path / "box"))
+    adoption = support.Adoption(root, support.base.make_box(tmp_path / "box"))
     adoption.as_done = audited.done
     return adoption
