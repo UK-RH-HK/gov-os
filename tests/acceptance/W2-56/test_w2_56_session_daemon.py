@@ -11,12 +11,18 @@ The stand-in session runs ``gov.codeintel.daemon_dir(<worktree>)`` twice with th
   first half's probe does).
 
 Each must lie under the session's temp folder (the launcher's, on its write list), and leave room for the tool's
-socket under it (107 bytes, DEC-338). A test's own temp root is longer than the real one (``/tmp``): the length is
-taken with the test's root replaced by ``/tmp``.
+socket under it (107 bytes, DEC-338). The launcher's temp root for the stand-in session is a short root of the case's own
+(``/tmp/w<8>``, made and removed by the case; ``w2_56_sandbox_support.short_base``), not a folder under pytest's long
+``tmp_path``, so the session's temp folder is as short as a real launch's (``/tmp/gov-launch-<8>``) and the daemon
+folder is not moved to ``/tmp/gov-cbm-<uid>`` (DEC-338) for the test's own long path; the rest of the box stays under
+``tmp_path``. Where /tmp cannot be written the root falls back to the temp root (long: the case may then be red for
+that reason alone), and the socket length is still taken with that root replaced by ``/tmp``. Where no short root can
+be made at all, the case fails and says so.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import os
 
 import pytest
@@ -36,8 +42,25 @@ STEPS = [
 ]
 
 
-def _daemons(tmp_path, role):
-    box = s.make_box(tmp_path)
+@pytest.fixture
+def short_root():
+    """The launcher's temp root for the case, short as a real launch's: ``/tmp/w<8>`` (under the temp root where /tmp
+    cannot be written), made and removed here. A real launch's temp folder is ``/tmp/gov-launch-<8>``; the daemon
+    folder moves to ``/tmp/gov-cbm-<uid>`` when a socket under a long one would pass 107 bytes (DEC-338), so a
+    stand-in session whose temp folder lay under pytest's long ``tmp_path`` would not show what a launched one does."""
+    base = sb.short_base("w")
+    if base is None:
+        pytest.fail(f"no short root for the stand-in session can be made: neither {sb.REAL_TMP_ROOT} nor the temp root "
+                    "is writable, and the daemon folder of a session under a long one moves, as DEC-338 requires")
+    try:
+        yield base
+    finally:
+        sb.remove(base)
+
+
+def _daemons(tmp_path, short_root, role):
+    """The box (its home and the rest under ``tmp_path``) with the launcher's temp root, ``tmpdir``, the short root."""
+    box = dataclasses.replace(s.make_box(tmp_path), tmpdir=short_root)
     sb.project(box)
     s.set_plan(box, STEPS)
     launch = s.run_launch(box, role, s.TICKET_OF[role].tk)
@@ -46,8 +69,8 @@ def _daemons(tmp_path, role):
 
 
 @pytest.mark.parametrize("role", s.WORKER_ROLES)
-def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, role):
-    box, launch, settings, daemons = _daemons(tmp_path, role)
+def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, short_root, role):
+    box, launch, settings, daemons = _daemons(tmp_path, short_root, role)
     tmpdir = sb.session_tmpdir(launch)
     assert tmpdir in [os.path.realpath(e) for e in sb.write_list(settings)], "the temp folder is not on the write list"
     outside = {label: path for label, path in daemons.items() if not sb.under(path, tmpdir)}
@@ -55,8 +78,8 @@ def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_te
 
 
 @pytest.mark.parametrize("role", s.WORKER_ROLES)
-def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, role):
-    box, _, _, daemons = _daemons(tmp_path, role)
+def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, short_root, role):
+    box, _, _, daemons = _daemons(tmp_path, short_root, role)
     root = os.path.realpath(box.tmpdir)
     long = {}
     for label, path in daemons.items():

@@ -27,8 +27,13 @@ the working tree: nothing there falls back to the working tree's store (``STORE_
 ``GOV_STORE`` that is not an absolute path is ``STORE_ROOT_INVALID``. A ``--root`` given wins; a call that does not come
 through the command line (no ``root`` in its arguments) is answered from the ``root`` it is given.
 
-The store it names (W2-138, DEC-1090 (3)): every result carries ``store`` (``gov.retrieval.retrieve.store_of``): the
-commit the store was built at and its folder. The folder is resolved once, whichever form named it (``--root <link>``,
+The store it names (W2-138, DEC-1090 (3); W2-189, DEC-1197 (2)(i)): every result carries ``store``
+(``gov.retrieval.retrieve.store_of``): the commit the store was built at, the head at the call, the tracked paths
+changed between the two (``stale``; a path the caller's role is walled from is counted in ``stale_walled``, never
+named) and its folder. HEAD may have moved past the store's commit: the search is answered from the store as it was
+built, the chunks of the stale paths left out whole, and nothing is rebuilt. A store that is missing, empty,
+unreadable or built with other index-time methods than ``rebuild.yaml``'s is still ``FACET_UNAVAILABLE``, and the
+stated gap below is decided against the same store, at a moved head too. The folder is resolved once, whichever form named it (``--root <link>``,
 ``GOV_STORE``, a call's ``root``), and every facet of the search reads it, even when the link is switched meanwhile.
 """
 
@@ -126,8 +131,10 @@ def run(root: Path, args, config: dict) -> dict:
     from gov.util.register import leave_out
 
     root = _store_root(root, args)
-    store = store_of(root)  # W2-138 S1: read once, named in the result and carried in the token
     role = getattr(args, "role", None)  # W2-13 S5: a --role given adds its filter beside GOV_ROLE's (DEC-1065 (2))
+    # W2-138 S1, W2-189: read once, named in the result and carried in the token; the stale paths the caller may not
+    # be handed are counted, not named
+    store = store_of(root, role)
     if args.continuation is None:
         nowhere = _nowhere(Path(root), args.query, [*args.ids, *([args.ticket] if args.ticket else [])])
         if nowhere is not None:

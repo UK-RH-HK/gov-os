@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
@@ -325,6 +326,106 @@ def _dependents(run: Run, moving: list[dict]) -> None:
         entry["consumers"] = consumers
 
 
+def _mentions(text: str, rel: str) -> bool:
+    """Whether ``text`` names the repository-relative path ``rel`` as a whole path (W2-190 S1).
+
+    The boundary rule: the character before the match is not a path character (a letter, digit, ``_``, ``-``, ``.`` or
+    ``/``; start of text counts as none), so ``docs/a/x.md`` does not name ``x.md``; the character after does not
+    continue the path: not a letter, digit, ``_``, ``-`` or ``/``, and not a ``.`` followed by one of those (an
+    extension), so ``x.mdx``, ``x.md/y`` and ``x.md.gz`` do not name ``x.md``, while a closing quote, backtick or
+    bracket, ``:``, ``#``, whitespace, the end of text and a ``.`` that ends a sentence do.
+    """
+    return re.search(r"(?<![\w\-./])" + re.escape(rel) + r"(?![\w\-/]|\.[\w\-])", text) is not None
+
+
+def _referencing(run: Run, deleting: list[str]) -> dict[str, list[str]]:
+    """Path -> the tracked files whose text names it, for each path in ``deleting`` (W2-190 S1).
+
+    Not searched: the adoption's own records (``governance/adoption/``, which list every tracked path) and every file
+    the proposal deletes (the deleted file itself included). A file that is not text is skipped: one holding a NUL
+    byte, or whose bytes are not valid UTF-8. A glob pattern in the path map does not hold the path's text, so it names
+    nothing; an exact path written there does."""
+    found: dict[str, set[str]] = {rel: set() for rel in deleting}
+    seen: dict[str, str | None] = {}  # blob id -> its text, None where it is no text: a blob is read once
+    needles = {rel: rel.encode("utf-8") for rel in deleting}
+    for other, blob_id in sorted(run.tracked.items()):
+        if other.startswith(FOLDER + "/") or other in found:
+            continue
+        if blob_id not in seen:
+            try:
+                data = project.blob(run.root, blob_id)
+            except GovError:  # an entry that is no blob of this repository (a submodule's commit): it holds no text
+                data = b"\0"
+            text = None
+            if any(needle in data for needle in needles.values()) and b"\0" not in data:
+                try:
+                    text = data.decode("utf-8")
+                except UnicodeDecodeError:
+                    pass
+            seen[blob_id] = text
+        text = seen[blob_id]
+        if text is not None:
+            for rel in deleting:
+                if _mentions(text, rel):
+                    found[rel].add(other)
+    return {rel: sorted(files) for rel, files in found.items()}
+
+
+def _superseded(run: Run, deleting: list[str]) -> dict[str, dict]:
+    """Path -> ``{"superseded_by": [ids], "status": str | None}`` for each path in ``deleting`` classed superseded
+    (W2-190 S2): a record in the file is the target of a SUPERSEDES edge of the record graph (its source ids), or the
+    file's own front matter says ``status: superseded`` in any case.
+
+    The graph is read with ``strict=False``: a record that cannot be read anywhere in the repository does not refuse a
+    delete that has nothing to do with it. The deleted file's own front matter that cannot be read (or a file that is
+    no text) is read as no status: the file is then superseded only by an edge. The tool does not class a document by
+    its content, so a file whose status it cannot read is not refused for that; the file's record, unreadable, is no
+    record of the graph either."""
+    records, edges = project.record_graph(run.root, strict=False)
+    ids: dict[str, set[str]] = {}
+    for record in records:
+        ids.setdefault(record["path"], set()).add(record["id"])
+    classed = {}
+    for rel in deleting:
+        mine = ids.get(rel, set())
+        sources = sorted({edge["source"] for edge in edges if edge["type"] == "SUPERSEDES" and edge["target"] in mine})
+        try:
+            head = project.frontmatter(project.blob(run.root, run.tracked[rel]).decode("utf-8"))
+        except (ValueError, UnicodeDecodeError, GovError):
+            head = None
+        status = head.get("status") if isinstance(head, dict) else None
+        status = status if isinstance(status, str) and status.casefold() == "superseded" else None
+        if sources or status:
+            classed[rel] = {"superseded_by": sources, "status": status}
+    return classed
+
+
+def _delete_problems(run: Run, entries: dict) -> list[dict]:
+    """The problems of the proposal's DELETE_FROM_ACTIVE_TREE entries: ``DELETE_REFERENCED`` (another tracked file
+    names the path) and ``DELETE_SUPERSEDED`` (the file is classed superseded), each with its evidence; a file that is
+    both gets both (W2-190, DEC-1197 (2)(ii)). The record graph is read only where the proposal deletes a tracked path."""
+    deleting = sorted(rel for rel, entry in entries.items()
+                      if entry.get("action") == "DELETE_FROM_ACTIVE_TREE" and rel in run.tracked)
+    if not deleting:
+        return []
+    referencing, superseded, problems = _referencing(run, deleting), _superseded(run, deleting), []
+    for rel in deleting:
+        files = referencing[rel]
+        if files:
+            problems.append({"path": rel, "code": "DELETE_REFERENCED", "referenced_by": files,
+                             "reason": "DELETE_REFERENCED: another tracked file names it, so deleting it leaves "
+                                       "the reference dangling (" + ", ".join(files) + "): keep or retire it"})
+        if rel in superseded:
+            found = superseded[rel]
+            evidence = ([f"the target of a SUPERSEDES edge from {', '.join(found['superseded_by'])}"]
+                        if found["superseded_by"] else []) + ([f"its front matter status is {found['status']}"]
+                                                              if found["status"] else [])
+            problems.append({"path": rel, "code": "DELETE_SUPERSEDED", **found,
+                             "reason": "DELETE_SUPERSEDED: it is classed superseded (" + "; ".join(evidence)
+                                       + "), and a superseded file is never deleted: keep or retire it"})
+    return problems
+
+
 def _embedding_policies(config: dict) -> None:
     """Refuse a path map in which a namespace states no value of POLICIES, exactly, or none says ``embedded``
     (DEC-694, DEC-700). Outside adoption such a namespace is read as not embedded; here it is not recorded."""
@@ -379,6 +480,7 @@ def a3(run: Run) -> dict:
             said.append("the proposal names it twice: an artefact has exactly one action")
         entries[entry["path"]] = entry
         problems += [{"path": entry["path"], "reason": reason} for reason in said]
+    problems += _delete_problems(run, entries)  # W2-190: beside the others, so a proposal lists every problem it has
     if problems:
         raise refuse("PROPOSAL_REFUSED", "the proposal is refused as a whole: "
                      + "; ".join(f"{item['path']}: {item['reason']}" for item in problems), problems=problems)

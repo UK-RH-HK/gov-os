@@ -9,12 +9,14 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
 import gov.context as ctx
 from gov import records
 from gov.cli.errors import GovError
+from gov.config.loader import PROJECT_DIR, REBUILD_FILE, SPLIT_IDENTIFIERS
 from gov.retrieval import lexical, supplementary
 from gov.store import load
 
@@ -49,6 +51,15 @@ def _commit(root, files):
 def _build(root):
     load(root)
     lexical.refresh(root)
+
+
+def _recipe_switched(root):
+    """Switch one index-time method in the project's rebuild.yaml, uncommitted, with no other change: the fixture's index
+    was built without it, so the keyword index is built with other methods than rebuild.yaml's."""
+    path = Path(root) / PROJECT_DIR / REBUILD_FILE
+    written = path.read_text(encoding="utf-8") if path.is_file() else ""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(written + f"{SPLIT_IDENTIFIERS}: true\n", encoding="utf-8")
 
 
 @pytest.fixture()
@@ -146,7 +157,10 @@ def test_the_packet_is_the_same_in_another_process(project):
 
 
 def test_an_index_that_does_not_answer_is_named_by_its_kind(project):
-    _commit(project, {"notes/new.md": "# New\n"})  # the index is now stale against the tree
+    # Rewrite-Reason: a commit after the build no longer makes the index unusable: the facet answers from the last good
+    # store, leaving out the changed paths (DEC-1197 (2)(i), W2-189); an index built with other index-time methods than
+    # rebuild.yaml's still does not answer (DEC-1068), so the set-up switches one recipe value (P-W2-189-P3 (a)).
+    _recipe_switched(project)  # the index is now stale against rebuild.yaml's recipe
     packet = ctx.context(project, "TK-1")
     assert packet["supplementary"] == []
     assert packet["dropped"] == [{"id": "supplementary", "reason": "the lexical index is stale"}]
@@ -296,7 +310,10 @@ def test_the_batches_are_in_the_packet_and_its_hash(project):
 
 
 def test_a_failed_lookup_has_no_batch_and_is_named(project):
-    _commit(project, {"notes/new.md": "# New\n"})
+    # Rewrite-Reason: a commit after the build no longer makes the index unusable: the facet answers from the last good
+    # store, leaving out the changed paths (DEC-1197 (2)(i), W2-189); an index built with other index-time methods than
+    # rebuild.yaml's still does not answer (DEC-1068), so the set-up switches one recipe value (P-W2-189-P3 (a)).
+    _recipe_switched(project)  # the index is now stale against rebuild.yaml's recipe
     packet = ctx.context(project, "TK-1")
     assert packet["supplementary_batches"] == [] and packet["dropped"][0]["reason"] == "the lexical index is stale"
 
