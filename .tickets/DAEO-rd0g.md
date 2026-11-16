@@ -47,9 +47,6 @@ sources:
 - DEC-1083
 - DAEO-swdu
 - DEC-1171
-- W2-15b
-- W2-L102
-- W2-L321
 est_loc: 100
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
@@ -92,3 +89,5 @@ This ticket has no `wbs_id`: the kernel's grammar (`common.schema.json`, `^W[0-9
 **Claimed 2026-11-15 by the CTO (DEC-1186 (3), DEC-1171 (3); package P-W2-15A-CLOSE):** the close run. A research session (1) rewrites section 2 of `docs/research/EXP-003/w2-15a-baseline.md` as the metric for the current set (40 visible, 39 hidden; W2-61's measure, both figures; pass at 34 of 39 or 35 of 40) and commits it before any new run; (2) records one refused probe of the sets root's hidden folder from its own worktree (a Read of a file that does not exist, the guard's refusal recorded, no content); (3) prepares the record's table from the visible run and the operator's counts. The CTO's visible run and the owner's operator's walled hidden run (counts only, `drafts/w2-15a-close/walled_hidden_counts.sh`) follow at one named head after the re-pin's done, never beside a store rebuild. On a miss: the record as measured, at most three gaps to W2-15b, S1's memory clause re-worded to "recorded against 34 of 39" (DEC-1186 (3)).
 
 **Kept open 2026-11-16 05:5x by the CTO (DEC-1186 (3), DEC-1157 (12); listed for the owner's reading):** section 2 and the refused probe landed at 7041f086c with the narrow independent check at f8404efe8 (pass, 0 blocking; rows N1 to N5); the queue closed the ticket in the same step. W2-15a stays open for P-W2-15A-CLOSE steps (3) and (4): the CTO's visible run and the owner's operator's counts-only walled run, both at one head holding 7041f086c, then the record and the close. Sources gain W2-15b, W2-L102 and W2-L321 (the structural pass's links notice: named in the KPI brackets).
+
+**Sources reverted 2026-11-16 by the CTO:** W2-15b, W2-L102 and W2-L321 left `sources:` again (W2-15b is DAEO-swdu, already listed): `gov context` resolves sources by store id only and BLOCKed on them (the nightly's W2-54 context-reproducibility red); the links notice stays standing.
