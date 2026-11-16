@@ -30,6 +30,10 @@ allowed_paths:
 - src/gov/launch/role.py
 - src/gov/adopt/fabric.py
 - tests/unit/adopt/test_w2_88_shipped.py
+- src/gov/brief/__init__.py
+- src/gov/_shipped/template/governance/kernel/skills/judging-work/SKILL.md
+- pyproject.toml
+- tests/acceptance/W2-88/w2_88_support.py
 - tests/unit/brief/test_w2_195*
 - tests/unit/launch/test_w2_195*
 - tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py
@@ -51,7 +55,7 @@ est_loc: 450
 kpis:
   success:
   - line: "S1 Preloaded: the Skills line of the kernel role files independent-auditor.md, qa-engineer.md, orchestrator.md and ticket-lead.md, and role-reviewer.md's skills list, name judging-work; a launch of each judging role carries the skill in its launch record's skills [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S1]"
-    verify: "tests/unit/launch/test_w2_195_preload.py: each named role file's Skills line and role-reviewer.md's skills list hold judging-work; gov launch --plan for independent-auditor and qa-engineer lists judging-work among the session's skills"
+    verify: "tests/unit/launch/test_w2_195_preload.py: each named role file's Skills line and role-reviewer.md's skills list hold judging-work; gov.launch.role.read_role for independent-auditor and qa-engineer returns judging-work among the skills the launch record carries (P-W2-195-1 (a): --plan prints one line, DEC-1167 (2))"
   - line: "S2 Briefed automatically: gov brief for the independent-auditor, reviewer and QA roles, and a lead brief's reviewer and probe steps, include sections 1 to 3 of the installed judging-work skill file (never a hand copy) and name the skill's version [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S2]"
     verify: "tests/unit/brief/test_w2_195_inject.py: a fixture project with the skill installed; each judging brief holds the skill's sections 1 to 3 byte for byte and its version; a non-judging brief (engineer) does not"
   - line: "S3 Checked: gov brief refuses BRIEF_JUDGING_RULE_MISSING and gov launch refuses LAUNCH_JUDGING_RULE_MISSING for a judging role (independent-auditor, reviewer, probe, QA engineer) whose brief or role lacks the skill or names a different version [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S3]"
