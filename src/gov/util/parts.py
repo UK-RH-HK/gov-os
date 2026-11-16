@@ -74,6 +74,26 @@ def libyaml_reads_as_python(text) -> bool:
             and "﻿" not in text[1:])
 
 
+def load_yaml(text):
+    """yaml.safe_load's answer for the str *text*, the pure-Python
+    SafeLoader's data or its refusal (W2-111, P-W2-111-YAML-REST (a)): the
+    path map's ``role_paths:`` block and a ticket's front matter.  libyaml's
+    CSafeLoader parses *text* only when it is installed and
+    ``libyaml_reads_as_python`` passes it (SafeLoader's own constructor and
+    resolver over the C parser); any other text, and any text whose libyaml
+    parse raises, is parsed by the pure-Python SafeLoader, so every refusal
+    is the pure loader's own (rv-3 F1)."""
+    import yaml
+
+    fast = getattr(yaml, "CSafeLoader", None)
+    if fast is not None and libyaml_reads_as_python(text):
+        try:
+            return yaml.load(text, Loader=fast)
+        except Exception:
+            pass  # SafeLoader's own answer, or its own error, below
+    return yaml.load(text, Loader=yaml.SafeLoader)
+
+
 def _as_stream(text, stream):
     """*text*, read from *stream*, as a stream again under *stream*'s name:
     the pure loader names a stream's file in its error's mark (and quotes
@@ -286,12 +306,13 @@ def _read_text(path: str) -> str:
 
 def _front(text: str) -> tuple[str | None, str | None]:
     """A ticket file's WBS id and id; one that cannot be read for them
-    refuses (fail closed)."""
+    refuses (fail closed).  The front matter is parsed by ``load_yaml``:
+    libyaml only for a text the pure-Python SafeLoader reads the same, so a
+    front it refuses goes to the line reader as with libyaml absent (W2-111,
+    P-W2-111-YAML-REST (a))."""
     head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
     try:
-        import yaml  # the C parser when there is one: the guard runs on every call
-        ticket = (yaml.load(head, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
-                  if head is not None else None)
+        ticket = load_yaml(head) if head is not None else None
     except Exception:
         ticket = None
     if not isinstance(ticket, dict):

@@ -373,7 +373,66 @@ diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
 diff --git a/.claude/hooks/role_reads.py b/.claude/hooks/role_reads.py
 --- a/.claude/hooks/role_reads.py
 +++ b/.claude/hooks/role_reads.py
-@@ -436,6 +436,31 @@
+@@ -92,6 +92,23 @@
+ _SECTION = {}
+ 
+ 
++def load_yaml(text):
++    """yaml.safe_load's answer for the str *text*, the pure-Python SafeLoader's data or its refusal (W2-111,
++    P-W2-111-YAML-REST (a)): the path map's role_paths: block and the session ticket's front matter. libyaml's
++    CSafeLoader parses *text* only when it is installed and the text is a str with no tab, no ``?`` and no BOM after
++    its first character (pretooluse.libyaml_reads_as_python, word for word): libyaml reads a tab as a separator, a
++    ``?`` inside a flow item and a BOM at the start of a later line, which the pure parser refuses (rv-3 F1). Any
++    other text, and any text whose libyaml parse raises (no libyaml too), is parsed by the pure-Python SafeLoader, so
++    every refusal is the pure loader's own. Hook-local until 0.1.1 (gov.util.parts.load_yaml does the same)."""
++    import yaml
++    if isinstance(text, str) and "\t" not in text and "?" not in text and "\ufeff" not in text[1:]:
++        try:
++            return yaml.load(text, Loader=yaml.CSafeLoader)
++        except Exception:
++            pass  # SafeLoader's own answer, or its own error, below
++    return yaml.load(text, Loader=yaml.SafeLoader)
++
++
+ def section(tree):
+     """The ``role_paths:`` section of the path map at ``tree``, or None when it has none (no check). A section that
+     is not a mapping of roles to ``reads_denied`` lists of globs raises (the hook fails closed)."""
+@@ -108,7 +125,7 @@
+     if block is not None:
+         import yaml
+         try:
+-            doc = yaml.load(block, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader)) or {}
++            doc = load_yaml(block) or {}
+         except yaml.YAMLError:
+             raise ValueError(f"{PATH_MAP_REL}: {KEY} cannot be read") from None
+         found = doc.get(KEY) if isinstance(doc, dict) else None
+@@ -148,7 +165,9 @@
+ 
+ def ticket_front(root, ticket_id):
+     """The session ticket's front matter (a dict) from ``root``'s .tickets/, found as gov.guard.reads._ticket finds
+-    it (its file, else the file whose wbs_id is the id); {} with no such ticket. A file that cannot be read raises."""
++    it (its file, else the file whose wbs_id is the id); {} with no such ticket or no front matter. A file that cannot
++    be read raises, and so does front matter the pure-Python SafeLoader refuses (``load_yaml``): an empty front would
++    hand a test designer the engineer's code (fail closed, P-W2-111-YAML-REST-FRONT (a))."""
+     from gov.guard import reads
+     if not ticket_id or "/" in ticket_id:
+         return {}
+@@ -166,11 +185,11 @@
+             return {}
+     text = reads._read_text(path)
+     head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else ""
+-    import yaml
+     try:
+-        front = yaml.load(head, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
++        front = load_yaml(head)
+     except Exception:
+-        front = None
++        raise ValueError("the session's ticket file cannot be read: its front matter is not YAML (fail closed, "
++                         "P-W2-111-YAML-REST-FRONT (a))") from None
+     return front if isinstance(front, dict) else {}
+ 
+ 
+@@ -436,6 +455,31 @@
  
  # -- judging a path -------------------------------------------------------------------------------------------------
  
@@ -405,7 +464,7 @@ diff --git a/.claude/hooks/role_reads.py b/.claude/hooks/role_reads.py
  class Judge:
      def __init__(self, role, denied, trees):
          self.role, self.denied, self._trees, self._all = role, denied, trees, None
-@@ -449,9 +474,10 @@
+@@ -449,9 +493,10 @@
                  found += [os.path.join(WORKTREES, n) for n in sorted(os.listdir(WORKTREES))]
              except OSError:
                  pass
@@ -417,3 +476,15 @@ diff --git a/.claude/hooks/role_reads.py b/.claude/hooks/role_reads.py
      def hit(self, full, plain=False):
          """The Denied glob ``full`` (an absolute path) is at or under, or None; ``plain``: only the globs of every
          tree."""
+@@ -852,7 +897,10 @@
+         globs = entry["reads_denied"]
+         if any("{ticket_" in g for g in globs) and front is None:
+             names, wbs = reads._ticket(root, ticket_id)
+-            front = ticket_front(root, ticket_id) if any("{ticket_impl" in g for g in globs) else {}
++            # read for every role the ticket fills, so that front matter the pure loader refuses refuses here, never
++            # later as "no links" (the own folder only) (P-W2-111-YAML-REST-FRONT (a)); kept only for {ticket_impl}
++            read = ticket_front(root, ticket_id)
++            front = read if any("{ticket_impl" in g for g in globs) else {}
+             if not wbs and isinstance(front.get("wbs_id"), str):
+                 wbs = front["wbs_id"]
+         allowed = front.get("allowed_paths") if isinstance(front, dict) else None
