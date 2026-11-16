@@ -405,3 +405,8 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 250 | DEC-1196 (3): the routine-jobs rule in the job runner (R1, R2, R3 by name from install/standing/, the routine log, the off switch, the digest lines), with its fresh review before the first install | IN PROGRESS: the runner's builder |
 | 251 | DEC-1196 (2): act-O, the job runner's kind for (O) ACTs in the allowlist sandbox, built and reviewed straight after the runner's install | WAITS: the runner's install |
 | 252 | DEC-1196 (5): every install and apply script refuses without an explicit target; every reviewer brief says rehearse only on copies | IN PROGRESS |
+| 253 | DEC-1197 (2): W2-81 (DAEO-l78m) reopened: the judge reads gov.adopt.command.STAGES (A7, A10), a test designer's change | NOT STARTED: next: the reopen's ticket edit and lead brief |
+| 254 | DEC-1197 (2)(i): NEW TICKET (owner's word): the store fresh after the adoption's last commit, or gov retrieve serving the last good store naming its commit; covers EXAMIN and every adopted repository | NOT STARTED: next: create it with tk and its KPI lines |
+| 255 | DEC-1197 (2)(ii): NEW TICKET (owner's word): A3 refuses DELETE_FROM_ACTIVE_TREE of a file another tracked file references, or one classed superseded | NOT STARTED: next: create it with tk and its KPI lines |
+| 256 | DEC-1197 (2), Wave 3: the lite verdict stage (CAP-44.h) and the findings records (CAP-44.g) | NOT STARTED: Wave 3 |
+| 257 | DEC-1197 (3): W2-81's full re-run on 0.1.1 after its re-pin (corrected adopter brief, a LITE ticket cycle per repository, the runner fix) | WAITS: 0.1.1's re-pin |

@@ -15302,6 +15302,15 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 ~01:21: "The undo: yes … P-ACT-O (a): (O) stays by hand until act-O is built; build it straight after the job runner installs, not later. P-JOBS-ROUTINE-1 (a), with R3 changed … My yes JOB line is needed only for: setups and anything that writes or commits in a repository (owner commits), the re-pin, (O) ACTs, and hidden-set reads. From tonight's incident: no agent ever runs an install or apply script against a live path while rehearsing …"
 - **Governing sources:** packages `P-JOBS-ROUTINE-1.md` (a77d059db); the (O) review rounds; the job runner reviews; DEC-1191 (2); DEC-1193.
 
+### DEC-1197 — P-W2-81-VERDICT-1 (a), (b), (c): the five stale stores rebuilt and the read step re-run; the runner's stage list fixed in W2-81; two product tickets filed; the lite verdict and findings a Wave 3 row; W2-81 re-runs in full on 0.1.1
+- **Status:** ACCEPTED (owner, 2026-11-16 ~01:38, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1189 (2), DEC-1178 (3)(e), DEC-974, DEC-1195
+- **Decision:**
+  - (1) **(a):** the five adopters with stale stores run a final `gov rebuild` (done 01:41-01:42; each store's commit equals HEAD); the owner's operator re-runs the read step and its summary.
+  - (2) **(b):** W2-81 (DAEO-l78m) is reopened within its purpose: its judge reads `gov.adopt.command.STAGES` (A7, A10 listed), not `gov.adopt.project.STAGES`; a test designer's change to W2-81's own test code. Two tickets are filed on the owner's word: (i) the store is fresh after the adoption's last commit, or `gov retrieve` serves the last good store naming its commit; it covers EXAMIN, whose A9 records the refresh hook as the operator's (memory-audit/ACT-WALLS), so no adopted repository refreshes its store after each commit today; (ii) A3 refuses DELETE_FROM_ACTIVE_TREE of a file another tracked file references, or one classed superseded. The lite verdict stage (CAP-44.h) and the findings records (CAP-44.g) are a Wave 3 row.
+  - (3) **(c) yes:** W2-81 re-runs in full on release 0.1.1 after its re-pin, with the corrected adopter brief (a final `gov rebuild`; the A3 proposal form; the A7/A10 `checked` form; the worker launch form; A9's `--out`; A3 with `--session`), a LITE ticket cycle per repository for `gov close`, and the runner fix.
+- **Basis:** the owner's message of 2026-11-16 ~01:38: "P-W2-81-VERDICT-1 (a) … (b): fix the runner's stage list inside W2-81, as its own test code. File now: the store fresh after adoption, and A3 refusing to delete a document its successor still references. The lite verdict and findings stage: a Wave 3 row … (c) yes …"
+- **Governing sources:** package `packages/P-W2-81-VERDICT-1.md` (d05949e43); DEC-1189 (2); DEC-1195.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15433,3 +15442,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.575 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1194 (P-W2-27-F016 (a): EXAMIN's three command front matters quoted by the owner's commit). Next free id: DEC-1195. |
 | 0.576 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1195 (Wave 3 row: the agent-to-agent layer productised for every adopted repository; tonight's lessons in DND 249). Next free id: DEC-1196. |
 | 0.577 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1196 (the undo; (O) by hand until act-O; routine jobs R1-R3 with R3 by independent review; when the owner's yes is needed; no rehearsal against a live path). Next free id: DEC-1197. |
+| 0.578 | 2026-11-16 | Owner (recorded by the orchestrator, DEC-861): DEC-1197 (P-W2-81-VERDICT-1 (a)(b)(c)). Next free id: DEC-1198. |
