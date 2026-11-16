@@ -13,9 +13,10 @@ They met four product defects, now fixed and landed on `w2/integrate`:
 | W2-153 (DAEO-8s85) | `gov adapters generate` writes `.claude/templates/` in an adopted repository; doctor names a missing copy | W2-81 and EXAMIN: A5 `LAUNCH_NO_TEMPLATE` (DEC-1192) |
 | W2-111 (DAEO-qvff) | the guard hook's import cut (S9), the live-hook diff for ACT-GUARD-FIX-7 (S10), malformed YAML fails closed | DEC-1187, P-W2-111-YAML-REST |
 | W2-190 (DAEO-6oj6, landed ef4d79693 this morning) | A3 refuses deleting a file another tracked file names (`DELETE_REFERENCED`) or one classed superseded (`DELETE_SUPERSEDED`) | W2-81: secret-history's two MISHANDLED deletes (DEC-1197 (2)(ii)) |
+| W2-189 (DAEO-kfn1, landed 933e5020b this morning) | `gov retrieve` (and `gov context`, which calls it) answers from the last good store when HEAD has moved, naming its commit, the head and the stale paths (walled ones counted, not named) | W2-81: five stale stores served nothing (DEC-1197 (2)(i)) |
 
 Also in since 0.1.0: W2-178 (the auditor's copy of a set without its dropped questions), W2-60a (role, skills, model and
-effort loaded at launch; the launch record), W2-94's re-anchor flow, W2-88 S27 (folder mode). In all: 10 merges (with W2-190), 23 files
+effort loaded at launch; the launch record), W2-94's re-anchor flow, W2-88 S27 (folder mode). In all: 11 merges (with W2-190 and W2-189), 28 files
 under `src/` and `pyproject.toml` (adopt 4, guard 3, adapters 3, the shipped template 7, util 2, doctor 1, secrets 1),
 no kernel file. Every one landed through the merge queue with its review.
 

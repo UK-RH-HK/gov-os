@@ -50,8 +50,16 @@ def make_store(box, root, state):
                         timeout=support.MEASURE_TIMEOUT_S).result()
         assert built.get("stores", {}).get("lexical", {}).get("status") == "recreated", \
             f"the rebuild did not recreate the lexical index: {built!r}"
-        support.write(root, support.BEST, support.RANKED[support.BEST] + "A line added after the rebuild.\n")
-        support.commit(root, "a change after the rebuild")
+        # Rewrite-Reason: DEC-1197 (2)(i) answers from a store that is behind HEAD by commits, so a later commit no
+        # longer makes the index unusable; DEC-1068: an index built with other index-time methods than rebuild.yaml's
+        # is still out of date (reason ``stale``). P-W2-189-P2: the set-up switches one INDEX_FLAGS value in the
+        # project's rebuild.yaml after the rebuild, left uncommitted and with no file change, so that it is the recipe
+        # alone, never a commit or a working-tree change, that makes this store unusable. The assertion is unchanged.
+        rebuild_yaml = Path(root) / "governance/project/rebuild.yaml"
+        written = rebuild_yaml.read_text(encoding="utf-8") if rebuild_yaml.is_file() else ""
+        support.write(root, "governance/project/rebuild.yaml",
+                      written + ("" if not written or written.endswith("\n") else "\n")
+                      + "lexical_split_identifiers: true\n")
         return
     store.parent.mkdir(parents=True, exist_ok=True)
     if state == "an empty file":

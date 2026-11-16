@@ -7,7 +7,7 @@ type: task
 class: implementation
 role: engineer
 profile: FULL
-status: in_progress
+status: closed
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-16T05:39:29Z
@@ -27,6 +27,10 @@ allowed_paths:
 - src/gov/cli/main.py
 - tests/unit/retrieval/test_w2_138_store.py
 - tests/acceptance/W2-13/test_w2_13_unavailable.py
+- tests/acceptance/W2-108/test_w2_108_change_seen.py
+- tests/acceptance/W1-21/test_w1_21_bundle.py
+- tests/acceptance/W1-21/test_w1_21_command.py
+- tests/unit/context/test_bounded.py
 reads:
 - src/gov/retrieval/**
 - src/gov/retrieve/**
@@ -95,3 +99,5 @@ because tracked files moved. Missing, empty, unreadable and recipe-changed store
 from anything but git's tracked files (no hidden-set path may appear in it).
 
 **Path case 2026-11-16 08:3x (P-W2-189-P1 (a), P-W2-189-P2; the CTO, DEC-1156 (7); listed for the owner's reading):** the build run returned PACKAGES at 89455a578 (42 of 43 acceptance cases). (1) S2's text form is printed at `src/gov/cli/main.py:191`, outside the paths: the ticket gains that file, and an engineer replaces the line with the shared `store_line(store)` (the W2-138 line unchanged when the store's commit equals HEAD). (2) Four W2-138 unit cases (`tests/unit/retrieval/test_w2_138_store.py:98, 117, 127, 162`) compare `store` to exactly `{commit, root}`; the interface adds `head` and `stale`: the ticket gains that file and the engineer adds the two keys to the expected values, nothing else. (3) W2-13's `[stale]` case (`tests/acceptance/W2-13/test_w2_13_unavailable.py:45-54`) commits a change after the rebuild and expects the facet unavailable, which DEC-1197 (2)(i) now answers from the store: an independent test designer revises its set-up by option (ii), an `INDEX_FLAGS` recipe value in `rebuild.yaml` that keeps the lexical index out of date with reason `stale` (DEC-1068), durable even if uncommitted changes are ever served; the case's assertion is unchanged. A narrow independent check judges (1)-(3) before the FULL review.
+
+**Path case 2026-11-16 09:2x (P-W2-189-P3 (a); the CTO, DEC-1156 (7); listed for the owner's reading):** build2 returned PACKAGES (accept 43/43; the narrow check and the FULL review pass at c512f982f), with five cases of other tickets red because they assert the rule DEC-1197 (2)(i) reverses (green on 452354001, red on the head; the auditor judges each new behaviour right: no stale text served, freshness still reported, the store named). The ticket gains the four files. An independent test designer revises `tests/acceptance/W2-108/test_w2_108_change_seen.py:45` (the committed case split from the working-tree case: AVAILABLE, the path not in the hits, the path in `stale`), `tests/acceptance/W1-21/test_w1_21_bundle.py:75` (the changed file not cited and named in the store's stale list; the stopping reason is row B2) and `tests/acceptance/W1-21/test_w1_21_command.py:39` (the store keys {commit, head, stale, root}); an engineer revises `tests/unit/context/test_bounded.py:151-152, 301` (the set-up keeps the index unusable by a recipe value, as W2-13's case does). **For the owner's reading:** `gov context` calls retrieve, so it too now serves the last good store after a commit (named, stale paths left out); if the owner wants `gov context` excluded, that is a re-baseline of this ticket (option (c), about 2 h, a src change outside its paths).

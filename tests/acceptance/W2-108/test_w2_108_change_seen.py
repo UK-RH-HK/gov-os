@@ -59,11 +59,32 @@ def test_a_file_changed_in_the_working_tree_is_seen(planted, driver, embedder, h
 
 
 def test_a_committed_change_is_seen(planted, driver, embedder):
+    # Rewrite-Reason: DEC-1197 (2)(i), P-W2-189-P3 (a) (the CTO, DEC-1156 (7)): the owner chose that a store behind
+    # by a commit is answered from, not reported unavailable. A committed change is therefore seen as: the lexical
+    # index still reported stale for the path (``freshness``, unchanged), both facets AVAILABLE, the changed path left
+    # out of every hit and of the bundle's evidence (never served at its old text, DEC-342), and named in ``stale``
+    # of the store the answers came from (``gov.retrieval.retrieve.store_of(root)["stale"]``). The working-tree
+    # cases keep ``assert_stale_after``: an uncommitted change still makes the facets unavailable.
     change = [S.edit(S.TIDES, "# Tides\n\nThe tide tables are kept by the lock keeper.\n"),
               S.git_step("add", "-A"), S.git_step("commit", "-q", "-m", "a committed change")]
-    before, after = warm_then(driver, planted, change, AFTER, embedder.host)
+    asked = [*AFTER, S.semantic_search(S.QUESTIONS[2]), S.call(S.RETRIEVE, "store_of", "{root}")]
+    before, after = warm_then(driver, planted, change, asked, embedder.host)
     assert_fresh_before(before)
-    assert_stale_after(after, S.TIDES)
+    freshness, lexical, semantic, bundle, tides_question, store = after
+    assert freshness == {"status": S.STALE, "stale": [S.TIDES]}, \
+        f"the lexical index was not reported stale after {S.TIDES} was committed: an old answer was reused\n{freshness}"
+    assert S.facet(lexical) == (True, S.AVAILABLE, None), f"lexical facet after {S.TIDES} was committed: {lexical}"
+    assert S.facet(semantic) == (True, S.AVAILABLE, None), f"semantic facet after {S.TIDES} was committed: {semantic}"
+    assert S.facet(tides_question) == (True, S.AVAILABLE, None), tides_question
+    assert bundle["facets"]["lexical"]["available"] and bundle["facets"]["semantic"]["available"], bundle["facets"]
+    assert lexical["hits"] and semantic["hits"], "the last good store answered nothing"
+    for name, answer in (("lexical", lexical), ("semantic", semantic), ("tide question", tides_question)):
+        assert S.TIDES not in [hit["path"] for hit in answer["hits"]], \
+            f"the {name} hits serve {S.TIDES}, changed since the store's commit: {answer['hits']}"
+    assert S.TIDES not in [item["path"] for item in bundle["evidence"]], \
+        f"the bundle cites {S.TIDES}, changed since the store's commit: {bundle['evidence']}"
+    assert S.TIDES in (store.get("stale") or []), \
+        f"store_of names no stale path although {S.TIDES} changed since the store's commit: {store}"
 
 
 def test_a_second_edit_of_an_edited_file_is_seen(planted, driver, embedder):
