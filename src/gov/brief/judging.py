@@ -26,8 +26,9 @@ PRELOADED_REL = f".claude/skills/{SKILL}/SKILL.md"
 JUDGING_ROLES = ("independent-auditor", "qa-engineer")
 JUDGING_RUNS = ("review",)  # the lead's runs whose steps brief a reviewer or a probe
 CODE = "BRIEF_JUDGING_RULE_MISSING"
-FIRST = re.compile(rb"^## 1\. ", re.MULTILINE)  # sections 1 to 3: from the line "## 1. ..." up to "## 4. ..."
-FOURTH = re.compile(rb"^## 4\. ", re.MULTILINE)
+# Sections 1 to 3: from the start of the line "## 1. The threat model" up to, not including, the line "## 4. Doing it"
+FIRST = re.compile(rb"^## 1\. The threat model\r?$", re.MULTILINE)
+FOURTH = re.compile(rb"^## 4\. Doing it\r?$", re.MULTILINE)
 
 
 def judges(role: str, run: str | None) -> bool:
@@ -63,8 +64,8 @@ def version_of(data: bytes) -> str | None:
 
 
 def sections(data: bytes) -> bytes | None:
-    """Sections 1 to 3 of the skill file's bytes, unchanged: from the start of the line ``## 1. `` up to, not
-    including, the line ``## 4. ``; None when either line is missing or they are out of order."""
+    """Sections 1 to 3 of the skill file's bytes, unchanged: from the start of the line ``## 1. The threat model`` up
+    to, not including, the line ``## 4. Doing it``; None when either line is missing or they are out of order."""
     first, fourth = FIRST.search(data), FOURTH.search(data)
     if first is None or fourth is None or fourth.start() <= first.start():
         return None
@@ -97,7 +98,7 @@ def block(root: Path) -> str:
     if version is None:
         raise _refuse(f"{rel} names no version in its front matter", path=rel)
     if carried_text is None:
-        raise _refuse(f"{rel} has no sections 1 to 3 (a line '## 1. ...' before a line '## 4. ...')", path=rel)
+        raise _refuse(f"{rel} has no sections 1 to 3 (a line '## 1. The threat model' before a line '## 4. Doing it')", path=rel)
     copy = _bytes(root, PRELOADED_REL, "preloaded copy")
     try:
         preloaded = version_of(copy)

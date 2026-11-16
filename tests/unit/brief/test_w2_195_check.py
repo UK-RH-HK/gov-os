@@ -50,6 +50,16 @@ def _no_sections(root: Path) -> None:
     path.write_bytes(path.read_bytes().replace(b"## 1. The threat model", b"## One. The threat model"))
 
 
+def _first_heading_reworded(root: Path) -> None:
+    path = root / KERNEL_REL
+    path.write_bytes(path.read_bytes().replace(b"## 1. The threat model\n", b"## 1. Threat model\n"))
+
+
+def _fourth_heading_reworded(root: Path) -> None:
+    path = root / KERNEL_REL
+    path.write_bytes(path.read_bytes().replace(b"## 4. Doing it\n", b"## 4. How to do it\n"))
+
+
 def _kernel_no_version(root: Path) -> None:
     path = root / KERNEL_REL
     data = path.read_bytes().replace(b'version: "1.0.0"\nmetadata:\n  version: "1.0.0"\n', b"")
@@ -59,7 +69,9 @@ def _kernel_no_version(root: Path) -> None:
 
 BREAKS = {"kernel-file-removed": _kernel_removed, "preloaded-copy-removed": _preloaded_removed,
           "preloaded-copy-other-version": _preloaded_other_version, "preloaded-copy-no-version": _preloaded_no_version,
-          "kernel-file-without-sections-1-to-3": _no_sections, "kernel-file-without-version": _kernel_no_version}
+          "kernel-file-without-sections-1-to-3": _no_sections, "kernel-file-without-version": _kernel_no_version,
+          "kernel-file-first-heading-reworded": _first_heading_reworded,
+          "kernel-file-fourth-heading-reworded": _fourth_heading_reworded}
 
 
 @pytest.mark.parametrize("role, run", JUDGING)
