@@ -396,7 +396,7 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 241 | DEC-1190 (3) and the W2-27 product findings (F-000 to F-015, W81-1 to W81-3): one owner package after W2-27, flag-not-drop for the adapters and doctor | NOT STARTED: after W2-27 |
 | 242 | DEC-1191 (1): the EXAMIN CTO and the six W2-81 sessions switched to adopter.sh at their next stop | IN PROGRESS |
 | 243 | DEC-1191 (2): the operator job runner (routine, (O) ACTs, the re-pin), its rehearsal and review; the owner's install step and crontab line | IN PROGRESS: building |
-| 244 | DEC-1191 (3): ACT-DEADMAN-INBOX-1 built, rehearsed, reviewed; the owner's yes | IN PROGRESS: building |
+| 244 | DEC-1191 (3): ACT-DEADMAN-INBOX-1 built, rehearsed, reviewed; the owner's yes | DONE: applied by the owner's hand at d5b5cfff2 (third round, DEC-1131 (3); manifest 01220514; 18 checks ok; deadman.py b3facfea) |
 | 245 | DEC-1192 (1): the owner's operator copies the templates into the seven adopted repositories; the CTO resumes the sessions at A5 | IN PROGRESS: the operator runs it |
 | 246 | DEC-1192 (2): W2-153 reopened (S-adopted: gov adapters generate writes .claude/templates/ in an adopted repository; gov doctor names a missing copy), then release 0.1.1 | IN PROGRESS: next: the W2-153 lead brief |
 | 247 | DEC-1193: the job runner's summary-only mode (before its install); the owner writes ~/.config/gov-os/sets-root | IN PROGRESS: the runner's builder adds the mode |
@@ -410,3 +410,5 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 255 | DEC-1197 (2)(ii): NEW TICKET (owner's word): A3 refuses DELETE_FROM_ACTIVE_TREE of a file another tracked file references, or one classed superseded | NOT STARTED: next: create it with tk and its KPI lines |
 | 256 | DEC-1197 (2), Wave 3: the lite verdict stage (CAP-44.h) and the findings records (CAP-44.g) | NOT STARTED: Wave 3 |
 | 257 | DEC-1197 (3): W2-81's full re-run on 0.1.1 after its re-pin (corrected adopter brief, a LITE ticket cycle per repository, the runner fix) | WAITS: 0.1.1's re-pin |
+| 258 | W2-27 F-018: EXAMIN's A7 and A10 review tickets by the owner's operator (operator_tickets_a7_a10.py 617522ef, the owner's yes 2026-11-16), after W2-81's read step; then the EXAMIN CTO resumed for A7 to A10 and a final gov rebuild | WAITS: the operator runs it after W2-81's read step |
+| 259 | ACT-DEADMAN-INBOX-1 follow-up F11 (class O, the owner's): the operator agent's own push call (opcommon.py:418) gets --setting-sources user and a private working folder; brought with the job runner's install | WAITS: the job runner's install |
