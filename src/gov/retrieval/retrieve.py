@@ -160,10 +160,56 @@ def resolved(root) -> Path:
     return real if real.is_dir() else Path(root)
 
 
-def store_of(root) -> dict:
-    """W2-138 S1: the store a search answers from: ``commit``, the commit it was built at (its fingerprints row's
-    ``head``, never the folder's HEAD now; None for a store built before W2-68 or one that cannot be read), and
-    ``root``, its folder as given (``resolved`` first)."""
+def _head_of(root) -> str | None:
+    """The folder's HEAD now, the full hash; None where git cannot say."""
+    try:
+        return lexical._git(Path(root), "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip() or None
+    except (GovError, UnicodeDecodeError):
+        return None
+
+
+def _changed_since(root, commit: str | None, head: str | None) -> list[str]:
+    """W2-189: the tracked paths that changed between the store's commit and HEAD, sorted, each once (a path added,
+    removed or renamed away from or to is named, both sides of a rename; one changed twice, once): git's own list of
+    the two commits' tracked files, never a file that is untracked or ignored. ``[]`` where the two are one. Where the
+    commit is unknown (a store built before W2-68) or git cannot compare it (not a commit of this folder), the tracked
+    paths whose stored blob differs from the working tree's, which the lexical facet leaves out as well; ``[]`` where
+    that cannot be read."""
+    if commit is not None and head is not None:
+        if commit == head:
+            return []
+        try:
+            out = lexical._git(Path(root), "diff", "--name-only", "--no-renames", "--no-ext-diff", "-z", commit, head)
+            return sorted({os.fsdecode(name) for name in out.split(b"\0") if name})
+        except GovError:
+            pass
+    try:
+        return sorted(lexical.freshness(Path(root))["stale"])
+    except (GovError, sqlite3.Error, OSError):
+        return []
+
+
+def _walled(store: dict, withhold) -> dict:
+    """``store`` with the stale paths the caller's ``withhold`` (``role_filter``) refuses taken out of ``stale`` and
+    counted in ``stale_walled`` (DEC-1157 (12), DEC-820): a path the caller may not read is not named. Taking out again
+    what is out already changes nothing. No filter, no change."""
+    if withhold is None or not store.get("stale"):
+        return store
+    kept = [rel for rel in store["stale"] if withhold.denied(rel) is None]
+    if len(kept) == len(store["stale"]):
+        return store
+    return {**store, "stale": kept, "stale_walled": store.get("stale_walled", 0) + len(store["stale"]) - len(kept)}
+
+
+def store_of(root, role=None) -> dict:
+    """W2-138 S1, W2-189: the store a search answers from: ``commit``, the commit it was built at (its fingerprints
+    row's ``head``, never the folder's HEAD now; None for a store built before W2-68 or one that cannot be read);
+    ``head``, the folder's HEAD now (None where git cannot say); ``stale``, the tracked paths changed between the two
+    (``_changed_since``; empty when they are one); and ``root``, its folder as given (``resolved`` first).
+
+    The paths the caller (``GOV_ROLE``, ``role`` beside it, ``GOV_TICKET``) may not be handed (``role_filter``) are
+    not named in ``stale``: ``stale_walled`` counts them, and is there only when some were withheld. A wall that cannot
+    be read withholds them all (fail closed)."""
     commit = None
     try:
         connection = loader.connect(root)
@@ -173,11 +219,29 @@ def store_of(root) -> dict:
             connection.close()
     except (GovError, sqlite3.Error):
         pass  # no store, or none that can be read: the search says so itself
-    return {"commit": commit, "root": str(root)}
+    head = _head_of(root)
+    named = {"commit": commit, "head": head, "stale": _changed_since(root, commit, head), "root": str(root)}
+    try:
+        return _walled(named, role_filter(root, role))
+    except GovError:  # the wall cannot be read: no stale path is named, only how many there are
+        return {**named, "stale": [], "stale_walled": len(named["stale"])} if named["stale"] else named
 
 
 def _short(commit) -> str:
     return str(commit)[:12] if commit else "unknown"
+
+
+def store_line(store: dict) -> str:
+    """The text form's line naming the store (W2-138 S1, W2-189 S2): ``store: <commit, 12 digits> (<folder>)``; where
+    HEAD is not the store's commit, the head and the number of stale paths follow it, and a second line names how many
+    stale paths the caller may not be shown."""
+    line = f"store: {_short(store.get('commit'))} ({store.get('root')})"
+    head = store.get("head")
+    if head is not None and head != store.get("commit"):
+        line += f", head {_short(head)}, {len(store.get('stale') or ())} stale path(s)"
+    if store.get("stale_walled"):
+        line += f"\n{store['stale_walled']} stale path(s) not shown (walled)"
+    return line
 
 
 _UNCHECKED = object()
@@ -346,7 +410,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     is withheld is counted in the bundle's ``role_filter``. ``root`` is resolved once (W2-138 S2); ``store`` is its
     ``store_of``, read here when not given, and its commit goes in the token (S3)."""
     root = resolved(root)
-    store = store_of(root) if store is None else store
+    store = store_of(root, role) if store is None else store
     if batch_size is None:
         batch_size = DEFAULT_BATCH_SIZE
     limit = BUNDLE_BUDGET if bundle_budget is None else bundle_budget
@@ -359,6 +423,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
+    store = _walled(store, withhold)  # a stale path the caller may not read is counted, not named (DEC-1157 (12))
     # W2-32 S8: the routing settings read first, so an invalid file is refused before any search work (S8-F4)
     route_settings, routed = routing.settings(root), {}
     pooling = pool.settings(root)  # W2-32 S11: read first too, so an invalid value is refused before any search
@@ -397,7 +462,12 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         answers[semantic.FILE_FACET] = _phrased(semantic.file_search, root, asked, "hits", cut=cut)
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
     routes = {name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()}  # W2-13: ranked lexical
-    chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
+    # W2-189: a path changed since the store's commit is left out whole, before any route reads its file: the paths the
+    # lexical index lags the tracked files by, and those the commits since the store's name (never a stale path's old text)
+    left_out = set(store.get("stale") or ()) | set(lexical.served(root)[1]) \
+        if facets[lexical.FACET]["available"] else set()
+    chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)
+              if chunk["path"] not in left_out} if facets[lexical.FACET]["available"] else {}
     closure_gaps, start = [], [*([ticket] if ticket else []), *ids]
     depth = closures.depth_of_radius(radius if start else min(radius, 1))  # W2-92: a question's records at R0 or R1
     start += [rid for rid in graph_route.start_ids(root, query, known) if rid not in start]  # W2-92: the record route
@@ -750,7 +820,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "expansions": expansions, "repeats": repeats, "gaps": gaps, "facets": facets,
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
-              "continuation": token}
+              "continuation": token, "store": store}
     if any(route_settings.values()):  # W2-32 S8: what the routing moved ahead, per half that is on
         bundle["routing"] = {**{half: [] for half, key in ((routing.CODE, "code_first"), (routing.NAMED, "named_first"))
                                 if route_settings[key]}, **routed,

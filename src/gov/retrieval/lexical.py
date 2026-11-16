@@ -504,9 +504,10 @@ def _tree(root: Path, place: Path) -> tuple | None:
     return None if stamps is None else (listed, names, stamps)
 
 
-def _checked(root: Path) -> tuple[tuple | None, str, list[str]]:
-    """The key of the store and the tree as they stand (None when one cannot be read), the status and the stale paths:
-    worked out once per key in a process, and on every call when there is no key (W2-108)."""
+def _looked(root: Path) -> tuple[tuple | None, tuple[str, list[str], bool]]:
+    """The key of the store and the tree as they stand (None when one cannot be read) and ``_freshness``'s answer: the
+    status, the stale paths and whether the index can be answered from as it stands. Worked out once per key in a
+    process, and on every call when there is no key (W2-108)."""
     root = Path(root)
     place = root.resolve()
     store, tree = _store_stamp(root), _tree(root, place)
@@ -514,8 +515,32 @@ def _checked(root: Path) -> tuple[tuple | None, str, list[str]]:
     key = None if store is None or tree is None or settings is None else (store, tree, settings)
     if key is None or _FRESHNESS.get(place, (None,))[0] != key:
         _FRESHNESS[place] = (key, _freshness(root))
-    status, stale = _FRESHNESS[place][1]
-    return key, status, list(stale)
+    status, stale, servable = _FRESHNESS[place][1]
+    return key, (status, list(stale), servable)
+
+
+def _checked(root: Path) -> tuple[tuple | None, str, list[str]]:
+    """The key of the store and the tree as they stand (None when one cannot be read), the status and the stale paths:
+    worked out once per key in a process, and on every call when there is no key (W2-108)."""
+    key, (status, stale, _) = _looked(root)
+    return key, status, stale
+
+
+def served_checked(root: Path) -> tuple[tuple | None, str, list[str]]:
+    """``_checked``'s key, then the status and the paths left out as ``served`` gives them."""
+    key, (status, stale, servable) = _looked(root)
+    return (key, "fresh", stale) if status == "stale" and servable else (key, status, [])
+
+
+def served(root: Path) -> tuple[str, list[str]]:
+    """What a search without refresh answers from (W2-189, DEC-1197 (2)(i)): the status, and the paths left out of its
+    answer. An index that only lags the tracked files (the stored blob of a path differs from the tracked file's, or the
+    path is tracked and not stored, or stored and no longer tracked) and whose methods are ``rebuild.yaml``'s is
+    ``fresh`` and the paths that differ are left out, whole: a path's old text is never served as current (DEC-342).
+    Any other index keeps its status, as ``freshness`` gives it: missing, empty, built with other methods (``stale``),
+    or built before W2-13 (``stale``); one that cannot be read raises. Writes nothing."""
+    _, status, left = served_checked(root)
+    return status, left
 
 
 def freshness(root: Path) -> dict:
@@ -526,14 +551,15 @@ def freshness(root: Path) -> dict:
     return {"status": status, "stale": stale}
 
 
-def _freshness(root: Path) -> tuple[str, list[str]]:
-    """The status and the stale paths, worked out from the store and the tracked files as they stand."""
+def _freshness(root: Path) -> tuple[str, list[str], bool]:
+    """The status, the stale paths and whether the index can be answered from as it stands (``served``), worked out
+    from the store and the tracked files as they stand."""
     connection = _open(root)
     if connection is None:
-        return "missing", []
+        return "missing", [], False
     try:
         if not _current(connection):
-            return "stale", []  # built by the code before W2-13: a refresh builds it again
+            return "stale", [], False  # built by the code before W2-13: a refresh builds it again
         stored = dict(connection.execute("SELECT path, blob FROM lexical_file"))
         current = _tracked(Path(root))
         stale = sorted(rel for rel in stored.keys() | current.keys() if stored.get(rel) != current.get(rel))
@@ -541,8 +567,10 @@ def _freshness(root: Path) -> tuple[str, list[str]]:
         if recipe != built:  # DEC-1068: built with other index-time methods than rebuild.yaml's
             indexed = [rel for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = 1")]
             switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
-            return "stale", sorted(set(stale) | _affected(switched, indexed, _register(Path(root))))
-        return "stale" if stale else "empty" if _empty(connection) else "fresh", stale
+            return "stale", sorted(set(stale) | _affected(switched, indexed, _register(Path(root)))), False
+        if stale:
+            return "stale", stale, not _empty(connection)  # an index with no chunk has nothing to answer from
+        return "empty" if _empty(connection) else "fresh", stale, False
     finally:
         connection.close()
 
@@ -588,18 +616,19 @@ def search(root: Path, query: str, refresh: bool = True, top_k: int | None = Non
     stale index is reported as ``FACET_UNAVAILABLE`` with its reason and no hit (DEC-342). It never raises: a store
     or a ``git`` that cannot be read is the reason ``unreadable`` (W2-M071).
     """
-    connection = None
+    connection, left_out = None, ()
     try:
         if refresh:
             connection, status = _update(Path(root))[0], "fresh"
         else:
-            connection, status = _open(root), freshness(root)["status"]
+            connection = _open(root)
+            status, left_out = served(root)
         if status == "fresh" and _empty(connection):
             status = "empty"
         if status != "fresh":
             return _unavailable(status)
         return {"available": True, "facet": FACET, "state": "AVAILABLE", "reason": None,
-                **_ranked(connection, query, top_k)}
+                **_ranked(connection, query, top_k, frozenset(left_out))}
     except (sqlite3.Error, OSError, GovError):
         return _unavailable("unreadable")
     finally:
@@ -607,9 +636,10 @@ def search(root: Path, query: str, refresh: bool = True, top_k: int | None = Non
             connection.close()
 
 
-def _ranked(connection: sqlite3.Connection, query: str, top_k: int | None = None) -> dict:
+def _ranked(connection: sqlite3.Connection, query: str, top_k: int | None = None,
+            left_out: frozenset = frozenset()) -> dict:
     """``hits`` and ``ranked`` of ``query`` in the open, fresh index; at most ``top_k`` (``TOP_K``) chunks added by
-    the words."""
+    the words. The chunks of the paths in ``left_out`` (``served``) are no candidate, before any cut."""
     top_k = top_k or TOP_K
     keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "bm25")
     split = _columns(connection) == SPLIT_COLUMNS  # M4's index: its parts column weighted too
@@ -623,7 +653,7 @@ def _ranked(connection: sqlite3.Connection, query: str, top_k: int | None = None
                                   "FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
                                   "ORDER BY c.path, c.start_line")
     held = [whole_id(name) for name in names]
-    rows = [(row, any(query in content for content in row[-1].splitlines())) for row in rows]
+    rows = [(row, any(query in content for content in row[-1].splitlines())) for row in rows if row[1] not in left_out]
     rows = [(row, hit) for row, hit in rows if hit or any(pattern.search(row[-1]) for pattern in held)]
     ranked = {row[0]: {**dict(zip(keys, row[:-1])), "exact": True} for row, _ in rows}  # the boost, in bm25 order
     rows = [row for row, hit in rows if hit]  # the exact route's chunks: those that hold the whole string
@@ -636,8 +666,11 @@ def _ranked(connection: sqlite3.Connection, query: str, top_k: int | None = None
                              "parent_id": parent_id})
     words, added = _words(query), 0
     if words:
-        for record in connection.execute(ranked_top, (words, top_k + len(ranked))):
-            if added < top_k and record[0] not in ranked:
+        # the cut is made by the query, before the paths left out are: it is raised by the chunks they hold
+        held_back = sum(1 for (path,) in connection.execute("SELECT path FROM lexical_chunk") if path in left_out) \
+            if left_out else 0
+        for record in connection.execute(ranked_top, (words, top_k + len(ranked) + held_back)):
+            if added < top_k and record[0] not in ranked and record[1] not in left_out:
                 ranked[record[0]] = {**dict(zip(keys, record)), "exact": False}
                 added += 1
     return {"hits": hits, "ranked": list(ranked.values())}
