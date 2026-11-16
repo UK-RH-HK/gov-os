@@ -14,7 +14,56 @@
 How does W2-61's measure score the m1 baseline in each retrieval mode? What do indexing and incremental updates cost?
 Does stacking in batches hold? Which of the 20 misses can W2-32's three bounded gaps reach?
 
-## 2. The metric (fixed before the first run: DEC-954 Q9, DEC-957)
+## 2. The metric (revised 2026-11-15 for the current set, before the close run: DEC-954 Q9, DEC-957, DEC-1171 (3), DEC-1186 (3))
+
+This section is the metric of the close run. It replaces pass 1's metric for the 48-question set (24 visible, 24
+hidden, memory proven at 21 of 24). It is committed before the close run's first raw output: every raw output of
+the close run is dated after this commit, and this commit is an ancestor of the first commit holding them (AR-10).
+
+- **The measure:** W2-61's measure, `src/gov/retrieval/measure.py` at the measured head, unchanged:
+  `python3 -m gov.retrieval.measure memory-retrieval --root <clone> --sets-root <root> --part visible|hidden
+  --out <dir> --gov <modes.py wrapper>`, one run per mode and part.
+- **The set:** the current `memory-retrieval` set. **40 visible** questions (`fixtures/evaluation/memory-retrieval/
+  visible/`, 40 files at `883e1ba6b`) and **39 hidden** questions, kept outside every tree under the evaluation sets
+  root (`HIDDEN_COUNT = 39` in `tests/acceptance/W2-61h/w2_61h_support.py`; h10 retired by DEC-1171 (2)). The count
+  the operator's walled run prints settles 39 or 40.
+- **Needed evidence and its labels:** each question's `sources` entries are its needed evidence (a path, with an
+  optional heading or line span and commit; a list of alternatives counts when any one matches). The labels were
+  written blind to the system's answers: the visible half by W2-61's question authors (Lens B), with the label fixes
+  of DEC-1060 and DEC-1069 (1) made by sessions independent of the retrieval work; the hidden half by the walled
+  writer and the owner's operator in their walls (W2-61h; DEC-1069 (1), DEC-1171 (2)). No label is changed here.
+- **The stacked context:** the calls' evidence items in order, each taken once, within the stack budget (an item's
+  size its text's length / 4, rounded up); a call continues the last while it returned a continuation and the budget
+  is not reached (DEC-860). Budgets: batch size 10, bundle budget 6,000 tokens, stack budget 24,000 tokens (the
+  measure's defaults).
+- **A hit:** an evidence item matches a source when its path equals the source's and its lines overlap the source's
+  span (a heading found in the measured root governs over `lines`; a family member counts only when its text holds
+  the gold span's text). **hit@5:** a source matched by one of the first five items of the stacked context.
+- **Per-question recall of needed evidence:** `pieces_found` / `pieces_needed` in the measure's record, the share of
+  the question's sources matched anywhere in the stacked context. A question has **all its evidence** when every
+  source is matched (`full_evidence`).
+- **The corpus figures, always together (W2-61's measure, DEC-833 item 3):** the hit@5 share, against the owner's
+  target of **95 %**, with CAP-10's **85 %** the floor; and the share of questions whose stacked context holds all
+  their needed evidence, against the owner's goal of **99 %**. The corpus mean of per-question recall is computed by
+  the record's table script from the records' `pieces_found` and `pieces_needed` (visible half; for the hidden half
+  only if the operator's counts give it).
+- **The memory proof:** mode `rerank` (the shipped path) at a hidden hit@5 of at least **34 of 39**, or **35 of 40**
+  once the hidden half is back at 40 (DEC-1171 (3)). The other modes have no pass line; their counts fill the table.
+- **The modes:** `rerank` (fused plus reranker), `lexical` (lexical only, ranked), `semantic` (semantic only) and
+  `fused` (fusion, no reranker), each through `w2-15a/modes.py`. The fifth, the lighter reranker (DEC-074 Q3), stands
+  as **not installed**; the line is met in part (DEC-1186 (3), Q1 (a)).
+- **The hidden half in this record:** counts only (questions judged, hit@5 count, all-evidence count, unresolved gold
+  blocks, the pass line), copied from the record of the owner's operator's walled run; never a question, an answer
+  or a hidden file's text (DEC-1186 (3), Q3 (a)). The visible cells are re-derived from the raw records by
+  `w2-15a/table.py`. The walled run follows the refused probe read recorded in `w2-15a/probe-refusal.md`.
+- **On a miss** (rerank below 34 of 39, or 35 of 40, or either figure below its floor): the figures are recorded as
+  measured, the misses classified, and at most three gaps named for W2-15b (W2-32 is closed), each with the misses it
+  is meant to reach; S1's memory clause then reads "recorded against 34 of 39" (DEC-1186 (3), Q2 (a)).
+- **Pass 1's sections 3 to 9** hold pass 1's figures on the old 48-question set and code (2026-11-03), kept as history
+  until the close run's record replaces them. Section 6, the stacking test (`raw/stack-q14.json`), stands as S3's one
+  baseline run and is not re-run.
+
+### 2.0 Pass 1's metric (fixed before pass 1's first run, 2026-11-03; kept as history)
 
 This is W2-61's measure (`src/gov/retrieval/measure.py` at the clone), unchanged, on the 48 questions: 24 visible
 (copied from the clone into `~/gov-os-eval`) and 24 hidden (`~/gov-os-eval`, outside every tree, with the gold
