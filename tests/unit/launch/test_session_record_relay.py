@@ -153,6 +153,19 @@ def test_a_truncated_last_line_is_not_a_result(tmp_path):
     assert relay.result == {"type": "result", "n": 1} and out.endswith(b'"n"')
 
 
+def test_a_line_nested_too_deep_to_parse_is_relayed_and_is_no_result(tmp_path):
+    """json.loads raises RecursionError (not ValueError) on deep nesting: the relay goes on, the code is kept."""
+    code = """
+        import os, json
+        os.write(1, json.dumps({"type": "result", "n": 1}).encode() + b"\\n")
+        os.write(1, b'{"type": "result", "x": ' + b"[" * 200000 + b"]" * 200000 + b"}\\nafter\\n")
+        raise SystemExit(4)
+    """
+    relay, exit_code, out, said = _relay_to_file(tmp_path, code)
+    assert exit_code == 4 and out.endswith(b"}\nafter\n") and len(out) > 400000
+    assert relay.result == {"type": "result", "n": 1} and said == []
+
+
 def test_no_output_gives_no_result(tmp_path):
     relay, exit_code, out, said = _relay_to_file(tmp_path, "raise SystemExit(3)")
     assert out == b"" and relay.result is None and exit_code == 3 and said == []

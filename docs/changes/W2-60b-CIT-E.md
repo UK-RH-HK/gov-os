@@ -147,9 +147,12 @@ after a signal), as before.
 - A pipe that cannot be read: one stderr line, and the relay stops. Not seen in practice, since `os.read` on a pipe
   fails only on a closed descriptor.
 
-**Tests:** `tests/unit/launch/test_session_record_relay.py` (22). They cover which runs are relayed; bytes
+A line nested too deep for `json.loads` (it raises `RecursionError`, not `ValueError`) is relayed and is no result;
+the relay goes on.
+
+**Tests:** `tests/unit/launch/test_session_record_relay.py` (23). They cover which runs are relayed; bytes
 identical, including all 256 byte values, a partial last line and a 5 MiB output; the last result line kept; a
-truncated line not taken; the exit code unchanged (3, 7, 9); a SIGINT mid-run relayed to the end with exit 130 and
+truncated line not taken; a line nested 200,000 deep; the exit code unchanged (3, 7, 9); a SIGINT mid-run relayed to the end with exit 130 and
 the result recorded; an unwritable stdout; an interactive run inherited; and `gov launch` run as its own process,
 its stdout compared byte for byte.
 

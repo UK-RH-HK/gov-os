@@ -1298,7 +1298,7 @@ class _Relay:
             return
         try:
             value = json.loads(line)
-        except ValueError:
+        except (ValueError, RecursionError):  # deep nesting raises RecursionError: no result, the relay goes on
             return
         if isinstance(value, dict) and value.get("type") == "result":
             self.result = value
