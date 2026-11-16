@@ -1,7 +1,6 @@
 # P-RELEASE-2: release 0.1.1 and its re-pin (your sitting)
 
-**DRAFT 2026-11-16 05:4x. The owner's steps (section 4) and the re-pin line (section 5) are filled from the rehearsed,
-reviewed bundle `drafts/repin-rel-0.1.1/` before this goes to you.**
+**Ready 2026-11-16 08:1x: the bundle is reviewed (READY, narrow re-check READY); section 4 is its rehearsed steps.**
 
 ## 1. What 0.1.1 is for
 0.1.0 (C `076cded14882`, re-pinned ~17:00 on 11-15) is what EXAMIN's copy and W2-81's six adoptions ran on overnight.
@@ -38,11 +37,85 @@ From my message "release ready at C" until you say "done" after the re-pin, noth
 `w2/integrate` but your bump, your record commit and your registry commit (memory rule; RL-3). Leads keep running;
 their lands wait. I write `log/act-in-progress.txt` at the hand-over.
 
-## 4. Your steps (filled from the bundle's rehearsed README)
-{TO FILL: the bump, `gov release 0.1.1`, the record check, the record commit, the tag v0.1.1 on the record commit, "released"}
+## 4. Your steps (copied word for word from the reviewed bundle README part 1, BUNDLE.sha256 dd201943; review READY, narrow re-check READY)
+
+1. Open a plain terminal.
+   ```
+   env | grep '^GOV_'          # must print nothing; if it prints, run: unset GOV_ROLE GOV_TICKET
+   ```
+2. Check the checkout:
+   ```
+   cd /home/usain/Dynamic-Agentic-Engineering-OS
+   git branch --show-current                     # w2/integrate
+   git rev-parse HEAD                            # the H the CTO named
+   git status --porcelain --untracked-files=all  # must print nothing
+   grep -n '^version' pyproject.toml             # 7:version = "0.1.0"
+   ```
+3. Raise the version to 0.1.1 in one commit of yours (this commit is C):
+   ```
+   sed -i 's/^version = "0.1.0"$/version = "0.1.1"/' pyproject.toml && git add pyproject.toml && git commit -q -F - <<'EOF'
+   Version 0.1.1 for release 0.1.1 (P-RELEASE-2)
+
+   Role: owner
+   Task: DAEO-sdxk
+   Implements: DEC-772, DEC-1089
+   EOF
+   git show --stat HEAD | tail -2                # 1 file changed, 1 insertion(+), 1 deletion(-): pyproject.toml
+   git log -1 --format='%(trailers)'             # the three lines
+   ```
+   - It passes the landing check (`Role: owner`; checked in the rehearsal: `landing_check.py` prints `[]`).
+   - The tests that read the version read `pyproject.toml` at run time (`tests/unit/cli/test_w2_59_version.py`; the
+     release tests use their own fixtures), so no test changes with it.
+4. Build:
+   ```
+   ~/.local/bin/gov release 0.1.1
+   ```
+   - It shows `type RELEASE-<4 digits> to build release 0.1.1:`. Type that code and press Enter.
+   - It answers with `"version": "0.1.1"` and the record's path.
+   - A `RELEASE_REFUSED` names its reason. Tell the CTO, and do nothing else.
+5. Check the record:
+   ```
+   (cd docs/releases/0.1.1 && sha256sum -c manifest.sha256)   # manifest.json: OK
+   git status --porcelain                                       # only: ?? docs/releases/0.1.1/
+   ```
+6. Commit it, with the trailers in ONE final paragraph. The message fills C itself (HEAD is C at this step); the
+   decision number `DEC-1198` is filled here (DEC-1198: the decision I record from your P-RELEASE-2 line; if another decision takes that number first, I correct it in this page when I say "release ready"), the same number the re-pin is
+   filled with, and the re-pin stops (part R) unless the record commit names that C and that decision:
+   ```
+   git add docs/releases/0.1.1
+   git commit -F - <<EOF
+   Release 0.1.1: the record of the second numbered, frozen release (W2-16, DEC-772)
+
+   Built by gov release 0.1.1 from $(git rev-parse --short=12 HEAD) on w2/integrate.
+
+   Role: owner
+   Task: DAEO-sdxk
+   Implements: DEC-772, DEC-1089, DEC-1198
+   EOF
+   git log -1 --format='%B' | grep '^Built by'   # Built by gov release 0.1.1 from <C, 12 digits> on w2/integrate.
+   git log -1 --format='%(trailers)'             # shows the three lines, the decision filled
+   ```
+7. Tag **the record commit**, the one you just made:
+   ```
+   git tag -a v0.1.1 -m "Release 0.1.1 (W2-16)"
+   git rev-parse 'v0.1.1^{commit}' HEAD          # the same id twice
+   git rev-parse HEAD^                           # C, your version bump commit
+   ```
+8. Optional, yours, as usual (DEC-1087 (7)): `git push origin w2/integrate v0.1.1`.
+9. Tell the CTO "released". It fills part 2 from the tag and gives you its line.
+
+**Option (b), no version bump (rehearsed as mode `opt-b`):** skip step 3. C is then the head H the CTO named, the
+record's `cli_version` and wheel name stay 0.1.0 (`gov-0.1.0-py3-none-any.whl`), and the CTO fills part 2 with
+`--cli 0.1.0`. Steps 1, 2 and 4 to 9 are the same commands (step 2's `grep` still shows 0.1.0; step 7's `HEAD^` is H).
 
 ## 5. The re-pin (your operator, plain terminal, about 5 minutes)
-{TO FILL: the one line, with the targets named (DEC-1196 (5)), the reviewed bundle's sha256 check first}
+At "released" I run `fill_release.sh --c <C> --repo /home/usain/Dynamic-Agentic-Engineering-OS --dec DEC-1198` (it
+refuses unless the tag, the record and the record commit's message all agree), rehearse the filled script at the real C
+on a mirror, have the filled bytes reviewed, then give your operator one line: the bundle's sha256 check first, then the
+script with both targets named (`--home /home/usain --repo /home/usain/Dynamic-Agentic-Engineering-OS`; DEC-1196 (5)).
+It installs `pin-<C>` beside pin-076cded14882, rebuilds the store, runs the checks, switches `~/.local/bin/gov`
+atomically and rolls back by itself on a failed check. Rollback line (yours, if anything goes wrong after the switch):
+`ln -sfn ~/.local/share/gov-os/pin-076cded14882/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov; hash -r`
 
 ## 6. After it
 - I end the hold, add the two release-check lines to `docs/plan/wave-2/examin-copy/release-check.md`, and check the
