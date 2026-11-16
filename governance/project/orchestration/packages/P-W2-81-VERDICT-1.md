@@ -81,3 +81,25 @@ medium-high. The two items needing your operator's targeted print (secret-histor
 evidence) are counts and record names, not hidden text.
 
 **Your line:** `P-W2-81-VERDICT-1 (a)`, plus which tickets of (b), and `(c) yes` or `(c) no`.
+
+## 4. The re-read on current stores (2026-11-16 ~02:0x, after (a): five final rebuilds)
+Still NOT_READY, 74 reasons. Only the figures changed: they are now real, measured on stores that match HEAD.
+
+| Repository | hit_at_5 (floor 85) | stacked_share (floor 99) | planted NOT_BUILT | controls | close |
+|---|---|---|---|---|---|
+| python-app | 52.4 | 61.9 | 5 + hidden #1 | 2 clean | exit 3 |
+| rust-workspace | 55.0 | 75.0 | 3 + hidden #2-#4 | 2 clean | exit 3 |
+| typescript-monorepo | 45.0 | 50.0 | 5 + hidden #5 | 2 clean | exit 3 |
+| legacy-docs | 5.0 | 5.0 | 3 + hidden #7-#10 | 2 FLAGGED | exit 3 |
+| secret-history | 75.0 | 85.0 | 3 + hidden #13; hidden #11, #12 MISHANDLED | 2 clean | exit 3 |
+| python-app-clean | 90.0 | 85.0 | none planted | 2 clean | exit 3 |
+
+**What the figures say:**
+- **Memory is below its floors in every repository**, by a wide margin, even on current stores. That is a real product result for the memory route, W2-88's A9 lite on an adopted repository.
+- **legacy-docs (5/5) is the outlier.** Its adopter kept its old documents out of the embeddings through the path map, and the repository is mostly documents. The likely cause is that most gold sources sat in a not-embedded namespace. That is the adopter's path-map choice meeting a product with no document route: A3 refused every document move (legacy-docs F-006).
+- **The planted problems' NOT_BUILT are the product's unbuilt capabilities, as W2-81's README table expects for today's code:** misleading names, orphaned tests, superseded plans and stale specs needing content classing, secrets in history, legacy-document extraction and retirement. They are not adopter failures.
+- **Unchanged by the re-read:** A7, A10, VERDICT, findings, close exit 3, secret-history's MISHANDLED and legacy-docs' FLAGGED are as triaged in sections 1 and 2.
+
+**For the morning:**
+- the figures go to the memory owner as a measured shortfall (a ticket or an existing reopen, on your word);
+- the full re-run on 0.1.1 (DEC-1197 (3)) measures them again.
