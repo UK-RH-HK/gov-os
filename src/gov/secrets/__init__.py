@@ -68,6 +68,7 @@ _FORM = 7  # the form of the record and of what a scan reads (in the cache's fin
 # text larger than the byte cap a batch of its own. gitleaks dir costs about 0.33 s a process and 2,000 small texts a
 # second besides; the byte cap bounds the folder's disk (a tmpfs is memory) and the run's time limit.
 _BATCH_TEXTS, _BATCH_BYTES = 1_000, 8 << 20
+_PER_PROCESS = 10  # texts per gitleaks process at least, on average, whatever the width (S27-W, DEC-1156 (7))
 _UNPLACED = "unreadable-report"  # the finding put on every text of a batch whose report cannot be placed on its files
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
@@ -434,17 +435,29 @@ def _held(findings: list[tuple[str, str | None]], root: Path | None) -> bool:
     return _commits(root, hashes) != hashes
 
 
-def _batches(items: list, sizes: list[int], width: int):
+def _batches(items: list, sizes: list[int], width: int, *, rule_sets: int):
     """``items`` in order, in batches of at most ``_BATCH_TEXTS`` texts and ``_BATCH_BYTES`` bytes (one text larger is
-    a batch of its own), and no larger than the share that keeps ``width`` workers busy."""
-    per = max(1, min(_BATCH_TEXTS, -(-len(items) // max(1, width))))
-    batch, held = [], 0
+    a batch of its own), spread evenly over as many batches as keep ``width`` workers busy and S27's bound allows.
+
+    The bound (DEC-1183 (2), run 9; S27-W, DEC-1156 (7)): each batch starts one ``gitleaks dir`` per rule set, so with
+    ``rule_sets`` sets the texts are split into at most ``len(items) // (_PER_PROCESS * rule_sets)`` batches (at least
+    one): at least ``_PER_PROCESS`` texts per gitleaks process on average, both rule sets counted, however wide the CPU
+    set or slot budget. The caps still split a batch and win over the bound: a cut forced by the byte cap leaves the
+    rest spread over the batches left, so only texts large in bytes (a batch's floor of texts over ``_BATCH_BYTES``)
+    add batches past it.
+    """
+    floor = _PER_PROCESS * max(1, rule_sets)
+    allowed = max(1, min(width, len(items) // floor))  # the batches the width and the bound allow
+    batch, held, left, made = [], 0, len(items), 0
     for item, size in zip(items, sizes):
         if batch and (len(batch) >= per or held + size > _BATCH_BYTES):
             yield batch
-            batch, held = [], 0
+            batch, held, made = [], 0, made + 1
+        if not batch:  # the texts left, this one among them, spread evenly over the batches left
+            per = min(_BATCH_TEXTS, -(-left // max(1, allowed - made)))
         batch.append(item)
         held += size
+        left -= 1
     if batch:
         yield batch
 
@@ -546,7 +559,7 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
     allowed = [False] * len(asked)
     width = _workers()  # at most this many batches, each one gitleaks at a time, at once (W2-20 S18)
     with ThreadPoolExecutor(max_workers=width) as pool:
-        futures = [pool.submit(judge, batch) for batch in _batches(candidates, sizes, width)]
+        futures = [pool.submit(judge, batch) for batch in _batches(candidates, sizes, width, rule_sets=len(rules))]
         try:
             for future in futures:
                 for index, verdict in future.result().items():
