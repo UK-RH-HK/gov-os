@@ -29,8 +29,8 @@ EXIT_CODES = {EXIT_GATE_SHUT: "the resource gate is shut: no session starts"}
 
 
 def add_arguments(parser) -> None:
-    parser.usage = ("gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] "
-                    "[--reason <text>] [--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]")
+    parser.usage = ("gov launch <role> <ticket> [--plan] [--tests-worktree] [--gate-override DEC-NNN] "
+                    "[--gpu-need-mib N] [--reason <text>] [--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]")
     parser.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
                         "independent-auditor, research or product-spec")
     parser.add_argument("ticket", metavar="<ticket>", help="an in_progress ticket")
@@ -39,6 +39,9 @@ def add_arguments(parser) -> None:
     parser.add_argument("--gpu-need-mib", metavar="<MiB>", type=int, help="the session's declared GPU need")
     parser.add_argument("--plan", action="store_true", help="print the role file's default line (model <id>, "
                         "effort <e>) and start nothing")
+    # W2-60b S10 (DEC-847, DEC-963, DEC-982): the test designer's own tree, made from the ticket's worktree.
+    parser.add_argument("--tests-worktree", action="store_true", help="make the ticket's tests worktree "
+                        "(<tree>-tests, on <branch>-tests at HEAD), print its path and start nothing")
     # W2-184 (interface 7.2a, the CTO's P-W2-184-2 (a)): RUBRIC-2's options, before "--"; the launcher judges them.
     parser.add_argument("--reason", metavar="<text>", help="why the launch chooses effort max itself (recorded)")
     parser.add_argument("--trial", metavar="<id>", help="the trial (governance/project/trials/<id>.yaml) that "
@@ -55,6 +58,8 @@ def run(root: Path, args, config: dict) -> int:
     from gov.launch import launcher
     if getattr(args, "plan", False):
         return launcher.plan(root, args.worker_role, args.ticket)
+    if getattr(args, "tests_worktree", False):
+        return launcher.tests_worktree(root, args.worker_role, args.ticket)
     # a given option only (an empty one too, for the launcher to refuse); absent, the launcher's default is None
     options = {key: value for key, _ in OPTIONS if (value := getattr(args, key, None)) is not None}
     if args.worker_role in launcher.LEAD_ROLES and options:

@@ -17,9 +17,9 @@ W2-60b (DAEO-ecac) gives every launched worker session one record keyed by its s
 harness's own record of the session (DEC-838 item 3, CAP-36.a lite). It also reads the launchable roles from the
 kernel's role files (DEC-946 (W3-P09)), makes `qa-engineer` a known role of the guard (DEC-959 item 3), refuses a
 second writing session in a worktree (DEC-847, DEC-963, DEC-1156 (3)), and builds the behaviour of
-`gov launch --tests-worktree` (DEC-982). Status **APPLIED** in the code, except two parts that are not in this
-ticket's paths. They are drafted below and not applied: the live hook's reviewer line, which needs the owner's ACT
-(§6), and the `command.py` flag, which is the CTO's path question (§7).
+`gov launch --tests-worktree` (DEC-982). Status **APPLIED** in the code, except one part that is not in this
+ticket's paths: the live hook's reviewer line, which needs the owner's ACT. It is drafted in §6 and not applied. The
+`command.py` flag (§7) was applied by the CTO's path case P1 (a) (f5d4ce253).
 
 ## 1. The changes
 
@@ -29,6 +29,7 @@ ticket's paths. They are drafted below and not applied: the live hook's reviewer
 | 2 | `src/gov/telemetry/sessionlog.py` | New reading only: `measure(path, session)` (turns, compactions, rate-limit events, cost, effort, minutes, the main session's models, one model per sub-agent, versions). `find`, `subagent_files` and `read` are not changed. | `tests/unit/telemetry/test_sessionlog_w2_60b.py` (one case checks that `read` is unchanged for a 429 line) |
 | 3 | `src/gov/launch/launcher.py` | (a) The `Keeper`'s `begin` once the session's process has started and its `end` in `_run`'s `finally`, on every exit path. (b) `_role_kind`: the launchable roles and the own-ticket rule, read from the role files. `OWN_TICKET_ROLES` and the `WORKER_ROLES` assignment are removed (§4). (c) `check_one_writer` before anything is written, and again under the start lock (en-3, review round 1 F1, §3); the start record is written straight after the CLI's start. (d) `tests_worktree()`. (e) A new role's template is found by name (§5). (f) en-2: a `--output-format json` worker session's stdout relayed, and its result line given to the record (§2a). | `tests/unit/launch/test_session_record_launch.py`, `tests/unit/launch/test_session_record_relay.py` |
 | 4 | `src/gov/guard/decide.py` | `"qa-engineer"` added to `KNOWN_ROLES`, and nothing else in the file. | `test_session_record_launch.py` (the guard cases) |
+| 5 | `src/gov/launch/command.py` | `--tests-worktree`: §7's diff, applied byte for byte (the CTO's path case P1 (a), DEC-1156 (7), f5d4ce253), and nothing else in the file. | `tests/unit/launch/test_session_record_tests_worktree_cli.py` |
 
 `git diff 4bc0399fb -- src/gov/guard/decide.py` shows one added line, and `.claude/hooks/pretooluse.py` is unchanged.
 
@@ -317,7 +318,19 @@ exists. Writing it is an ACT (DEC-315) and is not in this ticket's paths.
                  # the CTO's review records, where its briefs tell reviewers to write them (ACT-GUARD-FIX-4: two false
 ```
 
-## 7. The CTO's path question: `command.py` for `--tests-worktree` (not applied)
+## 7. The CTO's path question: `command.py` for `--tests-worktree` (applied in this ticket by the CTO's path case P1 (a), f5d4ce253)
+
+**Applied (brief en-4, build run 2):** the CTO's path case P-W2-60B-P1 (a) (DEC-1156 (7), commit f5d4ce253) added
+`src/gov/launch/command.py` to the ticket's `allowed_paths` for this diff only. The diff below was applied with
+`git apply`, byte for byte as recorded here (its context lines still matched), and `git diff` of `command.py` shows
+only its three hunks. The diff stays below as the record. The unit case
+`tests/unit/launch/test_session_record_tests_worktree_cli.py` runs `python3 -m gov.cli.main launch ...` as its own
+process in a scratch git repository. It covers four paths: the exit-0 path (it prints `<repo>-tests`, the tree is on
+`w2/T-1-tests` at HEAD, and there is no launch or session record), the refusal while the branch exists (exit 1,
+`LAUNCH_REFUSED` naming the branch, no tree), another role, and a tree on no branch. All four were red before the
+diff (exit 2, `unrecognized arguments: --tests-worktree`) and green after.
+
+What follows is the draft as en-2 wrote it, before it was applied.
 
 The behaviour is `launcher.tests_worktree(root, role, ticket_id)`:
 - the role is the independent test designer, and the ticket is known and `in_progress`;
