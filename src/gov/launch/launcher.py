@@ -59,15 +59,23 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
-from gov.launch import criticality as crit, environ, record, role as roles, sandbox
+from gov.launch import criticality as crit, environ, record, role as roles, sandbox, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
+from gov.util.gitenv import git_binary, git_env
 
-# DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
-WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
-# Open package DP-8: these roles need a ticket whose ``role`` is their own; the
-# two independent roles may be launched on any ``in_progress`` ticket.
-OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
+# W2-60b S7, S8 (DEC-946 (W3-P09), DEC-826 Q1): the launchable roles and their own-ticket rule are read from the
+# kernel's role files (``_role_kind``), so a new role is a file, not a code change. A role file is a worker's unless it
+# says otherwise: its ``Authority level`` line names another level (the CTO's, the Senior Engineer's and the ticket
+# lead's say ``coordinator``) or its ``Network`` line says the launcher gives it no profile. A worker keeps to a ticket
+# whose ``role`` is its own (open package DP-8) unless it is independent: its ``Authority level`` line says
+# "independent of", or its name begins ``independent-`` (the kernel's naming of its independent roles); an independent
+# role may be launched on any ``in_progress`` ticket. A role with no role file, or one that cannot be read, refuses.
+ROLE_NAME = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+AUTHORITY_HEAD, NETWORK_HEAD = "- **Authority level:**", "- **Network:**"
+WORKER_LEVEL, NO_PROFILE = "worker", "no profile from the launcher"
+INDEPENDENT, INDEPENDENT_PREFIX = "independent of", "independent-"
+TESTS_SUFFIX = "-tests"  # W2-60b S10: the tests worktree and its branch are the ticket tree's and branch's names + this
 # W2-136 S9: a lead is a session of GOV_ROLE orchestrator with a GOV_TICKET, launched as ``orchestrator`` or ``lead``
 # (W2-121's name for it). Only the launched role and ticket are checked against the plan, never the caller's own
 # environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
@@ -84,6 +92,12 @@ ROLE_TEMPLATES = {
     "lead": "role-lead",
     "orchestrator": "role-lead",
 }
+# A role the map does not name has the template ``role-<role>.md`` (W2-60b): a new role is its role file and its
+# template, with no code change.
+TEMPLATE_STEM = "role-{role}"
+# The worker roles the template map names (W2-153), kept for the callers that read the name; what a launch admits is
+# not this but whatever role file ``_role_kind`` admits (W2-60b S7).
+WORKER_ROLES = tuple(role for role in ROLE_TEMPLATES if role not in LEAD_ROLES)
 TEMPLATES_REL = ".claude/templates"  # the generated copies, written only by an ACT (DEC-315)
 TEMPLATE_FLAG = "--append-system-prompt-file"
 CLI_REL = ".local/bin/claude"
@@ -290,8 +304,36 @@ def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
         raise _refuse(f"unknown ticket '{ticket_id}'")
     if ticket.get("status") != "in_progress":
         raise _refuse(f"ticket '{ticket_id}' is not in_progress (status: {ticket.get('status')})")
-    if role in OWN_TICKET_ROLES and ticket.get("role") != role:
+    # W2-60b: whether the role keeps to its own ticket is read from its role file, only when the ticket is another's
+    if ticket.get("role") != role and _role_kind(root, role)["own_ticket"]:
         raise _refuse(f"ticket '{ticket_id}' is a ticket of another role ('{ticket.get('role')}'), not of '{role}'")
+
+
+def _role_kind(root: Path, role: str) -> dict:
+    """W2-60b S7, S8: the role file's path and whether the role keeps to its own ticket, read from the kernel role file
+    ``gov.launch.role`` reads; refused, naming the role, when the name is not a plain role name, the file is missing or
+    cannot be read, holds its ``Authority level`` or ``Network`` line more than once, or says it is no worker."""
+    _check_worker_role(role)
+    try:
+        rel, _, lines = roles._role_file(root, role)
+    except GovError as error:
+        raise _refuse(f"'{role}' is not a worker role: {error.message} (DEC-946 (W3-P09))") from None
+    stated = {}
+    for head in (AUTHORITY_HEAD, NETWORK_HEAD):
+        found = [line.strip()[len(head):].strip() for line in lines if line.lstrip().startswith(head)]
+        if len(found) > 1:
+            raise _refuse(f"'{role}': the role file {rel} holds its line '{head}' more than once, so it cannot be told "
+                          f"whether gov launch starts it (DEC-946 (W3-P09))")
+        stated[head] = found[0] if found else None
+    level, network = stated[AUTHORITY_HEAD], stated[NETWORK_HEAD]
+    word = re.split(r"[\s,.;:]", level, maxsplit=1)[0] if level is not None else None
+    if word is not None and word != WORKER_LEVEL:
+        raise _refuse(f"'{role}' is not a worker role: its role file {rel} gives the authority level '{word}', and "
+                      f"gov launch starts workers only (a lead is launched as {' or '.join(LEAD_ROLES)})")
+    if network is not None and network.startswith(NO_PROFILE):
+        raise _refuse(f"'{role}' is not a worker role: its role file {rel} says it has {NO_PROFILE}")
+    independent = (level is not None and INDEPENDENT in level) or role.startswith(INDEPENDENT_PREFIX)
+    return {"rel": rel, "own_ticket": not independent}
 
 
 def _guard_wired(settings: dict) -> bool:
@@ -401,7 +443,7 @@ def _check_cli_args(cli_args: list[str]) -> None:
 def template_args(root: Path, role: str) -> list[str]:
     """The flag that gives the session its role template, by absolute path; refused when the file is missing, so no
     session starts without its template (W2-153 S1, F1)."""
-    path = root / TEMPLATES_REL / f"{ROLE_TEMPLATES[role]}.md"
+    path = root / TEMPLATES_REL / f"{ROLE_TEMPLATES.get(role) or TEMPLATE_STEM.format(role=role)}.md"
     if not path.is_file():
         raise GovError("LAUNCH_NO_TEMPLATE", f"the role template {path} is missing: no '{role}' session starts "
                                              f"without it (DEC-1050)")
@@ -911,9 +953,46 @@ def _cli() -> Path:
 
 
 def _check_worker_role(role: str) -> None:
-    if role not in WORKER_ROLES:
-        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
-                      f"or a lead role ({', '.join(LEAD_ROLES)})")
+    """The role's name only, before anything is read (W2-60b): a plain role name, the stem of a role file. Whether it
+    is a worker is its role file's to say (``_role_kind``)."""
+    if not isinstance(role, str) or not ROLE_NAME.fullmatch(role):
+        raise _refuse(f"'{role}' is not a worker role: a role is the name of its role file (lower-case letters, digits "
+                      f"and '-'), and a lead role is {' or '.join(LEAD_ROLES)}")
+
+
+def tests_worktree(root: Path, role: str, ticket_id: str) -> int:
+    """W2-60b S10 (DEC-847, DEC-963, DEC-982): ``gov launch independent-test-designer <ticket> --tests-worktree``, run
+    in the ticket's worktree, makes the tests worktree ``<tree>-tests`` on a new branch ``<tree's branch>-tests`` at the
+    tree's ``HEAD``, prints its path and returns 0. No session starts, nothing is recorded or gated. An existing path or
+    branch, a tree on no branch, or a ticket that is unknown or not ``in_progress`` refuses."""
+    root = Path(os.path.realpath(root))
+    if role != "independent-test-designer":
+        raise _refuse(f"--tests-worktree makes the independent test designer's own tree, not one for '{role}' "
+                      f"(DEC-963)")
+    ticket = _load_ticket(str(root), ticket_id)
+    if ticket is None:
+        raise _refuse(f"unknown ticket '{ticket_id}'")
+    if ticket.get("status") != "in_progress":
+        raise _refuse(f"ticket '{ticket_id}' is not in_progress (status: {ticket.get('status')})")
+    git, env = git_binary() or "git", git_env(root)
+
+    def run(*argv: str) -> subprocess.CompletedProcess:
+        return subprocess.run([git, "-C", str(root), *argv], capture_output=True, text=True, env=env, check=False)
+
+    head = run("symbolic-ref", "--quiet", "--short", "HEAD")
+    if head.returncode != 0 or not head.stdout.strip():
+        raise _refuse(f"the tree {root} is on no branch, so its tests branch cannot be named")
+    branch, path = head.stdout.strip() + TESTS_SUFFIX, Path(f"{root}{TESTS_SUFFIX}")
+    if os.path.lexists(path):
+        raise _refuse(f"the tests worktree's path {path} is already there")
+    if run("show-ref", "--verify", "--quiet", f"refs/heads/{branch}").returncode == 0:
+        raise _refuse(f"the tests worktree's branch {branch} is already there")
+    made = run("worktree", "add", "-b", branch, str(path), "HEAD")
+    if made.returncode != 0:
+        why = (made.stderr.strip().splitlines() or ["no message"])[-1]
+        raise _refuse(f"git could not make the tests worktree {path} on the branch {branch}: {why}")
+    print(path)
+    return 0
 
 
 def plan(root: Path, role: str, ticket_id: str) -> int:
@@ -923,7 +1002,7 @@ def plan(root: Path, role: str, ticket_id: str) -> int:
     root = Path(os.path.realpath(root))
     if role in LEAD_ROLES:
         raise _refuse(f"a '{role}' session is started without a role file's default line, so it has no plan")
-    _check_worker_role(role)
+    _role_kind(root, role)
     _check_ticket(root, role, ticket_id)
     model, effort = roles.launch_default(root, role)
     print(f"model {model}, effort {effort}")
@@ -975,8 +1054,14 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _check_options(reason, trial, owner_named)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
+    if role not in ROLE_TEMPLATES:  # W2-60b S8: a new role's file before its template is looked for
+        _role_kind(root, role)
     template = template_args(root, role)
     cli = _cli()
+    # W2-60b S7: the role file says the role is a worker; today's refusals above come first (W2-60a Behaviour 10)
+    _role_kind(root, role)
+    # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree, before anything is written
+    session_record.check_one_writer(root, str(root), role)
     settings = build_settings(root, role, ticket_id)
     faults = sandbox_faults(settings)
     if faults:
@@ -1019,7 +1104,8 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
     just before the session starts, and the record is removed when it cannot be started."""
     from gov.resources import registry
 
-    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None}
+    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None}
+    keeper = None  # W2-60b: the session record's two calls, for a worker session with its launch record
 
     def end(signum=None, frame=None):
         """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session's whole process group (W2-56 S12). It is asked
@@ -1065,6 +1151,10 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 if written is not None:
                     record.remove(written)
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+            if written is not None:  # W2-60b S1: the session record, whole, once the session's process has started
+                keeper = session_record.Keeper(root, written, worktree=str(root), pid=os.getpid(), say=_say,
+                                               config=session_record.config_folder())
+                keeper.begin()
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:
@@ -1081,6 +1171,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             _end_group(state)  # W2-56 S12: what the session left in its group ends with it
             if state["ended"]:
                 code = INTERRUPT_EXIT
+            state["code"] = code
         return code
     finally:
         session = state["session"]
@@ -1089,6 +1180,8 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             session.wait()
         if session is not None and _group_alive(session):
             _signal_session(session, signal.SIGKILL)
+        if keeper is not None:  # W2-60b S1, S5: replaced whole by every ending; it never changes the exit code
+            keeper.end(state["code"] if state["code"] is not None else getattr(session, "returncode", None))
         if terminal is not None:
             _take_terminal(terminal)
         if state["registered"] is not None:

@@ -20,6 +20,7 @@ KNOWN_ROLES = frozenset({
     "engineer", "independent-auditor",
     "research",  # DEC-163: held to its ticket's allowed_paths, like engineer
     "ticket-lead",  # DEC-434: may write only scratch/checkpoint; no path patterns
+    "qa-engineer",  # DEC-959 item 3: held to its own ticket's allowed_paths (its findings report)
 })
 WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit",
                          "MultiEdit"})  # DEC-685: judged exactly like Edit
