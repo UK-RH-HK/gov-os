@@ -23,7 +23,7 @@ import shlex
 import stat
 import subprocess
 
-from gov.guard import bash_writes, runs
+from gov.guard import runs  # bash_writes: imported by the Bash call that reads with it (W2-111, DEC-1187)
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _line_write_targets,
                               _get_allowed_paths, _has_glob, _is_punct,
@@ -1464,6 +1464,7 @@ class _Judge:
                 why = self._tool(tool_name, dict(tool_input, command=whole.replace("\\\n", "")), cwd)
                 if why:
                     return why
+            from gov.guard import bash_writes  # W2-111: only a Bash call pays for the shell parser
             command, codes = bash_writes.read_view(whole)
             for code in codes:
                 for piece in _CODE_PIECE_RE.split(code):

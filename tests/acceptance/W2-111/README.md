@@ -4,8 +4,19 @@
 DEC-968). Written by a fresh independent test designer from the reopen's KPI lines, before the change, without
 reading the engineer's work (DEC-820, DEC-963). No earlier case is changed.
 
+`Rewrite-Reason: DEC-1187` (new cases for S9 and S10, the owner's second reopen of 2026-11-15, P-W2-111-MARGIN (a);
+the earlier cases unchanged; the figure table corrected as the r4c review found): see "S9 and S10 (DEC-1187)" below.
+
+`Rewrite-Reason: DEC-1157 (12), P-W2-111-S9-DROP (a)` (brief td-5, 2026-11-15: S9 amended by the CTO; the live-hook
+case's judgement loses the "at least 30 ms below the before figure" clause and records the drop instead; nothing else
+changed): see "S9 and S10 on the live hook's patched copy" below.
+
+`Rewrite-Reason: DEC-1156 (7), P-W2-111-R5-ROWS (a)` (brief td-7, 2026-11-15: rv-3's F2, the five timing files listed
+`serial: latency` in `tests/acceptance/serial-only.txt`; and rv-3's F1 as a described behaviour, DEC-136, DEC-802, one
+new case file; no earlier case changed): see "F1 (rv-3)" and "F2 (rv-3)" below.
+
 **Which lines this folder judges.** `gov accept W2-111` runs this folder only. It judges the reopen's lines:
-success-5 to success-8, failure-4 and failure-5. The earlier lines (success-1 to success-4, failure-1 to failure-3) are
+success-5 to success-10, failure-4 and failure-5. The earlier lines (success-1 to success-4, failure-1 to failure-3) are
 judged on the 15 revised hook-latency cases in their own three files, `tests/acceptance/W1-02/test_w1_02_guard_hook.py`,
 `tests/acceptance/W1-05/test_w1_05_live_hooks.py` and `tests/acceptance/W2-57/test_w2_57_designer_read_p95.py`
 (DEC-892, the ticket's `acceptance_tests` comment), not here.
@@ -57,7 +68,12 @@ per round; the PATH entry count; the tree count); `-s` or `-rA` shows them.
 | success-6 | `test_w2_111_many_trees_p95.py::test_a_call_with_150_worktrees_registered_is_decided_within_100_ms_at_p95` | the latency assertion, every round at or above 100 ms with 150 worktrees. See "Before the change": on the product hook these were green before the change (an open question to the lead). |
 | success-7 | `test_w2_111_install_decisions.py::test_each_install_form_is_still_refused_with_a_role_set`, `test_w2_111_install_decisions.py::test_the_same_non_installs_are_still_allowed_with_a_role_set`, `test_w2_111_install_decisions.py::test_a_changed_PATH_is_read_again_within_one_session` | none: green before the change, by design; they pin today's answers. Red after it only if an install is allowed, a non-install refused, or a call answered by another call's PATH. |
 | success-8, failure-4 | `test_w2_111_hidden_part_decisions.py::test_a_read_of_the_hidden_part_is_still_refused_with_150_worktrees`, `test_w2_111_hidden_part_decisions.py::test_a_read_outside_the_hidden_part_is_still_allowed_with_150_worktrees` | none: green before the change, by design (the fails-open check). Red after it only if a refusal turned into an allow, or an allow into a refusal. |
-| failure-5 | `test_w2_111_slow_hook.py::test_the_planted_150_ms_hook_fails_each_new_timing_case` | none: green before and after the change; red only if a new timing case passes the planted 150 ms hook. |
+| failure-5 | `test_w2_111_slow_hook.py::test_the_planted_150_ms_hook_fails_each_new_timing_case`, `test_w2_111_live_hook_slow_hook.py::test_the_planted_150_ms_hook_fails_the_live_hook_case` | the first: none, green before and after the change; red only if a new timing case passes the planted 150 ms hook. The second (DEC-1187): red before the change because the after copy cannot be built: `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared`; after it, red only if the live-hook case's judgement passes the planted hook. |
+| success-9 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded`, `test_w2_111_yaml_parity.py::test_the_product_loader_answers_each_text_as_the_pure_safe_loader_does` | The count cases: **none, green before the change** (35 passed at `00c9327e0`): they pin behaviours 1, 2 and 3 and DEC-218; behaviour 3 was expected red and is not (see "Before the change, S9"). The live-hook case (S9 as amended, P-W2-111-S9-DROP (a): every mapped case within 100 ms at p95, quiet, paired; decisions unchanged; the drop recorded): `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (20 of 20). The product loader's parity (F1, rv-3): on the ticket branch before the fix, the class texts red, `<text> (<form>): gov.util.parts.load_yaml_unique read the text that the pure SafeLoader refuses`; on the tests branch green (its loader is the pure one): see "F1 (rv-3)". |
+| success-10 | `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` | the diff is absent (the same text, 20 of 20). |
+| failure-4 | `test_w2_111_yaml_count.py::test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, `test_w2_111_yaml_count.py::test_a_write_or_edit_of_any_role_parses_no_path_map`, `test_w2_111_yaml_count.py::test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, `test_w2_111_yaml_count.py::test_a_broken_held_out_yaml_still_stops_every_call`, `test_w2_111_live_hook_diff_p95.py::test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded`, `test_w2_111_yaml_parity.py::test_the_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, `test_w2_111_yaml_parity.py::test_the_product_loader_answers_each_text_as_the_pure_safe_loader_does`, `test_w2_111_yaml_parity.py::test_the_live_hook_s_patched_copy_decides_each_held_out_text_as_the_applied_copy_does` | the count cases' decisions: none, green before (today's decisions, pinned); the live-hook case: the diff is absent. After the change, red if a decision differs from today's (the count cases) or between the two copies or from `measure.py`'s record (the live-hook case). F1 (rv-3): the fixture case none, green everywhere (it checks the texts); the product parity as in success-9's row; the live-hook parity, on the tests branch `the live hook's diff ... is absent` (7 of 7), and on the ticket branch before the fix, the class texts red, `<text>: a Read of an ordinary file of the project was decided allow by the patched copy and deny by the applied copy (the pure loader's)`. See "F1 (rv-3)". |
+| success-9, failure-4 | `test_w2_111_yaml_rest.py::test_yaml_rest_role_paths_block_is_read_by_the_role_filter_as_the_pure_loader_reads_it`, `test_w2_111_yaml_rest.py::test_yaml_rest_role_paths_ticket_front_matter_is_read_by_the_role_filter_as_the_pure_loader_reads_it`, `test_w2_111_yaml_rest.py::test_yaml_rest_product_hook_reads_the_ticket_front_matter_as_the_pure_loader_reads_it` | YAML-REST (P-W2-111-YAML-REST (a)), the product's three reads; the class texts red here (the base's `role_paths.py` and `parts.py` read with libyaml), the clean controls green: the block, `role_paths.caller (the engineer, the path map's role_paths: block) <text>: decided from a text the pure SafeLoader refuses: it answered ('filter', ...); with the pure loader the call is refused: ('refused', 'RolePathsError', ...)` (4); the role filter's front matter, `... <text>: decided from front matter the pure SafeLoader refuses: it answered ('filter', {..., 'src/app/new.py': True}) (the engineer's new code src/app/new.py withheld); the call must be refused (fail closed) ...` (5); the product hook, `the product hook, the engineer's Read of docs/notes.md (the ticket's front matter) <text>: decided ('allow', None) from front matter the pure SafeLoader refuses; with the pure loader the call is refused: ('deny', "the session's ticket file cannot be read for its WBS id ...")` (5). See "YAML-REST (P-W2-111-YAML-REST)". |
+| failure-4 | `test_w2_111_yaml_rest.py::test_yaml_rest_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, `test_w2_111_yaml_rest.py::test_yaml_rest_live_hook_patched_copy_refuses_calls_on_a_role_paths_block_the_pure_loader_refuses`, `test_w2_111_yaml_rest.py::test_yaml_rest_live_hook_patched_copy_refuses_calls_on_ticket_front_matter_the_pure_loader_refuses` | YAML-REST: the fixture case none, green everywhere (it checks the texts, 17); the live hook's two reads, `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent: S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (11 of 11, the clean controls too). See "YAML-REST (P-W2-111-YAML-REST)". |
 
 ## The cases
 
@@ -179,21 +195,330 @@ same cases pass run alone at load 25.
 | run | code | load | Bash plain | Bash pipe | Bash redirect | 151 trees Read | 151 trees Write | 151 trees Bash | planted 150 ms hook (all six) |
 |---|---|---|---|---|---|---|---|---|---|
 | quiet | before | 3 | 58.8 | 56.0 | 58.7 | 53.3 | 30.7 | 63.6 | not run |
-| about 20 | before | 20-24 | 118.0, 111.3, 117.6 (red) | 104.2, 106.8, 116.2 (red) | 165.7, 122.1, 64.6 | 55.1 | 30.3 | 63.9 | 180-271, each fails |
+| about 20 | before | 23.2-26.3 for the Bash rounds; 20.8-23.4 for the tree cases; 7.4-18.5 for the planted cases (corrected, r4c review) | 118.0, 111.3, 117.6 (red) | 104.2, 106.8, 116.2 (red) | 165.7, 122.1, 64.6 | 55.1 | 30.3 | 63.9 | 180-271, each fails |
 | 50 or more | before | 52-53 | 99.9 | 88.1 | 86.9 | 83.7 | 50.7 | 109.3, 97.3 | 201-298, each fails |
 | about 20 | after | 20-23 | 85.0 | 93.7 | 93.8 | 91.8 | 58.6 | 106.5, 93.8 | 209-304, each fails |
 | 37-49 | after | 37-49 | 86.9 | 89.4 | 83.0 | 93.2 | 51.5 | 89.8 | 202-246, each fails |
-| 50 or more | after | 51-59 | 86.9 | 94.8 | 91.9 | 86.5 | 57.8 | 97.4 | 238-283 (4 of 6 run, then stopped), each fails |
-| gov accept, PATH 5 entries | after | 25-40 | pass | pass | pass | one of the three 151-tree cases red | (same run) | (same run) | 6 of 6 fail |
+| 50 or more | after | 51-59 (the planted cases at 38-49, corrected, r4c review) | 86.9 | 94.8 | 91.9 | 86.5 | 57.8 | 97.4 | five figures printed, then stopped: four with a result, 238-283, each fails; the fifth (trees Write, 203.7-212.2) with no recorded result (corrected, r4c review) |
+| gov accept, PATH 5 entries (the lead's note, not in the log) | after | 25-40 (the lead's note, not in the log) | pass | pass | pass | one of the three 151-tree cases red | (same run) | (same run) | 6 of 6 fail |
 | alone, PATH 5 entries | after | 25 | not run | not run | not run | 83.1 | 51.3 | 87.4 | not run |
 
-The quiet run after the change is not yet taken: the machine stayed at load 23 or more from other work.
+The r4b runs (corrected, r4c review; the earlier line "The quiet run after the change is not yet taken" is withdrawn):
+after the change, quiet, the six timing cases ran at 27.0-50.5 ms, all passing; at load 60-64, at 46.4-86.5 ms, all
+passing; the planted 150 ms hook at 178.1-253.3 ms, every case failing. The "gov accept" row's PATH entry count and load
+are in neither `accept-1.json` nor `accept-1.err`: they are the lead's note, not the log's.
 
 **What the figures show.**
 
-- Before the change, the Bash cases' verdict changed with the load: red at load 20-24 (plain and pipe), green at load
+- Before the change, the Bash cases' verdict changed with the load: red at load 23-26 (plain and pipe), green at load
   3 and 52 (plain at 99.9).
-- After the change, every timing case passed in the lead's runs at every load (20-59). Under `gov accept` at load
-  25-40, one 151-tree case went red; the same cases passed run alone at load 25. The margin under load is 3-15 ms, so
-  the cases still judge near the bound: about 50 ms of each call is imports and YAML reads, outside this ticket's paths.
-- The planted 150 ms hook failed every case at every load (180-304).
+- After the change, every timing case passed in the lead's runs at every load measured (20-59 in r4, quiet and 60-64
+  in r4b). Under `gov accept` (its load and PATH: the lead's note, not in the log) one 151-tree case went red; the same
+  cases passed run alone at load 25. The margin under load is 3-15 ms, so the cases still judge near the bound: about
+  50 ms of each call is imports and YAML reads, outside this ticket's paths (the reason for DEC-1187).
+- The planted 150 ms hook failed every case at every load at which a result was recorded (178.1-304: r4 and r4b).
+
+## S9 and S10 (DEC-1187): the YAML count, and the live hook's diff timed
+
+`Rewrite-Reason: DEC-1187`. Written by a fresh independent test designer (brief td-4) from S9, S10, failure-4,
+failure-5 and the CTO's interface for S9's count case (DEC-1157 (3), the ticket's paragraph at its end), before the
+change and without reading the engineer's work (DEC-820): the diff file is used by the live-hook cases at run time, by
+its path, and was never opened. No earlier case is changed.
+
+### S9's count case (`test_w2_111_yaml_count.py`, 35 cases; support `w2_111_yaml_count.py`)
+
+**What it measures.** The product guard's hook (`template/governance/kernel/hooks/pretooluse.py`) run as W1-02 runs it
+(`w1_02_support.run_hook`), in W1-02's fixture project with the two governance YAML files the guard reads committed:
+`governance/project/held-out.yaml` (one held-out path, outside the project, that no call names) and
+`governance/project/path-map.yaml` (the kernel template's, with W2-111's planted evaluation set measuring the engineer
+and a `role_paths:` section in this repository's own form, so both sections a real project has are there). The only
+addition to W1-02's run is a probe folder first on the child's `PYTHONPATH`, whose `sitecustomize` (written by the
+case into its temporary folder; it never imports or patches the guard's modules) reports, per call and across every
+process of the call (the hook forks its decision):
+
+- the YAML files opened under the project's `governance/`: an audit hook on the `open` event;
+- every parse through yaml's public load API (`yaml.load`, `safe_load`, `full_load`, `unsafe_load`, their `_all` forms,
+  `compose`, `compose_all`, `parse`, and a loader's `get_single_data` used directly), counted once at its outermost
+  entry and put to its file: the stream's name, or, for text, the governance YAML file (or ticket file) whose bytes it
+  is or holds (a parser may parse one section's lines alone).
+
+A fixture first checks the probe is live: a direct `yaml.safe_load` of `held-out.yaml` in a child with the same
+environment must be reported as one open and one parse of it.
+
+**The cases.**
+
+- **Behaviour 1** (`test_a_call_refused_before_the_held_out_check_parses_no_yaml_file`, 6): a Bash call with
+  `dangerouslyDisableSandbox` set (no role, engineer, test designer, auditor) and a Read whose path holds a NUL byte (no
+  role, engineer): each refused, as today (the first with its reason naming `dangerouslyDisableSandbox`); no YAML parse
+  at all and no governance YAML file opened.
+- **Behaviour 2** (`test_a_write_or_edit_of_any_role_parses_no_path_map`, 10): Write and Edit, by no role (`docs/`,
+  refused), the engineer (`src/gov/guard/decide.py`, allowed; its ticket's acceptance file, refused), the test designer
+  (the acceptance file, allowed) and the auditor (`src/gov/guard/decide.py`, refused), each decided as today; no parse
+  of `path-map.yaml` (and, should it be opened, no parse the probe cannot place).
+- **Behaviour 3** (`test_each_yaml_file_a_call_opens_is_parsed_at_most_once`, 14): Read, Write, Edit, Glob, Grep and
+  Bash by the engineer and by no role, and Read and Bash by the test designer, each decided as today; no governance YAML
+  file parsed more than once; and `held-out.yaml` opened on each.
+- **DEC-218** (`test_a_broken_held_out_yaml_still_stops_every_call`, 5): with `held-out.yaml` broken, a Read (no role,
+  engineer), a Write, a Glob and a Bash (engineer) are each refused.
+
+**DEC-218, kept explicit.** `held-out.yaml` is read on every call past the guard's early refusals: a broken
+`held-out.yaml` stops every call. Its one parse per call is therefore needed, never waste: behaviour 3 asserts it is
+opened on each such call and parsed at most once; behaviour 1's calls, refused before the held-out check, read nothing;
+and the DEC-218 case asserts the broken file still refuses.
+
+**Before the change, S9** (2026-11-15, the test designer, at `00c9327e0`, in its launched session): **35 passed** in 3 s.
+Behaviours 1 and 2 were expected green and are: they pin today's behaviour. **Behaviour 3 was expected red and is
+not.** The probe shows, for a Read, Glob, Grep or Bash with a role set: `held-out.yaml` opened and parsed once,
+`path-map.yaml` opened and parsed once (one section's lines, `evaluation_sets:`), and a third parse whose text is the
+session's ticket's front matter (from `.tickets/<id>.md`, not a YAML file under `governance/`). With no role, the
+third parse is absent. Writes and edits open and parse `held-out.yaml` alone. So the "3 yaml loads for those 2 files"
+of the lead's measure at `0e2cdf33e` are 3 loads for 3 files: no governance YAML file is parsed twice. The same held
+with 3 worktrees registered and with the `role_paths:` section present (a scratch probe, not a case). The case was not
+forced red (no file planted to be parsed twice, no bound changed): the question goes to the lead
+(`proposed_decisions` of the test designer's return).
+
+### S9 and S10 on the live hook's patched copy: within 100 ms, the drop recorded (`test_w2_111_live_hook_diff_p95.py`, 20 cases; support `w2_111_live_hook.py`)
+
+**What it measures.** The engineer's diff of `.claude/hooks/` (`docs/changes/W2-111-live-hook/live-hook.diff`, paths
+`a/.claude/hooks/...`) is applied with `git apply` (in a fresh `git init` folder) to a clean copy of the tree's
+`.claude/hooks/` (`__pycache__` left out); a second clean copy is the before copy, its `pretooluse.py` and
+`bash_writes.py` checked against ACT-GUARD-FIX-6's sha256 prefixes (`9b4228ea095a`, `f03f9ac3e431`). A diff that is
+absent, cannot be read by `git apply`, changes no file or a path outside `.claude/hooks/`, or does not apply fails every
+case with that reason. Each copy is run as `.claude/settings.json`'s PreToolUse command runs the live hook: `sh` runs
+the pinned interpreter with `-E` and the copy's `pretooluse.py`; the interpreter is the first line of
+`$HOME/.local/bin/gov` (its `#!` taken off), else of the real home's (`pwd.getpwuid`: **the whole-folder run sets
+`HOME` to an empty folder, so the real home is used for the interpreter only**; the hook's own `HOME` is the session's),
+else of the `gov` on `PATH`. `CLAUDE_PROJECT_DIR` and the working folder are the repository root the tests run in (its
+real config, tickets and registered worktrees), `GOV_GUARD_CALLS_DIR` and `TMPDIR` point into pytest's temporary
+folder, as `measure.py` does; the payload is `measure.py`'s.
+
+The 20 cases are `measure.py`'s (`~/gov-os-runs/W2-111/gf6-measure/measure.py`), in its order and with its inputs; the
+scratch targets are under pytest's temporary folder. The first 15 are the mapped W1-05 (9), W1-02 (5) and W2-57 (1)
+cases; the last 5 the Bash cases. The measure is W2-111's: per call, the CPU time of the hook's process and its
+children (`RUSAGE_CHILDREN`) less the median CPU time of the reference hook timed beside it; nearest-rank p95 over 40
+calls after 3 warm-up calls; a round that does not pass is repeated, up to 3 rounds. **Before and after are paired in
+the same run**: each sample times a reference and the before copy, and a reference and the after copy, the order
+alternating sample by sample. A case passes when, in one round, the after figure is **under 100 ms** (DEC-1187 (1)'s
+own target, the same for the 15 mapped cases and the 5 Bash cases). Every call (warm-up included) must be decided
+the same by both copies, and by the before copy as `measure.py` recorded on the live repository (allow, but deny for
+the engineer's and the auditor's refused Writes) (failure-4). `git status --porcelain --untracked-files=all` of the
+repository is the same after the case as before it: the case writes nothing there. **The drop is recorded, not
+judged**: each case gives, per round, before, after and the drop (before less after), with the wall p95 of each and
+the load, in its failure message and in a line printed on a pass (`-s` shows it; the line starts `PASS` or `FAIL`), so
+S9's measured drop is visible in every run.
+
+**Why so.** S9 is judged on the live hook, where the fixed cost lies (P-W2-111-S9-BASE (a)); pairing the two copies in
+one run makes the drop a difference taken under the same load, never a figure from another day. CPU time less a
+reference beside it, not the wall time under load: W1-02's README, section "W2-111".
+
+**Why the 30 ms clause went** (P-W2-111-S9-DROP (a), the CTO under DEC-1157 (12), 2026-11-15; the ticket's S9 line).
+The case used to require each of the 15 mapped cases to be at least 30 ms below its before figure as well. That figure
+came from a measure taken at load 14-28; quiet, the applied ACT-GUARD-FIX-6 hook already runs 52-83 ms, under the
+bound, and the rest of each call (the interpreter, the pinned gov's imports, compiling the script) lies outside
+`.claude/hooks/`, where the diff cannot reach it. S9 is now judged by DEC-1187 (1)'s own target, S10's measure, with
+the drop recorded. The bound (100 ms), the pairing, the 40 samples, 3 warm-ups, up to 3 rounds, the before copy's
+hash check, the `git apply`, the decision equality, the porcelain check and the 20 parameter ids are unchanged. The test
+function, whose name ended "and 30 ms below the applied hook", was renamed to
+`test_the_live_hook_s_patched_copy_is_within_100_ms_of_the_applied_hook_the_drop_recorded` (td-6, the lead's decision
+on P-W2-111-TD5-NAME (a)), so that its name says what it now checks: the old name named a clause the case no longer
+judges. The 20 node ids are new in this run and never landed, so the rename removes no landed case (F1 guards only the
+15 revised cases of W1-02, W1-05 and W2-57, untouched).
+
+**Before the change:** all 20 red, each `the live hook's diff docs/changes/W2-111-live-hook/live-hook.diff is absent:
+S10's diff of .claude/hooks/ against the applied ACT-GUARD-FIX-6 bytes is not prepared` (0.1 s).
+
+**The harness checked without the diff** (a scratch run, not a case; 2026-11-15, the launched session, empty `HOME`,
+load 4-12): with a stand-in diff that adds one comment line, the copies built, the pinned interpreter resolved from the
+real home, every decision matched `measure.py`'s record in both copies, and `git status` was unchanged. At 40 samples
+the drop between identical copies was -28.3 to +12.2 ms over 15 rounds (5 cases): the noise of a recorded drop at this
+sample count (that run judged the 30 ms clause, since removed; not re-run for td-5).
+
+### failure-5 for the live-hook case (`test_w2_111_live_hook_slow_hook.py`, 5 cases)
+
+The planted hook (`w2_111_support.SLOW_HOOK`, as `test_w2_111_slow_hook.py` plants it: 150 ms of its own CPU time per
+call, a busy loop, then the after copy's own hook as `__main__`, so the decision is unchanged) is put in place of a copy
+of the after copy's `pretooluse.py`; the live-hook case's judgement, paired with the before copy, must fail: no round
+passes, all three rounds run, every after figure at or above 100 ms. **Five of the 20 cases**, spread over the kinds
+(`W1-05 Glob-no-role`, `W1-05 Write-engineer`, `W1-02 engineer Write acceptance (deny r1)`, `W2-57 test-designer Read
+ordinary`, `Bash pipeline (engineer)`): each takes all three rounds of a 0.2 s hook. Before the change: all 5 red, the
+diff absent (the same text). In the scratch runs with the stand-in diff (`W1-05 Glob-no-role`), the planted hook's
+after figures were 207.2-254.0 ms in every round printed, three rounds each time: the judgement failed it.
+
+### Kinds, markers and run time (DEC-1187's cases)
+
+The count cases are acceptance cases (about 0.1 s each; 35 in 3 s). The live-hook and its planted cases are
+**load-sensitive** (they assert a latency, by CPU time less a reference beside it). **No marker**: none needs a real
+model, a dev tier or the network; no name, id or file holds `real`, `green_here` or `time_limit`, so the whole-folder
+filter selects them all and `gov accept W2-111` runs them on this machine. They need what the live hook needs here: the
+pinned gov (`~/.local/bin/gov` or `gov` on `PATH`) and the tree's `.claude/hooks/` at ACT-GUARD-FIX-6's bytes. Run time,
+estimated from the scratch run (about 0.3 s per pair of calls; 0.45 s with the planted hook): each live-hook case 15 to
+40 s (one to three rounds of 40 pairs), the 20 about 5 to 13 minutes; each planted case about 55 s, the 5 about 5
+minutes. They are past the 5 s of their kind for the reason W1-02's measure is: 40 calls a round, three rounds when
+needed, two copies paired; not cut. No `skip`, `xfail` or `flaky` mark.
+
+**After ACT-GUARD-FIX-7 is applied** the tree's `.claude/hooks/` is no longer ACT-GUARD-FIX-6's bytes, and the 25
+live-hook cases fail on the before copy's hash check by design (the diff is judged against FIX-6's bytes): their
+retirement or re-pointing then is a follow-up row for the CTO (the test designer's return, `risks`).
+
+## F1 (rv-3): the YAML loader answers as the pure SafeLoader does (`test_w2_111_yaml_parity.py`, 28 cases; support `w2_111_yaml_parity.py`)
+
+`Rewrite-Reason: DEC-1156 (7), P-W2-111-R5-ROWS (a)`. Written by a fresh independent test designer (brief td-7) from
+rv-3's F1 given as a described behaviour (DEC-136), without reading the engineer's work or the diff (DEC-820): the diff
+is used by its path at run time, never opened.
+
+**The behaviour.** The guard reads `held-out.yaml` (and the path map's blocks) with a loader that refuses a key written
+twice. A text the pure-Python `yaml.SafeLoader` refuses must still be refused, and a text it reads must be read to the
+same data, whatever faster parser is used. rv-3 found libyaml's parser more lenient on: a tab inside or after a plain
+value and after `key:`, a `? ` inside a flow item, and a byte order mark after the start of the text. Before the fix such
+a `held-out.yaml` was read: a held-out entry with a tab in it no longer stopped every call, as the pure loader's refusal
+did (DEC-218): **fails open**.
+
+**The texts** (each under `held_out_paths:`, `{p}` an absolute folder under pytest's temporary folder): a tab inside an
+entry (`- {p}/held<TAB>mat`); a tab after an entry; a tab after `held_out_paths:`; `[{p}/held? mat]`; a BOM after a line
+break (`<BOM>- {p}/held` on line 2); a key written twice (`held_out_paths:` twice, the duplicate rule itself); and one
+clean control (`- {p}/held`). The pure loader refuses all but the clean one.
+
+**The cases.**
+
+- **The fixture** (`test_the_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, 7): the judging loader,
+  `yaml.load(text, Loader=PureUnique)` (`PureUnique`: a `yaml.SafeLoader` subclass whose `construct_mapping` raises
+  `ConstructorError(None, None, "a key is written twice", node.start_mark)` when the mapping's length differs from the
+  node's), refuses each refused text and reads the clean one to its one entry. Green everywhere: it shows the texts are
+  what they claim.
+- **The product loader** (`test_the_product_loader_answers_each_text_as_the_pure_safe_loader_does`, 14: each text, given
+  as `text` and as a `file` opened UTF-8 as the guard opens `held-out.yaml`): `gov.util.parts.load_yaml_unique` and
+  `gov.guard.heldout.load_yaml_unique` each give the pure loader's answer: the same data, or an exception of the same type
+  with the same text. (success-9: the parsed-once loader; failure-4.)
+- **The live hook's copy** (`test_the_live_hook_s_patched_copy_decides_each_held_out_text_as_the_applied_copy_does`, 7):
+  the before and after copies of `.claude/hooks/` (`w2_111_live_hook.make_copies`, as the live-hook case builds them),
+  each run as `.claude/settings.json`'s command runs the hook (the pinned interpreter, `-E`), no role set, on a planted
+  project: `CLAUDE_PROJECT_DIR` and the working folder a temporary git repository whose
+  `governance/project/held-out.yaml` is the text's bytes exactly; the call log in the temporary folder. A Read of a
+  planted file under the folder the entry names (as a lenient parser reads it: `held<TAB>mat`, `held? mat` or `held`)
+  and a Read of an ordinary file of the project (`docs/guide.md`) are decided the same by both copies. The before copy
+  reads `held-out.yaml` through the pinned gov's pure loader, so it must refuse both Reads for a refused text and refuse
+  the planted file and allow the ordinary one for the clean text (asserted: the harness is sound). (failure-4.)
+
+**Before the fix.** On this tests branch (`c034b6654ed0` plus these files) the product loader is the base's, the pure
+SafeLoader, so the 7 fixture and 14 product cases **pass here** (0.2 s); the 7 live-hook cases fail, `the live hook's
+diff docs/changes/W2-111-live-hook/live-hook.diff is absent`, as td-4's do. **The red before the fix shows only on the
+ticket branch**, whose r5 src and diff hold the faster parser; the lead runs it there. Expected there: each class text's
+product case `<text> (<form>): gov.util.parts.load_yaml_unique read the text that the pure SafeLoader refuses`, and each
+class text's live-hook case `<text>: a Read of an ordinary file of the project was decided allow by the patched copy and
+deny by the applied copy (the pure loader's)`. The clean control is green before and after.
+
+**The harness checked without the engineer's work** (scratch runs, not cases; the launched session, empty `HOME`): with a
+stand-in diff that changes nothing, the 7 live-hook cases passed (1.8 s); with a stand-in diff that puts libyaml's
+`CSafeLoader` in the hook's held-out loader, the 5 class texts failed with the message above (the planted file still
+refused, the ordinary file allowed: the fail-open), and the key written twice too (that stand-in has no duplicate check);
+the clean control passed. With a stand-in product loader of libyaml plus the duplicate check, the 10 class-text product
+cases failed (`read the text that the pure SafeLoader refuses`), and so did the key written twice given as text.
+
+**Exception text, said plainly.** The answer compared is the exception's type and its whole text, as the brief states.
+libyaml's error marks carry no snippet of the source line, the pure loader's do (for a text): so a refusal raised from
+libyaml has another text than the pure loader's for the same text input, even where both refuse (the stand-in's
+`key-written-twice-text`). Given a file, neither mark has a snippet. The guard's held-out reader replaces the parser's
+text by fixed text, so the difference reaches a user only through a path map's error.
+
+**Kinds.** Acceptance cases, about 0.2 s for the 21 in-process cases and 2 s for the 7 live-hook cases. Not timing
+cases, so not in `serial-only.txt`. No marker; no name, id or file holds `real`, `green_here` or `time_limit`, so the
+whole-folder filter selects all 28.
+
+## F2 (rv-3): the five timing files kept serial
+
+`Rewrite-Reason: DEC-1156 (7), P-W2-111-R5-ROWS (a)`. rv-3 found W2-111's timing cases red only inside lead_verify's
+parallel phase (load 10 to 20), while alone and quiet they passed 25 of 25. They are now listed in
+`tests/acceptance/serial-only.txt`, in its `# --- latency: kept serial, each alone` block, one entry per file, each
+`serial: latency: <reason>`: `test_w2_111_bash_p95.py`, `test_w2_111_many_trees_p95.py`, `test_w2_111_slow_hook.py`,
+`test_w2_111_live_hook_diff_p95.py` and `test_w2_111_live_hook_slow_hook.py`. The close leaves them out of its parallel
+phase and runs each alone afterwards; the nightly runs them alone too. No case, bound or round was changed.
+`gov_close_serial_only.entries` reads all five.
+
+## YAML-REST (P-W2-111-YAML-REST): the guard's other YAML reads answer as the pure SafeLoader does (`test_w2_111_yaml_rest.py`, 45 cases; support `w2_111_yaml_rest.py`)
+
+`Rewrite-Reason: P-W2-111-YAML-REST (a), DEC-136`. Written by a fresh independent test designer (brief td-8) from the
+owner's P-W2-111-YAML-REST (a) given as a described behaviour, without reading the engineer's work or the diff
+(DEC-820): the diff is used by its path at run time, never opened.
+
+**The behaviour.** A `role_paths:` block of the path map, or a session ticket's front matter, holding a tab inside or
+after a plain value (or after `key:`), a `? ` inside a flow item, or a BOM after a line break is read as the pure-Python
+`yaml.SafeLoader` reads it. Where the pure loader refuses the text, the role-checked call decided from it is refused
+(fail closed); where it reads it, the decision is the pure loader's. Before the fix libyaml's `CSafeLoader` reads these
+texts, so a call is decided from a block or front matter the pure parser refuses: **fails open** (rv-3's F1 class).
+
+**The five reads and how each is reached.**
+
+| read | interface | role-checked call |
+|---|---|---|
+| `gov.util.role_paths`, the `role_paths:` block | `role_paths.caller(root)`, the role filter of `gov retrieve` and `gov context`, in a fresh interpreter (`GOV_ROLE`, `GOV_TICKET`, `HOME` planted); answer: `RolePathsError` and its text, or which probe paths it withholds | the engineer's search of a planted repository (probes `docs/notes.md`, its ticket's `tests/acceptance/W2-988/test_fixture.py`) |
+| `gov.util.role_paths`, the ticket's front matter | the same | the test designer's search of the engineer's tree `<HOME>/gov-os-worktrees/W2-988` (a repository whose branch `w2/W2-988` adds `src/app/new.py` under the ticket's allowed_paths, against `w2/integrate`) |
+| `gov.util.parts`, the ticket's front matter | the product hook as W1-02 runs it, in W1-02's project with the session ticket `DAEO-zz88` added | the engineer's and the test designer's Read of `docs/notes.md` |
+| the live hook's `role_reads.py`, the block | the patched copy (`w2_111_live_hook.make_copies`), run as settings.json's command runs it (the pinned interpreter, `-E`), `CLAUDE_PROJECT_DIR` a planted repository, `HOME` planted | the engineer's Read of an ordinary file and of its ticket's acceptance test; the test designer's Read of an ordinary file and of the engineer's code (`<HOME>/gov-os-worktrees/W2-988/src/app/main.py`) |
+| the live hook's `role_reads.py`, the front matter | the same | the test designer's two Reads (only a role whose globs hold `{ticket_impl}` reads the front matter there) |
+
+The product's hook does not import `gov.util.role_paths` (it is memory's role filter, W2-150): its two reads are
+reached through `caller`, the module's documented entry, as `gov retrieve` calls it (no store, no model).
+
+**The oracle.** For the product, the same code run with libyaml's binding absent (`sys.modules["yaml._yaml"] = None`
+before PyYAML is imported: PyYAML then has no `CSafeLoader`, every loader is its pure-Python one). For the role filter a
+second interpreter; for the product hook a planted wrapper in place of the installed hook that runs the product hook
+beside it as `__main__` (its forked decision process inherits it; as `test_w2_111_slow_hook.py` plants its hook). Each
+product case asserts the answer (the refusal and its text, the filter, or the decision and its reason) equals the
+oracle's, and, for a class text, that it is a refusal. **For the live hook the applied copy is not the oracle**: it
+reads both places with libyaml too. The patched copy must refuse each call that reads a class text; the clean control
+must be decided alike by both copies, as the role rule has it (allow, deny, allow, deny).
+
+**The texts.** The block in the repository's own form (`reads_denied: ["{ticket_tests}", docs/private/**]` for the
+engineer, `["{ticket_impl}"]` for the test designer), the class text on the engineer's entry: a tab inside an entry
+(`- docs/private<TAB>notes/**`), a tab after an entry, a tab after `engineer:`, `[..., docs/private? notes/**]`, and the
+clean control. The front matter in the Wave tickets' shape, the class text on its `tags` line: `- guard<TAB>fixture`,
+`- guard<TAB>`, `tags:<TAB>[wave-2, guard]`, `[wave-2, guard? fixture]`, a BOM after a line break (`tags:` then
+`<BOM>- guard`), and the clean `tags: [wave-2, guard]`. libyaml reads each class text to data that passes the guard's
+checks (asserted by hand, printed by the fixture case). **No BOM in the block:** a BOM after a line break stands at the
+start of its line, and the block reader ends the `role_paths:` block at the first line that does not start with a
+space, a tab, a `#` or a line break, so neither parser sees it (checked: green before the fix, so not a case).
+
+**The product hook's front matter, its WBS id quoted** (`wbs_id: 'W2-988'`, a form the guard's own `wbs_id` pattern
+allows). When the YAML cannot be read, `parts` takes the guard's line reader, which reads an unquoted WBS id alike, so
+both parsers would give the same decision: no red. Quoted, the line reader cannot read it, and the pure path refuses
+(`the session's ticket file cannot be read for its WBS id: the call is refused (fail closed, DEC-820)`): the decision
+then depends on the YAML read alone. The role filter's front-matter case keeps the WBS id unquoted so that `parts`'
+read (which the filter also calls) cannot refuse, and the refusal can only come from `role_paths`' own read.
+
+**The cases.**
+
+- **The fixture** (`test_yaml_rest_pure_safe_loader_refuses_each_class_text_and_reads_the_clean_one`, 17: the 5 block
+  texts, the 6 front-matter texts unquoted and quoted): the pure SafeLoader refuses each class text and reads the clean
+  ones (both roles in the block; the WBS id and allowed_paths in the front matter). Green everywhere.
+- **The block, the role filter** (`test_yaml_rest_role_paths_block_is_read_by_the_role_filter_as_the_pure_loader_reads_it`,
+  5): refused, `RolePathsError` with the oracle's text, for each class text; the clean block withholds the ticket's test
+  and not `docs/notes.md`. (success-9, failure-4.)
+- **The front matter, the role filter**
+  (`test_yaml_rest_role_paths_ticket_front_matter_is_read_by_the_role_filter_as_the_pure_loader_reads_it`, 6): refused
+  (`RolePathsError`) for each class text, and equal to the oracle; the clean front matter withholds `src/app/new.py`
+  and not `docs/notes.md`. (success-9, failure-4.)
+- **The product hook** (`test_yaml_rest_product_hook_reads_the_ticket_front_matter_as_the_pure_loader_reads_it`, 6):
+  both Reads refused for each class text, with the oracle's reason; both allowed for the clean one. (success-9,
+  failure-4.)
+- **The live hook, the block**
+  (`test_yaml_rest_live_hook_patched_copy_refuses_calls_on_a_role_paths_block_the_pure_loader_refuses`, 5) and **the
+  front matter** (`test_yaml_rest_live_hook_patched_copy_refuses_calls_on_ticket_front_matter_the_pure_loader_refuses`,
+  6): each call reading a class text refused by the patched copy; the clean control alike in both copies. (failure-4.)
+
+**Fail closed for the front matter, said plainly.** Today both `role_paths`' and `role_reads.py`'s front-matter reads
+answer `{}` (no front matter) when their YAML read raises. With only the loader swapped, a class text then gives the
+test designer no `{ticket_impl}`: its search or Read of the engineer's code is **handed out** (checked by hand on the
+applied live copy run with libyaml absent: the test designer's Read of the engineer's code allowed, where the clean
+text refuses it). The behaviour states the call is refused (fail closed), and these cases hold it so; a fix that only
+swaps the loader fails the role filter's front-matter case and the live front-matter case.
+
+**Before the fix** (this tests branch at `8634b4d21b89` plus these files; the launched session, empty `HOME`, the
+whole-folder filter): 25 failed, 20 passed, 3.9 s. Red: the 14 product class cases, for the reasons in the map; the
+11 live cases, `the live hook's diff ... is absent`. Green: the 17 fixture cases and the 3 product clean controls (by
+design). The harness checked by hand (scratch runs, not cases): the applied live copy decides the class texts as the
+clean one (allow, deny, allow, deny), so a patched copy that changes nothing fails each class case on a call that must
+be refused; the applied copy run with libyaml absent refuses every call on a class block (`could not decide:
+governance/project/path-map.yaml: role_paths cannot be read; refused`).
+
+**Kinds.** Acceptance cases, about 4 s for the 45. Not timing cases, so not in `serial-only.txt`. No marker; no name,
+id or file holds `real`, `green_here` or `time_limit`, so the whole-folder filter selects all 45.
