@@ -89,6 +89,133 @@ def test_f1_a_project_with_tests_targets_alone_selects_as_it_did(repo):
     assert plan["ignore"] == ["tests/acceptance/W1-own/"] and plan["deselect"] == []
 
 
+# --- F2: the full plan names the map's outside targets --------------------------------
+
+COUPLING_WHY = "the scripts' suite lives beside them"
+FULL_OUTSIDE = {"tests/acceptance/W1-own/": ["OWN"], "tests": ["FULL"],
+                OUTSIDE_CASE: ["RECORD_READING"], "governance/scripts/tests/test_tool.py": ["EVERY_CLOSE"],
+                OUTSIDE_SUITE: ["COUPLING"]}
+
+
+def _full_why(plan: dict, target: str) -> list[dict]:
+    return next(e for e in plan["selected"] if e["target"] == target)["why"]
+
+
+def test_f2_a_first_close_without_a_base_names_every_outside_target_beside_tests(repo):
+    repo.commit("base", files=support.files())  # no green record: BASE_UNKNOWN
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["scope"] == "full" and [w["reason"] for w in plan["why_full"]] == ["BASE_UNKNOWN"]
+    assert targets(plan) == FULL_OUTSIDE
+    assert _full_why(plan, OUTSIDE_CASE) == [{"reason": "RECORD_READING"}]
+    assert _full_why(plan, "governance/scripts/tests/test_tool.py") == [{"reason": "EVERY_CLOSE"}]
+    assert _full_why(plan, OUTSIDE_SUITE) == [{"reason": "COUPLING", "coupling": COUPLING_WHY}]
+    assert plan["left_out"] == [] and plan["ignore"] == ["tests/acceptance/W1-own/"] and plan["deselect"] == []
+
+
+def test_f2_the_own_suite_and_tests_come_first_as_before(repo):
+    repo.commit("base", files=support.files())
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert [e["target"] for e in plan["selected"]][:2] == ["tests/acceptance/W1-own/", "tests"]
+
+
+def test_f2_every_coupling_is_named_whatever_the_change(repo):
+    """The change here touches no coupling's path: the full plan still holds each coupling's suites."""
+    second = {"paths": ["product/**"], "suites": ["product/tests/test_c.py", OUTSIDE_SUITE], "why": "the product"}
+    support.project(repo, support.map_data(couplings=support.map_data()["couplings"] + [second]))
+    _work(repo, {"src/core/z.py": "z = 2\n"})  # a shared-core change: full
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["scope"] == "full" and [w["reason"] for w in plan["why_full"]] == ["SHARED_CORE"]
+    found = targets(plan)
+    assert found["product/tests/test_c.py"] == ["COUPLING"]
+    assert found[OUTSIDE_SUITE] == ["COUPLING", "COUPLING"]  # named by two couplings: one entry, both reasons
+    assert _full_why(plan, OUTSIDE_SUITE) == [{"reason": "COUPLING", "coupling": COUPLING_WHY},
+                                              {"reason": "COUPLING", "coupling": "the product"}]
+
+
+@pytest.mark.parametrize("change,reason", [({"src/core/z.py": "z = 2\n"}, "SHARED_CORE"),
+                                           ({"product/app.py": "A = 2\n"}, "UNPLACED")])
+def test_f2_a_shared_core_or_unplaced_change_names_them_too(repo, change, reason):
+    support.project(repo, support.map_data(couplings=[
+        {"paths": ["governance/scripts/**"], "suites": [OUTSIDE_SUITE], "why": "w"}]))
+    _work(repo, change)
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["scope"] == "full" and reason in [w["reason"] for w in plan["why_full"]]
+    assert targets(plan)[OUTSIDE_SUITE] == ["COUPLING"] and targets(plan)[OUTSIDE_CASE] == ["RECORD_READING"]
+
+
+def test_f2_a_full_asked_plan_names_them(repo):
+    support.project(repo)
+    _work(repo, {"governance/scripts/tool.py": "T = 2\n"})
+    plan = select.plan(repo.root, "W1-own", full_asked=True, ticket="P-W1-own")
+    assert plan["scope"] == "full" and [w["reason"] for w in plan["why_full"]] == ["FULL_ASKED"]
+    assert targets(plan) == FULL_OUTSIDE
+
+
+def test_f2_an_outside_target_the_head_does_not_hold_is_left_out_with_its_reason(repo):
+    gone = {"paths": ["nothing/**"], "suites": ["governance/scripts/gone", "product/tests/test_a.py::test_gone"],
+            "why": "never there"}
+    support.project(repo, support.map_data(couplings=support.map_data()["couplings"] + [gone]))
+    _work(repo, {"src/core/z.py": "z = 2\n"})
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["scope"] == "full"
+    assert "governance/scripts/gone" not in targets(plan) and "product/tests/test_a.py::test_gone" not in targets(plan)
+    assert plan["left_out"] == [
+        {"target": "governance/scripts/gone", "why": [{"reason": "UNRESOLVED_TARGET", "detail": "FILE_GONE"}]},
+        {"target": "product/tests/test_a.py::test_gone",
+         "why": [{"reason": "UNRESOLVED_TARGET", "detail": "CASE_GONE"}]}]
+    # why_full names only the changed couplings', every-close and record-reading targets: here none of them
+    assert [w["reason"] for w in plan["why_full"]] == ["SHARED_CORE"]
+    assert targets(plan)[OUTSIDE_SUITE] == ["COUPLING"]  # the ones the head holds are still named
+
+
+def test_f2_an_unresolved_target_keeps_its_why_full_entry_and_is_also_left_out(repo):
+    support.project(repo, support.map_data(record_reading=["product/tests/test_a.py::test_gone"]))
+    _work(repo, {"src/own/y.py": "y = 2\n"})
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["why_full"] == [{"reason": "UNRESOLVED_TARGET", "target": "product/tests/test_a.py::test_gone",
+                                 "detail": "CASE_GONE"}]
+    assert plan["left_out"] == [{"target": "product/tests/test_a.py::test_gone",
+                                 "why": [{"reason": "UNRESOLVED_TARGET", "detail": "CASE_GONE"}]}]
+    assert "product/tests/test_a.py::test_gone" not in targets(plan)
+
+
+@pytest.mark.parametrize("breaking", ["missing", "unreadable"])
+def test_f2_an_unreadable_or_missing_map_gives_today_s_full_plan(repo, breaking):
+    files = support.files()
+    if breaking == "missing":
+        del files[select.MAP_REL]
+    else:
+        files[select.MAP_REL] = "version: 1\ncouplings: not-a-list\n"
+    repo.commit("base", files=files)
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["scope"] == "full"
+    assert targets(plan) == {"tests/acceptance/W1-own/": ["OWN"], "tests": ["FULL"]}
+    assert plan["left_out"] == []
+
+
+def test_f2_a_map_whose_targets_are_all_under_tests_gives_today_s_full_plan(repo):
+    data = {"version": 1, "shared_core": ["src/core/**"], "record_reading": ["tests/unit/test_u.py::test_u"],
+            "every_close": ["tests/unit"],
+            "couplings": [{"paths": ["product/**"], "suites": ["tests/acceptance/W1-own/", "tests/unit"], "why": "w"}]}
+    repo.commit("base", files=support.files(data))
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    assert plan["scope"] == "full"
+    assert targets(plan) == {"tests/acceptance/W1-own/": ["OWN"], "tests": ["FULL"]}
+    assert plan["left_out"] == []
+
+
+def test_f2_the_full_plan_s_outside_targets_reach_the_regression_run_line(repo):
+    from gov.close.command import _scope_form
+
+    repo.commit("base", files=support.files())
+    plan = select.plan(repo.root, "W1-own", ticket="P-W1-own")
+    root = repo.root
+    form = _scope_form(root, plan, root / "tests/acceptance/W1-own")
+    # record_reading, every_close, then the couplings' suites, each as a positional target of its own
+    assert form == [str(root / OUTSIDE_CASE.partition("::")[0]) + "::test_a",
+                    str(root / "governance/scripts/tests/test_tool.py"), str(root / OUTSIDE_SUITE)]
+
+
 # --- the strict-by-ticket selection (select.scoped) ------------------------------
 
 def test_s2_scoped_names_the_outside_suite_a_coupling_maps_the_change_to(repo):
