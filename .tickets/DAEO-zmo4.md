@@ -6,7 +6,7 @@ type: task
 class: implementation
 role: engineer
 profile: FULL
-status: in_progress
+status: closed
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-11 15:21:33+00:00
