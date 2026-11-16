@@ -57,7 +57,8 @@ path tail `.gov-runtime/spend/braked/<ticket>.json`, and the cost and projection
 | failure-1 | `test_w2_156_s6_record_only.py::test_s6_check_leaves_a_running_session_alive_calls_no_notifier_and_writes_only_its_record_and_one_inbox_item`, `test_w2_156_s6_record_only.py::test_s6_the_brake_holds_the_next_launch_only_and_stops_nothing_else` | as success-6: the stand-in session's process stays alive and not stopped (`/proc/<pid>/stat` state not `T`), its record is unchanged, and the notifier stub has 0 calls |
 | failure-2 | `test_w2_156_s1_sum.py::test_s1_sum_prints_the_total_of_the_three_measured_one_unknown_the_projection_and_the_brake_state`, `test_w2_156_s1_sum.py::test_s1_a_ticket_whose_sessions_are_all_not_measured_is_named_with_its_unknowns`, `test_w2_156_s4_no_projection.py::test_s4_a_large_cost_and_no_projection_gives_no_marker_no_record_no_inbox_item`, `test_w2_156_s4_no_projection.py::test_s4_another_ticket_s_projection_is_not_this_ticket_s` | `gov spend` does not exist: invalid choice 'spend', exit 2 |
 | failure-3 | `test_w2_156_s3_launch.py::test_s3_a_ticket_with_a_marker_is_refused_naming_the_marker_the_cost_and_the_projection`, `test_w2_156_s3_launch.py::test_s3_a_session_of_another_role_on_the_braked_ticket_is_refused_too`, `test_w2_156_s6_record_only.py::test_s6_the_brake_holds_the_next_launch_only_and_stops_nothing_else` | `gov launch did not refuse (exit code 0)`: with the marker planted the launch starts the stand-in CLI today |
-| failure-4 | checked by the lead and the landing, no case (`git diff --name-only` of the branch against its base lists only paths its `allowed_paths` match) | not applicable: no case |
+
+failure-4 (any change outside the ticket's `allowed_paths`) is the lead's and the landing's check (`git diff --name-only` of the branch against its base), not a test.
 
 ## What each file plants and checks
 
