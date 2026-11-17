@@ -57,20 +57,6 @@ def test_the_sessionstart_hook_is_registered_for_compact_clear_and_resume(hooks,
     assert "$CLAUDE_PROJECT_DIR" in command, f"the command does not find the hook through $CLAUDE_PROJECT_DIR: {command}"
 
 
-@pytest.mark.parametrize("event, tool, rel", (
-    ("PreToolUse", "Edit", support.GUARD_REL),
-    ("PreToolUse", "Write", support.GUARD_REL),
-    ("PreToolUse", "NotebookEdit", support.GUARD_REL),
-    ("PreToolUse", "Bash", support.GUARD_REL),
-    ("PreToolUse", "Read", support.GUARD_REL),
-))
-def test_the_guard_hooks_stay_registered(hooks, event, tool, rel):
-    """The ticket edits the settings file for the two new hooks only. Green before the implementation; it must stay so."""
-    assert support.command_for(hooks, event, tool, rel) is not None, (
-        f"{support.SETTINGS_REL} no longer registers {rel} for {event} on {tool}"
-    )
-
-
 @pytest.fixture(scope="module")
 def kernel_hooks(tmp_path_factory):
     """The ``hooks`` key of the ``.claude/settings.json`` of a project generated from the template (W2-90)."""

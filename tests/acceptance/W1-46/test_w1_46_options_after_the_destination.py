@@ -46,13 +46,13 @@ ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on 
 template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
 lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
 Each moved case names its fixtures by their old names in its first line; its verdict is the same.
+
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.1, 2.2, 6.1; release 0.1.2): this repository's settings no longer
+register the guard, so the cases that asked its committed guard to refuse a write are retired. The controls that ask
+the kernel's guard, generated from the template, stay.
 """
 
 from __future__ import annotations
-
-import os
-
-import pytest
 
 import w1_46_support as support
 
@@ -60,39 +60,10 @@ w47 = support.w47
 ENGINEER = support.ENGINEER
 OWN = "src/gov/guard"                      # the engineer's ticket: src/gov/guard/**
 OWN_NAME = "decide.py"                     # a file of the engineer's own, which exists, named from that directory
-UP = "../../.."                            # from that directory to the repository root
-TESTS = "tests/acceptance/W1-90"           # the acceptance tests of the engineer's ticket
-TEST_FILE = f"{TESTS}/test_fixture.py"     # one that exists
-TICKET_FILE = f".tickets/{support.TICKET_OF[ENGINEER]}.md"
-
-# name: (the session's working directory, relative to the project; the command)
-TRAILING_OPTION = {
-    "install-mode-onto-an-acceptance-test-with-cwd-inside-the-paths":
-        (OWN, f"install {OWN_NAME} {UP}/{TEST_FILE} -m 644"),
-    "cp-suffix-onto-an-acceptance-test-after-cd":
-        ("", f"cd {OWN} && cp {OWN_NAME} {UP}/{TEST_FILE} -S bak"),
-    "cp-long-suffix-onto-an-acceptance-test-with-cwd-inside-the-paths":
-        (OWN, f"cp {OWN_NAME} {UP}/{TEST_FILE} --suffix bak"),
-    "install-long-mode-onto-a-ticket-after-cd":
-        ("", f"cd {OWN} && install {OWN_NAME} {UP}/{TICKET_FILE} --mode 644"),
-    "ln-forced-suffix-onto-an-acceptance-test-with-cwd-inside-the-paths":
-        (OWN, f"ln -sf {OWN_NAME} {UP}/{TEST_FILE} -S bak"),
-}
 
 
 def _ask(guard, project, directory, command):
     return guard("Bash", w47.bash_input(command), ENGINEER, cwd=project / directory)
-
-
-@pytest.mark.parametrize("name", sorted(TRAILING_OPTION))
-def test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination(
-        guard, project, name):
-    """The option's value is a name inside the engineer's paths; the file lands on the operand before it."""
-    directory, command = TRAILING_OPTION[name]
-    assert os.path.isfile(project / OWN / OWN_NAME), "the fixture lost the engineer's own file"
-    assert os.path.isfile(project / TEST_FILE) and os.path.isfile(project / TICKET_FILE), "the fixture lost a destination"
-    w47.assert_stopped(_ask(guard, project, directory, command),
-                       f"`{command}` by an engineer, working directory {directory or 'the repository root'}")
 
 
 def test_the_guard_does_not_refuse_install_with_its_option_before_the_operands(kernel_guard, kernel_project):

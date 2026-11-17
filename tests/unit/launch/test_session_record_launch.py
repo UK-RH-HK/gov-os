@@ -198,15 +198,6 @@ def test_an_unwritable_record_keeps_the_exit_code_with_one_stderr_line(project, 
     assert (project / ".gov-runtime" / "sessions").read_text() == "not a folder"
 
 
-def test_the_first_and_a_later_launch_get_the_same_deny_rules(project):
-    """W2-56 S3 (one list on every launch): the records' folder exists before the first launch's settings are built,
-    so the runtime rules, which name what exists under .gov-runtime, are the same on every launch."""
-    for _ in range(2):
-        assert launcher.launch(project, "engineer", TICKET, []) == 0
-    first, later = (json.loads(s.argv[s.argv.index("--settings") + 1])["permissions"]["deny"] for s in Session.made)
-    assert first == later and f"Edit(/{project}/.gov-runtime/sessions)" in first
-
-
 def test_a_session_that_cannot_start_leaves_no_session_record(project, monkeypatch):
     def refuse(*args, **kwargs):
         raise OSError("no")

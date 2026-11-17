@@ -1,24 +1,15 @@
-"""W1-46 -- the launcher starts a worker session only inside a strict, fail-closed sandbox.
+"""W1-46 -- how the launcher starts a worker session: one ``--settings`` value, the CLI by its path, the root.
 
-KPI success 1 [CAP-61.a]: "gov launch refuses to start a worker session, with a
-non-zero exit and a named reason, unless the settings it built have the sandbox
-enabled, failIfUnavailable true, allowUnsandboxedCommands false and network
-strictAllowlist; it passes them through --settings and reads no sandbox setting
-from the repository; the settings it builds carry no excludedCommands (DEC-164)".
-KPI failure 1: "A worker session starts with the sandbox off, not strict or not
-fail-closed". Failure 2: "A sandbox setting is read from the repository's
-settings". Failure 8: "The settings the launcher builds carry an
-excludedCommands entry".
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.2, 6.1; release 0.1.2): the launcher writes no sandbox block and
+does not refuse a ``sandbox`` key in the repository's settings (DEC-233 superseded); the cases that asserted the
+strict sandbox, its excluded commands and the refusal of the key are retired. What stays:
 
-DEC-233: ``gov launch`` refuses to start, with a non-zero exit and a named
-reason, when the repository's ``.claude/settings.json`` or
-``.claude/settings.local.json`` carries a ``sandbox`` key.
-
-DEC-205: the launcher starts the CLI by its absolute path ``~/.local/bin/claude``,
-never a bare ``claude``.
-
-Described behaviour from the review of W1-47 (DEC-136): the launcher's settings
-do not depend on any file a worker can replace by a symbolic link.
+- the built settings reach the session through one ``--settings`` argument, and a second ``--settings`` after
+  ``--`` is refused: the session's settings come from the launcher alone;
+- DEC-205: the launcher starts the CLI by its absolute path ``~/.local/bin/claude``, never a bare ``claude``;
+- the session is started in the repository root, and only the worker roles are launched;
+- described behaviour from the review of W1-47 (DEC-136): the launcher's settings do not depend on any file a
+  worker can replace by a symbolic link.
 
 No session is started: the CLI at ``<HOME>/.local/bin/claude`` is a stand-in
 that records how it was called.
@@ -34,47 +25,17 @@ import pytest
 
 import w1_46_support as support
 
-WEAK_SANDBOX = {
-    "enabled": False,
-    "failIfUnavailable": False,
-    "allowUnsandboxedCommands": True,
-    "excludedCommands": ["git"],
-    "network": {"strictAllowlist": False, "allowedDomains": [support.NOT_A_RESEARCH_HOST]},
-}
-
-
-def _assert_strict(result):
-    faults = support.sandbox_faults(result.settings())
-    assert faults == [], f"a worker session was started with a sandbox that is not on, strict and fail-closed: {faults}"
-
-
-# --------------------------------------------------------------------------
-# Success 1, failures 1 and 8: what the session is started with
-# --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_a_worker_session_is_started_with_the_sandbox_on_strict_and_fail_closed(launch, role):
-    result = launch(role)
-    assert result.run.returncode == 0, f"gov launch {role} failed\n{result.describe()}"
-    _assert_strict(result)
-
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_the_built_settings_carry_no_excluded_commands(launch, role):
-    """DEC-164, failure 8."""
-    block = launch(role).settings().get("sandbox", {})
-    assert not block.get("excludedCommands"), f"the built settings carry excludedCommands: {block['excludedCommands']}"
-
 
 @pytest.mark.parametrize("role", support.WORKER_ROLES)
 def test_the_configuration_is_passed_through_one_settings_argument(launch, role):
-    """ "It passes them through --settings": one ``--settings`` value on the CLI's command line holds the sandbox block."""
+    """ "It passes them through --settings": one ``--settings`` value on the CLI's command line holds the built
+    settings, with the session's role in their env block (Emergency 2: no sandbox block any more)."""
     result = launch(role)
     session = result.session()
     assert any(arg == "--settings" or arg.startswith("--settings=") for arg in session["args"]), (
         f"the CLI was started without --settings: {session['args']}"
     )
-    assert isinstance(result.settings().get("sandbox"), dict), "the --settings value carries no sandbox block"
+    assert (result.settings().get("env") or {}).get("GOV_ROLE") == role, "the --settings value carries no env block"
 
 
 @pytest.mark.parametrize("role", support.WORKER_ROLES)
@@ -94,56 +55,7 @@ def test_the_session_is_started_in_the_repository_root(launch, project, role):
 
 
 # --------------------------------------------------------------------------
-# "Reads no sandbox setting from the repository" (failure 2): a sandbox key there refuses the launch (DEC-233)
-# --------------------------------------------------------------------------
-
-def _plant(project, how):
-    """Put a weak sandbox block in the repository's settings, the way ``how`` names."""
-    if how == "committed-settings":
-        path = project / support.SETTINGS_REL
-        data = json.loads(path.read_text(encoding="utf-8"))
-        data["sandbox"] = WEAK_SANDBOX
-        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-        support.check_support.commit_all(project, "a sandbox block in the committed settings")
-    elif how == "local-settings":
-        support.write(project, support.LOCAL_SETTINGS_REL, json.dumps({"sandbox": WEAK_SANDBOX}))
-    else:   # a link a worker could have left: the local settings resolve to a file in scratch
-        target = support.write(project, ".gov-runtime/scratch/w1-46/planted.json", json.dumps({"sandbox": WEAK_SANDBOX}))
-        (project / support.LOCAL_SETTINGS_REL).symlink_to(target)
-
-
-@pytest.mark.parametrize("role", (support.ENGINEER, support.RESEARCH))
-@pytest.mark.parametrize("how", ("committed-settings", "local-settings", "local-settings-linked-to-scratch"))
-def test_the_launcher_refuses_when_the_repositorys_settings_carry_a_sandbox_key(launch, project, role, how):
-    """DEC-233: non-zero exit, a named reason, nothing started. The CLI may merge the repository's settings.
-
-    The same project launches before the key is planted, so the key is the reason.
-    """
-    launch(role).session()
-    _plant(project, how)
-    support.assert_refused(launch(role), "sandbox")
-
-
-@pytest.mark.parametrize("block", (
-    {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
-     "network": {"strictAllowlist": True, "allowedDomains": []}},
-    {},
-), ids=("a-strict-block", "an-empty-block"))
-def test_the_key_itself_refuses_the_launch_whatever_it_holds(launch, project, block):
-    """DEC-233: "carries a `sandbox` key". The launcher does not judge the block; it refuses it."""
-    support.write(project, support.LOCAL_SETTINGS_REL, json.dumps({"sandbox": block}))
-    support.assert_refused(launch(support.ENGINEER), "sandbox")
-
-
-def test_this_repositorys_settings_carry_no_sandbox_block():
-    """DEC-161: "The repository's settings carry no sandbox block". Holds before implementation."""
-    for rel in (support.SETTINGS_REL, support.w47.TEMPLATE_SETTINGS_REL):
-        data = support.w47.load_json_object(support.REPO_ROOT / rel, rel)
-        assert "sandbox" not in data, f"{rel} carries a sandbox block"
-
-
-# --------------------------------------------------------------------------
-# The refusal (success 1, failure 1)
+# A second --settings after -- is refused
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("extra", (
@@ -154,7 +66,8 @@ def test_this_repositorys_settings_carry_no_sandbox_block():
     {"sandbox": {"excludedCommands": ["git"]}},
 ), ids=("enabled-false", "unsandboxed-commands-allowed", "not-fail-closed", "allowlist-not-strict", "excluded-commands"))
 def test_the_launcher_refuses_when_the_caller_hands_it_a_weaker_sandbox(launch, extra):
-    """A second ``--settings`` after ``--`` would weaken what the session gets: no session, non-zero exit, a reason."""
+    """A second ``--settings`` after ``--`` would replace what the launcher built: no session, non-zero exit, a reason.
+    Still refused under Emergency 2, whatever the value holds."""
     result = launch(support.ENGINEER, None, "--settings", json.dumps(extra))
     support.assert_refused(result, "sandbox", "settings")
 

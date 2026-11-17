@@ -1,5 +1,5 @@
-"""Builder tests for W2-56 (DAEO-wnnz): the launcher's cleaned environment, refused arguments, sandbox block,
-placeholders, process group and temp-folder removal.
+"""Builder tests for W2-56 (DAEO-wnnz): the launcher's cleaned environment, refused arguments, the sandbox module's
+own block and placeholders (no longer used by the launch since Emergency 2), process group and temp-folder removal.
 
 Regression evidence only (DEC-136). Every place is a temporary folder under a stand-in HOME; the CLI is a stand-in
 script; no reranker, model or real sandbox is started.
@@ -101,8 +101,8 @@ def test_a_prompt_that_names_a_guard_argument_among_other_words_starts(flag):
     launcher._check_cli_args(["-p", f"never pass {flag} to anything", "--model", "haiku"])
 
 
-@pytest.mark.parametrize("args", (["--dangerously-skip-permissions"], ["--permission-mode", "bypassPermissions"],
-                                  ["--add-dir=/x"], ["--settings", "{}"], ["--bare"], ["--setting-sources", "user"]))
+# Emergency 2 (0.1.2): the bypass, --add-dir and --bare no longer refuse.
+@pytest.mark.parametrize("args", (["--settings", "{}"], ["--setting-sources", "user"]))
 def test_the_refusals_of_today_still_refuse(args):
     with pytest.raises(GovError):
         launcher._check_cli_args(args)
@@ -192,13 +192,6 @@ def test_each_widening_is_a_fault(tmp_path, change):
     assert sandbox.faults(settings, tmp_path)
 
 
-def test_the_launchers_sandbox_faults_reads_the_socket_from_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("HOME", str(tmp_path))
-    assert launcher.sandbox_faults(_built(tmp_path)) == []
-    monkeypatch.setenv("HOME", str(tmp_path / "other"))
-    assert launcher.sandbox_faults(_built(tmp_path))
-
-
 # --- S4: the placeholders ---------------------------------------------------------------------------------------------
 
 def _git(root: Path, *args: str) -> str:
@@ -216,28 +209,6 @@ def _repository(tmp_path: Path) -> tuple[Path, Path]:
     (worktree / ".gov-runtime/scratch").mkdir(parents=True)
     (worktree / ".gov-runtime/records").mkdir()
     return main, worktree
-
-
-def test_no_placeholder_is_staged_in_any_worktree_and_an_ordinary_file_is(tmp_path):
-    main, worktree = _repository(tmp_path)
-    root = Path(os.path.realpath(worktree))
-    deny = launcher._runtime_rules(root) + launcher._tree_rules(root, "engineer")
-    sandbox.exclude_placeholders(root, deny)
-    sandbox.exclude_placeholders(root, deny)  # a second launch adds nothing
-    planted = [*sandbox.PLACEHOLDER_NAMES, *sandbox.PLACEHOLDER_PATHS,
-               *(f".gov-runtime/{'scratch'[:i]}" for i in range(1, 7)), "tests/acceptance"]
-    for rel in planted:
-        (root / rel).parent.mkdir(parents=True, exist_ok=True)
-        (root / rel).touch()
-    (root / "docs").mkdir()
-    (root / "docs/gitconfig-notes.md").write_text("x\n", encoding="utf-8")
-    (root / "new.txt").write_text("x\n", encoding="utf-8")
-    for place in (root, main):  # the worktree, and another worktree of the same repository
-        _git(place, "add", "-A")
-    assert sorted(_git(root, "diff", "--cached", "--name-only").split()) == ["docs/gitconfig-notes.md", "new.txt"]
-    exclude = Path(_git(root, "rev-parse", "--path-format=absolute", "--git-path", "info/exclude").strip())
-    text = exclude.read_text(encoding="utf-8")
-    assert text.count(sandbox.EXCLUDE_MARK) == 1 and text.count("\n.bashrc\n") == 1
 
 
 def test_a_folder_at_a_placeholder_name_is_still_added(tmp_path):
@@ -388,11 +359,6 @@ def test_a_launch_passes_the_cleaned_env_and_removes_its_folder(launched, code):
     assert len(Path(env["TMPDIR"]).name) == len("gov-launch-") + 8
     assert env["PATH"] == os.environ["PATH"] and settings["env"]["GOV_ROLE"] == "engineer"
     assert seen["pgid"] == seen["pid"]
-    assert settings["sandbox"]["network"]["allowUnixSockets"] == [sandbox.socket_path()]
-    allow = settings["sandbox"]["filesystem"]["allowWrite"]
-    assert allow[0] == f"/{env['TMPDIR']}" and allow[-1] == f"/{sandbox.log_path()}" and len(allow) <= 3
-    assert all(entry.startswith(f"/{os.path.realpath(env['HOME'])}/gov-os-runs/") for entry in allow[1:-1])
-    assert launcher.sandbox_faults(settings) == []
 
 
 def test_a_cli_that_cannot_be_started_is_refused_and_leaves_no_folder(launched, tmp_path):
@@ -400,86 +366,6 @@ def test_a_cli_that_cannot_be_started_is_refused_and_leaves_no_folder(launched, 
     with pytest.raises(GovError):
         launched()
     assert os.listdir(tmp_path / "temp") == []
-
-
-# --- S7 (round 2, the CTO's item 4): no path under a .git folder in the settings the launcher builds ----------------
-
-def _strings(value):
-    """Every string of a settings value, keys and values, at any depth."""
-    if isinstance(value, str):
-        yield value
-    elif isinstance(value, dict):
-        for key, item in value.items():
-            yield key
-            yield from _strings(item)
-    elif isinstance(value, list):
-        for item in value:
-            yield from _strings(item)
-
-
-def _under_a_git_folder(text: str) -> bool:
-    return ".git" in text.replace("(", "/").replace(")", "/").split("/")
-
-
-def test_a_worktree_sessions_settings_name_no_path_under_a_git_folder(tmp_path, monkeypatch):
-    """Lens E F17: the CLI's sandbox binds each existing path its settings deny (``--ro-bind <path> <path>``), so a git
-    lock file named there, or beside a git file the settings name, can vanish between the build and the mount. The
-    launcher's own settings (deny rules, write list, socket, env) name no path in or under any ``.git`` folder, for a
-    worktree that shares its repository's ``.git``; the git folder's own protections are the CLI's (CIT-E, S7)."""
-    home, temp, main = tmp_path / "home", tmp_path / "temp", tmp_path / "main"
-    for folder in (home / ".local/bin", temp, main):
-        folder.mkdir(parents=True)
-    git = git_env(main)
-    subprocess.run(["git", "init", "-q", str(main)], check=True, env=git)
-    (main / ".tickets").mkdir()
-    (main / ".tickets/TST-a001.md").write_text(
-        "---\nid: TST-a001\nwbs_id: W2-90\nstatus: in_progress\nrole: engineer\n---\n", encoding="utf-8")
-    (main / ".gov-runtime/scratch").mkdir(parents=True)
-    (main / ".gov-runtime/rebuild").mkdir()
-    subprocess.run(["git", "-C", str(main), "add", ".tickets"], check=True, env=git)
-    subprocess.run(["git", "-C", str(main), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "t"],
-                   check=True, env=git)
-    worktree = tmp_path / "W2-77"
-    subprocess.run(["git", "-C", str(main), "worktree", "add", "-q", str(worktree)], check=True, env=git)
-    (worktree / ".gov-runtime/scratch").mkdir(parents=True)
-    _plant_templates(worktree)
-    _plant_role_files(worktree, ("engineer", "independent-test-designer"))
-    for lock in ("config.lock", "index.lock", "HEAD.lock"):  # a git command in another worktree holds its locks now
-        (main / ".git" / lock).write_text("", encoding="utf-8")
-    out = tmp_path / "out.json"
-    cli = home / launcher.CLI_REL
-    cli.write_text(CLI.format(python=sys.executable, out=str(out)), encoding="utf-8")
-    cli.chmod(0o755)
-    monkeypatch.setenv("HOME", str(home))
-    _open_gate(home, monkeypatch)
-    monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
-    monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
-    for root in (main, worktree):
-        for role in ("engineer", "independent-test-designer"):
-            built = launcher.build_settings(Path(os.path.realpath(root)), role, "TST-a001")
-            assert [text for text in _strings(built) if _under_a_git_folder(text)] == [], (root.name, role)
-    assert launcher.launch(worktree, "engineer", "TST-a001", ["0"]) == 0
-    seen = json.loads(out.read_text(encoding="utf-8"))["settings"]
-    assert [text for text in _strings(seen) if _under_a_git_folder(text)] == []
-    assert launcher.sandbox_faults(seen) == []
-
-
-def test_the_research_fence_names_no_git_folder(tmp_path):
-    """The one launcher rule that lists a folder's entries leaves ``.git`` out at the top (it is the session's to commit
-    through), so neither ``.git`` nor a lock file in it is named."""
-    root = tmp_path / "repo"
-    for rel in (".git", "experiments/x", "src"):
-        (root / rel).mkdir(parents=True)
-    (root / ".git" / "config.lock").write_text("", encoding="utf-8")
-    rules = launcher._fence_rules(root, str(root / "experiments" / "x"))
-    assert rules and not [rule for rule in rules if _under_a_git_folder(rule)]
-
-
-def test_the_git_name_check_sees_each_form():
-    for text in ("Edit(//r/.git/config.lock)", "/r/.git", "/r/.git/worktrees/W2-77/index.lock", "Edit(/r/.git/**)"):
-        assert _under_a_git_folder(text), text
-    for text in ("Edit(//r/.gitignore)", "/r/.github/x", "/tmp/gov-launch-ab", "Edit(//r/.gov-runtime/rebuild)"):
-        assert not _under_a_git_folder(text), text
 
 
 # --- S14 (round 2, P-3): the template's rulesync source keeps the one allow rule through a regeneration ---------------

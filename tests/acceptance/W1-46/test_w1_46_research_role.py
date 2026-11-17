@@ -19,6 +19,10 @@ ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on 
 template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
 lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
 Each moved case names its fixtures by their old names in its first line; its verdict is the same.
+
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.1, 2.2, 6.1; release 0.1.2): this repository's settings no longer
+register the guard, so the cases that asked its committed guard to refuse a write are retired. The controls that ask
+the kernel's guard, generated from the template, stay.
 """
 
 from __future__ import annotations
@@ -122,36 +126,6 @@ def test_a_research_session_may_use_scratch(kernel_guard, kernel_project):
     w47.assert_allowed(result, "a Write to .gov-runtime/scratch/ by research")
 
 
-@pytest.mark.parametrize("tool", ("Write", "Edit"))
-@pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
-                                 "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
-                                 ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
-def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
-    """Holds before implementation, for another reason: the guard does not know the role yet."""
-    w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
-
-
-def test_a_research_bash_write_outside_its_experiment_folder_is_denied(guard, project):
-    for command in ("echo x >> README.md", "rm experiments/notes.md", f"cp {FOLDER}/README.md src/gov/copied.md",
-                    "touch experiments/spikes/exp-900/new.txt"):
-        w47.assert_stopped(guard("Bash", w47.bash_input(command), RESEARCH), f"`{command}` by research")
-
-
-def test_the_research_role_has_no_scope_on_another_roles_ticket(guard, project):
-    """ "Its ticket's allowed_paths": a research session on an engineer's ticket gets neither scope."""
-    for rel in (support.OWN_PATH[support.ENGINEER], f"{FOLDER}/notes.md"):
-        result = guard("Write", w47.write_input("Write", project / rel), RESEARCH, support.TICKET_OF[support.ENGINEER])
-        w47.assert_stopped(result, f"a Write to {rel} by research on the engineer's ticket")
-
-
-@pytest.mark.parametrize("role", support.EMPTY_ALLOWLIST_ROLES)
-def test_another_role_gains_nothing_from_the_research_ticket(guard, project, role):
-    result = guard("Bash", w47.bash_input(f"echo x > {FOLDER}/notes.md"), role, support.RESEARCH_TICKET)
-    if role == support.TEST_DESIGNER:
-        return   # its scope is tests/acceptance/** whatever the ticket (W1-02)
-    w47.assert_stopped(result, f"a Bash write into the experiment folder by {role} on the research ticket")
-
-
 def test_the_guard_grants_the_research_role_no_network_and_asks_nothing_for_it(kernel_guard, kernel_project):
     """ "Its network grant comes from the launcher's profile ... not from the guard": the guard just lets the call by."""
     guard, project = kernel_guard, kernel_project
@@ -163,10 +137,3 @@ def test_the_guard_grants_the_research_role_no_network_and_asks_nothing_for_it(k
 # --------------------------------------------------------------------------
 # Success 8 [CAP-58.d]: a file-tool write outside the repository
 # --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-@pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
-def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
-    """Holds before implementation for every role; it must still hold once the guard knows the research role."""
-    for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
-        w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")

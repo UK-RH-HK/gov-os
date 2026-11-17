@@ -7,8 +7,8 @@ exist, else the live hook.
 
 | Staged copy | Goes to | Made from (sha256 of the live file) |
 |---|---|---|
-| `role_reads.py` | `.claude/hooks/role_reads.py` | `5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07` |
-| `pretooluse.py` | `.claude/hooks/pretooluse.py` | `74f8dbea4761de37628305e5d58125641ae39a409a7ed0a2babb379b1ceca5b8` |
+| `role_reads.py` | `.claude/hooks/role_reads.py` | `02a782e31145edbd08f201adc2986627dd3f2e3533c548ccbb4c670eefbb1500` |
+| `pretooluse.py` | `.claude/hooks/pretooluse.py` | `101bee39d5c9c9f7165d67b89fde96efbfe924db7da57831f62f45dbe02511ec` |
 
 `pretooluse.py` was rebuilt on 2026-11-10 on the live hook at `9cce7430d` (ACT-SETS-GLOBS-1; it carries rule 2b's
 glob line, rule 2c and rule 2d, which the first copy, made from `bd545af8…` at `15952bbfa`, lacked). W2-141's one

@@ -124,12 +124,22 @@ def _sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+# The commit that applied ACT-GUARD-FIX-6 (fa6135903): the hooks the diff is judged against, read from git, so the
+# cases keep judging the same bytes after ACT-GUARD-FIX-7 applies the diff to the tree (DEC-1198 (6), DND 231).
+GF6_COMMIT = "fa613590390a80ddebd4dea593e57a6475dfb3c3"
+
+
 def _copy_hooks(dest_root):
-    source = REPO_ROOT / LIVE_HOOKS_REL
-    if not source.is_dir():
-        raise LiveHookUnavailable(f"the tree has no {LIVE_HOOKS_REL}/ to copy")
     dest = Path(dest_root) / LIVE_HOOKS_REL
-    shutil.copytree(source, dest, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    dest.mkdir(parents=True, exist_ok=True)
+    listed = _git(REPO_ROOT, "ls-tree", "--name-only", GF6_COMMIT, LIVE_HOOKS_REL + "/")
+    if listed.returncode != 0 or not listed.stdout.strip():
+        raise LiveHookUnavailable(f"git has no {LIVE_HOOKS_REL}/ at ACT-GUARD-FIX-6's commit {GF6_COMMIT[:12]}")
+    for rel in listed.stdout.split():
+        shown = subprocess.run(["git", "-C", str(REPO_ROOT), "show", f"{GF6_COMMIT}:{rel}"], capture_output=True,
+                               check=False)
+        if shown.returncode == 0:
+            (dest / Path(rel).name).write_bytes(shown.stdout)
     return dest
 
 
@@ -156,7 +166,7 @@ def make_copies(base):
         digest = _sha256(path)
         if not digest.startswith(prefix):
             raise LiveHookUnavailable(
-                f"the tree's {LIVE_HOOKS_REL}/{name} is not ACT-GUARD-FIX-6's bytes (sha256 {digest[:12]}, expected "
+                f"git's {LIVE_HOOKS_REL}/{name} at {GF6_COMMIT[:12]} is not ACT-GUARD-FIX-6's bytes (sha256 {digest[:12]}, expected "
                 f"{prefix}): the diff is judged against the applied ACT-GUARD-FIX-6 hook")
     diff = REPO_ROOT / DIFF_REL
     if not diff.is_file():

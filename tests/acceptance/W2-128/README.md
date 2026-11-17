@@ -194,8 +194,8 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S20 | `test_w2_128_templates.py::test_s20_t8_names_search_again_once_on_its_start_line` | red | `role-cto.md` does not exist |
 | S21 | `test_w2_128_rows.py::test_row_1_t4_a_revised_case_carries_that_ticket_s_task_trailer` | red | `role-test-designer.md` does not exist |
 | S21 | `test_w2_128_rows.py::test_row_2_t5_a_whole_branch_diff_uses_stat_or_excludes_the_acceptance_tests` | red | `role-engineer.md` does not exist |
-| S21 | `test_w2_128_rows.py::test_row_3_a_worker_brief_is_built_with_gov_context_and_role[role-lead]` | red | the file does not exist |
-| S21 | `test_w2_128_rows.py::test_row_3_a_worker_brief_is_built_with_gov_context_and_role[role-cto]` | red | the file does not exist |
+| S21 | `test_w2_128_rows.py::test_row_3_a_worker_brief_is_built_with_gov_brief_and_role[role-lead]` | red | the file does not exist |
+| S21 | `test_w2_128_rows.py::test_row_3_a_worker_brief_is_built_with_gov_brief_and_role[role-cto]` | red | the file does not exist |
 | S21 | `test_w2_128_rows.py::test_row_4_a_pair_runs_under_its_ticket_s_own_id[role-lead]` | red | the file does not exist |
 | S21 | `test_w2_128_rows.py::test_row_4_a_pair_runs_under_its_ticket_s_own_id[role-cto]` | red | the file does not exist |
 | S21 | `test_w2_128_rows.py::test_row_5_t0_no_merge_inside_the_sandbox` | red | `brief.md` does not exist |
