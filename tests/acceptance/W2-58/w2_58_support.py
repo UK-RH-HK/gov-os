@@ -892,16 +892,6 @@ def read_denial_faults(settings, project, home, rels):
     return faults
 
 
-HELD_OUT_SAMPLES = ("answers.md", "cases/test_hidden.py")
-
-
-def held_out_faults(settings, sandbox, project):
-    """DEC-873 item 2: the held-out material's ``Read`` rules (b) stay; the files of the stand-in material it misses."""
-    specs = read_deny_specs(settings)
-    return [str(sandbox.held_out / rel) for rel in HELD_OUT_SAMPLES
-            if not any(rule_covers(spec, sandbox.held_out / rel, project, sandbox.home) for spec in specs)]
-
-
 def tracked_files(project):
     return [rel for rel in git(project, "ls-files", "-z").split("\0") if rel]
 

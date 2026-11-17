@@ -1,0 +1,12 @@
+# Archive: the old start-up documents (EMERGENCY-2 11.1)
+
+Everything in this folder is history, superseded by `docs/emergency-2/EMERGENCY-2.md` (11.1, 11.2). Do not work from
+it. Archived on 2026-11-17 for the owner's step 3; each sha256 is of the file as archived here.
+
+- `START-NEXT-SESSION.md`: from `governance/project/orchestration/START-NEXT-SESSION.md` (git mv, at a246f72b2); sha256 8d1dce95356b8cfad916fc2f9f6bb85df3b493f582b0ca5f9a32cbb9c319940c; history, superseded by EMERGENCY-2.md 11.1; do not work from it.
+- `DECISIONS-IN-FORCE.md`: from `governance/project/orchestration/DECISIONS-IN-FORCE.md` (git mv, at a246f72b2); sha256 2eb46536fcd835c55b766781fb02dc695de6bfee8092fb89ad7cbe28ff072bfb; history, superseded by EMERGENCY-2.md 11.1; do not work from it.
+- `w2-orchestrator.md`: from `governance/project/prompts/w2-orchestrator.md`, the Wave 2 orchestrator prompt (git mv, at a246f72b2); sha256 e63d87d43804411db5af79453ee9445421576c86258d90f1cbe9c6d5a815bd88; history, superseded by EMERGENCY-2.md 11.1; do not work from it.
+- `w1-orchestrator.md`: from `governance/project/prompts/w1-orchestrator.md`, the Wave 1 orchestrator prompt (git mv, at a246f72b2); sha256 117ca2c3abfa9ed118ad8cdb6ed4f1b7cc81e3803242497529f699a76caa1146; history, superseded by EMERGENCY-2.md 11.1; do not work from it.
+- `CHECKPOINT.md`: copied from the main tree's `.gov-runtime/scratch/orchestrator/CHECKPOINT.md` (untracked; last written 2026-11-16 17:21; 339,120 bytes); sha256 45a433aa3995ff63b436deec77c5d9be66efa9595d47071a387b81adcd8b641a; history, superseded by EMERGENCY-2.md 11.1; do not work from it.
+- `CHECKPOINT-ARCHIVE.md`: copied from the main tree's `.gov-runtime/scratch/orchestrator/CHECKPOINT-ARCHIVE.md` (untracked; last written 2026-10-30 13:10; 493,300 bytes); sha256 2ce1cb7007ce5ce54e272a7fb4195fb0a90fcfc4a89f2058a1cb24a360a47100; history, superseded by EMERGENCY-2.md 11.1; do not work from it.
+- `memory-2026-11-16/`: the old memory index and its 107 entry files (108 files), copied from `~/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/memory.archived-20261117/`, where the live `memory/` folder's 2026-11-16 content was moved on 2026-11-17 (the live folder was already empty at the copy); sha256 of its `MEMORY.md` 48125cd2942119b3a9a07cd86108bea6a89322d19d35c329a9aa57e2e5105892, of the folder's `sha256sum` listing (sorted by name) 2d345e69e335e3037a33859cbcca054176df2d2d5a45e18633dcb88f01ced496; history, superseded by EMERGENCY-2.md 11.1; do not work from it.

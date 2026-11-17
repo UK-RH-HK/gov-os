@@ -78,7 +78,7 @@ LOG = ORCH / "log/stop-idle.log"
 STATE = ORCH / "log/stop-idle-state.json"
 AGENT_STALE_S = 1800
 STATUS_MAX_AGE_S = 300
-# The standing watchers of START-NEXT-SESSION section 6 (and the two machine watchers): never work, whatever their age.
+# The standing watchers of START-NEXT-SESSION section 6 (now docs/emergency-2/archive/; and the two machine watchers): never work, whatever their age.
 WATCHERS = ("inbox_wait.sh", "inbox_wait_quiet.sh", "helper_watch.py", "sentinel_check.sh", "bare_watch.sh",
             "store_refresh_daily.sh", "usage_log.sh", "mem_guard.py", "oom_watch.sh")
 USED_LOG = ("already started for", "already holds a return")  # the dispatcher's why_not() answers for a used log

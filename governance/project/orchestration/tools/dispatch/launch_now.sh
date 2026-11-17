@@ -42,7 +42,7 @@ TESTS="/home/usain/gov-os-worktrees/$W2-tests"
 RUNS="/home/usain/gov-os-runs"
 [ -e "$TESTS" ] || mkdir "$TESTS" || echo "$(date '+%F %T') LAUNCH_NO_TESTS_DIR: $TESTS could not be made; $W2 starts without it" >&2
 echo "$(date '+%F %T') gate open; $ID registered as pid $$; starting $W2" >&2
-exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json --permission-mode acceptEdits \
+exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json --permission-mode bypassPermissions \
   --allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob" \
   --settings "{\"env\":{\"GOV_ROLE\":\"orchestrator\",\"GOV_TICKET\":\"$ID\",\"CLAUDE_CODE_SUBAGENT_MODEL\":\"claude-opus-5-5\"}}" \
   --add-dir "$TESTS" --add-dir "$RUNS" \

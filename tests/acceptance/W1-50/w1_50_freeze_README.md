@@ -795,3 +795,15 @@ session with the caller's environment less `GOV_ROLE`, `GOV_TICKET` and **every 
 `CLAUDE`** (`inherited()`, as W1-46's live sessions do since DEC-784), where they removed a fixed list of six names
 before (I1 F-7). Nothing else of the cases changes: no expectation, no limit. Both now run in the nightly, not in the
 close (the serial-only list's `nightly: live-session` entries, DEC-889 item 5).
+
+## Emergency 2 (2026-11-17, release 0.1.2)
+
+docs/emergency-2/EMERGENCY-2.md 2.2 and 6.1: `gov launch` writes no sandbox block and no deny rule of its own, so
+there is no literal rule and no sandbox placeholder at the flag's path. Retired: the built-settings cases of
+`test_w1_50_freeze_launcher.py` (no literal rule when nothing is there, a literal rule for a flag or an unmarked file at
+launch, the patterns for the file tools, the other by-name rules) and its live case
+`test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path`; the whole of `test_w1_50_freeze_live_pause.py`
+(a flag put over the sandbox's placeholder). `test_w1_50_freeze_launcher.py` keeps the guard's case
+(`test_the_guard_denies_a_worker_s_write_to_the_flag_s_path`). `w1_50_freeze_support.py` loses the launch fixtures
+(`freeze_launch_base`, `freeze_launch_project`, `freeze_launch`) and `literal_runtime_names`. The rows above are kept as
+the record of their batches.

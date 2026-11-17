@@ -6,6 +6,12 @@ DEC-864 item 5; the history in DEC-162, DEC-215, DEC-218, DEC-508, DEC-525, DEC-
 DEC-570), before the implementation exists (`git diff --name-only w2/integrate...HEAD` was empty when they were
 written). Proportion: STANDARD (DEC-221): every KPI line's success and failure, and the key edge cases.
 
+**Emergency 2 (release 0.1.2, EMERGENCY-2 2.1-2.4).** `gov launch` writes no held-out `Read` rule and no longer reads
+`evaluation_sets`. Retired: `test_w2_58_launched_sessions.py::test_the_held_out_rules_stay_in_every_launched_role_s_settings`
+and `test_w2_58_fails_closed.py::test_a_malformed_evaluation_block_refuses_the_launch`; the held-out half of the four
+launcher cases named `…_and_keeps_the_held_out_rules` (their names kept for the opt-in lists), and the support's
+`held_out_faults`. Their "no Read denial" half stays. The rows below that name them are the record of their time.
+
 ## What the tests drive
 
 Public interfaces only:

@@ -95,7 +95,7 @@ def test_s6_the_r_12_commit_changes_only_decisions_in_force_and_only_its_r_12_li
     moved = [line for line in diff.splitlines() if line[:1] in "+-" and line[:3] not in ("+++", "---")]
     assert moved and all(line[1:].startswith("- R-12 (") for line in moved), "a line other than R-12's changed"
     assert commit in record.commit_list("status"), "the R-12 commit is a status commit of the record"
-    lines = [line for line in (head_tree / s.IN_FORCE).read_text(encoding="utf-8").splitlines()
+    lines = [line for line in (head_tree / s.IN_FORCE_AT_HEAD).read_text(encoding="utf-8").splitlines()
              if line.startswith("- R-12 (")]
     assert lines, "DECISIONS-IN-FORCE.md has no R-12 line"
 

@@ -13,8 +13,6 @@ from gov.cli.errors import GovError
 from gov.launch import launcher, plan_check
 from gov.launch.plan_check import check_lead
 
-REPOSITORY_CHECK = launcher._check_repository_settings
-
 
 def _open_gate(home: Path, monkeypatch) -> None:
     """An open resource gate under this HOME (W2-20 S19: every launch runs the start check): the gate file and its
@@ -226,8 +224,8 @@ def test_a_refused_lead_starts_nothing_even_with_the_cli_in_place(store, monkeyp
     assert started == []
 
 
-@pytest.mark.parametrize("args", [["--dangerously-skip-permissions"], ["--settings", "{}"], ["--bare"]])
-def test_an_admitted_lead_still_refuses_arguments_that_take_the_guard_away(store, monkeypatch, tmp_path, args):
+@pytest.mark.parametrize("args", [["--settings", "{}"]])  # Emergency 2 (0.1.2): the bypass and --bare no longer refuse
+def test_an_admitted_lead_still_refuses_arguments_that_take_the_settings_away(store, monkeypatch, tmp_path, args):
     started = _sessions(monkeypatch, tmp_path)
     monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "W9-4 T-4 a.md a.json")))
     with pytest.raises(GovError):
@@ -235,28 +233,17 @@ def test_an_admitted_lead_still_refuses_arguments_that_take_the_guard_away(store
     assert started == []
 
 
-def test_an_admitted_lead_is_refused_without_the_guard_wired(store, monkeypatch, tmp_path):
-    """A lead has no sandbox: a project whose settings do not wire the guard starts no lead."""
-    started = _sessions(monkeypatch, tmp_path)
-    monkeypatch.setattr(launcher, "_check_repository_settings", REPOSITORY_CHECK)  # the planted project has none
-    monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "W9-4 T-4 a.md a.json")))
-    with pytest.raises(GovError) as raised:
-        launcher.launch(store, "orchestrator", "T-4", [])
-    assert "does not register the guard" in raised.value.message
-    assert started == []
-
-
 @pytest.mark.parametrize("caller, ticket", [("orchestrator", "DAEO-sdxk"), ("orchestrator", "T-2"), ("lead", "T-2")])
 def test_a_worker_launch_from_a_lead_or_the_cto_never_consults_the_plan(store, monkeypatch, tmp_path, caller, ticket):
     """The CTO's session (GOV_ROLE=orchestrator, GOV_TICKET=DAEO-sdxk) and a lead launch workers of tickets in no
-    batch: the plan is never asked, and the worker starts with its own sandboxed settings."""
+    batch: the plan is never asked, and the worker starts with its own settings, not a lead's."""
     started = _sessions(monkeypatch, tmp_path, caller=caller, ticket=ticket)
     monkeypatch.setattr(plan_check, "check_lead", lambda *a, **k: pytest.fail("a worker was checked against the plan"))
     monkeypatch.setattr(launcher, "check_lead", lambda *a, **k: pytest.fail("a worker was checked against the plan"))
     assert launcher.launch(store, "engineer", "T-2", []) == 0
     settings = _settings(started[0][0])
     assert settings["env"]["GOV_ROLE"] == "engineer" and settings["env"]["GOV_TICKET"] == "T-2"
-    assert launcher.sandbox_faults(settings) == []
+    assert settings["permissions"]["deny"] == []  # a worker's settings: a lead's have no permissions block
 
 
 @pytest.mark.parametrize("where", [plan_check, launcher])

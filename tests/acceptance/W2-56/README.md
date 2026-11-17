@@ -13,6 +13,13 @@ before any implementation, reading only the integrated code (DEC-963).
 - **The follow-ups R3 and R5 (DEC-1112 (3), DEC-1114),** on integrate at `336828354` (W2-56 merged, review round 1
   READY): two findings sent back before the close, tests first. Section "The follow-ups R3 and R5" below; no earlier
   case changed.
+- **Emergency 2 (release 0.1.2, EMERGENCY-2 2.1-2.4):** `gov launch` writes no sandbox block and no deny rule of
+  its own, needs no guard in the repository's settings, and no longer refuses `--restricted`, `--safe-mode`, the
+  no-prompt mode, `--add-dir` or `--bare`. Retired with it: `test_w2_56_sandbox_block.py`,
+  `test_w2_56_placeholders.py`, `test_w2_56_real_sandbox.py`, those arguments' cases in
+  `test_w2_56_refused_arguments.py`, and the guard, sandbox, held-out, evaluation-set and research cases of
+  `test_w2_56_todays_refusals.py`; S1's daemon case no longer asks for the temp folder on a write list. The rows and
+  notes below that name them are the record of their time.
 
 The KPI lines are numbered in the ticket's order: S1 to S15 (success), F1 to F6 (failure).
 
@@ -62,10 +69,6 @@ to the launcher's END_WAIT_S (5 s) and a margin each.
 - **The session's temp folder** (its TMPDIR) is gone after every ending (exit 0, exit 3, the CLI killed by SIGKILL,
   each ending signal, a CLI that cannot be started), even when it holds folders its owner may not write (mode 0500,
   as a module cache leaves them), a fifo and a link to a file outside (removed as a link; the target is untouched).
-- **Placeholders:** the names in `w2_56_support.PLACEHOLDERS`, planted as empty files while a session runs, are
-  neither staged nor committed by `git add -A` or `git add .` and `git commit`, both by the worker inside the
-  session (its environment) and by the caller in the same worktree while the session runs (the caller's
-  environment); an ordinary new file beside them is committed, and so is `docs/gitconfig-notes.md`.
 - **S1's suite half** holds in a plain `python3 -m pytest` session started at the repository's root (a conftest or
   the code index itself), not only under a runner: in a suite other than W1-16 and W1-20 `codebase-memory-mcp` is
   not on PATH at test time; the daemon folders of one session lie in one folder of its own, apart from another
@@ -75,34 +78,6 @@ to the launcher's END_WAIT_S (5 s) and a margin each.
 
 ### The second half's interface (DEC-1112 (1))
 
-- **The sandbox block** of a worker's `--settings` (every worker role; a path entry is read with one leading `/`,
-  so today's `//<absolute path>` and `/<absolute path>` are the same):
-  - `sandbox` keys only from today's: `enabled` (true), `failIfUnavailable` (true), `allowUnsandboxedCommands`
-    (false), `network`, `filesystem`; never `excludedCommands`, `enableWeakerNestedSandbox` or any other key.
-  - `network` keys only `strictAllowlist` (true), `allowedDomains` (today's: empty, the research allowlist for
-    research) and `allowUnixSockets`: exactly one entry, `<HOME>/.cache/gov-os/rerank.sock`, where `HOME` is the
-    launcher's and the rest is `gov.retrieval.rerank`'s `CACHE_REL` and `SOCKET` (the service's own setting); no
-    pattern, never the folder. No `allowAllUnixSockets`, `allowLocalBinding` or port key.
-  - `filesystem` keys only `allowWrite` (and the narrowing `denyWrite`, `denyRead`). `allowWrite`: the session's
-    temp folder (the `TMPDIR` the CLI is handed), exactly one run folder under `<HOME>/gov-os-runs`, and **S11's
-    one log file** `<HOME>/.cache/gov-os/rerank.log` (`CACHE_REL` and `LOG`), nothing else: no entry from the
-    ticket's allowed paths, none in the worktree, never `/tmp/gov-cbm-<uid>`. The settings are the same for two
-    tickets whose allowed paths differ (but for the two folders), and name none of the allowed paths.
-  - `permissions.deny` keeps today's literal rules: `Edit(//<root>/.gov-runtime/<name>)` for each entry of
-    `.gov-runtime/` but `scratch` that exists at launch, none for `scratch`, and `Edit(//<root>/tests/acceptance)`
-    for every role but the test designer.
-- **Links (fail open if followed):** a `rerank.log` that is a link puts neither the link nor its target on the write
-  list (and the target is untouched); a `rerank.sock` that is a link allows neither. The launch may refuse instead.
-- **S11 (choice: one log file):** the log is a regular file when the session starts (the launcher makes it if it is
-  missing: the sandbox cannot bind a file that is not there). A search in the session that the service does not
-  answer leaves one FALLBACK line that `gov.retrieval.rerank.status()` (what `gov status` shows as `reranker`)
-  counts. The decision package D-11 weighs the other way.
-- **`sandbox_faults`:** `from gov.launch.launcher import sandbox_faults` still works; `sandbox_faults(settings)`
-  returns a list of reasons, empty for the settings the launcher built, and non-empty for each of: `enabled` false,
-  `failIfUnavailable` false, `allowUnsandboxedCommands` true, `strictAllowlist` false, `excludedCommands`,
-  `allowAllUnixSockets`, a second Unix socket, another socket in the reranker's place, a socket pattern, the socket's
-  folder, `allowLocalBinding`, `httpProxyPort`, `enableWeakerNestedSandbox`. It is called in a process whose `HOME`
-  is the launcher's (the reranker's socket is read from it).
 - **The guard** (`template/governance/kernel/hooks/pretooluse.py`, copied into the fixture project, event JSON on
   stdin, `GOV_ROLE` and `GOV_TICKET` set): for every worker role, a `Write` or `Edit` outside the ticket's paths and a
   Bash write it names (`>`, `tee`, `cp`, `touch`, `mv`, `sed -i`, a path in another worktree) are refused; a write
@@ -118,10 +93,6 @@ to the launcher's END_WAIT_S (5 s) and a margin each.
   hands the tool (D-2's revision).
 - **The stand-in's `run` step** (added to `w2_56_support`): runs a command with the session's own environment and
   the step's overrides (`{tmpdir}`, `{cwd}`, `{uid}` filled), recording its exit code and output.
-- **The real cases:** skipped unless `GOV_W2_56_REAL=1`; `GOV_W2_56_REAL_MODEL` names the model (default `haiku`,
-  empty for no `--model`). They use the real `HOME` and `~/.local/bin/claude`, and need a machine whose resource
-  gate is open.
-
 ## KPI lines, tests, and the outcome on `w2/integrate`
 
 **The second half, on `ca9c3c580`** (integrate merged in), the whole folder in the launch sandbox through the heavy
@@ -158,17 +129,10 @@ the length guard is green.
 | S1 | `test_w2_56_suite_daemon.py::test_s1_guard_each_daemon_folder_is_short_enough_for_the_tools_socket` | red here, green outside a sandbox | guard (DEC-338): here no build reaches the tool; today's folder is 34 bytes |
 | S1 | `test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder` | red (5 roles) | `daemon_dir` gives `/tmp/gov-cbm-1000/<16 hex>` for the session's commands and a suite inside, not under the session's temp folder |
 | S1 | `test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket` | green (guard, 5 roles) | today's folder is 34 bytes; a folder under the session's temp folder that is too long for the socket (D-12) fails it |
-| S1, S13 | `test_w2_56_real_sandbox.py::test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox` | skipped here (real) | the CTO's; expected red on integrate: the suite's build cannot write `/tmp/gov-cbm-<uid>` inside the sandbox; gov rebuild inside is out (P-1 (b)) |
-| S2 | `test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log` | green (guard, 5 roles) | today's list: the temp folder and the run folder; an entry from the allowed paths, the worktree or `/tmp/gov-cbm-<uid>` fails it |
-| S2 | `test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay` | green (guard, 5 roles) | today's literal rules; dropping one fails it |
 | S2 | `test_w2_56_guard_scope.py::test_s2_premise_a_write_inside_the_roles_scope_is_allowed` | green (premise, 5 roles) | a guard that refuses everything fails it |
 | S2 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_file_tool_write_outside_the_tickets_paths` | green (guard, 10) | Write and Edit, five roles: the guard refuses today (DEC-820 (4)) |
 | S2 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_bash_write_it_names_outside_the_tickets_paths` | green (guard, 11) | seven forms for the engineer, a redirect for the other four roles |
-| S2 | `test_w2_56_real_sandbox.py::test_s2_real_sandbox_a_script_write_into_another_worktree_or_a_denied_name_is_refused` | skipped here (real) | the CTO's; expected green today (the OS refuses both) |
 | S3 | `test_w2_56_guard_scope.py::test_s3_a_name_pattern_is_held_by_the_guards_match` | green (guard, 7) | `_match_pattern`: one `*` within a folder |
-| S3 | `test_w2_56_sandbox_block.py::test_s3_no_sandbox_entry_is_made_from_any_allowed_path` | green (guard) | the settings are the same for `src/app/**` and for a ticket with `test_batch*` |
-| S4 | `test_w2_56_placeholders.py::test_s4_no_placeholder_is_staged_or_committed_inside_the_session` | red (2) | `git add -A` and `git add .` in the session stage all 13 sandbox names (`.bashrc` … `.claude/agents`); the `.gov-runtime/` names are ignored already |
-| S4 | `test_w2_56_placeholders.py::test_s4_no_placeholder_is_committed_beside_a_running_session` | red | the caller's `git add -A` beside the running session stages the same 13 |
 | S5 | `test_w2_56_environment.py::test_s5_no_parent_claude_gov_or_pythonpath_value_reaches_the_session` | red (5 roles) | every planted CLAUDE*, GOV* and PYTHONPATH value reaches the process environment (`env = {**os.environ, …}`) |
 | S5 | `test_w2_56_environment.py::test_s5_each_parent_variable_set_alone_is_kept_from_the_session` | red (22), green (3) | each alone reaches the session; CLAUDE_CODE_TMPDIR, GOV_ROLE and GOV_TICKET are already replaced by the launcher's own |
 | S5 | `test_w2_56_environment.py::test_s5_an_unrelated_parent_variable_is_not_passed` | red | an unrelated parent variable passes (S5 read as the list of what passes; see D-3) |
@@ -181,45 +145,26 @@ the length guard is green.
 | S6 | — | auditor | the CIT-E's weighing of an accepted-arguments list (lens E R6) is a document, the auditor's |
 | S7 | `test_w2_56_start_together.py::test_s7_three_launches_at_once_in_worktrees_sharing_one_git_all_start_run_together_and_commit` | green (guard) | no lock today: all three start, run at once and commit; a lock held for a whole session fails it |
 | S7 | `test_w2_56_start_together.py::test_s7_a_launch_after_three_at_once_still_starts` | green (guard) | a lock left behind fails it |
-| S7 | `test_w2_56_real_sandbox.py::test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit` | skipped here (real) | the CTO's: the `.git/*.lock` failure needs bubblewrap |
-| S8 | `test_w2_56_sandbox_block.py::test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other` | red (5 roles) | the block allows no Unix socket (`[]`) |
-| S8 | `test_w2_56_sandbox_block.py::test_s8_the_socket_path_follows_the_services_setting_under_another_home` | red | as above, under a HOME with a space |
 | S8, F5 | `test_w2_56_session_reranker.py::test_s8_a_search_in_the_launched_session_reaches_the_planted_service_and_is_ranked` | skipped here | this sandbox refuses Unix sockets; outside it expected green (guard: the session's environment keeps what the search needs) |
-| S9 | `test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block` | green (guard, 5 roles) | today's keys and values |
-| S9 | `test_w2_56_sandbox_block.py::test_s9_sandbox_faults_accepts_the_built_settings` | green (premise, 5 roles) | a `sandbox_faults` that refuses the built settings fails it |
-| S9 | `test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change` | red (8), green (5) | today's five refusals hold; all sockets, a second socket, another socket, a pattern, the folder, local binding, a proxy port and a weaker nested sandbox are accepted |
-| S9, F4 | `test_w2_56_real_sandbox.py::test_s9_real_sandbox_a_second_unix_socket_is_refused` | skipped here (real) | the CTO's; expected green today (no socket allowed) |
 | S10 | — | the CTO | measured outside the sandbox, against the live service (`docs/changes/W2-127-evidence.md`) |
-| S11 | `test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it` | red (5 roles) | the log is not on the write list (D-11's choice) |
 | S11, F5 | `test_w2_56_session_reranker.py::test_s11_an_unranked_search_in_the_launched_session_is_counted_where_gov_status_counts` | green (guard) | without the OS's sandbox the line lands in the log; a session environment that sends it elsewhere fails it |
 | S12 | `test_w2_56_endings.py::test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group` | red (3) | SIGTERM, SIGINT, SIGHUP: the launcher signals the CLI's pid alone; its grandchild runs on |
 | S12 | `test_w2_56_endings.py::test_s12_a_process_of_the_group_that_ignores_the_ending_signal_is_killed_after_the_wait` | red | the grandchild that ignores SIGTERM still runs 13 s later |
 | S12 | `test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled` | green (guard, 3) | the folder goes on each ending signal today |
 | S12, S15 | `test_w2_56_endings.py::test_s15_a_temp_folder_holding_folders_the_owner_may_not_write_is_removed` | red (2) | exit 0 and SIGTERM: `shutil.rmtree` cannot empty a 0500 folder, the folder stays with one line on stderr |
-| S13 | `test_w2_56_real_sandbox.py::test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox` | skipped here (real) | as S1's row |
 | S14 | `test_w2_56_template.py::test_s14_the_template_carries_one_allow_rule_bash_gov_launch` | red | the template has no `permissions.allow` |
 | S14 | `test_w2_56_template.py::test_s14_guard_the_template_keeps_its_hooks` | green (guard) | the PreToolUse hook stays |
 | S15 | `test_w2_56_endings.py::test_s15_the_temp_folder_is_removed_whatever_the_sessions_exit` | green (guard, 3) | exit 0, exit 3, killed by SIGKILL: removed today |
 | S15 | `test_w2_56_endings.py::test_s15_a_cli_that_cannot_be_started_leaves_no_temp_folder` | green (guard) | removed today |
-| F1 | `test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log` | green (guard, 5) | as S2 |
 | F1 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_file_tool_write_outside_the_tickets_paths` | green (guard, 10) | as S2 |
 | F1 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_bash_write_it_names_outside_the_tickets_paths` | green (guard, 11) | as S2 |
-| F1 | `test_w2_56_sandbox_block.py::test_f1_a_reranker_log_that_is_a_link_widens_nothing` | green (guard) | no log on the list today; following the link fails it |
 | F2 | `test_w2_56_refused_arguments.py::test_f2_todays_refused_argument_still_refuses` | green (guard, 11) | DEC-313's and the other CLI arguments refused today |
 | F2 | `test_w2_56_todays_refusals.py::test_f2_todays_refusal_still_refuses` | green (guard, 18) | tickets, roles, repository settings, held-out list, evaluation sets, store, research allowlist and folder |
 | F2 | `test_w2_56_todays_refusals.py::test_f2_a_missing_cli_still_refuses` | green (guard) |  |
 | F2 | `test_w2_56_todays_refusals.py::test_f2_a_cli_that_cannot_be_started_still_refuses_and_leaves_no_temp_folder` | green (guard) |  |
 | F2 | `test_w2_56_todays_refusals.py::test_f2_premise_the_unchanged_project_starts_every_worker_role` | green (premise, 5) | the fixture project launches |
-| F2 | `test_w2_56_sandbox_block.py::test_f2_a_sandbox_that_cannot_be_built_stops_the_session` | green (guard, 5 roles) | `enabled` and `failIfUnavailable` true |
-| F2 | `test_w2_56_sandbox_block.py::test_f2_a_repository_settings_file_carrying_a_sandbox_key_still_refuses` | green (guard, 2) | DEC-233 |
-| F3 | `test_w2_56_placeholders.py::test_s4_no_placeholder_is_staged_or_committed_inside_the_session` | red (2) | as S4 |
-| F3 | `test_w2_56_placeholders.py::test_s4_no_placeholder_is_committed_beside_a_running_session` | red | as S4 |
 | F3 | `test_w2_56_environment.py::test_s5_no_parent_claude_gov_or_pythonpath_value_reaches_the_session` | red (5) | as S5 |
 | F3 | `test_w2_56_environment.py::test_s5_each_parent_variable_set_alone_is_kept_from_the_session` | red (22), green (3) | as S5 |
-| F4 | `test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block` | green (guard, 5) | as S9 |
-| F4 | `test_w2_56_sandbox_block.py::test_f4_a_reranker_socket_path_that_is_a_link_is_not_allowed` | green (guard) | no socket allowed today; allowing a link fails it |
-| F4 | `test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change` | red (8), green (5) | as S9: all sockets, a second socket, another socket, a socket pattern or folder, local binding and a proxy port pass `sandbox_faults` |
-| F5 | `test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it` | red (5) | as S11 |
 | F6 | `test_w2_56_template.py::test_f6_the_template_admits_gov_launch_and_no_raw_claude_launch` | red | no allow rule admits `gov launch …` (D-7 on the line's wording) |
 
 ## The second half: what this round did with each line (DEC-1112 (1))
@@ -453,61 +398,14 @@ guard.
 ## Files
 
 - `w2_56_support.py`: the fixture project, the stand-in CLI and its plan steps, the launch helpers, the planted
-  parent variables (S5) and the placeholder names (S4).
+  parent variables (S5).
 - `w2_56_daemon_probe.py`: the suite S1 runs as a pytest session of its own.
-- `test_w2_56_suite_daemon.py` (S1), `test_w2_56_placeholders.py` (S4, F3), `test_w2_56_environment.py` (S5, F3),
+- `test_w2_56_suite_daemon.py` (S1), `test_w2_56_environment.py` (S5, F3),
   `test_w2_56_refused_arguments.py` (S6, F2), `test_w2_56_start_together.py` (S7), `test_w2_56_endings.py` (S12,
   S15), `test_w2_56_template.py` (S14, F6), `test_w2_56_todays_refusals.py` (F2).
-- The second half: `w2_56_sandbox_support.py` (the sandbox block's readers, the reranker's setting and a stand-in
-  service, the guard asker, the in-session command step, `sandbox_faults` in a child);
-  `test_w2_56_sandbox_block.py` (S2, S3, S8, S9, S11, F1, F2, F4), `test_w2_56_guard_scope.py` (S2, S3, F1),
-  `test_w2_56_session_daemon.py` (S1), `test_w2_56_session_reranker.py` (S8, S11, F5),
-  `test_w2_56_real_sandbox.py` (S2, S7, S9, S13 in real sessions; skipped unless `GOV_W2_56_REAL=1`).
+- The second half: `w2_56_sandbox_support.py` (the session's temp folder, the reranker's setting and a stand-in
+  service, the guard asker, the in-session command step); `test_w2_56_guard_scope.py` (S2, S3, F1),
+  `test_w2_56_session_daemon.py` (S1), `test_w2_56_session_reranker.py` (S8, S11, F5).
 - The follow-ups: `w2_56_sweep_probe.py` (the one-case suite R3's nested runs run; no `test_` prefix),
   `w2_56_sweep_support.py` (the places, the nested runs, the plants, the pid-namespace wrapper);
   `test_w2_56_r3_sweep.py` (S1, R3), `test_w2_56_r5_lead_store.py` (S5, R5).
-
-## The real cases: what each costs and proves
-
-Each starts real `claude -p` sessions (model `haiku` unless `GOV_W2_56_REAL_MODEL` says otherwise) that run one Bash
-command; one session is roughly 20-60 s and a few cents of tokens (mostly the cached system prompt). Run them outside
-the launch sandbox, with the machine's resource gate open, by
-`GOV_W2_56_REAL=1 TMPDIR=$(mktemp -d /tmp/w56r.XXXX) PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-56/test_w2_56_real_sandbox.py`.
-
-**They need a short `TMPDIR`** (for example `/tmp/w56r.XXXX`). The CLI's sandbox makes its bridge sockets under the
-temp folder it inherits; under a long `TMPDIR` their paths pass the Unix socket limit (107 bytes) and the sandbox
-cannot start ("Failed to create bridge sockets after 5 attempts"), so every case fails for a reason not its own. S9's
-planted socket lies in its own short folder under `/tmp` (made and removed by the test), so it does not skip under a
-long `TMPDIR` either.
-
-**The CTO's run (2026-11-09, outside the sandbox, `TMPDIR=/tmp/w56r.XXXX`, on integrate's code):**
-
-| Case | Outcome | Reading |
-|---|---|---|
-| `test_s2_real_sandbox_a_script_write_into_another_worktree_or_a_denied_name_is_refused` | passed | the OS refuses both writes |
-| `test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit` | red, product | in the sandbox the placeholder `.bash_profile` is a character device: `git add -A` fails "can only add regular files" (D-8); kept |
-| `test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` (the old name) | red, product | `gov rebuild` cannot remove `.gov-runtime/rebuild/stores.json` (read-only); the step is now out of S13 (P-1 (b), below) |
-| `test_s9_real_sandbox_a_second_unix_socket_is_refused` | red, test bug (fixed) | the planted script was `elsewhere/socket.py`, which shadowed Python's `socket` module, so the command exited 1 before it tried to connect. Now `w56_unix_connect_probe.py`, run with `python3 -I`, its socket under a short `/tmp` folder; the claim is unchanged. Not yet re-run |
-
-**The CTO's second run (2026-11-09, outside the sandbox, short `TMPDIR`, on the engineer's head):** 259 passed, 1
-failed: the S13 case (then still with gov rebuild). S2, S7 and S9 pass.
-
-- **P-1 (b) (S13 changed, DEC-1112 (3)):** gov rebuild inside the sandbox is deferred to Wave 3 with set-up B; no
-  deny rule dropped, DEC-180 kept. Its step is dropped and the case renamed
-  `test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox`; gov check and the suite stay.
-- **The suite step's `FileNotFoundError` on `.w56-real/probe.jsonl`: test bug (fixed).** The planted script made
-  `.w56-real/` only after its runs, but the probe suite appends its record there (and the stand-in tool its
-  `calls.txt`) during the suite run, so the probe's first `open(mode='a')` failed on the missing folder whatever the
-  product did. The other real cases make the folder before they write. The script now makes it first; the claim is
-  unchanged. Not yet re-run.
-
-| Case | Sessions | What it proves that the settings-level cases cannot |
-|---|---|---|
-| `test_s2_real_sandbox_a_script_write_into_another_worktree_or_a_denied_name_is_refused` | 1 | that the CLI turns today's write list and literal deny rules into the OS's refusal of a script's write (the guard cannot name it) into another worktree and into `tests/acceptance/` |
-| `test_s9_real_sandbox_a_second_unix_socket_is_refused` | 1 | that a socket the block does not allow is refused by the OS while the reranker's one is allowed; with S10 it settles D-13 |
-| `test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit` | 3 at once | the `.git/*.lock` source-path failure exists only when bubblewrap binds the lock files |
-| `test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox` | 1, plus a `gov rebuild --no-embeddings` outside first | that the daemon folder is writable inside the sandbox and short enough for the real socket, and that the literal deny rules on an existing `.gov-runtime/` leave gov check and the suite working (gov rebuild inside: Wave 3, P-1 (b)) |
-
-They write what `gov launch` writes under the real `HOME` (a run folder under `~/gov-os-runs`, the registry entry
-while each session runs); the fixture's guard is a no-op, so only the OS fences; they never touch the live
-reranker's socket.

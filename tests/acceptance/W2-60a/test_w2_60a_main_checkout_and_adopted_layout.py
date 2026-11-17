@@ -2,8 +2,8 @@
 
 (i) The CLI loads a linked worktree session's local settings from the **main
 checkout's** ``.claude/settings.local.json``. A launch from a linked worktree
-refuses on that file what it refuses on the tree's own copy (DEC-233, DEC-313,
-DEC-826 Q1, DEC-838; a file that cannot be read), with the words the cases for
+refuses on that file what it refuses on the tree's own copy (DEC-826 Q1,
+DEC-838; a file that cannot be read), with the words the cases for
 the tree's own file assert, and starts no session and leaves no record. A
 worktree launch with no such file launches
 (``test_w2_60a_launch_record.py::test_every_worktree_shares_the_main_checkout_s_record_folder``,
@@ -27,10 +27,6 @@ VARIABLE = "CLAUDE_CODE_AUTO_COMPACT_WINDOW"
 ADOPTED_ROLES_REL = "governance/kernel/roles"
 
 
-def _permissions(key, value):
-    return lambda data: data.setdefault("permissions", {}).update({key: value})
-
-
 KEYS = {
     # (change to the main checkout's local settings, words the tree's own file's case asserts)
     "auto-compact-window": (lambda data: data.update({"autoCompactWindow": 300000}), ("autoCompactWindow",)),
@@ -39,10 +35,8 @@ KEYS = {
         lambda data: data.setdefault("modelSettings", {}).setdefault(s.OPUS, {}).update({"autoCompactWindow": 300000}),
         (THRESHOLD_MESSAGE, "autoCompactWindow")),
     "agent": (lambda data: data.update({"agent": s.ENGINEER}), ("agent",)),
-    "sandbox": (lambda data: data.update({"sandbox": {}}), ("DEC-233",)),
-    "bypass-default-mode": (_permissions("defaultMode", "bypassPermissions"), ("DEC-313",)),
-    "additional-directories": (_permissions("additionalDirectories", ["/w260a-added"]), ("DEC-313",)),
-    "disable-all-hooks": (lambda data: data.update({"disableAllHooks": True}), ("disableAllHooks",)),
+    # Emergency 2 (release 0.1.2): a sandbox key, the no-prompt mode, added directories and disableAllHooks are the
+    # repository's own choice, no longer refused; their cases are retired.
 }
 
 

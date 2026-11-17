@@ -156,25 +156,25 @@ def test_the_launch_adds_no_read_denial_for_ts_tests_and_keeps_the_held_out_rule
 
     No Read deny rule and no sandbox read denial covers a file of T's acceptance
     folder: the CLI would turn it into a read denial of the session's commands,
-    and the engineer's pytest would collect nothing (P-W2-58-1). The held-out
-    material is still covered.
+    and the engineer's pytest would collect nothing (P-W2-58-1).
+    Emergency 2 (release 0.1.2): the launcher writes no held-out Read rule any more, so the held-out half of this
+    case is retired; the name is kept for the opt-in lists that name it.
     """
     project = s.make_project(sandbox, base=True)
     settings = _launch_settings(sandbox, cli, s.ENGINEER, s.T)
     faults = s.read_denial_faults(settings, project, sandbox.home, (TEST_FILE, f"{ACC}/README.md"))
     assert not faults, (f"the launched engineer's settings deny reads of its own acceptance tests (DEC-873 item 2): "
                         f"{faults}")
-    lost = s.held_out_faults(settings, sandbox, project)
-    assert not lost, f"the held-out material lost its Read deny rule for {lost}: {s.read_deny_specs(settings)}"
 
 
 def test_the_launch_leaves_other_files_to_the_read_tool_and_keeps_the_held_out_rules(sandbox, cli):
+    """No Read deny rule of the launched engineer covers another test, the code, the held-out list or the settings.
+    Emergency 2 (release 0.1.2): the launcher writes no held-out Read rule any more, so the held-out half of this
+    case is retired; the name is kept for the opt-in lists that name it.
+    """
     project = s.make_project(sandbox, base=True)
     settings = _launch_settings(sandbox, cli, s.ENGINEER, s.T)
     specs = s.read_deny_specs(settings)
     for rel in (OTHER_TEST, "src/app/main.py", s.HELD_OUT_LIST_REL, s.SETTINGS_REL):
         covering = [spec for spec in specs if s.rule_covers(spec, project / rel, project, sandbox.home)]
         assert not covering, f"a Read deny rule of the launched engineer covers {rel}: {covering}"
-    held = sandbox.held_out / "answers.md"
-    assert any(s.rule_covers(spec, held, project, sandbox.home) for spec in specs), (
-        f"the held-out material lost its Read deny rule: {specs}")

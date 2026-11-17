@@ -87,17 +87,6 @@ def test_the_launch_denies_no_tracked_file_of_the_project_by_a_read_rule(sandbox
                         f"show as deleted (DEC-873 item 2, P-W2-58-1): {faults}")
 
 
-@pytest.mark.parametrize("session", sorted(LAUNCHED))
-def test_the_held_out_rules_stay_in_every_launched_role_s_settings(sandbox, cli, session):
-    """DEC-873 item 2: "The held-out material's rules (b) stay in the sandbox as well"."""
-    project = _project(sandbox)
-    role, ticket = LAUNCHED[session]
-    settings = s.launch(sandbox, cli, role, ticket).settings()
-    lost = s.held_out_faults(settings, sandbox, project)
-    assert not lost, (f"the launched {session}'s settings lost the held-out material's Read deny rule for {lost}: "
-                      f"{s.read_deny_specs(settings)}")
-
-
 # --------------------------------------------------------------------------
 # Live cases: a real session started through gov launch
 # --------------------------------------------------------------------------

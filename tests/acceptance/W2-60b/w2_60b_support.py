@@ -58,7 +58,6 @@ LAUNCHES_REL = ".gov-runtime/launches"
 CIT_E_REL = "docs/changes/W2-60b-CIT-E.md"
 BASE_COMMIT = "4bc0399fb"        # w2/W2-60b at the claim: the code before the change
 DECIDE_REL = "src/gov/guard/decide.py"
-LIVE_HOOK_REL = ".claude/hooks/pretooluse.py"
 LAUNCHER_REL = "src/gov/launch/launcher.py"
 KERNEL_ROLES = REPO_ROOT / "template/governance/kernel/roles"
 

@@ -44,6 +44,13 @@ with ``-m "not local_only"``.
 Each session is told the exact commands. Whether the model ran them is checked
 first: a session that left no result file fails every test with that reason.
 
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.1, 2.2, 2.7, 6.1; release 0.1.2): no guard, no sandbox, no
+permission limits. The cases whose subject was the sandbox's write fence, its network allowlist, the held-out
+directory's hiding, the deny rules under ``.gov-runtime/`` and the three trees, and the guard's refusal of a write
+outside the repository are retired. The probes still run as written; what stays reads the role and the ticket the
+session saw (and the containment finding that carries them), the install into the experiment folder's venv, and
+each session's own temp directory.
+
 Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The two sessions are launched in W1-46's launch project
 built on a project generated from the template (``kernel_launcher``): its ``.claude/settings.json`` is the one rulesync
 generates from the template's sources, so the session's guard and containment check are the kernel's, run from
@@ -192,79 +199,6 @@ def engineer(kernel_launcher, tmp_path_factory):
                   f"{SCRATCH}/probe.sh", ENGINEER_PROBE, f"{SCRATCH}/results.txt", watch=PROTECTED_TREES)
 
 
-@pytest.mark.parametrize("name", ("interpreter.txt", "substitution.txt", "here-string.txt"))
-def test_an_opaque_bash_write_outside_the_repository_fails(engineer, name):
-    """Success 8 [CAP-58.d], DEC-136: an interpreter one-liner, a command substitution, a here-string."""
-    assert not (engineer.outside / name).exists(), f"the launched session's Bash wrote {name} outside the repository"
-
-
-def test_a_file_tool_write_outside_the_repository_is_refused(engineer):
-    assert not (engineer.outside / "file-tool.txt").exists(), "the Write tool wrote outside the repository"
-
-
-def test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable(engineer):
-    """Success 10 (DEC-180): the freeze flag, the findings, the records, the snapshots; then scratch."""
-    runtime = engineer.project / ".gov-runtime"
-    # DEC-402, DEC-407 (package DP-F2, option a): what must not be there is a freeze the session's Bash made, a
-    # file the guard reads as frozen. An unmarked file there is no freeze. Read as ``freeze_state`` of
-    # ``src/gov/guard/decide.py`` reads it: the word, in any letter case, with the NUL bytes taken out; anything
-    # that is not a file counts as a freeze.
-    flag = runtime / "freeze"
-    made = flag.read_bytes() if flag.is_file() else (b"FROZEN" if os.path.lexists(flag) else b"")
-    assert b"FROZEN" not in made.replace(b"\x00", b"").upper(), "the session's Bash made a freeze"
-    assert not (runtime / "snapshots" / f"{MARK}.json").exists(), "the session's Bash wrote into the snapshots"
-    for name in ("findings.jsonl", "records.jsonl"):
-        assert MARK not in (runtime / name).read_text(encoding="utf-8").splitlines(), (
-            f"the session's Bash appended to .gov-runtime/{name}"
-        )
-    assert (engineer.project / SCRATCH / "scratch-write.txt").is_file(), ".gov-runtime/scratch/ was not writable"
-
-
-@pytest.mark.parametrize("kind", ("symlink", "hardlink"))
-def test_ln_into_gov_runtime_fails(engineer, kind):
-    """Success 10, DEC-136, DEC-311: ``ln`` onto and into a name that exists under ``.gov-runtime/`` at launch.
-
-    The symbolic link is forced onto the findings file; the hard link is made in
-    the snapshots directory. Both names have a literal ``Edit`` deny rule.
-    """
-    runtime = engineer.project / ".gov-runtime"
-    if kind == "symlink":
-        assert not (runtime / "findings.jsonl").is_symlink(), "ln -sf replaced .gov-runtime/findings.jsonl by a link"
-        assert (runtime / "findings.jsonl").is_file(), ".gov-runtime/findings.jsonl is gone"
-    else:
-        assert not os.path.lexists(runtime / "snapshots" / f"{MARK}-hardlink"), (
-            "ln created a hard link in .gov-runtime/snapshots/"
-        )
-
-
-@pytest.mark.parametrize("rel", PROTECTED_TREES, ids=("an-acceptance-test", "a-ticket", "the-settings"))
-def test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails(engineer, rel):
-    """Success 11 (DEC-315): an interpreter one-liner, a command substitution, ``sh -c``.
-
-    The write itself must fail, which its exit code shows: a write that lands
-    and is restored afterwards by the containment check (DEC-143) is not what
-    the line asks for. The file is unchanged as well.
-    """
-    status = engineer.results.get(f"tree_{PROTECTED_TREES.index(rel)}")
-    assert status not in (None, "0"), f"the launched engineer session's Bash wrote to {rel} (exit code {status!r})"
-    assert (engineer.project / rel).read_text(encoding="utf-8") == engineer.before[rel], (
-        f"the launched engineer session's Bash changed {rel}"
-    )
-
-
-def test_the_held_out_directory_looks_empty_from_the_sessions_bash(engineer):
-    """Success 9 [CAP-49.b]: hiding is silent. The stand-in holds three entries."""
-    assert len(os.listdir(engineer.stand_in)) == 3, "the stand-in lost its files"
-    assert engineer.results.get("held_out_entries", "").strip() == "0", (
-        f"the session's Bash saw {engineer.results.get('held_out_entries')!r} entries in the stand-in directory"
-    )
-
-
-def test_the_empty_allowlist_refuses_a_connection(engineer):
-    """Success 3 [CAP-61.c]."""
-    assert engineer.results.get("net_pypi") not in (None, "0"), "a launched engineer's Bash connected to pypi.org"
-
-
 def test_the_role_and_the_ticket_reach_the_session_and_its_hooks(engineer):
     """Success 2 [CAP-61.b]: the session's Bash sees both, and the containment hook records both in its finding.
 
@@ -323,99 +257,6 @@ def test_a_research_install_succeeds_into_a_venv_inside_the_experiment_folder(re
     """Success 6 [CAP-25.e], failure 6: with the committed settings loaded, no rule and no prompt stops it."""
     installed = list((research.project / FOLDER / ".venv").glob(f"lib/python*/site-packages/{support.WHEEL_PACKAGE}"))
     assert installed, f"`{INSTALL}` did not install the package into the experiment folder's venv"
-
-
-def test_a_research_install_outside_the_repository_fails_at_the_write_fence(research):
-    """Success 6, failures 3 and 4: "a system-wide install fails at the sandbox's write fence"."""
-    assert not (research.outside / "site").exists(), "the research session installed into a directory outside"
-    assert research.results.get("outside_install") not in (None, "0"), "the install outside the repository succeeded"
-
-
-def test_a_research_bash_write_to_a_sibling_directory_fails(research):
-    """Success 4 [CAP-61.c], failure 4: paths that existed at launch outside the experiment folder."""
-    assert research.results.get("sibling") not in (None, "0"), "the write to the sibling experiment succeeded"
-    assert research.results.get("top_level") not in (None, "0"), "the write to README.md succeeded"
-    for rel, text in research.before.items():   # README.md and the sibling experiment's file
-        assert (research.project / rel).read_text(encoding="utf-8") == text, f"{rel} was changed by the session"
-
-
-def test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported(research):
-    """Success 4, failure 5: "refused by the guard or reported as a containment finding"."""
-    created = research.project / f"{MARK}-created-after-launch"
-    reported = [f for f in research.findings() if f"{MARK}-created-after-launch" in json.dumps(f)]
-    assert not created.exists() or reported, (
-        "the session created a new path outside its experiment folder and no containment finding reports it"
-    )
-
-
-# Rewrite-Reason (W2-57, I1 F-1, DEC-892 item 3): each host is asked through the session's own route (the sandbox's
-# proxy) at the time the case's session runs, and a host the session cannot reach fails the case with a reason that
-# names the network: told apart from the sandbox refusing the host (the rule) and from load (a session that never
-# ran its probe fails every case with that reason, above). Never a skip, never a pass.
-PROXY_REFUSED = "403"   # the sandbox's proxy answers a CONNECT to a domain off its list with 403 (measured 2026-10-27)
-CURL_MEANINGS = {
-    "6": "the host's name could not be resolved",
-    "7": "no connection could be made",
-    "28": "no answer within curl's 20 s",
-    "35": "the TLS handshake failed",
-    "52": "the server answered nothing",
-    "56": "the connection broke while receiving (for a CONNECT: the proxy's answer)",
-}
-
-
-@dataclass(frozen=True)
-class Connection:
-    exit_code: str   # curl's exit code ("" when the probe left no line for the host)
-    connect: str     # the proxy's answer to the CONNECT ("000" when there was none)
-    status: str      # the HTTP status of the host's answer ("000" when there was none)
-    when: str        # when the probe asked, in UTC
-
-
-def _connection(session, host):
-    """What ``curl`` left for ``host``: its exit code, the proxy's CONNECT answer, the HTTP status and the time."""
-    parts = session.results.get(f"net_{host}", "").split()
-    return Connection(*(parts + [""] * 4)[:4])
-
-
-def _why_not_reached(host, found):
-    """The reason a host was not reached, in words: the sandbox's refusal, or the network at that time."""
-    if found.connect == PROXY_REFUSED:
-        return (f"the sandbox's proxy refused {host} (CONNECT {found.connect}): the research allowlist does not "
-                f"accept it; this is the rule, not the network")
-    meaning = CURL_MEANINGS.get(found.exit_code, "curl failed")
-    return (f"the network: through the session's own route (the sandbox's proxy), at {found.when or 'an unknown time'},"
-            f" {host} could not be reached: curl ended with {found.exit_code or 'no line'} ({meaning}), the proxy "
-            f"answered the CONNECT with {found.connect or 'nothing'}, HTTP status {found.status or 'none'}. This is "
-            f"the network at the time the session ran, not load and not the allowlist")
-
-
-@pytest.mark.parametrize("host", RESEARCH_HOSTS)
-def test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist(research, host):
-    """Success 3 [CAP-61.c], DEC-161, DEC-241: "the sandbox accepts these entries". Needs the network.
-
-    ``curl`` ends with 0 when the host itself answered over TLS, with any HTTP
-    status: the connection went through the sandbox's proxy. The status is kept
-    for the failure message. ``docs.readthedocs.io`` stands for the subdomain
-    entry of ``readthedocs.io``.
-    """
-    found = _connection(research, host)
-    assert found.exit_code == "0", (
-        f"a launched research session got no answer from {host}: {_why_not_reached(host, found)}"
-    )
-
-
-def test_the_research_allowlist_refuses_a_domain_that_is_not_on_it(research):
-    found = _connection(research, "example.com")
-    assert found.exit_code not in ("", "0"), (
-        f"the research session connected to example.com: curl ended with {found.exit_code!r}, "
-        f"HTTP status {found.status!r}"
-    )
-    # Rewrite-Reason (W2-57, I1 F-1): the refusal is the sandbox's own; a connection that failed on the network
-    # shows nothing of the rule and no longer passes the case.
-    assert found.connect == PROXY_REFUSED, (
-        "example.com was not reached, but the sandbox's proxy did not refuse it: "
-        + _why_not_reached("example.com", found)
-    )
 
 
 # --------------------------------------------------------------------------

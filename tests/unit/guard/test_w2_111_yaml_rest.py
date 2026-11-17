@@ -245,8 +245,10 @@ def patched(tmp_path_factory):
     (base / ".claude/hooks").mkdir(parents=True)
     for name in ("pretooluse.py", "bash_writes.py", "role_reads.py"):
         shutil.copy(REPO / ".claude/hooks" / name, base / ".claude/hooks" / name)
-    subprocess.run(["git", "apply", str(REPO / "docs/changes/W2-111-live-hook/live-hook.diff")], cwd=base,
-                   check=True, capture_output=True)
+    diff = str(REPO / "docs/changes/W2-111-live-hook/live-hook.diff")
+    # After ACT-GUARD-FIX-7 the tree's hooks already carry the diff (DEC-1198 (6), DEC-1156 (7)): used as they are.
+    if subprocess.run(["git", "apply", "--reverse", "--check", diff], cwd=base, capture_output=True).returncode:
+        subprocess.run(["git", "apply", diff], cwd=base, check=True, capture_output=True)
     return base / ".claude/hooks"
 
 

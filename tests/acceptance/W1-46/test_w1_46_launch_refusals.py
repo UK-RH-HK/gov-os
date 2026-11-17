@@ -2,7 +2,10 @@
 
 DEC-242: "``gov launch`` refuses to launch for an unknown ticket, a ticket that
 isn't ``in_progress``, or a ticket of another role. It refuses a research ticket
-whose ``allowed_paths`` isn't exactly one experiment folder."
+whose ``allowed_paths`` isn't exactly one experiment folder." Emergency 2
+(docs/emergency-2/EMERGENCY-2.md 2.2, 6.1; release 0.1.2) removed the research
+fence the experiment folder was built for: the launcher no longer checks a research
+ticket's folder, and those two cases are retired. The ticket refusals stay.
 
 Every refusal is a non-zero exit with a named reason, and nothing is started
 (KPI success 1's words for a refusal). Each test first launches the same role on
@@ -31,16 +34,7 @@ import w1_46_support as support
 
 ENGINEER, AUDITOR, RESEARCH = support.ENGINEER, support.AUDITOR, support.RESEARCH
 TEST_DESIGNER = support.TEST_DESIGNER
-FOLDER = support.EXPERIMENT_REL
 NEW_TICKET = "DAEO-zz98"
-
-NOT_ONE_EXPERIMENT_FOLDER = {
-    "several-entries": (f"{FOLDER}/**", "experiments/spikes/exp-900/**"),
-    "no-entry": (),
-    "the-whole-repository": ("**",),
-    "a-pattern-over-several-folders": ("experiments/spikes/exp-*/**",),
-    "a-file": (f"{FOLDER}/README.md",),
-}
 
 
 @pytest.mark.parametrize("role", (ENGINEER, RESEARCH))
@@ -83,10 +77,6 @@ def test_the_two_independent_roles_are_launched_on_a_ticket_of_any_role(launch, 
         f"gov launch refused a {role} on a ticket of the role {ticket_role}\n{result.describe()}"
     )
     assert (result.variable("GOV_ROLE"), result.variable("GOV_TICKET")) == (role, ticket)
-    assert support.sandbox_faults(result.settings()) == []
-    assert support.allowed_domains(result.settings()) == [], (
-        f"a {role} on a ticket of the role {ticket_role} was given a network allowlist"
-    )
 
 
 @pytest.mark.parametrize("role", (TEST_DESIGNER, AUDITOR))
@@ -96,22 +86,3 @@ def test_the_two_independent_roles_are_refused_a_ticket_that_is_not_in_progress(
     launch(role).session()
     ticket = support.write_ticket(project, NEW_TICKET, ENGINEER, status=status)
     support.assert_refused(launch(role, ticket), "in_progress", "status", status)
-
-
-@pytest.mark.parametrize("name", sorted(NOT_ONE_EXPERIMENT_FOLDER))
-def test_a_research_ticket_that_is_not_exactly_one_experiment_folder_refuses_the_launch(launch, project, name):
-    """Several entries, none, or an entry that is not one experiment folder: no fence can be generated from it."""
-    launch(RESEARCH).session()
-    ticket = support.write_ticket(project, NEW_TICKET, RESEARCH, allowed_paths=NOT_ONE_EXPERIMENT_FOLDER[name])
-    support.assert_refused(launch(RESEARCH, ticket), "allowed_paths", "experiment folder")
-
-
-def test_a_second_research_ticket_with_one_experiment_folder_is_launched(launch, project, sandbox):
-    """The control of the cases above: one folder, another one, and the fence follows the ticket."""
-    ticket = support.write_ticket(project, NEW_TICKET, RESEARCH, allowed_paths=("experiments/spikes/exp-900/**",))
-    result = launch(RESEARCH, ticket)
-    assert result.run.returncode == 0, f"gov launch refused a research ticket with one folder\n{result.describe()}"
-    assert not support.edit_denied(result, "experiments/spikes/exp-900/data.txt", project, sandbox)
-    assert support.edit_denied(result, f"{FOLDER}/README.md", project, sandbox), (
-        "the fence of a research session on another ticket leaves the first ticket's folder open"
-    )

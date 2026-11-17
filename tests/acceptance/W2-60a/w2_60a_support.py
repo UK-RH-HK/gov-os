@@ -901,8 +901,3 @@ def deny_rules(settings):
     rules = (settings.get("permissions") or {}).get("deny") or []
     return [str(rule) for rule in rules]
 
-
-def allow_write(settings):
-    block = ((settings.get("sandbox") or {}).get("filesystem") or {})
-    entries = block.get("allowWrite") or []
-    return [str(entry) for entry in entries]

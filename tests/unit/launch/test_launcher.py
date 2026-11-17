@@ -1,13 +1,11 @@
 """Builder tests for the worker session launcher (W1-46).
 
 Regression evidence only (DEC-136). They cover what the acceptance tests leave
-to the builder: the strict check itself, the names the ``.gov-runtime`` rules
-cover, the host form of the allowlist, and a refusal that leaves no temp
-directory behind.
+to the builder: the arguments that replace the launcher's settings, and a
+refusal that leaves no temp directory behind.
 """
 from __future__ import annotations
 
-import fnmatch
 import sys
 from pathlib import Path
 
@@ -17,146 +15,18 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
 from gov.cli.errors import GovError  # noqa: E402
-from gov.guard import heldout  # noqa: E402
 from gov.launch import launcher  # noqa: E402
 
-STRICT = {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
-          "network": {"strictAllowlist": True, "allowedDomains": []}}
 
-
-def test_a_strict_block_has_no_fault():
-    assert launcher.sandbox_faults({"sandbox": STRICT}) == []
-
-
-@pytest.mark.parametrize("change", (
-    {"enabled": False}, {"failIfUnavailable": "true"}, {"allowUnsandboxedCommands": None},
-    {"network": {"strictAllowlist": False}}, {"network": None}, {"excludedCommands": []},
-))
-def test_a_weaker_block_is_a_fault(change):
-    assert len(launcher.sandbox_faults({"sandbox": {**STRICT, **change}})) == 1
-
-
-def test_no_sandbox_block_is_every_fault():
-    assert len(launcher.sandbox_faults({})) == 4
-
-
-def _names(root):
-    prefix = f"Edit(/{root}/.gov-runtime/"
-    return [rule[len(prefix):-1] for rule in launcher._runtime_rules(root)]
-
-
-@pytest.mark.parametrize("name, covered", (
-    ("freeze", True), ("findings.jsonl", True), ("snapshots", True), ("s", True), ("scratc", True),
-    ("scratchy", True), ("scratch.bak", True), ("Scratch", True), ("scratch", False),
-))
-def test_the_runtime_rules_cover_every_name_but_scratch(tmp_path, name, covered):
-    assert any(fnmatch.fnmatchcase(name, pattern) for pattern in _names(tmp_path)) is covered
-
-
-def test_the_runtime_rules_name_the_entries_that_exist_at_launch(tmp_path):
-    for name in ("records.jsonl", "snapshots", "scratch"):
-        (tmp_path / ".gov-runtime" / name).mkdir(parents=True)
-    names = _names(tmp_path)
-    assert {"records.jsonl", "snapshots"} <= set(names) and "scratch" not in names
-
-
-def test_the_runtime_rules_name_the_freeze_flag_only_when_it_exists_at_launch(tmp_path):
-    """DEC-402: a denied name that does not exist gets a placeholder from the sandbox."""
-    assert "freeze" not in _names(tmp_path)
-    (tmp_path / ".gov-runtime").mkdir()
-    assert "freeze" not in _names(tmp_path)
-    (tmp_path / ".gov-runtime" / "freeze").write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
-    assert "freeze" in _names(tmp_path)
-
-
-@pytest.mark.parametrize("entry, valid", (
-    ("pypi.org", True), ("*.readthedocs.io", True), ("cdn-lfs.huggingface.co", True),
-    ("*", False), ("*.org.*", False), ("localhost", False), ("https://pypi.org", False), ("pypi.org/simple", False),
-    ("PyPI.org", False), ("pypi.org ", False), ("", False),
-))
-def test_an_allowlist_entry_is_a_host_name_or_its_subdomain_form(tmp_path, entry, valid):
-    (tmp_path / "list.yaml").write_text(f"hosts:\n- '{entry}'\n", encoding="utf-8")
-    if valid:
-        assert launcher._hosts(tmp_path, "list.yaml") == [entry]
-    else:
-        with pytest.raises(GovError):
-            launcher._hosts(tmp_path, "list.yaml")
-
-
-def test_a_missing_kernel_default_refuses(tmp_path):
-    with pytest.raises(GovError):
-        launcher._research_allowlist(tmp_path)
-
-
-def test_an_allowlist_key_written_twice_refuses(tmp_path):
-    (tmp_path / "list.yaml").write_text("hosts: [pypi.org]\nhosts: [github.com]\n", encoding="utf-8")
-    with pytest.raises(GovError):
-        launcher._hosts(tmp_path, "list.yaml")
-
-
-GUARD = {"type": "command", "command": 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"'}
-
-
-@pytest.mark.parametrize("entries, wired", (
-    ([{"hooks": [GUARD]}], True),
-    ([{"matcher": "*", "hooks": [GUARD]}], True),
-    ([{"matcher": "Write|Edit", "hooks": [GUARD]}, {"matcher": "Bash", "hooks": [GUARD]}], True),
-    ([{"matcher": "Write|Edit", "hooks": [GUARD]}], False),
-    ([{"matcher": "Bash.*", "hooks": [GUARD]}], False),
-    ([{"hooks": [{"type": "command", "command": "true"}]}], False),
-    ([{"hooks": []}], False),
-    ([], False),
-    (None, False),
-))
-def test_the_guard_is_wired_only_when_it_runs_before_every_guarded_tool(entries, wired):
-    assert launcher._guard_wired({"hooks": {"PreToolUse": entries}}) is wired
-
-
-def test_settings_without_a_hooks_block_do_not_wire_the_guard():
-    assert launcher._guard_wired({}) is False
-
-
-@pytest.mark.parametrize("args", (["--bare"], ["-p", "x", "--setting-sources", "user"], ["--setting-sources=project"],
+@pytest.mark.parametrize("args", (["-p", "x", "--setting-sources", "user"], ["--setting-sources=project"],
                                   ["--settings", "{}"], ["--settings={}"]))
-def test_an_argument_that_takes_the_guard_or_the_settings_away_refuses(args):
+def test_an_argument_that_takes_the_settings_away_refuses(args):
     with pytest.raises(GovError):
         launcher._check_cli_args(args)
 
 
 def test_a_prompt_that_names_an_argument_as_a_word_passes():
     launcher._check_cli_args(["-p", "Do not use --bare.", "--model", "haiku"])
-
-
-def _read_project(root: Path, sets: str) -> Path:
-    for rel, text in ((".tickets/DAEO-t95.md", "---\nid: DAEO-t95\nwbs_id: W2-95\nstatus: in_progress\n"
-                                               "role: engineer\n---\n"),
-                      ("governance/project/path-map.yaml", "namespaces: {}\n" + sets),
-                      ("tests/acceptance/W2-95/test_feature.py", "x\n")):
-        (root / rel).parent.mkdir(parents=True, exist_ok=True)
-        (root / rel).write_text(text, encoding="utf-8")
-    return root
-
-
-def test_the_settings_carry_the_held_out_read_rules_and_none_for_the_protected_parts(tmp_path, monkeypatch):
-    """W2-58, DEC-873: the guard refuses (c) and (d); a Read rule would deny the session's pytest the files too."""
-    monkeypatch.setattr(launcher, "_runtime_rules", lambda root: [])
-    root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    hidden: [eval/hidden/**]\n"
-                                   "    measures: {roles: [engineer]}\n")
-    (root / "eval/hidden").mkdir(parents=True)
-    (root / "eval/hidden/a.yaml").write_text("x\n", encoding="utf-8")
-    (root / heldout.CONFIG_REL).write_text(f"{heldout.CONFIG_KEY}:\n  - /held/out\n", encoding="utf-8")
-    for role in ("engineer", "independent-test-designer", "independent-auditor", "product-spec"):
-        settings = launcher.build_settings(root, role, "DAEO-t95")
-        reads = [rule for rule in settings["permissions"]["deny"] if rule.startswith("Read(")]
-        assert reads == ["Read(//held/out/**)"], role
-        assert "filesystem" not in settings["sandbox"], role
-
-
-def test_a_malformed_evaluation_set_refuses_the_launch(tmp_path):
-    root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    visible: [a]\n    measures: {roles: [research]}\n")
-    for role in ("engineer", "independent-auditor"):
-        with pytest.raises(GovError):
-            launcher.build_settings(root, role, "DAEO-t95")
 
 
 def test_a_refused_launch_leaves_no_temp_directory(tmp_path, monkeypatch):

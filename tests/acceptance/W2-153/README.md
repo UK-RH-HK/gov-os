@@ -46,6 +46,11 @@ baseline commit in the repository's history.
   `5ecd20c0d252`, before W2-56), against which F2's five worker cases failed whatever W2-153 did. Nothing else in F2
   changed: the comparison still allows only the one appended flag. Integrate's later W2-56 follow-ups (`4bc040898467`,
   launcher `feec5c25458b`) are not in W2-153's base and so not in the baseline.
+- **Emergency 2 (release 0.1.2).** The launcher no longer writes the sandbox block or a deny rule of its own, and the
+  dispatcher's lead line starts with `--permission-mode bypassPermissions` (the owner's switch-off, `bb61d3d74`).
+  F2 takes the same out of the baseline before it compares: the baseline's sandbox block and its `Edit(/…)` and
+  `Read(/…)` deny rules (a worker), and `bypassPermissions` read as integrate's `acceptEdits` (the lead line). The
+  comparison still allows only the one appended flag beyond those.
 
 ## The interface as read (the ticket's body)
 

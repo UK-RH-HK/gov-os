@@ -13,9 +13,9 @@ From the design (Behaviour 9): the record is ``<session id>.json`` in
 ``.gov-runtime/launches/`` of the repository's main checkout, found from the
 tree's ``.git`` without running git; written whole before the session starts;
 created only if no file of that name exists; a record that cannot be written
-refuses the launch, and a CLI that then cannot be started removes it. The
-settings deny the folder to the session's file tools by two literal rules,
-``Edit(/<folder>)`` and ``Edit(/<folder>/**)``, each once. The CLI's version is
+refuses the launch, and a CLI that then cannot be started removes it.
+(Emergency 2, release 0.1.2: the settings no longer deny the folder to the
+session by two literal rules; that half of the cases is retired.) The CLI's version is
 read from the name of the file the CLI's link resolves to (``.../versions/<v>``),
 never by running it; "not measured: <why>" when it is not such a link.
 
@@ -125,19 +125,8 @@ def test_a_cli_that_is_not_such_a_link_is_recorded_as_not_measured(launch):
 
 
 # --------------------------------------------------------------------------
-# The folder: shared by every worktree, made at launch, denied to the session
+# The folder: shared by every worktree, made at launch
 # --------------------------------------------------------------------------
-
-def _literal_rules(folder):
-    folder = os.path.realpath(folder)
-    return (f"Edit(/{folder})", f"Edit(/{folder}/**)")
-
-
-def _covered(entry, path):
-    entry = entry[1:] if entry.startswith("//") else entry
-    entry = entry.rstrip("/")
-    return path == entry or path.startswith(entry + "/")
-
 
 def test_every_worktree_shares_the_main_checkout_s_record_folder(sandbox, project, cli):
     worktree = sandbox.home / "work" / "worktree"
@@ -146,25 +135,16 @@ def test_every_worktree_shares_the_main_checkout_s_record_folder(sandbox, projec
     s.assert_launched(result)
     assert result.record().get("root") == os.path.realpath(worktree), "the record's root is not the worktree"
     assert not (worktree / s.RECORDS_REL).exists(), "the worktree has a record folder of its own"
-    rules = s.deny_rules(result.settings())
-    for rule in _literal_rules(sandbox.records):
-        assert rules.count(rule) == 1, f"the settings do not deny {rule} once: {rules.count(rule)}"
-    folder = os.path.realpath(sandbox.records)
-    covering = [entry for entry in s.allow_write(result.settings()) if _covered(entry, folder)]
-    assert not covering, f"the sandbox's write list covers the record folder: {covering}"
 
 
 @pytest.mark.parametrize("before", ("missing", "there"))
-def test_the_record_folder_is_made_and_denied_to_the_session_by_two_literal_rules(sandbox, project, launch, before):
+def test_the_record_folder_is_made_before_the_session_starts(sandbox, project, launch, before):
     if before == "there":
         sandbox.records.mkdir(parents=True)
     result = launch(s.ENGINEER)
     s.assert_launched(result)
     assert result.session()["records_at_start"].get(str(sandbox.records)) is not None, (
         "the record folder did not exist when the session started")
-    rules = s.deny_rules(result.settings())
-    for rule in _literal_rules(sandbox.records):
-        assert rules.count(rule) == 1, f"the settings deny {rule} {rules.count(rule)} times, not once"
 
 
 def _launches_is_a_file(sandbox):

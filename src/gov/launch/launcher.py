@@ -1,21 +1,24 @@
 """Worker session launcher: ``gov launch <role> <ticket> [-- <CLI arguments>]`` (W1-46, DEC-231).
 
 Starts the CLI at ``~/.local/bin/claude`` (DEC-205) in the repository root with
-one ``--settings`` value built here: the strict sandbox block, the role's network
-profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
-``GOV_TICKET``, ``GOV_STORE`` where the project configures its integration store
+one ``--settings`` value built here: ``GOV_ROLE``, ``GOV_TICKET``, ``GOV_STORE`` where the project configures its integration store
 (W2-116, ``gov.launch.store``) and a per-session temp directory, removed when the session ends
 (DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
 (DEC-392). A worker session starts as its role: the role file's text and its named
 skills appended, its default model and effort, no compaction threshold, the user
 settings' ask and deny rules kept, and one launch record written before it starts
-(W2-60a). Nothing fails open: whatever cannot be read or is not of the stated
-shape refuses the launch.
+(W2-60a).
+
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.1-2.4, 6.1, release 0.1.2): no guard, no sandbox, no permission
+limits. A launch no longer requires the guard in the repository's settings, writes no sandbox block and no deny rule
+of its own, and accepts the no-prompt mode (``permissions.defaultMode: bypassPermissions`` in the repository's
+settings, or ``--permission-mode bypassPermissions`` / ``--dangerously-skip-permissions`` after ``--``). The only deny
+rules a worker carries are the user's (``git push`` and ``sudo``, 2.4). Sessions stay apart by their worktree, their
+folders and their brief.
 
 A lead (``gov launch orchestrator|lead <ticket>``, W2-136 S9) is started only when
 the plan's check admits its ticket, with ``GOV_ROLE=orchestrator``, its
-``GOV_TICKET``, the launcher's own ``GOV_STORE`` as a worker's (W2-56 R5) and no
-sandbox block, as the dispatcher starts a lead (``build_lead_settings``); a worker
+``GOV_TICKET`` and the launcher's own ``GOV_STORE`` as a worker's (W2-56 R5), as the dispatcher starts a lead (``build_lead_settings``); a worker
 launch never consults the plan.
 
 Every launch, lead or worker, passes the machine-wide resource gate (W2-20 S19,
@@ -62,12 +65,10 @@ from subprocess import SubprocessError
 import yaml
 
 from gov.cli.errors import GovError
-from gov.guard.decide import ACCEPTANCE, _load_ticket
-from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
-from gov.guard.install import experiment_folder
-from gov.guard.reads import PolicyError, check_sets
+from gov.guard.decide import _load_ticket, freeze_state
+from gov.guard.heldout import load_yaml_unique
 from gov.guard import runs
-from gov.launch import criticality as crit, environ, record, role as roles, sandbox, session_record
+from gov.launch import criticality as crit, environ, record, role as roles, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
 from gov.spend import brake as spend_brake
@@ -109,29 +110,23 @@ TEMPLATE_FLAG = "--append-system-prompt-file"
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
-GUARD_HOOK = "hooks/pretooluse.py"  # the guard, as the repository's settings register it
-GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
-# DEC-315: no worker edits the tickets or .claude, and only the independent test
-# designer the acceptance tests, whatever the ticket's allowed_paths name.
-PROTECTED_TREES = (".tickets", ".claude")
-# DEC-273: a research ticket's one folder lies under this root. How a project
-# names another root is open (DP-18): there is no configuration key for it.
-EXPERIMENTS_ROOT = "experiments"
-# DEC-313: arguments that take the permission checks away or add a writable directory.
-BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
+# The no-prompt mode, accepted since Emergency 2 (0.1.2; DEC-313 superseded by EMERGENCY-2 2.2, 2.9).
 BYPASS_MODE = "bypassPermissions"
-# W2-56 S6 (DEC-826 Q5): arguments that drop the guard or add context, beside DEC-313's; refused alone, with a spaced
-# value and in the ``=`` form, wherever they stand after ``--``.
-GUARD_FLAGS = ("--restricted", "--safe-mode", "--agents", "--plugin-dir", "--plugin-url", "--mcp-config",
-               "--system-prompt")
+# Names kept for the readers that import them (suites, fixtures); since Emergency 2 no launch decides by them.
+GUARD_HOOK = "hooks/pretooluse.py"
+GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
+PROTECTED_TREES = (".tickets", ".claude")
+EXPERIMENTS_ROOT = "experiments"
+KERNEL_ALLOWLIST_REL = "template/governance/kernel/launch/research-allowlist.yaml"
+PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
+BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
+# W2-56 S6 (DEC-826 Q5): arguments that add context or replace the role's prompt; refused alone, with a spaced value
+# and in the ``=`` form, wherever they stand after ``--``. Emergency 2: the guard's own (--restricted, --safe-mode) go.
+CONTEXT_FLAGS = ("--agents", "--plugin-dir", "--plugin-url", "--mcp-config", "--system-prompt")
+GUARD_FLAGS = CONTEXT_FLAGS  # the former name, for its readers
 # W2-56 D-12: a worker's temp folder, short enough that its code-graph daemon folders fit the tool's socket (107
 # bytes, DEC-338); the prefix is what the weekly sweep (DEC-902) and the code index (``gov.codeintel``) look for.
 TEMP_PREFIX = "gov-launch-"
-# Open package DP-9: both files hold a list of host names under this key; the
-# project's file extends the kernel default, and may be absent (DEC-241).
-ALLOWLIST_KEY = "hosts"
-KERNEL_ALLOWLIST_REL = "template/governance/kernel/launch/research-allowlist.yaml"
-PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
 # DEC-392: these end the session and remove its folder, and the launcher then ends with INTERRUPT_EXIT.
 END_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 INTERRUPT_EXIT = 130
@@ -148,8 +143,8 @@ SET_ITSELF = {
     "--session-id": "the launcher gives the session its id and keys the launch record by it",
     "--autocompact": "no launch sets a compaction threshold (DEC-838)",
     "--fallback-model": "the session runs on the role's model alone, never on another (DEC-839 item 1)",
-    "--chrome": "a launched session loads no connector, and Chrome's runs outside the sandbox (DEC-826 Q5)",
-    "--ide": "a launched session loads no connector, and an IDE's runs outside the sandbox (DEC-826 Q5)",
+    "--chrome": "a launched session loads no connector (DEC-826 Q5)",
+    "--ide": "a launched session loads no connector (DEC-826 Q5)",
     "--system-prompt-snapshot": "the session's prompt is the CLI's default with the role's text appended (DEC-826 Q1)",
 }
 RESUME_RULE = "a launch resumes a session by its id (--resume <session id>), so that the record can name it"
@@ -157,7 +152,6 @@ COMPACT_ENV, COMPACT_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW", "autoCompactWindow
 # W2-60a: the other names under env by which the CLI takes a compaction threshold.
 COMPACT_ENVS = (COMPACT_ENV, "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS")
 _UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
-_HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
 # W2-184 (RUBRIC-2 at launch, DEC-1120): the options' forms, the trial and probe records' places, the effort floor.
 _TRIAL_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 _DECISION = re.compile(r"DEC-\d+")
@@ -185,106 +179,12 @@ def _refuse(reason: str) -> GovError:
     return GovError("LAUNCH_REFUSED", reason)
 
 
-def _hosts(root: Path, rel: str) -> list[str]:
-    """The host names of one allowlist file: a name, or ``*.<name>`` for its subdomains."""
-    try:
-        data = load_yaml_unique((root / rel).read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, yaml.YAMLError):
-        raise _refuse(f"the research allowlist {rel} cannot be read, or writes a key twice") from None
-    hosts = data.get(ALLOWLIST_KEY) if isinstance(data, dict) else None
-    if not isinstance(hosts, list) or not all(isinstance(h, str) and _HOST.fullmatch(h) for h in hosts):
-        raise _refuse(f"the research allowlist {rel} must hold a list of host names under '{ALLOWLIST_KEY}'")
-    return hosts
-
-
-def _research_allowlist(root: Path) -> list[str]:
-    hosts = _hosts(root, KERNEL_ALLOWLIST_REL)
-    if os.path.lexists(root / PROJECT_ALLOWLIST_REL):
-        hosts += _hosts(root, PROJECT_ALLOWLIST_REL)
-    return sorted(set(hosts))
-
-
-def _runtime_rules(root: Path) -> list[str]:
-    """``Edit`` deny rules for ``.gov-runtime/**`` except ``.gov-runtime/scratch/**`` (DEC-180).
-
-    The patterns match every name but ``scratch``; they bind the file tools. The
-    entries that exist at launch are also listed by name, so that the sandbox has
-    a literal rule for each (what it makes of a pattern in an ``Edit`` rule is not
-    measured; P-W2-58-1 measured ``Read`` rules): the freeze flag only when it is
-    there, since the sandbox puts a placeholder at a denied name that does not
-    exist (DEC-402).
-    """
-    base = f"/{root}/{RUNTIME}"
-    names = {f"{SCRATCH[:i]}[!{c}]*" for i, c in enumerate(SCRATCH)} | {SCRATCH[:i] for i in range(1, len(SCRATCH))}
-    names |= {f"{SCRATCH}?*"}
-    if (root / RUNTIME).is_dir():
-        names |= {n for n in os.listdir(root / RUNTIME) if n != SCRATCH and not any(c in n for c in "*?[")}
-    return [f"Edit({base}/{name})" for name in sorted(names)]
-
-
-def _fence_rules(root: Path, folder: str) -> list[str]:
-    """The research fence: an ``Edit`` deny rule for every entry that exists beside the path to the folder.
-
-    Left out: ``.git`` (the session commits its evidence record), an entry whose
-    name the sandbox would read as a pattern, and ``.gov-runtime`` (its own rules).
-    """
-    rules, here = [], root
-    for depth, part in enumerate(Path(folder).relative_to(root).parts):
-        for name in sorted(os.listdir(here)):
-            if name == part or any(c in name for c in "*?[") or (depth == 0 and name in (".git", RUNTIME)):
-                continue
-            rules.append(f"Edit(/{here}/{name})")
-        here = here / part
-    return rules
-
-
-def _tree_rules(root: Path, role: str) -> list[str]:
-    """``Edit`` deny rules for the acceptance tests, the tickets and ``.claude`` (DEC-315).
-
-    The literal rule names the folder to the sandbox; the pattern says the same
-    to the file tools (what the sandbox makes of a pattern in an ``Edit`` rule is
-    not measured; P-W2-58-1 measured ``Read`` rules).
-    """
-    trees = PROTECTED_TREES if role == "independent-test-designer" else (ACCEPTANCE, *PROTECTED_TREES)
-    return [f"Edit(/{root}/{tree}{tail})" for tree in trees for tail in ("", "/**")]
-
-
 def build_settings(root: Path, role: str, ticket_id: str) -> dict:
-    """The ``--settings`` value of a worker session, less its temp directory. ``root`` is a real path."""
-    deny = _runtime_rules(root) + _tree_rules(root, role)
-    domains: list[str] = []
-    if role == "research":
-        folder = experiment_folder(str(root), ticket_id)
-        if folder is None:
-            raise _refuse("the research ticket's allowed_paths is not exactly one experiment folder (DEC-242)")
-        if Path(folder).relative_to(root).parts[0] != EXPERIMENTS_ROOT or Path(folder) == root / EXPERIMENTS_ROOT:
-            raise _refuse(f"the research ticket's allowed_paths names a folder that is not under the experiments "
-                          f"root, {EXPERIMENTS_ROOT}/ (DEC-273)")
-        deny += _fence_rules(root, folder)
-        domains = _research_allowlist(root)
-    try:
-        deny += [f"Read(/{path}/**)" for path in load_held_out(str(root))]  # a missing file: no rule (DEC-242)
-    except HeldOutError as error:
-        raise _refuse(f"{error} (DEC-218)") from None
-    # DEC-873: no Read rule for (c) or (d), which the guard refuses: the CLI turns a Read rule that matches existing
-    # files into a read denial for the session's commands too, and running a test means reading it. A malformed
-    # evaluation_sets block still refuses the launch (fail closed, as DEC-218).
-    try:
-        check_sets(str(root))
-    except PolicyError as error:
-        raise _refuse(f"{error} (DEC-820)") from None
+    """The ``--settings`` value of a worker session: its env (``GOV_ROLE``, ``GOV_TICKET``, ``GOV_STORE``) and an empty
+    deny list, to which ``_worker_plan`` adds the user's deny rules. Emergency 2 (2.2, 2.4): no sandbox block and no
+    deny rule of the launcher's own. ``root`` is a real path."""
     env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, **_store_env(root)}
-    return {
-        "env": env,
-        "permissions": {"deny": deny},
-        "sandbox": {
-            "enabled": True,
-            "failIfUnavailable": True,
-            "allowUnsandboxedCommands": False,
-            # W2-56 S8 (DEC-1035 (2)): the reranker's one socket, from the service's own setting (gov.launch.sandbox)
-            "network": sandbox.network(domains),
-        },
-    }
+    return {"env": env, "permissions": {"deny": []}}
 
 
 def _store_env(root: Path) -> dict:
@@ -302,16 +202,9 @@ def _store_env(root: Path) -> dict:
 
 def build_lead_settings(root: Path, ticket_id: str) -> dict:
     """The ``--settings`` value of a lead session (W2-136 S9): ``GOV_ROLE=orchestrator``, its ``GOV_TICKET`` and the
-    launcher's own ``GOV_STORE`` as a worker's (W2-56 R5, ``_store_env``), no sandbox block, as the dispatcher starts
-    a lead. Kept apart from ``build_settings`` so that a worker's settings never lose their sandbox block or deny
-    rules on a lead's account. ``root`` is a real path."""
+    launcher's own ``GOV_STORE`` as a worker's (W2-56 R5, ``_store_env``), as the dispatcher starts a lead. ``root``
+    is a real path."""
     return {"env": {"GOV_ROLE": LEAD_GOV_ROLE, "GOV_TICKET": ticket_id, **_store_env(root)}}
-
-
-def sandbox_faults(settings: dict) -> list[str]:
-    """Why the settings are not on, strict and fail-closed, or wider than the launcher's (CAP-61.a, DEC-1035); empty
-    when they are. The reranker's socket is read from this process's HOME (``gov.launch.sandbox.faults``)."""
-    return sandbox.faults(settings)
 
 
 def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
@@ -352,35 +245,11 @@ def _role_kind(root: Path, role: str) -> dict:
     return {"rel": rel, "own_ticket": not independent}
 
 
-def _guard_wired(settings: dict) -> bool:
-    """True when the settings register the guard as a PreToolUse command for every guarded tool."""
-    hooks = settings.get("hooks")
-    entries = hooks.get("PreToolUse") if isinstance(hooks, dict) else None
-    covered = set()
-    for entry in entries if isinstance(entries, list) else []:
-        commands = entry.get("hooks") if isinstance(entry, dict) else None
-        if not any(isinstance(hook, dict) and hook.get("type") == "command" and GUARD_HOOK in str(hook.get("command"))
-                   for hook in (commands if isinstance(commands, list) else [])):
-            continue
-        matcher = entry.get("matcher")
-        if matcher in (None, "", "*"):
-            return True
-        covered |= set(matcher.split("|")) if isinstance(matcher, str) else set()
-    return GUARDED_TOOLS <= covered
-
-
 def _check_repository_settings(root: Path, worker: bool = True) -> None:
-    """The repository's settings carry no sandbox key (DEC-233) and wire the guard, with the hooks on.
-
-    The CLI may merge the repository's settings into the built ones, and a
-    session whose settings register no guard has none. For a worker (W2-60a), the
-    settings carry no agent key and no compaction threshold, and for a linked
-    worktree the CLI loads the local settings from the main checkout's file, which
-    is judged as the tree's own copy is (round 3, review 2's F1); a main checkout
-    that cannot be found refuses. A lead (``worker`` false, W2-136 S9) is judged as
-    before W2-60a.
-    """
-    wired = False
+    """The repository's settings can be read, and for a worker (W2-60a) carry no agent key and no compaction threshold;
+    for a linked worktree the CLI loads the local settings from the main checkout's file, which is judged as the tree's
+    own copy is; a main checkout that cannot be found refuses. Emergency 2 (2.2, 2.3; 0.1.2): the guard is not required,
+    and a sandbox key, ``disableAllHooks``, the no-prompt mode and added directories are the repository's own choice."""
     files = [(root / rel, rel) for rel in REPO_SETTINGS]
     if worker:
         main = record.main_checkout(root, "the local settings file the CLI loads for a worktree session")
@@ -392,26 +261,25 @@ def _check_repository_settings(root: Path, worker: bool = True) -> None:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            raise _refuse(f"{rel} cannot be read, so it cannot be shown to carry no sandbox key") from None
-        if not isinstance(data, dict) or "sandbox" in data:
-            raise _refuse(f"{rel} carries a sandbox key: the sandbox settings come from the launcher alone (DEC-233)")
-        if data.get("disableAllHooks", False) is not False:
-            raise _refuse(f"{rel} sets disableAllHooks: a worker session would have no guard")
-        permissions = data.get("permissions", {})
-        if not isinstance(permissions, dict):
-            raise _refuse(f"{rel}: permissions is not a map, so it cannot be shown to carry no bypass mode")
-        if permissions.get("defaultMode") == BYPASS_MODE:
-            raise _refuse(f"{rel} sets permissions.defaultMode to {BYPASS_MODE}: a worker session would run "
-                          f"without the permission checks (DEC-313)")
-        if "additionalDirectories" in permissions:
-            raise _refuse(f"{rel} carries permissions.additionalDirectories: a worker session gets no added "
-                          f"directory (DEC-313)")
+            raise _refuse(f"{rel} cannot be read as JSON") from None
+        if not isinstance(data, dict):
+            raise _refuse(f"{rel} is not a JSON object")
         if worker:
             _check_role_settings(data, rel)
-        wired = wired or (rel == REPO_SETTINGS[0] and _guard_wired(data))
-    if not wired:
-        raise _refuse(f"{REPO_SETTINGS[0]} does not register the guard ({GUARD_HOOK}) as a PreToolUse hook for "
-                      f"{', '.join(sorted(GUARDED_TOOLS))}: a worker session would have no guard")
+
+
+def _check_not_paused(root: Path) -> None:
+    """Emergency 2 (CAP-05; audit 7 C-1): with the guard gone, ``gov pause``'s freeze flag is honoured here: while the
+    main checkout's ``.gov-runtime/freeze`` is frozen, no lead or worker starts. A worktree's own flag counts too."""
+    roots = {root}
+    try:
+        roots.add(record.main_checkout(root, "the freeze flag gov pause sets"))
+    except GovError:
+        pass
+    for each in sorted(roots, key=str):
+        if freeze_state(str(each)) == "frozen":
+            raise _refuse(f"the project is paused (gov pause set {each}/.gov-runtime/freeze): no session starts "
+                          f"until the owner lifts it with gov pause --off (CAP-05)")
 
 
 def _check_role_settings(data: dict, rel: str) -> None:
@@ -434,26 +302,17 @@ def _check_role_settings(data: dict, rel: str) -> None:
 
 
 def _check_cli_args(cli_args: list[str]) -> None:
-    """Refuse the arguments that take the launcher's settings or the guard away from the session."""
-    for arg, value in zip(cli_args, [*cli_args[1:], None]):
-        if arg in BYPASS_FLAGS:
-            raise _refuse(f"the CLI arguments carry {arg}: a worker session keeps its permission checks (DEC-313)")
-        if arg == f"--permission-mode={BYPASS_MODE}" or (arg == "--permission-mode" and value == BYPASS_MODE):
-            raise _refuse(f"the CLI arguments carry --permission-mode {BYPASS_MODE}: a worker session keeps its "
-                          f"permission checks (DEC-313)")
-        if arg == "--add-dir" or arg.startswith("--add-dir="):
-            raise _refuse("the CLI arguments carry --add-dir: a worker session gets no added directory (DEC-313)")
+    """Refuse the arguments that replace the launcher's own settings, or add context or replace the role's prompt
+    (DEC-826 Q5). Emergency 2 (0.1.2): the no-prompt mode, ``--add-dir`` and ``--bare`` are accepted."""
+    for arg in cli_args:
         if arg == "--settings" or arg.startswith("--settings="):
-            raise _refuse("the CLI arguments carry --settings: the sandbox settings come from the launcher alone")
-        if arg == "--bare":
-            raise _refuse("the CLI arguments carry --bare, which skips every hook: the session would have no guard")
+            raise _refuse("the CLI arguments carry --settings: the session's settings come from the launcher")
         if arg == "--setting-sources" or arg.startswith("--setting-sources="):
-            raise _refuse("the CLI arguments carry --setting-sources: without the project's settings the session "
-                          "would have no guard hook")
+            raise _refuse("the CLI arguments carry --setting-sources: the launcher sets the session's sources itself")
         name = arg.split("=", 1)[0]
-        if name in GUARD_FLAGS:
-            raise _refuse(f"the CLI arguments carry {name}: it drops the guard or adds context to a worker session "
-                          f"(DEC-826 Q5)")
+        if name in CONTEXT_FLAGS:
+            raise _refuse(f"the CLI arguments carry {name}: it adds context to a worker session or replaces its "
+                          f"role's prompt (DEC-826 Q5)")
 
 
 def template_args(root: Path, role: str) -> list[str]:
@@ -519,13 +378,10 @@ def _composed(appended: bytes, template: bytes) -> bytes:
     return (appended if appended.endswith(b"\n") else appended + b"\n") + b"\n" + template
 
 
-def _worker_deny(deny: list[str], records: Path, user_deny: list[str]) -> list[str]:
-    """A worker's deny list: ``build_settings``' rules, the record folder's two rules, the user's; each once, in that
-    order. The record folder's rules always stand in their own place, whether or not the folder existed when
-    ``.gov-runtime`` was listed (W2-56 S3: one list on every launch; W2-60a S8: the folder denied by two literal rules
-    once each)."""
-    own = record.deny_rules(records)
-    return list(dict.fromkeys([rule for rule in deny if rule not in own] + own + user_deny))
+def _worker_deny(deny: list[str], user_deny: list[str]) -> list[str]:
+    """A worker's deny list: ``build_settings``' rules (none since Emergency 2), then the user's; each once, in that
+    order. Emergency 2 (2.4): the user's ``git push`` and ``sudo`` lines are the only denies."""
+    return list(dict.fromkeys([*deny, *user_deny]))
 
 
 def _check_options(reason: str | None, trial: str | None, owner_named: str | None) -> None:
@@ -853,7 +709,7 @@ def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: l
     resumed = record.original(records, given["resume"], role, ticket_id) if given["resume"] else None
     deny = settings["permissions"]["deny"]
     # The user's ask and deny rules only: never an allow rule or a mode, which would take a protection away.
-    settings["permissions"]["deny"] = _worker_deny(deny, records, user_rules["deny"])
+    settings["permissions"]["deny"] = _worker_deny(deny, user_rules["deny"])
     if user_rules["ask"]:
         settings["permissions"]["ask"] = list(dict.fromkeys(user_rules["ask"]))
     settings["autoMemoryEnabled"] = False  # DEC-826 Q5: no model-side memory
@@ -1065,9 +921,10 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
                           f"{', '.join(given)}")
         if projection_usd is not None:  # W2-156: a lead writes no launch record, so it has nowhere to keep one
             raise _refuse(f"a lead launch ({role}) takes no --projection-usd: it writes no launch record to hold one")
+        _check_not_paused(root)
         plan_override = _admit_lead(root, ticket_id)
         _check_cli_args(cli_args)
-        _check_repository_settings(root, False)  # a lead has no sandbox: the guard is its only fence
+        _check_repository_settings(root, False)
         template = template_args(root, role)
         cli = _cli()
         settings = build_lead_settings(root, ticket_id)  # an unusable store setting refuses here, before the gate
@@ -1085,6 +942,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _check_options(reason, trial, owner_named)
     _check_projection(projection_usd)
     _check_ticket(root, role, ticket_id)
+    _check_not_paused(root)
     _check_repository_settings(root)
     if role not in ROLE_TEMPLATES:  # W2-60b S8: a new role's file before its template is looked for
         _role_kind(root, role)
@@ -1097,18 +955,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     session_record.check_one_writer(root, str(root), role)
     session_record.make_folder(root)  # before the settings, so every launch's runtime rules are the same (W2-56 S3)
     settings = build_settings(root, role, ticket_id)
-    faults = sandbox_faults(settings)
-    if faults:
-        raise _refuse("the built settings are not strict: " + "; ".join(faults))
     # W2-60a: the role read once; W2-184: the session's model and effort are RUBRIC-2's for its role and criticality.
     plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd)
-    # W2-56 S4 (DEC-402): the names the sandbox puts placeholders at are kept out of git's way, for the session and
-    # for its caller in the same worktree; a repository whose exclude file cannot be written is not launched into.
-    try:
-        sandbox.exclude_placeholders(root, settings["permissions"]["deny"])
-    except OSError as error:
-        raise _refuse(f"the sandbox's placeholder names cannot be kept out of the repository's commits "
-                      f"({error.strerror or error}) (DEC-402)") from None
     lock = StartLock()
     try:
         # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start
@@ -1138,7 +986,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
 def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_prefix: str | None = None,
          own: str | None = None, entry: tuple[str, str] | None = None, lock=None, worker: dict | None = None) -> int:
     """Start the session and wait for it. With ``temp_prefix`` (a worker), the session gets a temp folder of its
-    own, in its env and its sandbox's write list with ``own``, removed when it ends (DEC-159, DEC-386). With
+    own, in its env, removed when it ends (DEC-159, DEC-386). With
     ``entry`` (its ticket and role), the session is in the machine-wide registry while it runs (W2-20 S1): one that
     cannot be entered is stopped, so the gate never runs blind to a session. ``lock`` (the machine-wide start lock,
     review F1) is given back once the session is registered, or when the launch ends without one. With ``worker``
@@ -1173,11 +1021,6 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         if temp_prefix is not None:  # DEC-159: a temp directory of the session's own, for the CLI and its commands
             tmpdir = tempfile.mkdtemp(prefix=temp_prefix)
             own_env.update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-            # W2-56 S2, S11: the temp folder, the run folder and the reranker's log, nothing else
-            settings["sandbox"]["filesystem"] = sandbox.filesystem(tmpdir, own)
-            faults = sandbox_faults(settings)
-            if faults:
-                raise _refuse("the built settings are not strict: " + "; ".join(faults))
         # W2-56 S5: the cleaned environment for the CLI process (gov.launch.environ), and in a worker's --settings (a
         # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env

@@ -38,13 +38,6 @@ def test_a_malformed_evaluation_block_refuses_the_calls_of_the_sessions_it_could
         s.assert_refused(world.ask(call, role, ticket), call, f"{session}, malformed evaluation_sets: ")
 
 
-def test_a_malformed_evaluation_block_refuses_the_launch(sandbox, cli):
-    s.make_eval_project(sandbox, block=_malformed_block())
-    result = s.launch(sandbox, cli, s.ENGINEER, s.MEASURED)
-    assert result.run.returncode != 0 and not result.calls, (
-        f"gov launch started a session under a malformed evaluation_sets block\n{result.describe()}")
-
-
 BROKEN_TICKET = "---\nid: DAEO-zz58\nwbs_id: [unclosed\nrole: engineer\n---\n# broken\n"
 
 
