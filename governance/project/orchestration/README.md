@@ -50,7 +50,8 @@ tree for tree: the folder's tree object `46610514` is the same on both branches.
 hand.
 
 The other kinds of context live where they did:
-- the standing rules in `governance/project/prompts/w2-orchestrator.md` and `docs/plan/WAVE_2_WBS.md` §0;
+- the rules in force in `docs/emergency-2/EMERGENCY-2.md` (the old prompt, `w2-orchestrator.md`, is history in
+  `docs/emergency-2/archive/`);
 - the brief templates in force in `governance/project/briefs/`;
 - plans in `docs/plan/`;
 - assessment reports in `docs/assessment/<yyyy-mm>/`;

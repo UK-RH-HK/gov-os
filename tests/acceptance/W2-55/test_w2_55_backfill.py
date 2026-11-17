@@ -205,9 +205,11 @@ def test_one_row_per_register_entry_at_the_base_in_its_order(proposal, written):
 
 
 def test_every_row_has_a_domain_a_scope_a_lands_in_a_status_and_a_reason(proposal, written):
-    _, register_text = written()
+    commit, register_text = written()
     ids = set(s.heading_ids(register_text))
-    held = set(repo_git("ls-tree", "-r", "--name-only", "HEAD").stdout.split("\n"))
+    # The places the proposal names, as the tree it was made from held them (DEC-1028 (2) (i)): since EMERGENCY-2
+    # (11.1) HEAD no longer holds the old prompt most rows land in; it is history in docs/emergency-2/archive/.
+    held = set(repo_git("ls-tree", "-r", "--name-only", commit).stdout.split("\n"))
     wrong = []
     for row in table(proposal()):
         why = []
@@ -220,7 +222,7 @@ def test_every_row_has_a_domain_a_scope_a_lands_in_a_status_and_a_reason(proposa
             named = [place.strip() for place in places.split(",") if place.strip()]
             if not named:
                 why.append("lands in is empty")
-            why += [f"lands in {place!r} is no file HEAD holds" for place in named if place not in held]
+            why += [f"lands in {place!r} is no file the proposal's commit holds" for place in named if place not in held]
         note = row.get("status", "")
         if not STATUS_NOTE.match(note):
             why.append(f"status {note!r} is none of: in force, done, SUPERSEDED by DEC-<n>, Changed by: DEC-<n>")

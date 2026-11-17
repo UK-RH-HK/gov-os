@@ -28,6 +28,7 @@ ROOT = HERE.parents[2]
 REGISTER = "docs/DECISION_REGISTER.md"
 ARCHIVE = "governance/project/orchestration/ARCHIVE-SUPERSEDED.md"
 IN_FORCE = "governance/project/orchestration/DECISIONS-IN-FORCE.md"
+IN_FORCE_AT_HEAD = "docs/emergency-2/archive/DECISIONS-IN-FORCE.md"  # archived as history (EMERGENCY-2 11.1)
 SITTING = "governance/project/orchestration/packages/W2-130-SITTING.md"
 RECONCILIATION = "governance/project/orchestration/packages/LIFT-1/LINK-RECONCILIATION.md"
 RECORD = "docs/research/W2-130-link-cleanup.md"
