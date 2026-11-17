@@ -55,7 +55,9 @@ namespaces:
       - "docs/changes/**"
       - "docs/charter/**"
       - "docs/contract/**"
-      - "docs/emergency-2/**"
+      - "docs/emergency-2/*"
+      - "docs/emergency-2/audits/**"
+      - "docs/emergency-2/release-0.1.2/**"
       - "docs/imported/**"
       - "docs/interfaces/**"
       - "docs/lessons/**"
@@ -118,6 +120,19 @@ namespaces:
     embedding_policy: not embedded
     lexical_policy: not indexed
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
+    deletion_rebuild: authoritative; restored from git only
+  # EMERGENCY-2 11.1, 11.3: the old start-up documents and memory, history only, out of both indexes
+  history-archive:
+    paths:
+      - "docs/emergency-2/archive/**"
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history; history, never edited
+    export_policy: allowed
+    embedding_policy: not embedded
+    lexical_policy: not indexed
+    provenance: the retiring CTO's records, archived by the owner's Emergency 2 (2026-11-17)
     deletion_rebuild: authoritative; restored from git only
   # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
   # orchestration record moved to the branch record/w2; only its searchable part (the README, the sync script,
