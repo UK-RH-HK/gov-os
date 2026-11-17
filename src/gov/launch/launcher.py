@@ -267,6 +267,15 @@ def _check_repository_settings(root: Path, worker: bool = True) -> None:
             _check_role_settings(data, rel)
 
 
+def _mode_args(cli_args: list[str]) -> list[str]:
+    """Emergency 2 (2.3): a session starts in the no-prompt mode unless the caller names a permission mode itself
+    (``--permission-mode``, ``--dangerously-skip-permissions``). The CLI does not take ``defaultMode: bypassPermissions``
+    from a project's settings for a launched session (seen in EXAMIN's smoke launch, 2026-11-17), so the launcher
+    passes it."""
+    named = any(a == "--permission-mode" or a.startswith("--permission-mode=") or a in BYPASS_FLAGS for a in cli_args)
+    return [] if named else ["--permission-mode", BYPASS_MODE]
+
+
 def _check_not_paused(root: Path) -> None:
     """Emergency 2 (CAP-05; audit 7 C-1): with the guard gone, ``gov pause``'s freeze flag is honoured here: while the
     main checkout's ``.gov-runtime/freeze`` is frozen, no lead or worker starts. A worktree's own flag counts too."""
@@ -737,7 +746,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
         "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}})
-    head = [*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
+    head = [*OWN_SWITCHES, *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
@@ -917,7 +926,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
             _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-            return _run(root, cli, settings, [*cli_args, *template], entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
+            return _run(root, cli, settings, [*_mode_args(cli_args), *cli_args, *template],
+                        entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
     _check_worker_role(role)
@@ -940,6 +950,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     settings = build_settings(root, role, ticket_id)
     # W2-60a: the role read once; W2-184: the session's model and effort are RUBRIC-2's for its role and criticality.
     plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+    plan["mode"] = _mode_args(cli_args)
     lock = StartLock()
     try:
         # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start

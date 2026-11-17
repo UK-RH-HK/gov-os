@@ -176,12 +176,14 @@ def test_the_launch_is_otherwise_what_it_was(project, role):
     # two switches that keep user-level context out; nothing else is added. A lead's line is as it was.
     between = _options(argv[3:-2 - len(args)])
     if role in launcher.WORKER_ROLES:
+        # Emergency 2 (2.3): the launcher's own no-prompt mode, the caller naming none
+        assert between.pop("--permission-mode", None) == "bypassPermissions", argv
         assert set(between) == {"--model", "--effort", "--session-id", "--strict-mcp-config", "--setting-sources"}, argv
         assert (between["--model"], between["--effort"]) == (ROLE_MODEL, "high"), argv
         assert between["--strict-mcp-config"] is None and between["--setting-sources"] == "project,local", argv
         assert re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", between["--session-id"])
     else:
-        assert between == {}, argv
+        assert between == {"--permission-mode": "bypassPermissions"}, argv  # Emergency 2 (2.3): a lead's too
 
 
 def _options(items: list[str]) -> dict:
