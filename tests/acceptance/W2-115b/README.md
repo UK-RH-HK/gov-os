@@ -1,7 +1,7 @@
 # W2-115b acceptance tests: gov queue, the product's deterministic landing (DAEO-j9z6)
 
-Written by the independent test designer (MR-3, DEC-963) from the ticket's KPI lines (8 success, 2 failure, rewritten
-2026-11-17) and the ticket lead's interface naming (command, settings, answer keys, error and exit codes, close record,
+Written by the independent test designer (MR-3, DEC-963) from the ticket's KPI lines (9 success, 2 failure, rewritten
+2026-11-17; success 9 added at dda23bd2e) and the ticket lead's interface naming (command, settings, answer keys, error and exit codes, close record,
 what a planted project needs), never from the implementation. EMERGENCY-2 §4.3 step 3.
 
 ## How the suite runs
@@ -62,10 +62,14 @@ what a planted project needs), never from the implementation. EMERGENCY-2 §4.3 
 | success-6 | `test_w2_115b_notices.py::test_a_commit_outside_the_allowed_paths_is_a_notice_and_the_ticket_lands_and_closes`, `test_w2_115b_notices.py::test_the_close_record_lists_the_notice`, `test_w2_115b_notices.py::test_a_path_inside_the_allowed_paths_is_not_listed` | as success-1 |
 | success-7 | `test_w2_115b_settings.py::test_the_queue_s_code_names_no_project`, `test_w2_115b_settings.py::test_queue_yaml_on_main_with_feature_branches_lands`, `test_w2_115b_settings.py::test_onto_and_the_ticket_form_land_on_the_named_branch`, `test_w2_115b_settings.py::test_a_detached_root_with_no_onto_and_no_queue_yaml_is_integration_unknown`, `test_w2_115b_settings.py::test_a_ticket_without_a_work_branch_is_branch_unknown` | as success-1; the grep case: "there is no src/gov/queue/" |
 | success-8 | `test_w2_115b_land.py::test_the_queue_s_record_is_written_and_holds_the_answer`, `test_w2_115b_land.py::test_the_seconds_of_each_step_and_the_total` | as success-1 |
+| success-9 | `test_w2_115b_dod.py::test_the_project_s_facts_hold_exactly_three_dod_lines`, `test_w2_115b_dod.py::test_the_facts_gov_adopt_writes_hold_exactly_three_dod_lines`, `test_w2_115b_dod.py::test_no_kernel_template_or_generated_copy_quotes_the_dropped_lines`, `test_w2_115b_dod.py::test_the_ticket_template_s_done_when_is_the_three_ids`, `test_w2_115b_dod.py::test_each_claude_templates_copy_is_its_kernel_template_with_three_lines` | the base's facts files (the project's and the one `gov adopt --facts` writes) hold DOD-1 to DOD-6; `role-lead.md` (kernel and `.claude/templates/` copy), `ticket.md` and the orchestrator agent files (`.claude/agents/`, both `.rulesync/subagents/`) quote DOD-4..6 or "DOD-1 to DOD-6"; `ticket.md`'s `done_when` lists six ids |
 | failure-1 | `test_w2_115b_unmoved.py::test_a_red_run_does_not_move_the_integration_branch`, `test_w2_115b_unmoved.py::test_a_red_on_the_base_too_is_batch_unexplained_and_moves_nothing`, `test_w2_115b_unmoved.py::test_a_g1_refusal_moves_nothing`, `test_w2_115b_unmoved.py::test_a_head_moved_during_the_run_is_head_moved_and_stays_as_moved` | as success-1 |
 | failure-2 | `test_w2_115b_land.py::test_green_closed_exactly_when_merged`, `test_w2_115b_red.py::test_red_closed_exactly_when_merged`, `test_w2_115b_batch.py::test_batch_closed_exactly_when_merged`, `test_w2_115b_authors.py::test_authors_closed_exactly_when_merged`, `test_w2_115b_authors.py::test_authors_alone_closed_exactly_when_merged`, `test_w2_115b_notices.py::test_notices_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_feature_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_onto_closed_exactly_when_merged`, `test_w2_115b_unmoved.py::test_unexplained_closed_exactly_when_merged`, `test_w2_115b_unmoved.py::test_moved_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_a_detached_root_with_no_onto_and_no_queue_yaml_is_integration_unknown`, `test_w2_115b_settings.py::test_a_ticket_without_a_work_branch_is_branch_unknown` | as success-1 (each first reads the queue's envelope, so none is green on the base by nothing having landed) |
 
-Every case is an acceptance test (no other kind). No case is green on the base.
+Every case is an acceptance test but four of success 9's, which are **repository-state** cases (they read this
+repository's own files: `facts.yaml`, the kernel templates and the generated copies) and belong to the record-reading
+set; `test_w2_115b_dod.py::test_the_facts_gov_adopt_writes_hold_exactly_three_dod_lines` is an acceptance case on a
+planted repository. No case is green on the base.
 
 ## Readings this suite takes
 
@@ -102,6 +106,18 @@ Every case is an acceptance test (no other kind). No case is green on the base.
     the head the run merged onto.
 12. **Failure-2's "branch's tip"** is the tip as planted (the queue never moves a work branch); a planted ticket with no
     work branch must not be closed.
+13. **Success 9's places** are those the orchestrator's message names: the kernel templates
+    (`template/governance/kernel/templates/`), `.claude/templates/`, `src/gov/_shipped/template/governance/kernel/templates/`,
+    `template/.rulesync/subagents/`, `.rulesync/subagents/` and `.claude/agents/`, every file in each, read from this
+    worktree's tree; a folder that is absent is not read (the kernel templates must exist). A dropped line is
+    `DOD-4`, `DOD-5` or `DOD-6` (not followed by a digit) or the text `DOD-1 to DOD-6`. "Names the close" is a word
+    beginning `close` (any case) in DOD-3's line; DOD-1 names `gov accept` or `{CMD:accept}`; DOD-2 names `gov queue`
+    literally. The facts `gov adopt` writes are those `gov adopt --facts --root <planted repository> --json` writes in
+    a fresh git repository with an empty `.tickets/`.
+14. **Each `.claude/templates/` copy equals its kernel template** is checked together with that copy holding no
+    dropped line, in one case: byte equality alone holds on the base already (the copies are regenerated today), so
+    the case is red on the base through `role-lead.md`'s "DOD-1 to DOD-6" and guards that the copy is regenerated
+    with the kernel template's new text.
 
 ## For the engineer
 
