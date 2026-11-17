@@ -660,9 +660,10 @@ def _bookkeeping(root: Path, ticket: str, paths: list[str]) -> bool:
     return all(p == f"{TICKETS_REL}/{ticket}.md" or p.startswith(own) or p in green for p in paths)
 
 
-def scoped(root: Path, ticket: str) -> dict:
+def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
-    "head"}``; ``SelectionRefused`` with its reason where it cannot be made."""
+    "head"}``; ``SelectionRefused`` with its reason where it cannot be made. ``change``: paths counted in the change
+    beside the ticket's own commits (``gov queue``: a work branch's changed paths, untrailered commits among them)."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter
 
     root = Path(root)
@@ -678,6 +679,8 @@ def scoped(root: Path, ticket: str) -> dict:
     # (the strict close's base), with the ticket's own commits; a ticket's own commits alone without a green record
     green = base(root)
     paths = sorted(set(own_paths) | set(changed(root, green))) if green else own_paths
+    if change:
+        paths = sorted(set(paths) | set(change))
     tickets = _tickets(root)
     couplings = test_map.get("couplings") or []
     why: dict[str, list[str]] = {}
