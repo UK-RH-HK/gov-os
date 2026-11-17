@@ -69,12 +69,15 @@ def test_s3_generated_brief_holds_no_question(role, tmp_path, repo, capsys):
 
 @pytest.mark.parametrize("role", s.BRIEF_ROLES)
 def test_s3_generated_brief_holds_no_unfilled_upper_slot(role, tmp_path, repo, capsys):
-    """S3's verify read as written: no ``{[A-Z]...}`` slot at all in a generated brief, so the product dispatcher's
-    brief check (any ``{UPPER}`` slot is "brief incomplete") passes it. README, "Readings": the form keys
-    keys.yaml lists (``{SUBJECT}``, ``{COMMIT_PATHS}``, ``{EXIT_FILE}``, ...) count as slots here."""
+    """S3 as the lead answered (reading (b), ticket commit e485739a1): every ``{UPPER}`` slot a generated brief still
+    holds is a form key this tree's keys.yaml lists (read at test time), and none is QUESTION. README, "Readings"."""
+    keys = yaml.safe_load(s.KEYS.read_text(encoding="utf-8")).get("keys")
+    assert isinstance(keys, list), "keys.yaml has no keys list"
     text = s.ok_brief(s.brief(capsys, repo, role, "--store", tmp_path / "no-store"))
-    slots = sorted(set(s.UNIT.findall(text)))
-    assert not slots, f"gov brief {role} holds unfilled slots: {slots}"
+    slots = sorted({re.match(r"\{([A-Z][A-Z0-9_]*)", slot).group(1) for slot in s.UNIT.findall(text)})
+    assert "QUESTION" not in slots, f"gov brief {role} holds {{QUESTION}}"
+    unknown = [slot for slot in slots if slot not in {str(key) for key in keys}]
+    assert not unknown, f"gov brief {role} holds slots that are no key in keys.yaml: {unknown}"
 
 
 # --- S4: the role templates ------------------------------------------------------------------------------------------

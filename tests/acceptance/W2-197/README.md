@@ -59,13 +59,11 @@ below: 12 lines (S1-S9, F1-F3), 90 cases (parametrised functions are named once 
   `tmp_path` with this repository's exact section would withhold nothing from a test designer. The planted section
   gives the test designer a plain glob for the implementation path (`src/widget/**`); the engineer's half uses the real
   `{ticket_tests}` placeholder, which needs the brief's ticket (the brief runs with no `GOV_TICKET`).
-- **S3, "no unfilled `{UPPER}` slot".** Read as the verify writes it: no `{[A-Z]...}` slot at all in a generated
-  brief, the form keys keys.yaml lists (`{SUBJECT}`, `{COMMIT_PATHS}`, `{EXIT_FILE}`, `{FOLDER}`, and the lead's
-  `{BASE}`, `{BRIEF_FILE}`, `{EFFORT}`, `{MESSAGE_FILE}`, `{WORKER_ROLE}`) included, because the product dispatcher's
-  brief check refuses any such slot. The `{QUESTION}` half is a case of its own
-  (`test_s3_generated_brief_holds_no_question`), so the wider half
-  (`test_s3_generated_brief_holds_no_unfilled_upper_slot`) can be dropped alone if the owner reads the line as
-  `{QUESTION}` only (a proposed decision in the designer's return).
+- **S3, "no unfilled `{UPPER}` slot".** Read as the lead answered (reading (b); the ticket's line as amended in
+  `e485739a1`): no generated brief holds `{QUESTION}` (`test_s3_generated_brief_holds_no_question`), and every
+  `{UPPER}` slot a generated brief still holds is a form key this tree's `keys.yaml` lists, read at test time
+  (`{SUBJECT}`, `{COMMIT_PATHS}`, `{EXIT_FILE}`, `{FOLDER}`, the lead's `{BASE}`, `{BRIEF_FILE}`, ...), with
+  QUESTION not among them (`test_s3_generated_brief_holds_no_unfilled_upper_slot`).
 - **S8, "the caller's tree".** For `gov retrieve` from a linked worktree the case runs with the working folder and
   `--root` both in the linked worktree (a planted store of its own), so either reading of "caller's tree" lands the
   line in the main worktree's `.gov-runtime/memory-use.jsonl`.
@@ -110,7 +108,7 @@ and it is meant to hold from this ticket's base through its landing.
 | S3 | `test_w2_197_text.py::test_s3_t0_holds_no_sandbox_split_for_retrieve` | red | brief.md says "No `gov retrieve` in the sandbox" |
 | S3 | `test_w2_197_text.py::test_s3_t0_holds_the_memory_section_with_its_key` | red | brief.md has no memory section and no `{MEMORY_BLOCK}` |
 | S3 | `test_w2_197_text.py::test_s3_generated_brief_holds_no_question` | red (6 rows) | no `--store` option (and every brief holds `{QUESTION}`) |
-| S3 | `test_w2_197_text.py::test_s3_generated_brief_holds_no_unfilled_upper_slot` | red (6 rows) | no `--store` option (and every brief holds `{QUESTION}`, `{SUBJECT}`, `{COMMIT_PATHS}`, `{FOLDER}`, `{EXIT_FILE}`; the lead's five more); see "Readings" |
+| S3 | `test_w2_197_text.py::test_s3_generated_brief_holds_no_unfilled_upper_slot` | red (6 rows) | no `--store` option (and every brief holds `{QUESTION}`, which keys.yaml still lists); see "Readings" |
 | S4 | `test_w2_197_text.py::test_s4_role_template_holds_the_shared_memory_line` | red (7 rows) | no role template holds the shared memory line |
 | S4 | `test_w2_197_text.py::test_s4_role_cto_launching_work_opens_every_subagent_prompt_with_the_memory_block` | red | role-cto.md's Launching work names no subagent memory block |
 | S4 | `test_w2_197_text.py::test_s4_brief_commands_table_has_a_retrieve_row` | red (3 rows: engineer, product-spec, independent-auditor) | no `--store` option (and their templates name no `{CMD:retrieve}`) |
