@@ -63,10 +63,10 @@
     },
     "patterns": { "type": "array", "items": { "$ref": "#/$defs/pattern" } },
     "target": {
-      "description": "A pytest target relative to the project: a folder, a file, or a node id or its beginning.",
+      "description": "A pytest target relative to the project: a folder, a file, or a node id or its beginning, anywhere in the project (DEC-1199 (2), F-023): no leading / or \\, no drive letter, no .. path segment, no backslash. The loader also refuses one that leaves the project through a link; the selection refuses one that names nothing.",
       "type": "string",
       "minLength": 1,
-      "pattern": "^tests/"
+      "pattern": "^(?![/\\\\])(?![A-Za-z]:)(?!(?:(?:(?!::)[\\s\\S])*[/\\\\])?\\.\\.(?:[/\\\\]|::|$))[^\\\\]+$"
     },
     "targets": { "type": "array", "items": { "$ref": "#/$defs/target" } }
   }
