@@ -265,16 +265,33 @@ class _Drop:
 DROP = _Drop()
 
 
+NO_STORE = "no-store"  # under the scratch folder, never made: the store gov brief retrieves from (W2-197)
+MEMORY_LOG_DIR = "memory-log"  # under the scratch folder: the memory-use log's own folder (W2-197 S8)
+
+
+def memory_log(scratch: Path) -> Path:
+    return scratch / MEMORY_LOG_DIR / "memory-use.jsonl"
+
+
 def child_env(scratch: Path, extra: dict | None = None) -> dict:
-    """The child's environment: this tree's ``src`` first, an empty ``HOME``, no bytecode written, no network."""
+    """The child's environment: this tree's ``src`` first, an empty ``HOME``, no bytecode written, no network.
+
+    Revised for W2-197 (EMERGENCY-2 5.4): ``gov brief`` now retrieves the ticket's memory from a store (``GOV_STORE``
+    when no ``--store`` is given, before facts.yaml's ``store_tree``, which in this tree's facts names the real
+    integration store) and appends a line to the memory-use log (``GOV_MEMORY_LOG``). Both are set here to the
+    scratch folder, outside the fixture repository: ``GOV_STORE`` a folder that does not exist (no store is read,
+    nothing reaches a model) and ``GOV_MEMORY_LOG`` a file in a folder of its own, so no case reads the real store or
+    writes a real repository's log."""
     home = scratch / "empty-home"
     home.mkdir(exist_ok=True)
+    memory_log(scratch).parent.mkdir(exist_ok=True)
     env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "GOV_"))}
     env.setdefault("PYTHONUSERBASE", site.getuserbase())
     dead = "http://127.0.0.1:9"
     env.update({"PYTHONPATH": str(SRC), "HOME": str(home), "PYTHONDONTWRITEBYTECODE": "1",
                 "http_proxy": dead, "https_proxy": dead, "HTTP_PROXY": dead, "HTTPS_PROXY": dead,
-                "OLLAMA_HOST": "127.0.0.1:9", "CUDA_VISIBLE_DEVICES": ""})
+                "OLLAMA_HOST": "127.0.0.1:9", "CUDA_VISIBLE_DEVICES": "",
+                "GOV_STORE": str(scratch / NO_STORE), "GOV_MEMORY_LOG": str(memory_log(scratch))})
     if extra:
         env.update(extra)
     return env

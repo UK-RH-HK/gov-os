@@ -14,7 +14,7 @@ KPI cells use positions in the ticket: `S<n>` is the n-th success line, `F<n>` t
       python3 -m pytest tests/acceptance/W2-152 -q -p no:cacheprovider -o tmp_path_retention_policy=failed \
       -m "not local_only" -k "not real and not green_here and not time_limit"
 
-About 15 s. No model, no network, no GPU, no store, no `gov retrieve`. No case is named `real`, `green_here` or
+About 15 s. No model, no network, no GPU, no store, no `gov retrieve` (revised for W2-197: every run's `GOV_STORE` names a folder that does not exist and `GOV_MEMORY_LOG` a file in the case's scratch folder; below). No case is named `real`, `green_here` or
 `time_limit` and none is marked `local_only`, so the exclusion leaves nothing out. The cases need `git`, `PyYAML` and
 `jsonschema` 4.x.
 
@@ -139,9 +139,9 @@ About 15 s. No model, no network, no GPU, no store, no `gov retrieve`. No case i
 | F1 | `test_w2_152_fill.py::test_f1_json_brief_is_the_same_text_as_plain_stdout` | red | no `gov brief` (exit 2) |
 | F2 | `test_w2_152_ready.py::test_f2_advisory_items_alone_exit_0_with_ok_true` | red | no `gov brief` (exit 2) |
 | F2 | `test_w2_152_ready.py::test_f2_every_required_field_missing_is_refused_and_each_named` | red | no `gov brief`: no envelope, no refusal |
-| F3 | `test_w2_152_files.py::test_f3_the_tree_is_byte_unchanged_after_a_brief_and_after_a_refusal` | red | no `gov brief` (exit 2): the run must succeed before the tree is compared |
-| F3 | `test_w2_152_files.py::test_f3_the_spy_sees_no_write_and_no_read_beyond_the_inputs` | red | no `gov brief` (exit 2) |
-| F3 | `test_w2_152_files.py::test_f3_no_process_starts_and_unreadable_other_files_change_nothing` | red | no `gov brief` (exit 2) |
+| F3 | `test_w2_152_files.py::test_f3_the_tree_is_byte_unchanged_after_a_brief_and_after_a_refusal` | red | no `gov brief` (exit 2): the run must succeed before the tree is compared |; revised for W2-197 (below): green on W2-197's base
+| F3 | `test_w2_152_files.py::test_f3_the_spy_sees_no_write_and_no_read_beyond_the_inputs` | red | no `gov brief` (exit 2) |; revised for W2-197 (below): green on W2-197's base
+| F3 | `test_w2_152_files.py::test_f3_no_process_starts_and_unreadable_other_files_change_nothing` | red | no `gov brief` (exit 2) |; revised for W2-197 (below): green on W2-197's base
 
 ## Revision 2 (`test_w2_152_rev2.py`, 11 cases)
 
@@ -159,6 +159,34 @@ it; these were not run there.
   a finding (any code) naming `kpis`.
 - **S8, unreadable front matter:** an unclosed front-matter block or invalid YAML in it: refused as
   `TICKET_UNREADABLE` (the error code, or a finding's code), never `ALLOWED_PATHS_EMPTY`.
+
+## Revised for W2-197 (EMERGENCY-2 5.4; DAEO-3d3o, 2026-11-17)
+
+By W2-197's independent test designer, in the same commit series as W2-197's own cases (the implementation was not
+read). W2-197 makes `gov brief` retrieve the ticket's memory from a store (`--store`, else `GOV_STORE`, else facts.yaml's
+`paths.store_tree`, which in this tree's facts names the real integration store, else the root) and append one line to
+the memory-use log (`GOV_MEMORY_LOG`, else the main worktree's `.gov-runtime/memory-use.jsonl`).
+
+- **Every run is hermetic** (`w2_152_support.child_env`, so every case that runs gov brief, the spy's runs and S10's
+  nested `gov accept` included): `GOV_STORE` is `<scratch>/no-store`, a folder that is never made (no store is read,
+  nothing reaches a model, the real store is never touched), and `GOV_MEMORY_LOG` is
+  `<scratch>/memory-log/memory-use.jsonl`, in a folder of its own outside the fixture repository (no case writes a
+  real repository's log, and the fixture repository stays byte-unchanged). `<scratch>` is the case's `tmp_path`.
+- **F3, the spy** (`test_f3_the_spy_sees_no_write_and_no_read_beyond_the_inputs`): beyond the inputs, exactly two
+  things are allowed: opening, making or writing the log in its folder (`memory-log/`), and reads under the store's
+  folder (outside the repository, so never counted as foreign). Every other write, change or read under the
+  repository fails it as before.
+- **F3, processes** (`test_f3_no_process_starts_and_unreadable_other_files_change_nothing`): a process start that is a
+  git naming the store's folder is allowed (the retrieval reads the store's commit and its main tree with git); any
+  other process fails it as before. The unreadable-decoy half is unchanged.
+- **F3, the tree** (`test_f3_the_tree_is_byte_unchanged_after_a_brief_and_after_a_refusal`): unchanged; it holds because
+  the log is outside the repository.
+- **S1 and F1 (determinism)**: unchanged; a missing store gives the same block on every run. The golden files are
+  unchanged: the planted T-0 holds no `{MEMORY_BLOCK}`.
+- **S10** (`test_s10_gov_accept_w2_128_still_passes`) is not changed, but it is red on W2-197's base: it runs
+  `gov accept W2-128`, whose row 6 is revised for W2-197 and red there until brief.md says memory first.
+- All revised cases are green on W2-197's base (`067cd2946`), where gov brief reads no store and writes no log; they
+  turn red only if the brief writes or reads beyond the two allowances. No other expectation was lowered.
 
 ## Checked against a stand-in
 
