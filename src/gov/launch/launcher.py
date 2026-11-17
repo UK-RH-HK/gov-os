@@ -673,7 +673,7 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         raise _refuse(f"the review of session {repeated['session_id']} ran on model {model}, effort {effort}, "
                       f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
     return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
-            "tier": model.split("-")[1], "criticality": ticket_class,
+            "tier": model.split("-")[1], "criticality": ticket_class, "rubric": crit.REL if crit.exists(root) else None,
             "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
             "review_round": review_round}
 
@@ -733,14 +733,52 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "effort": effort, "effort_source": chosen["effort_source"], "criticality": chosen["criticality"],
         "trial": chosen["trial"], "promotion": chosen["promotion"], "effort_reason": chosen["effort_reason"],
         "owner_named": chosen["owner_named"], "review_round": chosen["review_round"],
+        "rubric": chosen.get("rubric"),  # W2-121c RT-8: the rubric file the choice came from, or null
         "subagent_model": model, "compaction_threshold": "none",
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
         "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}})
+    _say(_rubric_line(model, effort, chosen))
     head = [*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
+
+
+def _rubric_line(model: str, effort: str, chosen: dict) -> str:
+    """W2-121c RT-8: the one line naming the session's model and effort, where each came from, the ticket's
+    criticality and the rubric file (or that there is none)."""
+    rubric = (f"criticality {chosen['criticality']}, rubric {chosen['rubric']}" if chosen.get("rubric")
+              else "no rubric: the role's default")
+    return (f"gov launch: model {model} ({chosen['model_source']}), effort {effort} ({chosen['effort_source']}), "
+            f"{rubric}\n")
+
+
+def _end_message(entry: dict | None, code) -> None:
+    """W2-121c RT-2: the session's end as one wake message to whoever launched it, with the id the watch pass gives
+    the same end. Best effort: a failed send is said on stderr and never changes the exit code or the launch."""
+    if entry is None:
+        return
+    try:
+        from gov.dispatch import inbox, runtime
+        role, ticket = entry.get("role"), entry.get("ticket")
+        inbox.send(entry["notify"], "wake", f"session {role} {ticket} ended with exit code {code}",
+                   sender=entry["address"], message_id=runtime.end_id(entry),
+                   data={"role": role, "ticket": ticket, "pid": entry.get("pid"), "exit_code": code,
+                         "repository": entry.get("repository")})
+    except Exception as error:  # noqa: BLE001 - nothing here may end the launch
+        _say(f"gov launch: the end message to {entry.get('notify')} could not be sent: "
+             f"{' '.join(str(getattr(error, 'message', error)).split())}\n")
+
+
+def _notify_address() -> str:
+    """Whoever launched: the launching process's ``$GOV_MSG_ADDRESS`` when it is an address, else ``cto``."""
+    from gov.dispatch import inbox
+    given = os.environ.get("GOV_MSG_ADDRESS")
+    try:
+        return inbox.check(given) if given else "cto"
+    except inbox.InboxError:
+        return "cto"
 
 
 def check_lead(root: Path, ticket_id: str):
@@ -974,7 +1012,8 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
     just before the session starts, and the record is removed when it cannot be started."""
     from gov.resources import registry
 
-    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None}
+    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None,
+             "entry": None}
     keeper = None  # W2-60b: the session record's two calls, for a worker session with its launch record
     relay = None  # W2-60b S2: the session's stdout relayed, for its result line, when it runs --output-format json
 
@@ -1001,6 +1040,9 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         if temp_prefix is not None:  # DEC-159: a temp directory of the session's own, for the CLI and its commands
             tmpdir = tempfile.mkdtemp(prefix=temp_prefix)
             own_env.update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
+        address = f"{entry[1]}:{entry[0]}" if entry is not None else None
+        if address is not None:  # W2-121c RT-2: the session's own inbox address
+            own_env["GOV_MSG_ADDRESS"] = address
         # W2-56 S5: the cleaned environment for the CLI process (gov.launch.environ), and in a worker's --settings (a
         # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
@@ -1029,7 +1071,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:
-                    registry.register(pid, root, *entry)
+                    state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address)
                     state["registered"] = pid
                 except (OSError, GovError) as error:
                     raise _refuse(f"the session cannot be entered in the machine-wide registry "
@@ -1065,6 +1107,8 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 keeper.result = relay.result
         if keeper is not None:  # W2-60b S1, S5: replaced whole by every ending; it never changes the exit code
             keeper.end(state["code"] if state["code"] is not None else getattr(session, "returncode", None))
+        _end_message(state["entry"], state["code"] if state["code"] is not None else getattr(session, "returncode",
+                                                                                            None))
         if terminal is not None:
             _take_terminal(terminal)
         if state["registered"] is not None:
