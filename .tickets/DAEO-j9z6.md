@@ -1,6 +1,6 @@
 ---
 id: DAEO-j9z6
-status: deferred
+status: in_progress
 deps: [DAEO-emq1]
 links: [DAEO-emq1]
 created: 2026-11-11T23:59:00Z
@@ -8,9 +8,9 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-115b
-tags: [close, queue, full, wave-3, deferred]
+tags: [close, queue, full, emergency-2]
 wbs_id: W2-115b
-title: 'gov queue, the product''s merge queue: the queue lines of W2-115, split by its P1 (b)'
+title: 'gov queue, the product''s deterministic landing: a thin queue on the close''s pieces (EMERGENCY-2 4.3 step 3)'
 class: implementation
 state_class: AUTHORITATIVE
 role: engineer
@@ -19,23 +19,33 @@ depends_on: [DAEO-emq1]
 waits_on: []
 allowed_paths:
 - src/gov/queue/**
-- tests/unit/queue/test_w2_115b*
-est_loc: 300
+- src/gov/close/select.py
+- src/gov/close/batch.py
+- tests/unit/queue/**
+- tests/acceptance/W2-115b/**
+- .tickets/DAEO-j9z6.md
+est_loc: 450
 kpis:
   success:
-  - '`gov queue` gives W2-97''s queue in the product: the commit tested is the commit landed; one run per batch on the merged result, in a heavy-job slot (W2-20); a run skipped when the merged code is identical to what the lead tested, with its reason; a red batch''s culprit ejected and the rest advanced (W2-115''s attribution) Verify: a planted queue of two batches, one green and one red with a culprit: the commit landed equals the commit tested (the same hash in both records), one run per batch on the merged result in a heavy-job slot, a run on identical merged code skipped with its reason, the red batch''s culprit ejected and the rest advanced. [DEC-959 item 1, DEC-983, DEC-982] [moved from W2-117 S1, DEC-1083]'
-  - 'Each green run lands and closes in one step: the ticket merges, its close record (the run, its counts, every red with its verdict, the baseline traced against) is written and the ticket closed on that run, the close citing the queue''s record instead of running its own tests on the same code; no ticket sits merged but not closed Verify: a planted green run: the ticket''s merge, its close record (run, counts, each red with its verdict, the baseline traced against) and its `closed` status all come from that run, the close cites the queue''s record and runs no tests of its own; after the run no planted ticket is merged and not closed. [DEC-989, DEC-959 item 1, DEC-983, DEC-982, DEC-1003, SMART-WORK-2] [moved from W2-117 S2, DEC-1083]'
-  - 'Nothing project-specific: no branch, path or ticket of this repository is named in the code; this repository''s queue moves onto it and W2-97''s tool is retired Verify: grep of the close and queue code for this repository''s branch names, paths and ticket ids finds 0 lines; a planted second repository''s queue runs with the same code; this repository''s queue runs on it and W2-97''s tool is no longer called. [DEC-983, DEC-982] [moved from W2-117 S3, DEC-1083]'
-  - 'After each landing, the queue starts the integration store''s refresh (W2-116) and seeds its own warm clones from it Verify: a planted landing: the integration store''s refresh (W2-116) is started once afterwards and the queue''s own warm clones are seeded from that store, both visible in the queue''s record. [DEC-1014 items 4 and 6, SMART-WORK-5 E, DEC-1015 item 3] [moved from W2-117 S4, DEC-1083]'
-  - 'When the integration branch moved during a run only by record or governance files (the record places and the governance overlay), the queue merges onto the new head and re-runs only the record-reading suites (named in the test map), then advances; any other file in the move re-runs the whole selection; a record-reading set that cannot be read re-runs the whole selection Verify: planted moves: only record or governance files changed: the queue merges onto the new head and re-runs only the record-reading suites, then advances; any other file in the move: the whole selection re-runs; an unreadable record-reading set: the whole selection re-runs. [DEC-1001 (a), DEC-1003, SMART-WORK-2] [moved from W2-117 S5, DEC-1083]'
-  - 'The queue keeps its work clones between runs (reset to the head, untracked files removed, the stores kept, so a rebuild is incremental); a clone that cannot be reset is replaced by a fresh one; measured: the rebuild''s seconds per run, warm against fresh Verify: two planted runs: the second finds its clone reset to the head, untracked files removed, stores kept and the rebuild incremental; an unresettable clone is replaced by a fresh one; the record holds the rebuild''s seconds per run, warm against fresh. [DEC-1001 (b), DEC-1003, SMART-WORK-2] [moved from W2-117 S6, DEC-1083]'
+  - '`gov queue <ticket>[=<branch>] ... [--onto <branch>]` merges each ticket''s branch (`--no-ff`) onto the integration branch''s head in the warm clone, runs one impact-selected run on the merged result (the union of the candidates'' `select.scoped` selections, the change counted as the branch''s own commits since the integration head as well as the ticket''s), and on green moves the integration branch from that head to the tested merge with one close commit per landed ticket on top of it Verify: a planted repository, one ticket whose change is green: afterwards the integration branch''s head reaches the recorded tested merge through close commits only (each changing only that ticket''s ticket file, `docs/close/<id>/` and `docs/checkpoints/<id>/`); the tested merge''s parents are the old head and the branch''s tip; the run''s JUnit holds the ticket''s own suite and a suite that imports the changed module, and no suite the change reaches by nothing; the root''s working tree follows the branch where it is checked out there. [EMERGENCY-2 4.3 step 3; audit 1 §4; DEC-959 item 1, DEC-983]'
+  - 'The ticket closes at the land: each landed ticket''s close record `docs/close/<id>/CL-<id>.md` (`close: queue`, the tested merge as `commit`, the selection, the runs'' counts, every red with its verdict, the culprits, the base, the queue''s record) is written and its status is `closed` in the same landing, with no test run of its own Verify: a planted green landing: the ticket''s close record holds those keys, `commit` equals the tested merge and `runs` the queue run''s counts, its `queue` key names the queue''s record, the ticket''s status at the new head is `closed`, and the planted tests'' run log shows only the queue''s run. [EMERGENCY-2 4.3 step 5; DEC-989]'
+  - 'On red the failing tests are named and nothing moves: a ticket whose change turns a test red is not landed; the answer names each failing test''s node id and the ticket as the culprit, and the integration branch, the ticket''s branch and the ticket''s status are as they were Verify: a planted ticket that breaks a reached test: exit 3; the answer names the failing node id and the ticket among the culprits; the integration branch, the work branch and the ticket file are unchanged. [EMERGENCY-2 4.3 steps 3 and 4; W2-115 attribution]'
+  - 'A red batch''s culprit is sent back and the rest land: of two tickets, the one whose change is red is not landed and stays open, named with its failing test; the other is landed and closed on the merged result without the culprit, run again there Verify: a planted batch of two tickets, one red: the culprit''s branch is not an ancestor of the new head and its status is open; the other''s branch is, its status is `closed`, its close record names the culprit and its `commit` is the merge without the culprit; exit 3. [DEC-959 item 1, DEC-982, W2-115 S6]'
+  - 'Who wrote the acceptance tests is checked by code (G-1): a ticket whose branch holds a commit that changes `tests/acceptance/` or the ticket''s `acceptance_tests.path` without every `Role:` trailer of it being `independent-test-designer` or `owner` is refused before the run (`TEST_AUTHOR_REFUSED`, the commit''s id named) and not landed; a merge commit counts only where its result there differs from git''s own merge of its parents Verify: planted branches: an engineer-role commit to `tests/acceptance/` refused with its id named and nothing of it landed, the rest of the batch landing; a test designer''s or owner''s commit landing; a clean merge of the test designer''s branch landing; a merge that edits an acceptance test in its resolution refused. [MR-3 as audit 7 rewrites it; DEC-1050 (12); land.py G-1]'
+  - 'Paths outside the ticket''s allowed paths are a notice, never a refusal: each commit''s path outside the ticket''s `allowed_paths` (read at the branch''s tip) and outside its own record places is listed under `path_notices` with the commit''s id, and the ticket lands Verify: a planted ticket with a commit outside its allowed paths: it lands and closes; the answer and its close record list that path and commit under `path_notices`; a path inside them is not listed. [audit 7 C-6, CAP-58.h as rewritten]'
+  - 'Nothing project-specific: the integration branch and the work branch''s form come from `--onto` and `<ticket>=<branch>`, else from `governance/project/queue.yaml` (`integration`, `work_branch` with `{wbs}` and `{ticket}`), else the integration branch is the one checked out at the root; with neither the queue refuses before anything (`INTEGRATION_UNKNOWN`, `BRANCH_UNKNOWN`, exit 1) Verify: grep of `src/gov/queue/` for `w2/`, `integrate`, `DAEO-`, `/home/` finds 0 lines; a planted repository on `main` with branches `feature/<wbs>` named in `queue.yaml` lands with the same code; a planted repository with neither setting nor branch is refused with each code and changes nothing. [DEC-983, DEC-982; audit 1 §4 row 2]'
+  - 'Minutes, measured: the answer and the queue''s record (`.gov-runtime/queue/<stamp>/queue.json`) state the seconds of each step (merge, selection, run, close) and the total Verify: a planted landing: the record exists at that place, holds the same result as the answer, and each of the five figures is a number of seconds, none negative, the total not less than any step. [EMERGENCY-2 4.3 step 3 "in minutes"; audit 1 §4 Time]'
   failure:
-  - 'A branch advanced to a commit that was not the one tested, or after a red. Verify: a planted queue run where the branch head moves after the test, and one where the run is red: the branch is not advanced in either; the advanced hash always equals the tested hash. [moved from W2-117 F1, DEC-1083]'
-  - 'A second run on identical code, or a skip without its reason. Verify: a planted queue with two batches whose merged code is identical: only one test run is recorded, and the skip carries its reason. [moved from W2-117 F2, DEC-1083]'
+  - 'The integration branch advanced after a red, after a refusal, or to anything but the tested merge with its close commits; or advanced from a head other than the one the run merged onto. Verify: planted runs that are red, red on the base too (`BATCH_UNEXPLAINED`), refused by G-1, and one where the integration branch moves during the run (`HEAD_MOVED`, exit 3): the branch is not moved by the queue in any of them (the moved head stays as it was moved).'
+  - 'A ticket merged and not closed, or closed and not merged. Verify: after every planted run, each planted ticket''s status at the integration head is `closed` exactly when its branch''s tip is an ancestor of that head.'
 non_goals:
-- the close itself (W2-115); the trailers switch (W2-115's S17)
-done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-983, DEC-982, DEC-979, DEC-968, DEC-966, DEC-953, DEC-1001, DEC-1002, DEC-1003, DEC-1010, DEC-1014, DEC-1015, DEC-1050, DEC-1083, DEC-959, DEC-988, DEC-989, DEC-1123, DEC-1125, DEC-1052, DEC-1079, CAP-33, DAEO-zkr9]
+- the close itself (W2-115), its strict mode, W2-193 and W2-194
+- Gov OS's own landing tools (land.py, merge_queue.py, landing_select.sh) and the switch-over to gov queue (the CTO's, later)
+- merge_queue.py's speed-ups (records-only head moves, store seeding and promotion, the identical-code skip), until friction asks for them
+- the run of a direct commit (a chore) through the queue
+- languages other than Python (W2-19)
+done_when: [DOD-1, DOD-2, DOD-3, DOD-5]
+sources: [EMERGENCY-2, DEC-983, DEC-982, DEC-959, DEC-989, DEC-1050, DEC-1083, DEC-1201, CAP-33, DAEO-zkr9]
 acceptance_tests:
   path: tests/acceptance/W2-115b/
   author: independent-test-designer (MR-3); written before implementation
@@ -52,3 +62,16 @@ as the reference. Runs after W2-115 (the close it lands through). Class C3 (the 
 Parked in docs/plan/WAVE_3_PARKING.md as W3-P32: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
 
 **Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-115b leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
+
+
+## Rewritten for Emergency 2 (the CTO's brief, 2026-11-17)
+
+EMERGENCY-2 §6.2 A-4 moves W2-115b back to the release ("the landing must exist in adopted repositories"); §4.3 step 3
+is the deterministic landing it builds. The CTO's decision on audit 1's question 1 is option (b), a thin queue on the
+product's existing pieces (`batch.isolate`, `select.scoped`, the close's record and `tk close`), about 300 to 500
+lines, not a port of Gov OS's scratch `merge_queue.py`. The six success and two failure lines of 2026-11-11 predate
+Emergency 2 and are replaced by the lines above; the warm-clone measure, the records-only head moves, the store
+refresh and the identical-code skip are left out (non-goals) until friction asks for them. The FULL review
+(DOD-4) and `guard_refusals` (DOD-6) go by §3.6 and §2.2. `select.py` and `batch.py` are in the allowed paths only
+for keyword arguments the queue passes (`scoped`'s change, `isolate`'s workers); their behaviour without them is
+unchanged.
