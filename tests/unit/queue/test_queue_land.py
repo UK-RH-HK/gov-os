@@ -169,3 +169,12 @@ def test_the_command_prints_the_envelope(project):
     envelope = json.loads(done.stdout)
     assert done.returncode == 0, done.stderr
     assert envelope["ok"] and envelope["command"] == "queue" and envelope["result"]["landed"] == [TICKET]
+
+
+def test_a_refusal_prints_the_envelope_and_the_line_on_stderr(project):
+    env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "src")}
+    done = subprocess.run([sys.executable, "-m", "gov.cli.main", "queue", TICKET, "--root", str(project.root),
+                           "--json"], capture_output=True, text=True, env=env)
+    assert done.returncode == 1
+    assert json.loads(done.stdout)["error"]["code"] == "BRANCH_UNKNOWN"
+    assert done.stderr.startswith("BRANCH_UNKNOWN: ")

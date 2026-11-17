@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,7 +53,12 @@ def add_arguments(parser) -> None:
 
 
 def run(root: Path, args, config: dict):
-    return land(Path(root), list(args.tickets), args.onto, args.timeout)
+    try:
+        return land(Path(root), list(args.tickets), args.onto, args.timeout)
+    except GovError as error:
+        if getattr(args, "json", False):  # the envelope on stdout, the line on stderr too (without --json gov prints it)
+            print(f"{error.code}: {error.message}", file=sys.stderr)
+        raise
 
 
 def _git(cwd: Path, *args: str, ok: bool = False) -> str | None:
