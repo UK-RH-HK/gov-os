@@ -24,7 +24,15 @@ allowed_paths:
 - tests/unit/queue/**
 - tests/acceptance/W2-115b/**
 - .tickets/DAEO-j9z6.md
-est_loc: 450
+- governance/project/facts.yaml
+- src/gov/adopt/facts.py
+- template/governance/kernel/templates/**
+- .claude/templates/**
+- src/gov/_shipped/template/governance/kernel/templates/**
+- template/.rulesync/subagents/**
+- .rulesync/subagents/**
+- .claude/agents/**
+est_loc: 480
 kpis:
   success:
   - '`gov queue <ticket>[=<branch>] ... [--onto <branch>]` merges each ticket''s branch (`--no-ff`) onto the integration branch''s head in the warm clone, runs one impact-selected run on the merged result (the union of the candidates'' `select.scoped` selections, the change counted as the branch''s own commits since the integration head as well as the ticket''s), and on green moves the integration branch from that head to the tested merge with one close commit per landed ticket on top of it Verify: a planted repository, one ticket whose change is green: afterwards the integration branch''s head reaches the recorded tested merge through close commits only (each changing only that ticket''s ticket file, `docs/close/<id>/` and `docs/checkpoints/<id>/`); the tested merge''s parents are the old head and the branch''s tip; the run''s JUnit holds the ticket''s own suite and a suite that imports the changed module, and no suite the change reaches by nothing; the root''s working tree follows the branch where it is checked out there. [EMERGENCY-2 4.3 step 3; audit 1 §4; DEC-959 item 1, DEC-983]'
@@ -35,6 +43,7 @@ kpis:
   - 'Paths outside the ticket''s allowed paths are a notice, never a refusal: each commit''s path outside the ticket''s `allowed_paths` (read at the branch''s tip) and outside its own record places is listed under `path_notices` with the commit''s id, and the ticket lands Verify: a planted ticket with a commit outside its allowed paths: it lands and closes; the answer and its close record list that path and commit under `path_notices`; a path inside them is not listed. [audit 7 C-6, CAP-58.h as rewritten]'
   - 'Nothing project-specific: the integration branch and the work branch''s form come from `--onto` and `<ticket>=<branch>`, else from `governance/project/queue.yaml` (`integration`, `work_branch` with `{wbs}` and `{ticket}`), else the integration branch is the one checked out at the root; with neither the queue refuses before anything (`INTEGRATION_UNKNOWN`, `BRANCH_UNKNOWN`, exit 1) Verify: grep of `src/gov/queue/` for `w2/`, `integrate`, `DAEO-`, `/home/` finds 0 lines; a planted repository on `main` with branches `feature/<wbs>` named in `queue.yaml` lands with the same code; a planted repository with neither setting nor branch is refused with each code and changes nothing. [DEC-983, DEC-982; audit 1 §4 row 2]'
   - 'Minutes, measured: the answer and the queue''s record (`.gov-runtime/queue/<stamp>/queue.json`) state the seconds of each step (merge, selection, run, close) and the total Verify: a planted landing: the record exists at that place, holds the same result as the answer, and each of the five figures is a number of seconds, none negative, the total not less than any step. [EMERGENCY-2 4.3 step 3 "in minutes"; audit 1 §4 Time]'
+  - 'DONE is the green landing itself (audit 1 question 2 (b)): the Definition of Done is three lines, acceptance green (`gov accept`), the landing''s checks green (`gov queue`: the run on the merged result green, the acceptance tests'' authors checked) and the close written at the land; DOD-4 (the FULL review) and DOD-6 (the return''s fields and guard_refusals) are gone from the facts files (the project''s and the default `gov adopt` writes), the ticket template''s `done_when`, the lead template and every generated copy Verify: `governance/project/facts.yaml`''s `dod` and the facts `gov adopt` writes in a planted repository each hold exactly DOD-1, DOD-2 and DOD-3, whose lines name `gov accept` (or its command key), `gov queue` and the close; no kernel template, `.claude/templates/` copy, `src/gov/_shipped/` copy, `.rulesync/` source or `.claude/agents/` file quotes DOD-4, DOD-5, DOD-6 or "DOD-1 to DOD-6"; the ticket template''s `done_when` is `[DOD-1, DOD-2, DOD-3]`; each `.claude/templates/` copy equals its kernel template byte for byte. [EMERGENCY-2 4.3 step 5; audit 1 §2 and question 2 (b); the owner''s working assumption of 2026-11-17, approved kernel text by the CTO''s message (3.5)]'
   failure:
   - 'The integration branch advanced after a red, after a refusal, or to anything but the tested merge with its close commits; or advanced from a head other than the one the run merged onto. Verify: planted runs that are red, red on the base too (`BATCH_UNEXPLAINED`), refused by G-1, and one where the integration branch moves during the run (`HEAD_MOVED`, exit 3): the branch is not moved by the queue in any of them (the moved head stays as it was moved).'
   - 'A ticket merged and not closed, or closed and not merged. Verify: after every planted run, each planted ticket''s status at the integration head is `closed` exactly when its branch''s tip is an ancestor of that head.'
@@ -44,7 +53,7 @@ non_goals:
 - merge_queue.py's speed-ups (records-only head moves, store seeding and promotion, the identical-code skip), until friction asks for them
 - the run of a direct commit (a chore) through the queue
 - languages other than Python (W2-19)
-done_when: [DOD-1, DOD-2, DOD-3, DOD-5]
+done_when: [DOD-1, DOD-2, DOD-3]
 sources: [EMERGENCY-2, DEC-983, DEC-982, DEC-959, DEC-989, DEC-1050, DEC-1083, DEC-1201, CAP-33, DAEO-zkr9]
 acceptance_tests:
   path: tests/acceptance/W2-115b/
@@ -75,3 +84,8 @@ refresh and the identical-code skip are left out (non-goals) until friction asks
 (DOD-4) and `guard_refusals` (DOD-6) go by §3.6 and §2.2. `select.py` and `batch.py` are in the allowed paths only
 for keyword arguments the queue passes (`scoped`'s change, `isolate`'s workers); their behaviour without them is
 unchanged.
+
+**DONE by code (the owner's working assumption, 2026-11-17, through the CTO):** audit 1's question 2, option (b), is
+added to this ticket: DONE is the green landing itself (accept green, the land's checks green, the close written);
+the Definition of Done shrinks to those three lines and DOD-4 and DOD-6 go (success line 9). The kernel text for it
+is approved by the CTO's message (§3.5).
