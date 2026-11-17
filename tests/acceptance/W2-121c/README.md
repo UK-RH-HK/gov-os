@@ -1,7 +1,10 @@
 # W2-121c acceptance tests: the run-time tool, slice 1
 
-Ticket DAEO-5rgj (W2-121c), profile FULL. Written by the independent test designer (MR-3) from the ticket's ten success
-lines, two failure lines and its `## Interface` section, before any implementation, on the base `61629dda8`. The code
+Ticket DAEO-5rgj (W2-121c), profile FULL. Written by the independent test designer (MR-3) from the ticket's eleven success
+lines, two failure lines and its `## Interface` section, before any implementation, on the base `61629dda8`; round 2
+follows the ticket as amended at `c82d31a56` (the owner's working assumptions T1 (c), T2 (b), T3 (a): RT-2c's night
+limit and push, RT-3b's `refuse` with no GPU, and the eleventh success line, the interim stall check in the Gov OS
+dispatcher's tick). The code
 read is the integrated public surface (`gov.cli.main`, `gov dispatch`, `gov.resources.machine`, the registry,
 `gov launch` and its acceptance harnesses), never this ticket's branch.
 
@@ -10,8 +13,9 @@ read is the integrated public surface (`gov.cli.main`, `gov dispatch`, `gov.reso
     env TMPDIR=$(mktemp -d) HOME=<an empty folder> PYTHONUSERBASE=$HOME_REAL/.local PYTHONPATH=<worktree>/src \
       python3 -m pytest tests/acceptance/W2-121c -q -p no:cacheprovider -o tmp_path_retention_policy=failed -n 6
 
-52 cases, each a few seconds (child `gov` processes, stubs, real `sleep` processes; no model, no network, no real
-`claude`, never the real `~/.gov-os`). No wait is longer than 10 s: `gov msg wait` runs with `--timeout` 2 to 9. All are
+62 cases, each a few seconds (child `gov` processes, stubs, real `sleep` processes; no model, no network, no real
+`claude`, never the real `~/.gov-os`). No wait is longer than 10 s: `gov msg wait` runs with `--timeout` 2 to 9, and a slow push
+stand-in (8 s) is waited for at most 10 s. All are
 acceptance tests; none is `local_only`.
 
 ## What is planted
@@ -33,6 +37,18 @@ acceptance tests; none is `local_only`.
   unchanged (W2-184's fixture project with role tables and `criticality.yaml`, or without the file; a C2 engineer
   ticket; W2-60a's recording stand-in CLI and open resource gate). A small wrapper in front of the stand-in captures the
   session's own registry entry while it runs and can hold the session until a release file appears.
+- **The clock**: every RT-2c pass reads `GOV_RUNTIME_NOW` (ISO-8601 with `+00:00`; TZ=UTC, so local time is UTC):
+  12:00 for day, 03:30 for night, on 2026-11-16; transcript mtimes are set relative to it. The **push** is a stand-in
+  script that logs its arguments (optionally after a delay); a `claude` stand-in on `PATH` and in the fixture HOME's
+  `~/.local/bin/` logs any call, so a push that should not happen is seen.
+- **The dispatcher's tick** (S11, `w2_121c_support.Dispatch`): `dispatcher.py tick` on planted state as the
+  dispatcher's own unit fixture (`tests/unit/orchestration/test_dispatcher.py`, `w`) plants it: a git repository on
+  `w2/integrate`, an ORCH folder (log, briefs, dispatch, tools, merge-queue), every external command and reading
+  through its `DISPATCH_*` variable, an empty `ready.txt` (nothing starts, nothing lands), the embedding URL a closed
+  port; plus a fixture HOME, `DISPATCH_PROJECTS` (a planted projects folder holding `<session>.jsonl` transcripts:
+  a user entry, the `assistant` entry with its `timestamp`, then a later non-assistant entry), `<ORCH>/log/cto-session.txt`
+  naming the session, and `DISPATCH_PUSH_COMMAND` the push stand-in. The whole tick runs (about 0.4 s on the base);
+  only the `*-stall-wake*.txt` items in `<D>/inbox/` and the push stand-in's runs are asserted.
 - Messages are read straight from `messages.jsonl` (no mark moved); `state.json` and `log.jsonl` straight from
   `~/.gov-os/runtime/`.
 
@@ -69,9 +85,12 @@ Every item is a test function (a parametrised one covers all its rows). "Red on 
 | S6 (RT-2b) | `test_w2_121c_rt2_watch_ends.py::test_rt2b_a_pid_watch_gives_one_message_when_the_process_is_gone` | no `gov msg watch` (exit 2) |
 | S6 (RT-2b) | `test_w2_121c_rt2_watch_ends.py::test_rt2b_an_exit_file_watch_gives_one_message_naming_the_exit_code` | no `gov msg watch` (exit 2) |
 | S6 (RT-2b) | `test_w2_121c_rt2_watch_ends.py::test_rt2b_an_end_the_launcher_already_messaged_adds_none` | no `gov msg` (exit 2) |
-| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_a_silent_transcript_gives_one_message_per_incident` | no `gov msg watch` (exit 2) |
+| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_a_silent_transcript_gives_one_message_and_one_push_per_incident` | no `gov msg watch` (exit 2) |
 | S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_a_transcript_within_the_limit_gives_none` | no `gov msg watch` (exit 2) |
-| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_the_default_limit_is_3600_s` | no `gov msg watch` (exit 2) |
+| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_the_day_limit_defaults_to_3600_s` | no `gov msg watch` (exit 2) |
+| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_at_night_90_minutes_give_none_and_130_minutes_give_one` | no `gov msg watch` (exit 2) |
+| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_without_push_no_command_runs` | no `gov msg watch` (exit 2) |
+| S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_the_push_runs_detached_and_the_pass_does_not_wait_for_it` | no `gov msg watch` (exit 2) |
 | S7 (RT-2c) | `test_w2_121c_rt2_stall.py::test_rt2c_a_folder_is_read_by_its_newest_file` | no `gov msg watch` (exit 2) |
 | S8 (RT-3a) | `test_w2_121c_rt3_limits.py::test_rt3a_each_limit_follows_its_rule_on_two_planted_profiles_and_three_differ` | no `gov dispatch limits` (exit 2) |
 | S8 (RT-3a) | `test_w2_121c_rt3_limits.py::test_rt3a_the_text_form_names_the_machine_and_each_limit_with_its_value_and_rule` | no `gov dispatch limits` (exit 2) |
@@ -80,18 +99,27 @@ Every item is a test function (a parametrised one covers all its rows). "Red on 
 | S8 (RT-3a) | `test_w2_121c_rt3_limits.py::test_rt3a_with_no_gpu_the_budget_is_0` | no `gov dispatch limits` (exit 2) |
 | S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_admit_exit_0_when_used_plus_need_stays_within_the_budget` | exit 2, not 0 (no `gov dispatch limits`) |
 | S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_wait_exit_3_with_the_reason_when_used_plus_need_exceeds_the_budget` | exit 2, not 3 (no `gov dispatch limits`) |
-| S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_with_no_gpu_the_answer_is_wait_naming_no_gpu` | exit 2, not 3 (no `gov dispatch limits`) |
+| S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_with_no_gpu_the_answer_is_refuse_saying_memory_is_unavailable` | exit 2, not 3 (no `gov dispatch limits`) |
 | S10 (RT-8) | `test_w2_121c_rt8_launch_line.py::test_rt8_the_launch_line_names_model_effort_their_sources_the_class_and_the_rubric_file` | no stderr line naming the rubric |
 | S10 (RT-8) | `test_w2_121c_rt8_launch_line.py::test_rt8_without_criticality_yaml_the_line_says_no_rubric_and_the_record_holds_null` | no stderr line naming the rubric |
+| S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_by_day_a_61_minute_silence_gives_one_item_and_one_push_three_more_passes_none` | 0 stall items, not one (the tick has no stall check) |
+| S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_a_newer_entry_then_a_new_61_minute_silence_gives_one_more_of_each` | 0 stall items and 0 pushes at the first stall |
+| S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_in_the_quiet_hours_61_minutes_give_the_item_and_no_push_121_minutes_the_push` | 0 stall items, not one |
+| S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_a_fresh_entry_gives_nothing` | the same entry at 61 minutes gives no item |
+| S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_the_session_named_in_cto_session_txt_is_watched_not_a_newer_transcript` | no stall item |
+| S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_the_push_is_detached_and_the_tick_does_not_wait_for_it` | no stall item |
 | F1 | `test_w2_121c_f1_once.py::test_f1_an_end_the_launcher_messaged_and_the_pass_also_sees_is_one_message` | no `gov dispatch watch` (exit 2) |
 | F1 | `test_w2_121c_f1_once.py::test_f1_an_end_present_through_several_passes_is_one_message` | no `gov dispatch watch` (exit 2) |
 | F1 | `test_w2_121c_f1_once.py::test_f1_a_pass_killed_after_sending_but_before_writing_its_state_leaves_one_message` | no `gov msg watch` (exit 2) |
 | F2 | `test_w2_121c_f2_problems.py::test_f2_a_fault_is_named_in_problems_and_the_log_and_the_pass_still_sends` | no `gov dispatch watch` (exit 2) |
 
-Count per line: S1 8 functions (11 cases), S2 3, S3 4, S4 3, S5 2, S6 6, S7 4, S8 5 (6 cases), S9 3 (5 cases), S10 2,
+Count per line: S1 8 functions (11 cases), S2 3, S3 4, S4 3, S5 2, S6 6, S7 7, S8 5 (6 cases), S9 3 (5 cases), S10 2,
+S11 6 (7 cases),
 F1 3, F2 1 (3 cases: an unreadable registry entry, a missing transcript, a failing `nvidia-smi`).
 
-Red run on the base (`-n 6`): `52 failed in 20.23s` (and `gov accept DAEO-5rgj`: outcome fail, every line 0 passed), every case for the reason above (the command or action does not
+Red run on the base (`-n 6`): `62 failed in 21.20s` (round 2, on a clean `git archive` of `c82d31a56` with this folder copied in, since the
+ticket's worktree now holds an engineer's uncommitted files; `gov accept DAEO-5rgj --root <that export>`: outcome fail,
+62 failed, 0 unmapped, every line 0 passed), every case for the reason above (the command or action does not
 exist, or the launcher sends and prints nothing); no harness error.
 
 ## The test designer's readings where the Interface is open
@@ -111,8 +139,28 @@ exist, or the launcher sends and prints nothing); no harness error.
 - **"Naming" in a message** (the role, the ticket, the exit code, the label, the silent minutes) is looked for in the
   message's `text` or `data`. The exit code and the minutes as whole numbers (the minutes 120 or 121 for 2 h).
 - **The exit file** holds the code as its text (`3\n`).
+- **RT-2c's clock**: `GOV_RUNTIME_NOW` is given with an explicit `+00:00` and the pass runs with TZ=UTC, so the
+  local time is the same whichever way it is read. The push stand-in's **last argument equals the message's `text`**;
+  the push command is given as one absolute path with no arguments (so splitting it or not gives the same command).
+  "Without `--push` no command runs" is read as: the `claude` stand-in (on `PATH` and in `~/.local/bin`) is never
+  called. "Detached" is read as: a pass with a push that takes 8 s returns within 5 s, and the push still runs once.
+  The night case uses the defaults (`--night` 02:00-07:30, `--night-stall-after` 7200) at 03:30.
+- **RT-3b with no GPU**: exit 3 and the word `refuse`, never `admit`; the text says memory is unavailable (`memory`
+  within 40 characters of `unavailable`, either order) and names the embedding (`embed`) and reranking (`rerank`)
+  jobs.
+- **S11's clock is `DISPATCH_NOW`**, the dispatcher's existing planted clock (`now()` reads it), in **epoch seconds**,
+  not ISO-8601: the brief's instruction to use an existing planted-clock variable in place of a new one. TZ=UTC, so
+  the quiet hours 02:00-07:30 are UTC. The planted times: 12:00 for day, 03:30 for night (2026-11-16).
+- **S11's item and push**: an item is any `<D>/inbox/*-stall-wake*.txt` (the dispatcher's `inbox_item` adds `-<n>`
+  when a stamp repeats); a push is one run of the `DISPATCH_PUSH_COMMAND` stand-in (one absolute path) with a
+  non-empty last argument. Detached: the tick with an 8-second push returns within 5 s and the push runs once. The
+  real push (`claude`) must not run beside the planted command. The whole tick is run (no direct call of
+  `watch_stall`). "A fresh entry gives nothing" is checked at 5 and 59 minutes, then the same entry at 61 minutes
+  gives the item (so the case is not green on a tick with no stall check). The named session's transcript is the one
+  watched even beside a newer transcript with a fresh entry.
 - **"Set back again"** (RT-2c) is to another past mtime than the first incident's (3 h, after 2 h): the stall id is
-  `stall:<request id>:<mtime>`, so the same mtime twice would be the same id (see the return's note).
+  `stall:<request id>:<mtime>`, so the same mtime twice would be the same id (P-W2-121c-td-1 (a), accepted by the
+  lead in round 2).
 - **RT-2a's environment**: `GOV_MSG_ADDRESS` is read from the stand-in process's own environment. The registry entry's
   `notify` and `address` are read from the entry while the session runs (the launcher removes it at the end).
 - **RT-2a's "within 5 s of the stub's end"**: polled for 5 s from `gov launch`'s return (which follows the stub's end).

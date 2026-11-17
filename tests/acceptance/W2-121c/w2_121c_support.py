@@ -174,6 +174,13 @@ class Box:
         self.processes: list[subprocess.Popen] = []
         self.locks: list[int] = []
         self.profile(PROFILE_A)
+        self.claude_log = self.base / "claude-calls.log"  # a stand-in `claude` that must never run unless asked
+        for place in (self.bin / "claude", self.home / ".local" / "bin" / "claude"):
+            if not place.exists():  # a HOME shared with a launch sandbox keeps its own stand-in
+                write(place, f"#!/bin/sh\necho \"$@\" >> {self.claude_log}\n").chmod(0o755)
+
+    def claude_calls(self) -> list[str]:
+        return self.claude_log.read_text().splitlines() if self.claude_log.is_file() else []
 
     # -- the planted machine ------------------------------------------------------------------------------------------
 
@@ -351,9 +358,9 @@ class Box:
             assert done.returncode == 0, f"gov dispatch watch: exit {done.returncode}\n{said(done)}"
         return done
 
-    def passes(self, count):
+    def passes(self, count, extra_env=None):
         for _ in range(count):
-            self.run_pass()
+            self.run_pass(extra_env=extra_env)
 
     def state(self) -> dict:
         assert self.state_path.is_file(), f"no {self.state_path} after the pass"
@@ -632,3 +639,160 @@ def poll(predicate, seconds, step=0.1):
         time.sleep(step)
         value = predicate()
     return value
+
+
+# --------------------------------------------------------------------------
+# The Gov OS dispatcher's tick (the last success line: the interim stall check)
+# --------------------------------------------------------------------------
+
+DISPATCHER = REPO_ROOT / "governance/project/orchestration/tools/dispatch/dispatcher.py"
+PROCSTAT = "cpu  1000 0 0 9000 0 0 0 0 0 0\ncpu0 1 0 0 1 0 0 0 0 0 0\n"
+
+_PUSH_STUB = r'''#!@PYTHON@
+"""W2-121c push stand-in: records its arguments, one JSON line a run (after @DELAY@ s)."""
+import json, sys, time
+time.sleep(@DELAY@)
+with open(@LOG@, "a", encoding="utf-8") as handle:
+    handle.write(json.dumps(sys.argv[1:]) + "\n")
+'''
+
+
+def epoch(iso: str) -> float:
+    """Seconds since the epoch of an ISO-8601 time with its offset."""
+    from datetime import datetime
+
+    return datetime.fromisoformat(iso).timestamp()
+
+
+def iso_z(seconds: float) -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(seconds))
+
+
+def push_stub(folder, name="push-stub", delay=0) -> tuple[Path, Path]:
+    """A push command stand-in at ``<folder>/<name>``: each run appends its arguments as one JSON line to the log,
+    ``delay`` seconds after it starts (a slow push, to show the caller does not wait for it)."""
+    folder = Path(folder)
+    log = folder / f"{name}.log"
+    stub = write(folder / name, _PUSH_STUB.replace("@PYTHON@", sys.executable).replace("@LOG@", repr(str(log)))
+                 .replace("@DELAY@", repr(float(delay))))
+    stub.chmod(0o755)
+    return stub, log
+
+
+def push_runs(log: Path, settle=0.0) -> list[list[str]]:
+    """The push stand-in's runs, read after waiting ``settle`` seconds for a detached one to land."""
+    deadline = time.monotonic() + settle
+    while True:
+        runs = ([json.loads(line) for line in Path(log).read_text(encoding="utf-8").splitlines() if line.strip()]
+                if Path(log).is_file() else [])
+        if time.monotonic() >= deadline:
+            return runs
+        time.sleep(0.1)
+
+
+def wait_for_runs(log: Path, count: int, seconds: float) -> list[list[str]]:
+    """The runs once there are ``count`` of them, or what there is after ``seconds``."""
+    return poll(lambda: len(push_runs(log)) >= count and push_runs(log), seconds) or push_runs(log)
+
+
+class Dispatch:
+    """The dispatcher's tick on planted state (as tests/unit/orchestration/test_dispatcher.py's fixture plants it): a
+    git repository on w2/integrate, an ORCH folder (log, briefs, dispatch, tools, merge-queue), every external command
+    and reading through its DISPATCH_* variable, no ready entry and no landing; HOME, TMPDIR and the clock planted
+    (DISPATCH_NOW, epoch seconds, the dispatcher's own planted clock; TZ=UTC so local time is UTC). The CTO session's
+    transcripts live in a planted projects folder (DISPATCH_PROJECTS) and the push is a stand-in
+    (DISPATCH_PUSH_COMMAND)."""
+
+    SESSION = "0f1e2d3c-cto-session"
+
+    def __init__(self, base, push=True, push_delay=0):
+        self.base = Path(base).resolve()
+        self.base.mkdir(parents=True, exist_ok=True)
+        self.home, self.tmpdir = self.base / "home", self.base / "tmp"
+        self.repo, self.orch = self.base / "repo", self.base / "orch"
+        self.projects = self.base / "projects" / "-planted-project"
+        for folder in (self.home, self.tmpdir, self.repo, self.projects):
+            folder.mkdir(parents=True, exist_ok=True)
+        for sub in ("log", "briefs", "dispatch", "tools", "merge-queue"):
+            (self.orch / sub).mkdir(parents=True, exist_ok=True)
+        self.d = self.orch / "dispatch"
+        git = ["git", "-C", str(self.repo), "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false"]
+        quiet = {"capture_output": True, "check": True, "env": {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull}}
+        subprocess.run(git + ["init", "-q", "-b", "w2/integrate"], **quiet)
+        write(self.repo / ".tickets" / "T-A.md", "---\nid: T-A\nstatus: in_progress\nwbs_id: W2-X\n---\n# T-A\n")
+        subprocess.run(git + ["add", "-A"], **quiet)
+        subprocess.run(git + ["commit", "-q", "-m", "tickets"], **quiet)
+        (self.base / "worktrees").mkdir(exist_ok=True)
+        write(self.base / "procs.json", "[]")
+        write(self.base / "held.json", "[]")
+        write(self.base / "loadavg", "3.0 4.0 5.0 1/100 1\n")
+        write(self.base / "meminfo", "MemTotal:       65536000 kB\nMemAvailable:   16384000 kB\n")
+        write(self.base / "procstat", PROCSTAT)
+        write(self.base / "proc" / "locks", "")
+        (self.base / "slots").mkdir(exist_ok=True)
+        write(self.d / "ready.txt", "# the CTO's list (empty)\n")
+        write(self.orch / "log" / "cto-session.txt", self.SESSION + "\n")
+        self.push_command, self.push_log = push_stub(self.base, delay=push_delay) if push else (None, self.base / "push-stub.log")
+        self.claude_log = self.base / "claude-calls.log"  # a stand-in `claude` that must never run unless asked
+        for place in (self.base / "bin" / "claude", self.home / ".local" / "bin" / "claude"):
+            write(place, f"#!/bin/sh\necho \"$@\" >> {self.claude_log}\n").chmod(0o755)
+
+    def env(self, now: float, extra=None) -> dict:
+        base = self.base
+        env = {
+            "PATH": f"{base / 'bin'}:/usr/local/bin:/usr/bin:/bin", "HOME": str(self.home), "TMPDIR": str(self.tmpdir),
+            "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "TZ": "UTC", "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONPATH": python_path(), "PYTHONUSERBASE": user_base(),
+            "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
+            "DISPATCH_ORCH": str(self.orch), "DISPATCH_STATE": str(self.d), "DISPATCH_REPO": str(self.repo),
+            "DISPATCH_WORKTREES": str(base / "worktrees"), "DISPATCH_PROCSTAT": str(base / "procstat"),
+            "DISPATCH_NPROC": "20", "DISPATCH_GUARD_CMD": "true", "DISPATCH_GUARD_SYNC": "1",
+            "DISPATCH_EMBED_URL": "http://127.0.0.1:9/api/embed",
+            "DISPATCH_SLOT_GLOB": str(base / "slots" / "gov-os-heavy-slot-*.lock"), "DISPATCH_PROC": str(base / "proc"),
+            "DISPATCH_NVIDIA_SMI": str(base / "nvidia-smi"), "DISPATCH_GPU_LOG_SHARED": str(base / "serve-11434.log"),
+            "DISPATCH_GPU_LOG_QUERY": str(base / "serve-11435.log"), "DISPATCH_SS": str(base / "ss"),
+            "DISPATCH_RERANK_GLOB": str(base / "rerank" / "gov-os-rerank-gpu-*.lock"),
+            "DISPATCH_GPU_SHARED_CMD": str(base / "shared-counter"),
+            "DISPATCH_RERANK_HOOK": str(base / "hook" / "gov_reranker_gpu_slot.py"),
+            "DISPATCH_FAKE_PROCS": str(base / "procs.json"), "DISPATCH_FAKE_HELD": str(base / "held.json"),
+            "DISPATCH_GATE_CMD": "echo OPEN", "DISPATCH_DISK_CMD": "true",
+            "DISPATCH_LAUNCH_CMD": "true", "DISPATCH_LAND_CMD": "true",
+            "DISPATCH_LOADAVG": str(base / "loadavg"), "DISPATCH_MEMINFO": str(base / "meminfo"),
+            "DISPATCH_NIGHTLY_RUNS": str(base / "nightly"),
+            "DISPATCH_NOW": repr(float(now)),
+            "DISPATCH_PROJECTS": str(self.projects),
+        }
+        if self.push_command is not None:
+            env["DISPATCH_PUSH_COMMAND"] = str(self.push_command)
+        env.update(extra or {})
+        return env
+
+    def transcript(self, last_assistant: float, name=None) -> Path:
+        """The session's transcript (``<SESSION>.jsonl`` unless ``name``): a user entry, then an assistant entry at
+        ``last_assistant``, then a later queued notification that is not an assistant entry (as a frozen session's
+        file keeps growing)."""
+        lines = [
+            {"type": "user", "timestamp": iso_z(last_assistant - 30), "message": {"role": "user", "content": "go"}},
+            {"type": "assistant", "timestamp": iso_z(last_assistant),
+             "message": {"role": "assistant", "content": [{"type": "text", "text": "working"}]}},
+            {"type": "system", "timestamp": iso_z(last_assistant + 600), "content": "a queued notification"},
+        ]
+        return write(self.projects / f"{name or self.SESSION}.jsonl", "".join(json.dumps(x) + "\n" for x in lines))
+
+    def tick(self, now: float, extra=None) -> subprocess.CompletedProcess:
+        # as a dispatcher running each minute: the last CPU sample a minute old (the unit suite's `tick`)
+        write(self.d / "cpu_prev.json", json.dumps({"t": now - 60, "busy": 1000, "total": 9000, "emb": {}}))
+        done = subprocess.run([sys.executable, str(DISPATCHER), "tick"], cwd=str(self.base), env=self.env(now, extra),
+                              capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        assert done.returncode == 0, f"dispatcher.py tick exited {done.returncode}\n{said(done)}"
+        return done
+
+    def items(self) -> list[Path]:
+        return sorted((self.d / "inbox").glob("*-stall-wake*.txt")) if (self.d / "inbox").is_dir() else []
+
+    def pushes(self, settle=1.0) -> list[list[str]]:
+        """The push stand-in's runs, after waiting ``settle`` seconds for a detached one to land."""
+        return push_runs(self.push_log, settle)
+
+    def claude_calls(self) -> list[str]:
+        return self.claude_log.read_text().splitlines() if self.claude_log.is_file() else []

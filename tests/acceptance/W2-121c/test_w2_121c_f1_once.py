@@ -67,7 +67,7 @@ def test_f1_a_pass_killed_after_sending_but_before_writing_its_state_leaves_one_
 
     box.end(session)
     box.end(job)
-    when = int(time.time()) - 7200
+    when = int(time.time()) - 3 * 3600  # past the night limit too, whatever the hour
     os.utime(transcript, (when, when))
     box.run_pass()  # sends the three messages, writes its state ...
     sent = sorted(m.get("id") for m in box.wakes(LEAD))

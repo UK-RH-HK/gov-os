@@ -10,7 +10,8 @@ rule; each watch pass writes the same into state.json. The rules (the ticket's, 
 
 Line 9 (RT-3b): ``gov dispatch limits --gpu-need-mib <n>`` answers ``admit`` (exit 0) only when a GPU is present and
 its used MiB plus ``n`` stays within ``gpu_budget_mib``, else ``wait`` with the reason (exit 3); never the CPU; with no
-GPU the answer is ``wait``.
+GPU the answer is ``refuse`` (exit 3), saying embedding and reranking jobs are refused and memory is unavailable
+(amended c82d31a56, the owner's working assumption T3 (a)).
 
 The test designer's reading of the open output shape: ``gov dispatch limits --json``'s ``result`` holds ``machine``
 and ``limits`` objects with the Interface's keys, the shape state.json gives them.
@@ -144,9 +145,13 @@ def test_rt3b_wait_exit_3_with_the_reason_when_used_plus_need_exceeds_the_budget
         f"the wait does not give its reason (the budget)\n{s.said(done)}")
 
 
-def test_rt3b_with_no_gpu_the_answer_is_wait_naming_no_gpu(box):
+def test_rt3b_with_no_gpu_the_answer_is_refuse_saying_memory_is_unavailable(box):
     box.profile(s.PROFILE_A, gpu=False)
     done, text = _answer(box, need=1)
     assert done.returncode == 3, f"with no nvidia-smi: exit {done.returncode}, not 3\n{s.said(done)}"
-    assert re.search(r"\bwait\b", text, re.I), f"the answer does not say wait\n{s.said(done)}"
-    assert re.search(r"\bno\s+gpu\b", text, re.I), f"the wait does not name no GPU\n{s.said(done)}"
+    assert re.search(r"\brefuse", text, re.I), f"the answer does not say refuse\n{s.said(done)}"
+    assert not re.search(r"\badmit\b", text, re.I), f"the answer with no GPU says admit\n{s.said(done)}"
+    assert re.search(r"memory[^.\n]{0,40}unavailable|unavailable[^.\n]{0,40}memory", text, re.I), (
+        f"the refusal does not say memory is unavailable\n{s.said(done)}")
+    assert re.search(r"embed", text, re.I) and re.search(r"rerank", text, re.I), (
+        f"the refusal does not name the embedding and reranking jobs\n{s.said(done)}")
