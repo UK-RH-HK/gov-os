@@ -67,9 +67,16 @@ def root(tmp_path, monkeypatch):
     return root.resolve()
 
 
-def stage(root, name, session="adopter", conf=None, **more):
+def stage(root, name, session="adopter", conf=None, as_after_a2=True, **more):
+    """Run one stage. A successful A2 is followed by stage AS (W2-192: A3 stands on AS's committed record), with the
+    same session and configuration, so a chain written A0, A1, A2, A3 still reaches A3. A case that must see A3
+    without AS passes ``as_after_a2=False`` on its A2."""
     args = SimpleNamespace(**{"lite": True, "stage": name, "map": None, "verdict": None, "session": session, **more})
-    return stages.run(root, args, conf or config())
+    result = stages.run(root, args, conf or config())
+    if name == "A2" and as_after_a2:
+        stages.run(root, SimpleNamespace(lite=True, stage="AS", map=None, verdict=None, session=session),
+                   conf or config())
+    return result
 
 
 def refused(code, root, name, **more):
@@ -123,6 +130,17 @@ def test_a_stage_refuses_without_the_stage_before_it_and_on_a_dirty_tree(root):
     assert refused("STAGE_MISSING", root, "A1").details["stage"] == "A0"
     write(root, "lib/new.py", "x = 1\n")
     assert refused("TREE_NOT_CLEAN", root, "A0").details["paths"] == ["lib/new.py"]
+
+
+def test_the_helper_runs_as_after_a2_and_a3_without_it_is_refused(root):
+    for name in ("A0", "A1"):
+        stage(root, name)
+    stage(root, "A2", as_after_a2=False)
+    assert "governance/adoption/AS-spec-audit.md" not in sh(root, "ls-files")
+    assert refused("STAGE_MISSING", root, "A3", map=proposal(root)).details["stage"] == "AS"
+    stage(root, "A2")  # A2 again, now followed by AS: A3 stands on its record
+    assert "governance/adoption/AS-spec-audit.md" in sh(root, "ls-files")
+    assert stage(root, "A3", map=proposal(root))["stage"] == "A3"
 
 
 def test_a_record_changed_after_the_next_stage_stood_on_it_breaks_the_chain(root):
