@@ -43,11 +43,13 @@ ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on 
 template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
 lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
 Each moved case names its fixtures by their old names in its first line; its verdict is the same.
+
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.1, 2.2, 6.1; release 0.1.2): this repository's settings no longer
+register the guard, so the cases that asked its committed guard to refuse a write are retired. The controls that ask
+the kernel's guard, generated from the template, stay.
 """
 
 from __future__ import annotations
-
-import os
 
 import pytest
 
@@ -62,7 +64,6 @@ TESTS = "tests/acceptance/W1-90"           # the acceptance tests of the enginee
 TEST_FILE = f"{TESTS}/test_fixture.py"     # one that exists
 TICKETS = ".tickets"
 TICKET_FILE = f"{TICKETS}/{support.TICKET_OF[ENGINEER]}.md"
-FREEZE = ".gov-runtime/freeze"
 
 
 def _ask(guard, project, command):
@@ -72,40 +73,6 @@ def _ask(guard, project, command):
 # --------------------------------------------------------------------------
 # 1. A link and a write through it, in one command
 # --------------------------------------------------------------------------
-
-def _linked_writes(project):
-    """The commands, with the link's target as an absolute path: it names the same place however it is resolved."""
-    directory = f"ln -s {project}/{TESTS} {LINK}"
-    return {
-        "acceptance-tests-symbolic-then-redirect": f"{directory} && echo x > {LINK}/test_fixture.py",
-        "acceptance-tests-symbolic-then-touch": f"{directory}; touch {LINK}/test_w1_46_new.py",
-        "acceptance-tests-symbolic-then-cp": f"{directory} && cp {OWN_FILE} {LINK}/test_fixture.py",
-        "acceptance-test-hard-then-redirect": f"ln {TEST_FILE} {LINK}.py && echo x > {LINK}.py",
-        "freeze-flag-symbolic-then-touch": f"ln -s {project}/{FREEZE} {LINK} && touch {LINK}",
-    }
-
-
-@pytest.mark.parametrize("name", (
-    "acceptance-tests-symbolic-then-redirect", "acceptance-tests-symbolic-then-touch",
-    "acceptance-tests-symbolic-then-cp", "acceptance-test-hard-then-redirect", "freeze-flag-symbolic-then-touch",
-))
-def test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command(guard, project, name):
-    """The link's own destination is inside the engineer's paths; what the second part writes is not."""
-    command = _linked_writes(project)[name]
-    assert not os.path.lexists(project / LINK) and not os.path.lexists(project / f"{LINK}.py"), "the link exists"
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
-
-
-def test_the_guard_refuses_the_write_when_the_symbolic_link_was_made_by_an_earlier_call(guard, project):
-    """The same two steps as two calls: the link is on disk when the guard judges the write. Holds today.
-
-    A hard link made by an earlier call is not tested: the guard allows the
-    write through it today, and no line decides it (README, DP-19).
-    """
-    os.symlink(project / TESTS, project / LINK)
-    command = f"echo x > {LINK}/test_fixture.py"
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer, through a symbolic link on disk")
-
 
 @pytest.mark.parametrize("kind", ("symbolic", "hard"))
 def test_the_guard_does_not_refuse_a_link_whose_source_and_destination_are_inside_the_roles_paths(
@@ -119,27 +86,6 @@ def test_the_guard_does_not_refuse_a_link_whose_source_and_destination_are_insid
 # --------------------------------------------------------------------------
 # 2. cp with the target directory given by an option
 # --------------------------------------------------------------------------
-
-TARGET_OPTION = {
-    "short": "-t {directory}",
-    "short-joined": "-t{directory}",
-    "long-with-equals": "--target-directory={directory}",
-    "long": "--target-directory {directory}",
-}
-
-
-@pytest.mark.parametrize("spelling", sorted(TARGET_OPTION))
-def test_the_guard_refuses_cp_with_the_acceptance_tests_as_the_target_directory_option(guard, project, spelling):
-    """The last operand is the engineer's own file, a source; the copy lands in the acceptance-test directory."""
-    command = f"cp {TARGET_OPTION[spelling].format(directory=TESTS)} {OWN_FILE}"
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
-
-
-@pytest.mark.parametrize("spelling", ("short", "long-with-equals"))
-def test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option(guard, project, spelling):
-    command = f"cp {TARGET_OPTION[spelling].format(directory=TICKETS)} {OWN_FILE}"
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
-
 
 def test_cp_with_the_destination_as_the_last_operand_is_judged_as_before(kernel_guard, kernel_project):
     """The control: allowed inside the engineer's paths, refused in the acceptance tests and the tickets."""

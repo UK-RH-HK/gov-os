@@ -13,8 +13,8 @@ stand-in CLI.
    outside the ticket's ``allowed_paths`` stay refused, and its allowed paths
    stay open. As a project in the temp folder does not get the temp folder's
    allowance (DEC-108's counterpart), the own folder outside such a project
-   gives that session nothing, and ``gov launch`` there puts no entry in the
-   sandbox write list that holds the project's root.
+   gives that session nothing. (Emergency 2, release 0.1.2: ``gov launch``
+   writes no sandbox write list, so its case for such a project is retired.)
 2. **Only a plain folder name names a folder.** The ticket's name (its
    ``external-ref``, or its tk id when it has none) names the own folder only
    when it starts with a letter or digit and holds only letters, digits,
@@ -43,9 +43,6 @@ import w2_50_support as support
 q = support.q
 MAIN, OTHER, NO_W2_ID = support.MAIN, support.OTHER, support.NO_W2_ID
 ENGINEER, TEST_DESIGNER, ORCHESTRATOR = support.ENGINEER, support.TEST_DESIGNER, support.ORCHESTRATOR
-
-GLOB_CHARACTERS = "*?["
-
 
 def _refused(result, what, sandbox, *paths):
     names = []
@@ -95,32 +92,18 @@ def _launched(box, cli, role, ticket):
     return result
 
 
-def _real_entries(result, box):
-    return [(entry, support.entry_path(entry, box)) for entry in result.allow_write()]
-
-
 def _assert_temp_folder_kept(result, box):
+    """The session still gets a temp folder of its own (its TMPDIR), not the launcher's. Emergency 2 (release 0.1.2):
+    there is no sandbox write list to hold it on."""
     folder = result.variable("TMPDIR")
-    assert folder and any(support.covers(real, os.path.join(folder, "f.txt")) for _, real in _real_entries(result, box)), (
-        f"the sandbox may not write the session's temp folder {folder}: {result.allow_write()}")
+    assert folder and os.path.realpath(folder) != os.path.realpath(box.tmpdir), (
+        f"the session got no temp folder of its own: TMPDIR is {folder!r}")
 
 
-def _entries_at_or_under_the_root(result, box):
-    """The write list's entries that are the root, lie under it, or hold it."""
-    root = os.path.realpath(box.root)
-    return [entry for entry, real in _real_entries(result, box)
-            if real is not None and (support.covers(real, root) or real.startswith(root + "/"))]
-
-
-def _patterns(result):
-    """The write list's entries that hold a glob character, once a trailing ``/**`` is set aside."""
-    found = []
-    for entry in result.allow_write():
-        text = str(entry)
-        text = text[: -len("/**")] if text.endswith("/**") else text
-        if any(character in text for character in GLOB_CHARACTERS):
-            found.append(entry)
-    return found
+def _folders_under_the_root(box):
+    """The folders the launches made under the root (the run folders), by name."""
+    root = box.root
+    return sorted(name for name in os.listdir(root) if (root / name).is_dir()) if root.is_dir() else []
 
 
 # --------------------------------------------------------------------------
@@ -203,18 +186,6 @@ def test_the_own_folder_outside_a_project_inside_it_gives_that_session_nothing(s
     _refused(_ask(box, project, "Bash", command), f"Bash `{command}` (beside the project)", box, own)
 
 
-def test_a_launch_in_a_project_inside_the_own_folder_does_not_add_the_project(sandbox, cli):
-    """``gov launch`` there: no entry of the sandbox write list holds the project's root; the temp folder stays."""
-    box = _inside_the_own_folder(sandbox)
-    project = support.make_project(box)
-    result = _launched(box, cli, ENGINEER, MAIN)
-    holding = [entry for entry, real in _real_entries(result, box) if support.covers(real, project)]
-    assert holding == [], (
-        f"the sandbox of a session in the project {project} may write the project itself through {holding}: "
-        f"allowWrite is {result.allow_write()}")
-    _assert_temp_folder_kept(result, box)
-
-
 # --------------------------------------------------------------------------
 # 2. Only a plain folder name names a folder
 # --------------------------------------------------------------------------
@@ -270,16 +241,10 @@ LAUNCHED_NOT_PLAIN = ("a-star", "a-double-star", "a-bracket", "a-quote", "a-spac
 
 @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
 def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
-    """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+    """No folder made; the temp folder stays. (Emergency 2, release 0.1.2: no sandbox write list to read.)"""
     name, _ = NOT_PLAIN[case]
     _named_project(sandbox, name)
     result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
-    under = _entries_at_or_under_the_root(result, sandbox)
-    assert under == [], (
-        f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
-        f"{under}: allowWrite is {result.allow_write()}")
-    patterns = _patterns(result)
-    assert patterns == [], f"the sandbox's write list holds a pattern: {patterns}"
     if name not in (".", ".."):
         assert not os.path.lexists(sandbox.root / name), f"the launcher made {sandbox.root / name}"
     _assert_temp_folder_kept(result, sandbox)
@@ -290,11 +255,9 @@ def test_the_launcher_adds_the_folder_of_a_plain_name_with_dot_and_underscore(sa
     _named_project(sandbox, PLAIN)
     support.set_plan(cli, check=(sandbox.root / PLAIN,))
     result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
-    own = os.path.realpath(sandbox.root / PLAIN)
-    under = [real for _, real in _real_entries(result, sandbox)
-             if real is not None and real.startswith(os.path.realpath(sandbox.root) + "/")]
-    assert under == [own], f"the sandbox's entries under the root are {under}, not [{own}]: {result.allow_write()}"
     assert result.session()["seen"][str(sandbox.root / PLAIN)] is True, "the session started without its folder"
+    made = _folders_under_the_root(sandbox)
+    assert made == [PLAIN], f"the folders made under the root are {made}, not [{PLAIN!r}]"
 
 
 # --------------------------------------------------------------------------
@@ -363,11 +326,6 @@ def test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name(sandbox, 
     else:
         _crossing_project(sandbox)
     result = _launched(sandbox, cli, ENGINEER, ticket)
-    holding = [entry for entry, real in _real_entries(result, sandbox)
-               if support.covers(real, sandbox.root / folder / "f.txt")]
-    assert holding == [], (
-        f"the sandbox of a session on {ticket.tk} may write the shared folder {sandbox.root / folder} through "
-        f"{holding} ({case})")
     assert not os.path.lexists(sandbox.root / folder), f"the launcher made the shared folder {sandbox.root / folder}"
     _assert_temp_folder_kept(result, sandbox)
 
@@ -377,8 +335,6 @@ def test_the_launcher_keeps_the_folder_of_a_ticket_whose_name_no_other_shares(sa
     _sharing_project(sandbox, "closed")
     support.set_plan(cli, check=(sandbox.own(OTHER),))
     result = _launched(sandbox, cli, ENGINEER, OTHER)
-    own = os.path.realpath(sandbox.own(OTHER))
-    under = [real for _, real in _real_entries(result, sandbox)
-             if real is not None and real.startswith(os.path.realpath(sandbox.root) + "/")]
-    assert under == [own], f"the sandbox's entries under the root are {under}, not [{own}]: {result.allow_write()}"
     assert result.session()["seen"][str(sandbox.own(OTHER))] is True, "the session started without its folder"
+    made = _folders_under_the_root(sandbox)
+    assert made == [sandbox.own(OTHER).name], f"the folders made under the root are {made}, not [{sandbox.own(OTHER).name!r}]"

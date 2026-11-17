@@ -43,6 +43,10 @@ commands:
   context:
     run: 'gov context {ID} --role {WORKER_ROLE}'
     check: 'gov context --help'
+  brief:
+    # the owner's Emergency 2: a worker's brief is built by gov brief, not gov context
+    run: 'gov brief {WORKER_ROLE} {ID}'
+    check: 'gov brief --help'
   links:
     run: 'gov links --since {BASE}'
     check: 'gov links --help'

@@ -1,26 +1,17 @@
-"""W1-46 -- no worker session without the permission checks, or with a directory added (batch 4, after implementation).
+"""W1-46 -- the no-prompt mode and added directories are accepted (Emergency 2, release 0.1.2).
 
-DEC-313 (owner, on DP-10): "``gov launch`` refuses ``--dangerously-skip-permissions``,
-``--permission-mode bypassPermissions`` and ``--add-dir``, in any position, and
-the matching settings keys (``permissions.defaultMode: bypassPermissions``,
-``permissions.additionalDirectories``). ``--allow-dangerously-skip-permissions``,
-which the package also named, is refused with them".
+DEC-313 had ``gov launch`` refuse ``--dangerously-skip-permissions``,
+``--allow-dangerously-skip-permissions``, ``--permission-mode bypassPermissions``
+and ``--add-dir``, and the matching settings keys. Emergency 2
+(docs/emergency-2/EMERGENCY-2.md 2.2, 2.3, 2.9; release 0.1.2) supersedes it: agents
+have full permission in their repository, worktree and run folder, and the no-prompt
+mode is set in the project settings. The refusal cases are retired; in their place
+each former refusal is asserted in its positive form: the launch starts and the CLI
+gets the arguments unchanged, and the matching keys in the repository's two settings
+files no longer refuse the launch.
 
-A refusal is a non-zero exit with a named reason, and nothing is started (KPI
-success 1's words). Each refusal test first launches the same role in the same
-project, so the argument or the key is the reason.
-
-"The matching settings keys" are tested in the two settings files of the
-repository the launcher already refuses a ``sandbox`` key in (DEC-233):
-``.claude/settings.json`` and ``.claude/settings.local.json``.
-
-Controls: a harmless permission mode launches, as an argument
-(``--permission-mode acceptEdits``, what DEC-183 gives a headless worker) and as
-the settings key (``permissions.defaultMode: acceptEdits``); an argument's name
-inside the prompt's text refuses nothing.
-
-Not tested: ``permissions.additionalDirectories`` with an empty list, and the
-keys in a user's or a managed settings file, which no decision names.
+Controls kept: a harmless permission mode launches, as an argument and as the
+settings key; an argument's name inside the prompt's text is passed through.
 
 No session is started.
 """
@@ -38,13 +29,12 @@ ORDINARY = ("-p", "Do the ticket's work.", "--output-format", "json", "--allowed
             "claude-opus-5-5", "--max-turns", "8")   # W2-60a: a model after -- must be the role's (DEC-839 item 1)
 ADDED_DIRECTORY = "/w1-46-added-directory"
 
-REFUSED_ARGUMENTS = {
+FORMERLY_REFUSED = {
     "skip-permissions": ("--dangerously-skip-permissions",),
     "allow-skip-permissions": ("--allow-dangerously-skip-permissions",),
     "bypass-mode": ("--permission-mode", "bypassPermissions"),
     "add-dir": ("--add-dir", ADDED_DIRECTORY),
 }
-REASON = ("bypass", "skip-permissions", "permission", "add-dir", "additionalDirectories", "director")
 
 
 def _placed(arguments, position):
@@ -58,26 +48,23 @@ def _placed(arguments, position):
 
 
 @pytest.mark.parametrize("position", ("alone", "first", "middle", "last"))
-@pytest.mark.parametrize("name", sorted(REFUSED_ARGUMENTS))
-def test_the_launcher_refuses_a_bypass_or_an_added_directory_in_any_position(launch, name, position):
-    """DEC-313: "in any position" among the arguments passed after ``--``."""
-    launch(ENGINEER).session()
-    support.assert_refused(launch(ENGINEER, None, *_placed(REFUSED_ARGUMENTS[name], position)), *REASON)
+@pytest.mark.parametrize("name", sorted(FORMERLY_REFUSED))
+def test_a_bypass_or_an_added_directory_is_now_passed_to_the_session_in_any_position(launch, name, position):
+    """Emergency 2 (2.2, 2.3): the launch starts and the CLI gets the caller's arguments unchanged, in order."""
+    passed = _placed(FORMERLY_REFUSED[name], position)
+    result = launch(ENGINEER, None, *passed)
+    assert result.run.returncode == 0, f"gov launch refused {FORMERLY_REFUSED[name]}\n{result.describe()}"
+    assert support.caller_args_then_template_pair(result.session()["args"], passed), (
+        f"the CLI did not get the arguments unchanged: {result.session()['args']}")
 
 
 @pytest.mark.parametrize("arguments", (("--permission-mode=bypassPermissions",), (f"--add-dir={ADDED_DIRECTORY}",)),
                          ids=("bypass-mode-joined", "add-dir-joined"))
-def test_the_launcher_refuses_the_joined_spelling_too(launch, arguments):
-    """The CLI reads ``--option=value`` as ``--option value``."""
-    launch(ENGINEER).session()
-    support.assert_refused(launch(ENGINEER, None, *ORDINARY, *arguments), *REASON)
-
-
-def test_a_research_session_is_refused_the_same_arguments(launch):
-    """The refusal is the launcher's, not one role's: one case for the role with a network grant."""
-    launch(RESEARCH).session()
-    for name in sorted(REFUSED_ARGUMENTS):
-        support.assert_refused(launch(RESEARCH, None, *ORDINARY, *REFUSED_ARGUMENTS[name]), *REASON)
+def test_the_joined_spelling_is_passed_too(launch, arguments):
+    passed = ORDINARY + arguments
+    result = launch(RESEARCH, None, *passed)
+    assert result.run.returncode == 0, f"gov launch refused {arguments}\n{result.describe()}"
+    assert support.caller_args_then_template_pair(result.session()["args"], passed), result.describe()
 
 
 def _set_permissions(project, rel, key, value):
@@ -88,11 +75,12 @@ def _set_permissions(project, rel, key, value):
 @pytest.mark.parametrize("key, value", (("defaultMode", "bypassPermissions"),
                                         ("additionalDirectories", [ADDED_DIRECTORY])),
                          ids=("bypass-default-mode", "additional-directories"))
-def test_the_launcher_refuses_the_matching_keys_in_the_repositorys_settings(launch, project, rel, key, value):
-    """DEC-313: ``permissions.defaultMode: bypassPermissions`` and ``permissions.additionalDirectories``."""
-    launch(ENGINEER).session()
+def test_the_matching_keys_in_the_repositorys_settings_no_longer_refuse_the_launch(launch, project, rel, key, value):
+    """Emergency 2 (2.3): the no-prompt mode lives in the project settings; the launcher leaves it to them."""
     _set_permissions(project, rel, key, value)
-    support.assert_refused(launch(ENGINEER, None, *ORDINARY), *REASON, "defaultMode")
+    result = launch(ENGINEER, None, *ORDINARY)
+    assert result.run.returncode == 0, f"gov launch refused permissions.{key} in {rel}\n{result.describe()}"
+    result.session()
 
 
 # --------------------------------------------------------------------------
@@ -108,7 +96,6 @@ def test_a_harmless_permission_mode_is_launched(launch, arguments):
     assert support.caller_args_then_template_pair(result.session()["args"], passed), (
         f"the CLI did not get the arguments unchanged, followed by nothing or the one template pair: "
         f"{result.session()['args']}")
-    assert support.sandbox_faults(result.settings()) == []
 
 
 @pytest.mark.parametrize("rel", (support.SETTINGS_REL, support.LOCAL_SETTINGS_REL), ids=("committed", "local"))
@@ -119,8 +106,8 @@ def test_a_harmless_default_mode_in_the_repositorys_settings_is_launched(launch,
     result.session()
 
 
-def test_an_arguments_name_inside_the_prompt_refuses_nothing(launch):
-    """Only an argument of the CLI is refused, not a word of the prompt the worker is given."""
+def test_an_arguments_name_inside_the_prompt_is_passed_through(launch):
+    """A word of the prompt the worker is given is passed through as it is."""
     prompt = "Never use --dangerously-skip-permissions, --add-dir or --permission-mode bypassPermissions."
     result = launch(ENGINEER, None, "-p", prompt, "--permission-mode", "acceptEdits")
     assert result.run.returncode == 0, f"gov launch refused a prompt that names an argument\n{result.describe()}"

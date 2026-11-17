@@ -6,6 +6,16 @@ launcher on `w2/integrate`, and the design's behaviour sections and the lead's c
 in text. The design note and the research record (this ticket's own files) were not read (DEC-820 (c)). The tests
 were written before the implementation existed, and shown red.
 
+**Emergency 2 (release 0.1.2, EMERGENCY-2 2.1-2.4).** `gov launch` writes no sandbox block and no deny rule of its own,
+needs no guard, and no longer refuses the no-prompt mode, `--add-dir`, `--bare`, a repository sandbox key,
+`disableAllHooks`, added directories, a malformed held-out list or a second research folder. Retired: those cases of
+`test_every_refusal_the_launcher_makes_today_still_refuses` and of
+`test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch`, and the record folder's deny-rule and
+write-list asserts (`test_the_record_folder_is_made_and_denied_to_the_session_by_two_literal_rules` is now
+`test_the_record_folder_is_made_before_the_session_starts`); `test_today_s_checks_come_first_with_today_s_message`
+takes `--settings` and settings that are not JSON in place of `--bare` and the sandbox key. The rows below are the
+record of their time.
+
 ## How to run them: this worktree's own `src/` (DEC-732)
 
     PYTHONPATH=/home/usain/gov-os-worktrees/W2-60a/src python3 -m pytest tests/acceptance/W2-60a -q \

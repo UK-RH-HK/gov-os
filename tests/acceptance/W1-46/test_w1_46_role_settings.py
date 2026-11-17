@@ -1,4 +1,9 @@
-"""W1-46 -- per-role settings: the role and the ticket, ``.gov-runtime/``, the temp directory, the network profile.
+"""W1-46 -- per-role settings: the role and the ticket, and the temp directory.
+
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.2, 2.4, 6.1; release 0.1.2): the launcher writes no sandbox block
+and no deny rule of its own, so the cases of KPI success 3 (the empty network allowlist) and success 10 (the
+``Edit`` deny rules for ``.gov-runtime/**`` and the guard's refusal there) are retired. The lines below are kept as
+the KPI wrote them.
 
 KPI success 2 [CAP-61.b]: "For each worker role (engineer,
 independent-test-designer, independent-auditor, research; a research or
@@ -82,41 +87,6 @@ def test_both_variables_reach_the_guard(kernel_launch, kernel_guard, kernel_proj
 
 
 # --------------------------------------------------------------------------
-# Success 10: .gov-runtime/ (DEC-180)
-# --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_the_built_settings_deny_edits_under_gov_runtime(launch, project, sandbox, role):
-    """The freeze flag, the snapshots, the findings and the records, and a new entry such as a link."""
-    result = launch(role)
-    open_paths = [rel for rel in support.PROTECTED_RUNTIME if not support.edit_denied(result, rel, project, sandbox)]
-    assert open_paths == [], (
-        f"no Edit deny rule of the built settings covers {open_paths}; rules: "
-        f"{support.deny_rules(result.settings(), 'Edit')}"
-    )
-
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_the_built_settings_leave_scratch_writable(launch, project, sandbox, role):
-    result = launch(role)
-    closed = [rel for rel in support.SCRATCH_PATHS if support.edit_denied(result, rel, project, sandbox)]
-    assert closed == [], (
-        f"an Edit deny rule of the built settings covers {closed} under .gov-runtime/scratch/; rules: "
-        f"{support.deny_rules(result.settings(), 'Edit')}"
-    )
-
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-@pytest.mark.parametrize("tool", ("Write", "Edit"))
-def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
-    """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
-    for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
-                ".gov-runtime/snapshots/keep.json"):
-        result = guard(tool, support.w47.write_input(tool, project / rel), role)
-        support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
-
-
-# --------------------------------------------------------------------------
 # Success 7: a per-session temp directory (DEC-159)
 # --------------------------------------------------------------------------
 
@@ -140,16 +110,3 @@ def test_two_sessions_get_two_temp_directories(launch, sandbox):
     second = set(_session_directories(launch(support.ENGINEER), sandbox))
     assert first and second, "no temp directory of the session's own was set"
     assert not (first & second), f"two sessions were given the same temp directory: {sorted(first & second)}"
-
-
-# --------------------------------------------------------------------------
-# Success 3: network profiles (DEC-158)
-# --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", support.EMPTY_ALLOWLIST_ROLES)
-def test_engineer_test_designer_and_auditor_get_an_empty_allowlist(launch, role):
-    domains = support.allowed_domains(launch(role).settings())
-    assert domains == [], f"the allowlist of a launched {role} is not empty: {domains}"
-
-
-# The research allowlist (DEC-241) is in ``test_w1_46_research_allowlist.py``.

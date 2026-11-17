@@ -10,7 +10,7 @@ The stand-in session runs ``gov.codeintel.daemon_dir(<worktree>)`` twice with th
 - **suite**: the same, with ``TMPDIR`` a folder deeper under it, as a test session inside sets one for its tests (the
   first half's probe does).
 
-Each must lie under the session's temp folder (the launcher's, on its write list), and leave room for the tool's
+Each must lie under the session's temp folder (the launcher's), and leave room for the tool's
 socket under it (107 bytes, DEC-338). The launcher's temp root for the stand-in session is a short root of the case's own
 (``/tmp/w<8>``, made and removed by the case; ``w2_56_sandbox_support.short_base``), not a folder under pytest's long
 ``tmp_path``, so the session's temp folder is as short as a real launch's (``/tmp/gov-launch-<8>``) and the daemon
@@ -72,7 +72,6 @@ def _daemons(tmp_path, short_root, role):
 def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, short_root, role):
     box, launch, settings, daemons = _daemons(tmp_path, short_root, role)
     tmpdir = sb.session_tmpdir(launch)
-    assert tmpdir in [os.path.realpath(e) for e in sb.write_list(settings)], "the temp folder is not on the write list"
     outside = {label: path for label, path in daemons.items() if not sb.under(path, tmpdir)}
     assert not outside, f"the daemon folder is not under the session's temp folder {tmpdir}: {outside}"
 

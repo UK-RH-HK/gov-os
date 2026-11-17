@@ -55,6 +55,7 @@ namespaces:
       - "docs/changes/**"
       - "docs/charter/**"
       - "docs/contract/**"
+      - "docs/emergency-2/**"
       - "docs/imported/**"
       - "docs/interfaces/**"
       - "docs/lessons/**"

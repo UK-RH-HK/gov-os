@@ -150,7 +150,7 @@ def test_f2_the_built_arguments_are_integrate_s_but_for_the_one_flag(bed, baseli
     if role in WORKER_ROLES:  # the settings compared as values: the JSON text is rebuilt once W2-60a's are taken out
         mine = _without_w2_60a(mine, role)
         mine, base = [mine[0], _rules_sorted(json.loads(mine[1])), *mine[2:]], [
-            base[0], _rules_sorted(json.loads(base[1])), *base[2:]]
+            base[0], _rules_sorted(_without_emergency_2(json.loads(base[1]))), *base[2:]]
     assert mine == base,f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
 
 
@@ -169,12 +169,25 @@ def _rules_sorted(settings: dict) -> dict:
     return settings
 
 
+def _without_emergency_2(settings: dict) -> dict:
+    """Integrate's worker settings at the baseline with what Emergency 2 (release 0.1.2, EMERGENCY-2 2.2, 2.4) took out
+    of the launcher taken out of them too: the sandbox block, and the launcher's own deny rules, every one of them an
+    ``Edit`` or ``Read`` rule on an absolute path (``Edit(/…)``, ``Read(/…)``). A user's deny rule (none in this bed)
+    stays. That change is the owner's, not W2-153's."""
+    settings.pop("sandbox", None)
+    deny = (settings.get("permissions") or {}).get("deny")
+    if isinstance(deny, list):
+        settings["permissions"]["deny"] = [rule for rule in deny
+                                           if not (rule.startswith("Edit(/") or rule.startswith("Read(/"))]
+    return settings
+
+
 def _without_w2_60a(argv: list[str], role: str) -> list[str]:
     """A worker's normalised arguments with what W2-60a (DAEO-cv58) adds taken out, each checked present first: on the
     line, the role's effort, the session id and the two switches that keep user-level context out (the model is the
     caller's here, so none is added); in ``--settings``, ``autoMemoryEnabled: false``, the subagent model (the role's)
-    in ``env`` and the deny rules on the launch-record folder ``.gov-runtime/launches/``. What is left must be
-    integrate's."""
+    in ``env``. (W2-60a's deny rules on the launch-record folder ``.gov-runtime/launches/`` are gone with Emergency 2,
+    release 0.1.2.) What is left must be integrate's."""
     assert argv[:1] == ["--settings"], argv
     rest, seen, index = argv[2:], {}, 0
     kept = []
@@ -194,10 +207,6 @@ def _without_w2_60a(argv: list[str], role: str) -> list[str]:
     settings = json.loads(argv[1])
     assert settings.pop("autoMemoryEnabled", None) is False, f"{role}: no autoMemoryEnabled false: {argv[1]}"
     assert settings["env"].pop("CLAUDE_CODE_SUBAGENT_MODEL", None) == ROLE_MODEL, f"{role}: {argv[1]}"
-    deny = settings["permissions"]["deny"]
-    records = [rule for rule in deny if "/.gov-runtime/launches/" in rule]
-    assert records, f"{role}: no deny rule on the launch-record folder: {deny}"
-    settings["permissions"]["deny"] = [rule for rule in deny if rule not in records]
     return ["--settings", json.dumps(settings), *kept]
 
 

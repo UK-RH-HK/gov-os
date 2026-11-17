@@ -21,10 +21,8 @@ import pytest
 
 import w1_47_support as support
 
-# Retired by DEC-925 item 1: docs/source left the tree on 2026-10-01, and DEC-922's settings regeneration dropped
-# its two deny rules (P-I1-2, DEC-899). Every other rule of the support's list stays checked (README, "Retired cases").
-RETIRED_DENY_RULES = ("Read(./docs/source/**)", "Edit(./docs/source/**)")
-KEPT_DENY_RULES = tuple(rule for rule in support.KEPT_DENY_RULES if rule not in RETIRED_DENY_RULES)
+# Emergency 2 (EMERGENCY-2.md 2.4, DEC-1209): the settings carry two denies only, git push and sudo; the test of the
+# other deny rules (secret files, the held-out folder) is retired with the guard.
 
 
 @pytest.mark.parametrize("prefix", support.WITHDRAWN_ASK_PREFIXES)
@@ -55,14 +53,6 @@ def test_the_sudo_deny_rule_is_in_place(settings):
     """KPI success 5, failure 5: ``Bash(sudo:*)`` stays."""
     assert "Bash(sudo:*)" in support.permission_rules(settings, "deny"), (
         f"permissions.deny of {support.SETTINGS_REL} no longer carries Bash(sudo:*)"
-    )
-
-
-@pytest.mark.parametrize("rule", KEPT_DENY_RULES)
-def test_the_other_deny_rules_are_in_place(settings, rule):
-    """KPI success 5: "leaves the Bash(sudo:*) deny rule and the other deny rules in place"."""
-    assert rule in support.permission_rules(settings, "deny"), (
-        f"permissions.deny of {support.SETTINGS_REL} no longer carries {rule}"
     )
 
 

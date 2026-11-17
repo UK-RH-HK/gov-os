@@ -77,9 +77,11 @@ def test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag(bed):
         assert box[box.index("--ticket") + 1] == support.DISPATCH_TICKET, f"the box's --ticket is not the bed's: {box}"
         rw = [box[i + 1] for i, arg in enumerate(box[:-1]) if arg == "--rw"]
         assert str(bed.tree) in rw, f"the lead tree {bed.tree} is not among the box's --rw folders: {rw}"
-        for i, arg in enumerate(argv[:-1]):
-            if arg == "--permission-mode" and argv[i + 1] == "bypassPermissions":
-                argv[i + 1] = "acceptEdits"
+    # Emergency 2 (the owner's switch-off, bb61d3d74; EMERGENCY-2 2.2): the lead starts with --permission-mode
+    # bypassPermissions where integrate's line had acceptEdits; that change is the owner's, not W2-153's.
+    for i, arg in enumerate(argv[:-1]):
+        if arg == "--permission-mode" and argv[i + 1] == "bypassPermissions":
+            argv[i + 1] = "acceptEdits"
     mine = support.without_flag(argv)
     assert mine == theirs["argv"], f"the lead line changed beyond the one flag\nthis tree: {mine}\nintegrate: {theirs['argv']}"
 

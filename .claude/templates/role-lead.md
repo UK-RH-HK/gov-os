@@ -21,7 +21,7 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-6 in the 
 0. {CMD:identity} (expect orchestrator, {ID}) and {CMD:where} (expect {TREE}, w2/{W2}); `test -f {CHECKPOINT_FILE} && echo resume`; read {TICKET_FILE}; read the 3 to 5 paths, or ask the one memory question, that the part names. Then start your run's first step. Ask memory, not the register: {CMD:retrieve} "<question>".
 
 ## Every run
-- Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}`; no `gov context` (the owner's Emergency 2).
+- Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - Check that the ticket's interface (where config lives, error names, function signatures) is stated in the ticket before the pair starts; if it is not, return PACKAGES [DEC-1052].
 - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].

@@ -674,3 +674,34 @@ Batch 7 opened no package: MR-3, DEC-334 and DEC-311 decide the described behavi
 **D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** `w1_46_support.plant_open_gate` plants an open gate (W2-136's form: a dated `gate.json` in the case's HOME, readings with room to spare under `<elsewhere>/open-gate` through `GOV_RESOURCES_*`); `launch` plants it and `gov_environment` carries its readings once planted; the live sessions keep the real HOME's `gate.json` and take the planted readings. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
 
 **D-10's pinned-gov fix (2026-11-10, W2-20 `DAEO-r30l`, Rewrite-Reason: DEC-866, W2-106):** `ask_guard` first gives the sandbox's HOME a pinned `gov` of this tree (W1-47's `plant_pinned_gov`: `<HOME>/.local/bin/gov`, its first line this interpreter, and a user-site path file naming this tree's `src`), so the pinned hook lines no longer take the runner's `PATH`: before, with `PATH=/usr/bin:/bin` 106 cases ended `gov hook: no pinned gov` (exit 2), and with the owner's `PATH` they judged the owner's pin. No expectation changes. After, both opt-ins: 71 failed, 386 passed under both PATHs, the same 71, each an allow of this repository's own `.claude/hooks/pretooluse.py` (DEC-953's tree guard, which this project copies) on a call `gov.guard.decide` denies; before, the clean PATH's exit 2 counted as their deny.
+
+## Emergency 2 (2026-11-17, release 0.1.2)
+
+docs/emergency-2/EMERGENCY-2.md 2.1-2.4 and 6.1: no guard, no sandbox, no permission limits. `gov launch` no longer
+requires the guard in the repository's settings; no longer refuses a `sandbox` key, `disableAllHooks`,
+`permissions.defaultMode: bypassPermissions` or `additionalDirectories` there, nor `--dangerously-skip-permissions`,
+`--allow-dangerously-skip-permissions`, `--permission-mode bypassPermissions`, `--add-dir`, `--bare`, `--restricted`
+or `--safe-mode`; writes no sandbox block and no deny rule of its own; and no longer checks a research ticket's
+experiment folder or reads `held-out.yaml` and the research allowlist. This repository's settings no longer register
+the guard. The batch records above are kept as they were; what changed in the suite:
+
+- **Retired files:** `test_w1_46_duplicate_keys.py` (held-out and allowlist keys written twice), `test_w1_46_experiment_folder.py`
+  (the experiment folder's place, and the repository guard on it), `test_w1_46_protected_trees.py` (`Edit` deny rules
+  for the three trees), `test_w1_46_research_allowlist.py` (the built allowlist), `test_w1_46_research_fence.py` (the
+  research fence).
+- **Retired cases in kept files:** the held-out `Read` rules and refusals (`test_w1_46_held_out.py` keeps KPI failure 9);
+  the strict sandbox, its excluded commands and the `sandbox`-key refusals (`test_w1_46_sandbox_settings.py`); the
+  `.gov-runtime/` deny rules, the empty allowlist and the repository guard's refusal (`test_w1_46_role_settings.py`); the
+  literal runtime rules and the repository guard's cases (`test_w1_46_runtime_and_ln.py`); the research-folder refusals
+  (`test_w1_46_launch_refusals.py`); every case that asked this repository's committed guard (`guard` fixture) in
+  `test_w1_46_hard_links_mv_and_install.py`, `test_w1_46_links_and_cp_targets.py`,
+  `test_w1_46_options_after_the_destination.py` and `test_w1_46_research_role.py`; the live cases whose subject was the
+  sandbox's fence, network or hiding (`test_w1_46_live_sessions.py`). The cases on the kernel's guard (`kernel_guard`)
+  stay.
+- **Turned into their positive form:** `test_w1_46_bypass_and_added_directories.py` (each former argument in four positions
+  and joined, and the two settings keys: the launch starts and the CLI gets the arguments unchanged) and the `--bare` and
+  unwired-guard cases of `test_w1_46_guard_wiring.py` (the launch starts; the built settings register no hook).
+- **Kept refusals:** `--setting-sources` (any value) and a second `--settings`.
+- **Support:** `sandbox_faults`, `accepts`, `rewrite_allowlist`, `allowlist_key`, `edit_denied`, `literal_edit_denials`,
+  `has_glob_character` and their constants are gone from `w1_46_support.py`; `allowed_domains`, `deny_rules` and
+  `covers` stay for W1-33's and W1-38's suites.

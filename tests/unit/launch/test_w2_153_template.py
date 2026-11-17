@@ -285,7 +285,7 @@ def test_the_dispatchers_lead_form_is_otherwise_the_same_command():
         assert lines[start - 2].startswith('exec bash "$BOX/session_start.sh" ')
     head = lines[start].strip()
     lines = lines[:start] + [head if head.startswith("exec ") else "exec " + head] + lines[start + 1:]
-    mode = "bypassPermissions" if boxed else "acceptEdits"
+    mode = "bypassPermissions"  # the owner's Emergency 2 (bb61d3d74, DEC-1209): every lead starts in the no-prompt mode
     # ACT-LEADS-ADD-DIR-1 (DEC-1161 (2)) added the lead's --add-dir line after W2-153; it is judged apart from this.
     command = [line for line in lines[start:start + 7]
                if "--append-system-prompt-file" not in line and not line.startswith("  --add-dir ")]

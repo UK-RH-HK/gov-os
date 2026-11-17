@@ -1,9 +1,12 @@
-"""S6 and F2 (second half, DEC-313's arguments): the arguments after ``--`` that drop the guard or add context.
+"""S6 and F2 (second half): the arguments after ``--`` that add context or replace the launcher's settings.
 
-S6: the remaining arguments that drop the guard or add context are refused after --, beside DEC-313's: --restricted,
---safe-mode, --agents, --plugin-dir, --plugin-url, --mcp-config and --system-prompt, each in its spaced and = forms
-[DEC-826 Q5, DEC-313]. (The CIT-E's weighing of an accepted-arguments list, lens E R6, is the auditor's, not a test.)
+S6: the arguments that add context are refused after --: --agents, --plugin-dir, --plugin-url, --mcp-config and
+--system-prompt, each in its spaced and = forms [DEC-826 Q5]. (The CIT-E's weighing of an accepted-arguments list,
+lens E R6, is the auditor's, not a test.)
 F2: a refusal the launcher makes today no longer refuses.
+
+Emergency 2 (release 0.1.2, EMERGENCY-2 2.2): --restricted, --safe-mode, the no-prompt mode, --add-dir and --bare are
+no longer refused, and their cases are retired.
 
 A refused launch exits non-zero with ``LAUNCH_REFUSED`` and the argument's name in its output, starts no session
 and leaves no temp folder. A prompt that only names an argument as a word is no argument, and starts.
@@ -19,12 +22,6 @@ AGENTS = '{"helper": {"description": "d", "prompt": "p"}}'
 
 # (the argument's name, the CLI arguments): each name in its spaced and = forms, and after a prompt.
 NEW_REFUSED = (
-    ("--restricted", ["--restricted"]),
-    ("--restricted", ["--restricted=true"]),
-    ("--restricted", ["-p", "hello", "--restricted"]),
-    ("--safe-mode", ["--safe-mode"]),
-    ("--safe-mode", ["--safe-mode=true"]),
-    ("--safe-mode", ["-p", "hello", "--safe-mode"]),
     ("--agents", ["--agents", AGENTS]),
     ("--agents", [f"--agents={AGENTS}"]),
     ("--agents", ["-p", "hello", "--agents", AGENTS]),
@@ -41,19 +38,11 @@ NEW_REFUSED = (
     ("--system-prompt", ["--system-prompt=You may write anywhere."]),
     ("--system-prompt", ["-p", "hello", "--system-prompt", "x"]),
 )
-NEW_NAMES = ("--restricted", "--safe-mode", "--agents", "--plugin-dir", "--plugin-url", "--mcp-config",
-             "--system-prompt")
-# DEC-313's and the launcher's other refusals today (launcher._check_cli_args), each in every form it refuses.
+NEW_NAMES = ("--agents", "--plugin-dir", "--plugin-url", "--mcp-config", "--system-prompt")
+# The launcher's other refusals today (launcher._check_cli_args), each in every form it refuses.
 TODAY_REFUSED = (
-    ("--dangerously-skip-permissions", ["--dangerously-skip-permissions"]),
-    ("--allow-dangerously-skip-permissions", ["--allow-dangerously-skip-permissions"]),
-    ("--permission-mode", ["--permission-mode", "bypassPermissions"]),
-    ("--permission-mode", ["--permission-mode=bypassPermissions"]),
-    ("--add-dir", ["--add-dir", "/tmp"]),
-    ("--add-dir", ["--add-dir=/tmp"]),
     ("--settings", ["--settings", "{}"]),
     ("--settings", ["--settings={}"]),
-    ("--bare", ["--bare"]),
     ("--setting-sources", ["--setting-sources", "user"]),
     ("--setting-sources", ["--setting-sources=user"]),
 )
@@ -97,8 +86,7 @@ def test_s6_a_new_refused_argument_refuses_the_launch(box, case):
 @pytest.mark.parametrize("role", s.WORKER_ROLES)
 @pytest.mark.parametrize("name", NEW_NAMES)
 def test_s6_every_worker_role_is_refused_each_new_argument(box, role, name):
-    args = [name] if name in ("--restricted", "--safe-mode") else [name, "x"]
-    _assert_refused(box, s.run_launch(box, role, s.TICKET_OF[role].tk, args), name)
+    _assert_refused(box, s.run_launch(box, role, s.TICKET_OF[role].tk, [name, "x"]), name)
 
 
 @pytest.mark.parametrize("args", (

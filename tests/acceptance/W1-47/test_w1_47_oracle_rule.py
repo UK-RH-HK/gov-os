@@ -43,18 +43,6 @@ def test_the_configuration_holds_a_list_of_absolute_paths_under_its_key(configur
         pytest.fail(f"{support.CONFIG_KEY} of {support.CONFIG_REL} is not a list of absolute paths", pytrace=False)
 
 
-def test_the_committed_settings_carry_a_read_deny_rule_built_from_every_configured_path(configured, settings):
-    """KPI success 3, failure 3 [CAP-49.c]: present, and with exactly the configured path, for each path."""
-    if not all(support.held_out_read_rules(settings, value) for value in configured.values):
-        pytest.fail(
-            f"permissions.deny of {support.SETTINGS_REL} carries no Read rule built from a path of "
-            f"{support.CONFIG_KEY} in {support.CONFIG_REL}: the rule is missing, or its path differs from the "
-            "configured one. The rule is Read(/<configured absolute path>), with or without a trailing / or /** "
-            "(neither value is shown)",
-            pytrace=False,
-        )
-
-
 def test_the_read_deny_rule_is_not_an_ask_or_an_allow_rule(configured, settings):
     """KPI failure 3: a rule in another list does not hide the oracle; a configured path is in ``deny`` only."""
     for kind in ("ask", "allow"):

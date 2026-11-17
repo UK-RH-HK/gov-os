@@ -12,7 +12,7 @@ The reviewer set the launcher reads is shown black-box in ``test_w2_60b_s10_s12_
 harness: the kernel hook copied into a planted project, ``GOV_ROLE=qa-engineer`` and ``GOV_TICKET`` a ticket whose
 ``role:`` is ``qa-engineer`` and whose ``allowed_paths`` is its findings report.
 
-``test_s9_only_known_roles_changes_in_decide_and_the_live_hook_is_unchanged`` is of the kind **repository-state**: it
+``test_s9_only_known_roles_changes_in_decide`` is of the kind **repository-state**: it
 reads this repository's own history against the claim's base ``4bc0399fb``.
 """
 
@@ -77,7 +77,9 @@ def _git(*args):
     return done.stdout
 
 
-def test_s9_only_known_roles_changes_in_decide_and_the_live_hook_is_unchanged():
+def test_s9_only_known_roles_changes_in_decide():
+    """Emergency 2 (release 0.1.2): the half that asked this repository's live guard hook to be unchanged since the
+    base is retired; the hook is the owner's ACTs' (ACT-GUARD-FIX-6 to 8) and is switched off (bb61d3d74)."""
     diff = _git("diff", "-U0", t.BASE_COMMIT, "--", t.DECIDE_REL)
     assert diff.strip(), f"{t.DECIDE_REL} is unchanged since {t.BASE_COMMIT}: qa-engineer has not joined KNOWN_ROLES"
     old = _block(_git("show", f"{t.BASE_COMMIT}:{t.DECIDE_REL}").splitlines())
@@ -90,5 +92,3 @@ def test_s9_only_known_roles_changes_in_decide_and_the_live_hook_is_unchanged():
     assert not outside, f"{t.DECIDE_REL} changes outside the KNOWN_ROLES set: {outside}"
     added = [line for line in diff.splitlines() if line.startswith("+") and not line.startswith("+++")]
     assert any(f'"{QA}"' in line for line in added), f"the KNOWN_ROLES change does not add \"{QA}\": {added}"
-    assert _git("diff", t.BASE_COMMIT, "--", t.LIVE_HOOK_REL) == "", (
-        f"this repository's live hook {t.LIVE_HOOK_REL} is changed: its REVIEWERS line is the owner's ACT")

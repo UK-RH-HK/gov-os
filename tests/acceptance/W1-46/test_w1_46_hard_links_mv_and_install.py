@@ -39,6 +39,10 @@ ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on 
 template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
 lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
 Each moved case names its fixtures by their old names in its first line; its verdict is the same.
+
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.1, 2.2, 6.1; release 0.1.2): this repository's settings no longer
+register the guard, so the cases that asked its committed guard to refuse a write are retired. The controls that ask
+the kernel's guard, generated from the template, stay.
 """
 
 from __future__ import annotations
@@ -57,9 +61,6 @@ OWN_DIRECTORY = f"{OWN}/w1_46_directory"   # a directory inside the engineer's p
 LINK = f"{OWN}/w1_46_link"                 # a new name inside the engineer's paths
 TESTS = "tests/acceptance/W1-90"           # the acceptance tests of the engineer's ticket
 TEST_FILE = f"{TESTS}/test_fixture.py"     # one that exists
-TICKETS = ".tickets"
-TICKET_FILE = f"{TICKETS}/{support.TICKET_OF[ENGINEER]}.md"
-FREEZE = ".gov-runtime/freeze"
 
 
 def _ask(guard, project, command, role=ENGINEER):
@@ -69,23 +70,6 @@ def _ask(guard, project, command, role=ENGINEER):
 # --------------------------------------------------------------------------
 # 1. A hard link whose source is a file the role may not write
 # --------------------------------------------------------------------------
-
-HARD_LINKS = {
-    "ln-from-an-acceptance-test": f"ln {TEST_FILE} {LINK}.py",
-    "cp-l-from-an-acceptance-test": f"cp -l {TEST_FILE} {LINK}.py",
-    "link-from-a-ticket": f"link {TICKET_FILE} {LINK}.md",
-    "ln-from-the-freeze-flag": f"ln {FREEZE} {LINK}",
-}
-
-
-@pytest.mark.parametrize("name", sorted(HARD_LINKS))
-def test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write(guard, project, name):
-    """The link is alone in its command, and its destination is inside the engineer's paths."""
-    command = HARD_LINKS[name]
-    assert os.path.isfile(project / TEST_FILE) and os.path.isfile(project / TICKET_FILE), "the fixture lost a source"
-    assert not os.path.lexists(project / FREEZE), "the fixture project is frozen"
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
-
 
 @pytest.mark.parametrize("spelling", ("link", "cp -l"))
 def test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths(kernel_guard,
@@ -107,13 +91,6 @@ def test_the_test_designer_may_hard_link_one_acceptance_test_to_another_name_the
 # 2. mv with the target directory given by the long option
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("directory", (TESTS, TICKETS), ids=("the-acceptance-tests", "the-tickets"))
-def test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option(guard, project, directory):
-    """The one operand is the engineer's own file, a source; the file lands in the directory the option names."""
-    command = f"mv --target-directory={directory} {OWN_FILE}"
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
-
-
 def test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths(kernel_guard, kernel_project):
     """The control: the directory exists, inside the engineer's paths."""
     guard, project = kernel_guard, kernel_project
@@ -125,21 +102,6 @@ def test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_p
 # --------------------------------------------------------------------------
 # 3. install
 # --------------------------------------------------------------------------
-
-INSTALLS = {
-    "target-directory-option-into-the-acceptance-tests": f"install -t {TESTS} {OWN_FILE}",
-    "two-operands-onto-an-acceptance-test": f"install {OWN_FILE} {TEST_FILE}",
-    "created-path-under-the-tickets": f"install -D {OWN_FILE} {TICKETS}/w1-46/decide.py",
-    "two-operands-onto-a-ticket": f"install {OWN_FILE} {TICKET_FILE}",
-}
-
-
-@pytest.mark.parametrize("name", sorted(INSTALLS))
-def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
-    """The source is the engineer's own file in every form."""
-    command = INSTALLS[name]
-    w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
-
 
 def test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths(kernel_guard, kernel_project):
     """The control: the plain form, from the engineer's own file to a new name beside it."""

@@ -60,7 +60,12 @@
     ]
   },
   "permissions": {
-    "deny": [],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git push *)",
+      "Bash(sudo:*)",
+      "Bash(sudo *)"
+    ],
     "defaultMode": "bypassPermissions"
   }
 }
