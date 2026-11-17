@@ -12,8 +12,9 @@ roles:
   orchestrator:
     role_file: template/governance/kernel/roles/orchestrator.md
     agent: .claude/agents/orchestrator.md
-    # W2-62 (DEC-837, DEC-863): the prompt in force, which the session-start hook names.
-    prompt: governance/project/prompts/w2-orchestrator.md
+    # W2-62 (DEC-837, DEC-863): the prompt in force, which the session-start hook names. Since EMERGENCY-2
+    # (11.1, 11.2) it is EMERGENCY-2.md; the old prompt is history in docs/emergency-2/archive/.
+    prompt: docs/emergency-2/EMERGENCY-2.md
   product-spec:
     role_file: template/governance/kernel/roles/product-spec.md
     agent: .claude/agents/product-spec.md

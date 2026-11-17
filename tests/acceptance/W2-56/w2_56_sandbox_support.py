@@ -2,11 +2,9 @@
 
 Built on ``w2_56_support`` (the fixture project, the stand-in CLI, the launch helpers). What it adds:
 
-- **The sandbox block, read from ``--settings``** as the stand-in recorded it: the write list
-  (``sandbox.filesystem.allowWrite``), the Unix sockets (``sandbox.network.allowUnixSockets``), each path entry
-  normalised to one leading ``/`` (today's launcher writes ``//<absolute path>``, the CLI's absolute form).
-- **The reranker's own setting** (W2-112): the socket and the log are ``<HOME>/.cache/gov-os/rerank.sock`` and
-  ``rerank.log``, read from ``gov.retrieval.rerank`` (``CACHE_REL``, ``SOCKET``, ``LOG``) with the launcher's ``HOME``.
+- **The session's temp folder**, the ``TMPDIR`` the launcher handed the CLI.
+- **The reranker's own setting** (W2-112): the socket is ``<HOME>/.cache/gov-os/rerank.sock``, read from
+  ``gov.retrieval.rerank`` (``CACHE_REL``, ``SOCKET``) with the launcher's ``HOME``.
 - **The guard**: the kernel's PreToolUse hook (``template/governance/kernel/hooks/pretooluse.py``), copied into the
   fixture project at ``governance/kernel/hooks/pretooluse.py`` (where its settings point) and run as the harness runs
   it: the call as event JSON on stdin, the session's role and ticket in ``GOV_ROLE`` and ``GOV_TICKET`` (W2-58's form).
@@ -15,8 +13,8 @@ Built on ``w2_56_support`` (the fixture project, the stand-in CLI, the launch he
   ``PYTHONPATH`` from the session, S5).
 - **A planted reranker** under the planted ``HOME``: its interpreter file, and a stand-in service on the socket (a
   thread of the test's own process; never the live service).
-- **``sandbox_faults``**, called as ``gov.launch.launcher.sandbox_faults(settings)`` in a child process whose ``HOME``
-  is the launcher's.
+
+Emergency 2 (release 0.1.2): the launcher writes no sandbox block, and the helpers that read it are retired.
 """
 
 from __future__ import annotations
@@ -45,46 +43,12 @@ PATTERN = s.Ticket("DAEO-zw64", s.ENGINEER, "W2-85", ("src/app/**", "tests/unit/
 
 
 # --------------------------------------------------------------------------
-# The sandbox block
+# The session's folders
 # --------------------------------------------------------------------------
-
-def norm(entry) -> str:
-    """A path entry with one leading ``/`` (``//abs`` and ``/abs`` name the same absolute path)."""
-    return "/" + str(entry).lstrip("/")
-
-
-def block(settings: dict) -> dict:
-    value = settings.get("sandbox")
-    assert isinstance(value, dict), f"the --settings value has no sandbox block: {json.dumps(settings)[:600]}"
-    return value
-
-
-def network(settings: dict) -> dict:
-    value = block(settings).get("network")
-    assert isinstance(value, dict), f"the sandbox block has no network map: {json.dumps(block(settings))[:600]}"
-    return value
-
-
-def write_list(settings: dict) -> list[str]:
-    files = block(settings).get("filesystem") or {}
-    entries = files.get("allowWrite", []) if isinstance(files, dict) else files
-    assert isinstance(entries, list), f"sandbox.filesystem.allowWrite is not a list: {entries!r}"
-    return [norm(entry) for entry in entries]
-
-
-def unix_sockets(settings: dict):
-    value = network(settings).get("allowUnixSockets", [])
-    return [norm(entry) for entry in value] if isinstance(value, list) else value
-
 
 def session_tmpdir(launch) -> str:
     """The session's own temp folder: the ``TMPDIR`` the launcher handed the CLI."""
     return os.path.realpath(launch.call["env"]["TMPDIR"])
-
-
-def run_folders(box: s.Box, entries) -> list[str]:
-    root = os.path.realpath(box.home / "gov-os-runs")
-    return [entry for entry in entries if os.path.realpath(entry).startswith(root + "/")]
 
 
 def under(path: str, folder: str) -> bool:
@@ -107,10 +71,6 @@ def reranker_cache(home) -> Path:
 
 def reranker_socket(home) -> str:
     return str(reranker_cache(home) / _rerank().SOCKET)
-
-
-def reranker_log(home) -> str:
-    return str(reranker_cache(home) / _rerank().LOG)
 
 
 def reranker_interpreter(home) -> Path:
@@ -215,20 +175,6 @@ def project(box: s.Box, extra=None, guard=False, tickets=(PATTERN,)) -> Path:
 def started(launch) -> dict:
     assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
     return launch.settings()
-
-
-def refused(launch) -> bool:
-    return launch.returncode != 0 and not launch.calls and "LAUNCH_REFUSED" in launch.output
-
-
-def faults(box: s.Box, settings: dict) -> list:
-    """``gov.launch.launcher.sandbox_faults(settings)``, in a child process with the launcher's environment."""
-    code = ("import json, sys\nfrom gov.launch.launcher import sandbox_faults\n"
-            "print(json.dumps(sandbox_faults(json.load(sys.stdin))))\n")
-    done = subprocess.run([sys.executable, "-c", code], input=json.dumps(settings), capture_output=True, text=True,
-                          env=s.base_environment(box), cwd=str(box.project), timeout=s.COMMAND_TIMEOUT_S)
-    assert done.returncode == 0, f"sandbox_faults could not be called:\n{done.stderr[-1500:]}"
-    return json.loads(done.stdout.strip().splitlines()[-1])
 
 
 def short_base(prefix: str) -> Path | None:

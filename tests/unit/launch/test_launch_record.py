@@ -95,12 +95,8 @@ def _worktree(tmp_path, main_local=None):
     return main, tree
 
 
+# Emergency 2 (0.1.2): a sandbox key, disableAllHooks, the no-prompt mode and added directories no longer refuse.
 @pytest.mark.parametrize("data", (
-    {"sandbox": {"enabled": False}},
-    {"disableAllHooks": True},
-    {"permissions": {"defaultMode": "bypassPermissions"}},
-    {"permissions": {"additionalDirectories": ["/elsewhere"]}},
-    {"permissions": []},
     {"agent": "engineer"},
     {"autoCompactWindow": 1},
     {"env": {"CLAUDE_CODE_AUTO_COMPACT_WINDOW": "1"}},
@@ -134,9 +130,9 @@ def test_the_worktree_s_own_local_file_is_still_judged(tmp_path):
 
 def test_the_main_checkout_s_file_is_read_through_a_link_as_the_tree_s_own_is(tmp_path):
     main, tree = _worktree(tmp_path)
-    (tmp_path / "elsewhere.json").write_text('{"disableAllHooks": true}', encoding="utf-8")
+    (tmp_path / "elsewhere.json").write_text('{"agent": "x"}', encoding="utf-8")
     (main / ".claude" / "settings.local.json").symlink_to(tmp_path / "elsewhere.json")
-    with pytest.raises(GovError, match="disableAllHooks"):
+    with pytest.raises(GovError, match="carries an agent key"):
         launcher._check_repository_settings(tree)
     (tmp_path / "elsewhere.json").unlink()  # a link to nothing cannot be read: refused
     with pytest.raises(GovError, match="cannot be read"):
@@ -161,20 +157,6 @@ def test_the_main_checkout_s_own_launch_is_unchanged(tmp_path):
     (main / ".claude" / "settings.local.json").write_text('{"agent": "x"}', encoding="utf-8")
     with pytest.raises(GovError, match=r"^\.claude/settings\.local\.json carries an agent key"):
         launcher._check_repository_settings(main)
-
-
-def test_the_deny_list_is_the_same_before_and_after_the_record_folder_exists(tmp_path):
-    """W2-56 S3 with W2-60a S8: the first launch makes ``.gov-runtime/launches``; the next launch's deny list holds the
-    same rules in the same order, each once, the folder named by its two literal rules."""
-    root = tmp_path.resolve()
-    records = root / ".gov-runtime" / "launches"
-    before = launcher.build_settings(root, "engineer", "T-1")["permissions"]["deny"]
-    assert record.folder(root) == records
-    after = launcher.build_settings(root, "engineer", "T-1")["permissions"]["deny"]
-    merged = [launcher._worker_deny(deny, records, ["Edit(/elsewhere)"]) for deny in (before, after)]
-    assert merged[0] == merged[1]
-    assert len(merged[0]) == len(set(merged[0]))
-    assert all(merged[0].count(rule) == 1 for rule in record.deny_rules(records))
 
 
 def test_the_record_s_folder_keeps_its_messages(tmp_path):

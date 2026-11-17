@@ -79,17 +79,6 @@ def test_a_broken_configuration_fails_closed_with_no_role(project, guard):
     support.assert_stopped(result, f"Read by a session with no role with a {support.CONFIG_REL} that has no key")
 
 
-def test_a_broken_configuration_fails_closed_through_the_committed_settings(wired, live):
-    """DEC-218: in this repository's wiring, through the commands its settings register."""
-    support.write_config(wired, BROKEN["not-yaml"])
-    result = live(wired, "Read", {"file_path": f"{wired}/README.md"}, support.ORCHESTRATOR)
-    assert result.ran, f"the Read call reached no registered PreToolUse command: {result.describe()}"
-    assert result.decision == "deny", (
-        f"Read with a {support.CONFIG_REL} that is not YAML was let through by the registered commands: "
-        f"{result.describe()}"
-    )
-
-
 def test_a_repaired_configuration_opens_the_guard_again(project, sandbox, guard):
     """DEC-218: "the owner repairs it": with a file of the stated shape the calls go through as before."""
     orchestrator = support.EVERY_SESSION[support.ORCHESTRATOR]

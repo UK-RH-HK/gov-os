@@ -133,8 +133,9 @@ def test_the_launch_of_a_measured_session_adds_no_read_denial_for_the_set_and_ke
     No Read deny rule and no sandbox read denial covers the hidden part, the
     visible part, the file beside it or the scorer: the CLI would turn a Read rule
     into a read denial of the session's commands, and the measurement could not
-    run (P-W2-58-1). The guard alone refuses (d). The held-out material is still
-    covered. Measured by ticket (an engineer) and, added, by role (research).
+    run (P-W2-58-1). The guard alone refuses (d). Measured by ticket (an engineer) and, added, by role (research).
+    Emergency 2 (release 0.1.2): the launcher writes no held-out Read rule any more, so the held-out half of this
+    case is retired; the name is kept for the opt-in lists that name it.
     """
     files = {s.ALLOWLIST_TEMPLATE_REL: s.ALLOWLIST_TEMPLATE.read_text(encoding="utf-8")}
     project = s.make_project(sandbox, base=True, extra={**s.EVAL_FILES, **files,
@@ -144,8 +145,6 @@ def test_the_launch_of_a_measured_session_adds_no_read_denial_for_the_set_and_ke
     faults = s.read_denial_faults(settings, project, sandbox.home, (*HIDDEN, VISIBLE_FILE, BESIDE, s.SCORER_REL))
     assert not faults, (f"the launched measured session's settings ({session}) deny reads of the evaluation set "
                         f"(DEC-873 item 2): {faults}")
-    lost = s.held_out_faults(settings, sandbox, project)
-    assert not lost, f"the held-out material lost its Read deny rule for {lost}: {s.read_deny_specs(settings)}"
 
 
 def test_the_launch_of_an_unmeasured_session_leaves_the_hidden_part_to_the_read_tool(sandbox, cli):

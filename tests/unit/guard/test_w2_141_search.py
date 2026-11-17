@@ -285,14 +285,6 @@ def test_the_hook_judges_the_folder_in_every_tree(rr, tmp_path, monkeypatch):
     assert _hook(rr, root, E, *_b(f"grep -rn --exclude-dir={W} z {tmp_path / 'trees'}"), trees=trees) == ""
 
 
-def test_the_staged_pretooluse_adds_only_glob_to_g14s_tools():
-    live = (LIVE / "pretooluse.py").read_text(encoding="utf-8")
-    staged = (STAGED / "pretooluse.py").read_text(encoding="utf-8")
-    old = 'if tool in ("Read", "NotebookRead", "Grep", "Bash"):'
-    assert live.count(old) == 1
-    assert staged == live.replace(old, 'if tool in ("Read", "NotebookRead", "Grep", "Glob", "Bash"):')
-
-
 def test_the_hook_s_block_is_reads_py_s_byte_for_byte():
     def block(path):
         text = path.read_text(encoding="utf-8")

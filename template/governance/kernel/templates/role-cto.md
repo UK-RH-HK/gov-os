@@ -13,7 +13,7 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 
 ## Launching work
 - Launch a ticket only when it is ready: its required fields set, warnings named in the part [DEC-1052].
-- Build a worker's brief with `gov context {ID} --role <the worker's role>` ({CMD:context}) [DEC-1065].
+- Build a worker's brief with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
 - Build a lead's brief with {CMD:lead_brief} from the part; launch with the role-lead template appended.
 - Launch with {CMD:launch_worker}; wait with {CMD:wait_for}; never a hand-written sleep loop.
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].

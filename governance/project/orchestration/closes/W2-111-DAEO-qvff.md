@@ -14,3 +14,10 @@
 - gitleaks: off by configuration (DEC-1045): the change was not scanned
 - Queue run: 2026-11-16 02:40:03 to 2026-11-16 03:04:18
 - Closed: 2026-11-16 03:05:00 GMT, by the orchestrator under DEC-953 items 1 and 5, DEC-989
+
+## Final close (DEC-1157 (12); DEC-1198 (6), DEC-1203 (b)): ACT-GUARD-FIX-7 follow-up 03
+- Reopened by the CTO within purpose at 8dd846103 for ACT-GUARD-FIX-7's follow-up 03 only.
+- The independent test designer's commit 3a7605226 (tests/acceptance/W2-111/w2_111_live_hook.py only; equal to the prepared patch, sha256 9592d19067ed5412...), merged in 3d813cb12.
+- Its run of the four helper files: 1 failed, 97 passed in 438.54 s (test_w2_111_live_hook_diff_p95.py [W1-05-Edit-engineer]: 109-113 ms per round at load 10-11, decisions all matching); that case alone, once: 1 passed. No case edited, no retry beyond that.
+- Follow-up 02 (the CTO's path case) is ba7ba093f. Follow-up 01 goes in right after ACT-GUARD-FIX-7's apply.
+- Closed again: 2026-11-16 16:29 GMT, by the orchestrator.

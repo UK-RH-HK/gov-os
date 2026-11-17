@@ -308,6 +308,81 @@ def judge_rule(why):
             reads.RUNTIME_REFUSAL: "2-listing"}.get(why, "2-judge")
 
 
+# -- the YAML the guard reads, parsed once per call through libyaml (W2-111, DEC-1187) ------------------------------
+
+_YAML = {"product": None, "seen": {}}  # the product's own loader, and this call's answers by their text
+
+
+def libyaml_reads_as_python(text):
+    """Whether libyaml's parser is taken for *text* (W2-111, P-W2-111-R5-ROWS (a)): a str with no tab, no ``?`` and no
+    BOM after its first character. libyaml reads three kinds of text the pure-Python parser refuses (rv-3 F1): a tab
+    as a separator (inside or after a value, after ``key:``), a ``?`` inside a flow item (``[a? b]``, ``[a?b]``: in a
+    flow the pure scanner ends a plain scalar at any ``?`` and takes it as a key indicator) and a BOM at the start of
+    a later line (libyaml skips it; the pure scanner only at the first character). Whether a ``?`` lies in a flow
+    cannot be told without scanning, so any ``?`` takes the pure parser; so does a byte string. The product's
+    gov.util.parts.libyaml_reads_as_python, word for word."""
+    return (isinstance(text, str) and "\t" not in text and "?" not in text
+            and "﻿" not in text[1:])
+
+
+def load_yaml_unique(stream):
+    """W2-111 (DEC-1187, P-W2-111-R5-ROWS (a)): the pure-Python SafeLoader's answer with the check of a key written
+    twice (the pinned product's loader), the same data or the same refusal with its text. A text
+    ``libyaml_reads_as_python`` passes is parsed by libyaml's CSafeLoader when it is installed (the pure-Python
+    SafeLoader took 30 ms of every call); its constructor and resolver are SafeLoader's own and the check of a key
+    written twice is the product's, word for word. Any other text, and any text whose libyaml parse raises (a YAML
+    error, a key written twice, no libyaml), is given to the product's own loader, so every refusal and its text are
+    the pure loader's, never this one's. A stream is read first and given to the product's loader as a stream of the
+    same name and text (the pure loader names a stream's file in its error's mark). Each text is parsed once per hook
+    run (one run judges one call; nothing is kept on disk or across calls), and each caller gets its own copy.
+    Hook-local until 0.1.1: the product's loader does the same from 0.1.1 on (gov.util.parts, W2-111)."""
+    import copy
+    text = stream.read() if hasattr(stream, "read") else stream
+    seen = _YAML["seen"]
+    key = (type(text), text) if isinstance(text, (str, bytes)) else None
+    if key is None or key not in seen:
+        done = False
+        if libyaml_reads_as_python(text):
+            try:
+                import yaml
+
+                class Loader(yaml.CSafeLoader):
+                    def construct_mapping(self, node, deep=False):
+                        mapping = super().construct_mapping(node, deep=deep)
+                        if len(mapping) != len(node.value):
+                            raise yaml.constructor.ConstructorError(
+                                None, None, "a key is written twice", node.start_mark)
+                        return mapping
+
+                data, done = yaml.load(text, Loader=Loader), True
+            except Exception:
+                pass  # the product's answer, or its own error, below
+        if not done:
+            again = text
+            if text is not stream:  # a stream: the same text again, under the stream's name
+                import io
+                again = io.BytesIO(text) if isinstance(text, bytes) else io.StringIO(text)
+                if hasattr(stream, "name"):
+                    again.name = stream.name
+            data = _YAML["product"](again)
+        if key is None:
+            return data
+        seen[key] = data
+    return copy.deepcopy(seen[key])
+
+
+def use_fast_yaml():
+    """The pinned judge's held-out loader and evaluation sets read their YAML through ``load_yaml_unique`` above:
+    the name in gov.util.parts (evaluation_sets) and in gov.guard.heldout (load_held_out, which imported it), for
+    this hook run only. The product's loader is kept as the fallback. Hook-local until 0.1.1."""
+    from gov.guard import heldout
+    from gov.util import parts
+    if _YAML["product"] is None:
+        _YAML["product"] = parts.load_yaml_unique
+    parts.load_yaml_unique = load_yaml_unique
+    heldout.load_yaml_unique = load_yaml_unique
+
+
 def parse_both(parse, command, cwd):
     """The product's parser on a command it is to read as before this fix, and, when the command continues a line
     with a backslash-newline, on the text with each one removed too (ACT-GUARD-FIX-3 round 2): the targets of both,
@@ -399,7 +474,7 @@ def _tree_roots(root):
         try:
             out = subprocess.run(["git", "-C", repo, "worktree", "list", "--porcelain"], capture_output=True,
                                  text=True, timeout=5).stdout
-            return [os.path.realpath(line[9:]) for line in out.splitlines() if line.startswith("worktree ")]
+            return realpaths([line[9:] for line in out.splitlines() if line.startswith("worktree ")])
         except Exception:
             return []
 
@@ -414,9 +489,67 @@ def _tree_roots(root):
             roots += [os.path.realpath(origin)] + worktrees(origin)
     except Exception:
         pass
-    for pattern in ("*/.git", "*/*/.git", "*/*/*/.git", "*/*/*/*/.git"):
-        roots += [os.path.realpath(os.path.dirname(g)) for g in glob.glob(os.path.join(RUNS, pattern))]
+    roots += realpaths([os.path.dirname(g) for g in runs_gits(RUNS)])
     return list(dict.fromkeys(roots))
+
+
+def realpaths(paths):
+    """W2-111 (DEC-1187): ``os.path.realpath`` of each path, the folders they share resolved once (39 worktrees under
+    one folder: one walk of that folder, not 39). An absolute, normal path whose last name is no link is its folder's
+    real path and that name, as realpath walks it (a name it cannot stat is no link, as realpath takes it); any other
+    path is realpath's own. The same code as the product's gov.guard.reads._realpaths (W2-111 r4, in 0.1.1)."""
+    seen = {}
+
+    def real(path):
+        if path not in seen:
+            folder, name = os.path.split(path)
+            if not name or name in (".", "..") or not os.path.isabs(path) or os.path.normpath(path) != path:
+                seen[path] = os.path.realpath(path)
+            else:
+                at = os.path.join(real(folder), name)
+                try:
+                    link = stat.S_ISLNK(os.lstat(at).st_mode)
+                except OSError:
+                    link = False
+                seen[path] = os.path.realpath(path) if link else at
+        return seen[path]
+    return [real(p) for p in paths]
+
+
+RUNS_GLOBS = ("*/.git", "*/*/.git", "*/*/*/.git", "*/*/*/*/.git")  # the run clones' .git, at depth 1 to 4
+
+
+def _glob_folders(folder):
+    """glob's own listing of one folder for a ``*`` that has more parts after it: the names of the entries that are
+    folders (links to folders too: is_dir() follows them), not hidden (no leading dot), in the order the folder lists
+    them; an entry that cannot be stat'ed is passed over, and a folder that cannot be listed gives what was listed
+    before the error, as glob._iterdir and glob._listdir do."""
+    names = []
+    try:
+        with os.scandir(folder) as it:
+            for entry in it:
+                try:
+                    if entry.is_dir():
+                        names.append(entry.name)
+                except OSError:
+                    pass
+    except OSError:
+        pass
+    return [n for n in names if n[:1] != "."]
+
+
+def runs_gits(top):
+    """W2-111 (DEC-1187): exactly ``[g for p in RUNS_GLOBS for g in glob.glob(os.path.join(top, p))]``, the same
+    paths in the same order, with each folder listed once instead of once per glob (the 4 globs listed the first
+    level 4 times, the second 3 and the third 2: about 640 listings on every call). Glob k's matches are the depth-k
+    folders that hold a .git (os.path.lexists, glob's test of a literal last part), in glob's order: the depth-k
+    folders are each depth-(k-1) folder's listing in turn, as glob's own recursion yields them."""
+    found, level = [], [top]
+    for _pattern in RUNS_GLOBS:
+        # os.path.join(d, n), as posixpath.join writes it for a name with no slash (a listed name has none)
+        level = [(d + n if d.endswith("/") else d + "/" + n) for d in level for n in _glob_folders(d)]
+        found += [g for g in (d + "/.git" for d in level) if os.path.lexists(g)]
+    return found
 
 
 def review_may_write(path, root, cwd, made=()):
@@ -647,7 +780,11 @@ def session_applies(entry, mine, root, main, ticket):
     if not ticket:
         return False
     from gov.guard import reads
-    names = set(reads._ticket(root, ticket)[0]) | set(reads._ticket(main, ticket)[0]) | {ticket}
+    here = reads._ticket(root, ticket)[0]
+    # W2-111 (DEC-1187): the main tree's ticket is read only when it is another tree's (the same folder, the same
+    # file: the same names, or the same refusal raised by the first read)
+    there = here if os.path.realpath(root) == main else reads._ticket(main, ticket)[0]
+    names = set(here) | set(there) | {ticket}
     return bool(names & set(tickets))
 
 
@@ -761,6 +898,246 @@ def write_refusal(entries, tool, tin, command, cwd):
 _CLASSES = []
 
 
+# -- P-GUARD-FP-1 (b), DEC-1199 (5): shell-local literal values for the revision rule (round 2: a strict grammar) ------
+# In one Bash command, a statement `NAME=<literal>` (at the top level, after the start, `;` or a newline, followed by
+# `;`, a newline, `&&`, `||` or the end) and a top-level `for NAME in <literal words>; do ... done` give NAME its values.
+# The revision rule (the copied _Judge.git, colon, cat_file, patched, stored and ask, through classes()'s _expand_token)
+# then judges each value as if typed: one judgement per value of a loop, at most _LOCAL_MOST. Nothing else reads them.
+# The reading is a grammar, not a deny list: the whole command must be made of what it follows, or nothing is bound
+# (every name stays a word the guard cannot resolve, refused as before). It follows only: plain words (letters, digits
+# and _./+:%@,^=- unquoted; any text in single quotes; in double quotes, text without a backslash, a backtick or $
+# other than $NAME); $NAME and ${NAME} references; the separators ; && || | & and newline; the redirections > >> <
+# >& <& &> >| to a plain word; the for-loop form above (not nested). Every command word must be a plain literal word,
+# not one of _LOCAL_DENY (the builtins and keywords that set or reread a variable or run text as code, the blocks and
+# the test forms). It refuses (binds nothing) on anything else: $( $[ $(( ${…:…} $' $" $1 $@ backticks, a backslash,
+# ( ) { } [ ] outside quotes, a heredoc or herestring, ;;, any IFS anywhere, an assignment anywhere but a statement of
+# its own at the top level, NAME+=, a value with anything but the plain characters (a value with a tilde, a glob, a
+# brace, a quote mark left or whitespace), a reference to NAME before NAME is first set, and a bound name written as
+# $NAME inside single quotes anywhere (the shell passes it literally). The pre-pass is skipped when the command has no
+# word git. A name the bind does not hold is not read from the hook's environment by the revision rule (round 2, F5),
+# but for $HOME, read as ~ is.
+
+_LOCAL = {"bind": {}}  # NAME -> value for the judgement being made; {} outside a Bash judgement
+_LOCAL_MOST = 16
+_LOCAL_DENY = frozenset(
+    "builtin command eval exec trap source . alias unalias declare typeset local export readonly unset read printf "
+    "mapfile readarray let getopts wait coproc enable shopt set fc history bind caller hash select case esac function "
+    "if then else elif fi while until time ! { } [ [[ ]] test in do done".split())
+_LOCAL_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
+_LOCAL_PLAIN = re.compile(r"[A-Za-z0-9_./+:%@,^=-]+\Z")
+_LOCAL_VALUE = re.compile(r"[A-Za-z0-9_./+:%@,^=-]+\Z")
+_LOCAL_REF = re.compile(r"\$(?:\{([A-Za-z_][A-Za-z0-9_]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
+_LOCAL_DOLLAR = re.compile(r"\$(?:\{[A-Za-z_][A-Za-z0-9_]*\}|[A-Za-z_][A-Za-z0-9_]*)")
+_LOCAL_REDIRECT = frozenset((">", ">>", "<", ">&", "<&", "&>", ">|"))
+_LOCAL_SEP = frozenset((";", "&&", "||", "|", "&"))
+
+
+def _local_lex(s):
+    """The command's tokens: ("op", text) or ("word", text without quotes, its unquoted-or-double-quoted text, plain
+    literal); and the single-quoted texts. None for anything outside the grammar."""
+    out, quoted, i, n = [], [], 0, len(s)
+    while i < n:
+        c = s[i]
+        if c in " \t\r":
+            i += 1
+            continue
+        if c == "\n":
+            out.append(("op", ";"))
+            i += 1
+            continue
+        if c == "#":
+            j = s.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        two = s[i:i + 2]
+        if two in ("<<", ";;", "|&"):
+            return None
+        if two in ("&&", "||", ">>", ">&", "<&", "&>", ">|"):
+            out.append(("op", two))
+            i += 2
+            continue
+        if c in ";&|<>":
+            out.append(("op", c))
+            i += 1
+            continue
+        if c in "(){}[]":
+            return None
+        text, seen, plain = [], [], True
+        while i < n and s[i] not in " \t\r\n;&|<>":
+            c = s[i]
+            if c == "'":
+                j = s.find("'", i + 1)
+                if j < 0:
+                    return None
+                text.append(s[i + 1:j])
+                quoted.append(s[i + 1:j])
+                plain = False
+                i = j + 1
+            elif c == '"':
+                j = s.find('"', i + 1)
+                if j < 0:
+                    return None
+                body = s[i + 1:j]
+                if "\\" in body or "`" in body or _LOCAL_DOLLAR.sub("", body).count("$"):
+                    return None
+                text.append(body)
+                seen.append(body)
+                plain = False
+                i = j + 1
+            elif c == "$":
+                m = _LOCAL_DOLLAR.match(s, i)
+                if not m:
+                    return None  # $( $[ $(( ${x:-y} $' $" $1 $@ $? ...
+                text.append(m.group(0))
+                seen.append(m.group(0))
+                plain = False
+                i = m.end()
+            elif c in "\\`(){}[]":
+                return None
+            else:
+                text.append(c)
+                seen.append(c)
+                i += 1
+        word = "".join(text)
+        if plain and not _LOCAL_PLAIN.match(word):
+            plain = False  # a glob, tilde or other character: allowed as an argument, never a command word or a value
+        out.append(("word", word, "".join(seen), plain))
+    return out, quoted
+
+
+def local_bindings(command):
+    """The binds to judge a Bash command under (P-GUARD-FP-1 (b)): [{}] when nothing is bound; otherwise one map of
+    NAME to value per judgement, every value of each loop."""
+    import itertools
+    if not command or not re.search(r"(?<![\w.-])git(?![\w.-])", command):
+        return [{}]
+    if re.search(r"(?<![A-Za-z0-9_])IFS(?![A-Za-z0-9_])", command):
+        return [{}]
+    lexed = _local_lex(command)
+    if lexed is None:
+        return [{}]
+    toks, quoted = lexed
+    values, first, refs, poisoned = {}, {}, {}, set()
+    start, before, in_loop = True, ";", False
+    i = 0
+    while i < len(toks):
+        t = toks[i]
+        if t[0] == "op":
+            op = t[1]
+            if op in _LOCAL_REDIRECT:
+                if i + 1 >= len(toks) or toks[i + 1][0] != "word" or not toks[i + 1][3]:
+                    return [{}]  # a redirection to anything but a plain word
+                i += 2
+                continue
+            before, start = op, True
+            i += 1
+            continue
+        _, word, seen, plain = t
+        for m in _LOCAL_REF.finditer(seen):
+            refs.setdefault(m.group(1) or m.group(2), i)
+        if not start:  # an argument (git -c a=b, env A=b): not an assignment of this shell
+            i += 1
+            continue
+        start = False
+        head = word.split("=", 1)[0]
+        if word == "for":
+            if in_loop or before not in (";",):
+                return [{}]  # nested, or after && || | &
+            if i + 2 >= len(toks) or toks[i + 1][0] != "word" or not toks[i + 1][3] or \
+                    not _LOCAL_NAME.match(toks[i + 1][1]) or toks[i + 2][:2] != ("word", "in"):
+                return [{}]
+            name, j, words = toks[i + 1][1], i + 3, []
+            while j < len(toks) and toks[j][0] == "word":
+                words.append(toks[j])
+                j += 1
+            if not words or j + 1 >= len(toks) or toks[j][:2] != ("op", ";") or toks[j + 1][:2] != ("word", "do"):
+                return [{}]
+            if all(w[3] and _LOCAL_VALUE.match(w[1]) for w in words):
+                values.setdefault(name, [])
+                values[name] += [w[1] for w in words]
+                first.setdefault(name, i)
+            else:
+                poisoned.add(name)
+            in_loop = True
+            i = j + 2  # past "; do"
+            start = True
+            continue
+        if word == "done":
+            if not in_loop:
+                return [{}]
+            in_loop = False
+            i += 1
+            continue
+        if "=" in word and _LOCAL_NAME.match(head.rstrip("+")) and seen.split("=", 1)[0] == head:
+            group, j = [], i
+            while j < len(toks) and toks[j][0] == "word" and "=" in toks[j][1] and \
+                    _LOCAL_NAME.match(toks[j][1].split("=", 1)[0].rstrip("+")):
+                group.append(toks[j])
+                j += 1
+            after = toks[j][1] if j < len(toks) else ";"
+            alone = j >= len(toks) or (toks[j][0] == "op" and after in (";", "&&", "||"))
+            for w in group:
+                name, value = w[1].split("=", 1)
+                if name.endswith("+"):
+                    poisoned.add(name[:-1])
+                elif (alone and not in_loop and before == ";" and w[3] and _LOCAL_VALUE.match(value)):
+                    values.setdefault(name, []).append(value)
+                    first.setdefault(name, i)
+                else:
+                    poisoned.add(name)
+            i = j
+            continue
+        if not plain or word in _LOCAL_DENY:
+            return [{}]  # a command word that is not a plain literal, or a builtin or keyword outside the grammar
+        i += 1
+    if in_loop:
+        return [{}]
+    for text in quoted:
+        for m in _LOCAL_REF.finditer(text):
+            poisoned.add(m.group(1) or m.group(2))  # written $NAME in single quotes: the shell passes it literally
+    names = [n for n in values if n not in poisoned and n in refs and refs[n] > first[n]]
+    choices = [(n, list(dict.fromkeys(values[n]))) for n in names]
+    total = 1
+    for _, vs in choices:
+        total *= len(vs)
+    if total > _LOCAL_MOST:
+        choices = [(n, vs) for n, vs in choices if len(vs) == 1]
+    if not choices:
+        return [{}]
+    return [dict(zip([n for n, _ in choices], combo)) for combo in itertools.product(*[vs for _, vs in choices])]
+
+
+def _local_subst(word):
+    """*word* with $NAME and ${NAME} of the judgement's bind replaced by their values; None when a $NAME is left that
+    the bind does not hold (round 2, F5: the revision rule never reads a name from the hook's own environment, which
+    need not be the shell's), except $HOME, which is read from the same HOME as ~ (the product expands both)."""
+    if not isinstance(word, str) or "$" not in word:
+        return word
+    bind = _LOCAL["bind"]
+    left = []
+
+    def one(m):
+        name = m.group(1) or m.group(2)
+        if name in bind:
+            return bind[name]
+        if name != "HOME":  # $HOME is read as ~ is, from the same HOME (the product expands both)
+            left.append(name)
+        return m.group(0)
+    out = _LOCAL_REF.sub(one, word)
+    return None if left else out
+
+
+# P-GUARD-FP-1 (b) round 2 (F5): every git option that prints a patch (a diff of file contents), so the revision rule
+# reads it as a patch: -p, -u, -U<n>, --unified, --patch-with-stat, --patch-with-raw, --cc, -c, --dd, --remerge-diff,
+# --binary, --word-diff[=...], --word-diff-regex=..., --color-words[=...], -W, --function-context.
+_PATCH_OPTIONS = frozenset(("-p", "--patch", "-u", "--patch-with-stat", "--patch-with-raw", "--cc", "-c", "--dd",
+                            "--remerge-diff", "--binary", "-W", "--function-context"))
+
+
+def _patchy(a):
+    return a in _PATCH_OPTIONS or a.startswith(("-U", "--unified", "--word-diff", "--color-words"))
+
+
 def classes():
     """SetsRoot, Judge (DEC-1082 (3)) and Narrow (ACT-SETS-GLOBS-1), made once the pinned judge is imported (inside
     main's fail-closed try)."""
@@ -785,7 +1162,11 @@ def classes():
     _Part = reads._Part
     _REV_FAULT = reads._REV_FAULT
     _git = reads._git
-    _expand_token = reads._expand_token
+    def _expand_token(word, _product=reads._expand_token):
+        """P-GUARD-FP-1 (b): the revision rule's expansion: a shell-local literal value of this judgement's bind
+        first (local_bindings); a $NAME the bind does not hold is not expanded (None: the hook's environment need
+        not be the shell's, round 2 F5); then the pinned judge's own expansion (~, and nothing else left)."""
+        return _product(_local_subst(word))
     _options = reads._options
     _pathspecs = reads._pathspecs
     _x_top = reads._x_top
@@ -956,7 +1337,7 @@ def classes():
                 why = self.reads("git", args, cwd)
                 # W2-42a R4: git cat-file is judged on for any session with a
                 # refused part (the object's place), the other two for the hidden.
-                if why or sub not in ("cat-file", "format-patch", "archive") or not (
+                if why or sub not in ("cat-file", "format-patch", "archive", "ls-tree") or not (
                         hidden or (sub == "cat-file" and self.parts)):
                     return why
             dd = rest.index("--") if "--" in rest else len(rest)
@@ -985,6 +1366,10 @@ def classes():
                 if hidden and (revs or "--cached" in before) and self.covers(specs, cwd, hidden):
                     return self.stored(revs, "--cached" in before, cwd, addr, hidden)
                 return ""
+            if sub == "ls-tree":  # P-GUARD-FP-1 (b): its tree-ish read with a literal revision, then its paths
+                operands = [a for a in before if not a.startswith("-")] + specs
+                return self.stored(operands[:1], False, cwd, addr, hidden) if (
+                    operands and self.covers(operands[1:], cwd, hidden)) else ""
             if sub == "archive":  # its tree-ish, then its paths
                 operands = _options(before, _ARCHIVE_VALUED)[0] + specs
                 return self.stored(operands[:1], False, cwd, addr, hidden) if (
@@ -1019,11 +1404,9 @@ def classes():
                             return why
                     return ""
             quiet = (any(a in _GIT_QUIET or a.startswith("--stat=") for a in before)
-                     and not any(a in ("-p", "--patch", "-u") or a.startswith("-U")
-                                 for a in before))
+                     and not any(_patchy(a) for a in before))
             if sub in ("log", "whatchanged"):
-                patch = not quiet and any(a in ("-p", "--patch", "-u") or a.startswith("-U")
-                                          for a in before)
+                patch = not quiet and any(_patchy(a) for a in before)
             else:
                 patch = sub == "format-patch" or not quiet and (
                     sub == "diff" or len(shown) < len(operands) or not operands)
@@ -1229,8 +1612,72 @@ def classes():
                 raise PolicyError(_REV_FAULT) from None
             return None if out.returncode else out.stdout
 
+    # W2-111 (DEC-1187; S8's rule, the product's gov.guard.reads._TreePart of r4): each tree's part is made when a path
+    # at, in or above the tree is judged. A part was made for every tree on every call (94 on the live repository,
+    # 18 ms), though a call's paths lie in one or two of them. Every answer is the made part's: a path not below the
+    # root is in no part of the tree (rel() is None, match(None) is False); a path that is not at, in or above the root
+    # is at or above none of its literal folders (each at or below the root); below() keeps the part's own first test.
+    # The globs are the evaluation sets' and the block's, checked as text paths (_paths_ok), so making a part cannot
+    # raise: making it later changes no refusal into an allow.
+    def tree_part(base):
+        class TreePart(base):
+            def __init__(self, root, globs, reason):  # no set-up of the part yet
+                self.root, self.globs, self.reason, self.base = root, globs, reason, None
+                self.strict = reason == reads.HIDDEN_REFUSAL
+                self._made = None
+
+            def made(self):
+                """The tree's part, made once."""
+                if self._made is None:
+                    self._made = base(self.root, self.globs, self.reason)
+                return self._made
+
+            @property
+            def lead(self):
+                return self.made().lead
+
+            @property
+            def rx(self):
+                return self.made().rx
+
+            @property
+            def literals(self):
+                return self.made().literals
+
+            def inside(self, path):
+                return self.rel(path) is not None and self.made().inside(path)
+
+            def match(self, rel):
+                return self.made().match(rel)
+
+            def under(self, path):
+                return reads._related(path, self.root) and self.made().under(path)
+
+            def held(self):
+                return self.made().held()
+
+            @property
+            def files(self):
+                return self.made().files
+
+            def below(self, folder):
+                if not folder or (self.strict and not reads._related(folder, self.root)):
+                    return []
+                return self.made().below(folder)
+        return TreePart
+
     _CLASSES.append((SetsRoot, Judge, Narrow))
+    _LAZY.append((tree_part(reads._Part), tree_part(Narrow)))
     return _CLASSES[0]
+
+
+_LAZY = []
+
+
+def tree_parts():
+    """W2-111: the lazy tree parts (TreePart of the judge's _Part, TreeNarrow of Narrow), made with ``classes``."""
+    classes()
+    return _LAZY[0]
 
 
 def inside(path, folder):
@@ -1350,6 +1797,77 @@ def rm_refusal(command, cwd, root):
     return None
 
 
+# -- the install check, PATH read once and only for a download (W2-111, DEC-1184 (3), DEC-1187) --------------------
+
+_PATH_READ = {}
+
+
+def _path_folders():
+    """The real folders of the current PATH, read once per PATH value (r4's gov.guard.install._path_folders)."""
+    value = os.environ.get("PATH", "")
+    found = _PATH_READ.get(value)
+    if found is None:
+        found = frozenset(os.path.realpath(d) for d in value.split(":") if d)
+        _PATH_READ.clear()
+        _PATH_READ[value] = found
+    return found
+
+
+def has_install(command):
+    """gov.guard.install.has_install as W2-111 r4 made it (S7, in 0.1.1): the same answer for every command, with the
+    real folders of PATH read only when a download names a target to compare them with, once per PATH value. The
+    pinned 0.1.0 resolved every PATH folder on every Bash call (46 in a real session, 27 under /mnt/c) before it
+    looked at the command. From 0.1.1 the product's own is used; until then this copy, over the pinned module's own
+    helpers (the same code in 0.1.0 and 0.1.1). Hook-local until 0.1.1."""
+    from gov.guard import install
+    if hasattr(install, "_path_folders"):  # 0.1.1 on: the product's own
+        return install.has_install(command)
+    for seg in install._segments(command):
+        cs = install._split(seg, install._is_pipe)
+        # Pipe to shell: curl/wget ... | sh/bash
+        if len(cs) >= 2:
+            ln, _ = install._head(cs[-1])
+            if ln in install._SH and any(
+                    install._head(c)[0] in ("curl", "wget") for c in cs[:-1]):
+                return True
+        for pcmd in cs:
+            nm, args = install._head(pcmd)
+            # Strip version suffix (pip3.11 -> pip, pip2 -> pip,
+            # python2.7 -> python): any trailing digits-and-dots.
+            j = len(nm)
+            while j > 0 and (nm[j - 1].isdigit() or nm[j - 1] == '.'):
+                j -= 1
+            if 0 < j < len(nm) and nm[j].isdigit():
+                nm = nm[:j]
+            # Package-manager install
+            if nm in install._PKG:
+                if "install" in args:
+                    return True
+                if nm == "npm":
+                    nopt = next((a for a in args if a[:1] != "-"), "")
+                    if nopt == "i":
+                        return True
+            elif nm in ("python", "python3"):
+                if (len(args) >= 3 and args[0] == "-m"
+                        and args[1] == "pip" and "install" in args[2:]):
+                    return True
+            elif nm == "uv":
+                if install._uv_install(args):
+                    return True
+            elif nm == "uvx":
+                return True
+            # Binary download into a PATH directory
+            if nm in ("curl", "wget"):
+                t = install._download_target(nm, args)
+                if t is not None:
+                    t = os.path.expanduser(t)
+                    if os.path.isabs(t) \
+                            and os.path.realpath(
+                                os.path.dirname(t)) in _path_folders():
+                        return True
+    return False
+
+
 def answer(decision, reason, rule):
     record(decision, rule)  # ACT-GUARD-CALLLOG-1: never raises, never changes the decision
     out = {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": decision,
@@ -1397,6 +1915,7 @@ def main():
     ticket = os.environ.get("GOV_TICKET")
     from gov.guard import reads
     from gov.guard.heldout import load_held_out, names_held_out
+    use_fast_yaml()  # W2-111 (DEC-1187): the same answers and refusals, through libyaml, each text once
     acting = reads.acting_role(role, data.get("agent_type"))
     command = tin.get("command") if tool == "Bash" and isinstance(tin.get("command"), str) else None
 
@@ -1410,11 +1929,12 @@ def main():
 
     # Rules 2 and 3, the hidden half and secrets: the product's read judge with only these parts.
     SetsRoot, Judge, Narrow = classes()
+    TreePart, TreeNarrow = tree_parts()  # W2-111: each tree's part made when a path at, in or above it is judged
     mine = list(dict.fromkeys((role, acting)))
     hidden = []
     for r in mine:
         hidden += reads._hidden(root, r, ticket)
-    parts = [reads._Part(t, hidden, reads.HIDDEN_REFUSAL) for t in tree_roots(root)] if hidden else []
+    parts = [TreePart(t, hidden, reads.HIDDEN_REFUSAL) for t in tree_roots(root)] if hidden else []
     # DEC-1082 (3): the sets root outside the repository. The main tree's block names the root, its globs and the roles
     # refused them. To those globs are added the hidden globs of each set that measures the role, from the main tree's
     # map (an older branch's map cannot drop a set). They are refused under the sets root and in every tree.
@@ -1429,14 +1949,23 @@ def main():
         outside = list(dict.fromkeys(outside))
         if outside:
             sets_parts = [SetsRoot(top, outside, reads.HIDDEN_REFUSAL)] + \
-                         [Narrow(t, outside, reads.HIDDEN_REFUSAL) for t in tree_roots(root)]
+                         [TreeNarrow(t, outside, reads.HIDDEN_REFUSAL) for t in tree_roots(root)]
     parts += sets_parts
     seen = tin
     if command is not None:
         # ACT-GUARD-FIX-3: a heredoc that cat or tee takes as data is no read; $((n+6)) is no listing.
         import bash_writes
         seen = dict(tin, command=bash_writes.reads_view(command))
-    why = Judge(root, parts).tool(tool, seen, cwd)
+    # P-GUARD-FP-1 (b): a shell-local literal value is judged by the revision rule as if typed; a loop, every value.
+    why = ""
+    for bind in (local_bindings(command) if command is not None else [{}]):
+        _LOCAL["bind"] = bind
+        try:
+            why = Judge(root, parts).tool(tool, seen, cwd)
+        finally:
+            _LOCAL["bind"] = {}
+        if why:
+            break
     if why:
         answer("deny", why, judge_rule(why))
 
@@ -1529,7 +2058,7 @@ def main():
 
     # Rule 4, installs.
     if tool == "Bash":
-        from gov.guard.install import has_install, has_sudo
+        from gov.guard.install import has_sudo  # has_install: this file's (W2-111, the PATH read once)
         command = tin.get("command") or ""
         if has_sudo(command):
             answer("deny", "sudo is refused to every session", "4-sudo")

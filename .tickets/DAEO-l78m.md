@@ -1,6 +1,6 @@
 ---
 id: DAEO-l78m
-status: closed
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:51Z
@@ -20,6 +20,7 @@ allowed_paths:
 - tests/acceptance/W2-81/test_w2_81_judge.py
 - tests/acceptance/W2-81/README.md
 - docs/probes/DAEO-l78m/**
+- docs/plan/wave-2/w2-81-rerun-0.1.1/**
 kpis:
   success:
   - 'Five repositories of different shapes, built at test time, file by file and commit by commit, each in a temporary folder of its own as a git repository of its own (as W1-41''s cases build theirs): a Python application with drifted specs and plans; a Rust workspace of several crates; a TypeScript monorepo of several packages; a repository of legacy documents and large files; a repository with a secret in its history. Nothing is cloned from this repository, its worktrees or the dev tiers, and no built repository is committed; the large files are generated at test time, never tracked [DEC-941, DEC-936 item 3.6, REPLAN-W2 section 7.6] Verify: the README''s "The five shapes, and the clean variant" and the builders'' self-tests in tests/acceptance/W2-81/ (accepted at the close)'
@@ -36,6 +37,8 @@ kpis:
   - 'The builders and the per-repository question sets serve W2-88''s proof of memory for any repository, read-only; the hidden half is W2-93''s [DEC-954 Q9f, DEC-957] Verify: W2-88''s acceptance suite imports the builders and question sets read-only (accepted at W2-88''s close)'
   - line: "S-STAGES (DEC-1197 (2)) The judge counts A7 and A10 as built from the adoption command's own stage list, `gov.adopt.command.STAGES` (the list `gov adopt --lite --stage` accepts, which names A7 and A10), not from `gov.adopt.project.STAGES` (A0 to A6, A8, A9); its self-test and the README's \"Today's list\" say the same; with A7 and A10 built, a repository whose A7 or A10 record is absent or malformed is MISSED and named, never NOT_BUILT and never passed"
     verify: "tests/acceptance/W2-81/test_w2_81_judge.py: `built_today()` holds A7 and A10 exactly when `gov.adopt.command.STAGES` lists them; a stand-in adoption output without the A7 record gives A7 MISSED (not NOT_BUILT) and NOT_READY naming it; one with both lite records in the stages' front matter gives them FOUND; the README's capability table row for A7, A10 reads built, from command.STAGES"
+  - line: "S-RERUN (DEC-1197 (3), DEC-1202, the exit proof) W2-81's full run on release 0.1.1 across its six repositories (the corrected adopter brief: a final gov rebuild, the A3, A7/A10 and launch forms, A9's --out; a LITE ticket cycle per repository for gov close; the memory-class rule so product documents are indexed) reaches READY, or READY but for exceptions the owner names one by one; in each repository gov doctor exits 0 and the governance share is measured"
+    verify: "the owner's operator's read step on 0.1.1 prints verdict READY (or each remaining reason named in an owner decision); the run record under docs/plan/wave-2/w2-81-rerun-0.1.1/ holds, per repository, the gov doctor command with exit code 0 and the governance share with the command that measured it"
   failure:
   - "A planted problem judged FOUND_AND_HANDLED when the adoption missed or mishandled it, or a missing or unreadable record read as handled. Verify: the mutation self-tests in test_w2_81_judge.py (a missed or unreadable record is MISSED; accepted at the close)"
   - "A READY verdict with a control flagged, a stage unmeasured, or a figure below its floor or reported alone. Verify: the mutation self-tests in test_w2_81_judge.py (a flagged control, an unmeasured stage, a figure below its floor or alone: NOT_READY)"
@@ -97,3 +100,4 @@ test designer's change (the role this ticket always had); the allowed paths are 
 the README and the narrow check's record (they were `tests/acceptance/W2-81/**`). The twelve success and five failure lines of 2026-10-29 predate the verify form and `gov brief` refuses them (`KPI_NO_VERIFY`); the CTO appended to each a Verify clause naming the README section and the self-tests or run that already check it, and changed no line's text (listed for the owner's reading). FULL: a narrow independent check
 (DEC-1154) before the land. The full re-run on 0.1.1 (DEC-1197 (3)) is the orchestrator's, after the re-pin.
 
+**Reopened 2026-11-16 by DEC-1202 (EXIT-PROOF yes):** W2-81 stands for Wave 2's proof on adopted repositories (W2-46 re-pointed to S-RERUN): the full re-run on release 0.1.1 across its six repositories (DEC-1197 (3), DND 257), with gov doctor green and the governance share measured in each. EXAMIN's adoption left Wave 2 for EXAMIN's Wave 0 (DEC-1201).

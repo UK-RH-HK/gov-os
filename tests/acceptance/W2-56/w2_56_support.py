@@ -5,7 +5,7 @@ The tests drive public interfaces only:
 - **``gov launch <role> <ticket> [-- <CLI arguments>]``**, through gov's console entry point (no install), with a
   stand-in for the CLI at ``<HOME>/.local/bin/claude``. The stand-in starts no session. It records what it was
   handed (its arguments, the ``--settings`` value, its whole process environment, its cwd, pid, process group and
-  session) and then runs the steps of a plan file written by the test (plant files, run git, start a grandchild,
+  session) and then runs the steps of a plan file written by the test (write files, run git, start a grandchild,
   wait for a file, end with a code or by SIGKILL). The plan's path is written into the stand-in itself, so the
   stand-in needs nothing from its environment, which is what the launcher cleans.
 - **``gov.codeintel``**, run in a pytest session of its own (``w2_56_daemon_probe.py``) with a stand-in for the
@@ -376,12 +376,6 @@ for step in plan:
             os.chmod(os.path.dirname(locked), 0o500)
         os.symlink(step["outside"], os.path.join(tmp, "link-outside"))
         os.mkfifo(os.path.join(tmp, "fifo"))
-    elif do == "plant":
-        for rel in step["names"]:
-            target = os.path.join(cwd, rel)
-            os.makedirs(os.path.dirname(target), exist_ok=True)
-            if not os.path.lexists(target):
-                open(target, "w").close()
     elif do == "write":
         target = os.path.join(cwd, fill(step["path"]))
         os.makedirs(os.path.dirname(target), exist_ok=True)
@@ -656,17 +650,3 @@ def leaks(env: dict, planted: dict) -> list[str]:
         if MARK in str(value) and not any(f"{name}=" in entry for entry in found):
             found.append(f"{name}={value!r} (holds the parent's mark)")
     return found
-
-
-# --------------------------------------------------------------------------
-# The placeholders (KPI S4)
-# --------------------------------------------------------------------------
-
-# The names the CLI's sandbox puts a placeholder at when nothing is there (its fixed write denials: shell and git
-# start-up files, editor folders, the CLI's own command and agent folders), each at the worktree's root.
-SANDBOX_NAMES = (".bashrc", ".bash_profile", ".zshrc", ".zprofile", ".profile", ".gitconfig", ".gitmodules",
-                 ".ripgreprc", ".mcp.json", ".vscode", ".idea", ".claude/commands", ".claude/agents")
-# The names the launcher's own deny rules write literally that need not exist (launcher._runtime_rules: every
-# prefix of "scratch" under .gov-runtime/): the sandbox puts a placeholder at each (DEC-402).
-DENIED_NAMES = tuple(f".gov-runtime/{'scratch'[:i]}" for i in range(1, len("scratch")))
-PLACEHOLDERS = SANDBOX_NAMES + DENIED_NAMES

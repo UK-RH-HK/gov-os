@@ -27,7 +27,6 @@ from __future__ import annotations
 import json
 import os
 import re
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -45,7 +44,6 @@ import w1_28_support as pause_support   # noqa: E402  ``gov pause`` through the 
 import w1_46_support as launch_support  # noqa: E402  ``gov launch`` and what the built settings say
 
 cli_support = pause_support.cli_support
-w47 = launch_support.w47
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 RUNTIME_REL = ".gov-runtime"
@@ -224,34 +222,6 @@ def freeze_pause(freeze_project, freeze_sandbox):
     return _pause
 
 
-@pytest.fixture(scope="session")
-def freeze_launch_base(tmp_path_factory):
-    """W1-46's launch fixture project, built once. Every test works on its own copy of it."""
-    return launch_support.make_project(tmp_path_factory.mktemp("w1-50-freeze-launch-base") / "repo")
-
-
-@pytest.fixture()
-def freeze_launch_project(freeze_launch_base, tmp_path, freeze_sandbox):
-    """This test's own copy of the launch project, with a ``held-out.yaml`` made up here (a stand-in directory)."""
-    target = tmp_path / "launch-repo"
-    shutil.copytree(freeze_launch_base, target, symlinks=True)
-    stand_in = w47.make_stand_in(freeze_sandbox.elsewhere / "held-out-stand-in")
-    w47.configure_stand_in(target, stand_in)
-    assert not os.path.lexists(flag(target)), "the launch fixture project starts with something at the flag's path"
-    return target
-
-
-@pytest.fixture()
-def freeze_launch(freeze_launch_project, freeze_sandbox):
-    """``launch(role)`` runs ``gov launch <role> <ticket>`` in the project, with the stand-in CLI: no session starts."""
-    cli = launch_support.install_stand_in_cli(freeze_sandbox)
-
-    def _launch(role=ENGINEER):
-        return launch_support.launch(freeze_launch_project, freeze_sandbox, cli, role, launch_support.TICKET_OF[role])
-
-    return _launch
-
-
 # --------------------------------------------------------------------------
 # Lifting a freeze (DEC-409): the batch of 2026-10-06
 # --------------------------------------------------------------------------
@@ -330,10 +300,3 @@ def freeze_frozen(freeze_project):
     """The project, frozen by a flag as ``gov pause`` leaves it. No command is run to set it."""
     put_flag(freeze_project)
     return freeze_project
-
-
-def literal_runtime_names(result, project, sandbox):
-    """The names directly under ``.gov-runtime/`` that the built settings deny by a literal ``Edit`` rule."""
-    runtime = os.path.join(os.path.realpath(project), RUNTIME_REL)
-    return sorted(os.path.basename(path) for path in launch_support.literal_edit_denials(result, project, sandbox)
-                  if os.path.dirname(path) == runtime)

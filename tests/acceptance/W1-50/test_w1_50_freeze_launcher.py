@@ -1,138 +1,28 @@
-"""W1-50, KPI line 2 (DEC-402): the launcher and the flag's path.
+"""W1-50, KPI line 2 (DEC-402): the flag's path, as the guard holds it.
 
 "gov launch does not deny the freeze flag's path when the flag does not exist
 at launch, so a launched session leaves no placeholder there."
 
-Cause, confirmed on a live session on 2026-10-05: the sandbox puts an empty
-file at every name its settings deny by a literal rule when that name does not
-exist, for as long as a command of the session runs. The guard of every other
-session, outside the sandbox, read the one at ``.gov-runtime/freeze`` as a
-freeze.
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.2, 6.1; release 0.1.2): ``gov launch`` writes no sandbox block and no
+deny rule of its own, so there is no literal rule and no sandbox placeholder at the flag's path any more. The cases
+that read the built settings' rules for the flag (no literal rule when nothing is there, a literal rule for a flag or
+an unmarked file that exists at launch, the patterns for the file tools, the other by-name rules) and the live
+session that watched for the sandbox's placeholder are retired.
 
-Three parts:
-
-- **The built settings**, read as W1-46's suite reads them (the ``--settings``
-  value a stand-in CLI is started with): no literal ``Edit`` rule names the
-  flag when nothing is at its path; a flag that exists at launch keeps its
-  literal rule, as every name under ``.gov-runtime/`` does (DEC-311); the
-  patterns still cover the path for the file tools; the launcher's other
-  by-name rules are as they were. An *unmarked* file at the path at launch is
-  denied by name like any name that exists (DEC-404, on package DP-F1).
-- **What the guard still holds** once the literal rule is gone: a worker's
-  Write, Edit and recognisable Bash writes to the flag's path are denied
-  whether nothing, a placeholder or a real flag is there. These hold today.
-- **One live session** (``local_only``, as W1-46 marks its own; the ticket
-  lead runs it): no file appears at the path while a worker's Bash runs.
-
-Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The live session is launched in W1-46's launch project built
-on a project generated from the template (``kernel_freeze_launch_base``): its ``.claude/settings.json`` is the one
-rulesync generates from the template's sources, so the session's guard is the kernel's, run from
-``governance/kernel/hooks/``, no longer this repository's live wiring (``tests/acceptance/W2-90/README.md``).
+What stays: **what the guard holds**: a worker's Write, Edit and recognisable Bash writes to the flag's path are
+denied whether nothing, a placeholder or a real flag is there.
 """
 
 from __future__ import annotations
 
 import os
-import shutil
-import sys
-import threading
-import time
-from pathlib import Path
 
 import pytest
 
 import w1_50_freeze_support as support
-from w1_50_freeze_support import (  # noqa: F401  fixtures
-    freeze_launch, freeze_launch_base, freeze_launch_project, freeze_project, freeze_sandbox)
+from w1_50_freeze_support import freeze_project, freeze_sandbox  # noqa: F401  fixtures
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
-
-import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
-
-
-@pytest.fixture(scope="module")
-def kernel_freeze_launch_base(tmp_path_factory):
-    """W1-46's launch fixture project on a project generated from the template, built once (W2-90)."""
-    try:
-        return kernel_wiring.w1_46_project(tmp_path_factory.mktemp("w2-90-w1-50-launcher-kernel"))
-    except kernel_wiring.GenerationFailed as exc:
-        pytest.fail(str(exc), pytrace=False)
-
-launch_support = support.launch_support
 ENGINEER = support.ENGINEER
-FLAG_NAME = "freeze"
-# The launcher's by-name rules for the names that would otherwise be matched as ``scratch`` (W1-46): unchanged.
-OTHER_NAMES = ["s", "sc", "scr", "scra", "scrat", "scratc"]
-
-
-# --------------------------------------------------------------------------
-# The built settings
-# --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", launch_support.WORKER_ROLES)
-def test_no_literal_rule_names_the_flag_when_nothing_is_at_its_path(freeze_launch, freeze_launch_project,
-                                                                    freeze_sandbox, role):
-    result = freeze_launch(role)
-    names = support.literal_runtime_names(result, freeze_launch_project, freeze_sandbox)
-    assert FLAG_NAME not in names, (
-        f"the settings built for a launched {role} deny {support.FLAG_REL} by a literal Edit rule although nothing "
-        f"is there: the sandbox will put a placeholder at the path (DEC-402). Literal names: {names}"
-    )
-
-
-def test_no_literal_rule_names_the_flag_when_the_runtime_directory_does_not_exist(freeze_launch,
-                                                                                  freeze_launch_project,
-                                                                                  freeze_sandbox):
-    shutil.rmtree(freeze_launch_project / support.RUNTIME_REL)
-    result = freeze_launch(ENGINEER)
-    names = support.literal_runtime_names(result, freeze_launch_project, freeze_sandbox)
-    assert FLAG_NAME not in names, f"a literal Edit rule names the flag in a project with no runtime directory: {names}"
-
-
-def test_a_flag_that_exists_at_launch_keeps_its_literal_rule(freeze_launch, freeze_launch_project, freeze_sandbox):
-    """DEC-311: every name that exists at launch. A real flag stays protected inside the sandbox."""
-    support.put_text(freeze_launch_project, support.A_MARKER_LINE)
-    result = freeze_launch(ENGINEER)
-    names = support.literal_runtime_names(result, freeze_launch_project, freeze_sandbox)
-    assert FLAG_NAME in names, (
-        f"a marked flag exists at launch and no literal Edit rule names it: a worker's Bash could remove it. "
-        f"Literal names: {names}"
-    )
-
-
-def test_an_unmarked_file_at_the_path_at_launch_has_a_literal_rule_too(freeze_launch, freeze_launch_project,
-                                                                       freeze_sandbox):
-    """DEC-404 (DP-F1, option a): denied by name whenever a file exists there at launch, marked or not (DEC-311)."""
-    support.put_placeholder(freeze_launch_project)
-    result = freeze_launch(ENGINEER)
-    names = support.literal_runtime_names(result, freeze_launch_project, freeze_sandbox)
-    assert FLAG_NAME in names, (
-        f"an empty file exists at {support.FLAG_REL} at launch and no literal Edit rule names it, although every "
-        f"name that exists at launch has one. Literal names: {names}"
-    )
-
-
-@pytest.mark.parametrize("at_launch", ("nothing", "a-marked-flag"))
-def test_the_patterns_still_deny_the_flag_to_the_file_tools(freeze_launch, freeze_launch_project, freeze_sandbox,
-                                                            at_launch):
-    """DEC-180: the pattern rules bind Write and Edit whatever exists. Only the literal rule changes."""
-    if at_launch == "a-marked-flag":
-        support.put_text(freeze_launch_project, support.A_MARKER_LINE)
-    result = freeze_launch(ENGINEER)
-    assert launch_support.edit_denied(result, support.FLAG_REL, freeze_launch_project, freeze_sandbox), (
-        f"no Edit deny rule of the built settings covers {support.FLAG_REL}; rules: "
-        f"{launch_support.deny_rules(result.settings(), 'Edit')}"
-    )
-
-
-def test_the_other_by_name_rules_are_as_they_were(freeze_launch, freeze_launch_project, freeze_sandbox):
-    """DEC-402 names the flag alone: the names at launch and the six prefixes of ``scratch`` keep their rules."""
-    at_launch = sorted(name for name in os.listdir(freeze_launch_project / support.RUNTIME_REL) if name != "scratch")
-    result = freeze_launch(ENGINEER)
-    names = support.literal_runtime_names(result, freeze_launch_project, freeze_sandbox)
-    missing = [name for name in at_launch + OTHER_NAMES if name not in names]
-    assert not missing, f"the built settings lost the literal Edit rule of {missing}; literal names: {names}"
-    assert "scratch" not in names, f"a literal Edit rule closes scratch: {names}"
 
 
 # --------------------------------------------------------------------------
@@ -181,104 +71,3 @@ def test_the_guard_denies_a_worker_s_write_to_the_flag_s_path(freeze_project, fr
         assert result.decision == "deny", f"with {state} at the path, Bash `{command}` by {role}: {result.describe()}"
     after = os.lstat(support.flag(freeze_project)) if os.path.lexists(support.flag(freeze_project)) else None
     assert (before is None) == (after is None), f"asking the guard changed what is at {FLAG}"
-
-
-# --------------------------------------------------------------------------
-# One live session
-# --------------------------------------------------------------------------
-
-SCRATCH = ".gov-runtime/scratch/w1-50"
-SESSION_TIMEOUT_S = 420.0
-# Rewrite-Reason: DEC-784 (W2-57, I1 F-7): the session launches with no CLAUDE* variable in the environment
-# (CLAUDECODE, CLAUDE_CODE_* and every other name beginning CLAUDE), as W1-46's live sessions do, not only a fixed
-# list of them: a run from a Claude session then launches as a run from a plain shell does.
-NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
-NOT_INHERITED_PREFIX = "CLAUDE"
-
-
-def inherited(environ):
-    """The caller's environment less ``GOV_ROLE``, ``GOV_TICKET`` and every name beginning ``CLAUDE`` (DEC-784)."""
-    return {key: value for key, value in environ.items()
-            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
-PROBE = f"""#!/bin/bash
-# W1-50 acceptance probe: what a launched worker's Bash sees at the flag's path, and time for the test to look.
-OUT={SCRATCH}/results.txt
-: > "$OUT"
-if [ -e {FLAG} ] || [ -L {FLAG} ]; then echo "inside=present" >> "$OUT"; else echo "inside=absent" >> "$OUT"; fi
-sleep 10
-if [ -e {FLAG} ] || [ -L {FLAG} ]; then echo "inside_later=present" >> "$OUT"; else echo "inside_later=absent" >> "$OUT"; fi
-echo "end=1" >> "$OUT"
-"""
-PROMPT = ("Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not "
-          f"work around it. Run this Bash command as written: bash {SCRATCH}/probe.sh  Then answer DONE.")
-
-
-def _watch(paths, seen, stop):
-    """Note every moment something is at one of ``paths``, as the file system outside the sandbox shows it."""
-    while not stop.is_set():
-        for name, path in paths.items():
-            try:
-                status = os.lstat(path)
-            except OSError:
-                continue
-            seen.setdefault(name, (oct(status.st_mode), status.st_size))
-        time.sleep(0.05)
-
-
-@pytest.mark.local_only
-def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(kernel_freeze_launch_base, tmp_path):
-    """A real engineer session, one Bash call of about ten seconds, watched from outside the sandbox.
-
-    ``.gov-runtime/s`` is the control: it keeps its by-name rule and does not
-    exist, so the sandbox's placeholder is expected there while the command
-    runs. It shows that the watcher sees a placeholder when there is one.
-    """
-    freeze_launch_base = kernel_freeze_launch_base
-    missing = [name for name in ("bwrap", "socat") if shutil.which(name) is None]
-    if not (Path.home() / launch_support.CLI_REL).is_file():
-        missing.append("~/.local/bin/claude")
-    if missing:
-        pytest.fail(f"a launched session needs {missing} on this machine", pytrace=False)
-
-    project = tmp_path / "repo"
-    shutil.copytree(freeze_launch_base, project, symlinks=True)
-    sandbox = launch_support.cli_support.make_sandbox(tmp_path / "sandbox")
-    support.w47.configure_stand_in(project, support.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
-    launch_support.write(project, f"{SCRATCH}/probe.sh", PROBE)
-    launch_support.set_live_launch_default(project, ENGINEER)
-    runtime = project / support.RUNTIME_REL
-    assert not os.path.lexists(runtime / FLAG_NAME) and not os.path.lexists(runtime / "s")
-
-    seen, stop = {}, threading.Event()
-    watcher = threading.Thread(target=_watch, args=({"flag": runtime / FLAG_NAME, "control": runtime / "s"}, seen,
-                                                    stop), daemon=True)
-    env = inherited(os.environ)
-    env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
-    # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
-    env.update(launch_support.plant_open_gate(sandbox))
-    watcher.start()
-    try:
-        run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER], "--",
-                                     "-p", PROMPT, "--permission-mode", "acceptEdits",
-                                     "--max-turns", "6", "--allowedTools", "Bash", env=env, timeout=SESSION_TIMEOUT_S)
-    finally:
-        stop.set()
-        watcher.join(timeout=5)
-
-    results_path = project / SCRATCH / "results.txt"
-    if not results_path.is_file() or "end=1" not in results_path.read_text(encoding="utf-8"):
-        pytest.fail(f"the launched session did not run the probe to its end\n{run.describe()[-1500:]}", pytrace=False)
-    results = dict(line.split("=", 1) for line in results_path.read_text(encoding="utf-8").splitlines() if "=" in line)
-
-    assert "flag" not in seen, (
-        f"while the session's Bash ran, something was at {FLAG} outside the sandbox (mode, size: {seen['flag']}): "
-        f"the launcher still denies the path by name (DEC-402)"
-    )
-    assert (results.get("inside"), results.get("inside_later")) == ("absent", "absent"), (
-        f"inside the sandbox the worker's Bash saw something at {FLAG}: {results}"
-    )
-    assert not os.path.lexists(runtime / FLAG_NAME), f"the session left something at {FLAG}"
-    assert "control" in seen, (
-        "the watcher saw no placeholder at .gov-runtime/s, which keeps its by-name rule: this case did not observe "
-        "the sandbox, so it shows nothing about the flag's path"
-    )

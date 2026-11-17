@@ -1,47 +1,19 @@
-"""W1-46 -- ``.gov-runtime/`` named literally at launch, and ``ln`` judged by the guard (batch 4, after implementation).
+"""W1-46 -- ``ln`` judged by the kernel's guard, and ``.gov-runtime/scratch/`` writable (batch 4, after implementation).
 
-DEC-311 (owner, on DP-14; amends DEC-180):
+Emergency 2 (docs/emergency-2/EMERGENCY-2.md 2.2, 6.1; release 0.1.2): the launcher writes no deny rule of its own,
+and this repository's settings no longer register the guard. Retired here: the literal ``Edit`` deny rules for the
+names under ``.gov-runtime/`` at launch (DEC-311's first line) and the cases that asked this repository's committed
+guard to refuse a write or an ``ln`` under ``.gov-runtime/`` or outside a role's paths. What stays asks the kernel's
+guard, generated from the template, and still holds: its controls (scratch stays writable to every role, ``ln`` to a
+destination the role may write is let through) and the research role's ``ln`` into its folder.
 
-- "The launcher's settings carry a literal ``Edit`` deny rule for every name
-  that exists under ``.gov-runtime/`` outside ``scratch/`` at launch, plus the
-  freeze flag."
-- "The guard treats the destination of ``ln`` as a write target."
-- "A new name created under ``.gov-runtime/`` at the OS level after launch is a
-  residual in ``bootstrap.md``." It is not tested as refused, here or in the
-  live session.
-- "``.gov-runtime/`` outside ``scratch/`` is denied by the guard to every role,
-  not only to the orchestrator."
-
-KPI success 10: "a write to the freeze flag, the snapshots, the findings or the
-records fails, through a file tool, through an opaque Bash form and through ln,
-while .gov-runtime/scratch/** stays writable (DEC-180, DEC-176)".
-
-**A literal rule** names one path and holds no ``*``, ``?`` or ``[``: the Linux
-sandbox skips a rule with one of them (EXP-001 §1), so only a literal rule
-stops a Bash command there. "Every name that exists under ``.gov-runtime/``"
-is read as the entries of that directory itself (``findings.jsonl``,
-``records.jsonl``, ``snapshots``): a rule on a directory holds for everything
-under it.
-
-**``ln``** is tested in its plain forms, ``ln [-s] <target> <destination>``,
-with ``-sf`` onto a name that exists and with a directory as the destination.
-Not tested: ``ln -t <directory>``, ``ln <target>`` with no destination, several
-targets, and what a hard link in a writable place lets a session do to the file
-it links to (README, reading 16: a residual for EXP-002).
-
-The guard is asked through the PreToolUse commands the project's committed
-settings register. No session is started.
-
-Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
-ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
-template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
-lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
-Each moved case names its fixtures by their old names in its first line; its verdict is the same.
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The ``kernel_*`` fixtures are W1-46's launch project built
+on a project generated from the template, whose ``.claude/settings.json`` rulesync generates from the template's
+sources, and the PreToolUse lines those settings register, run from ``governance/kernel/hooks/``
+(``tests/acceptance/W2-90/README.md``).
 """
 
 from __future__ import annotations
-
-import os
 
 import pytest
 
@@ -53,94 +25,13 @@ ORCHESTRATOR, PRODUCT_SPEC = w47.ORCHESTRATOR, w47.PRODUCT_SPEC
 FOLDER = support.EXPERIMENT_REL
 RUNTIME = ".gov-runtime"
 SEED = f"{RUNTIME}/scratch/w1-46/seed.txt"
-FREEZE = f"{RUNTIME}/freeze"
-PROTECTED = (FREEZE, f"{RUNTIME}/findings.jsonl", f"{RUNTIME}/records.jsonl", f"{RUNTIME}/snapshots/keep.json")
 # Every role the guard knows, with the ticket it works on in the fixture project.
 EVERY_ROLE = {**{role: w47.TICKET_OF[role] for role in (ORCHESTRATOR, PRODUCT_SPEC)}, **support.TICKET_OF}
 
 
-def _names_at_launch(project):
-    """The entries of ``.gov-runtime/`` outside ``scratch/``, as they are now."""
-    return sorted(name for name in os.listdir(project / RUNTIME) if name != "scratch")
-
-
-def _missing_literal_rules(result, project, sandbox, names):
-    root = os.path.realpath(project)
-    literal = support.literal_edit_denials(result, project, sandbox)
-    return [name for name in names if os.path.join(root, RUNTIME, name) not in literal]
-
-
 # --------------------------------------------------------------------------
-# The settings the launcher builds: a literal rule per name that exists at launch, plus the freeze flag
+# The kernel's guard: .gov-runtime/scratch/ stays writable to every role
 # --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_each_name_under_gov_runtime_at_launch_has_a_literal_edit_deny_rule(launch, project, sandbox, role):
-    names = _names_at_launch(project)
-    assert names == ["findings.jsonl", "records.jsonl", "snapshots"], f"the fixture's runtime directory holds {names}"
-    result = launch(role)
-    missing = _missing_literal_rules(result, project, sandbox, names)
-    assert missing == [], (
-        f"no literal Edit deny rule names .gov-runtime/{missing} for a launched {role}; rules: "
-        f"{support.deny_rules(result.settings(), 'Edit')}"
-    )
-
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_the_freeze_flag_has_no_literal_rule_when_it_does_not_exist_at_launch(launch, project, sandbox, role):
-    """Owner decision DEC-402, amending DEC-311: the sandbox puts a placeholder at a denied name that does not exist.
-
-    A flag that exists at launch keeps its rule, as every name does: ``tests/acceptance/W1-50/``.
-    """
-    assert not os.path.lexists(project / FREEZE), "the fixture project is frozen"
-    result = launch(role)
-    assert _missing_literal_rules(result, project, sandbox, ["freeze"]) == ["freeze"], (
-        f"a literal Edit deny rule names the freeze flag, which does not exist, for a launched {role}; rules: "
-        f"{support.deny_rules(result.settings(), 'Edit')}"
-    )
-
-
-def test_the_literal_rules_are_computed_at_each_launch(launch, project, sandbox):
-    """A file and a directory that appear between two launches are named by the second one."""
-    new = ["last_head.json", "w1-46-reports"]
-    launch(ENGINEER).session()
-    support.write(project, f"{RUNTIME}/last_head.json", "{}\n")
-    support.write(project, f"{RUNTIME}/w1-46-reports/one.txt", "x\n")
-    second = launch(ENGINEER)
-    missing = _missing_literal_rules(second, project, sandbox, new)
-    assert missing == [], f"names that exist under .gov-runtime/ at launch have no literal Edit deny rule: {missing}"
-
-
-@pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_no_literal_rule_names_scratch_or_a_path_under_it(launch, project, sandbox, role):
-    """ "Outside ``scratch/``": scratch stays writable for a Bash command too."""
-    scratch = os.path.join(os.path.realpath(project), RUNTIME, "scratch")
-    literal = support.literal_edit_denials(launch(role), project, sandbox)
-    closed = sorted(path for path in literal if path == scratch or path.startswith(scratch + "/"))
-    above = sorted(path for path in literal if scratch.startswith(path + "/"))
-    assert closed == [] and above == [], f"a literal Edit deny rule closes scratch: {closed + above}"
-
-
-# --------------------------------------------------------------------------
-# The guard: .gov-runtime/ outside scratch/ is refused to every role
-# --------------------------------------------------------------------------
-
-@pytest.mark.parametrize("role", (ORCHESTRATOR, PRODUCT_SPEC))
-def test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start(
-        guard, project, role):
-    """DEC-311: "to every role". The four worker roles are in ``test_w1_46_role_settings.py``."""
-    for rel in PROTECTED:
-        result = guard("Write", w47.write_input("Write", project / rel), role, EVERY_ROLE[role])
-        w47.assert_stopped(result, f"Write to {rel} by {role}")
-
-
-@pytest.mark.parametrize("role", sorted(EVERY_ROLE))
-def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(guard, project, role):
-    for rel in PROTECTED:
-        command = f"echo x > {rel}"
-        result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
-        w47.assert_stopped(result, f"`{command}` by {role}")
-
 
 @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
 def test_scratch_stays_writable_for_every_role(kernel_guard, kernel_project, role):
@@ -154,28 +45,14 @@ def test_scratch_stays_writable_for_every_role(kernel_guard, kernel_project, rol
 
 
 # --------------------------------------------------------------------------
-# The guard: the destination of ln is a write target
+# The kernel's guard: ln to a destination the role may write
 # --------------------------------------------------------------------------
 
 LINK = {"symbolic": "ln -s", "hard": "ln"}
-# Destinations an engineer on its ticket (src/gov/guard/**) may not write.
-NOT_WRITABLE = {
-    "the-runtime-directory": f"{RUNTIME}/w1-46-link",
-    "an-acceptance-test": "tests/acceptance/W1-90/test_w1_46_link.py",
-    "outside-the-tickets-paths": "docs/w1-46-link.md",
-}
 WRITABLE = {
     "inside-the-tickets-paths": "src/gov/guard/w1_46_link.py",
     "scratch": f"{RUNTIME}/scratch/w1-46/link.txt",
 }
-
-
-@pytest.mark.parametrize("kind", sorted(LINK))
-@pytest.mark.parametrize("name", sorted(NOT_WRITABLE))
-def test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write(guard, project, kind, name):
-    command = f"{LINK[kind]} {SEED} {NOT_WRITABLE[name]}"
-    result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
-    w47.assert_stopped(result, f"`{command}` by an engineer")
 
 
 @pytest.mark.parametrize("kind", sorted(LINK))
@@ -186,28 +63,6 @@ def test_the_guard_does_not_refuse_ln_to_a_destination_the_role_may_write(kernel
     command = f"{LINK[kind]} {SEED} {WRITABLE[name]}"
     result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
     w47.assert_allowed(result, f"`{command}` by an engineer")
-
-
-@pytest.mark.parametrize("command", (
-    f"ln -sf {SEED} {RUNTIME}/findings.jsonl",
-    f"ln -f {SEED} {RUNTIME}/records.jsonl",
-    f"ln -s {SEED} {RUNTIME}/snapshots",
-    f"cd {RUNTIME} && ln -s scratch/w1-46/seed.txt w1-46-link",
-), ids=("symbolic-forced-onto-the-findings", "hard-forced-onto-the-records", "into-the-snapshots-directory",
-        "after-cd-into-the-runtime-directory"))
-def test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime(guard, project, command):
-    """An option before the operands, a destination that is a directory, and a destination relative to ``cd``."""
-    result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
-    w47.assert_stopped(result, f"`{command}` by an engineer")
-
-
-@pytest.mark.parametrize("role", (ORCHESTRATOR, RESEARCH))
-def test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role(guard, project, role):
-    """ "To every role": the role with the widest scope, and the new one."""
-    for kind in sorted(LINK):
-        command = f"{LINK[kind]} {SEED} {RUNTIME}/w1-46-link"
-        result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
-        w47.assert_stopped(result, f"`{command}` by {role}")
 
 
 def test_the_guard_holds_a_research_ln_to_the_experiment_folder(kernel_guard, kernel_project):

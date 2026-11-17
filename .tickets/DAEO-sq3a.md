@@ -18,6 +18,13 @@ allowed_paths:
 - src/gov/launch/sandbox.py
 - tests/unit/retrieval/test_w2_186_*.py
 - tests/unit/launch/test_w2_186_*.py
+- tests/unit/launch/test_w1_28.py
+- tests/unit/launch/test_w2_56.py
+- tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py
+- tests/acceptance/W1-46/test_w1_46_research_allowlist.py
+- tests/acceptance/W1-46/test_w1_46_role_settings.py
+- tests/acceptance/W1-46/test_w1_46_launch_refusals.py
+- tests/acceptance/W1-28/test_w1_28_launch_product_spec.py
 - docs/changes/W2-186-evidence.md
 - docs/probes/DAEO-sq3a/**  # the probe record
 reads:
