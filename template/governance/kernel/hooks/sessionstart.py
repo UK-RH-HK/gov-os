@@ -110,7 +110,7 @@ def main() -> None:
         prompt = roster_prompt(project_root)
         if "/lead/" in rel:
             lead_ticket = ticket or "this worktree's ticket (GOV_TICKET is not set)"
-            appendix = f"appendix A5 of {prompt} and " if prompt else ""
+            appendix = f"{prompt} §4 and " if prompt else ""  # the roster's prompt: EMERGENCY-2.md's ticket model (11-17)
             critical_parts.append(
                 f"You are the ticket lead for {lead_ticket}; read {appendix}your checkpoint {rel} now.")
         else:
