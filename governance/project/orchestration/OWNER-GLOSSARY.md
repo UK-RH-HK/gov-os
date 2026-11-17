@@ -96,5 +96,6 @@ owner's phone only if the CTO has stalled; the stand-by file tells it the CTO is
 **Wave 2 / EXAMIN's copy.** Wave 2 is the current build of the Gov OS; EXAMIN's copy is the first adoption on a copy of
 a real product repository, which starts when its entry criteria (K9) are met, never because a date arrived.
 
-**The register / DECISIONS-IN-FORCE.** `docs/DECISION_REGISTER.md` holds every decision with its reasons; the short
-list in `governance/project/orchestration/DECISIONS-IN-FORCE.md` holds what is in force now.
+**The register / DECISIONS-IN-FORCE.** `docs/DECISION_REGISTER.md` holds every decision with its reasons. The short
+list DECISIONS-IN-FORCE is history in `docs/emergency-2/archive/` (EMERGENCY-2 11.1); what holds now is
+`docs/emergency-2/EMERGENCY-2.md`, and the register where it does not contradict it.

@@ -42,7 +42,7 @@ KEYWORDS = {
     "release": ("release", "version", "install", "package", "publish", "licen"),
 }
 HOMES = {  # where an entry in force that no file states yet is proposed to be written (DEC-851)
-    "repository": "governance/project/prompts/w2-orchestrator.md",
+    "repository": "docs/emergency-2/EMERGENCY-2.md",  # the rules in force (EMERGENCY-2 11.1, 11.2)
     "guard": "template/governance/kernel/hooks/pretooluse.py", "retrieval": "template/governance/kernel/skills/"
     "retrieval/SKILL.md", "context": "template/governance/kernel/skills/checkpoint/SKILL.md",
     "adopt": "template/governance/kernel/skills/adopt/SKILL.md", "plan": "template/governance/kernel/skills/planning/"
