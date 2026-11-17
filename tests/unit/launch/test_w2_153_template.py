@@ -240,9 +240,20 @@ def _launch_now(tmp_path: Path, with_template: bool) -> tuple[subprocess.Complet
     (tree / ".claude/templates").mkdir(parents=True)
     if with_template:
         (tree / ".claude/templates/role-lead.md").write_text("# lead\n", encoding="utf-8")
+    # ACT-BOX-LAUNCH-1 (DEC-1207 (b)): the lead form starts the lead through the owner's pinned box when it names one;
+    # a stub pinned box records its arguments and runs the command after "--" (a no-op for a form without the box).
+    box = home / ".gov-os-owner/box"
+    box.mkdir(parents=True)
+    (home / ".gov-os-owner/heldout").mkdir()
+    (home / ".gov-os-owner/heldout/MAP").write_text("", encoding="utf-8")
+    boxed = tmp_path / "box-argv.txt"
+    (box / "session_start.sh").write_text(
+        f'#!/bin/bash\nprintf "%s\\n" "$@" > "{boxed}"\nwhile [ $# -gt 0 ] && [ "$1" != -- ]; do shift; done\nshift\n'
+        'exec "$@"\n', encoding="utf-8")
     text = LAUNCH_NOW.read_text(encoding="utf-8")
     text = text.replace("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator", str(orch))
     text = text.replace("/home/usain/gov-os-worktrees", str(trees)).replace("/home/usain/.local", str(home / ".local"))
+    text = text.replace("/home/usain/.gov-os-owner", str(home / ".gov-os-owner"))
     script = tmp_path / "launch_now.sh"
     script.write_text(text, encoding="utf-8")
     done = subprocess.run(["bash", str(script), "W9-1", "T-1", "B.md", "L.json"], capture_output=True, text=True,
@@ -256,18 +267,31 @@ def test_the_dispatchers_lead_form_passes_the_lead_template(tmp_path):
     argv = record.read_text(encoding="utf-8").splitlines()
     template = str(tmp_path / "trees/W9-1/.claude/templates/role-lead.md")
     assert argv[-2:] == ["--append-system-prompt-file", template]
+    if "session_start.sh" in LAUNCH_NOW.read_text(encoding="utf-8"):  # ACT-BOX-LAUNCH-1: the lead runs in the box
+        box = (tmp_path / "box-argv.txt").read_text(encoding="utf-8").splitlines()
+        assert box[box.index("--scope") + 1] == "tree" and box[box.index("--ticket") + 1] == "T-1"
+        assert box[box.index("--rw") + 1] == str(tmp_path / "trees/W9-1")
 
 
 def test_the_dispatchers_lead_form_is_otherwise_the_same_command():
     """F2: removing the added flag line leaves the exec command as integrate's (the call form kept, D-4)."""
     lines = LAUNCH_NOW.read_text(encoding="utf-8").splitlines()
-    start = next(i for i, line in enumerate(lines) if line.startswith("exec /home/usain/.local/bin/claude "))
+    # ACT-BOX-LAUNCH-1 (DEC-1207 (b), DEC-1205 (2)(iii)) puts the box's start before the CLI and the CLI's own line
+    # after it, with full permission inside the box; without the box the CLI line is the exec itself, as at W2-153.
+    start = next(i for i, line in enumerate(lines)
+                 if line.startswith(("exec /home/usain/.local/bin/claude ", "  /home/usain/.local/bin/claude ")))
+    boxed = lines[start].startswith("  ")
+    if boxed:
+        assert lines[start - 2].startswith('exec bash "$BOX/session_start.sh" ')
+    head = lines[start].strip()
+    lines = lines[:start] + [head if head.startswith("exec ") else "exec " + head] + lines[start + 1:]
+    mode = "bypassPermissions"  # the owner's Emergency 2 (bb61d3d74, DEC-1209): every lead starts in the no-prompt mode
     # ACT-LEADS-ADD-DIR-1 (DEC-1161 (2)) added the lead's --add-dir line after W2-153; it is judged apart from this.
     command = [line for line in lines[start:start + 7]
                if "--append-system-prompt-file" not in line and not line.startswith("  --add-dir ")]
     assert command[:4] == [
         "exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json "
-        "--permission-mode acceptEdits \\",
+        f"--permission-mode {mode} \\",
         '  --allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob" \\',
         '  --settings "{\\"env\\":{\\"GOV_ROLE\\":\\"orchestrator\\",\\"GOV_TICKET\\":\\"$ID\\",'
         '\\"CLAUDE_CODE_SUBAGENT_MODEL\\":\\"claude-opus-5-5\\"}}" \\',

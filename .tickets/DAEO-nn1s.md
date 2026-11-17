@@ -1,7 +1,7 @@
 ---
 id: DAEO-nn1s
 status: open
-deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-r9ss, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-swdu, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-b926, DAEO-60rw, DAEO-0pyc, DAEO-lrre, DAEO-6n5k, DAEO-6ox0, DAEO-ha8z, DAEO-kl5e, DAEO-egsy, DAEO-siiz, DAEO-7rr2, DAEO-0rfi, DAEO-arrl, DAEO-wnnz, DAEO-cy5o, DAEO-5j8b, DAEO-kh9l, DAEO-cv58, DAEO-ecac, DAEO-iw1f, DAEO-h2k3, DAEO-juee, DAEO-pl6k, DAEO-0uhh, DAEO-e82f, DAEO-c1uz, DAEO-9nys, DAEO-2gc7, DAEO-rmbe, DAEO-uzme, DAEO-e8f0, DAEO-ye2a, DAEO-qty6, DAEO-2azm, DAEO-ebmh, DAEO-tgk2, DAEO-b6hm, DAEO-l78m, DAEO-4k3l, DAEO-m1u3, DAEO-gdzh, DAEO-s9qc, DAEO-jsg1, DAEO-2bdu, DAEO-8lmb, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-g87r, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-r9ss, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-swdu, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-0pyc, DAEO-lrre, DAEO-6n5k, DAEO-6ox0, DAEO-ha8z, DAEO-kl5e, DAEO-egsy, DAEO-siiz, DAEO-7rr2, DAEO-0rfi, DAEO-arrl, DAEO-wnnz, DAEO-cy5o, DAEO-5j8b, DAEO-kh9l, DAEO-cv58, DAEO-ecac, DAEO-iw1f, DAEO-h2k3, DAEO-juee, DAEO-pl6k, DAEO-0uhh, DAEO-e82f, DAEO-c1uz, DAEO-9nys, DAEO-2gc7, DAEO-rmbe, DAEO-uzme, DAEO-e8f0, DAEO-ye2a, DAEO-qty6, DAEO-2azm, DAEO-ebmh, DAEO-tgk2, DAEO-b6hm, DAEO-l78m, DAEO-4k3l, DAEO-m1u3, DAEO-gdzh, DAEO-s9qc, DAEO-jsg1, DAEO-2bdu, DAEO-8lmb, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-g87r, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -29,10 +29,6 @@ depends_on:
 - DAEO-r30l
 - DAEO-kmcr
 - DAEO-2ds6
-- DAEO-h4rh
-- DAEO-csj8
-- DAEO-b926
-- DAEO-60rw
 - DAEO-0pyc
 - DAEO-lrre
 - DAEO-6n5k
@@ -98,8 +94,8 @@ kpis:
   - 'Every exit criterion of §5 is run and evidenced, including: the full, uncached regression and the dev-tier regression, both green Verify: the exit run''s record holds the full uncached regression and the dev-tier regression, each with its command, its date and exit code 0'
   - 'Every exit criterion of §5 is run and evidenced, including: a mid-programme specification change on a-dev that propagates through CIT-P → CIT-E with the correct impact set (WBS §6 exit) Verify: the record holds a planted specification change on a-dev, its CIT-P to CIT-E trace and the impact set it listed, set beside the expected impact set with no difference'
   - 'Every exit criterion of §5 is run and evidenced, including: every Wave 2 close record listed with its exit code Verify: the record lists every Wave 2 close record with its exit code; a count of the close records on the integration branch equals the number of rows'
-  - 'Every exit criterion of §5 is run and evidenced, including: the governance share per programme, the EXAMIN pilot included Verify: the record holds the governance share for each programme, EXAMIN''s pilot included, each with the command that measured it'
-  - 'Every exit criterion of §5 is run and evidenced, including: gov doctor green in EXAMIN. Verify: the record holds the `gov doctor` run in EXAMIN with its output and exit code 0 [re-scoped, DEC-1083]'
+  - 'Every exit criterion of §5 is run and evidenced, including: the governance share per programme, measured on adopted repositories by W2-81''s S-RERUN (DEC-1202) Verify: the record holds the governance share for each programme and for each of W2-81''s six adopted repositories on release 0.1.1, each with the command that measured it'
+  - 'Every exit criterion of §5 is run and evidenced, including: gov doctor green on adopted repositories (W2-81''s S-RERUN, DEC-1202). Verify: the record holds the `gov doctor` run in each of W2-81''s six repositories on release 0.1.1 with its output and exit code 0 [re-scoped, DEC-1083; re-pointed, DEC-1202]'
   - 'AR-1 to AR-10 are each shown once, in order, in the Wave 2 exit run''s record, with the evidence path of each (DEC-721); the AR lines whose tickets moved to Wave 3 are named as Wave 3 there (DEC-953, DEC-954, W-8). EXP-003''s line is shown by W2-15a. Verify: the record holds ten rows, AR-1 to AR-10 in order, each with an evidence path that exists on disk; each AR line whose ticket moved to Wave 3 is named as Wave 3, and EXP-003''s row points to W2-15a [moved from W2-24 S5, DEC-1083] [re-worded, DEC-1084]'
   failure:
   - 'Any AR line not shown. Verify: a count of the AR rows in the record under ten, or an AR row with no evidence path, is the failure; neither is found in the record [moved from W2-24 F1, DEC-1083] [re-worded, DEC-1084]'
@@ -137,3 +133,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-46), as approved (DEC-729). The list row
   - every Wave 2 close record listed with its exit code;
   - the governance share per programme, the EXAMIN pilot included;
   - `gov doctor` green here and in EXAMIN.
+
+**Re-pointed 2026-11-16 by DEC-1202 (EXIT-PROOF yes):** EXAMIN's adoption left Wave 2 (DEC-1201); its two EXAMIN lines now read the proof on adopted repositories, W2-81's S-RERUN (the full re-run on release 0.1.1 across six repositories), and its four EXAMIN deps (W2-27 to W2-30) are dropped.

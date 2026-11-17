@@ -30,7 +30,6 @@ would start but for it), and, for a few, in a tree with no role file at all
 
 from __future__ import annotations
 
-import json
 import uuid
 
 import pytest
@@ -127,31 +126,12 @@ def test_a_prompt_that_names_the_round_2_arguments_as_words_is_launched(launch):
 # --------------------------------------------------------------------------
 # Every refusal of today's still refuses
 # --------------------------------------------------------------------------
-
-def _settings(change, rel=s.SETTINGS_REL):
-    return lambda project, sandbox, cli: s.rewrite_settings(project, change, rel)
-
-
-def _permissions(key, value):
-    return _settings(lambda data: data.setdefault("permissions", {}).update({key: value}))
-
-
-def _unwire(project, sandbox, cli):
-    s.write(project / s.SETTINGS_REL, json.dumps({"permissions": {"deny": []}}) + "\n")
-
+# Emergency 2 (release 0.1.2, EMERGENCY-2 2.1-2.3): the refusals of the no-prompt mode, --add-dir, --bare, a
+# repository sandbox key, disableAllHooks, added directories, a guard not wired, the held-out file and the research
+# folder are no longer made, and their cases are retired.
 
 def _not_json(project, sandbox, cli):
     s.write(project / s.SETTINGS_REL, "{ not json\n")
-
-
-def _held_out(project, sandbox, cli):
-    s.write(project / s.HELD_OUT_REL, "held_out_paths: not-a-list\n")
-
-
-def _two_experiment_folders(project, sandbox, cli):
-    ticket = s.Ticket(s.EXPERIMENT.tk, s.RESEARCH, s.EXPERIMENT.wbs,
-                      ("experiments/spikes/exp-960/**", "experiments/spikes/exp-961/**"), cls="research")
-    s.write(project / f".tickets/{ticket.tk}.md", s.ticket_text(ticket))
 
 
 def _no_cli(project, sandbox, cli):
@@ -160,32 +140,13 @@ def _no_cli(project, sandbox, cli):
 
 TODAY = {
     # (role, ticket, arguments after --, change before the launch, words today's message carries)
-    "skip-permissions": (s.ENGINEER, s.T, ("--dangerously-skip-permissions",), None, ("DEC-313",)),
-    "allow-skip-permissions": (s.ENGINEER, s.T, ("--allow-dangerously-skip-permissions",), None, ("DEC-313",)),
-    "bypass-mode-spaced": (s.ENGINEER, s.T, ("--permission-mode", "bypassPermissions"), None, ("DEC-313",)),
-    "bypass-mode-joined": (s.ENGINEER, s.T, ("--permission-mode=bypassPermissions",), None, ("DEC-313",)),
-    "add-dir-spaced": (s.ENGINEER, s.T, ("--add-dir", "/w260a-added"), None, ("--add-dir", "DEC-313")),
-    "add-dir-joined": (s.ENGINEER, s.T, ("--add-dir=/w260a-added",), None, ("--add-dir", "DEC-313")),
     "settings-spaced": (s.ENGINEER, s.T, ("--settings", "{}"), None, ("--settings",)),
     "settings-joined": (s.ENGINEER, s.T, ("--settings=/w260a/settings.json",), None, ("--settings",)),
-    "bare": (s.ENGINEER, s.T, ("--bare",), None, ("--bare",)),
     "setting-sources-spaced": (s.ENGINEER, s.T, ("--setting-sources", "user,project,local"), None,
                                ("--setting-sources",)),
     "setting-sources-the-launcher-s-own-value": (s.ENGINEER, s.T, ("--setting-sources=project,local",), None,
                                                  ("--setting-sources",)),
-    "sandbox-key-committed": (s.ENGINEER, s.T, (), _settings(lambda d: d.update({"sandbox": {"enabled": False}})),
-                              ("DEC-233",)),
-    "sandbox-key-local": (s.ENGINEER, s.T, (), _settings(lambda d: d.update({"sandbox": {}}), s.LOCAL_SETTINGS_REL),
-                          ("DEC-233",)),
-    "disable-all-hooks": (s.ENGINEER, s.T, (), _settings(lambda d: d.update({"disableAllHooks": True})),
-                          ("disableAllHooks",)),
-    "bypass-default-mode": (s.ENGINEER, s.T, (), _permissions("defaultMode", "bypassPermissions"), ("DEC-313",)),
-    "additional-directories": (s.ENGINEER, s.T, (), _permissions("additionalDirectories", ["/w260a-added"]),
-                               ("DEC-313",)),
-    "guard-not-wired": (s.ENGINEER, s.T, (), _unwire, ("does not register the guard",)),
     "settings-not-json": (s.ENGINEER, s.T, (), _not_json, ("cannot be read",)),
-    "held-out-malformed": (s.ENGINEER, s.T, (), _held_out, ("DEC-218",)),
-    "research-two-folders": (s.RESEARCH, s.EXPERIMENT, (), _two_experiment_folders, ("DEC-242",)),
     # Since W2-136 (DEC-1088 (5)) a launch of the orchestrator is a lead launch, refused for a ticket on no approved
     # ready list ("no lead for ticket '<id>': no approved ready list can be read ..."); still no CLI start, no record.
     "orchestrator": (s.ORCHESTRATOR, s.T, (), None, ("no lead for ticket",)),
@@ -207,7 +168,7 @@ def test_every_refusal_the_launcher_makes_today_still_refuses(sandbox, project, 
     s.assert_refused(s.launch(sandbox, cli, role, ticket, *passed), "LAUNCH_REFUSED", *words)
 
 
-FIRST = ("bare", "setting-sources-spaced", "unknown-ticket", "sandbox-key-committed", "no-cli")
+FIRST = ("settings-spaced", "setting-sources-spaced", "unknown-ticket", "settings-not-json", "no-cli")
 
 
 @pytest.mark.parametrize("case", FIRST)

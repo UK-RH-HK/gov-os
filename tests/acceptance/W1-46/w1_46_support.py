@@ -147,25 +147,16 @@ RUNTIME_FILES = {
     ".gov-runtime/snapshots/keep.json": "{}\n",
     ".gov-runtime/scratch/w1-46/seed.txt": "seed\n",
 }
-PROTECTED_RUNTIME = (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
-                     ".gov-runtime/snapshots/keep.json", ".gov-runtime/snapshots/new.json",
-                     ".gov-runtime/last_head.json", ".gov-runtime/a-link")
-SCRATCH_PATHS = (".gov-runtime/scratch/w1-46/seed.txt", ".gov-runtime/scratch/new/file.txt")
 
-# The starting hosts of the research allowlist, copied from DEC-241 in the register, less the host DEC-316 drops.
+# The starting hosts of the research allowlist (DEC-241 less DEC-316's), which the live research probe asks.
 STARTING_HOSTS = (
     "github.com", "api.github.com", "raw.githubusercontent.com", "objects.githubusercontent.com",
     "codeload.github.com", "pypi.org", "files.pythonhosted.org", "registry.npmjs.org", "huggingface.co",
     "arxiv.org", "export.arxiv.org", "docs.python.org", "docs.rs", "crates.io",
     "static.crates.io", "developer.mozilla.org",
 )
-DROPPED_HOST = "cdn-lfs.huggingface.co"   # DEC-316: it does not resolve; no longer a starting host
-ALLOWLIST_KEY = "hosts"                   # DEC-272
-# "And the subdomains of readthedocs.io": the entry's form in the sandbox, and one host it must accept.
-READTHEDOCS_ENTRY = "*.readthedocs.io"
+# One subdomain of readthedocs.io, which the live research probe asks.
 READTHEDOCS_HOST = "docs.readthedocs.io"
-NOT_A_RESEARCH_HOST = "w1-46-not-allowlisted.example"
-ADDED_HOST = "w1-46-added-by-the-owner.example"
 
 COMMAND_TIMEOUT_S = 60.0
 HOOK_TIMEOUT_S = 30.0
@@ -540,73 +531,11 @@ def caller_args_then_template_pair(argv, args, role=None):
 # What the built settings say
 # --------------------------------------------------------------------------
 
-def sandbox_faults(settings):
-    """Why the settings are not "on, strict and fail-closed" (CAP-61.a); empty when they are."""
-    block = settings.get("sandbox")
-    if not isinstance(block, dict):
-        return ["the settings carry no sandbox block"]
-    faults = []
-    if block.get("enabled") is not True:
-        faults.append("sandbox.enabled is not true")
-    if block.get("failIfUnavailable") is not True:
-        faults.append("sandbox.failIfUnavailable is not true")
-    if block.get("allowUnsandboxedCommands") is not False:
-        faults.append("sandbox.allowUnsandboxedCommands is not false")
-    network = block.get("network")
-    if not isinstance(network, dict) or network.get("strictAllowlist") is not True:
-        faults.append("sandbox.network.strictAllowlist is not true")
-    if block.get("excludedCommands"):
-        faults.append("sandbox.excludedCommands has an entry (DEC-164)")
-    return faults
-
-
 def allowed_domains(settings):
     network = settings.get("sandbox", {}).get("network", {})
     domains = network.get("allowedDomains", []) if isinstance(network, dict) else []
     assert isinstance(domains, list), f"sandbox.network.allowedDomains is not a list: {domains!r}"
     return domains
-
-
-def accepts(domains, host):
-    """A domain allowlist accepts ``host`` as the sandbox does: the same name, or a subdomain of a ``*.`` entry."""
-    for entry in domains:
-        entry = str(entry).lower()
-        if entry == host or (entry.startswith("*.") and host.endswith(entry[1:])):
-            return True
-    return False
-
-
-def rewrite_allowlist(project, change):
-    """Rewrite the project's research allowlist: ``change`` gets the list of entries and returns what replaces it.
-
-    The list is under the key ``hosts`` (DEC-272); the rest of the file is kept.
-    A file of another shape is rewritten in its own shape, so that a test of a
-    malformed file can start from it.
-    """
-    path = Path(project) / ALLOWLIST_REL
-    assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if isinstance(data, list):
-        new = change(list(data))
-    else:
-        keys = [key for key, value in data.items() if isinstance(value, list)] if isinstance(data, dict) else []
-        assert len(keys) == 1, (
-            f"{ALLOWLIST_REL} is neither a list of hosts nor a mapping with one list of hosts: this test must be "
-            "revised for its shape"
-        )
-        new = dict(data)
-        new[keys[0]] = change(list(data[keys[0]]))
-    path.write_text(yaml.safe_dump(new, default_flow_style=False), encoding="utf-8")
-    return path
-
-
-def allowlist_key(project):
-    """The key that holds the list of hosts in the project's research allowlist, or None for a top-level list."""
-    path = Path(project) / ALLOWLIST_REL
-    assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    keys = [key for key, value in data.items() if isinstance(value, list)] if isinstance(data, dict) else []
-    return keys[0] if len(keys) == 1 else None
 
 
 def hook_keys(settings):
@@ -697,25 +626,6 @@ def covers(specs, relpath, project, home):
         if any(regex.match(candidate) for candidate in candidates):
             return True
     return False
-
-
-def edit_denied(result, relpath, project, sandbox):
-    return covers(deny_rules(result.settings(), "Edit"), relpath, Path(project), sandbox.home)
-
-
-def literal_edit_denials(result, project, sandbox):
-    """The absolute paths the built settings deny by a literal ``Edit`` rule: a rule that names one path, no pattern.
-
-    The Linux sandbox skips a rule with ``*``, ``?`` or ``[`` in it (EXP-001
-    §1), so only a literal rule binds a Bash command there (DEC-311).
-    """
-    root = os.path.realpath(project)
-    return {os.path.normpath(_absolute(spec, root, str(sandbox.home)))
-            for spec in deny_rules(result.settings(), "Edit") if not has_glob_character(spec)}
-
-
-def has_glob_character(name):
-    return any(character in name for character in "*?[")
 
 
 # --------------------------------------------------------------------------

@@ -43,6 +43,10 @@ commands:
   context:
     run: 'gov context {ID} --role {WORKER_ROLE}'
     check: 'gov context --help'
+  brief:
+    # the owner's Emergency 2: a worker's brief is built by gov brief, not gov context
+    run: 'gov brief {WORKER_ROLE} {ID}'
+    check: 'gov brief --help'
   links:
     run: 'gov links --since {BASE}'
     check: 'gov links --help'
@@ -152,7 +156,8 @@ steps:
     line: 'Before every heavy run and at the end, give {CMD:scratch_size} and {CMD:scratch_inodes} in `evidence` [DEC-898].'
     match: 'du -s'
   context_ceiling:
-    "on": true
+    # off: the owner's Emergency 2 (2026-11-16): gov context out of the lead steps
+    "on": false
     line: 'Before DONE, run {CMD:context_ceiling} once; on CONTEXT_OVER_CEILING return the figures and a package naming what to trim [DEC-1027].'
     match: 'gov(\.cli\.main)? context \S+ --json'
   checkpoint_record:

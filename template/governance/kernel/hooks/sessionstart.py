@@ -146,16 +146,7 @@ def main() -> None:
             critical_parts.append(f"{rel} is missing, can't be read or has no RESUME HERE section.")
 
     optional_parts: list[str] = []
-    if ticket:
-        try:
-            _add_src(project_root)
-            from gov.context import context
-            result = context(Path(project_root), ticket, brief=True)
-            summary = result.get("summary", "")
-            if summary:
-                optional_parts.append(summary)
-        except Exception:
-            pass
+    # The owner's Emergency 2 (2026-11-16): no `gov context` packet at session start; the checkpoint injection stays.
 
     try:
         done = subprocess.run(

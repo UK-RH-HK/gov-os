@@ -1,0 +1,107 @@
+- [Stand-by file when waiting](standby-file-when-waiting.md) — write log/cto-standby.txt whenever waiting on the owner or operator; end it when the wait ends
+- [Sentinel down: push the owner](sentinel-down-push.md) — on a sentinel-down inbox item, PushNotification at once, any hour; re-arm sentinel_check.sh each session
+- [Waits by pid only](waits-by-pid-only.md) — every wait/stop via tools/proc.sh by pid or -pgid, never a name match (L-0075, DEC-1073)
+- [Merge never staged](merge-never-staged.md) — never leave a --no-commit merge in the shared main tree; merge in one command with the ticket trailer
+- [Control paths by ACT](control-paths-by-act.md) — check class-rules.yaml before briefing an edit to a committed tool; (b)/(O) paths go by ACT
+- [Merge Task trailer](merge-task-trailer.md) — a ticket merge carries the ticket's Task id, not only DAEO-sdxk (landing P1 on control paths)
+- [act-in-progress holds the operator](act-in-progress-holds-operator.md) — log/act-in-progress.txt makes G9 hold every queued ACT; absent before queuing a .req
+- [Check before a ready line](check-before-ready-line.md) — role-lead.md in the worktree, brief non-empty, no {UPPER} slots, unused log name
+- [Pytest through heavy_slot.sh](pytest-through-heavy-slot.md) — every pytest (lead and workers) via heavy_slot.sh, TMPDIR outside the repo; put it in every brief
+- [Review record carries the verdict block](review-record-verdict-block.md) — an ACT's review.md needs the reviewer's fenced verdict block or the operator's G4 refuses; check before queueing
+- [Gate refusal is a wait](gate-refusal-is-a-wait.md) — memory/CPU/disk/slot gate refusals don't count toward two-refusal; relaunch when open, no asking
+- [Narrow check after review](narrow-check-after-review.md) — an owner-decided change added after a ticket's review: narrow independent check, no asking; land on it
+- [No ticket without the owner](no-ticket-without-owner.md) — no new ticket or split without the owner's P1 decision (DEC-974, prompt §3); never push an ACT with unanswered owner questions
+- [CTO fixes path cases](cto-fixes-path-cases.md) — own-branch path cases and decided-behaviour test revisions: CTO routes, narrow check, lists for reading (DEC-1156 (7))
+- [Bring lead stoppers at once](night-bring-lead-stoppers.md) — every lead-stopping decision to the owner at once, any hour (DEC-1157 (1))
+- [DEC-1157: no holds](dec-1157-no-holds.md) — cap, CPU band, night hold, freezes, one-per-batch removed; interface at claim; two lines ready; merged deps = met
+- [Status block names new tickets](status-block-names-new-tickets.md) — each status block names every ticket added since the last report with its approving owner decision (DEC-1169 (2))
+- [Long runs in background](long-runs-background-timeout.md) — gov accept/lead_verify via run_in_background + 7200000 ms timeout; a timed-out foreground call is killed at 10 min
+- [Trailers in one block](trailers-one-block.md) — Task/Role and Co-Authored-By in ONE last paragraph; a blank line hides Task from git (landing-check P1, 11-13)
+- [Ticket fields: no inline comments](ticket-fields-no-inline-comments.md) — role:/class:/status: bare; the launcher reads them raw (W2-94 LAUNCH_BLOCKED, 11-13) ; quote list items holding ": " and schema-check tickets before commit (11-16)
+- [No deferral](no-deferral.md) — do now all doable now; only an owner wait (till asleep) or ticket dependency holds; owner waits as a package at once (DEC-1180)
+- [Status block names reopened tickets](status-block-names-reopened.md) — each block names every ticket reopened since the last report and why (owner 11-14); status_block.py prints it from .tickets diffs
+- [Brief: worker model the launcher picks](brief-worker-model-launcher-picks.md) — check criticality.yaml + W2-184 promotion (fails-open finding forces Opus) before naming Sonnet in a brief
+- [Lessons to memory at once](lesson-to-memory-at-once.md) — every refusal, wrong assumption or brief defect goes to memory before the next action (owner 11-14, after the trial)
+- [Walls APPROVED line names the kind](walls-approved-line-kind.md) — "<sha>  brief writer <path>"; my q02 line lacked "writer" (11-14); rehearse vs the launcher's parser
+- [Close record: append, never Write](close-record-append-not-write.md) — kept-open tickets already have the queue's closes/ record; append a Final close section (11-14)
+- [Background waits: no 2 h cap seen](background-wait-2h-cap.md) — CORRECTED 11-15: wake_at/watchers lived 5.5 h+; proc.sh wait ends at its own --max; check with ps, don't assume
+- [Map fix: run parse_map first](check-map-with-parse-map.md) — list every refused README row in the brief; cells start with the bare line name (W2-188, 11-14)
+- [config.lock is the sandbox's](config-lock-sandbox-placeholder.md) — 0-byte 0444 .git/config.lock while workers run; never rm live; branch -d warning harmless
+- [Load tests outside critical windows](load-tests-outside-critical-windows.md) — loaded-run KPIs: brief says no load generator until the CTO opens the window (W2-111 burn.py, 11-15)
+- [DEC-866 marks with every Changes:](dec866-marks-with-every-changes.md) — the old entry's Status gets "Changed by DEC-n" in the same commit, else W2-130 reddens the nightly (11-15)
+- [Release hold freezes all commits](release-hold-freezes-all-commits.md) — "release ready at C" to "released": no commit/land on w2/integrate (HEAD must be C); then src-only freeze until "done" (11-15) ; land check: pgrep -f "python3 [^ ]*tools/land[.]py W2-" (the /usr/bin anchor missed my own lands, 11-16)
+- [Check own tmux before paste](check-own-tmux-before-paste.md) — tmux display-message for own session name before paste/kill by name; if it's the target, stop (11-14 handover)
+- [Stamp from date output](stamp-from-date-output.md) — every time stamp copied from a fresh `date`, never guessed or rounded up (11-14: stamps ran ahead ×8)
+- [Launcher tree is the cwd](launch-worker-tree-is-cwd.md) — test designer launches need LAUNCH_TREE=<W2>-tests, else it runs in the lead tree (W2-188 td-4, 11-14)
+- [Launched PATH is short](launched-path-is-short.md) — launched sessions have 5 PATH entries, interactive 46 (27 /mnt/c); PATH-dependent costs need the real session PATH, count recorded
+- [Load window before burn](load-window-before-burn.md) — duplicate, merged into load-tests-outside-critical-windows (kept: the guard refuses deleting memory files)
+- [Auditor scratch via Bash](auditor-scratch-via-bash.md) — a launched auditor has no Write tool; in quiet hours a Write is refused; brief: scratch files via Bash heredoc in $TMPDIR (W2-178 au-1, 11-15)
+- [Copy TD logs before worktree remove](copy-td-logs-before-worktree-remove.md) — the -tests tree holds td logs in ignored .gov-runtime; worktree remove deletes them; cp first (W2-178, 11-15)
+- [Hidden probe refused by settings, not hook](hidden-probe-refused-by-settings.md) — the memory-retrieval/hidden Read deny fires before pretooluse.py; name the refusing layer (W2-15a, 11-15)
+- [Research launch needs one experiments/ folder](research-launch-needs-experiments-folder.md) — gov launch refuses research unless allowed_paths is exactly one experiments/<x>/**; --plan doesn't check (W2-15a, 11-15)
+- [Probe record: one unquoted verdict block](probe-record-one-verdict-block.md) — a "> ```verdict" copy fails land.py's ready() closed; run ready() before committing (W2-111 r4, 11-15) ; and open it with the probe frontmatter or W1-08/W1-26 redden (W2-189, 11-16)
+- [Engineer brief: no acceptance code](engineer-brief-no-acceptance-code.md) — engineer briefs carry failing output only, never 'read tests/acceptance/...' (W2-94 en-3, 11-15)
+- [gov context over ceiling on W2-88](gov-context-over-ceiling-w2-88.md) — CONTEXT_OVER_CEILING 72k tokens; brief by hand, name it a brief gap; launcher maps C3->C2 (11-15)
+- [Tests branch never FF to the ticket](tests-branch-never-ff-to-ticket.md) — merging w2/<W2> into -tests brings the engineer src to the TD (DEC-820); TD batches stay on their own commit (11-15)
+- [KPI baseline exists before brief](kpi-baseline-exists-before-brief.md) — a 'drop N ms vs figure X' line: find X (or measure it) and profile where the cost is before briefing (W2-111 S9, 11-15)
+- [gov context blocked by a new DEC](gov-context-blocked-new-dec.md) — 'mandatory input DEC-n not found in the store': brief by hand, brief gap (W2-111 r5, 11-15)
+- [Adopted repo review ticket fields](adopted-review-ticket-fields.md) — auditor ticket: state_class, role, allowed_paths in a namespace (not governance/adoption/), kpis+verify, reads/needs/waits_on; dry-run on a clone (F-011, 11-15)
+- [Attribute parses per file](attribute-parses-per-file.md) — record each yaml.load's source before claiming 'parsed twice' (W2-111 S9 count, 11-15: it was the ticket front matter)
+- [W2-81 run needs session and kit](w2-81-run-needs-session-and-kit.md) — --mode run never READY; 0.1.0 A0 needs the kit (gitleaks.toml not shipped); full run = build, kit+A0, session, read (11-15)
+- [Worker pytest line: sandbox TMPDIR](worker-pytest-line-sandbox-tmpdir.md) — TMPDIR="$TMPDIR", PYTHONUSERBASE=/home/usain/.local, empty-home made by the lead; never /tmp/<x> or Write under .gov-runtime/scratch (W2-174 en-1, 11-15)
+- [lead_verify load reddens timing](lead-verify-load-reddens-timing.md) — CPU-time hook cases go red under lead_verify's own load 10-20; one alone re-run behind a load gate (W2-111 r5, 11-15)
+- [Wake the EXAMIN CTO after a reply](wake-examin-cto-after-reply.md) — CHANGED 11-16: interactive tmux examin-cto (Remote Control); SendMessage to examin/cto-name.txt (examin-5b), tmux fallback + second Enter; no adopter.sh
+- [Launched sessions: no pip install](launched-session-no-pip-install.md) — the guard refuses pip install outside the CTO session; wheel briefs: compare wheel vs export, lead runs installing cases (W2-88 nc-s29, 11-15)
+- [Sessions: only outside reads ask](sessions-get-tools-at-start.md) — CORRECTED: user settings allow Bash/Read/Edit/Write; pre-allow the replies folder with --allowedTools 'Read(//abs/**)' (tested 11-15)
+- [Re-arm the inbox waiter every time](rearm-inbox-waiter-every-time.md) — same response as each completion; 11-15 two DONE returns sat ~50 min unread
+- [Shipped folder is exact](shipped-folder-exactness-tests.md) — a new file under src/gov/_shipped/ needs fabric.PACKAGED, test_w2_88_shipped THE_SHIPPED and W2-88 acceptance ITEMS (W2-174 r2b, 11-15)
+- [Rehearse every handed command](rehearse-every-handed-command.md) — tools/rehearse.sh on a scratch clone; expected output from its RESULT.md (owner 11-15)
+- [Worker effort floor is high](worker-effort-floor-high.md) — gov launch refuses engineer/TD below effort high (W2-184 FLOOR, DEC-1120 (3)); W2-174 r2c 11-16
+- [Doctor new part: report, not drift](doctor-new-part-report-not-drift.md) — a gap a fresh copier project has is status "report"; drift reddens W1-39 (W2-153 en-1, 11-16)
+- [No rehearsal against a live path](no-rehearsal-against-live.md) — DEC-1196 (5): install/apply scripts refuse without an explicit target; reviewers rehearse only on copies
+- [Bind over a live path detaches](bind-over-live-path-detaches.md) — a host rename unmounts a bwrap bind on a live dentry; freeze on sandbox-private tmpfs; no /sets on ro / (11-16)
+- [gov plan lists deferred tickets](gov-plan-lists-deferred-tickets.md) — batch 1 held W2-17/18/19/34 (Wave 3, DEC-954) and W2-115b/121c (parked, DEC-1142 (8)); check tags + WAVE_3_PARKING before claiming (11-16)
+- [Rename defeats link checks](rename-defeats-link-checks.md) — same-user mv brings a secret into reach with nlink 1; require a content index + shown frozen list; resolve links stepwise (job runner r9, 11-16)
+- [No timeout wrap on closes](no-timeout-wrap-on-closes.md) — `timeout 600` killed W2-138's dry close after selection; background + 7200000 ms only; skip --dry (11-16)
+- [Mirror copy skips live refresh tmp](mirror-copy-skips-live-refresh-tmp.md) — copying a live store half races the hook's refresh: tar --exclude=rebuild/seed.tmp (re-pin 0.1.1 rehearsal, 11-16)
+- [Run measures in package form](run-measures-in-package-form.md) — copy the actor's exact line; I added the operator's env -u prefix to W2-15a's visible run and restarted it (11-16) ; stop the target's own pgid and ps-check it is gone (the wrapper group left the first run alive to 07:22)
+- [Reopen old ticket: add Verify first](reopen-old-ticket-needs-verify.md) — pre-verify KPI strings make gov brief refuse KPI_NO_VERIFY; worktrees via new_worktree.sh (W2-81 reopen, 11-16)
+- [ACT checks match source as written](act-check-source-strings-as-written.md) — grep fragments on one source line; run each check on the after copy before freezing; count pytest ERRORs, not only FAILED (GF7, 11-16)
+- [Copy's settings name live paths](copy-settings-name-live-paths.md) — an operator copy's settings point at LIVE home/held-out; never run a step without --config on it (round 10 index pass, 11-16)
+- [Worker return lost to a background notice](worker-return-lost-to-bg-notice.md) — a short/off-topic log result: take the return from the transcript jsonl; briefs: no background pytest (W2-189 td-1, 11-16)
+- [Test refusal paths: resolve first](test-refusal-paths-resolve-first.md) — realpath -m a crafted path before testing a live-path refusal; a miscounted ../ ran a rehearsal in /tmp/home (11-16)
+- [Never edit a running bash script](never-edit-running-bash-script.md) — bash reads scripts incrementally; stop the batch first, or the run crashes and skips its live after-record (11-16)
+- [Sandbox code graph: adopt reds](sandbox-codegraph-adopt-reds.md) — inside gov launch the code graph fails; W2-88/W1-41/W2-23 move cases red there, green in lead_verify (W2-190, 11-16)
+- [Sources need store ids](sources-need-store-ids.md) — never add a W2 id to sources for a links notice; gov context BLOCKs and W2-54 goes red (nightly 11-16)
+- [git archive base export form](git-archive-base-export-form.md) — re-run reds on base: literal sha + named paths in a Write-tool script; whole-tree --format=tar heredoc refused (W2-189, 11-16)
+- [Second review launch: effort max](second-review-launch-effort-max.md) — a narrow check after the FULL review is round 2 (probe): effort high repeats round 1 and gov launch refuses; --plan doesn't warn (W2-189, 11-16)
+- [One fix brief after verify](one-fix-brief-after-verify.md) — launch the fix engineer only after lead_verify reds and alone re-runs are read; no load generator in a brief (W2-60b en-3, 11-16)
+- [Guard empty sed address](guard-empty-sed-address.md) — `[ -n "$n" ] &&` before sed -i "${n}s…" on ready.txt; empty n would comment out every line (11-16)
+- [Narrow check: --owner-named DEC-1154](narrow-check-launch-owner-named.md) — a DEC-1154 check past two review rounds needs --owner-named DEC-1154 or gov launch refuses (W2-88 nc-s27w, 11-16)
+- [Worktree add, then mkdir with &&](worktree-add-then-mkdir-with-and.md) — a failed add plus ; mkdir blocks retries; stale -tests branch: delete if merged; launch_worker needs --class and --model (W2-56, 11-16)
+- [Probe brief: fill reviewer_effort](probe-brief-fill-reviewer-effort.md) — write the launched effort literally; a placeholder made au-3 claim "low" at high (W2-60b, 11-16)
+- [bwrap mount order and WSL DNS](bwrap-mount-order-and-wsl-dns.md) — share /tmp before masking HOME; resolv.conf is under /mnt/wsl; unshare pid; mask tmux/bus/interop/docker (11-16)
+- [Guard FP: avoid two forms](guard-fp-avoid-forms.md) — script text naming key/hidden/acceptance paths and git revisions in loop vars cause most live false positives; Write + run by path; literal hashes (11-16)
+- [Registry DEC names the tool](registry-dec-names-the-tool.md) — a re-pin's approving DEC title must contain "gov", else W1-06 install-approvals reds after the registry commit (DEC-1198, 11-16)
+- [Interactive CTO session start](interactive-cto-session-start.md) — tmux --remote-control --resume: trust prompt once, 2nd Enter for tmux wakes, SendMessage name is folder-derived (11-16)
+- [Report ends with status block](report-ends-with-status-block.md) — every report ends with counts, leads, closes, reopened, new tickets, waiting on the owner; IDLE-REASON does not replace it (owner 11-16)
+- [Job protocol changes reported](job-protocol-changes-reported.md) — queue/jobs/README.md is the operator's rulebook: quote every change in my next report before the operator follows it (owner 11-16)
+- [Lead brief: --plan names its own ticket](lead-brief-plan-ticket-id.md) — W2-192 facts said `gov launch --plan … DAEO-6oj6` (W2-190); check the id (11-16)
+- [Read the rule before routing](read-the-rule-before-routing.md) — check the deciding module's own conditions before sending a route (accepted_reds needs an owner register entry + Role: owner commit; corrected 11-16)
+- [Guard shell reading: grammar, not deny list](guard-shell-reading-allowlist.md) — bind nothing on any unfollowed shell form; never fall back to the hook env (GF-8 r1 refused, 11-16)
+- [GOLDEN RULE: how work is judged](reviews-moderated-dec1010.md) — blocks only if ordinary-work + fails open/loses work; crafted = Wave 3 row; moderator; 2 rounds then owner; paste into EVERY judging brief (DEC-1204, owner 11-16)
+- [Accept map: no caseless row](accept-map-no-caseless-row.md) — a README map row with no case fails gov accept for ever; F4 (git diff) goes in prose under the table (W2-156 td-1, 11-16)
+- [Case subprocess: pytest in user site](case-subprocess-pytest-user-site.md) — a case running `python -m pytest` with its own HOME needs the parent import path; lead_verify lacks PYTHONUSERBASE (W2-191, 11-16); lead $TMPDIR empty; fix-round tests tree from the TD commit
+- [Status counts fresh every report](status-counts-fresh-every-report.md) — run status_block.py for each report; never copy counts forward (169/182 vs 170, 185 vs 184, 11-16)
+- [Adopt A6 rebuilds the store](adopt-a6-rebuilds-store.md) — a rebuild hold covers A6, the A10 gate, A9, gov rebuild; headless sessions read replies only at stops (11-16)
+- [Rehearsal reds count ERROR too](rehearsal-reds-count-errors.md) — compare FAILED+ERROR ids; G3 needs last line 'failures: 0', no addendum after it (ACT-GOLDEN-RULE-1, 11-16)
+- [YAML-parse front matter before a sha yes](yaml-parse-front-matter-before-sha-yes.md) — judging-work 0fc1c502's description had an unquoted ': '; quote, re-approve on bytes (11-16)
+- [Brief: step-0 path, no find /](auditor-brief-step0-path-no-find-root.md) — name EMG-d4b-launched.md by literal path; forbid find from /; au-1 W2-191 walked the eval root (11-16)
+- [Generated skill copy is not kernel bytes](generated-skill-copy-not-kernel-bytes.md) — rulesync rewrites front matter; assert bytes for kernel + mirror only, name/version/body for .claude copy (W2-195, 11-16)
+- [Grep every suite for a changed rule](grep-every-suite-for-changed-rule.md) — before a TD brief amending a rule, grep all tests/ for the old assertion; W2-186 missed W1-33/W1-46/W1-28 empty-allowlist cases (11-16)
+- [Memory bar is end-to-end judged](memory-bar-is-end-to-end-judged.md) — 95 % = judged figure (DEC-1097/1098 reader+Opus+Sonnet, answer and citation); hit@k only diagnostics (owner 11-16)
+- [Boxed launch: exclude + gate](box-launch-needs-exclude-and-gate.md) — gov launch writes info/exclude; planted HOME needs gate.json with lowered floors (fix 6, 11-16)
+- [New stage not in the hash chain](new-stage-not-in-hash-chain.md) — a stage inserted in project.STAGES strands earlier adoptions (A9, A7/A10 refuse); side record checked by its consumer (W2-192, 11-16)
+- [Audit reports go to docs/audit](audit-reports-docs-audit.md) — briefs name docs/audit/<topic>/; guard REVIEW_PATHS refuse drafts/ for auditors (11-16 emergency)
+- [Class trailer on every commit](class-trailer-every-commit.md) — `Class: Q|L|S|F` in the trailer block from 11-16 (provisional rubric); 0 of 8 carried it
+- [ACT rebuild keeps review.md](act-rebuild-keeps-review.md) — a bundle rebuild removes the folder; copy review.md aside first (ACT-BOX-LAUNCH-1 r1 lost, 11-16)

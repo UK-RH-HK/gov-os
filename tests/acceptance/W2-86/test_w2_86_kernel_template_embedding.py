@@ -114,6 +114,8 @@ def test_guard_outside_template_every_verdict_as_at_the_base(tmp_path):
     head, before = _selected(ROOT, outside, head_db), _selected(base, outside, base_db)
     still = sorted(head & cut)
     assert still == [], f"{len(still)} files of D-7's cut still embedded, e.g. {still[:5]}"
-    moved = sorted((head ^ before) - cut)
+    # EMERGENCY-2 11.3: the archived start-up documents leave memory's index on purpose (path-map history-archive)
+    archived = {rel for rel in outside if _matches(rel, "docs/emergency-2/archive/**")}
+    moved = sorted((head ^ before) - cut - archived)
     assert moved == [], f"{len(moved)} files outside template/ and D-7's cut gained or lost their embedding, " \
                         f"e.g. {moved[:5]}"

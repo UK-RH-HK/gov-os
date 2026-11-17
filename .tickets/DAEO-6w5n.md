@@ -18,10 +18,7 @@ profile: FULL
 depends_on: [DAEO-cb2b]
 waits_on: []
 allowed_paths:
-- src/gov/watch/**
-- src/gov/launch/**
-- tests/unit/watch/test_w2_121d*
-- tests/unit/launch/test_w2_121d*
+- .gov-runtime/scratch/deferred/W2-121d/**
 est_loc: 400
 kpis:
   success:
@@ -48,3 +45,5 @@ Split from W2-121 (DAEO-cb2b) by the CTO's delegated decision on its run 1's P-W
 Parked in docs/plan/WAVE_3_PARKING.md as W3-P34: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
 
 **Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-121d leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
+
+**Paths cleared on its deferral (DEC-1201), 2026-11-16 16:1x, by the CTO (as W2-19's, DND 273):** a scratch-only placeholder stands in (the schema needs one path); the list was `src/gov/watch/**`, `src/gov/launch/**`, `tests/unit/watch/test_w2_121d*`, `tests/unit/launch/test_w2_121d*`; `src/gov/launch/**` held W2-195 (DEC-1204, top priority) in gov plan on `src/gov/launch/role.py` though this ticket is deferred to Wave 3. Restored when Wave 3 plans it.

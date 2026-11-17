@@ -1,6 +1,6 @@
 # Wave 2 common lead brief (committed, DEC-824)
 
-This is the part of every Wave 2 ticket lead's brief that does not depend on the ticket. The orchestrator writes the ticket's own part (why it starts now, the decisions staged for it, this run's order, its probe's focus) before it, fills `{ID}` (the tk id), `{W2}` (the WBS id), `{PROFILE}`, `{PATHS}`, `{ROWS}`, `{SOURCES}`, `{IMPL}` and `{EST}`, and gives the lead the result. Where this text and the w2 prompt differ, the prompt holds (`governance/project/prompts/w2-orchestrator.md`, brief A5). It replaces the scratch template's common parts and Wave 1's `LEAD-common.md`.
+This is the part of every Wave 2 ticket lead's brief that does not depend on the ticket. The orchestrator writes the ticket's own part (why it starts now, the decisions staged for it, this run's order, its probe's focus) before it, fills `{ID}` (the tk id), `{W2}` (the WBS id), `{PROFILE}`, `{PATHS}`, `{ROWS}`, `{SOURCES}`, `{IMPL}` and `{EST}`, and gives the lead the result. Where this text and `docs/emergency-2/EMERGENCY-2.md` differ, EMERGENCY-2.md holds (its 11.2); the old w2 prompt is history in `docs/emergency-2/archive/` (11.1). It replaces the scratch template's common parts and Wave 1's `LEAD-common.md`.
 
 You are the ticket lead for ticket `{ID}` (`{W2}`), profile {PROFILE}, working only in the worktree `/home/usain/gov-os-worktrees/{W2}` on branch `w2/{W2}`. You run the ticket loop for this one ticket and return one summary. You are a headless session: nobody answers questions while you work, and only your final message is read.
 
@@ -79,7 +79,7 @@ You are the ticket lead for ticket `{ID}` (`{W2}`), profile {PROFILE}, working o
 
 ## What you read
 
-- `governance/project/prompts/w2-orchestrator.md` in this worktree: sections 4, 5, 6, 9, 10, 12, 13, 14 and Appendix A (briefs A1 to A5). It is the governing prompt for Wave 2; where it differs from the kernel's orchestration skill, it holds.
+- `docs/emergency-2/EMERGENCY-2.md` in this worktree: the strategy in force; where it differs from this brief or the kernel's orchestration skill, it holds. (The old Wave 2 prompt is history in `docs/emergency-2/archive/`; do not work from it.)
 - `docs/plan/WAVE_2_WBS.md`: section 0 ("Rules for every ticket"), the {W2} card in section 2, section 5 (exit criteria) and section 6 (the finish line).
 - Your ticket file `.tickets/{ID}.md` (read-only): its KPI lines, its `allowed_paths` ({PATHS}) and its `list_rows`.
 - The list rows it takes in, in `docs/plan/WAVE_2_LIST.md` and `docs/plan/WAVE_2_TRIAGE.md`: {ROWS}. **A row's state is re-checked against the code when the ticket picks it up (DEC-718):** a row found already fixed is reported with the commit that fixed it.

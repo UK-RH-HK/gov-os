@@ -159,12 +159,13 @@ def _closed_ticket(launch, project):
     return launch(support.ENGINEER, w46.write_ticket(project, "DAEO-zz98", support.ENGINEER, status="closed"))
 
 
-def _bypass(launch, project):
-    return launch(support.ENGINEER, None, "--dangerously-skip-permissions")
+def _settings_flag(launch, project):
+    # Emergency 2 (0.1.2): --dangerously-skip-permissions and an unwired guard no longer refuse; --settings still does.
+    return launch(support.ENGINEER, None, "--settings", "{}")
 
 
-def _unwired(launch, project):
-    w46.rewrite_settings(project, lambda data: data.pop("hooks", None))
+def _unreadable_settings(launch, project):
+    w46.write(project, w46.LOCAL_SETTINGS_REL, "{ not json")
     return launch(support.ENGINEER)
 
 
@@ -172,8 +173,8 @@ def _not_a_role(launch, project):
     return launch("no-such-role")
 
 
-REFUSALS = {"unknown-ticket": _unknown_ticket, "closed-ticket": _closed_ticket, "bypass-flag": _bypass,
-            "unwired-guard": _unwired, "not-a-role": _not_a_role}
+REFUSALS = {"unknown-ticket": _unknown_ticket, "closed-ticket": _closed_ticket, "settings-flag": _settings_flag,
+            "unreadable-settings": _unreadable_settings, "not-a-role": _not_a_role}
 
 
 @pytest.mark.parametrize("name", sorted(REFUSALS))

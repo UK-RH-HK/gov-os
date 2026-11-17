@@ -171,23 +171,6 @@ def test_every_path_of_the_list_is_hidden(project, sandbox, guard, who):
     support.assert_allowed(result, f"Read on a directory the list does not hold, by {who},")
 
 
-def test_the_oracle_path_is_hidden_through_the_committed_settings(wired, live, live_sandbox):
-    """KPI success 4: the rule is live in this repository, through the commands its settings register."""
-    stand_in = support.make_stand_in(live_sandbox.tmpdir / "held-out-stand-in")
-    support.configure_stand_in(wired, stand_in)
-    for tool_name, tool_input in (
-        ("Read", {"file_path": f"{stand_in}/answers.md"}),
-        ("Grep", {"pattern": "answers", "path": f"{stand_in}"}),
-        ("Bash", support.bash_input(f"ls {stand_in}")),
-    ):
-        result = live(wired, tool_name, tool_input, support.ORCHESTRATOR)
-        assert result.ran, f"the {tool_name} call reached no registered PreToolUse command: {result.describe()}"
-        assert result.decision == "deny", (
-            f"{tool_name} on the stand-in oracle path was not denied by the registered commands: "
-            f"{result.describe()}"
-        )
-
-
 # --------------------------------------------------------------------------
 # What stays open
 # --------------------------------------------------------------------------

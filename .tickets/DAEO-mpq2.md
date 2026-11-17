@@ -20,6 +20,11 @@ allowed_paths:
 - src/gov/adopt/stages.py
 - src/gov/adopt/spec_audit.py
 - tests/unit/adopt/test_w2_192*
+- src/gov/adopt/project.py
+- "tests/acceptance/W1-41/*support*.py"
+- "tests/acceptance/W2-23/*support*.py"
+- "tests/acceptance/W2-88/*support*.py"
+- "tests/acceptance/W2-190/*support*.py"
 reads:
 - template/governance/kernel/skills/adopt/SKILL.md
 - src/gov/adopt/**
@@ -65,3 +70,5 @@ adoption stage for every repository; EXAMIN's CTO does it by hand meanwhile (its
 the skill's text and the Contract's CAP-44 line by CIT-P. For the release after 0.1.1.
 
 **Started now** on the owner's line of 2026-11-16 14:5x ("Launch leads now for the two new tickets … nothing blocks building them"); it lands in the release after 0.1.1.
+
+**Path case 2026-11-16 15:3x (P-W2-192-P1 (a), P2 (a); the CTO, DEC-1156 (7); listed for the owner's reading):** the tests run returned DONE (30 cases, 5a9a6ca7a). Other tickets' adoption cases run A3 straight after A2, which stage AS now precedes: the ticket gains `src/gov/adopt/project.py` (the stage chain, the engineer's) and the shared support helpers of W1-41, W2-23, W2-88 and W2-190 (acceptance folders: an independent test designer's change, each case's assertion unchanged, AS run before A3). P2 (a): F1's owner route stays as the cases state (AS and A3 leave every gap's answer empty). The kernel CIT-P (the adopt skill, CAP-44's line) comes back once the code is green.

@@ -1,0 +1,66 @@
+# The Contract's CAP list (generated from CONTRACT_v4.md 4.3)
+
+Source: `docs/contract/CONTRACT_v4.md` (sha256 `5c0a503169dde5130bdb690642fb809b49aa92f25862b9b71a4dadfe77a141ec`); 62 capabilities.
+
+- CAP-01: Authority precedence and hard invariants
+- CAP-02: Release authenticity (lite: signed git tags)
+- CAP-03: Security and sensitivity classification
+- CAP-04: Budget and resource governance
+- CAP-05: Emergency controls (pause/freeze/cancel/rollback)
+- CAP-06: Repository contract and path map
+- CAP-07: Authoritative vs derived state separation
+- CAP-08: Deterministic structured memory (records)
+- CAP-09: Relationship/graph memory
+- CAP-10: Semantic memory (vector/embedding retrieval)
+- CAP-11: Lexical memory (FTS/BM25)
+- CAP-12: Code-structural memory (AST/LSP/SCIP)
+- CAP-13: Temporal and episodic memory
+- CAP-14: Failure memory
+- CAP-15: Context packet compilation
+- CAP-16: Multi-batch, multi-hop, paginated retrieval
+- CAP-17: Incremental indexing and freshness
+- CAP-18: Retrieval router (multi-route fusion)
+- CAP-19: Retrieval component separation and model selection
+- CAP-20: Rebuild guarantee (delete derived, rebuild from git)
+- CAP-21: Owner-only approval facts (lite of L0-L5 authority levels)
+- CAP-22: Agent roles and typed A2A handoffs
+- CAP-23: Concurrency and task claims
+- CAP-24: Skill lifecycle and versioning
+- CAP-25: Tool registry and capability memory (lite)
+- CAP-26: Plugin trust boundary (hash-binding, descriptor security)
+- CAP-27: Read/act separation of commands (lite of MCP/A2A/knowledge layers)
+- CAP-28: Natural-language intent routing and small command surface
+- CAP-29: Specification lineage (idea to live evidence)
+- CAP-30: Feature readiness contract (26-dimension checklist)
+- CAP-31: Unified task DAG with dynamic generation
+- CAP-32: Research and experiment lifecycle
+- CAP-33: Change-impact transactions (CIT-P simulation, CIT-E execution)
+- CAP-34: Human decision gates and contradiction resolution
+- CAP-35: Model routing (T0-T3 tiers, reasoning levels)
+- CAP-36: Empirical model routing telemetry
+- CAP-37: Structured checkpoints and mandatory triggers
+- CAP-38: Verification test families (product and governance)
+- CAP-39: Governance health scheduler (G0-G6 tiers)
+- CAP-40: Execution telemetry and organisational questions
+- CAP-41: Lesson records with scope
+- CAP-42: Legacy governance retirement and archive policy
+- CAP-43: Canonical OS repo separation and immutable releases
+- CAP-44: gov init and gov adopt lifecycle
+- CAP-45: gov update lifecycle
+- CAP-46: Cross-machine sync via git
+- CAP-47: Independent adoption/audit roles and fresh-session independence
+- CAP-48: Framework health SLOs and healthy-repo definition
+- CAP-49: Qualification oracle (synthetic repos, fault injection, hidden tests)
+- CAP-50: Artifact flow, dependency consumption and end-to-end traceability
+- CAP-51: Decisions register (structured, versioned, authoritative)
+- CAP-52: Model-agnostic adapters (provider, IDE, CLI)
+- CAP-53: Proportionality profiles (LITE/STANDARD/FULL)
+- CAP-54: Progressive adoption (day-one to maturity)
+- CAP-55: Retrieval stopping reasons
+- CAP-56: Retrieval in disposable subagent context
+- CAP-57: Deterministic worklist closure for facets
+- CAP-58: Path guards as default-deny allow-lists
+- CAP-59: Review-repair loop budget
+- CAP-60: Below-floor recovery (break-glass)
+- CAP-61: Worker session launcher and OS sandbox
+- CAP-62: Sandbox escape hatch denied

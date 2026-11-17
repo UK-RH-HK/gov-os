@@ -1,38 +1,24 @@
-"""W1-46 -- no worker session is started that the guard does not decide for (batch 3, after implementation).
+"""W1-46 -- the arguments after ``--`` and the repository's hook wiring (batch 3, after implementation).
 
-Described behaviours A and B of the review after implementation (DEC-136).
-
-KPI success 2 [CAP-61.b]: "sets GOV_ROLE and GOV_TICKET; an acceptance test
-shows that a launched worker is sandboxed and that both variables reach the
-guard (DEC-161)". KPI success 8 [CAP-58.d]: in a launched worker session "a
-file-tool write outside it is refused by the permission rules and the guard".
-MR-3: "An implementer write to ``tests/acceptance/**`` is refused by the guard".
-DEC-135: a probe finding that could let an implementer change acceptance tests
-is fixed.
+Described behaviours A and B of the review after implementation (DEC-136), as
+Emergency 2 leaves them (docs/emergency-2/EMERGENCY-2.md 2.1, 2.2, 6.1; release
+0.1.2): the guard is switched off and retired, so ``gov launch`` no longer
+requires it in the repository's settings (DEC-314's refusal of an unwired guard,
+of ``disableAllHooks`` and of ``--bare`` is superseded). Those refusal cases are
+retired; each is asserted in its positive form: the launch starts.
 
 **A, the arguments after ``--``** (DEC-231: "everything after ``--`` is passed
-to the CLI unchanged"). The CLI's own help says of ``--bare``: "Minimal mode:
-skip hooks (those defined in settings ...)". A session started with it has no
-guard, whatever the launcher builds, and the launcher may not drop the argument:
-it refuses. ``--setting-sources`` chooses which of the user, project and local
-settings are loaded; without the project's settings the guard they register is
-not loaded. The ordinary arguments of a headless worker (DEC-183, DEC-232)
-still pass, unchanged and in order.
+to the CLI unchanged"). The ordinary arguments of a headless worker (DEC-183,
+DEC-232) pass, unchanged and in order; ``--bare`` is passed too.
+``--setting-sources`` is still refused with any value: the launcher sets the
+session's sources itself. The settings the launcher builds register no hook and
+carry no ``disableAllHooks``.
 
 **B, a project whose settings do not wire the guard**: no
 ``.claude/settings.json``, one that registers no PreToolUse command, or
-``disableAllHooks: true`` in the committed or the local settings.
+``disableAllHooks: true`` in the committed or the local settings: launched.
 
-**Who wires the guard (DEC-314, batch 4).** "``gov launch`` refuses when the
-project's settings do not register the guard. The launcher does not register the
-hooks itself. As built, the refusal covers a missing or unwired
-``.claude/settings.json``, ``disableAllHooks``, ``--bare``, and
-``--setting-sources`` with any value." The tests of ``--setting-sources`` and of
-B, which accepted either answer of DP-11 in batch 3, now assert the refusal
-only: a non-zero exit, a named reason, nothing started. The settings the
-launcher builds register no hook and carry no ``disableAllHooks``.
-
-Permission bypass and added directories (DEC-313) are in
+Permission bypass and added directories are in
 ``test_w1_46_bypass_and_added_directories.py``.
 
 No session is started.
@@ -61,28 +47,28 @@ HEADLESS = ("-p", "Do the ticket's work. Do not use --bare or --add-dir.", "--ou
 
 @pytest.mark.parametrize("role", (ENGINEER, RESEARCH))
 def test_a_headless_workers_ordinary_arguments_pass_unchanged(launch, role):
-    """DEC-231. The control of the refusals below; holds since the implementation."""
+    """DEC-231. The control of the cases below; holds since the implementation."""
     result = launch(role, None, *HEADLESS)
     assert result.run.returncode == 0, f"gov launch refused a headless worker's ordinary arguments\n{result.describe()}"
     args = result.session()["args"]
     assert support.caller_args_then_template_pair(args, HEADLESS), (
         f"the CLI did not get the arguments unchanged, in order, followed by nothing or the one template pair: {args}")
-    assert support.sandbox_faults(result.settings()) == []
 
 
 @pytest.mark.parametrize("arguments", (("--bare",), HEADLESS + ("--bare",), ("--bare",) + HEADLESS),
                          ids=("alone", "after-the-ordinary-arguments", "before-the-ordinary-arguments"))
-def test_the_launcher_refuses_the_argument_that_skips_the_hooks(launch, arguments):
-    """``--bare`` skips every hook: non-zero exit, a named reason, nothing started."""
-    launch(ENGINEER).session()
-    support.assert_refused(launch(ENGINEER, None, *arguments), "--bare", "hook", "guard")
+def test_the_argument_that_skips_the_hooks_is_now_passed(launch, arguments):
+    """Emergency 2: ``--bare`` is no longer refused; the CLI gets it with the caller's other arguments, in order."""
+    result = launch(ENGINEER, None, *arguments)
+    assert result.run.returncode == 0, f"gov launch refused --bare\n{result.describe()}"
+    assert support.caller_args_then_template_pair(result.session()["args"], arguments), result.describe()
 
 
 @pytest.mark.parametrize("arguments", (("--setting-sources", "user"), ("--setting-sources=user",),
                                        ("--setting-sources", "")),
                          ids=("user-only", "user-only-joined", "no-source"))
 def test_no_session_is_started_without_the_projects_settings_unless_the_launcher_wires_the_guard(launch, arguments):
-    """Without the project's settings their PreToolUse command is not loaded: refused (DEC-314)."""
+    """The launcher sets the session's setting sources itself: refused (DEC-314, kept by Emergency 2)."""
     launch(ENGINEER).session()
     support.assert_refused(launch(ENGINEER, None, *HEADLESS, *arguments), "--setting-sources", "hook", "guard")
 
@@ -117,9 +103,9 @@ def _unwire(project, how):
     if how == "no-settings-file":
         (project / support.SETTINGS_REL).unlink()
     elif how == "no-hooks-block":
-        _rewrite(project, lambda data: data.pop("hooks"))
+        _rewrite(project, lambda data: data.pop("hooks", None))
     elif how == "no-pretooluse-command":
-        _rewrite(project, lambda data: data["hooks"].pop("PreToolUse"))
+        _rewrite(project, lambda data: data.get("hooks", {}).pop("PreToolUse", None))
     elif how == "hooks-off-in-the-committed-settings":
         _rewrite(project, lambda data: data.update(disableAllHooks=True))
     else:
@@ -131,18 +117,12 @@ UNWIRED = ("no-settings-file", "no-hooks-block", "no-pretooluse-command", "hooks
 
 
 @pytest.mark.parametrize("how", UNWIRED)
-def test_no_session_is_started_in_a_project_that_does_not_wire_the_guard(launch, project, how):
-    """The same project launches before the change, so the change is the reason. Refused (DEC-314)."""
-    launch(ENGINEER).session()
+def test_a_project_that_does_not_wire_the_guard_is_launched(launch, project, how):
+    """Emergency 2 (2.2): no guard is required; the launch starts and the built settings still register no hook."""
     _unwire(project, how)
-    support.assert_refused(launch(ENGINEER), "hook", "guard", "settings")
-
-
-def test_a_research_session_is_not_started_without_the_guard_either(launch, project):
-    """The research fence leans on the guard for every path created after launch (KPI success 4)."""
-    launch(RESEARCH).session()
-    _unwire(project, "no-pretooluse-command")
-    support.assert_refused(launch(RESEARCH), "hook", "guard", "settings")
+    result = launch(ENGINEER)
+    assert result.run.returncode == 0, f"gov launch refused a project without the guard ({how})\n{result.describe()}"
+    assert support.hook_keys(result.settings()) == [], result.describe()
 
 
 def test_hooks_left_on_explicitly_do_not_refuse_the_launch(launch, project):

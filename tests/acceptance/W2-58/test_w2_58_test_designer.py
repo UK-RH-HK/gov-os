@@ -156,8 +156,9 @@ def test_the_launch_adds_no_read_denial_for_the_changed_files_and_keeps_the_held
     which asked for a wildcard Read rule over the changed files on the belief that the Linux sandbox skips it).
 
     No Read deny rule and no sandbox read denial covers a file T's branch
-    changes, nor its own tests, its ticket or unchanged code; the held-out
-    material is still covered.
+    changes, nor its own tests, its ticket or unchanged code.
+    Emergency 2 (release 0.1.2): the launcher writes no held-out Read rule any more, so the held-out half of this
+    case is retired; the name is kept for the opt-in lists that name it.
     """
     project = s.make_project(sandbox, base=True)
     settings = s.launch(sandbox, cli, TD, s.T).settings()
@@ -165,8 +166,6 @@ def test_the_launch_adds_no_read_denial_for_the_changed_files_and_keeps_the_held
                                                                     "src/other/main.py"))
     assert not faults, (f"the launched test designer's settings deny reads of the code it tests (DEC-873 item 2): "
                         f"{faults}")
-    lost = s.held_out_faults(settings, sandbox, project)
-    assert not lost, f"the held-out material lost its Read deny rule for {lost}: {s.read_deny_specs(settings)}"
 
 
 def test_the_launch_with_no_base_denies_the_read_tool_no_code(sandbox, cli):
