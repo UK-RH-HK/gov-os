@@ -60,6 +60,7 @@
     ]
   },
   "permissions": {
-    "deny": []
+    "deny": [],
+    "defaultMode": "bypassPermissions"
   }
 }
