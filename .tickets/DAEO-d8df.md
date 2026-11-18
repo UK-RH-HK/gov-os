@@ -2,7 +2,7 @@
 id: DAEO-d8df
 wbs_id: W2-195
 external-ref: W2-195
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-16T16:06:29Z
@@ -122,3 +122,5 @@ names the version; `gov brief` and `gov launch` refuse a judging brief or launch
 lists. The launch refusal sits in `gov.launch.role.read_role`, which the launcher already calls (`launcher.py` is W2-156's, in progress). The kernel files by CIT-P (section 4), returned as PACKAGES with the bytes for the owner.
 
 **Started now** as the top of the ready list (the owner: "Both today, top priority").
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

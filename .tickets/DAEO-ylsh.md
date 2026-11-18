@@ -1,6 +1,6 @@
 ---
 id: DAEO-ylsh
-status: in_progress
+status: closed
 deps: [DAEO-ecac, DAEO-r30l]
 links: [DAEO-ecac, DAEO-cv58]
 created: 2026-11-11T01:20:16Z
@@ -78,3 +78,5 @@ Filed by the product-spec helper of the night audit (DAEO-sdxk's anti-drift audi
 - **Rabbit holes.** Reading a session's log text (counts only, as W2-60b); a brake on a reviewer's session of the same ticket (it counts, it is not exempt).
 
 [DEC-1091 (2), DEC-1089 (3), DEC-1119 (5)]
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
