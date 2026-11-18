@@ -17,6 +17,11 @@ DEC-1003, INVESTIGATION-1 Q-1).
   nightly's recorded result is read first, and stands for the run without the change when that night ran on that
   very commit; no clone is built for a nightly baseline.
 
+- **The base run** (W2-193 S4, W2-194 S1): a red whose alone runs cannot judge it (``absent`` or ``unknown`` on
+  either side) is judged by its node's result in the selection run at the base, in the close's process layout;
+  only where needed, once per close. A base run that collected nothing or did not complete judges nothing: those
+  reds are named (``baseline_missing``), never excused.
+
 No accepted-reds or load-sensitive list is read or written here (S5; ``gov.close.ratchet`` stays the strict
 close's).
 """
@@ -38,6 +43,8 @@ CLONE_REL = ".gov-runtime/close/clone"
 KEEP = ".gov-runtime/"  # the clone's stores, kept by every reset
 TIMEOUT, UNKNOWN, ABSENT = "timeout", "unknown", "absent"
 NEVER_MATCH = (TIMEOUT, UNKNOWN, ABSENT)
+NOT_COLLECTED, SKIPPED = "not collected", "skipped"  # a node's result in the base run besides green and a red
+UNJUDGEABLE = (ABSENT, UNKNOWN)  # an alone run that cannot judge a red (W2-193 S4): the base run judges it
 LATENCY = "latency"  # the serial-only list's comment kind that makes an entry load-sensitive
 LOAD_SENSITIVE_ROUNDS = 3
 TIMED_OUT_EXITS = (124, 137)  # timeout(1): the limit reached, and the kill after it
@@ -196,10 +203,14 @@ def failure_type(message: str | None, text: str | None) -> str:
 
 
 def _node(clone: Path, case) -> str:
+    """The node id pytest resolves for a JUnit testcase (W2-193 S2): a test's own id (``file::Class::name``); a
+    collection error (no class, its dotted module in ``name``) its module file, so its alone run collects it."""
     file = case.get("file") or ""
     classname, name = case.get("classname") or "", case.get("name") or ""
     if not file:  # a collection error names the module in ``name``, dotted
         return name.replace(".", "/") + ".py" if not classname else f"{classname.replace('.', '/')}.py::{name}"
+    if not classname:  # a collector's error (a module that cannot be imported): no test of it has an id of its own
+        return file
     module = file[:-3].replace("/", ".") if file.endswith(".py") else ""
     classes = classname[len(module):].strip(".") if module and classname.startswith(module) else ""
     return "::".join([file] + [c for c in classes.split(".") if c] + [name])
@@ -212,20 +223,24 @@ def read_results(junit: Path, clone: Path) -> dict | None:
     except (OSError, ET.ParseError):
         return None
     counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}
-    failures = []
+    failures, outcomes = [], {}
     for case in tree.iter("testcase"):
         node = _node(Path(clone), case)
         bad = case.findall("failure") + case.findall("error")
         if bad:
             counts["failed" if case.findall("failure") else "errors"] += 1
             element = bad[0]
-            failures.append({"test": node, "failure_type": failure_type(element.get("message"), element.text),
+            kind = failure_type(element.get("message"), element.text)
+            failures.append({"test": node, "failure_type": kind,
                              "text": ((element.text or "").strip() or element.get("message") or "")[:2000]})
+            outcomes.setdefault(node, kind)
         elif case.findall("skipped"):
             counts["skipped"] += 1
+            outcomes.setdefault(node, SKIPPED)
         else:
             counts["passed"] += 1
-    return {**counts, "failures": failures}
+            outcomes.setdefault(node, None)
+    return {**counts, "failures": failures, "outcomes": outcomes}
 
 
 def run_alone(clone: Path, test: str, options: list[str], folder: Path, timeout: float, tag: str) -> str | None:
@@ -273,6 +288,27 @@ def judge(with_change: list[str | None], without: list[str | None]) -> tuple[boo
                             f"(same failure type in {same}/{len(without)})")
     return False, kind, (f"red alone with {kind} ({len(reds)}/{rounds}) and red with the same failure type on the "
                          f"head without the change ({same}/{len(without)}): not caused by the change")
+
+
+def needs_base_run(with_change: list[str | None], without: list[str | None]) -> bool:
+    """Whether a red's alone runs cannot judge it (W2-193 S4, W2-194 S1): red alone, and an alone run on either side
+    ``absent`` (pytest found nothing to run by its id) or ``unknown`` (the run could not be read). A timeout is a
+    result, not a gap."""
+    reds = [t for t in with_change if t is not None]
+    return bool(reds) and any(t in UNJUDGEABLE for t in reds + list(without))
+
+
+def judge_by_base_run(kind: str, there: str | None) -> tuple[bool, str]:
+    """``(caused, reason)`` of a red the alone runs cannot judge, by its node's result in the base run (the
+    selection run at the base, in the close's own process layout): a base red only where it is red there with the
+    same failure type; green, skipped, another type or not collected there, it is the change's; a timeout, an
+    unknown type and an absent case never match."""
+    seen = "green" if there is None else there
+    if kind in NEVER_MATCH:
+        return True, f"its failure type {kind} never matches the base run ({seen} there)"
+    if there == kind:
+        return False, f"red with the same failure type ({kind}) in the base run: not caused by the change"
+    return True, f"red with {kind} and {seen} in the base run: the change's"
 
 
 def load_sensitive(clone: Path, test: str) -> bool:
@@ -348,9 +384,15 @@ def _same_commit(clone: Path, a: str | None, b: str | None) -> bool:
 
 
 def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: list[dict], options: list[str],
-              folder: Path, timeout: float) -> tuple[list[dict], dict]:
+              folder: Path, timeout: float, base_run=None) -> tuple[list[dict], dict]:
     """Each failing test of a run judged (S4): ``(reds, nightly)``. ``reds``: ``{test, failure_type, caused,
-    reason}``; ``nightly``: ``{read, record}``. The clone is left at ``commit``."""
+    reason, rounds}``, with ``baseline_missing`` on a red the base run had to judge and could not;
+    ``nightly``: ``{read, record}``. The clone is left at ``commit``.
+
+    ``base_run`` (W2-193 S4, W2-194 S1): called at most once, only where a red's alone runs cannot judge it
+    (``needs_base_run``), it runs the selection at the base and answers ``{"usable", "outcomes", "why"}``; each such
+    red is then judged by its node's result there (``judge_by_base_run``), or, where the run is not usable (it
+    collected nothing or did not complete), marked ``baseline_missing`` (and caused: never excused)."""
     night = nightly_reading(root)
     tests = list(dict.fromkeys(f["test"] for f in failing))
     rounds = {t: LOAD_SENSITIVE_ROUNDS if load_sensitive(clone, t) else 1 for t in tests}
@@ -385,6 +427,9 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
                     without.setdefault(t, [UNKNOWN] * rounds[t])
             finally:
                 checkout(clone, commit)
+    unjudged = [t for t in tests if base is not None and base_run is not None and t not in from_night
+                and needs_base_run(with_change[t], without.get(t, []))]
+    at_base = base_run() if unjudged else None
     reds = []
     for t in tests:
         caused, kind, reason = judge(with_change[t], without.get(t, []))
@@ -392,8 +437,22 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
             reason += "; no head without the change: no green base on HEAD's line is known, so the red is the change's"
         if t in from_night:
             reason += f"; the head without the change read from the nightly record {night['record']}"
+        in_run = next((f["failure_type"] for f in failing if f["test"] == t), UNKNOWN)
+        there, missing = None, False
+        if t in unjudged:
+            if kind in UNJUDGEABLE:  # the alone run gave no type: the run's own is the red's
+                kind = in_run
+            if at_base["usable"]:
+                there = at_base["outcomes"].get(t, NOT_COLLECTED)
+                caused, why = judge_by_base_run(kind, there)
+                reason += f"; judged by the base run at {base[:12]}: {why}"
+            else:
+                caused, missing = True, True
+                reason += f"; the base run at {base[:12]} cannot judge it ({at_base['why']})"
         if kind == UNKNOWN:
-            kind = next((f["failure_type"] for f in failing if f["test"] == t), UNKNOWN)
-        reds.append({"test": t, "failure_type": kind, "caused": caused, "reason": reason,
-                     "rounds": rounds[t]})
+            kind = in_run
+        red = {"test": t, "failure_type": kind, "caused": caused, "reason": reason, "rounds": rounds[t]}
+        if missing:
+            red["baseline_missing"] = True
+        reds.append(red)
     return reds, {"read": night["read"], "record": night["record"]}
