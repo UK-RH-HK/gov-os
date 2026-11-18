@@ -41,3 +41,10 @@ say otherwise and I change course. Each audit's full table is in `docs/emergency
 - **U2** The helper default model in `~/.claude/settings.json` (forces Opus on unnamed spawns; your file): **(a) set it to Sonnet; I name Opus where it matters**; (b) remove the line; (c) keep.
 - **U3** Your operator session on Sonnet: **(a) yes**; (b) keep Opus.
 - **U4** Leads on Sonnet for LITE/STANDARD: (a) keep Opus; **(b) a trial on two tickets judged by an Opus reviewer**; (c) Sonnet for all.
+
+## Added by the morning CTO (2026-11-18)
+Already decided in DEC-1212: U1-U4 and L4 (Sonnet for the proving run, acceptance included). L1, L2, T1-T3 are built on
+your working assumptions: confirm or change.
+- **Q-UPD** `gov update` meeting your own edit to a shipped file: **(b) a three-way merge keeping your file, the release's copy written aside on a conflict** (built).
+- **Q-CLOSE** The close's base excuses a red from an untrailered first commit: **(a) accept it, the red still recorded; refusing such a close a Wave 3 row**.
+- **Q-CAP44** W2-192's CIT-P Part B (CAP-44.m, the adoption stage AS spec audit in the Contract) was never approved, so the validator's `cit-p-lines-applied` is red (W2-49): **(a) fold it into G5's re-baseline; a known red until then**; (b) withdraw Part B now.
