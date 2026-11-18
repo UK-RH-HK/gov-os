@@ -98,6 +98,10 @@ rules and the roster of files (`role_faults`); the content statements of S1, S3,
    `Launch by criticality` line is a failure (the Interface: "only where RUBRIC-2 varies").
 5. **S7, D-10.** A role file fails when one of its statements joins `D-10` to a model, Opus, Sonnet or a launch (the
    through-D-10 rule is the CTO's launch practice, in no role file). A bare mention of D-10 (a path map) passes.
+5b. **S7, the lead roles' model (rewritten 2026-11-18).** DEC-1212 (3) (the owner) put every lead on Sonnet: the table's
+    rows for `orchestrator`, `ticket-lead` and `senior-engineer` are `claude-sonnet-5-5`, effort high (the role files say so
+   since 24a384ae8; the line form was fixed in 76073838d), and S8's exact Launch default line for `senior-engineer` is the
+   Sonnet form. `independent-auditor` stays on Opus, effort high.
 6. **One line.** The work order and one-writer sentences must be one physical line (the KPI says "in one line"; the
    launcher's reader needs one line for its own forms).
 7. **S4, denial of reads.** The `Allowed paths` item of each of the two files must hold one statement with "read", "work",
