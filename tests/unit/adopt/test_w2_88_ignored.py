@@ -52,7 +52,8 @@ def test_the_f3_rule_refuses_ma_and_a0_at_once_naming_each_path_with_its_rule(ro
         more = {"out": str(tmp_path / "out")} if name == "MA" else {}
         caught = refused("PATH_IGNORED", root, name, **more)
         found = {item["path"]: item for item in caught.details["ignored"]}
-        assert set(found) >= {".claude/skills/retrieval/SKILL.md", ".claude/skills/discovery/SKILL.md"}
+        assert set(found) >= {".claude/skills/retrieval/SKILL.md", ".claude/skills/discovery/SKILL.md",
+                              ".claude/skills/judging-work/SKILL.md"}
         assert all(item["source"] == ".gitignore" and item["line"] == line and item["pattern"] == F3
                    for item in found.values())
         assert all(path.startswith(".claude/skills/") for path in found)  # this rule ignores nothing else A0 to A9 write
@@ -105,6 +106,7 @@ def test_a_path_the_index_tracks_is_no_refusal_and_neither_is_a_negated_rule(roo
     ignoring(root, F3)
     ignoring(root, "!.claude/skills/retrieval")
     ignoring(root, "!.claude/skills/discovery")
+    ignoring(root, "!.claude/skills/judging-work")
     result = stage(root, "A0")  # the rule's negations leave both skill folders alone
     assert result["stage"] == "A0" and sh(root, "log", "-1", "--format=%s").startswith("gov adopt --lite A0")
 
@@ -128,5 +130,5 @@ def test_the_one_list_names_every_stage_record_the_kernel_copies_and_a0s_files(r
         assert project.record_path(stage_name) in listed
     assert {".gitleaks.toml", ".gitignore", "governance/project/retrieval.yaml",
             ".claude/skills/retrieval/SKILL.md", ".claude/skills/discovery/SKILL.md",
-            "governance/kernel/templates/brief.md", "governance/kernel/templates/role-cto.md"} <= set(listed)
+            ".claude/skills/judging-work/SKILL.md", "governance/kernel/templates/brief.md", "governance/kernel/templates/role-cto.md"} <= set(listed)
     assert len(listed) == len(set(listed))
