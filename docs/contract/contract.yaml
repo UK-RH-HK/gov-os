@@ -124,12 +124,11 @@ envelope:
     - DEC-083
     - DEC-157
     - DEC-163
-    statement: 'The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
-      source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are
-      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install
-      system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside
-      its own experiment folder, within its ticket''s `allowed_paths`, and the sandbox''s write fence enforces this (DEC-157,
-      DEC-158, DEC-163).'
+    - DEC-1214
+    statement: The CTO approves and records every install in the tool registry (tool, exact version, source and checksum,
+      need, disk and RAM, uninstall command), so that nothing out of the work's scope or beyond the machine's capacity is
+      installed; there is no permission prompt, and `sudo` stays with the owner (DEC-1214 G7 (c)). Worker roles never install
+      system-wide.
 master_rules:
 - id: MR-1
   title: Specification comes first
@@ -1526,10 +1525,11 @@ capabilities:
     - W1-26
 - id: CAP-25
   title: Tool registry and capability memory (lite)
-  outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
-  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; an install command from
-    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied, except a research session''s
-    install inside its own experiment folder (DEC-163).'
+  outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and trust that the CTO approved and
+    recorded each install.
+  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; every install is recorded
+    in the tool registry with the CTO''s approval, its scope and its machine cost; `sudo` stays the owner''s (the deny line
+    refuses it in every permission mode).'
   wave: W1
   provider:
   - W1-04
@@ -1552,6 +1552,7 @@ capabilities:
   - DEC-163
   - DEC-172
   - DEC-174
+  - DEC-1214 G7 (c)
   scenarios:
     dev:
     - CHAOS-A-05
@@ -1564,9 +1565,9 @@ capabilities:
     - CHAOS-X-Q05
   disposition:
     class: LITE
-    lite_form: Tool registry with pins; the orchestrator installs a tool only after the owner approves a decision package
-      in chat, and records version, sha256, install and uninstall commands, date and approving decision; `gov doctor` checks
-      the pins. No automated install classification (DEC-083).
+    lite_form: Tool registry with pins; the CTO approves and records every install (version, sha256, install and uninstall
+      commands, date, approving decision, scope and machine cost), so that nothing out of the work's scope or beyond the machine's
+      capacity is installed; `gov doctor` checks the pins; `sudo` stays the owner's. No automated install classification (DEC-083).
   covers:
   - id: CAP-25.a
     item: Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks
@@ -1577,9 +1578,8 @@ capabilities:
     - W1-06
     - W1-27
   - id: CAP-25.b
-    item: Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the
-      owner
-    source: Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083
+    item: The CTO approves and records every install; no permission prompt; `sudo` stays with the owner
+    source: Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083; DEC-1214 G7 (c)
     wave: W1
     provider:
     - W1-04

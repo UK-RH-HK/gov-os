@@ -83,7 +83,7 @@ Full statement: [ADR-0001](../adr/ADR-0001-threat-model.md) (DEC-039 as amended 
 7. **Paths are allowed, not forbidden.** Paths are declared on the ticket and checked at the landing; nothing is refused
    at write time. Checks derive their scope from the repository, never from a hand-kept list (DEC-041).
 8. **Assemble, then glue.** Mature tools do the heavy lifting. The `gov` CLI is thin glue behind the API-0002
-   envelope. The owner approves every tool install (DEC-001, DEC-083).
+   envelope. The CTO approves and records every tool install; `sudo` stays the owner's (DEC-001, DEC-083, DEC-1214 G7).
 9. **Delete before you wrap.** A loop that does not converge in two rounds goes to the owner once, with options: fixed
    differently, narrowed, split, deferred, deleted or continued. It is never defended with more machinery (DEC-044 as
    amended by DEC-096 and DEC-1204).
@@ -182,9 +182,9 @@ from kernel role files plus the project roster. It carries:
 **Authority.** The owner is L5: the customer and the final authority (MR-6). Agents hold no approval authority.
 - A decision becomes ACTIVE only with an approval fact from the owner's git account: an owner commit, a signed tag or
   a PR approval (DEC-046, CAP-21).
-- Only the orchestrator installs tools, and only after the owner approves a decision package in chat. The install is
-  recorded in the tool registry. Install commands are `ask` for the orchestrator, also in Auto mode, and denied for
-  every other role, except the research role, inside its experiment folder (DEC-163). `sudo` stays with the owner (DEC-083, DEC-095).
+- The CTO approves and records every tool install in the tool registry, so that nothing out of the work's scope or
+  beyond the machine's capacity is installed. There is no permission prompt. `sudo` stays with the owner (DEC-083,
+  DEC-095, DEC-1214 G7; EMERGENCY-2 §2.2).
 
 **The human as customer** (MR-6).
 - The questions that matter arrive as decision packages in the active chat: question, why now, options, impact,
@@ -224,7 +224,7 @@ operator agent, its cron launcher and its lock are retired with the ACT pipeline
 | Below-floor recovery, break-glass, DEGRADED mode (CAP-60) | Rests on the signed-release-root trust chain, which is not built | DEC-039 (ADR-0001) |
 | Full root of trust: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation (CAP-02 beyond its LITE form) | Same-privilege adversary; the LITE form is a pinned, hash-verified release with its manifest, and no signing until friction asks | DEC-1214 L3 (DEC-027 superseded), DEC-074 Q11 |
 | In-process authority levels L0–L5, acting-role resolution, sealed human channel (CAP-21 beyond its LITE form) | Same-privilege adversary; approvals come only from the owner's git account | DEC-039, DEC-074 Q11 |
-| Automated tool-install gate, argv classification, install-authority envelopes (CAP-25 beyond its LITE form) | Reading argv cannot determine what executes; the owner approves each install | DEC-040 as amended by DEC-083 |
+| Automated tool-install gate, argv classification, install-authority envelopes (CAP-25 beyond its LITE form) | Reading argv cannot determine what executes; the CTO approves and records each install | DEC-040 as amended by DEC-083 and DEC-1214 G7 |
 | Separate A2A communication layer and three-layer knowledge fabric (CAP-27 beyond its LITE form) | One owner, one harness at a time; kept as "read commands never mutate". Minimal per-session inbox files inside the run-time tool are in scope (RT-6) | DEC-074 Q11; EMERGENCY-2 §6.3 |
 | The full upstream lesson export gate and FCP loop (Contract v3 Q4) | Lessons stay in `docs/lessons/`. Only a lite loop for framework lessons is built, in Wave 3: a lesson packet with no product code, data or secrets goes to a shared inbox (CAP-41) | DEC-053 Q7, reversed for framework lessons only by DEC-165 |
 | LLM-extracted knowledge graphs for authority (Graphiti, LightRAG, GraphRAG, Cognee) and BMAD | Non-deterministic and token-heavy | DEC-021 |
