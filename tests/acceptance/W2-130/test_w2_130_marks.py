@@ -128,7 +128,8 @@ def test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_a
 
 
 def test_s2_gov_links_reports_no_unmarked_change_but_the_eight_pairs_the_auditor_judged_wrong(head_findings):
-    found = set(s.by_pair(head_findings))
+    # The owner's approvals after the clean-up (DEC-1211, DEC-1212) are the only pairs allowed beside the eight.
+    found = set(s.by_pair(head_findings)) - s.OWNER_APPROVED_AFTER
     assert found == set(s.EIGHT), (f"extra: {sorted(found - set(s.EIGHT))}; missing: "
                                    f"{sorted(set(s.EIGHT) - found)}")
 
@@ -215,7 +216,7 @@ def test_s2_the_drift_script_on_head_leaves_no_pair_once_the_listed_pairs_are_se
     assert isinstance(out.get("drift"), list) and out.get("count") == len(out["drift"]), "drift output form"
     run = record.data("drift-run")
     aside = {s.pair(item) for item in run.get("set_aside", [])}
-    allowed = _judged(record) | aside
+    allowed = _judged(record) | aside | s.OWNER_APPROVED_AFTER
     left = [pair for pair in (s.pair(item) for item in out["drift"]) if pair not in allowed]
     assert not left, f"{len(left)} drift pairs remain after the set-aside: {left[:6]}"
 
