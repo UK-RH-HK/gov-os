@@ -377,10 +377,11 @@ capabilities:
     wave: W3
 - id: CAP-03
   title: Security and sensitivity classification
-  outcome: 'An agent can rely on secrets never reaching an index, a packet or an export: a content-based filter runs before
-    every indexer, and harness deny rules cover secret files.'
-  acceptance: After indexing a tree with planted secrets (including a token-shaped canary gitleaks defaults miss), no canary
-    string appears in any `.gov-runtime/` store, codebase-memory index, context packet or evidence bundle.
+  outcome: 'An agent can rely on secrets never reaching an index, a brief or an export: the path map''s sensitivity classes
+    keep secret-class files out of every index, and one full gitleaks scan runs before a repository goes public or is shared.'
+  acceptance: After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted
+    string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include
+    one full gitleaks scan before any public push or sharing, and no gitleaks scan runs on a private repository.
   wave: W1
   provider:
   - gitleaks 8.30.1
@@ -395,6 +396,7 @@ capabilities:
   - Distribution Protocol v1.2 §14, §17
   - DEC-074
   - DEC-076
+  - EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
   scenarios:
     dev:
     - CHAOS-A-14
@@ -423,9 +425,9 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-03.a
-    item: Sensitivity class per path/dataset/namespace before read, index or export; secrets excluded by default-deny content
-      filter
-    source: Contract v3 A3; Framework v4.1.2 §16, §72
+    item: Sensitivity class per path/dataset/namespace before read, index or export; secret-class paths excluded from every
+      index by default-deny; one full gitleaks scan runs before a repository goes public or is shared
+    source: Contract v3 A3; Framework v4.1.2 §16, §72; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
     wave: W1
     provider:
     - W1-15
@@ -451,8 +453,8 @@ capabilities:
     provider:
     - W1-17
   - id: CAP-03.e
-    item: Secret exclusion holds on every retrieval route, including the code route
-    source: OWNER-DIRECTION-BR-0003; DEC-076
+    item: Secret exclusion by sensitivity class holds on every retrieval route, including the code route
+    source: OWNER-DIRECTION-BR-0003; DEC-076; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
     wave: W1
     provider:
     - W1-16
@@ -2567,8 +2569,9 @@ capabilities:
     - W1-08
   - id: CAP-41.g
     item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code,
-      data or secrets, scanned by gitleaks; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`'
-    source: DEC-165
+      data or secrets; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan
+      while the inbox is private, one full scan before it is shared'
+    source: DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
     wave: W3
   - id: CAP-41.h
     item: A high or critical lesson is raised to the owner immediately, as a decision package
