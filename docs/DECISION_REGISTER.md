@@ -129,7 +129,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates:** C5, D2 (code route), K1 (code-side impact), W7 (dead code)
 
 ### DEC-015 — Symbol navigation & refactoring: native LSP first, Serena optional
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** retired
 - **Decision:** Use Claude Code's built-in LSP tools (definition, references, document symbols — available since v2.0.74). Add Serena only for multi-file refactors (rename/move) where it collapses many steps into one atomic call. [E-SERENA-LSP][E-SERENA]
 - **Install note:** Serena's maintainers advise installing via their Quick Start, not MCP/plugin marketplaces. [E-SERENA]
 
@@ -146,7 +146,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates:** D4, D5
 
 ### DEC-018 — Local T1 model
-- **Status:** DEFERRED to Wave 3, model routing (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** DEFERRED to Wave 3, model routing (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** retired
 - **Decision:** gpt-oss:20b loaded on demand (≈13 GB, fits a 16 GB card fully resident at 8k context) for T1 tasks: file classification during adopt, lesson scoping, summaries. Not used for implementation. [E-LOCAL]
 - **Constraint:** cannot co-reside comfortably with embed+rerank at larger contexts; rely on Ollama keep-alive unload.
 
@@ -221,7 +221,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates:** A3, E1, N2, N3, O5 (G0–G3 local, G4–G5 CI)
 
 ### DEC-026 — Telemetry
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-086 (for Wave 1)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-086 (for Wave 1) · **Class:** retired
 - **Decision:** Start with Claude Code OpenTelemetry → local collector → Prometheus → Grafana (no cloud, light). [E-OTEL] Add Langfuse (plugin, self-host or cloud) when per-turn traces are needed. [E-LANGFUSE]
 - **Primary metric:** governance tokens per completed task (DEC-004).
 - **Gates:** P1, P2 (partial), U
@@ -851,7 +851,7 @@ round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
 - **Decision:** Decision packages are ranked P1–P3 and asked at most five at a time. A P1 package may bypass the cap.
 
 ### DEC-094 — Test execution and integration are distinct roles, added in Wave 2
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-7 option (b) · **Amends:** DEC-066 (Wave 2 roster)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-7 option (b) · **Amends:** DEC-066 (Wave 2 roster) · **Class:** retired
 - **Decision:** MR-5's "test execution" and "integration" roles are distinct role definitions in Wave 2, alongside
   integration/API.
 
