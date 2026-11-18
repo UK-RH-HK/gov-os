@@ -7726,7 +7726,7 @@ The orchestrator's planning report of 2026-10-16 put five packages (P-W2-1 to P-
   4. Impact-selected tests (the rest of W2-38) stay where they are.
 
 ### DEC-727 — EXAMIN adoption on the copy starts on the safety-critical subset; the real repository stays gated
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-722, DEC-723 · **Basis:** a copy can be thrown away, so its adoption needs only the tickets that keep a repository and its sessions safe; the real repository needs the whole adoption-readiness block and the final retrieval figures.
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-722, DEC-723 · **Basis:** a copy can be thrown away, so its adoption needs only the tickets that keep a repository and its sessions safe; the real repository needs the whole adoption-readiness block and the final retrieval figures. · **Class:** superseded by EMERGENCY-2 §7.2 (DEC-1211)
 - **Decision:**
   1. W2-27 (adoption on the copy) depends only on W2-01, W2-03, W2-04, W2-05, W2-06, W2-08, W2-09, W2-10, W2-18 (with W2-16's hash-pinned release), W2-20, W2-21 and W2-23, plus W2-19 only if W2-26 shows that EXAMIN's tests are not pytest.
   2. W2-28 (the independent verdict on the copy) follows on the copy.
@@ -7858,7 +7858,7 @@ W2-26's lead (run 2) returned its research round with two packages: P-1, where t
 The orchestrator put package P-W2-8 to the owner after W2-26's record: EXAMIN's governance suite has 15 failures and 165 errors (169 from the fixtures of its own `governance/framework/kit/bootstrap.py`), and its product suite needs 10 package installs and a bundled Postgres. The package also corrected DEC-735 item 2. The owner answered every part and added (f).
 
 ### DEC-736 — EXAMIN's tests at adoption: W2-19 on the path, a ratchet baseline of known reds, the product suite measured before W2-30, the legacy kit kept, the owner's own files never overwritten
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-727, DEC-735, DEC-083, DEC-722, CAP-44.h · **Basis:**
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-727, DEC-735, DEC-083, DEC-722, CAP-44.h · **Basis:** · **Class:** superseded by EMERGENCY-2 §7.2 (DEC-1211)
   - `gov close` runs its regression only over `tests/` (`src/gov/close/command.py`, the call of the regression on `root / "tests"`). EXAMIN's suites are in `product/tests` and `governance/scripts/tests`. W2-27's KPI "gov close at exit 0 with EXAMIN's own test command" therefore needs W2-19's declared test commands, whatever the language.
   - W2-26's record (`docs/research/EXP-003/examin/`, `62c4e477` on `w2/W2-26`):
     - the governance suite gave 828 passed, 15 failed and 165 errors, all `AssertionError`;
@@ -15363,7 +15363,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** `docs/plan/WAVE_3_PARKING.md`, `docs/plan/WAVE_2_WBS.md`; DEC-954; DEC-1142 (8); DEC-1199; DEC-1200.
 
 ### DEC-1202 — Wave 2's exit proof: W2-81's full re-run on release 0.1.1 across its six repositories (S-RERUN) stands for Gov OS proven on adopted repositories; W2-46 re-pointed; W2-82's wait on W2-27 dropped; the four extra Wave 3 moves kept; the EXAMIN CTO's Wave 0 brief 2ec48c78 approved
-- **Status:** ACCEPTED (owner, 2026-11-16 ~15:2x to 15:3x, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1201, DEC-1197 (3), DEC-1200 · **Changes:** DEC-1099 (3) (W2-82's wait on W2-27); DEC-954 (W2-46's EXAMIN dependencies and lines)
+- **Status:** ACCEPTED (owner, 2026-11-16 ~15:2x to 15:3x, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1201, DEC-1197 (3), DEC-1200 · **Changes:** DEC-1099 (3) (W2-82's wait on W2-27); DEC-954 (W2-46's EXAMIN dependencies and lines) · **Class:** superseded by EMERGENCY-2 §6.2 (DEC-1211)
 - **Decision:**
   - (1) **EXIT-PROOF yes:** the single Wave 2 item standing for Gov OS proven on adopted repositories is W2-81's full re-run on release 0.1.1 across its six repositories (DEC-1197 (3), DND 257): W2-81 (DAEO-l78m) reopened with S-RERUN (READY, or READY but for exceptions the owner names one by one; gov doctor exit 0 and the governance share measured in each repository). W2-46's two EXAMIN lines re-point to S-RERUN and its four EXAMIN dependencies (W2-27 to W2-30) are dropped; W2-47 cites none.
   - (2) **W2-82** (the Definition of Ready: `gov claim` checks readiness and `gov launch` refuses a lead on a ticket that is not ready) needs no adopted repository, so its wait on W2-27 (FORECAST-W2-1, DEC-1099 (3)) is dropped, not re-pointed.
