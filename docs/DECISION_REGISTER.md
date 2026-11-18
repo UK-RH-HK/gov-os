@@ -151,14 +151,14 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Constraint:** cannot co-reside comfortably with embed+rerank at larger contexts; rely on Ollama keep-alive unload.
 
 ### DEC-019 — Research corpus ingestion: Docling → markdown in git
-- **Status:** DEFERRED to Wave 3 (owner, 2026-11-09, DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** DEFERRED to Wave 3 (owner, 2026-11-09, DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** retired
 - **Decision:** Convert research PDFs (papers, patents, datasheets, standards) once with Docling; commit the markdown with frontmatter (`source_path`, `source_sha256`, `converter`, `converter_version`) next to the original; index with DEC-016. Use MarkItDown as fast path for DOCX/PPTX and clean digital PDFs.
 - **Evidence:** Docling is MIT, LF AI & Data hosted, runs fully locally, and ships CLI, HTTP service and an MCP server. [E-DOCLING] Comparative testing reports Docling materially better on tables, formulas and multi-column PDFs; MarkItDown 50–100× faster on simple digital PDFs but loses structure. [E-PDFCMP]
 - **Pin:** Docling releases very frequently — pin the exact version (record in manifest so conversions are reproducible). [E-DOCLING-PIN]
 - **Gates:** J1, B3 (truth stays in git), D1
 
 ### DEC-020 — RAGFlow: conditional, research facet only
-- **Status:** CONDITIONAL · **Basis:** ESTABLISHED (evidence) + SUGGESTION (integration pattern)
+- **Status:** CONDITIONAL · **Basis:** ESTABLISHED (evidence) + SUGGESTION (integration pattern) · **Class:** retired
 - **Verdict by use:**
 
   | Use in Gov OS | Fit | Reason |
