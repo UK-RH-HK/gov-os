@@ -1,7 +1,7 @@
 ---
 id: CAP-64.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'RT-2: the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing (verify: finish times against message times)'
 depends_on:

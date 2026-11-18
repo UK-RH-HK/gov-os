@@ -1,7 +1,7 @@
 ---
 id: CAP-49.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the oracle hidden from a launched worker''s Bash by the sandbox and a `Read` deny rule: no sandbox; the transcript scan (CAP-66) detects a read instead'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-58
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Containment judged at the landing
 depends_on:

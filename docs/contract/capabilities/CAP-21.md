@@ -1,7 +1,7 @@
 ---
 id: CAP-21
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Owner-only approval facts (lite of L0-L5 authority levels)
 depends_on:

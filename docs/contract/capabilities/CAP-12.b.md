@@ -1,7 +1,7 @@
 ---
 id: CAP-12.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Per-repository index home; secrets excluded from the code graph
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-29.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions → algorithms → architecture → interfaces → security/performance/operations → WBS → tests → live evidence
 depends_on:

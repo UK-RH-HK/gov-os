@@ -1,7 +1,7 @@
 ---
 id: CAP-21.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: in-process L0–L5 levels, acting-role resolution, sealed human channel'
 depends_on:

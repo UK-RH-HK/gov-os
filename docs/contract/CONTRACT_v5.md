@@ -1,10 +1,10 @@
 ---
 id: CONTRACT-v5
-status: ACCEPTED
+status: PROPOSED
 version: "5.0"
 revised: 2026-11-18
 depends_on: [CHARTER-v6, ADR-0001, ADR-0002]
-decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-722, DEC-1089, DEC-1090]
+decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-409, DEC-722, DEC-741, DEC-836, DEC-848, DEC-906, DEC-1007, DEC-1030, DEC-1052, DEC-1065, DEC-1089, DEC-1090, DEC-1093, DEC-1116, DEC-1120, DEC-1149, DEC-1182, DEC-1200, DEC-1204, DEC-1207, DEC-1210, DEC-1211, DEC-1212, DEC-1213, DEC-1214]
 type: specification
 state_class: AUTHORITATIVE
 ---
@@ -13,7 +13,7 @@ state_class: AUTHORITATIVE
 
 Contract v5 states what the Gov OS must do, as outcomes with **one observable acceptance check each**. It replaces Contract v3 as the working text (DEC-058). `contract.yaml` holds the same content in machine-readable form; `readiness-dimensions.yaml` defines the 26 readiness rows that Wave 1's OpenSpec schema implements.
 
-**Version 5.0** (2026-11-18). The re-baseline of EMERGENCY-2 (audit 7, DEC-1214 G5): the file is `CONTRACT_v5.md`, the id `CONTRACT-v5`; the text of version 4.4 is in git history.
+**Version 5.0** (2026-11-18, status PROPOSED until the owner approves it by group, `docs/emergency-2/G5-APPROVAL.md`). The re-baseline of EMERGENCY-2 (audit 7, DEC-1214 G5): the file is `CONTRACT_v5.md`, the id `CONTRACT-v5`; the text of version 4.4 is in git history.
 
 | Version | Date | Change |
 |---|---|---|
@@ -22,6 +22,7 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 | 4.2 | 2026-10-17 | W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741). Carries DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release contents of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers items: CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions) and CAP-43.d (the rest of the release contents). CAP-44.h lists the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, each marked W2 or W3, from the named read of Adoption Protocol v3.0 §20 and Distribution Protocol v1.2 §18 the owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release tags) and CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343; DEC-741). No capability changes wave; 62 capabilities; 211 → 214 covers items. |
 | 4.3 | 2026-11-09 | W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093). Carries DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and CAP-45 with it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated source is the release's manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers items (W2 20 → 19, W3 38 → 39). |
 | 4.4 | 2026-11-18 | W2-192 specification change (docs/changes/W2-192-CIT-P.md), approved by the owner (DEC-1213). Carries DEC-1200 (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3. 62 capabilities; 215 covers items (W2 19 → 20). |
+| 5.0 | 2026-11-18 | Re-baseline to EMERGENCY-2 (docs/emergency-2/audits/07-contract-rebaseline.md; owner decisions DEC-1214 G5, G6, L3, M1, G7), proposed by group in docs/emergency-2/G5-APPROVAL.md and awaiting the owner's approval. No guard, no sandbox, no box (CAP-58, CAP-61, CAP-62 and their clauses dropped; §2 Boundary rewritten); pause carried by the launch, the dispatcher and the landing (CAP-05); memory in the brief and a fresh 80 at 95 % end to end, `gov context` retired, hit@k a diagnostic (CAP-01, CAP-10, CAP-15, CAP-17.b, CAP-19.c, CAP-48.a, §2 Token budget); the landing and the flow, no repair ticket, two rounds (MR-1 to MR-3, CAP-23.c, CAP-31, CAP-38, CAP-39, CAP-53, CAP-59, §2 Loop budget); a fresh audit only at the release acceptance and at adoption stages A5, AS, A7 and A10 (MR-4, CAP-47.d, CAP-38.f, CAP-24.c, CAP-33.d); the lean release pinned and hash-verified, no signing, `gov update` in the release (CAP-02, CAP-43, CAP-45, CAP-44.f/.h, CAP-49); gitleaks only before a repository goes public (CAP-03, CAP-41.g); the run-time tool and the rubric (CAP-04, CAP-22.b, CAP-23.b, CAP-35, CAP-37, CAP-40); the CTO approves every install (§2 Tool installs, CAP-25); Wave 3 is friction. New CAP-63 to CAP-69 (the landing, the run-time tool, memory by construction, the hidden-set scan, backups, the basis line, transcripts kept). Status PROPOSED until the owner approves. CAP-44.m's leftovers settled: the records' version, DEC-1200 in the decisions list, the source map. 69 capabilities; 239 covers items. |
 
 **Precedence:** Charter v6 → Contract v5 → ADRs → everything else. The ADRs supersede the originals where they conflict.
 
@@ -37,7 +38,7 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 | NONE | 0 | 0 | 3 | 3 |
 | **All** | 62 | 4 | 3 | 69 |
 
-DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1. Version 4.1 adds CAP-61 and CAP-62 to Wave 1 (DEC-152, DEC-153).
+DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1. Version 4.1 added CAP-61 and CAP-62 to Wave 1 (DEC-152, DEC-153). **Version 5.0** (EMERGENCY-2, audit 7): Wave 2 is what the lean release must have and Wave 3 is friction only (EMERGENCY-2 §8.4); CAP-15, 23, 35, 39, 45 and 49 move to Wave 2; CAP-62 becomes a dropped capability like CAP-26 and CAP-60; CAP-58 and CAP-61 keep a few items and drop the rest (Wave NONE); CAP-63 to CAP-69 are new.
 
 ## 2. Envelope and boundary
 

@@ -1,7 +1,7 @@
 ---
 id: CAP-60.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: below-floor recovery, break-glass, DEGRADED mode'
 depends_on:

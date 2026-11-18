@@ -1,7 +1,7 @@
 ---
 id: MR-4
 type: specification
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Audit, discovery and impact are distinct functions
 depends_on:

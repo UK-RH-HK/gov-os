@@ -1,7 +1,7 @@
 ---
 id: CAP-50.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Typed output→input contracts with required/optional dependencies and output schemas
 depends_on:

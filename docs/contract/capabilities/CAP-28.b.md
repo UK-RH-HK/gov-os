@@ -1,7 +1,7 @@
 ---
 id: CAP-28.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Internal governance operations exposed as gov commands
 depends_on:

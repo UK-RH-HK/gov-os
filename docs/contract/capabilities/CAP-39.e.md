@@ -1,7 +1,7 @@
 ---
 id: CAP-39.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Scheduler beyond the landing''s selection: parallel independent checks, isolated worktrees and processes, a cache keyed by content, policy and framework hashes (built only if friction asks)'
 depends_on:

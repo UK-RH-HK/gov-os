@@ -1,7 +1,7 @@
 ---
 id: CAP-57
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Deterministic worklist closure for facets
 depends_on:

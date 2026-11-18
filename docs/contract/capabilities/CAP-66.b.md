@@ -1,7 +1,7 @@
 ---
 id: CAP-66.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The memory reader runs with only the memory tool, and the gold sits outside the index and outside the clone
 depends_on:

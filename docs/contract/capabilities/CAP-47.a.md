@@ -1,7 +1,7 @@
 ---
 id: CAP-47.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Role separation for adoption and audit
 depends_on:

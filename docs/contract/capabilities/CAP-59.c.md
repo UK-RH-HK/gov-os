@@ -1,7 +1,7 @@
 ---
 id: CAP-59.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Anti-snowball: finding → whole-system context → one disposition before code'
 depends_on:

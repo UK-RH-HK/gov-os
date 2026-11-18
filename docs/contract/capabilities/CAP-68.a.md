@@ -1,7 +1,7 @@
 ---
 id: CAP-68.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: A new rule's decision record names its incident, checked by code at the decision-record commit
 depends_on:

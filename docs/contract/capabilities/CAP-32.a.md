@@ -1,7 +1,7 @@
 ---
 id: CAP-32.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Research becomes evidence records separate from authority
 depends_on:

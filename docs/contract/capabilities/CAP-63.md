@@ -1,7 +1,7 @@
 ---
 id: CAP-63
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The landing
 depends_on:

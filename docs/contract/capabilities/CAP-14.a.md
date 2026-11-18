@@ -1,7 +1,7 @@
 ---
 id: CAP-14.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Failed approaches recorded and surfaced before a retry
 depends_on:

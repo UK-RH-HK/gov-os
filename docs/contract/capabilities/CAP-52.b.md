@@ -1,7 +1,7 @@
 ---
 id: CAP-52.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Claude Code first, others later
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-25.f
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the committed settings carry no install ask rule so that the guard''s install rule decides alone: no guard, no install rule'
 depends_on:

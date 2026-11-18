@@ -1,7 +1,7 @@
 ---
 id: CAP-64.h
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'RT-8: the launcher picks the model and effort from the rubric and states them (verify: the launch log)'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-63.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The landing exists in an adopted repository (`gov queue`), not only among Gov OS's own tools
 depends_on:

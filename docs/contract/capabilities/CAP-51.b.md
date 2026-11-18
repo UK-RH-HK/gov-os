@@ -1,7 +1,7 @@
 ---
 id: CAP-51.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Authority/current/superseded filtering in retrieval
 depends_on:

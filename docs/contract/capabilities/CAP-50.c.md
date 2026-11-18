@@ -1,7 +1,7 @@
 ---
 id: CAP-50.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Consumption receipt and implementation traceability
 depends_on:

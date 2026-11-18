@@ -1,7 +1,7 @@
 ---
 id: CAP-64.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'RT-5: after a compaction, restart or crash a session resumes at the recorded next step without the owner restating it (CAP-37; verify: a forced compaction and a killed session)'
 depends_on:

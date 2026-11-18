@@ -1,7 +1,7 @@
 ---
 id: CAP-41.g
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan while the inbox is private, one full scan before it is shared'
 depends_on:

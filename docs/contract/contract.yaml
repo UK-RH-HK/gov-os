@@ -1,6 +1,6 @@
 # Contract v5 — machine-readable. Same content as CONTRACT_v5.md.
 id: CONTRACT-v5
-status: ACCEPTED
+status: PROPOSED
 version: '5.0'
 date: '2026-09-30'
 revised: '2026-11-18'
@@ -53,6 +53,21 @@ change_log:
   change: 'W2-192 specification change (docs/changes/W2-192-CIT-P.md), approved by the owner (DEC-1213). Carries DEC-1200
     (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3. 62
     capabilities; 215 covers items (W2 19 → 20).'
+- version: '5.0'
+  date: '2026-11-18'
+  change: 'Re-baseline to EMERGENCY-2 (docs/emergency-2/audits/07-contract-rebaseline.md; owner decisions DEC-1214 G5, G6,
+    L3, M1, G7), proposed by group in docs/emergency-2/G5-APPROVAL.md and awaiting the owner''s approval. No guard, no sandbox,
+    no box (CAP-58, CAP-61, CAP-62 and their clauses dropped; §2 Boundary rewritten); pause carried by the launch, the dispatcher
+    and the landing (CAP-05); memory in the brief and a fresh 80 at 95 % end to end, `gov context` retired, hit@k a diagnostic
+    (CAP-01, CAP-10, CAP-15, CAP-17.b, CAP-19.c, CAP-48.a, §2 Token budget); the landing and the flow, no repair ticket, two
+    rounds (MR-1 to MR-3, CAP-23.c, CAP-31, CAP-38, CAP-39, CAP-53, CAP-59, §2 Loop budget); a fresh audit only at the release
+    acceptance and at adoption stages A5, AS, A7 and A10 (MR-4, CAP-47.d, CAP-38.f, CAP-24.c, CAP-33.d); the lean release
+    pinned and hash-verified, no signing, `gov update` in the release (CAP-02, CAP-43, CAP-45, CAP-44.f/.h, CAP-49); gitleaks
+    only before a repository goes public (CAP-03, CAP-41.g); the run-time tool and the rubric (CAP-04, CAP-22.b, CAP-23.b,
+    CAP-35, CAP-37, CAP-40); the CTO approves every install (§2 Tool installs, CAP-25); Wave 3 is friction. New CAP-63 to
+    CAP-69 (the landing, the run-time tool, memory by construction, the hidden-set scan, backups, the basis line, transcripts
+    kept). Status PROPOSED until the owner approves. CAP-44.m''s leftovers settled: the records'' version, DEC-1200 in the
+    decisions list, the source map. 69 capabilities; 239 covers items.'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v6 → Contract v5 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:

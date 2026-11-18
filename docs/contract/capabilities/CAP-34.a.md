@@ -1,7 +1,7 @@
 ---
 id: CAP-34.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Agent- vs human-resolvable contradictions
 depends_on:

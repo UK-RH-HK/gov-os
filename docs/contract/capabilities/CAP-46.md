@@ -1,7 +1,7 @@
 ---
 id: CAP-46
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Cross-machine sync via git
 depends_on:

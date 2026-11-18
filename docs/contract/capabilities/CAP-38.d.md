@@ -1,7 +1,7 @@
 ---
 id: CAP-38.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Governance suite currency
 depends_on:

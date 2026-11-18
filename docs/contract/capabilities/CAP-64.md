@@ -1,7 +1,7 @@
 ---
 id: CAP-64
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The run-time tool
 depends_on:

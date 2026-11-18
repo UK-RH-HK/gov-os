@@ -1,7 +1,7 @@
 ---
 id: CAP-39.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded
 depends_on:

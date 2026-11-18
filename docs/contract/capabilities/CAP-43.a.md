@@ -1,7 +1,7 @@
 ---
 id: CAP-43.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Canonical OS repository separation; developed once
 depends_on:

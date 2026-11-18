@@ -1,7 +1,7 @@
 ---
 id: CAP-58.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: default-deny write allow-lists per role and ticket: the guard is retired'
 depends_on:

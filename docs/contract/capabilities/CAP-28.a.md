@@ -1,7 +1,7 @@
 ---
 id: CAP-28.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Natural-language intent first; small explicit command set
 depends_on:

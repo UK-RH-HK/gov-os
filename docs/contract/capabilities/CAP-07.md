@@ -1,7 +1,7 @@
 ---
 id: CAP-07
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Authoritative vs derived state separation
 depends_on:

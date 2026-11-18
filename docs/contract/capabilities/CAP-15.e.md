@@ -1,7 +1,7 @@
 ---
 id: CAP-15.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The brief's hash and provenance prove what the worker received
 depends_on:

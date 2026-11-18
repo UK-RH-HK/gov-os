@@ -1,7 +1,7 @@
 ---
 id: CAP-02
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Release authenticity (lite: pinned and hash-verified)'
 depends_on:

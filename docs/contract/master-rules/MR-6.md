@@ -1,7 +1,7 @@
 ---
 id: MR-6
 type: specification
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The human is the customer and final authority
 depends_on:

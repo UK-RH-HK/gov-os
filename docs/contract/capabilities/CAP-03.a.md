@@ -1,7 +1,7 @@
 ---
 id: CAP-03.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Sensitivity class per path/dataset/namespace before read, index or export; secret-class paths excluded from every index by default-deny; one full gitleaks scan runs before a repository goes public or is shared
 depends_on:

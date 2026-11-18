@@ -1,7 +1,7 @@
 ---
 id: CAP-35.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form)
 depends_on:

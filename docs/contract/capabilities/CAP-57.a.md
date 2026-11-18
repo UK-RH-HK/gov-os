@@ -1,7 +1,7 @@
 ---
 id: CAP-57.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Deterministic closure over referenced ids to radius-scaled depth; synthesis citation check
 depends_on:

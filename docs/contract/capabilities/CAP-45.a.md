@@ -1,7 +1,7 @@
 ---
 id: CAP-45.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'gov update: check/impact, authenticated source (the release''s manifest and file hashes, CAP-43.b; no signature, DEC-1214 L3), compatibility/migration, a three-way merge that keeps the owner''s own edits and the overlay, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance'
 depends_on:

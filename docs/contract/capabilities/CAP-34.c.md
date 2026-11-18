@@ -1,7 +1,7 @@
 ---
 id: CAP-34.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Presented in the active chat; ranked P1–P3; at most five at a time, P1 may bypass
 depends_on:

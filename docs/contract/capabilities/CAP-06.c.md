@@ -1,7 +1,7 @@
 ---
 id: CAP-06.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Unknown material artefacts block destructive migration
 depends_on:

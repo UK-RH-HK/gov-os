@@ -1,7 +1,7 @@
 ---
 id: CAP-29.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Forward and reverse lineage; missing and stale links detected
 depends_on:

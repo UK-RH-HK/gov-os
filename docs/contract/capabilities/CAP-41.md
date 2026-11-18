@@ -1,7 +1,7 @@
 ---
 id: CAP-41
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Lesson records with scope
 depends_on:

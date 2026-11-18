@@ -1,7 +1,7 @@
 ---
 id: CAP-34.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Declined, revoked, stale or other-CIT gates cannot authorise execution
 depends_on:

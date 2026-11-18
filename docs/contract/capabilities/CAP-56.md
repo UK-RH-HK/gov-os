@@ -1,7 +1,7 @@
 ---
 id: CAP-56
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Retrieval in disposable subagent context
 depends_on:

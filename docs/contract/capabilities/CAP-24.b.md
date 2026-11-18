@@ -1,7 +1,7 @@
 ---
 id: CAP-24.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'A skill is a method: not a tool and not a policy (skills hold no permissions and no authority)'
 depends_on:

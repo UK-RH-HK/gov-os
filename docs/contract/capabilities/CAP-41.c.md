@@ -1,7 +1,7 @@
 ---
 id: CAP-41.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: PROJECT/PRODUCT/FRAMEWORK scope
 depends_on:

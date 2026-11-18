@@ -1,7 +1,7 @@
 ---
 id: CAP-58.f
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the containment check on `PostToolUseFailure`: a hook-time check; the landing judges commits instead'
 depends_on:

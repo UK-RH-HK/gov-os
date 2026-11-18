@@ -1,7 +1,7 @@
 ---
 id: CAP-62
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Sandbox escape hatch denied
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-58.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: permission classes enforced as role permissions by the guard: no guard, no permission editing'
 depends_on:

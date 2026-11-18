@@ -1,7 +1,7 @@
 ---
 id: CAP-01.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Machine-readable precedence: Charter → Contract → ADRs → specifications → tasks → retrieval → inference'
 depends_on:

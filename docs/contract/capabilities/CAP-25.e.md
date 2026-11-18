@@ -1,7 +1,7 @@
 ---
 id: CAP-25.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the research role''s install fence (the sandbox write fence and the generated `Edit` deny rules): an install by the research role is free inside its repository, worktree or venv (CAP-25.b)'
 depends_on:

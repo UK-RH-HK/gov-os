@@ -1,7 +1,7 @@
 ---
 id: CAP-13
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Temporal and episodic memory
 depends_on:

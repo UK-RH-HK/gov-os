@@ -1,7 +1,7 @@
 ---
 id: CAP-28
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Natural-language intent routing and small command surface
 depends_on:

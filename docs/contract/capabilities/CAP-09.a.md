@@ -1,7 +1,7 @@
 ---
 id: CAP-09.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Typed edges EVIDENCE_FOR, CONSTRAINS, IMPLEMENTS, TESTS, GENERATES, VALIDATES, SUPERSEDES, DEPENDS_ON
 depends_on:

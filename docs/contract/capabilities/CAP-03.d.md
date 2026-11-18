@@ -1,7 +1,7 @@
 ---
 id: CAP-03.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Whole-repository corpus minus secrets
 depends_on:

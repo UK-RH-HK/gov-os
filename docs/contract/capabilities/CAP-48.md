@@ -1,7 +1,7 @@
 ---
 id: CAP-48
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Framework health SLOs and healthy-repo definition
 depends_on:

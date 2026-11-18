@@ -14,7 +14,7 @@ What it makes:
 
 The generator was first run on the v4.4 files and reproduced the 277 records, the 6 master-rule records and the
 Contract text byte for byte (`--baseline <the commit before v5>`), then used for v5. The prose of the §1 notes
-paragraph lives in `docs/contract/tools/counts_notes.md`.
+paragraph lives in `docs/contract/tools/counts_notes.md` (version 4) and `counts_notes_v5.md` (version 5).
 """
 from __future__ import annotations
 
@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[3]
 CON = ROOT / "docs/contract"
 YAML = CON / "contract.yaml"
 NOTES = CON / "tools/counts_notes.md"
+NOTES_V5 = CON / "tools/counts_notes_v5.md"
 WAVES = ("W1", "W2", "W3", "NONE")
 CLASSES = ("KEPT", "LITE", "DROP")
 
@@ -67,8 +68,8 @@ def disposition_text(cap: dict) -> str:
 
 
 # ------------------------------------------------------------------ records
-def record(rid: str, typ: str, title: str, depends: str, body: str, name: str) -> tuple[str, str]:
-    head = f"---\nid: {rid}\ntype: {typ}\nstatus: ACCEPTED\nstate_class: DERIVED\n"
+def record(rid: str, typ: str, title: str, depends: str, body: str, name: str, status: str = "ACCEPTED") -> tuple[str, str]:
+    head = f"---\nid: {rid}\ntype: {typ}\nstatus: {status}\nstate_class: DERIVED\n"
     head += yaml.safe_dump({"title": title}, allow_unicode=True, width=1 << 30, default_flow_style=False)
     head += f"depends_on:\n- {depends}\n---\n\n# {rid}: {title}\n\n"
     return name, head + body
@@ -85,17 +86,17 @@ def records(c: dict) -> dict[str, str]:
                 f"- **Disposition:** {cap['disposition']['class']}\n")
         if covers:
             body += "- **Covers:** " + ", ".join(cv["id"] for cv in covers) + "\n"
-        n, t = record(cap["id"], "capability", cap["title"], c["id"], body, f"capabilities/{cap['id']}.md")
+        n, t = record(cap["id"], "capability", cap["title"], c["id"], body, f"capabilities/{cap['id']}.md", c["status"])
         out[n] = t
         for cv in covers:
             cbody = (f"A covers item of {cap['id']} ({cap['title']}). {auth} (DEC-614).\n\n"
                      f"- **Item:** {cv['item']}\n- **Wave:** {cv['wave']}\n")
-            n, t = record(cv["id"], "capability", cv["item"], cap["id"], cbody, f"capabilities/{cv['id']}.md")
+            n, t = record(cv["id"], "capability", cv["item"], cap["id"], cbody, f"capabilities/{cv['id']}.md", c["status"])
             out[n] = t
     for mr in c["master_rules"]:
         body = (f"A master rule of the Charter (v{c.get('charter', '5')}, §4). {auth}; this record exists so that the id "
                 f"resolves.\n\n- **Text:** {mr['text_source']}\n- **Acceptance:** {mr['acceptance']}\n")
-        n, t = record(mr["id"], "specification", mr["title"], c["id"], body, f"master-rules/{mr['id']}.md")
+        n, t = record(mr["id"], "specification", mr["title"], c["id"], body, f"master-rules/{mr['id']}.md", c["status"])
         out[n] = t
     return out
 
@@ -169,7 +170,7 @@ def capability(cap: dict) -> str:
 
 
 def body(c: dict) -> str:
-    notes = NOTES.read_text(encoding="utf-8").rstrip("\n")
+    notes = (NOTES_V5 if "charter" in c else NOTES).read_text(encoding="utf-8").rstrip("\n")
     parts = ["## 1. Counts", "", counts(c), "", notes, "", "## 2. Envelope and boundary", "", envelope(c), "",
              "## 3. Master-rule clauses", "", MR_INTRO(c), "", master_rules(c), "", "## 4. Capabilities", ""]
     parts.append("\n\n".join(capability(cap) for cap in c["capabilities"]))

@@ -1,7 +1,7 @@
 ---
 id: CAP-15.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Missing mandatory input → `gov brief` refuses or reports BLOCKED; a superseded input cannot satisfy a current requirement; conflicting inputs → contradiction handling
 depends_on:

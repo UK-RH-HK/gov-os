@@ -1,7 +1,7 @@
 ---
 id: CAP-14
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Failure memory
 depends_on:

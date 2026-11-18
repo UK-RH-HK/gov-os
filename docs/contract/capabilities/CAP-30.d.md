@@ -1,7 +1,7 @@
 ---
 id: CAP-30.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Scenarios drive data and tests; data provenance recorded; data author independent where practical
 depends_on:

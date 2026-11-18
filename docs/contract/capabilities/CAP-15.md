@@ -1,7 +1,7 @@
 ---
 id: CAP-15
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The brief carries the ticket's retrieval
 depends_on:

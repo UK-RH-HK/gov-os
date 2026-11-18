@@ -1,7 +1,7 @@
 ---
 id: CAP-27
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Read/act separation of commands (lite of MCP/A2A/knowledge layers)
 depends_on:

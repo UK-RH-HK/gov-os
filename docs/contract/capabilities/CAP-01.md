@@ -1,7 +1,7 @@
 ---
 id: CAP-01
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Authority precedence and hard invariants
 depends_on:

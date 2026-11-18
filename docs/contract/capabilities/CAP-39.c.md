@@ -1,7 +1,7 @@
 ---
 id: CAP-39.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Impact-selected tests at the landing: the landing runs the tests the change''s impact selects (`gov impact`)'
 depends_on:

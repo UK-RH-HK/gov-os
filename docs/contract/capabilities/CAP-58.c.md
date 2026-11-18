@@ -1,7 +1,7 @@
 ---
 id: CAP-58.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: a session with no or an unknown role has no write privilege: nothing refuses a write; the landing judges the commit'
 depends_on:

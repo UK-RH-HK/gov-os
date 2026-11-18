@@ -1,7 +1,7 @@
 ---
 id: CAP-24.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Kernel and instruction text (role files, brief and role templates, skills, CLAUDE.md and AGENTS.md) changes only by the CTO's decision, approval and own commit; the landing checks kernel bytes against the CTO-approved list
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-04.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Governance share ≤ 15 %, reported weekly with its baseline (56 %), by P1's method until `gov telemetry` measures it (DEC-086; EMERGENCY-2 §10.2, A-7)
 depends_on:

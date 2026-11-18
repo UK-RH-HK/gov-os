@@ -1,7 +1,7 @@
 ---
 id: CAP-59
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Review-repair loop budget
 depends_on:

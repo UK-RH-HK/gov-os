@@ -1,7 +1,7 @@
 ---
 id: CAP-26.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: plugin hash-binding, descriptor security, self-attestation prevention'
 depends_on:

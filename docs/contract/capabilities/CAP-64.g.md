@@ -1,7 +1,7 @@
 ---
 id: CAP-64.g
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'RT-7: one state file and one wake rule replace today''s watcher layers (verify: one watcher process)'
 depends_on:

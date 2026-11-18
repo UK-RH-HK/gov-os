@@ -1,7 +1,7 @@
 ---
 id: CAP-12
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Code-structural memory (AST/LSP/SCIP)
 depends_on:

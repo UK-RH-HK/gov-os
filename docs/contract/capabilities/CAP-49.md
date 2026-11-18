@@ -1,7 +1,7 @@
 ---
 id: CAP-49
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Qualification oracle (synthetic repos, fault injection, hidden tests)
 depends_on:

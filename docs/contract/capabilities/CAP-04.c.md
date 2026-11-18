@@ -1,7 +1,7 @@
 ---
 id: CAP-04.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Retrieval spend budget scaled by impact radius; hitting it is a governed event, never silent truncation; there is no packet ceiling (the final-packet budget of DEC-031 is superseded by EMERGENCY-2 §5.5)
 depends_on:

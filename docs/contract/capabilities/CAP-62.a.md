@@ -1,7 +1,7 @@
 ---
 id: CAP-62.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the guard denies a Bash call carrying `dangerouslyDisableSandbox: true`: no sandbox, no guard'
 depends_on:

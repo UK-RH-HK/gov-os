@@ -1,7 +1,7 @@
 ---
 id: CAP-09
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Relationship/graph memory
 depends_on:

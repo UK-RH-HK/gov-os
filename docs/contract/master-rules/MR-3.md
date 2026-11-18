@@ -1,7 +1,7 @@
 ---
 id: MR-3
 type: specification
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: KPIs; the builder never writes its own acceptance tests
 depends_on:

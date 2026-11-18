@@ -1,7 +1,7 @@
 ---
 id: CAP-23.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Exclusive claim lock with holder named
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-64.i
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: A stalled session is detected by the dispatcher's cron pass, a shell script that costs no model (DEC-1214 T1)
 depends_on:

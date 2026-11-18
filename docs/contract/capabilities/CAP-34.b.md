@@ -1,7 +1,7 @@
 ---
 id: CAP-34.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Decision package with ten fields
 depends_on:

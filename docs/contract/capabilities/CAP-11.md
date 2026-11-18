@@ -1,7 +1,7 @@
 ---
 id: CAP-11
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Lexical memory (FTS/BM25)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-15.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Brief: mandatory inputs by id, version and sha256; the authority record first; the supplementary block separate; all carried in the brief'
 depends_on:

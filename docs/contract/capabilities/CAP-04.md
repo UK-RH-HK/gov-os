@@ -1,7 +1,7 @@
 ---
 id: CAP-04
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Budget and resource governance
 depends_on:

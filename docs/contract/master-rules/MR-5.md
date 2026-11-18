@@ -1,7 +1,7 @@
 ---
 id: MR-5
 type: specification
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The Gov OS works as a software company
 depends_on:

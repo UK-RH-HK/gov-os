@@ -1,7 +1,7 @@
 ---
 id: CAP-58.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the orchestrator''s write scope under the guard: there is no guard to except it from'
 depends_on:

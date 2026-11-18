@@ -1,7 +1,7 @@
 ---
 id: CAP-05.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'PAUSE and FREEZE (`gov pause`): the freeze flag stops launches, dispatcher ticks and landings and sends a stop message to every running session; `--off` lifts all three, and only the owner in person lifts (DEC-409)'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-33.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Upstream change propagates staleness and generates revalidation tasks
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-38.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Independent test authorship; builder tests are regression evidence only
 depends_on:

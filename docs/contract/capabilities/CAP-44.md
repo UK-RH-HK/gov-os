@@ -1,7 +1,7 @@
 ---
 id: CAP-44
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: gov init and gov adopt lifecycle
 depends_on:

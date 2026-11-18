@@ -1,7 +1,7 @@
 ---
 id: CAP-09.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Dangling references reported by id
 depends_on:

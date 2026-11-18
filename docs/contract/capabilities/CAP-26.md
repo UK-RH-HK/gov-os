@@ -1,7 +1,7 @@
 ---
 id: CAP-26
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Plugin trust boundary (hash-binding, descriptor security)
 depends_on:

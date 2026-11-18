@@ -1,7 +1,7 @@
 ---
 id: CAP-42.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Legacy governance retirement: rules imported or archived, zero active authority'
 depends_on:

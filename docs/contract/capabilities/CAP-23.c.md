@@ -1,7 +1,7 @@
 ---
 id: CAP-23.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Parallel tickets: each ticket in its own worktree with a ticket lead; the landing merges it into the integration branch, runs the impact-selected tests and checks paths and test authorship (NEW-1); the number in flight comes from the machine''s slots, not from a constant'
 depends_on:

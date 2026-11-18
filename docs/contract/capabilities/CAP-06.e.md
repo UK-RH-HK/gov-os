@@ -1,7 +1,7 @@
 ---
 id: CAP-06.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Project-specific floor in the overlay
 depends_on:

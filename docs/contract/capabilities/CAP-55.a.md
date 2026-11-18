@@ -1,7 +1,7 @@
 ---
 id: CAP-55.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Fixed stopping reasons; NOT_FOUND never proof of absence; canaries per index
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-18
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Retrieval router (multi-route fusion)
 depends_on:

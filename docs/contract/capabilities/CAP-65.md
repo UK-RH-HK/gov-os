@@ -1,7 +1,7 @@
 ---
 id: CAP-65
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Memory by construction
 depends_on:

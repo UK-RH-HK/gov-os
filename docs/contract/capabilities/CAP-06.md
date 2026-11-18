@@ -1,7 +1,7 @@
 ---
 id: CAP-06
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Repository contract and path map
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-04.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1)
 depends_on:

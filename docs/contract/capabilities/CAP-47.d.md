@@ -1,7 +1,7 @@
 ---
 id: CAP-47.d
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Audit triggers: the release acceptance and adoption stages A5, AS, A7 and A10; otherwise only a red test, a failed landing or merge, or a feature that does not work as intended'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-63.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The landing merges, runs the impact-selected tests on the merged result and checks trailers, containment (a notice), test authorship, a committed tree, store freshness and disk
 depends_on:

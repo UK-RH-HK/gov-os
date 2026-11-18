@@ -1,7 +1,7 @@
 ---
 id: CAP-47
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Independent adoption/audit roles and fresh-session independence
 depends_on:

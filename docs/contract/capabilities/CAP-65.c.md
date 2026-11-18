@@ -1,7 +1,7 @@
 ---
 id: CAP-65.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'A memory-use log records each retrieve: who asked, when, the question and what came back'
 depends_on:

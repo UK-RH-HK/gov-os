@@ -1,7 +1,7 @@
 ---
 id: CAP-35.c
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Role defaults: the rubric''s model and effort per role'
 depends_on:

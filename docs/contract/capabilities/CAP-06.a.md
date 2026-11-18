@@ -1,7 +1,7 @@
 ---
 id: CAP-06.a
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Every material artefact classified by current path, class, authority and intended target
 depends_on:

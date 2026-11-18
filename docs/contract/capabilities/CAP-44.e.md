@@ -1,7 +1,7 @@
 ---
 id: CAP-44.e
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: A8 legacy memory extraction/retirement
 depends_on:

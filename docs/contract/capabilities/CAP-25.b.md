@@ -1,7 +1,7 @@
 ---
 id: CAP-25.b
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: The CTO approves and records every install; no permission prompt; `sudo` stays with the owner
 depends_on:

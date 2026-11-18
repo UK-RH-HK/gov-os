@@ -1,7 +1,7 @@
 ---
 id: CAP-24
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: Skill lifecycle and versioning
 depends_on:

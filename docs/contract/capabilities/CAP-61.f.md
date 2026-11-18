@@ -1,7 +1,7 @@
 ---
 id: CAP-61.f
 type: capability
-status: ACCEPTED
+status: PROPOSED
 state_class: DERIVED
 title: 'Non-goal: the untested sandbox cases of EXP-002: there is no sandbox to test'
 depends_on:
