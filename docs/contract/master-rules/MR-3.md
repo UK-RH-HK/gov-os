@@ -12,5 +12,5 @@ depends_on:
 
 A master rule of the Charter (v6, §4). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves.
 
-- **Text:** architecture v0.3 §1A (verbatim in Charter v5 §4)
-- **Acceptance:** An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome. The orchestrator may write anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it as to every role but the Independent Test Designer (DEC-156).
+- **Text:** architecture v0.3 §1A (Charter v6 §4)
+- **Acceptance:** The landing refuses a commit that changes `tests/acceptance/` without `Role: independent-test-designer` (or the owner's `Role: owner`), naming the commit, in the Gov OS repository and in an adopted repository (`gov queue`); a feature ticket is not READY until `tests/acceptance/<ticket-id>/` exists and its tests are red on the base; a breach is a forbidden outcome.

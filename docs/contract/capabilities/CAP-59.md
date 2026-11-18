@@ -12,8 +12,8 @@ depends_on:
 
 Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
-- **Outcome:** The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop continues until it converges, or until three consecutive iterations fail to converge, and then the owner decides from an escalation package.
-- **Acceptance:** After three consecutive non-converging iterations on the same surface, `gov close` stops the loop and puts an escalation package in chat (each iteration's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue); the iteration count never appears in the output seen by the looping session.
+- **Outcome:** The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop runs at most two rounds, and then the owner decides once, from an escalation package with options.
+- **Acceptance:** After two rounds on the same surface the review tool refuses a third and puts one escalation package in chat (each round's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue); READY is computed from the reviewers' verdict blocks; the round count never appears in the output seen by the looping session.
 - **Wave:** W1
 - **Disposition:** KEPT
 - **Covers:** CAP-59.a, CAP-59.b, CAP-59.c

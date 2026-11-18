@@ -32,8 +32,8 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
 | W1 | 36 | 4 | 0 | 40 |
-| W2 | 7 | 0 | 0 | 7 |
-| W3 | 12 | 0 | 0 | 12 |
+| W2 | 8 | 0 | 0 | 8 |
+| W3 | 11 | 0 | 0 | 11 |
 | NONE | 0 | 0 | 3 | 3 |
 | **All** | 55 | 4 | 3 | 62 |
 
@@ -45,18 +45,18 @@ DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation valida
 - **RAM budget** (DEC-078). Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare; incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker, VRAM peak ≈ 5.2 of 16 GiB.
 - **Token budget** (DEC-004, DEC-086, DEC-1211, DEC-1214). Governance tokens ≤ 15 % of a ticket's fresh input + output tokens, reported weekly with its baseline (56 % before EMERGENCY-2) by P1's method until `gov telemetry` measures it (EMERGENCY-2 §10.2, A-7). Governance tokens = text the Gov OS injects or returns (instruction files, the brief, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. AGENTS.md ≤ ~1.5k tokens. There is no context packet and no packet ceiling anywhere: `gov context` is retired (DEC-1214 M1), and the brief carries the ticket's retrieval uncut. A breach is a health finding, never a silent cost.
 - **Boundary** (DEC-039, DEC-075, DEC-087, DEC-848, DEC-1211). No guard, no sandbox, no box and no permission prompts (EMERGENCY-2 §2). Agents have full permission in the repository, the worktree and the run folder they work in; sessions stay apart by where each starts, the folders it is given and its brief, and nothing enforces it. Mistakes are caught and corrected at the landing and by the transcript scan, not prevented. The hard boundary is git history; the owner's own `git push` and release from his own terminal; two settings deny lines, `git push` and `sudo`, which hold in every permission mode; and an hourly `git bundle` of each repository, kept outside the tree. The landing merges into integration and only the owner pushes. The lefthook pre-push gate G3 on the owner's machine and GitHub Actions CI G4–G5 stay as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks). `main` is not protected; enabling protection later changes no other decision.
-- **Loop budget** (DEC-044, DEC-096). Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) continues until it converges or until three consecutive iterations fail to converge; the third failure produces an escalation package for the owner (each iteration's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides. The iteration count and budget are held by the orchestrator or gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).
+- **Loop budget** (DEC-044, DEC-096, DEC-1204, DEC-1211). Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) runs at most two rounds; if the second does not converge there is one escalation package for the owner (each round's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides once. READY is computed by code from the reviewers' verdict blocks. The round count and budget are held by the orchestrator or gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).
 - **Tool installs** (DEC-083, DEC-157, DEC-163). The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version, source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`, and the sandbox's write fence enforces this (DEC-157, DEC-158, DEC-163).
 
 ## 3. Master-rule clauses
 
-The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each clause below is a contract item with one acceptance check.
+The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 reworded the checks of MR-1 to MR-4. Each clause below is a contract item with one acceptance check.
 
 | Id | Rule | Acceptance | Provider | Dev scenarios | Decisions |
 |---|---|---|---|---|---|
-| MR-1 | Specification comes first | A production ticket whose specification has a required readiness cell open for its profile (FULL for a spine) cannot reach READY: `tk ready` does not list it and `gov readiness` names the open cells; an N/A without a reason is rejected. | W1-12, W1-13, W1-35, W1-42 | MR-A-02, MR-B-02 | DEC-065, DEC-085 |
-| MR-2 | Closed specifications generate the work | A closed specification produces tickets with class, role, depends_on, allowed_paths, KPIs and profile, and `gov check` fails a ticket missing any of them; every required open readiness cell has a linked gap ticket (discovery, data, research or test-design) and `gov check` fails an unlinked one — created by the planning skill in W1, generated by `gov readiness --generate` from W2. | W1-14, W1-35, W1-13, W1-26, W2: gov readiness --generate, W1-09, W1-42 | MR-A-02, MR-A-04, MR-B-02, MR-B-04 | DEC-065, DEC-089 |
-| MR-3 | KPIs; the builder never writes its own acceptance tests | An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome. The orchestrator may write anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it as to every role but the Independent Test Designer (DEC-156). | W1-02, W1-03, W1-09, W1-30, W1-33, W1-05, W1-26, W1-35, W1-42, W1-45 | MR-A-01, MR-B-01 | DEC-065, DEC-069, DEC-076, DEC-084, DEC-150, DEC-156 |
+| MR-1 | Specification comes first | A feature ticket whose specification has a required readiness cell open for its profile (FULL for a spine) cannot reach READY: `tk ready` does not list it and `gov readiness` names the open cells; an N/A without a reason is rejected. READY is computed by code from the template; a fix or a chore has no ticket. | W1-12, W1-13, W1-35, W1-42 | MR-A-02, MR-B-02 | DEC-065, DEC-085, DEC-1052, DEC-1116, DEC-1211 |
+| MR-2 | Closed specifications generate the work | A closed specification produces feature tickets with class, role, depends_on, allowed_paths, KPIs and profile, and `gov check` fails a ticket missing any of them; every required open readiness cell has a linked gap ticket (discovery, data, research or test-design) and `gov check` fails an unlinked one — created by the planning skill, generated by `gov discover` (`gov readiness --generate` is folded into it, W2-36). | W1-14, W1-35, W1-13, W1-26, W2-36 (gov discover), W1-09, W1-42 | MR-A-02, MR-A-04, MR-B-02, MR-B-04 | DEC-065, DEC-089, DEC-1211 |
+| MR-3 | KPIs; the builder never writes its own acceptance tests | The landing refuses a commit that changes `tests/acceptance/` without `Role: independent-test-designer` (or the owner's `Role: owner`), naming the commit, in the Gov OS repository and in an adopted repository (`gov queue`); a feature ticket is not READY until `tests/acceptance/<ticket-id>/` exists and its tests are red on the base; a breach is a forbidden outcome. | W1-09, W1-30, W1-33, W1-05, W1-26, W1-35, W1-42, W2-115b | MR-A-01, MR-B-01 | DEC-065, DEC-069, DEC-906, DEC-1211 |
 | MR-4 | Audit, discovery and impact are distinct functions | Each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or skill and record; closing a spine, STANDARD or FULL feature specification, an accepted CIT-E that changes a closed spine, and every wave or release exit each create an audit ticket for a fresh auditor that authored none of the audited files; its report names the milestone, and contested or owner-level findings appear in chat as decision packages. | W1-27, W1-13, W1-35, W1-36, W1-33, W1-43, W1-42 | MR-A-05, MR-A-06, MR-B-05, MR-B-06 | DEC-065, DEC-066, DEC-070, DEC-088 |
 | MR-5 | The Gov OS works as a software company | Each Wave 1 role exists as a generated subagent definition with purpose, allowed-path pattern, tools, model tier, authority level and handoff format, and a ticket's role field names one of them. | W1-33, W1-38 | CHAOS-X-02 | DEC-065, DEC-066 |
 | MR-6 | The human is the customer and final authority | Every owner question appears in the active chat as a package with all eight MR-6 fields (the template carries ten), ranked P1–P3 and batched at most five at a time, P1 allowed to bypass; the dependent branch waits while an independent branch proceeds; each answer is committed as a decision record. | W1-34, W1-35, W1-42 | MR-A-03, MR-B-03 | DEC-065, DEC-093 |
@@ -379,7 +379,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 - **Covers:**
   - `CAP-23.a` [W1] Exclusive claim lock with holder named — Contract v3 E4; G-03 · delivered by W1-09
   - `CAP-23.b` [W3] Parallel-agent concurrency and the claims role — Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
-  - `CAP-23.c` [W1] Parallel tickets in Wave 1, a light form: up to 6 tickets in flight, each in its own short-lived worktree with a ticket lead, gated by available memory and load; the main orchestrator merges each into the integration branch after green and re-runs every suite after each merge; no worktree is left behind — DEC-235; DEC-236 · delivered by W1-42
+  - `CAP-23.c` [W2] Parallel tickets: each ticket in its own worktree with a ticket lead; the landing merges it into the integration branch, runs the impact-selected tests and checks paths and test authorship (NEW-1); the number in flight comes from the machine's slots, not from a constant — DEC-235; DEC-236; EMERGENCY-2 §4 (DEC-1211) · delivered by W1-42
 - **Scenarios:** dev CHAOS-X-03 · qual CHAOS-X-Q03
 
 ### CAP-24 — Skill lifecycle and versioning
@@ -483,17 +483,17 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-30.g` [W2] For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs); owned by the UX role — DEC-104
 - **Scenarios:** dev MR-A-02, MR-A-04, A-01 · qual MR-A-Q02, MR-A-Q04, CHAOS-A-Q07, A-Q01, A-Q02, A-Q05, AUDIT-A-Q32, AUDIT-A-Q35, AUDIT-A-Q37, AUDIT-A-Q43, AUDIT-A-Q44, AUDIT-A-Q47 (+9 not listed in the matrix row)
 
-### CAP-31 — Unified task DAG with dynamic generation
+### CAP-31 — Unified task DAG
 
-- **Outcome:** An agent works from one task DAG in git, and failures generate their own repair tasks.
-- **Acceptance:** A failed `gov close` creates a repair ticket that depends on the failed one, and `tk ready` shows it only after its dependencies are closed.
+- **Outcome:** An agent works from one task DAG in git, and a red landing names its own cause.
+- **Acceptance:** A landing that turns red names its cause in the land record; the fix lands without a new ticket and is recorded in the owning ticket, and where no test caught the bug the failing test is committed first; `tk ready` lists a ticket only after its dependencies are closed.
 - **Wave:** W1
 - **Provider:** ticket v0.3.2, W1-09, W1-14, W1-30, W1-08
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate I1, I2, I3, I4; Framework v4.1.2 §41-44; DEC-074
+- **Sources:** Contract v3 Gate I1, I2, I3, I4; Framework v4.1.2 §41-44; DEC-074; EMERGENCY-2 §4.2 (DEC-1211)
 - **Covers:**
   - `CAP-31.a` [W1] One task DAG; task contract with class, role, inputs, allowed paths, KPIs, profile — Contract v3 I1, I2; Framework v4.1.2 §41, §42 · delivered by W1-08, W1-14
-  - `CAP-31.b` [W1] Dynamic generation of repair/revalidation tasks — Contract v3 I3; Framework v4.1.2 §43 · delivered by W1-30
+  - `CAP-31.b` [W1] A known bug is a fix, not a ticket: a red landing generates no repair ticket; the fix is recorded in the owning ticket, the failing test first where no test caught it — Contract v3 I3; Framework v4.1.2 §43; EMERGENCY-2 §4.2 (DEC-1211) · delivered by W1-30
   - `CAP-31.c` [W1] Parallel and serial execution by dependency — Contract v3 I4; Framework v4.1.2 §44 · delivered by W1-09
   - `CAP-31.d` [W1] A task cannot be READY if a mandatory input is absent — Contract v3 W3 · delivered by W1-09
 - **Scenarios:** dev MR-A-02, MR-A-03, MR-A-04, A-03, A-04, MR-B-02, MR-B-03, MR-B-04, CHAOS-B-05, CHAOS-B-06, GATE-B-01, AUDIT-B-05 (+2 not listed in the matrix row) · qual MR-A-Q02, MR-A-Q03, MR-A-Q04, GATE-A-Q04, A-Q01, A-Q02, AUDIT-A-Q28, AUDIT-A-Q29, AUDIT-A-Q30, AUDIT-A-Q31, AUDIT-A-Q32, MR-B-Q04 (+2 not listed in the matrix row)
@@ -594,11 +594,11 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 ### CAP-38 — Verification test families (product and governance)
 
 - **Outcome:** The owner can see product and governance verification results, with builder tests counted as regression evidence only.
-- **Acceptance:** `gov check` reports each governance test family RED/YELLOW/GREEN, and `gov close` runs the independent acceptance tests separately from builder tests.
+- **Acceptance:** `gov check` reports each governance test family RED/YELLOW/GREEN; `gov accept` runs only the independent acceptance tests and reports pass or fail per KPI line; the landing runs the impact-selected tests; builder tests count as regression evidence only.
 - **Wave:** W1
 - **Provider:** W1-26, W1-30, W1-37, W1-02, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-35, W1-36, W1-38, W1-42
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate O1, O2, O3, O4; Framework v4.1.2 §62-64; DEC-042 (builder tests are regression evidence only); DEC-083; DEC-136; DEC-137
+- **Sources:** Contract v3 Gate O1, O2, O3, O4; Framework v4.1.2 §62-64; DEC-042 (builder tests are regression evidence only); DEC-083; DEC-136; DEC-137; EMERGENCY-2 §4 (DEC-1211)
 - **Covers:**
   - `CAP-38.a` [W1] Product test families — Contract v3 O1; Framework v4.1.2 §62 · delivered by W1-30
   - `CAP-38.b` [W1] Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility; authority/role limits and mutation scope are landing checks (CAP-58.h, MR-3), not test families — Contract v3 O2; Framework v4.1.2 §63; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-26, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-30, W1-35, W1-36, W1-38, W1-42
@@ -608,19 +608,20 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-38.f` [W1] For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record — DEC-137 · delivered by W1-30
 - **Scenarios:** dev MR-A-06, A-02, MR-B-02, MR-B-04, MR-B-06, AUDIT-B-04, AUDIT-X-01 · qual AUDIT-A-Q08, A-Q05, AUDIT-A-Q40, AUDIT-A-Q41, AUDIT-A-Q46, AUDIT-B-Q02, AUDIT-X-Q01
 
-### CAP-39 — Governance health scheduler (G0-G6 tiers)
+### CAP-39 — Governance health tiers and the landing's checks (G1-G5)
 
-- **Outcome:** Governance checks run at the right tier automatically, and a stale required index blocks close.
-- **Acceptance:** `gov close` fails when a required index is stale; the scheduler runs the configured tiers on schedule and records results.
-- **Wave:** W3 (G0–G5 tiers in W1 (W1-40); the health scheduler and G6 (in qualification) are W3)
-- **Provider:** lefthook 2.1.15, GitHub Actions, W1-40, W3: health scheduler, W1-02, W1-26
+- **Outcome:** Governance checks run at the right tier automatically, and a stale required index fails the landing.
+- **Acceptance:** The landing fails when a required index is stale, and records each check it ran with its tier and its RED, YELLOW or GREEN result; `gov ci` runs the CI tiers.
+- **Wave:** W2 (tiers G1–G5 in W1 (W1-40); the landing's impact selection is the release (W2); a scheduler beyond it is friction)
+- **Provider:** lefthook 2.1.15, GitHub Actions, W1-40, W2-115b (the landing), W1-02, W1-26
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate O5; Framework v4.1.2 §62-64; DEC-007; DEC-075; DEC-087
+- **Sources:** Contract v3 Gate O5; Framework v4.1.2 §62-64; DEC-007; DEC-075; DEC-087; EMERGENCY-2 §4.3, §4.4 (DEC-1211)
 - **Covers:**
   - `CAP-39.a` [W1] Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard — Contract v3 O5; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-40, W1-02
   - `CAP-39.b` [W3] G6 qualification (synthetic repos, chaos, soak, hidden tests) — Contract v3 O5; DEC-067
-  - `CAP-39.c` [W3] Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes; cache keyed by content/policy/framework hashes — Contract v3 O5
+  - `CAP-39.c` [W2] Impact-selected tests at the landing: the landing runs the tests the change's impact selects (`gov impact`) — Contract v3 O5; EMERGENCY-2 §4 (DEC-1211) · delivered by W2-115b
   - `CAP-39.d` [W1] RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded — Contract v3 O5 · delivered by W1-26
+  - `CAP-39.e` [W3] Scheduler beyond the landing's selection: parallel independent checks, isolated worktrees and processes, a cache keyed by content, policy and framework hashes (built only if friction asks) — Contract v3 O5; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev ISO-X-02, SOAK-X-02, MR-X-02 · qual ISO-X-Q02, SOAK-X-Q02, MR-X-Q02
 
 ### CAP-40 — Execution telemetry and organisational questions
@@ -825,15 +826,15 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 
 ### CAP-53 — Proportionality profiles (LITE/STANDARD/FULL)
 
-- **Outcome:** The owner gets ceremony in proportion to impact: LITE, STANDARD or FULL.
-- **Acceptance:** An R0 change runs only the LITE checks and an R3 change raises the FULL gate and readiness rows, with the profile computed by `gov impact`.
-- **Wave:** W2 (declared per ticket in W1 (W1-09); computed from impact in W2)
-- **Provider:** W1-09, W2: gov impact profile, W1-08, W1-13, W1-31
+- **Outcome:** The owner gets ceremony in proportion to the work: a feature, a fix or a chore, with model, effort and checks from the owner's rubric.
+- **Acceptance:** A feature ticket carries its profile (LITE, STANDARD or FULL) and the model, effort and checks follow from its class in the rubric; a fix is recorded in its owning ticket and a chore is a direct commit listed in the digest, neither with a ticket of its own; the profiles stay until the measured rubric replaces them (DEC-1208, DEC-1120).
+- **Wave:** W2 (profiles declared per ticket in W1 (W1-09); the rubric replaces computing the profile from impact)
+- **Provider:** W1-09, W1-08, W1-13, W1-31, W2-121c (the launcher states the rubric's model and effort)
 - **Disposition:** KEPT
-- **Sources:** DEC-005 (proportionality profiles); DEC-035 (radius-scaled budgets/facets); DEC-004 (governance overhead budget 10-15%); OWNER-DIRECTION-P2-0009 §11; DEC-085
+- **Sources:** DEC-005 (proportionality profiles); DEC-035 (radius-scaled budgets/facets); DEC-004 (governance overhead budget 10-15%); OWNER-DIRECTION-P2-0009 §11; DEC-085; DEC-1120; DEC-1208; EMERGENCY-2 §4.1, §4.5, §4.6 (DEC-1211)
 - **Covers:**
-  - `CAP-53.a` [W1] Profiles LITE/STANDARD/FULL by radius; readiness rows per profile — DEC-005; DEC-085 · delivered by W1-13, W1-08
-  - `CAP-53.b` [W2] Profile computed from impact — DEC-035; architecture v0.3 §2.3
+  - `CAP-53.a` [W1] Work is a feature, a fix or a chore; model, effort and checks come from the measured rubric; the profiles LITE/STANDARD/FULL by radius, with readiness rows per profile, stay until the rubric replaces them — DEC-005; DEC-085; EMERGENCY-2 §4.5 (DEC-1211) · delivered by W1-13, W1-08
+  - `CAP-53.b` [NONE] Non-goal: a profile computed from impact (`gov impact`): the rubric replaces it — EMERGENCY-2 §4.5 (DEC-1211)
   - `CAP-53.c` [W1] Governance budget within profile — DEC-004; OWNER-DIRECTION-P2-0009 §11 · delivered by W1-31
 - **Scenarios:** dev MR-X-02 · qual MR-X-Q02
 
@@ -907,14 +908,14 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 
 ### CAP-59 — Review-repair loop budget
 
-- **Outcome:** The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop continues until it converges, or until three consecutive iterations fail to converge, and then the owner decides from an escalation package.
-- **Acceptance:** After three consecutive non-converging iterations on the same surface, `gov close` stops the loop and puts an escalation package in chat (each iteration's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue); the iteration count never appears in the output seen by the looping session.
+- **Outcome:** The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop runs at most two rounds, and then the owner decides once, from an escalation package with options.
+- **Acceptance:** After two rounds on the same surface the review tool refuses a third and puts one escalation package in chat (each round's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue); READY is computed from the reviewers' verdict blocks; the round count never appears in the output seen by the looping session.
 - **Wave:** W1
 - **Provider:** W1-30, W1-43, W1-44
 - **Disposition:** KEPT
-- **Sources:** DEC-044 as amended by DEC-096 (loop policy); OWNER-DIRECTION-P2-0009 §2 (simplification principle)
+- **Sources:** DEC-044 as amended by DEC-096 (loop policy); OWNER-DIRECTION-P2-0009 §2 (simplification principle); DEC-1204; EMERGENCY-2 §3.3 (DEC-1211)
 - **Covers:**
-  - `CAP-59.a` [W1] Loops (review→repair, audit→repair, test→fix, verification) run to convergence or to three consecutive non-converging iterations, then an escalation package with each iteration's outcome, the reason it is not converging and the options fix differently / narrow / split / defer / delete / continue; the owner decides — DEC-044 as amended by DEC-096; OWNER-DIRECTIVE-0003; OWNER-AUTHORISATION-P2-0006 · delivered by W1-30, W1-43
+  - `CAP-59.a` [W1] Loops (review→repair, audit→repair, test→fix, verification) run at most two rounds; then one escalation package with each round's outcome, the reason it is not converging and the options fix differently / narrow / split / defer / delete / continue; the owner decides once; READY is computed by code — DEC-044 as amended by DEC-096; OWNER-DIRECTIVE-0003; OWNER-AUTHORISATION-P2-0006; DEC-1204 · delivered by W1-30, W1-43
   - `CAP-59.b` [W1] Iteration count and budget held by the orchestrator or gov, never disclosed to sessions inside the loop — DEC-096 · delivered by W1-30, W1-43
   - `CAP-59.c` [W1] Anti-snowball: finding → whole-system context → one disposition before code — OWNER-AMENDMENT-P2-0010 §7 · delivered by W1-30, W1-44
 - **Scenarios:** dev MR-X-03 · qual MR-X-Q03

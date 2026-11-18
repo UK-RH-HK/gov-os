@@ -177,9 +177,11 @@ def body(c: dict) -> str:
 
 
 def MR_INTRO(c: dict) -> str:
-    n = c.get("charter", "5")
-    return (f"The rule texts are in Charter v{n} §4, verbatim from architecture v0.3 §1A. Each clause below is a contract "
-            "item with one acceptance check.")
+    if "charter" not in c:  # the Contract before v5: the Charter's rules were verbatim
+        return ("The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each clause below is a contract "
+                "item with one acceptance check.")
+    return (f"The rule texts are in Charter v{c['charter']} §4, from architecture v0.3 §1A; EMERGENCY-2 reworded the checks of "
+            "MR-1 to MR-4. Each clause below is a contract item with one acceptance check.")
 
 
 def contract_text(c: dict, existing: str) -> str:

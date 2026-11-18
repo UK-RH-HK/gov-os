@@ -3,14 +3,14 @@ id: CAP-39.c
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: 'Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes; cache keyed by content/policy/framework hashes'
+title: 'Impact-selected tests at the landing: the landing runs the tests the change''s impact selects (`gov impact`)'
 depends_on:
 - CAP-39
 ---
 
-# CAP-39.c: Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes; cache keyed by content/policy/framework hashes
+# CAP-39.c: Impact-selected tests at the landing: the landing runs the tests the change's impact selects (`gov impact`)
 
-A covers item of CAP-39 (Governance health scheduler (G0-G6 tiers)). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-39 (Governance health tiers and the landing's checks (G1-G5)). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes; cache keyed by content/policy/framework hashes
-- **Wave:** W3
+- **Item:** Impact-selected tests at the landing: the landing runs the tests the change's impact selects (`gov impact`)
+- **Wave:** W2

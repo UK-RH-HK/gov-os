@@ -82,9 +82,9 @@ Full statement: [ADR-0001](../adr/ADR-0001-threat-model.md) (DEC-039 as amended 
    at write time. Checks derive their scope from the repository, never from a hand-kept list (DEC-041).
 8. **Assemble, then glue.** Mature tools do the heavy lifting. The `gov` CLI is thin glue behind the API-0002
    envelope. The owner approves every tool install (DEC-001, DEC-083).
-9. **Delete before you wrap.** A loop that does not converge goes to the owner, who may have it fixed differently,
-   narrowed, split, deferred, deleted or continued. It is never defended with more machinery (DEC-044 as amended by
-   DEC-096).
+9. **Delete before you wrap.** A loop that does not converge in two rounds goes to the owner once, with options: fixed
+   differently, narrowed, split, deferred, deleted or continued. It is never defended with more machinery (DEC-044 as
+   amended by DEC-096 and DEC-1204).
 
 ## 4. Master rules (verbatim from architecture v0.3 §1A)
 
@@ -98,11 +98,11 @@ These rules apply to every session in every Gov OS, including the Gov OS's own d
 - **MR-2 Closed specifications generate the work.** A closed specification produces the WBS: tasks, dependencies,
   order and roles. Readiness gaps generate tasks of their own (discovery, data, research, test design). No
   production code task becomes READY until its specification's required cells are satisfied.
-- **MR-3 Every task carries KPIs, and the builder never writes its own acceptance tests.** Each task states
+- **MR-3 Every feature carries KPIs, and the builder never writes its own acceptance tests.** Each feature ticket states
   measurable success and failure criteria.
   - A **separate, freshly spawned Independent Test Designer** writes the acceptance tests from those KPIs, before
     implementation starts.
-  - The implementer cannot edit them: the acceptance-test paths are outside the implementer's allowed paths.
+  - The landing refuses an acceptance-test change that the test designer did not author (EMERGENCY-2 §4.3).
   - Where practical, the test-data author is independent of both.
   - Builder tests are regression evidence only.
 - **MR-4 Audit, discovery and impact are distinct functions.** Discovery closes specifications. Impact assessment
@@ -130,7 +130,11 @@ These rules apply to every session in every Gov OS, including the Gov OS's own d
 
 ## 5. Proportionality and the loop policy
 
-**Profiles** (DEC-005, DEC-085). Ceremony scales with impact radius.
+**Work classes and profiles** (DEC-005, DEC-085; EMERGENCY-2 §4). Work is a feature, a fix or a chore. A feature is a
+ticket with a spec and KPIs. A known bug is a fix, recorded in its owning ticket, with the failing test first when no
+test caught it. A chore (records, docs, configuration, a tidy-up with the tests unchanged) is a direct commit, listed
+in the digest. The measured rubric sets model, effort and checks; the profiles below stay until it replaces them, and
+ceremony scales with impact radius.
 
 | Profile | Radius | Readiness rows required | Independent verification | Retrieval | Human gate |
 |---|---|---|---|---|---|
@@ -143,15 +147,15 @@ These rules apply to every session in every Gov OS, including the Gov OS's own d
 - **A spine specification always closes at FULL**, whatever the profile of the change that opens it (DEC-085).
 - The round counts are placeholders, tuned from telemetry (DEC-035).
 
-**Loop policy** (DEC-096, amending DEC-044, DEC-070 and DEC-082). This applies to every loop that runs until
+**Loop policy** (DEC-1204, amending DEC-096, DEC-044, DEC-070 and DEC-082). This applies to every loop that runs until
 convergence: review→repair, audit→repair, test→fix and verification.
-- The loop continues until it converges, or until **three consecutive iterations fail to converge**.
-- The third consecutive failure produces an **escalation package** for the owner. It gives:
-  - each iteration's outcome;
+- The loop runs **at most two rounds**.
+- A second round that does not converge produces one **escalation package** for the owner, with options. It gives:
+  - each round's outcome;
   - why the loop is not converging;
   - the options: fix differently, narrow, split, defer, delete, or continue.
-- The owner decides.
-- The orchestrator or `gov` holds the iteration count and the budget. **They are never disclosed to the sessions inside
+- The owner decides once. READY is computed by code.
+- The orchestrator or `gov` holds the round count and the budget. **They are never disclosed to the sessions inside
   the loop.**
 - Retrieval stopping rules are a separate thing and are unchanged (DEC-034, DEC-080).
 

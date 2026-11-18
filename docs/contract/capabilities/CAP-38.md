@@ -13,7 +13,7 @@ depends_on:
 Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can see product and governance verification results, with builder tests counted as regression evidence only.
-- **Acceptance:** `gov check` reports each governance test family RED/YELLOW/GREEN, and `gov close` runs the independent acceptance tests separately from builder tests.
+- **Acceptance:** `gov check` reports each governance test family RED/YELLOW/GREEN; `gov accept` runs only the independent acceptance tests and reports pass or fail per KPI line; the landing runs the impact-selected tests; builder tests count as regression evidence only.
 - **Wave:** W1
 - **Disposition:** KEPT
 - **Covers:** CAP-38.a, CAP-38.b, CAP-38.c, CAP-38.d, CAP-38.e, CAP-38.f
