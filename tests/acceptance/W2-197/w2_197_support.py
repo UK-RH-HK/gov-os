@@ -8,6 +8,7 @@ in process, and readers for the memory block and the memory-use log.
   title, one of them under the ticket's acceptance path and one under its implementation path (S2).
 - ``BriefRepo(root)``: a repository for ``gov brief``: this tree's kernel templates and facts file (copied at test
   time, ``ready.new_since`` set to the fixture's date) and the READY ticket, as W2-152's ``real_repo`` builds it.
+- ``BriefRepo`` also holds the installed judging-work skill (W2-195), which the independent-auditor brief needs.
 - ``gov(capsys, *argv)``: ``gov.cli.main.main`` in this process, so the stand-ins of ``conftest.py`` (no reranker, no
   semantic route) hold for the command line too.
 
@@ -40,6 +41,9 @@ TEMPLATES = REPO / TEMPLATES_REL
 FACTS = REPO / "governance/project/facts.yaml"
 KEYS = TEMPLATES / "keys.yaml"
 BRIEF_T0 = TEMPLATES / "brief.md"
+JUDGING_SKILL = REPO / "template/governance/kernel/skills/judging-work/SKILL.md"
+JUDGING_SKILL_RELS = ("template/governance/kernel/skills/judging-work/SKILL.md",
+                      ".claude/skills/judging-work/SKILL.md")
 RETRIEVAL_SKILL_REL = "template/governance/kernel/skills/retrieval/SKILL.md"
 
 SECTION = "## What memory holds for this ticket"
@@ -213,6 +217,15 @@ class BriefRepo:
                 shutil.copyfile(path, folder / path.name)
         self.write_facts(facts if facts is not None else real_facts())
         self.ticket(ready_front())
+        self.install_judging_skill()
+
+    def install_judging_skill(self) -> None:
+        """The project's installed judging-work skill (W2-195): the kernel file and the preloaded copy of the same
+        version, as an adopted project holds them; the independent-auditor brief is refused without it."""
+        for rel in JUDGING_SKILL_RELS:
+            path = self.root / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(JUDGING_SKILL, path)
 
     def write_facts(self, data: dict) -> None:
         path = self.root / "governance/project/facts.yaml"
