@@ -4,11 +4,11 @@ Read `docs/emergency-2/EMERGENCY-2.md` first. This page is the state at the hand
 DEC-1212 and DEC-1213 are in force.
 
 ## 1. Waits on the owner
-- The decision page `docs/emergency-2/audits/DECISIONS-FOR-THE-OWNER.md`: the owner answers it himself, line by line
-  (his word, 2026-11-18). Open: L3, M1, K1, K2, G1-G7, E1-E3, Q-UPD, Q-CLOSE; L1, L2, T1-T3 to confirm (built on the
-  working assumptions). Q-CAP44 is answered (DEC-1213). Record each answer as it comes, one register entry per message.
-- The EXAMIN CTO's input box held an unsent line of the owner's at 20:45 ("A, as you recommend; S1-S7 as recommended
-  too"); the CTO did not type into that session (see 3).
+- Nothing on the decisions page: the owner decided all of it on 2026-11-18 evening, DEC-1214 (his page:
+  `docs/emergency-2/audits/OWNER-DECISIONS-2026-11-18.md`; DEC-974 and DEC-027 superseded). Proposals he asked for are
+  in 4 (L2's command list, T2's escalation rubric).
+- The owner sent the EXAMIN CTO his answers himself, with `gov update` from the CTO's note; the CTO's E3 addendum is
+  beside it: `/home/usain/gov-os-runs/W2-27/examin/.gov-runtime/scratch/govos/ADDENDUM-WAVE0-2026-11-18.md`.
 
 ## 2. Done on 2026-11-18
 - **Release 0.1.3** (the owner): tag v0.1.3 on 116aa23cd, C = 1d4e6a875a5d, re-pinned (pin-1d4e6a875a5d live,
@@ -33,27 +33,45 @@ DEC-1212 and DEC-1213 are in force.
   themselves cannot deadlock), only while no lead runs; check `lead-mem.jsonl` afterwards for samples over 20.
 
 ## 3. Running at the handover
-- Nothing of the CTO's: no lead, no suite.
-- **EXAMIN:** the owner asked the CTO to tell the EXAMIN CTO to run `gov update`. Its instructions are written:
-  `/home/usain/gov-os-runs/W2-27/examin/.gov-runtime/scratch/govos/FROM-GOVOS-CTO-2026-11-18-update.md` (with the
-  CTO's read-only `--check`: 0.1.0 → 0.1.3, no conflicts, 33 updated, 2 added, 2 removed, 1 merged). Not yet delivered:
-  the session's input box held the owner's unsent line. Deliver it once that line is sent (tmux `examin-cto`:
-  "Read .gov-runtime/scratch/govos/FROM-GOVOS-CTO-2026-11-18-update.md and follow it").
-- The shared reranker runs from the new pin (pid 83090, started 20:32 by the first search; a search reranks 40).
+- Nothing of the CTO's. Wednesday's building points were spent at 21:00 (78 %); Thursday has 4 (budget `log/budget.md`).
+- EXAMIN: the EXAMIN CTO runs `gov update` to 0.1.3, then step 5 (the owner's order).
+- The shared reranker runs from the new pin (started by the first search).
+- **Known red on w2/integrate:** W2-130's two pinned-pairs cases (DEC-1214's `Changes:` marks), first item below.
 
-## 4. Next, in order
-1. The owner's decisions as they come; the EXAMIN `gov update` and its report.
-2. A green night: `python3 -m gov.close.nightly w2/integrate --root .` writes `docs/close/nightly/NR-*.json` (the
-   first green base since 29 October), through the slot's rule above; then map what still places nothing (hooks,
-   skills) and move Gov OS's own landing onto `gov queue`.
-3. The first fresh 80 for Gov OS from the reserve (JOB-20261116-17's design, `gov memaudit scan` for the hidden set).
-4. Run-time tool slices 2 to 4; the proving run (Sonnet, DEC-1212); the re-baseline (G5) once the owner answers it.
-5. Small, Wave 3 unless friction: five modules whose git calls inherit `GIT_*` (AR-2 rows 78, 80, 86, 87, 90); AR-2
-   rows 19-21 name retired guard files; W1-07's `RECORDED_GOV_COMMANDS` lacks the commands since; load-timed cases
-   (W2-45 S1, W2-13 latency, W1-07 timeouts) want event waits.
-6. From the old handover, still open: W2-195's launch refusal or a gov brief flag; gov brief's retrieval time limit;
-   the memory line in CLAUDE.md/AGENTS.md and the other skills (audit 2 M5, M6); gov adapters' held-out Read deny rules
-   and the indep-walls hook; the W2-155 branch and the E2-finish-base worktree after bundling.
+## 4. Next, in order (DEC-1214 applied; no approval per ticket for this list, K2 (c))
+1. **W2-130 for good (T):** the two cases accept any drift pair whose later decision is recorded as the owner's
+   (`Decided-by: owner`), instead of a pinned set; one test designer.
+2. **Green base, NIGHT (c):** land the done work as a batch, run the full suite through the slot rule (2 above), fix
+   every red to green. Make that run with `python3 -m gov.close.nightly w2/integrate --root .` by hand (not scheduled)
+   so its green writes `docs/close/nightly/NR-*.json`, the base `select.scoped` reads. Then map what places nothing and
+   move Gov OS's landing onto `gov queue`. The scheduled nightly and the morning brief come back when a morning is green.
+3. **M1 (c), a feature:** retire `gov context`, the module too; the close inside the landing records the decisions from
+   the ticket's sources; every caller replaced by something tested (audit 2 lists them); no ceiling. Test designer
+   first, then engineer.
+4. **L2, a proposal to the owner first:** the landing and the close as one deterministic action (the landing writes the
+   close record); a table of every `gov` command: stays, merges, retires, on practical, fast, cheap, quality, records
+   kept, nothing duplicated (audit 1 and `gov --help`). Then build it.
+5. **K1 in code:** audit 4's Table 3 with audit 09's models (Sonnet for leads, helpers, C2 including auditors; C3 and the
+   CTO on Opus) in the role files' `Launch by criticality` lines and the launcher; W2-33/W2-184 follow (T).
+6. **G1 and G2:** bundle the six worktrees' unique commits and tar the live scratch tools (outside the tree); an archive
+   branch and the tag `pre-emergency-2` (the tag push is the owner's); then `git rm` the retired code, tests, ACT
+   bundles and prompts (audit 5's list), with the suites green after; `origin/record/w2` no more syncing, its worktree
+   removed. Memory's index cleaned of them before the fresh 80.
+7. **G4 then G5 (product-spec):** apply audit 8's 33 groups (the CTO settles the 48 doubtful rows), archive the old
+   register read-only out of the index; then Charter v6 and Contract v5 in one change from audit 7's tables, with G6,
+   L3, M1, CAP-31's no-repair-ticket, CAP-44.m's leftovers (the 275 records at 4.3, DEC-1200 in `decisions:`, the source
+   map); to the owner by group.
+8. **T2:** a push for a CTO stall and for every owner decision the CTO needs (features, specs, KPIs, data and
+   measurement, P1 touching the core or kernel); review the escalation rubric against it and propose a change.
+9. **G7:** the CTO approves and records every install (the tool registry), sudo the owner's: one line in the kernel
+   text (CLAUDE.md/AGENTS.md, the CTO's call, §3.5) and the registry's form.
+10. **The first fresh 80 for Gov OS** after 6's index clean (reserve points); then run-time tool slices 2 to 4, the
+    proving run (Sonnet), the release acceptance. **G3** (the size audit) after the refactoring.
+11. Small, Wave 3 unless friction: five modules whose git calls inherit `GIT_*` (AR-2 rows 78, 80, 86, 87, 90); AR-2
+    rows 19-21 name retired guard files; W1-07's `RECORDED_GOV_COMMANDS`; load-timed cases (W2-45 S1, W2-13 latency,
+    W1-07 timeouts); from the old handover: W2-195's launch refusal or a brief flag, gov brief's retrieval time limit,
+    the memory line in CLAUDE.md/AGENTS.md and the skills (audit 2 M5, M6), gov adapters' held-out Read deny rules and
+    the indep-walls hook, the W2-155 branch and E2-finish-base worktree after bundling.
 
 ## How to run things without false reds (learned today)
 - Absolute `PYTHONPATH` (tests start `gov` in subprocesses); node on PATH for openspec
