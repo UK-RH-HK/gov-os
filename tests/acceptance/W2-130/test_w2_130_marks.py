@@ -127,11 +127,26 @@ def test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_a
 # ---------------------------------------------------------------------------------------------------------- S2
 
 
-def test_s2_gov_links_reports_no_unmarked_change_but_the_eight_pairs_the_auditor_judged_wrong(head_findings):
-    # The owner's approvals after the clean-up (DEC-1211, DEC-1212) are the only pairs allowed beside the eight.
-    found = set(s.by_pair(head_findings)) - s.OWNER_APPROVED_AFTER
-    assert found == set(s.EIGHT), (f"extra: {sorted(found - set(s.EIGHT))}; missing: "
-                                   f"{sorted(set(s.EIGHT) - found)}")
+def test_s2_gov_links_reports_no_unmarked_change_but_the_eight_pairs_the_auditor_judged_wrong(head_findings, head_tree):
+    # The eight stay reported (the auditor judged each wrong); any other pair must have the owner as its later
+    # decision (a marked change by rule), else it is extra and fails by name.
+    register = (head_tree / s.REGISTER).read_text(encoding="utf-8")
+    reported = set(s.by_pair(head_findings))
+    extra = set(s.not_owner_marked(reported, register)) - set(s.EIGHT)
+    missing = set(s.EIGHT) - reported
+    assert not extra and not missing, f"extra: {sorted(extra)}; missing: {sorted(missing)}"
+
+
+def test_s2_a_pair_is_a_marked_change_only_when_its_later_decision_is_recorded_as_the_owners():
+    register = "\n".join([
+        "### DEC-1 — old", "- **Status:** ACCEPTED (owner, 2026-01-01)",
+        "### DEC-2 — by the owner's page", "- **Status:** ACCEPTED (owner, 2026-11-18, in the chat; standing)",
+        "### DEC-3 — by the owner through the orchestrator",
+        "- **Status:** ACCEPTED (the chat; recorded with `Role: orchestrator`, `Decided-by: owner (chat)`)",
+        "### DEC-4 — by the orchestrator", "- **Status:** ACCEPTED (orchestrator, 2026-11-18; standing)",
+        "### DEC-5 — by a decision about the owner", "- **Status:** ACCEPTED (CTO; the owner is told)", ""])
+    pairs = [("DEC-1", "DEC-2"), ("DEC-1", "DEC-3"), ("DEC-1", "DEC-4"), ("DEC-1", "DEC-5"), ("DEC-1", "DEC-9")]
+    assert s.not_owner_marked(pairs, register) == [("DEC-1", "DEC-4"), ("DEC-1", "DEC-5"), ("DEC-1", "DEC-9")]
 
 
 def test_s2_judged_wrong_holds_the_eight_gov_links_pairs_each_with_the_auditors_verdict(record):
@@ -216,8 +231,10 @@ def test_s2_the_drift_script_on_head_leaves_no_pair_once_the_listed_pairs_are_se
     assert isinstance(out.get("drift"), list) and out.get("count") == len(out["drift"]), "drift output form"
     run = record.data("drift-run")
     aside = {s.pair(item) for item in run.get("set_aside", [])}
-    allowed = _judged(record) | aside | s.OWNER_APPROVED_AFTER
-    left = [pair for pair in (s.pair(item) for item in out["drift"]) if pair not in allowed]
+    allowed = _judged(record) | aside
+    register = (head_tree / s.REGISTER).read_text(encoding="utf-8")
+    drift = [s.pair(item) for item in out["drift"]]
+    left = [pair for pair in s.not_owner_marked(drift, register) if pair not in allowed]
     assert not left, f"{len(left)} drift pairs remain after the set-aside: {left[:6]}"
 
 
