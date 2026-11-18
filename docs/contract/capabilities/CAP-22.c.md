@@ -13,4 +13,4 @@ depends_on:
 A covers item of CAP-22 (Agent roles and typed A2A handoffs). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
 - **Item:** Distinct test execution and integration roles
-- **Wave:** W2
+- **Wave:** W3

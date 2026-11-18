@@ -176,8 +176,7 @@ from kernel role files plus the project roster. It carries:
 | Wave | Roles |
 |---|---|
 | 1 | orchestrator · product/specification · independent test designer · engineer · independent auditor · research, in a minimal form (DEC-163) |
-| 2 | architecture · frontend · backend · database/data · integration/API · test execution · integration · DevOps/SRE · security · performance · UX; typed handoffs (DEC-094) |
-| 3 | research, with the full research lifecycle · AI/ML · data author · change controller · memory/knowledge · tooling · release · claims/concurrency |
+| 2 and after | Added when an adopted repository needs them (EMERGENCY-2 §8.4): architecture · frontend · backend · database/data · integration/API · test execution · integration · DevOps/SRE · security · performance · UX · AI/ML · data author · change controller · memory/knowledge · tooling · release · claims/concurrency. A handoff is the worker's return contract plus the run-time tool's inbox files (RT-6) |
 
 **Authority.** The owner is L5: the customer and the final authority (MR-6). Agents hold no approval authority.
 - A decision becomes ACTIVE only with an approval fact from the owner's git account: an owner commit, a signed tag or

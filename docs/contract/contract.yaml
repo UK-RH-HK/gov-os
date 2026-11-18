@@ -57,8 +57,8 @@ supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as p
 precedence: Charter v6 → Contract v5 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
   W1: Integrate
-  W2: Strengthen
-  W3: Complete
+  W2: 'Strengthen: everything the lean release must have (EMERGENCY-2 §8.1, §8.2)'
+  W3: 'Friction: built only when an adopted repository needs it, never before (EMERGENCY-2 §8.4)'
   NONE: dropped (non-goal)
 dispositions:
   KEPT: delivered in full
@@ -377,7 +377,7 @@ capabilities:
     wave: NONE
   - id: CAP-02.c
     item: 'SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3)'
-    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3
+    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-03
   title: Security and sensitivity classification
@@ -496,8 +496,8 @@ capabilities:
   - id: CAP-04.a
     item: Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's
       spend brake covers it, EMERGENCY-2 §6.2 A-1)
-    source: Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211)
-    wave: W2
+    source: Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
   - id: CAP-04.b
     item: Governance share ≤ 15 %, reported weekly with its baseline (56 %), by P1's method until `gov telemetry` measures
       it (DEC-086; EMERGENCY-2 §10.2, A-7)
@@ -515,8 +515,8 @@ capabilities:
   - id: CAP-04.d
     item: Exceeding a delegated limit raises a decision package (built only if friction asks; until then the run-time tool's
       spend brake covers it, EMERGENCY-2 §6.2 A-1)
-    source: Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211)
-    wave: W2
+    source: Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
 - id: CAP-05
   title: Emergency controls (pause/freeze/cancel/rollback)
   outcome: The owner can stop the work with one command and resume it, and roll back by `git revert`.
@@ -1091,7 +1091,7 @@ capabilities:
   - id: CAP-15.f
     item: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only
       if friction asks; off with `gov context`)'
-    source: DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4; EMERGENCY-2 §9.2 (DEC-1211)
+    source: DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4; EMERGENCY-2 §9.2 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
     provider:
     - W1-23
@@ -1273,7 +1273,7 @@ capabilities:
     wave: W2
   - id: CAP-19.b
     item: Evidence-driven model selection (bake-off, per-repository benchmark)
-    source: Contract v3 D5; Framework v4.1.2 §14.3
+    source: Contract v3 D5; Framework v4.1.2 §14.3; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-19.c
     item: 'Retrieval learning loop: a miss is a memory-quality event → root cause → fix → judged by the next fresh 80 (no
@@ -1416,7 +1416,7 @@ capabilities:
   - id: CAP-22.c
     item: Distinct test execution and integration roles
     source: MR-5; DEC-094; EMERGENCY-2 §8.4 (DEC-1211)
-    wave: W2
+    wave: W3
   - id: CAP-22.d
     item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment
       session runs as `GOV_ROLE=research` in its own experiment folder or worktree, its ticket''s `allowed_paths` judged at
@@ -1737,11 +1737,11 @@ capabilities:
   - id: CAP-29.a
     item: Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions →
       algorithms → architecture → interfaces → security/performance/operations → WBS → tests → live evidence
-    source: Contract v3 H1; Framework v4.1.2 §36
+    source: Contract v3 H1; Framework v4.1.2 §36; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-29.b
     item: Forward and reverse lineage; missing and stale links detected
-    source: Contract v3 W8
+    source: Contract v3 W8; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-30
   title: Feature readiness contract (26-dimension checklist)
@@ -1812,7 +1812,7 @@ capabilities:
     - W2-36
   - id: CAP-30.d
     item: Scenarios drive data and tests; data provenance recorded; data author independent where practical
-    source: Contract v3 H4; Framework v4.1.2 §39
+    source: Contract v3 H4; Framework v4.1.2 §39; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-30.e
     item: Capability taxonomy for STANDARD rows; extended only through a governed change
@@ -1832,8 +1832,8 @@ capabilities:
     item: For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner
       has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs);
       owned by the UX role
-    source: DEC-104
-    wave: W2
+    source: DEC-104; EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
 - id: CAP-31
   title: Unified task DAG
   outcome: An agent works from one task DAG in git, and a red landing names its own cause.
@@ -1951,11 +1951,11 @@ capabilities:
   covers:
   - id: CAP-32.a
     item: Research becomes evidence records separate from authority
-    source: Contract v3 J1; Framework v4.1.2 §45
+    source: Contract v3 J1; Framework v4.1.2 §45; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-32.b
     item: Experiment lifecycle; discovery flow
-    source: Contract v3 J2; Framework v4.1.2 §46
+    source: Contract v3 J2; Framework v4.1.2 §46; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-32.c
     item: Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point;
@@ -2030,7 +2030,7 @@ capabilities:
     wave: W2
   - id: CAP-33.c
     item: Upstream change propagates staleness and generates revalidation tasks
-    source: Contract v3 W6
+    source: Contract v3 W6; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-33.d
     item: Changes to the Gov OS's own Charter and Contract pass evidence → a CIT-P with three costed options (DEC-105) → the
@@ -2205,7 +2205,7 @@ capabilities:
   covers:
   - id: CAP-36.a
     item: 'Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings'
-    source: Contract v3 M4; Framework v4.1.2 §58
+    source: Contract v3 M4; Framework v4.1.2 §58; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-37
   title: Structured checkpoints and mandatory triggers
@@ -2213,8 +2213,8 @@ capabilities:
   acceptance: After every ticket transition a checkpoint file exists; after a forced compaction and after a killed session,
     a session resumes at the checkpoint's recorded next step without the owner restating it (RT-5).
   wave: W1
-  wave_note: model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in
-    `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156)
+  wave_note: model-switch continuity waits for friction (CAP-37.e); until W1-25's `gov checkpoint`, the orchestrator's checkpoint
+    lives in `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156)
   provider:
   - W1-25
   - W1-29
@@ -2282,8 +2282,8 @@ capabilities:
     - W1-29
   - id: CAP-37.e
     item: Model/provider switch reconstructs the same inputs
-    source: Contract v3 W9
-    wave: W2
+    source: Contract v3 W9; EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
   - id: CAP-37.f
     item: Checkpoint discipline; resume after crash
     source: OWNER-DIRECTION-BR-0004; OWNER-DIRECTION-BR-0006 §7, §8
@@ -2509,7 +2509,7 @@ capabilities:
   - id: CAP-40.b
     item: 'Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate,
       human-gate concentration, retrieval misses, cost by task/feature, first-pass completion'
-    source: Contract v3 P2; Framework v4.1.2 §66
+    source: Contract v3 P2; Framework v4.1.2 §66; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-40.c
     item: 'The weekly measures with their baselines: product share of spend, governance share (≤ 15 %), owner messages per
@@ -2597,20 +2597,20 @@ capabilities:
     item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code,
       data or secrets; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan
       while the inbox is private, one full scan before it is shared'
-    source: DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
+    source: DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.h
     item: A high or critical lesson is raised to the owner immediately, as a decision package
-    source: DEC-165
+    source: DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.i
     item: The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each
       release's notes list the lessons fixed, with their severity
-    source: DEC-165
+    source: DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.j
     item: Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox
-    source: DEC-165
+    source: DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-42
   title: Legacy governance retirement and archive policy
@@ -2791,7 +2791,7 @@ capabilities:
     wave: W2
   - id: CAP-44.g
     item: Remediation, finding states, human gates during adoption
-    source: Adoption Protocol v3.0 §17–§19
+    source: Adoption Protocol v3.0 §17–§19; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.h
     item: 'Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent
@@ -2818,7 +2818,7 @@ capabilities:
     wave: W2
   - id: CAP-44.i
     item: Interrupted-session recovery and freeze during adoption
-    source: Adoption Protocol v3.0 §4
+    source: Adoption Protocol v3.0 §4; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.j
     item: The path map keeps a healthy native framework/package layout unless the target structure is materially better and
@@ -2830,12 +2830,12 @@ capabilities:
   - id: CAP-44.k
     item: A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles,
       A10 over the A9 knowledge fabric)
-    source: Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722
+    source: Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.l
     item: Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY
       conditions, after A0–A11
-    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
+    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.m
     item: 'AS spec audit, lite: after A2 and before A3, `gov adopt --lite --stage AS` records every spec found (path, title,
@@ -2963,7 +2963,7 @@ capabilities:
   covers:
   - id: CAP-47.a
     item: Role separation for adoption and audit
-    source: Contract v3 T1; Adoption Protocol v3.0 §3
+    source: Contract v3 T1; Adoption Protocol v3.0 §3; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-47.b
     item: Fresh-session independence with a bounded context pack
@@ -2973,7 +2973,7 @@ capabilities:
     - W1-36
   - id: CAP-47.c
     item: Adoption evidence tree
-    source: Contract v3 T3; Adoption Protocol v3.0 §5
+    source: Contract v3 T3; Adoption Protocol v3.0 §5; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-47.d
     item: 'Audit triggers: the release acceptance and adoption stages A5, AS, A7 and A10; otherwise only a red test, a failed
@@ -3010,14 +3010,14 @@ capabilities:
       stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness
       coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent
       reconstruction success'
-    source: Contract v3 U; Framework v4.1.2 §75; EMERGENCY-2 §5.2 (DEC-1211)
+    source: Contract v3 U; Framework v4.1.2 §75; EMERGENCY-2 §5.2 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-48.b
     item: 'HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness
       passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability
       satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived
       memory rebuildable'
-    source: Contract v3 U; Framework v4.1.2 §76
+    source: Contract v3 U; Framework v4.1.2 §76; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-49
   title: Qualification oracle (synthetic repos, fault injection, hidden tests)
@@ -3095,7 +3095,7 @@ capabilities:
     - W1-08
   - id: CAP-50.b
     item: Typed output→input contracts with required/optional dependencies and output schemas
-    source: Contract v3 W2
+    source: Contract v3 W2; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.c
     item: Consumption receipt and implementation traceability
@@ -3105,20 +3105,20 @@ capabilities:
     - W1-30
   - id: CAP-50.d
     item: Upstream-change staleness propagation; COMPLETE is not permanently valid
-    source: Contract v3 W6
+    source: Contract v3 W6; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.e
     item: Orphan/dead-output detection with governed remediation
-    source: Contract v3 W7
+    source: Contract v3 W7; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.f
     item: 'Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection,
       staleness accuracy, requirement→code and →test coverage, orphan recall, reconstruction correctness'
-    source: Contract v3 W11
+    source: Contract v3 W11; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.g
     item: Health-scheduler integration
-    source: Contract v3 W12
+    source: Contract v3 W12; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-51
   title: Decisions register (structured, versioned, authoritative)

@@ -89,7 +89,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Covers:**
   - `CAP-02.a` [W1] File-hash manifest in framework.lock; gov doctor MATCH/DRIFT — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D · delivered by W1-39, W1-27
   - `CAP-02.b` [NONE] Non-goal: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation, unprovisioned-machine trust anchors — DEC-027, DEC-039, OWNER-DECISION-P2-0002
-  - `CAP-02.c` [W3] SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3) — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3
+  - `CAP-02.c` [W3] SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3) — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev CHAOS-X-01 · qual CHAOS-X-Q01
 
 ### CAP-03 — Security and sensitivity classification
@@ -117,10 +117,10 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate A4; Framework v4.1.2 §73; OWNER-DIRECTION-P2-0009 §11 (10-15% overhead target); DEC-004, DEC-031; DEC-083; DEC-086; DEC-1149; EMERGENCY-2 §6.2 A-1, §10.2 (DEC-1211)
 - **Covers:**
-  - `CAP-04.a` [W2] Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1) — Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211)
+  - `CAP-04.a` [W3] Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1) — Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-04.b` [W1] Governance share ≤ 15 %, reported weekly with its baseline (56 %), by P1's method until `gov telemetry` measures it (DEC-086; EMERGENCY-2 §10.2, A-7) — OWNER-DIRECTION-P2-0009 §11; DEC-004; EMERGENCY-2 §10.2 (DEC-1211) · delivered by W1-31
   - `CAP-04.c` [W1] Retrieval spend budget scaled by impact radius; hitting it is a governed event, never silent truncation; there is no packet ceiling (the final-packet budget of DEC-031 is superseded by EMERGENCY-2 §5.5) — DEC-031; EMERGENCY-2 §5.5 (DEC-1211) · delivered by W1-21
-  - `CAP-04.d` [W2] Exceeding a delegated limit raises a decision package (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1) — Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211)
+  - `CAP-04.d` [W3] Exceeding a delegated limit raises a decision package (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1) — Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev SOAK-X-01 · qual SOAK-X-Q01
 
 ### CAP-05 — Emergency controls (pause/freeze/cancel/rollback)
@@ -269,7 +269,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-15.c` [W2] Missing mandatory input → `gov brief` refuses or reports BLOCKED; a superseded input cannot satisfy a current requirement; conflicting inputs → contradiction handling — Contract v3 W3, W4; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1 · delivered by W2-197
   - `CAP-15.d` [NONE] Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov context` — EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
   - `CAP-15.e` [W2] The brief's hash and provenance prove what the worker received — Contract v3 W4; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1 · delivered by W2-197
-  - `CAP-15.f` [W3] Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only if friction asks; off with `gov context`) — DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4; EMERGENCY-2 §9.2 (DEC-1211) · delivered by W1-23
+  - `CAP-15.f` [W3] Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only if friction asks; off with `gov context`) — DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4; EMERGENCY-2 §9.2 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211) · delivered by W1-23
   - `CAP-15.g` [NONE] Non-goal: a file path plus a summary of at most ~2.5k tokens: packet mechanics, retired with `gov context` — EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
 - **Scenarios:** dev CHAOS-A-11, ISO-X-01, RETR-X-04 · qual ISO-X-Q01, RETR-X-Q02
 
@@ -324,7 +324,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Sources:** Contract v3 Gate D4, D5; Framework v4.1.2 §14.2, §14.3; OWNER-DIRECTION-BR-0006 §5 (provisional BGE, replaceable); DEC-017; DEC-046; DEC-074
 - **Covers:**
   - `CAP-19.a` [W2] Components separable; model swap by configuration under a fail-closed pin — Contract v3 D4; Framework v4.1.2 §14.2; DEC-046 (D-0005/6)
-  - `CAP-19.b` [W3] Evidence-driven model selection (bake-off, per-repository benchmark) — Contract v3 D5; Framework v4.1.2 §14.3
+  - `CAP-19.b` [W3] Evidence-driven model selection (bake-off, per-repository benchmark) — Contract v3 D5; Framework v4.1.2 §14.3; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-19.c` [W2] Retrieval learning loop: a miss is a memory-quality event → root cause → fix → judged by the next fresh 80 (no set is reused) — Framework v4.1.2 §18; DEC-1207 (3); DEC-1210
 - **Scenarios:** dev RETR-X-01 · qual RETR-X-Q01
 
@@ -364,7 +364,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Covers:**
   - `CAP-22.a` [W1] Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced by W1-33's generated definitions — Contract v3 E2; Framework v4.1.2 §24; DEC-119; DEC-154 · delivered by W1-05, W1-33
   - `CAP-22.b` [W2] A handoff is the worker's return contract (CAP-37.d) plus the run-time tool's per-session inbox files with a read mark (RT-6): a finished worker's return reaches its lead's inbox file and no owner message relays it — Contract v3 E3; Framework v4.1.2 §25; EMERGENCY-2 §6.3 (DEC-1211) · delivered by W2-121c
-  - `CAP-22.c` [W2] Distinct test execution and integration roles — MR-5; DEC-094; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-22.c` [W3] Distinct test execution and integration roles — MR-5; DEC-094; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-22.d` [W1] A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research` in its own experiment folder or worktree, its ticket's `allowed_paths` judged at the landing as a notice; no guard and no network allowlist; the full research lifecycle (CAP-32) stays W3 — DEC-163; DEC-158; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-46
 - **Scenarios:** dev CHAOS-X-02 · qual CHAOS-X-Q02
 
@@ -461,8 +461,8 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate H1; Framework v4.1.2 §36; DEC-011; DEC-064
 - **Covers:**
-  - `CAP-29.a` [W3] Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions → algorithms → architecture → interfaces → security/performance/operations → WBS → tests → live evidence — Contract v3 H1; Framework v4.1.2 §36
-  - `CAP-29.b` [W3] Forward and reverse lineage; missing and stale links detected — Contract v3 W8
+  - `CAP-29.a` [W3] Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions → algorithms → architecture → interfaces → security/performance/operations → WBS → tests → live evidence — Contract v3 H1; Framework v4.1.2 §36; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-29.b` [W3] Forward and reverse lineage; missing and stale links detected — Contract v3 W8; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev A-X-01 · qual A-X-Q01
 
 ### CAP-30 — Feature readiness contract (26-dimension checklist)
@@ -477,10 +477,10 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-30.a` [W1] 26-row readiness checklist, five states, silent N/A invalid, no defaulted N/A — Contract v3 H2; Framework v4.1.2 §37; DEC-085 · delivered by W1-12, W1-13
   - `CAP-30.b` [W1] Readiness gaps generate linked tickets (W1 planning skill + gov check) — Contract v3 H3; Framework v4.1.2 §38; DEC-089 · delivered by W1-13, W1-26, W1-35
   - `CAP-30.c` [W2] Automatic generation of the gap tickets, inside `gov discover` (`gov readiness --generate` is folded into it, W2-36) — Contract v3 H3; DEC-089; EMERGENCY-2 §6.2 A-4 (DEC-1211) · delivered by W2-36
-  - `CAP-30.d` [W3] Scenarios drive data and tests; data provenance recorded; data author independent where practical — Contract v3 H4; Framework v4.1.2 §39
+  - `CAP-30.d` [W3] Scenarios drive data and tests; data provenance recorded; data author independent where practical — Contract v3 H4; Framework v4.1.2 §39; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-30.e` [W1] Capability taxonomy for STANDARD rows; extended only through a governed change — Framework v4.1.2 §40 · delivered by W1-12, W1-26
   - `CAP-30.f` [W1] Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code — DEC-103 · delivered by W1-35
-  - `CAP-30.g` [W2] For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs); owned by the UX role — DEC-104
+  - `CAP-30.g` [W3] For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs); owned by the UX role — DEC-104; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev MR-A-02, MR-A-04, A-01 · qual MR-A-Q02, MR-A-Q04, CHAOS-A-Q07, A-Q01, A-Q02, A-Q05, AUDIT-A-Q32, AUDIT-A-Q35, AUDIT-A-Q37, AUDIT-A-Q43, AUDIT-A-Q44, AUDIT-A-Q47 (+9 not listed in the matrix row)
 
 ### CAP-31 — Unified task DAG
@@ -507,8 +507,8 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate J1, J2; Framework v4.1.2 §45, §46; DEC-019; DEC-020; DEC-102; DEC-163; DEC-166
 - **Covers:**
-  - `CAP-32.a` [W3] Research becomes evidence records separate from authority — Contract v3 J1; Framework v4.1.2 §45
-  - `CAP-32.b` [W3] Experiment lifecycle; discovery flow — Contract v3 J2; Framework v4.1.2 §46
+  - `CAP-32.a` [W3] Research becomes evidence records separate from authority — Contract v3 J1; Framework v4.1.2 §45; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-32.b` [W3] Experiment lifecycle; discovery flow — Contract v3 J2; Framework v4.1.2 §46; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-32.c` [W1] Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point; they run in their own experiment folder or worktree, outside production paths, and leave an evidence record (what was tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P — DEC-102; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-35
   - `CAP-32.d` [W2] `gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way — DEC-166 · delivered by W2-36
 - **Scenarios:** dev A-X-02 · qual AUDIT-A-Q02, AUDIT-A-Q06, AUDIT-A-Q20, AUDIT-A-Q21, AUDIT-A-Q23, AUDIT-A-Q24, AUDIT-A-Q38, AUDIT-A-Q43, CIT-B-Q01
@@ -524,7 +524,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Covers:**
   - `CAP-33.a` [W1] CIT-P proposal and CIT-E apply/archive records — Contract v3 K1, K2; Framework v4.1.2 §47 · delivered by W1-35
   - `CAP-33.b` [W2] Automatic impact simulation over record and code graphs; impact radius → profile — Contract v3 K3, K4; Framework v4.1.2 §48, §49
-  - `CAP-33.c` [W3] Upstream change propagates staleness and generates revalidation tasks — Contract v3 W6
+  - `CAP-33.c` [W3] Upstream change propagates staleness and generates revalidation tasks — Contract v3 W6; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-33.d` [W1] Changes to the Gov OS's own Charter and Contract pass evidence → a CIT-P with three costed options (DEC-105) → the owner's approval → a versioned promotion; kernel and instruction text follows CAP-24.c — Framework v4.1.2 §5; EMERGENCY-2 §3.5 (DEC-1211) · delivered by W1-35
   - `CAP-33.e` [W1] An experiment or finding that contradicts a closed specification opens a CIT-P whose impact assessment gives three costed options (apply now, defer, re-baseline); the owner chooses; CIT-E records what was done; every version of the specification is kept — DEC-105 · delivered by W1-35
   - `CAP-33.f` [W1] The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that is an OpenSpec proposal plus `gov closure` — DEC-167 · delivered by W1-35
@@ -570,14 +570,14 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate M4; Framework v4.1.2 §58; DEC-026
 - **Covers:**
-  - `CAP-36.a` [W3] Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings — Contract v3 M4; Framework v4.1.2 §58
+  - `CAP-36.a` [W3] Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings — Contract v3 M4; Framework v4.1.2 §58; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev SOAK-X-01 · qual SOAK-X-Q01
 
 ### CAP-37 — Structured checkpoints and mandatory triggers
 
 - **Outcome:** An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
 - **Acceptance:** After every ticket transition a checkpoint file exists; after a forced compaction and after a killed session, a session resumes at the checkpoint's recorded next step without the owner restating it (RT-5).
-- **Wave:** W1 (model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156))
+- **Wave:** W1 (model-switch continuity waits for friction (CAP-37.e); until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156))
 - **Provider:** W1-25, W1-29, W1-49
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate N1, N2, N3, N4; Framework v4.1.2 §59-61; OWNER-DIRECTION-BR-0004 (checkpoint discipline); OWNER-DIRECTION-BR-0006 §7, §8; DEC-025; DEC-150; DEC-156; DEC-248; EMERGENCY-2 §6.3 (DEC-1211)
@@ -586,7 +586,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-37.b` [W1] Mandatory triggers incl. ticket transition, compaction, stop — Contract v3 N2; Framework v4.1.2 §60 · delivered by W1-25, W1-29
   - `CAP-37.c` [W1] The run-time tool's one state file and one wake rule mark a stale session and wake it (RT-5, RT-7); nothing is blocked — Contract v3 N3; Framework v4.1.2 §60; EMERGENCY-2 §6.3 (DEC-1211) · delivered by W1-25, W1-29
   - `CAP-37.d` [W1] Worker return contract: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action — Contract v3 N4; Framework v4.1.2 §61 · delivered by W1-29
-  - `CAP-37.e` [W2] Model/provider switch reconstructs the same inputs — Contract v3 W9
+  - `CAP-37.e` [W3] Model/provider switch reconstructs the same inputs — Contract v3 W9; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-37.f` [W1] Checkpoint discipline; resume after crash — OWNER-DIRECTION-BR-0004; OWNER-DIRECTION-BR-0006 §7, §8 · delivered by W1-25
   - `CAP-37.g` [W1] Auto-resume hooks: a PreCompact hook ensures the checkpoint is current (the orchestrator's, and in a worktree the lead's); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint's RESUME HERE section; after a forced compaction the session knows the active tickets, the open owner decisions and the round counts without the owner restating them; there is no context packet (EMERGENCY-2 §5.5) — DEC-248; DEC-208; EMERGENCY-2 §5.5, §6.1 (DEC-1211); DEC-837 · delivered by W1-49
 - **Scenarios:** dev CHAOS-A-01, CHAOS-A-04, ISO-X-01, ISO-X-03, CHAOS-X-02 · qual CHAOS-A-Q01, CIT-A-Q02, CIT-A-Q04, SOAK-A-Q01, A-Q03, AUDIT-A-Q36, CHAOS-B-Q01, CHAOS-B-Q03, CHAOS-B-Q04, CHAOS-B-Q05, CHAOS-B-Q10, CHAOS-B-Q11 (+6 not listed in the matrix row)
@@ -634,7 +634,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Sources:** Contract v3 Gate P1, P2; Framework v4.1.2 §65, §66; DEC-026; DEC-086; DEC-106; DEC-170
 - **Covers:**
   - `CAP-40.a` [W1] Per ticket: agent/session/model/provider, role/task, skill/tool versions, brief id, retrieval queries/hits, tokens in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions — Contract v3 P1; Framework v4.1.2 §65 · delivered by W1-31
-  - `CAP-40.b` [W3] Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate, human-gate concentration, retrieval misses, cost by task/feature, first-pass completion — Contract v3 P2; Framework v4.1.2 §66
+  - `CAP-40.b` [W3] Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate, human-gate concentration, retrieval misses, cost by task/feature, first-pass completion — Contract v3 P2; Framework v4.1.2 §66; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-40.c` [W1] The weekly measures with their baselines: product share of spend, governance share (≤ 15 %), owner messages per day, time and cost per ticket, landing time, memory use (EMERGENCY-2 §10.2) — DEC-106; DEC-086; EMERGENCY-2 §10.2 (DEC-1211) · delivered by W1-31, W1-42
   - `CAP-40.d` [NONE] Non-goal: the sandbox's instruction tokens as a separate line of the telemetry record: there is no sandbox — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev CHAOS-A-12, ISO-X-03, SOAK-X-01 · qual GATE-B-Q01, GATE-B-Q03, GATE-B-Q04, SOAK-X-Q01
@@ -654,10 +654,10 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-41.d` [W1] Phase-2 lessons carried (L-0074, anti-stall, no manufactured history, anti-snowball) — DEC-046; OWNER-DECISION-P2-0008 §9; OWNER-DIRECTION-BR-0004 §2D; OWNER-AMENDMENT-P2-0010 §7 · delivered by W1-44
   - `CAP-41.e` [NONE] Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j) — Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7; DEC-165
   - `CAP-41.f` [W1] Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical); both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration — DEC-165; DEC-168 · delivered by W1-08
-  - `CAP-41.g` [W3] A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets; the product's orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan while the inbox is private, one full scan before it is shared — DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
-  - `CAP-41.h` [W3] A high or critical lesson is raised to the owner immediately, as a decision package — DEC-165
-  - `CAP-41.i` [W3] The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release's notes list the lessons fixed, with their severity — DEC-165
-  - `CAP-41.j` [W3] Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox — DEC-165
+  - `CAP-41.g` [W3] A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets; the product's orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan while the inbox is private, one full scan before it is shared — DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-41.h` [W3] A high or critical lesson is raised to the owner immediately, as a decision package — DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-41.i` [W3] The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release's notes list the lessons fixed, with their severity — DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-41.j` [W3] Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox — DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev RETR-X-04, B-X-02 · qual GATE-B-Q01, GATE-B-Q02, AUDIT-B-Q16, AUDIT-B-Q27, RETR-X-Q04
 
 ### CAP-42 — Legacy governance retirement and archive policy
@@ -704,12 +704,12 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-44.d` [W1] A6 controlled migration; failed batch rolls back; moves precede new indexing — Adoption Protocol v3.0 §11; Distribution Protocol v1.2 §10, §11 · delivered by W1-41
   - `CAP-44.e` [W1] A8 legacy memory extraction/retirement — Adoption Protocol v3.0 §13; Distribution Protocol v1.2 §10 · delivered by W1-41
   - `CAP-44.f` [W2] A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary of each index (CAP-55); the fresh auditor runs at A5, AS, A7 and A10 (DEC-1214 G6) — Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722; DEC-1214 G6
-  - `CAP-44.g` [W3] Remediation, finding states, human gates during adoption — Adoption Protocol v3.0 §17–§19
+  - `CAP-44.g` [W3] Remediation, finding states, human gates during adoption — Adoption Protocol v3.0 §17–§19; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-44.h` [W2] Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native layout kept, the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor green (exit 0), gov check with no RED family, and one ticket closed by gov close at exit 0 with the repository's own test command; of the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those marked W2 and the lite part named for those marked W3: (1) certified kernel pinned: W3 (the certification by qualification is CAP-43.c), its lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay separate: W3, no lite part, (3) path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5 review and the native layout kept, CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a separate verifier role, CAP-47.a), its lite part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no accidental legacy authority, CAP-48.b), its lite part A8's retirement of legacy memory (CAP-44.e), (6) memory independently verified: W3 (over the A9 knowledge fabric and by a separate role, CAP-44.k, CAP-47.a), its lite part the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit completed: W3 (A11, CAP-44.k), no lite part, (8) critical/high unaccepted findings resolved: W3 (finding states and remediation, CAP-44.g, and the A11 audit), no lite part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b), its lite part the derived state rebuilt from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY; only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions it does not check; at the release, EXAMIN's copy gets its verdict with memory at 95 % or more end to end on a fresh 80 (EMERGENCY-2 §8.2 item 3) — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.2 (DEC-1211)
-  - `CAP-44.i` [W3] Interrupted-session recovery and freeze during adoption — Adoption Protocol v3.0 §4
+  - `CAP-44.i` [W3] Interrupted-session recovery and freeze during adoption — Adoption Protocol v3.0 §4; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-44.j` [W1] The path map keeps a healthy native framework/package layout unless the target structure is materially better and the migration risk is justified — Framework v4.1.2 §79.3; Distribution Protocol v1.2 §10 A3 · delivered by W1-41
-  - `CAP-44.k` [W3] A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles, A10 over the A9 knowledge fabric) — Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722
-  - `CAP-44.l` [W3] Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY conditions, after A0–A11 — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
+  - `CAP-44.k` [W3] A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles, A10 over the A9 knowledge fabric) — Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-44.l` [W3] Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY conditions, after A0–A11 — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-44.m` [W2] AS spec audit, lite: after A2 and before A3, `gov adopt --lite --stage AS` records every spec found (path, title, its stated wave or status), each built, partly built or not built with evidence (code paths, tests, commits), the tickets found done or not by wave, the specs with no code, the code with no spec (top-level code modules no spec names), and each gap as one question to the owner with a place for the answer; the lite checks (every spec and every top-level code module the inventory holds named, every gap with a question) refuse a record that fails either; A3 refuses to run before AS is recorded; built or not is judged from code paths, tests and commits, never by a model; the path map's reviewer at A5 reads the record — DEC-1200; P-ADOPT-SPEC-AUDIT-1 · delivered by W2-192
 - **Scenarios:** dev B-01, B-04, B-05, B-X-01 · qual B-X-Q01
 
@@ -747,9 +747,9 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate T1, T2, T3; Adoption Protocol v3.0 §3; DEC-042 (builder tests are regression, not certification); DEC-066; DEC-070; DEC-088; DEC-090; DEC-1214 G6
 - **Covers:**
-  - `CAP-47.a` [W3] Role separation for adoption and audit — Contract v3 T1; Adoption Protocol v3.0 §3
+  - `CAP-47.a` [W3] Role separation for adoption and audit — Contract v3 T1; Adoption Protocol v3.0 §3; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-47.b` [W1] Fresh-session independence with a bounded context pack — Contract v3 T2; DEC-042; OWNER-AMENDMENT-P2-0010 · delivered by W1-36
-  - `CAP-47.c` [W3] Adoption evidence tree — Contract v3 T3; Adoption Protocol v3.0 §5
+  - `CAP-47.c` [W3] Adoption evidence tree — Contract v3 T3; Adoption Protocol v3.0 §5; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-47.d` [W1] Audit triggers: the release acceptance and adoption stages A5, AS, A7 and A10; otherwise only a red test, a failed landing or merge, or a feature that does not work as intended — MR-4; DEC-1214 G6 (a); EMERGENCY-2 §3.4, §3.6 (DEC-1211) · delivered by W1-13, W1-35, W1-36
 - **Scenarios:** dev AUDIT-X-01 · qual AUDIT-X-Q01
 
@@ -762,8 +762,8 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate U; Framework v4.1.2 §75, §76; DEC-004
 - **Covers:**
-  - `CAP-48.a` [W3] SLOs tracked with thresholds: suite freshness, product-test health, the end-to-end judged memory figure (not Recall@K), stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success — Contract v3 U; Framework v4.1.2 §75; EMERGENCY-2 §5.2 (DEC-1211)
-  - `CAP-48.b` [W3] HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived memory rebuildable — Contract v3 U; Framework v4.1.2 §76
+  - `CAP-48.a` [W3] SLOs tracked with thresholds: suite freshness, product-test health, the end-to-end judged memory figure (not Recall@K), stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success — Contract v3 U; Framework v4.1.2 §75; EMERGENCY-2 §5.2 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-48.b` [W3] HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived memory rebuildable — Contract v3 U; Framework v4.1.2 §76; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev SOAK-X-02 · qual SOAK-X-Q02
 
 ### CAP-49 — Qualification oracle (synthetic repos, fault injection, hidden tests)
@@ -790,12 +790,12 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Sources:** Contract v3 Gate W1-W12; Framework v4.1.2 §36-38; DEC-036; DEC-064
 - **Covers:**
   - `CAP-50.a` [W1] Stable artefact identity: id, type, canonical path, status, lifecycle, version/hash, provenance, lineage, expected consumers — Contract v3 W1 · delivered by W1-08
-  - `CAP-50.b` [W3] Typed output→input contracts with required/optional dependencies and output schemas — Contract v3 W2
+  - `CAP-50.b` [W3] Typed output→input contracts with required/optional dependencies and output schemas — Contract v3 W2; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-50.c` [W1] Consumption receipt and implementation traceability — Contract v3 W5 · delivered by W1-30
-  - `CAP-50.d` [W3] Upstream-change staleness propagation; COMPLETE is not permanently valid — Contract v3 W6
-  - `CAP-50.e` [W3] Orphan/dead-output detection with governed remediation — Contract v3 W7
-  - `CAP-50.f` [W3] Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection, staleness accuracy, requirement→code and →test coverage, orphan recall, reconstruction correctness — Contract v3 W11
-  - `CAP-50.g` [W3] Health-scheduler integration — Contract v3 W12
+  - `CAP-50.d` [W3] Upstream-change staleness propagation; COMPLETE is not permanently valid — Contract v3 W6; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-50.e` [W3] Orphan/dead-output detection with governed remediation — Contract v3 W7; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-50.f` [W3] Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection, staleness accuracy, requirement→code and →test coverage, orphan recall, reconstruction correctness — Contract v3 W11; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-50.g` [W3] Health-scheduler integration — Contract v3 W12; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev A-X-01 · qual CHAOS-X-Q02, A-X-Q01
 
 ### CAP-51 — Decisions register (structured, versioned, authoritative)

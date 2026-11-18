@@ -13,4 +13,4 @@ depends_on:
 A covers item of CAP-37 (Structured checkpoints and mandatory triggers). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
 - **Item:** Model/provider switch reconstructs the same inputs
-- **Wave:** W2
+- **Wave:** W3
