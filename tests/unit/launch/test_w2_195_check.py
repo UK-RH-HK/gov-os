@@ -1,12 +1,15 @@
 """W2-195 (DAEO-d8df) S3, the launch's half: ``read_role`` (which ``gov launch`` calls) refuses
 ``LAUNCH_JUDGING_RULE_MISSING`` for a judging role (independent-auditor, as which the reviewer and the probe launch;
 qa-engineer) whose role file does not name judging-work, or whose preloaded copy is missing or of another version
-than the kernel file's (DEC-1204 (5)). Other roles are not checked.
+than the kernel file's (DEC-1204 (5)). The check applies in a project that holds the kernel judging-work file; a
+project without it launches unchecked (S3 as revised at 3a1af46ce: EMERGENCY-2 2.1, catch, do not prevent). Other
+roles are not checked.
 
 Regression evidence only (DEC-136), on planted trees.
 """
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -57,12 +60,6 @@ def _other_version(tmp_path, name):
     return plant(tmp_path, name, WITH, preloaded=_versioned(_rulesync_form(KERNEL.read_bytes()), OTHER))
 
 
-def _kernel_removed(tmp_path, name):
-    tree = plant(tmp_path, name, WITH)
-    (tree / KERNEL_REL).unlink()
-    return tree
-
-
 def _kernel_other_version(tmp_path, name):
     return plant(tmp_path, name, WITH, kernel=_versioned(KERNEL.read_bytes(), OTHER),
                  preloaded=KERNEL.read_bytes())
@@ -70,7 +67,7 @@ def _kernel_other_version(tmp_path, name):
 
 BREAKS = {"skills-line-lacks-judging-work": _lacks, "no-skills-line": _no_line,
           "preloaded-copy-removed": _copy_removed, "preloaded-copy-other-version": _other_version,
-          "kernel-file-removed": _kernel_removed, "kernel-file-other-version": _kernel_other_version}
+          "kernel-file-other-version": _kernel_other_version}
 
 
 @pytest.mark.parametrize("name", JUDGES)
@@ -102,16 +99,43 @@ def test_a_preloaded_copy_in_rulesyncs_form_passes(tmp_path, name):
 
 
 def test_an_adopted_tree_compares_with_its_governance_kernel(tmp_path):
-    tree = plant(tmp_path, "qa-engineer", WITH)
+    tree = plant(tmp_path, "qa-engineer", WITH, preloaded=_versioned(_rulesync_form(KERNEL.read_bytes()), OTHER))
     (tree / "template").rename(tree / "moved")
     (tree / "governance/kernel/roles").mkdir(parents=True)
     (tree / "moved/governance/kernel/roles/qa-engineer.md").rename(tree / "governance/kernel/roles/qa-engineer.md")
+    adopted = tree / "governance/kernel/skills/judging-work/SKILL.md"
+    adopted.parent.mkdir(parents=True)
+    adopted.write_bytes(KERNEL.read_bytes())  # the adopted kernel's file, not template/'s, is the one compared
     with pytest.raises(GovError) as raised:
         role.read_role(tree, "qa-engineer")
     assert raised.value.code == CODE and "governance/kernel/skills/judging-work/SKILL.md" in raised.value.message
-    (tree / "governance/kernel/skills/judging-work").mkdir(parents=True)
-    (tree / "governance/kernel/skills/judging-work/SKILL.md").write_bytes(KERNEL.read_bytes())
+    (tree / PRELOADED).write_bytes(_rulesync_form(KERNEL.read_bytes()))
     assert role.read_role(tree, "qa-engineer")["role_text"]["path"] == "governance/kernel/roles/qa-engineer.md"
+
+
+@pytest.mark.parametrize("name", JUDGES)
+@pytest.mark.parametrize("layout", ("template", "adopted"))
+def test_a_project_without_the_kernel_file_launches_a_bare_judging_role_unchecked(tmp_path, name, layout):
+    """S3 as revised (3a1af46ce, EMERGENCY-2 2.1): no kernel judging-work file, no launch check; the role file names
+    no skill and there is no preloaded copy, and the launch is read all the same."""
+    tree = plant(tmp_path, name, "")
+    (tree / KERNEL_REL).unlink()
+    (tree / PRELOADED).unlink()
+    if layout == "adopted":
+        (tree / "template/governance/kernel/roles").rename(tmp_path / "roles")
+        (tmp_path / "governance/kernel").mkdir(parents=True)
+        (tmp_path / "roles").rename(tmp_path / "governance/kernel/roles")
+        shutil.rmtree(tree / "template")
+    loaded = role.read_role(tree, name)
+    assert [skill for skill in loaded["skills"] if skill["name"] == "judging-work"] == []
+
+
+@pytest.mark.parametrize("name", JUDGES)
+def test_a_project_without_the_kernel_file_but_with_the_skill_launches_too(tmp_path, name):
+    tree = plant(tmp_path, name, WITH)
+    (tree / KERNEL_REL).unlink()
+    entry = [skill for skill in role.read_role(tree, name)["skills"] if skill["name"] == "judging-work"]
+    assert entry[0]["named"] is True
 
 
 @pytest.mark.parametrize("name", ("engineer", "independent-test-designer", "orchestrator", "ticket-lead"))

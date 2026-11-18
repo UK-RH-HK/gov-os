@@ -137,6 +137,9 @@ def test_install_judging_skill_lets_a_bare_judging_role_launch_and_leaves_other_
     for name in ("independent-auditor", "qa-engineer", "engineer"):
         (tmp_path / role.ROLES_REL).mkdir(parents=True, exist_ok=True)
         (tmp_path / role.ROLES_REL / f"{name}.md").write_text(bare.format(name), encoding="utf-8")
+    kernel = (tmp_path / role.ROLES_REL).parent / "skills/judging-work/SKILL.md"
+    kernel.parent.mkdir(parents=True)
+    kernel.write_bytes(KERNEL.read_bytes())  # a project that holds the kernel file: the launch check applies
     with pytest.raises(GovError) as raised:
         role.read_role(tmp_path, "independent-auditor")
     assert raised.value.code == "LAUNCH_JUDGING_RULE_MISSING"

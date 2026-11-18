@@ -61,14 +61,15 @@ TOOLS_FIELD = re.compile(r"^[-*]\s+\*\*Tools:?\*\*:?(.*(?:\n[ \t]+\S.*)*)", re.M
 # so a call that never answers ends the check red with its own finding, not cut off by the runner.
 TIME_LIMIT = 25
 # W2-153 S3 (DEC-1050): the kernel skills each role's subagent preloads, from the ticket (not the templates' own
-# front matter).
+# front matter). W2-195 (DEC-1204 (5)): the two of them that judge work, as their kernel role files' Skills lines name
+# it, preload judging-work too; qa-engineer and ticket-lead have no role template, so their lists are not compared.
 ROLE_SKILLS = {
     "engineer": ["test-driven-development"],
     "independent-test-designer": ["test-design"],
-    "independent-auditor": ["audit"],
+    "independent-auditor": ["audit", "judging-work"],
     "product-spec": ["change"],
     "research": ["discovery"],
-    "orchestrator": ["orchestration"],
+    "orchestrator": ["orchestration", "judging-work"],
 }
 # W2-153 S4: the kernel templates copied byte for byte into .claude/templates/ (written only by an ACT, DEC-315).
 TEMPLATE_COPIES = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",

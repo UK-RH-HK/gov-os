@@ -48,8 +48,8 @@ TABLE_FORM = ("- **Launch by criticality:** C3 model <model>, effort <effort>; C
               "(an entry may read: C<n> model <model>, effort <effort> on FULL, model <model>, effort <effort> "
               "otherwise)")
 TABLE_CLASSES = ("C3", "C2", "C1", "C0")
-# W2-195 (DEC-1204 (5)): the roles that judge work launch only with the judging-work skill preloaded, of the kernel
-# file's version; the reviewer and the probe launch as independent-auditor.
+# W2-195 (DEC-1204 (5)): in a project that holds the kernel judging-work file, the roles that judge work launch only
+# with the skill preloaded, of the kernel file's version; the reviewer and the probe launch as independent-auditor.
 JUDGING_ROLES = judging.JUDGING_ROLES
 JUDGING_CODE = "LAUNCH_JUDGING_RULE_MISSING"
 _PAIR = rf"model ({MODEL}), effort ({'|'.join(EFFORTS)})"
@@ -182,7 +182,9 @@ def _judging(root: Path, rel: str, named: list[str], skills: dict[str, dict]) ->
     """A judging role's launch carries the judging-work skill (W2-195, DEC-1204 (5)): its role file names it, its
     preloaded copy is at ``.claude/skills/judging-work/SKILL.md`` and of the kernel file's version (the top-level
     ``version``, else ``metadata.version``, as rulesync writes the copy). Anything else is
-    ``LAUNCH_JUDGING_RULE_MISSING``, before the generic refusal of a named skill that is not there."""
+    ``LAUNCH_JUDGING_RULE_MISSING``, before the generic refusal of a named skill that is not there. ``read_role``
+    calls it only in a project that holds the kernel judging-work file (a link counts, so a broken one is refused);
+    a project without that file launches unchecked (EMERGENCY-2 2.1: catch, do not prevent)."""
     def refuse(reason: str) -> GovError:
         return GovError(JUDGING_CODE, f"a role that judges work launches with the judging-work skill (DEC-1204 (5)): "
                                       f"{reason}")
@@ -320,8 +322,8 @@ def read_role(root: Path, role: str) -> dict:
     if len(set(named)) != len(named):
         raise _refuse(f"the role file {rel} names a skill twice in its line '- **Skills:**'")
     skills = _skills(root)
-    if role in JUDGING_ROLES:
-        _judging(root, rel, named, skills)
+    if role in JUDGING_ROLES and os.path.lexists(root / judging.kernel_rel(root)):
+        _judging(root, rel, named, skills)  # only where the project holds the kernel file (S3 as revised, 3a1af46ce)
     appended = [data]
     for name in named:
         skill = skills.get(name)

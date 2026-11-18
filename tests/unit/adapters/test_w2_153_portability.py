@@ -98,8 +98,20 @@ def test_a_top_level_skills_list_is_a_finding(project, under):
 def test_the_skills_lists_are_the_tickets():
     assert portability.ROLE_SKILLS == {
         "engineer": ["test-driven-development"], "independent-test-designer": ["test-design"],
-        "independent-auditor": ["audit"], "product-spec": ["change"], "research": ["discovery"],
-        "orchestrator": ["orchestration"]}
+        "independent-auditor": ["audit", "judging-work"], "product-spec": ["change"], "research": ["discovery"],
+        "orchestrator": ["orchestration", "judging-work"]}
+
+
+def test_the_judging_roles_with_a_template_preload_judging_work_as_their_kernel_role_files_name_it():
+    """W2-195 (DEC-1204 (5)): the roles whose skills are compared (those with a role template) and whose kernel role
+    file's Skills line names judging-work list it too; qa-engineer and ticket-lead have no template, so none."""
+    from gov.launch import role
+    for name, listed in portability.ROLE_SKILLS.items():
+        lines = [text for text in (REPO / role.ROLES_REL / f"{name}.md").read_text(encoding="utf-8").splitlines()
+                 if role.SKILLS_LINE.fullmatch(text)]
+        named = role.SKILLS_LINE.fullmatch(lines[0]).group(1).split(", ") if lines else []
+        assert ("judging-work" in listed) == ("judging-work" in named), name
+    assert "qa-engineer" not in portability.ROLE_SKILLS and "ticket-lead" not in portability.ROLE_SKILLS
 
 
 def test_the_test_designer_lists_test_design_now_w2_128_reconciled_it():
