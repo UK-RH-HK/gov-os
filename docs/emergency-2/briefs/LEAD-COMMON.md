@@ -1,12 +1,16 @@
-# What every ticket lead's brief shares (Emergency 2, the night of 2026-11-17)
+# What every ticket lead's brief shares (Emergency 2; revised by the CTO 2026-11-18)
 
 Written by the CTO for the ticket leads of the build list (EMERGENCY-2 §6.1, §6.2). Your own brief names your feature.
 
 ## Where you work
 - Your own worktree and branch: `git -C /home/usain/Dynamic-Agentic-Engineering-OS worktree add -b e2/<name> /home/usain/gov-os-worktrees/E2-<name> w2/integrate` (or the existing ticket worktree your brief names: bring it up to date with `git merge w2/integrate` first). Work and commit only there.
-- **Never commit to `w2/integrate`** and never touch the main tree `/home/usain/Dynamic-Agentic-Engineering-OS`: the owner is cutting release 0.1.2 from it tonight. The CTO lands your branch.
+- **Never commit to `w2/integrate`** and never touch the main tree `/home/usain/Dynamic-Agentic-Engineering-OS`: the CTO works there and lands your branch.
 - Never `git push`, never `sudo`. Full permission otherwise in your worktree, its `-tests` worktree and `~/gov-os-runs/`.
-- The machine is shared with other leads: run pytest with at most `-n 6`, and give each run its own temp folder (`TMPDIR=$(mktemp -d)`).
+- **The machine rule.** Every test run goes through the machine-wide heavy slot (two slots today), one run at a time:
+  `TMPDIR=$(mktemp -d) PYTHONPATH=<worktree>/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest <paths> -q -p no:cacheprovider`
+  - No `-n`: the slot sets the workers. `PYTHONPATH` absolute (tests start `gov` in subprocesses). The slot waits while taken; never bypass it.
+  - The smallest set that proves your change; no full suites (the CTO runs those); no rebuild and no memory measure without asking the CTO.
+  - Before starting a worker: `uptime` and `free -g`; over load 30 or under 3 GB available, wait.
 
 ## Read first
 `docs/emergency-2/EMERGENCY-2.md` §3, §4, §5 and the rows of §6 your brief names; your ticket file(s) in `.tickets/`; the audit tables your brief names under `docs/emergency-2/audits/`.
