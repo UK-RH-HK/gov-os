@@ -25,20 +25,20 @@ def judge(root, rels):
 
 
 @pytest.mark.parametrize("value", ["1", "yes"])
-def test_a_full_scan_reads_nothing_from_the_cache_and_refreshes_it(project, engine, cache, per_text, monkeypatch, value):
+def test_a_full_scan_reads_nothing_from_the_cache_and_refreshes_it(project, engine, cache, monkeypatch, value):
     rels = support.put(project, FILES)
-    texts = len(rels) + 1
+    full = support.cost(engine, lambda: judge(project, rels))  # every text: the files' batch, then the name
     monkeypatch.setenv("GOV_SECRETS_FULL_SCAN", value)
     for label in ("a full scan on an empty cache", "a full scan of texts remembered"):
         verdicts, calls = support.counted(engine, lambda: judge(project, rels))
-        assert verdicts == (rels, False) and calls == texts * per_text, f"{label}: every text is scanned"
+        assert verdicts == (rels, False) and calls == full, f"{label}: every text is scanned"
     monkeypatch.delenv("GOV_SECRETS_FULL_SCAN")
     verdicts, calls = support.counted(engine, lambda: judge(project, rels))
     assert verdicts == (rels, False) and calls == 0, "after it, an ordinary call is answered from what it wrote"
 
 
 @pytest.mark.parametrize("value", ["0", ""])
-def test_the_setting_empty_or_zero_is_an_ordinary_call(project, engine, cache, per_text, monkeypatch, value):
+def test_the_setting_empty_or_zero_is_an_ordinary_call(project, engine, cache, monkeypatch, value):
     rels = support.put(project, FILES)
     judge(project, rels)
     monkeypatch.setenv("GOV_SECRETS_FULL_SCAN", value)

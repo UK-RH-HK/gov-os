@@ -11,7 +11,9 @@ D. A cache that can be read but not written (a read-only file or folder, a write
    current engine's clean verdicts, writes nothing, clears nothing, and never answers a row of another engine.
 
 Every pass that must be a fresh process (as a rebuild is) runs in a child process, as in round 1. The stand-ins here
-log each scan call and each version call; they never log content.
+log each scan call (``stdin``, or ``dir`` of folder mode, DEC-1183 (2): one process a batch and rule set) and each version
+call; they never log content. Where a case must tell how many texts a pass gave to gitleaks, not how many processes, it
+reads the child's ``scan_counts()`` (the texts scanned), as one ``dir`` call judges a whole batch.
 """
 
 from __future__ import annotations
@@ -53,7 +55,7 @@ def planted_name():
 # --------------------------------------------------------------------------
 
 _STANDIN = r'''import json, os, subprocess, sys
-# W2-107 round 2 stand-in gitleaks (@TAG@): logs each scan and version call; scans as the real gitleaks does, or as an
+# W2-107 round 2 stand-in gitleaks (@TAG@): logs each scan (stdin or dir) and version call; scans as the real gitleaks does, or as an
 # older one that does not know one rule; answers "version" as its version file says; may rename another engine over
 # its own place during a scan.
 REAL, LOG, TAG, OLD, VERSION = @REAL@, @LOG@, @TAG@, @OLD@, @VERSION@
@@ -86,9 +88,9 @@ if args[:1] == ["version"]:
         print(answer)
         sys.exit(0)
     os.execv(REAL, [REAL] + args)
-if args[:1] != ["stdin"]:
+if args[:1] not in (["stdin"], ["dir"]):
     os.execv(REAL, [REAL] + args)
-log("stdin")
+log(args[0])
 if STAGED and os.path.exists(STAGED):
     handle = os.open(COUNTER, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
     try:
@@ -99,7 +101,9 @@ if STAGED and os.path.exists(STAGED):
         os.replace(STAGED, SELF)  # another engine lands at this one's place while this scan runs
 if not OLD:
     os.execv(REAL, [REAL] + args)
-done = subprocess.run([REAL] + args, input=sys.stdin.buffer.read(), capture_output=True)
+given = sys.stdin.buffer.read() if args[0] == "stdin" else None  # a dir call has its folder, and no text on stdin
+done = subprocess.run([REAL] + args, input=given, stdin=None if given is not None else subprocess.DEVNULL,
+                      capture_output=True)
 out, code = done.stdout, done.returncode
 try:
     findings = json.loads(out) if code else None
@@ -120,7 +124,7 @@ LOG, SETTING, RELEASES = @LOG@, @SETTING@, @RELEASES@
 args = sys.argv[1:]
 with open(SETTING, encoding="utf-8") as handle:
     release = handle.read().strip()
-if args[:1] in (["stdin"], ["version"]):
+if args[:1] in (["stdin"], ["dir"], ["version"]):
     handle = os.open(LOG, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
     try:
         os.write(handle, (args[0] + " " + release + "\n").encode())
@@ -160,12 +164,15 @@ def engine_at(folder, log):
 
 
 def logged(log, kind, tag=None):
-    """How many ``kind`` calls (``stdin`` or ``version``) ``log`` holds, of ``tag`` alone where it is given."""
+    """How many ``kind`` calls (``version``, or ``scan``: a ``stdin`` or a ``dir`` call) ``log`` holds, of ``tag`` alone
+    where it is given."""
     log = Path(log)
     if not log.exists():
         return 0
+    kinds = support.SCAN_COMMANDS if kind == "scan" else (kind,)
     lines = log.read_text(encoding="utf-8").splitlines()
-    return sum(1 for line in lines if (line == f"{kind} {tag}" if tag else line.startswith(f"{kind} ")))
+    return sum(1 for line in lines
+               if any((line == f"{each} {tag}" if tag else line.startswith(f"{each} ")) for each in kinds))
 
 
 def status(path):
@@ -300,6 +307,7 @@ def test_a_gitleaks_replaced_during_a_scan_has_nothing_remembered_for_that_text(
     clean = support.put(project, {"docs/neighbour.md": "W2-107: an ordinary neighbour.\n"})
     kept, findings = support.uncached(engine, lambda: secrets.indexable(project, secret))
     assert kept == [] and findings >= 1, "premise: a gitleaks that knows the rule drops the planted text"
+    both = support.cost(engine, lambda: secrets.indexable(project, secret + clean))  # one batch, one process a rule set
 
     place, log, staged = tmp_path / "swap/gitleaks", tmp_path / "swap-calls.log", tmp_path / "staged/gitleaks"
     make_standin(place, log, "old", old=CANARY_RULE, staged=staged, counter=tmp_path / "swap-count", swap_at=per_text)
@@ -310,21 +318,23 @@ def test_a_gitleaks_replaced_during_a_scan_has_nothing_remembered_for_that_text(
         "premise: the old engine does not know the rule: it lets the planted text through"
 
     new_bytes = make_standin(staged, log, "new").read_bytes()
-    old_calls = logged(log, "stdin", "old")
+    old_calls = logged(log, "scan", "old")
     run, _ = child(project, secret, [], at, cache)
     assert run.error is None, f"the switch: the filter raised {run.error}"
     assert not staged.exists() and place.read_bytes() == new_bytes, \
         "premise: the new engine landed at the old one's place during the scan"
-    assert logged(log, "stdin", "old") - old_calls == per_text, "premise: the old engine made every scan call of the text"
+    assert logged(log, "scan", "old") - old_calls == per_text, "premise: the old engine made every scan call of the text"
 
     if then == "the-new-engine":
         run, calls = child(project, secret + clean, [], at, cache)
         assert run.error is None and run.indexable == clean, \
             "the planted secret, which only the new engine knows, is dropped: the old verdict was not credited to it"
-        assert calls == findings + per_text, "the text judged across the switch is scanned again"
+        assert run.counts["content"]["scanned"] == 2 and calls == both, \
+            "the text judged across the switch is scanned again, with its neighbour (nothing was remembered)"
         run, calls = child(project, secret + clean, [], at, cache)
         assert run.indexable == clean, "the planted secret is dropped again"
-        assert calls == findings, "control: the new engine's clean verdicts are remembered"
+        assert run.counts["content"]["scanned"] == 1 and calls == findings, \
+            "control: the new engine's clean verdict is remembered, the secret is scanned again"
     else:
         back = place.parent / ".gitleaks-back"
         back.write_bytes(old_bytes)
@@ -332,35 +342,38 @@ def test_a_gitleaks_replaced_during_a_scan_has_nothing_remembered_for_that_text(
         os.replace(back, place)
         run, calls = child(project, secret + clean, [], at, cache)
         assert run.error is None and run.indexable == secret + clean, "the old engine's verdicts"
-        assert calls == 2 * per_text, \
-            "the text judged across the switch is scanned again: nothing was written for it, not even under the " \
-            "engine that judged it"
+        assert run.counts["content"]["scanned"] == 2 and calls == both, \
+            "the text judged across the switch is scanned again, with its neighbour: nothing was written for it, not " \
+            "even under the engine that judged it"
         run, calls = child(project, secret + clean, [], at, cache)
         assert run.indexable == secret + clean, "the old engine's verdicts again"
-        assert calls == 0, "control: with no switch, the old engine's clean verdicts are remembered"
+        assert run.counts["content"]["scanned"] == 0 and calls == 0, \
+            "control: with no switch, the old engine's clean verdicts are remembered"
 
 
 # --------------------------------------------------------------------------
 # B. The filter's reading form is part of the fingerprint
 # --------------------------------------------------------------------------
 
-def test_a_raised_reading_form_rescans_every_remembered_text(project, engine, cache, per_text, monkeypatch):
+def test_a_raised_reading_form_rescans_every_remembered_text(project, engine, cache, monkeypatch):
     """The reading form is raised as the module raises it: its ``_FORM``, documented on the base as "the form of the
     record and of what a scan reads", set one higher on the module this run imports, between calls in one process."""
     form = getattr(secrets, "_FORM", None)
     assert isinstance(form, int), "the filter's reading form is the module's _FORM, a whole number (the base's convention)"
     rels = support.put(project, FILES)
     name = "docs/an-ordinary-name.md"
-    texts = len(rels) + 1
-    steps = [("the form as it is", form, texts), ("the form as it is, again", form, 0),
-             ("the form raised", form + 1, texts), ("the form raised, again", form + 1, 0),
-             ("the form back", form, texts)]
+    def judge():
+        return secrets.indexable(project, rels), secrets.path_holds_secret(project, name)
+
+    full = support.cost(engine, judge)  # every text: the files' batch, then the name
+    steps = [("the form as it is", form, True), ("the form as it is, again", form, False),
+             ("the form raised", form + 1, True), ("the form raised, again", form + 1, False),
+             ("the form back", form, True)]
     for label, value, scanned in steps:
         monkeypatch.setattr(secrets, "_FORM", value)
-        verdicts, calls = support.counted(
-            engine, lambda: (secrets.indexable(project, rels), secrets.path_holds_secret(project, name)))
+        verdicts, calls = support.counted(engine, judge)
         assert verdicts == (rels, False), f"{label}: the verdicts are unchanged"
-        assert calls == scanned * per_text, f"{label}: {scanned} of {texts} texts scanned"
+        assert calls == (full if scanned else 0), f"{label}: {'every text scanned' if scanned else 'none scanned'}"
 
 
 # --------------------------------------------------------------------------
@@ -446,8 +459,7 @@ def a_plain_writer_is_refused(cache):
         writer.close()
 
 
-def test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_texts(
-        project, engine, cache, per_text):
+def test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_texts(project, engine, cache):
     """Another connection, in a process of its own, holds the write lock (readers may still read) while the filter
     judges remembered texts, a new clean text and the texts holding the secret. The remembered texts are answered, the
     rest are scanned, and the lock is waited out only a short while."""
@@ -458,6 +470,8 @@ def test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_text
         assert run.error is None and run.indexable == rels, f"{label}: the verdicts are right"
         assert calls == scanned, f"{label}: premise: a cache that can be written answers the clean texts"
     fresh = support.put(project, {"docs/fresh.md": "W2-107: a page written while the write lock is held.\n"})
+    # what the new text and the texts holding the secret cost together: the file text in one batch, the name's scans
+    expected = child(project, secret + fresh, names[1:], engine, "")[1]
     with write_lock_held_elsewhere(cache):
         assert a_plain_writer_is_refused(cache), "premise: the write lock is held"
         snapshot = cache.read_bytes()
@@ -465,7 +479,7 @@ def test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_text
         assert a_plain_writer_is_refused(cache), "premise: the write lock is still held after the pass"
         assert run.error is None, f"the filter raised {run.error} under a held write lock"
         assert run.indexable == rels + fresh and run.names == [False, True], "the verdicts are right"
-        assert calls == findings + per_text, \
+        assert calls == expected, \
             "the remembered clean texts are answered; only the new text and the texts holding the secret are scanned"
         assert run.seconds <= seconds + LOCKED_EXTRA_S, "the write lock is waited out only a short while"
         assert cache.read_bytes() == snapshot, "nothing is written while the lock is held elsewhere"

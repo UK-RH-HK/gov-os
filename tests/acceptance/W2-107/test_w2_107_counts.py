@@ -55,19 +55,21 @@ def test_the_counts_show_scanned_and_remembered_per_kind_and_agree_with_the_gitl
     def judge(paths, names):
         return secrets.indexable(project, paths), [secrets.path_holds_secret(project, name) for name in names]
 
+    full = support.cost(engine, lambda: judge(rels, NAMES))  # the files in one batch, each name by its own run
+    assert full >= 1, "premise: scanning the texts costs gitleaks calls"
     _, counts, calls = measured(engine, lambda: judge(rels, NAMES))
-    assert counts == tally((3, 0), (2, 0)) and calls == 5 * per_text, "the first pass scans every text"
+    assert counts == tally((3, 0), (2, 0)) and calls == full, "the first pass scans every text"
     _, counts, calls = measured(engine, lambda: judge(rels, NAMES))
     assert counts == tally((0, 3), (0, 2)) and calls == 0, "the second pass remembers every text and scans none"
     support.write(project / rels[0], "W2-107: page 0, changed.\n")
     _, counts, calls = measured(engine, lambda: judge(rels + secret, NAMES + [bad_name]))
     assert counts == tally((2, 2), (1, 2)), "the changed file and the secrets are scanned, the rest remembered"
-    findings = support.uncached(engine, lambda: judge(secret, [bad_name]))[1]
-    assert calls == per_text + findings, "the stand-in saw the scans counted: the changed file's and the secrets'"
+    expected = support.cost(engine, lambda: judge(rels[:1] + secret, [bad_name]))  # the changed file and the secrets
+    assert calls == expected, "the stand-in saw the scans counted: the changed file's and the secrets'"
     monkeypatch.setenv("GOV_SECRETS_FULL_SCAN", "1")
     _, counts, calls = measured(engine, lambda: judge(rels, NAMES))
-    assert counts == tally((3, 0), (2, 0)) and calls == 5 * per_text, "a full scan remembers nothing it answers"
+    assert counts == tally((3, 0), (2, 0)) and calls == full, "a full scan remembers nothing it answers"
     monkeypatch.delenv("GOV_SECRETS_FULL_SCAN")
     with support.cache_off():
         _, counts, calls = measured(engine, lambda: judge(rels, NAMES))
-    assert counts == tally((3, 0), (2, 0)) and calls == 5 * per_text, "with no cache, every text counts as scanned"
+    assert counts == tally((3, 0), (2, 0)) and calls == full, "with no cache, every text counts as scanned"

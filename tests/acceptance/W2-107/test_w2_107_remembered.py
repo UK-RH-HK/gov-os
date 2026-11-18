@@ -2,7 +2,9 @@
 
 KPI success 1 (a second rebuild of an unchanged tree scans nothing again; the key is the content's sha256, the kind and
 the engine's fingerprint; one cache shared by every tree); failure 6's testable part. The scan calls are counted by
-the stand-in gitleaks first on PATH; ``per_text`` is what one clean text costs with no cache.
+the stand-in gitleaks first on PATH. The files of one ``indexable`` call are judged by one gitleaks process a rule set
+(folder mode), a path's names by one process a rule set each: a case takes what the same work costs with no cache as the
+base (``full``; ``per_text`` is what one clean text alone costs) and expects that, or nothing when all is remembered.
 """
 
 from __future__ import annotations
@@ -26,8 +28,10 @@ CLEAN = {
 
 def test_files_judged_clean_once_are_not_scanned_again(project, engine, cache, per_text):
     rels = support.put(project, CLEAN)
+    full = support.cost(engine, lambda: secrets.indexable(project, rels))
+    assert full >= 1, "premise: scanning the files costs gitleaks calls"
     kept, calls = support.counted(engine, lambda: secrets.indexable(project, rels))
-    assert kept == rels and calls == len(rels) * per_text, "the first call scans every file"
+    assert kept == rels and calls == full, "the first call scans every file"
     kept, calls = support.counted(engine, lambda: secrets.indexable(project, rels))
     assert kept == rels, "the second call gives the same verdicts, in the same order"
     assert calls == 0, "the second call with the same bytes, engine and rules starts gitleaks for nothing"
@@ -36,7 +40,7 @@ def test_files_judged_clean_once_are_not_scanned_again(project, engine, cache, p
 def test_path_names_judged_clean_once_are_not_scanned_again(project, engine, cache, per_text):
     names = ["docs/alpha-name.md", "docs/plans/beta-name.md"]
     verdicts, calls = support.counted(engine, lambda: [secrets.path_holds_secret(project, name) for name in names])
-    assert verdicts == [False, False] and calls == len(names) * per_text, "the first call scans every name"
+    assert verdicts == [False, False] and calls == len(names) * per_text, "the first call scans every name, each by its own run"
     verdicts, calls = support.counted(engine, lambda: [secrets.path_holds_secret(project, name) for name in names])
     assert verdicts == [False, False]
     assert calls == 0, "names judged clean before are answered without gitleaks"
