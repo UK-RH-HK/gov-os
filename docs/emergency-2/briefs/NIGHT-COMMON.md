@@ -13,8 +13,9 @@ rule, memory first, the flow, trailers, models). This page adds tonight's rules;
 - **Models (the rubric).** You and every helper run Sonnet. **C3 work** (audit 4 Table 3, line 174 of
   `docs/emergency-2/audits/04-tickets-and-rubric.md`: the kernel and the Contract; `src/gov/close/**`, `src/gov/accept/**`,
   the landing and the merge queue; `src/gov/memaudit/**`, `fixtures/evaluation/**`; `src/gov/release/**`,
-  `src/gov/update/**`, `src/gov/lock/**`; the path map): its independent test designer and engineer run **Opus**: pass
-  `model: "opus"` (exactly that string) to the Agent tool for those two helpers only. Everything else names no model.
+  `src/gov/update/**`, `src/gov/lock/**`; the path map): its independent test designer and engineer run **Claude Fable 5.2** (the owner's temporary substitution of Opus until
+  the weekly reset, DEC-1215): pass `model: "fable"` to the Agent tool for those two helpers only (`opus` is refused while
+  the substitution is active). Everything else names no model.
 - **The machine.** Every test run through the heavy slot (LEAD-COMMON's command); the slot waits until the load is under
   12: let it wait, never bypass it. No full suite (the CTO runs it). No `gov rebuild` of the shared store.
 - **Other leads work tonight** in their own worktrees: run-time tool slice 2 (`src/gov/dispatch/**`), the rubric and
