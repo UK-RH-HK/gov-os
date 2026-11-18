@@ -2,7 +2,7 @@
 id: DAEO-7jln
 wbs_id: W2-193
 external-ref: W2-193
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-16T15:51:18Z
@@ -65,3 +65,5 @@ Filed 2026-11-16 by the CTO on the owner's word (DEC-1203 (3): "EXA-CLOSE (c); t
 **Approach.** Colliding suites run in separate processes; alone re-runs carry the node id the red's own run used; an empty or failed base is named and compared per node. Evidence: `drafts/w2-27-findings/PRODUCT-FINDINGS.md` (F-024, F-028), EXAMIN's reports 15c and 18.
 
 **Fix, 2026-11-18 (EMERGENCY-2 4.2, 3.6; S6, S7; branch e2/close-e2).** `gov close` no longer opens a repair ticket for a base red `accepted_reds` does not cover (W2-115 S5, CAP-31): a known bug is a fix recorded in its owning ticket's record, not a ticket, so the close record lists the base reds it saw and the close proceeds. It no longer refuses a FULL ticket for lacking a review record (W2-115 S11): no ticket gets a reviewer; where a probe record with a verdict block exists, READY is still computed by code. W2-115's cases that asserted the repair ticket or the missing-review refusal are revised with a Rewrite-Reason line.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** S1-S7 merged into w2/integrate (a34e51925, 9b847bf0d), gov accept 22/22 on the merged tree; no review (3.6).
