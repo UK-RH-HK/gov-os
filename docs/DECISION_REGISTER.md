@@ -4992,7 +4992,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 113. One delegated decision: where the owner's choice after an escalation is recorded (register v0.113, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-455 — The owner's choice after an escalation is the register entry; `gov close` records its id, and every refusal for a finding counts
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a · **Changed by:** DEC-868 item 3 and DEC-908 (for one part): a broken context is refused at once by the pre-close `gov check`, uncounted, not a counted iteration. · **Changed by:** DEC-899 (P-IS-4 (a))
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a · **Changed by:** DEC-868 item 3 and DEC-908 (for one part): a broken context is refused at once by the pre-close `gov check`, uncounted, not a counted iteration. · **Changed by:** DEC-899 (P-IS-4 (a)) · **Class:** superseded by EMERGENCY-2 §4.2 (DEC-1211)
 - **Decision:**
   - The owner's choice is recorded where the owner records decisions: in the register entry itself, in its text.
     `gov close` takes that entry's id as an argument, accepts it only when the ticket is escalated and W1-11's
@@ -5023,7 +5023,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - W1-27 is reopened for the two exclusions, test first.
 
 ### DEC-457 — DEC-455 is accepted by the owner
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Confirms:** DEC-455
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Confirms:** DEC-455 · **Class:** superseded by EMERGENCY-2 §3.3 (DEC-1211)
 - **Decision:** The owner's choice after an escalation is the register entry and `gov close` records its id;
   every close refused for a finding about the ticket's work counts as an iteration.
 
