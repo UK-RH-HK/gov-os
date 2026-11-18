@@ -14,32 +14,44 @@ change_log:
     the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
     MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
     the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
-    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48, same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability). Owner decision during Wave 1, same version: new `CAP-37.g` on the new ticket W1-49 (DEC-248: light auto-resume hooks, a light form of CAP-37). Owner decision during Wave 1, same version: new `CAP-58.h` on the new ticket W1-50 (DEC-255: containment attribution by commit trailers).'
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after
+    the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58;
+    CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass
+    of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04;
+    CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no
+    install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e,
+    49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new
+    `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48,
+    same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under
+    DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on
+    W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability). Owner decision during
+    Wave 1, same version: new `CAP-37.g` on the new ticket W1-49 (DEC-248: light auto-resume hooks, a light form of CAP-37).
+    Owner decision during Wave 1, same version: new `CAP-58.h` on the new ticket W1-50 (DEC-255: containment attribution by
+    commit trailers).'
 - version: '4.2'
   date: '2026-10-17'
-  change: 'W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741).
-    Carries DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release
-    contents of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers
-    items: CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions)
+  change: 'W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741). Carries
+    DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release contents
+    of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers items:
+    CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions)
     and CAP-43.d (the rest of the release contents). CAP-44.h lists the ten ADOPTED_HEALTHY conditions of Adoption Protocol
     v3.0 §20, each marked W2 or W3, from the named read of Adoption Protocol v3.0 §20 and Distribution Protocol v1.2 §18 the
-    owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the
-    release''s manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release
-    tags) and CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343;
-    DEC-741). No capability changes wave; 62 capabilities; 211 → 214 covers items.'
+    owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the release''s
+    manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release tags) and
+    CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343; DEC-741).
+    No capability changes wave; 62 capabilities; 211 → 214 covers items.'
 - version: '4.3'
   date: '2026-11-09'
-  change: 'W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093).
-    Carries DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and
-    CAP-45 with it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated
-    source is the release''s manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part
-    of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers
-    items (W2 20 → 19, W3 38 → 39).'
+  change: 'W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093). Carries
+    DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and CAP-45 with
+    it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated source is the release''s
+    manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part of the authenticated source,
+    beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers items (W2 20 → 19, W3 38 → 39).'
 - version: '4.4'
   date: '2026-11-18'
   change: 'W2-192 specification change (docs/changes/W2-192-CIT-P.md), approved by the owner (DEC-1213). Carries DEC-1200
-    (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3.
-    62 capabilities; 215 covers items (W2 19 → 20).'
+    (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3. 62
+    capabilities; 215 covers items (W2 19 → 20).'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -103,7 +115,10 @@ envelope:
     - DEC-163
     statement: 'The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
       source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are
-      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside its own experiment folder, within its ticket''s `allowed_paths`, and the sandbox''s write fence enforces this (DEC-157, DEC-158, DEC-163).'
+      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install
+      system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside
+      its own experiment folder, within its ticket''s `allowed_paths`, and the sandbox''s write fence enforces this (DEC-157,
+      DEC-158, DEC-163).'
 master_rules:
 - id: MR-1
   title: Specification comes first
@@ -1366,8 +1381,11 @@ capabilities:
     source: MR-5; DEC-094
     wave: W2
   - id: CAP-22.d
-    item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research`, the guard knows the role, its writes are held to its ticket''s `allowed_paths` (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32) stays W3'
-    source: 'DEC-163; DEC-158'
+    item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment
+      session runs as `GOV_ROLE=research`, the guard knows the role, its writes are held to its ticket''s `allowed_paths`
+      (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32)
+      stays W3'
+    source: DEC-163; DEC-158
     wave: W1
     provider:
     - W1-46
@@ -1410,7 +1428,9 @@ capabilities:
     source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
     wave: W3
   - id: CAP-23.c
-    item: 'Parallel tickets in Wave 1, a light form: up to 6 tickets in flight, each in its own short-lived worktree with a ticket lead, gated by available memory and load; the main orchestrator merges each into the integration branch after green and re-runs every suite after each merge; no worktree is left behind'
+    item: 'Parallel tickets in Wave 1, a light form: up to 6 tickets in flight, each in its own short-lived worktree with
+      a ticket lead, gated by available memory and load; the main orchestrator merges each into the integration branch after
+      green and re-runs every suite after each merge; no worktree is left behind'
     source: DEC-235; DEC-236
     wave: W1
     provider:
@@ -1465,7 +1485,8 @@ capabilities:
   title: Tool registry and capability memory (lite)
   outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
   acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; an install command from
-    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied, except a research session''s install inside its own experiment folder (DEC-163).'
+    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied, except a research session''s
+    install inside its own experiment folder (DEC-163).'
   wave: W1
   provider:
   - W1-04
@@ -1524,26 +1545,33 @@ capabilities:
     source: DEC-083; OWNER-DECISION-P2-0003
     wave: NONE
   - id: CAP-25.d
-    item: Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an install by the owner, or by
-      the orchestrator under DEC-083, in both cases recorded with its owner approval; worker roles never install system-wide
+    item: Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an install by the owner, or
+      by the orchestrator under DEC-083, in both cases recorded with its owner approval; worker roles never install system-wide
     source: DEC-153; DEC-157; DEC-209
     wave: W1
     provider:
     - W1-48
   - id: CAP-25.e
-    item: 'The research role may install only inside its own experiment folder (a venv or local prefix within its ticket''s `allowed_paths`); a system-wide install is denied to it; the sandbox''s write fence enforces this: the sandbox stops a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one to a path that existed at launch elsewhere inside it; a path created later is covered by the guard''s per-ticket allow-list. It is the one exception to the denial in CAP-25.b'
-    source: 'DEC-163; DEC-157'
+    item: 'The research role may install only inside its own experiment folder (a venv or local prefix within its ticket''s
+      `allowed_paths`); a system-wide install is denied to it; the sandbox''s write fence enforces this: the sandbox stops
+      a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one to a path that existed at
+      launch elsewhere inside it; a path created later is covered by the guard''s per-ticket allow-list. It is the one exception
+      to the denial in CAP-25.b'
+    source: DEC-163; DEC-157
     wave: W1
     provider:
     - W1-46
   - id: CAP-25.f
-    item: 'The committed `.claude/settings.json` carries no install or download ask rule; the guard''s install rule decides install commands alone, and in a launched worker session the sandbox backs it'
+    item: The committed `.claude/settings.json` carries no install or download ask rule; the guard's install rule decides
+      install commands alone, and in a launched worker session the sandbox backs it
     source: DEC-172
     wave: W1
     provider:
     - W1-47
   - id: CAP-25.g
-    item: 'The guard''s install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs: `ask` for the orchestrator, denied for engineer, independent test designer and independent auditor, and let through for the research role inside its experiment folder (`CAP-25.e`)'
+    item: 'The guard''s install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs: `ask` for the
+      orchestrator, denied for engineer, independent test designer and independent auditor, and let through for the research
+      role inside its experiment folder (`CAP-25.e`)'
     source: DEC-174; DEC-083; DEC-163
     wave: W1
     provider:
@@ -1851,7 +1879,8 @@ capabilities:
   acceptance: A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes
     it.
   wave: W3
-  wave_note: 'experiments as part of discovery, with an evidence record, are W1 (DEC-102); a minimal research role is W1 (DEC-163, CAP-22.d); `gov discover` is W2 (DEC-166); the full research lifecycle is W3'
+  wave_note: experiments as part of discovery, with an evidence record, are W1 (DEC-102); a minimal research role is W1 (DEC-163,
+    CAP-22.d); `gov discover` is W2 (DEC-166); the full research lifecycle is W3
   provider:
   - Docling (pinned)
   - MarkItDown
@@ -1899,8 +1928,10 @@ capabilities:
     provider:
     - W1-35
   - id: CAP-32.d
-    item: '`gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way'
-    source: 'DEC-166'
+    item: '`gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery
+      skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured
+      numbers, back the answer; the same request in plain language works the same way'
+    source: DEC-166
     wave: W2
 - id: CAP-33
   title: Change-impact transactions (CIT-P simulation, CIT-E execution)
@@ -1908,7 +1939,8 @@ capabilities:
   acceptance: A decision change raises a CIT-P listing the affected specs, decisions, tickets, tests and code from both graphs,
     with a radius; after apply/archive the CIT-E record matches the proposal or lists the differences.
   wave: W2
-  wave_note: 'OpenSpec proposal and apply/archive in W1, where a plain-language impact question runs an OpenSpec proposal plus `gov closure` (DEC-167); computed impact W2'
+  wave_note: OpenSpec proposal and apply/archive in W1, where a plain-language impact question runs an OpenSpec proposal plus
+    `gov closure` (DEC-167); computed impact W2
   provider:
   - OpenSpec 1.13.2
   - W1-35
@@ -1975,14 +2007,15 @@ capabilities:
     provider:
     - W1-35
   - id: CAP-33.f
-    item: 'The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that is an OpenSpec proposal plus `gov closure`'
-    source: 'DEC-167'
+    item: The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that
+      is an OpenSpec proposal plus `gov closure`
+    source: DEC-167
     wave: W1
     provider:
     - W1-35
   - id: CAP-33.g
-    item: 'From Wave 2 the same plain-language question runs `gov impact`'
-    source: 'DEC-167'
+    item: From Wave 2 the same plain-language question runs `gov impact`
+    source: DEC-167
     wave: W2
 - id: CAP-34
   title: Human decision gates and contradiction resolution
@@ -2209,7 +2242,11 @@ capabilities:
     provider:
     - W1-25
   - id: CAP-37.g
-    item: "Light auto-resume hooks, a light form brought forward into Wave 1: a PreCompact hook ensures the checkpoint is current (the orchestrator's, and in a worktree the lead's); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint's RESUME HERE section within the hook's size cap; after a forced compaction the session knows the active tickets, the open owner decisions and the loop counts without the owner restating them; W1-29 upgrades the injection to the full context packet"
+    item: 'Light auto-resume hooks, a light form brought forward into Wave 1: a PreCompact hook ensures the checkpoint is
+      current (the orchestrator''s, and in a worktree the lead''s); a SessionStart hook on compact, clear and resume injects
+      the prompt path and the checkpoint''s RESUME HERE section within the hook''s size cap; after a forced compaction the
+      session knows the active tickets, the open owner decisions and the loop counts without the owner restating them; W1-29
+      upgrades the injection to the full context packet'
     source: DEC-248; DEC-208
     wave: W1
     provider:
@@ -2425,7 +2462,9 @@ capabilities:
     - W1-31
     - W1-42
   - id: CAP-40.d
-    item: 'For a launched worker session the sandbox''s instruction tokens in the system prompt are reported as a separate line of the ticket''s telemetry record, not inside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures'
+    item: For a launched worker session the sandbox's instruction tokens in the system prompt are reported as a separate line
+      of the ticket's telemetry record, not inside the governance share; whether they count toward the 15 % is decided at
+      the Wave 1 exit, using measured figures
     source: DEC-170; DEC-086; EXP-001 §3.6
     wave: W1
     provider:
@@ -2436,7 +2475,8 @@ capabilities:
   acceptance: A committed lesson whose scope matches a ticket is returned by `gov retrieve` for that ticket and not for an
     out-of-scope ticket.
   wave: W1
-  wave_note: 'upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165); scope and severity are in the W1 lesson schema (DEC-168)'
+  wave_note: upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165);
+    scope and severity are in the W1 lesson schema (DEC-168)
   provider:
   - W1-08
   - W1-21
@@ -2488,30 +2528,34 @@ capabilities:
     provider:
     - W1-44
   - id: CAP-41.e
-    item: 'Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j)'
+    item: 'Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons
+      is built (CAP-41.f to CAP-41.j)'
     source: Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7; DEC-165
     wave: NONE
   - id: CAP-41.f
-    item: 'Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical); both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration'
-    source: 'DEC-165; DEC-168'
+    item: Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical);
+      both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration
+    source: DEC-165; DEC-168
     wave: W1
     provider:
     - W1-08
   - id: CAP-41.g
-    item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets, scanned by gitleaks; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`'
-    source: 'DEC-165'
+    item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code,
+      data or secrets, scanned by gitleaks; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`'
+    source: DEC-165
     wave: W3
   - id: CAP-41.h
-    item: 'A high or critical lesson is raised to the owner immediately, as a decision package'
-    source: 'DEC-165'
+    item: A high or critical lesson is raised to the owner immediately, as a decision package
+    source: DEC-165
     wave: W3
   - id: CAP-41.i
-    item: 'The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release''s notes list the lessons fixed, with their severity'
-    source: 'DEC-165'
+    item: The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each
+      release's notes list the lessons fixed, with their severity
+    source: DEC-165
     wave: W3
   - id: CAP-41.j
-    item: 'Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox'
-    source: 'DEC-165'
+    item: Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox
+    source: DEC-165
     wave: W3
 - id: CAP-42
   title: Legacy governance retirement and archive policy
@@ -2565,8 +2609,8 @@ capabilities:
   acceptance: '`framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of
     them disagrees with the installed kernel.'
   wave: W1
-  wave_note: 'Release 1 tag at the end of qualification; the manifest and file hashes of a release are W2 (CAP-43.b, lite,
-    DEC-722); release contents of CAP-43.d built before W3 are delivered ahead of that item''s wave'
+  wave_note: Release 1 tag at the end of qualification; the manifest and file hashes of a release are W2 (CAP-43.b, lite,
+    DEC-722); release contents of CAP-43.d built before W3 are delivered ahead of that item's wave
   provider:
   - Copier 9.18.2
   - W1-39
@@ -2602,9 +2646,9 @@ capabilities:
     source: Framework v4.1.2 §75C; DEC-067
     wave: W3
   - id: CAP-43.d
-    item: 'Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations, schema
-      versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions,
-      rollback procedure'
+    item: 'Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations,
+      schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human
+      decisions, rollback procedure'
     source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722
     wave: W3
 - id: CAP-44
@@ -2617,8 +2661,8 @@ capabilities:
   wave: W3
   wave_note: W1 delivers gov init (copier copy) and adoption stages A0-A6 and A8 with baseline, rollback points and the A5
     independent path-map review (W1-39, W1-41); the lite A7 and A10 gates and the lite verdict are W2 (CAP-44.f, CAP-44.h;
-    DEC-722); stage AS, the lite spec audit, is W2 (CAP-44.m; DEC-1200); A9, A11, the full A7 and A10 gates and the verdict with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47
-    (CAP-44.k, CAP-44.l; DEC-090)
+    DEC-722); stage AS, the lite spec audit, is W2 (CAP-44.m; DEC-1200); A9, A11, the full A7 and A10 gates and the verdict
+    with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47 (CAP-44.k, CAP-44.l; DEC-090)
   provider:
   - Copier 9.18.2
   - W1-39
@@ -2680,9 +2724,9 @@ capabilities:
     - W1-41
   - id: CAP-44.f
     item: 'A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent
-      Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan
-      reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and
-      the canary of each index (CAP-55)'
+      Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed
+      at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary
+      of each index (CAP-55)'
     source: Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722
     wave: W2
   - id: CAP-44.g
@@ -2690,26 +2734,25 @@ capabilities:
     source: Adoption Protocol v3.0 §17–§19
     wave: W3
   - id: CAP-44.h
-    item: 'Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh
-      Independent Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native
-      layout kept, the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor
-      green (exit 0), gov check with no RED family, and one ticket closed by gov close at exit 0 with the repository''s own
-      test command; of the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those
-      marked W2 and the lite part named for those marked W3: (1) certified kernel pinned: W3 (the certification by
-      qualification is CAP-43.c), its lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay
-      separate: W3, no lite part, (3) path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5
-      review and the native layout kept, CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a
-      separate verifier role, CAP-47.a), its lite part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no
-      accidental legacy authority, CAP-48.b), its lite part A8''s retirement of legacy memory (CAP-44.e), (6) memory
-      independently verified: W3 (over the A9 knowledge fabric and by a separate role, CAP-44.k, CAP-47.a), its lite part
-      the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit completed: W3 (A11, CAP-44.k), no lite part, (8)
-      critical/high unaccepted findings resolved: W3 (finding states and remediation, CAP-44.g, and the A11 audit), no lite
-      part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b), its lite part the derived state rebuilt
-      from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction demonstrated: W3 (CAP-48.b), no
-      lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS when each lite condition
-      not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY; only the owner accepts
-      an exception; the auditor accepts none; the verdict record names itself lite and names the conditions it does not
-      check'
+    item: 'Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent
+      Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native layout kept,
+      the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor green (exit 0), gov
+      check with no RED family, and one ticket closed by gov close at exit 0 with the repository''s own test command; of the
+      ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those marked W2 and the lite
+      part named for those marked W3: (1) certified kernel pinned: W3 (the certification by qualification is CAP-43.c), its
+      lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay separate: W3, no lite part, (3)
+      path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5 review and the native layout kept,
+      CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a separate verifier role, CAP-47.a), its lite
+      part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no accidental legacy authority, CAP-48.b), its lite
+      part A8''s retirement of legacy memory (CAP-44.e), (6) memory independently verified: W3 (over the A9 knowledge fabric
+      and by a separate role, CAP-44.k, CAP-47.a), its lite part the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit
+      completed: W3 (A11, CAP-44.k), no lite part, (8) critical/high unaccepted findings resolved: W3 (finding states and
+      remediation, CAP-44.g, and the A11 audit), no lite part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b),
+      its lite part the derived state rebuilt from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction
+      demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS
+      when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY;
+      only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions
+      it does not check'
     source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
     wave: W2
   - id: CAP-44.i
@@ -2735,12 +2778,12 @@ capabilities:
     wave: W3
   - id: CAP-44.m
     item: 'AS spec audit, lite: after A2 and before A3, `gov adopt --lite --stage AS` records every spec found (path, title,
-      its stated wave or status), each built, partly built or not built with evidence (code paths, tests, commits), the
-      tickets found done or not by wave, the specs with no code, the code with no spec (top-level code modules no spec
-      names), and each gap as one question to the owner with a place for the answer; the lite checks (every spec and every
-      top-level code module the inventory holds named, every gap with a question) refuse a record that fails either; A3
-      refuses to run before AS is recorded; built or not is judged from code paths, tests and commits, never by a model;
-      the path map''s reviewer at A5 reads the record'
+      its stated wave or status), each built, partly built or not built with evidence (code paths, tests, commits), the tickets
+      found done or not by wave, the specs with no code, the code with no spec (top-level code modules no spec names), and
+      each gap as one question to the owner with a place for the answer; the lite checks (every spec and every top-level code
+      module the inventory holds named, every gap with a question) refuse a record that fails either; A3 refuses to run before
+      AS is recorded; built or not is judged from code paths, tests and commits, never by a model; the path map''s reviewer
+      at A5 reads the record'
     source: DEC-1200; P-ADOPT-SPEC-AUDIT-1
     wave: W2
     provider:
@@ -2751,8 +2794,8 @@ capabilities:
   acceptance: '`gov update --check` reports the version change and migrations; `copier update` applies them with the overlay
     files unchanged and `gov doctor` green.'
   wave: W3
-  wave_note: 'gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of
-    `gov doctor` is W3 (DEC-165)'
+  wave_note: gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of `gov
+    doctor` is W3 (DEC-165)
   provider:
   - Copier 9.18.2
   - 'W3: gov update --check'
@@ -2780,8 +2823,9 @@ capabilities:
     source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090
     wave: W3
   - id: CAP-45.b
-    item: 'In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update`'
-    source: 'DEC-165'
+    item: In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and
+      their highest lesson severity at session start; the owner decides when to run `gov update`
+    source: DEC-165
     wave: W3
 - id: CAP-46
   title: Cross-machine sync via git
@@ -2943,8 +2987,13 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-49.c
-    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s own session is an accepted residual; the oracle path is held in `governance/project/held-out.yaml` and in the committed deny rule built from it; register entry DEC-067 names the directory historically; the guard and the launcher take the path from `held-out.yaml`, and no acceptance test names it'
-    source: 'DEC-162'
+    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included,
+      by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the
+      guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s
+      own session is an accepted residual; the oracle path is held in `governance/project/held-out.yaml` and in the committed
+      deny rule built from it; register entry DEC-067 names the directory historically; the guard and the launcher take the
+      path from `held-out.yaml`, and no acceptance test names it'
+    source: DEC-162
     wave: W1
     provider:
     - W1-47
@@ -3318,16 +3367,19 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-58.a
-    item: 'Default-deny write allow-lists per role and ticket, except the orchestrator (`CAP-58.e`); checks derived, not enumerated'
-    source: 'DEC-041; DEC-076; DEC-156'
+    item: Default-deny write allow-lists per role and ticket, except the orchestrator (`CAP-58.e`); checks derived, not enumerated
+    source: DEC-041; DEC-076; DEC-156
     wave: W1
     provider:
     - W1-02
     - W1-03
     - W1-26
   - id: CAP-58.b
-    item: 'Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them; a launched worker session''s network grant comes from the launcher''s network profile (`CAP-61.c`), which the role definition names'
-    source: 'Framework v4.1.2 §32; DEC-158; DEC-163'
+    item: 'Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL
+      per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_*
+      denied unless the role definition grants them; a launched worker session''s network grant comes from the launcher''s
+      network profile (`CAP-61.c`), which the role definition names'
+    source: Framework v4.1.2 §32; DEC-158; DEC-163
     wave: W1
     provider:
     - W1-33
@@ -3346,8 +3398,11 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-58.e
-    item: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket''s `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding (DEC-171)'
-    source: 'DEC-150; DEC-156; DEC-171'
+    item: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the
+      guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed;
+      an orchestrator change outside the active ticket''s `allowed_paths` is a record, not a containment finding, while a
+      change under `tests/acceptance/**` stays a finding (DEC-171)'
+    source: DEC-150; DEC-156; DEC-171
     wave: W1
     provider:
     - W1-45
@@ -3359,11 +3414,15 @@ capabilities:
     provider:
     - W1-47
   - id: CAP-58.g
-    item: 'The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write, as a guard exception'
-    source: 'DEC-165'
+    item: The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write,
+      as a guard exception
+    source: DEC-165
     wave: W3
   - id: CAP-58.h
-    item: "Containment attribution by commit trailers: a forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit, each commit's paths against the allowed paths of its own `Role` and `Task` trailers and not against the caller; a merge commit is not a finding when every commit it brings passes; a commit with no `Role` or `Task` trailer is judged against the caller"
+    item: 'Containment attribution by commit trailers: a forward HEAD move, including an integration merge by the orchestrator,
+      is judged commit by commit, each commit''s paths against the allowed paths of its own `Role` and `Task` trailers and
+      not against the caller; a merge commit is not a finding when every commit it brings passes; a commit with no `Role`
+      or `Task` trailer is judged against the caller'
     source: DEC-255; DEC-182
     wave: W1
     provider:
@@ -3449,7 +3508,7 @@ capabilities:
     false`, network `strictAllowlist`) and fail-closed (`failIfUnavailable: true`); a launched worker''s Bash command cannot
     write outside the repository, its network profile applies, and its `GOV_ROLE` and `GOV_TICKET` reach the guard.'
   wave: W1
-  wave_note: 'the untested sandbox cases are a W2 experiment, EXP-002 (DEC-160, DEC-164)'
+  wave_note: the untested sandbox cases are a W2 experiment, EXP-002 (DEC-160, DEC-164)
   provider:
   - Claude Code sandbox (bubblewrap 0.9.0, socat 1.8.0.0)
   - W1-46
@@ -3489,8 +3548,14 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-61.c
-    item: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard''s per-ticket allow-list, not by the list; the list''s exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox'
-    source: 'DEC-158; DEC-161; DEC-163; EXP-001 §1, §3.4, §5.3'
+    item: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research
+      and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation
+      sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher
+      generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later
+      is covered by the guard''s per-ticket allow-list, not by the list; the list''s exceptions are `.git/` and any entry
+      whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research
+      domains; WebSearch and WebFetch run outside the sandbox'
+    source: DEC-158; DEC-161; DEC-163; EXP-001 §1, §3.4, §5.3
     wave: W1
     provider:
     - W1-46
@@ -3509,7 +3574,9 @@ capabilities:
     provider:
     - W1-48
   - id: CAP-61.f
-    item: 'The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals'
+    item: The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp
+      filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by
+      experiment EXP-002; until then they are open residuals
     source: DEC-160; DEC-164; EXP-001 §4
     wave: W2
 - id: CAP-62
