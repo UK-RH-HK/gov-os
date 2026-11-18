@@ -3,6 +3,15 @@
 Ticket: DAEO-0i6h (W1-35) — "Skills: discovery, planning, independent test design, change"
 Profile: STANDARD
 
+**Rewrites of 2026-11-18 (Class Q, Task emergency-2), each to what a decision now says:**
+`TestReferencedCommands::test_referenced_commands_are_known` accepts the twelve reserved commands and the commands
+`gov.check.commands.GOV_COMMANDS` records (the change skill says `gov impact`, W2-37, DEC-812 item 6), and a command no
+list records still fails (a planted `gov frobnicate`). In the orchestration rows, `decisions` pins "a commit of its own,
+never `Role: owner`" (DEC-861, DEC-862) and `the ticket loop` pins the parallel work order, a fresh test designer and a
+fresh implementer neither reading the other's work (DEC-959 item 7), and one scoped verification (DEC-968, MR-3).
+`TestRulesyncSources::test_the_orchestrator_roles_rulesync_source_carries_the_role_files_body` judges the composed
+source of W2-153 (DEC-1050): `role-lead.md`'s body, one blank line, the role file's body.
+
 ## KPI coverage
 
 ### Success lines
