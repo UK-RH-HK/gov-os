@@ -241,7 +241,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates extended:** D2, D3, C9, W4, W10
 
 ### DEC-031 — Two separate budgets
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080 · **Class:** superseded by EMERGENCY-2 §5.5 (DEC-1211)
 - **Decision:** (1) *retrieval spend budget* — scales with impact radius; (2) *final context packet budget* — fixed ceiling. Hitting (1) is a governed event, never silent truncation.
 
 ### DEC-032 — Retrieval loop runs in a disposable context
@@ -4422,7 +4422,7 @@ fourth round.
     it as a residual.
 
 ### DEC-414 — W1-19 DP-12, DP-11 and DP-13: the pass line is 80 on the dev tiers; the parent-bounded chunks stay; no ranked lexical route in W1-19; the retrieval instruction stays
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-19 packages DP-12 option (b), DP-11, DP-13 option (a) · **Amends:** W1-19's second KPI line · **Under:** DEC-343, DEC-406, DEC-388
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-19 packages DP-12 option (b), DP-11, DP-13 option (a) · **Amends:** W1-19's second KPI line · **Under:** DEC-343, DEC-406, DEC-388 · **Class:** superseded by EMERGENCY-2 §5.2 (DEC-1211)
 - **Decision:**
   - DP-12: the parent-bounded chunks stay (DEC-343). The KPI line is restated: mean hit@5 at or above 80 on the
     dev tiers is the pass line; 85 (the S0b2 baseline) is re-measured at the Wave 1 exit run (W1-42) and at
@@ -4574,7 +4574,7 @@ again; no model or settings change was made. A one-line headless probe answered 
   `constrains: [<ticket id>]`) joins the record and the ticket within the closure. No schema work.
 
 ### DEC-425 — W1-21 DP-7: the retrieval-regression check's baselines and severity
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-7 option (a) · **Under:** DEC-414, CAP-38.b
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-7 option (a) · **Under:** DEC-414, CAP-38.b · **Class:** superseded by EMERGENCY-2 §5.2 (DEC-1211)
 - **Decision:**
   - The check needs a mean hit@5 of at least 80 (DEC-414) and at most 2 forbidden citations.
   - The query set is found through `GOV_DEV_TIERS`.
@@ -5985,7 +5985,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 153. Delegated, stricter-only: three packages of W1-41's third run and the judgement of its probe (register v0.153, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-551 — External references in the context: a defective file blocks every ticket, a register-shaped id is refused by its form, a ticket with only external sources is refused
-- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each is the form that refuses more, as built; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `920229dc` (`log/W1-41-lead-run3.json`: 156 cases green, every acceptance suite green) · **Under:** DEC-511, DEC-520, DEC-449, DEC-454
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each is the form that refuses more, as built; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `920229dc` (`log/W1-41-lead-run3.json`: 156 cases green, every acceptance suite green) · **Under:** DEC-511, DEC-520, DEC-449, DEC-454 · **Class:** superseded by EMERGENCY-2 §5.5 (DEC-1211)
 - **Decision:**
   - **P-11.** A defective `governance/project/external-references.yaml` (unreadable, not valid, wrong shape, a duplicate id) blocks every ticket's context and names the file, not only a ticket that declares an id the store lacks: a defect is seen at once.
   - **P-12.** An entry whose id has the form of a register decision is refused by its form in every project, whether or not the project names a register: a decision is never made an outside source by a list.
@@ -9100,7 +9100,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. **W2-33's carded scope moves to Wave 3:** the test-execution and integration roles (CAP-22.c), the UX role and the typed handoff record (CAP-22.b), with their rows. CAP-22.b and CAP-22.c stay among the nine items DEC-841 moves.
 
 ### DEC-833 — The owner's 99 % goal is the target W2-61 and W2-15b measure; CAP-10's 85 stays the Contract's floor (plan §11 items 1 and 3; items 1b and 5)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** CAP-10, DEC-725, DEC-828 item 4, DEC-414 · **Basis:** OWNER, 2026-10-19 · **Settles:** DEC-828 item 4 (keep 85).
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** CAP-10, DEC-725, DEC-828 item 4, DEC-414 · **Basis:** OWNER, 2026-10-19 · **Settles:** DEC-828 item 4 (keep 85). · **Class:** superseded by EMERGENCY-2 §5.2 (DEC-1211)
 - **Decision:**
   1. **CAP-10's line stays 85** (hit@5), the Contract's floor; it is not re-baselined to 80. W1-21's and W2-54's tests that use 80 are corrected to 85 by W2-32's test designer.
   2. **The owner's goal of 99 % is the target** that W2-61 and W2-15b measure: the stacked context contains all the evidence each question needs, across batches.
@@ -14975,7 +14975,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 Version-table row (append after the register's last row; the CTO's 0.550 for DEC-1170 comes before it):
 
 ### DEC-1165 — gov context's ceiling: the close's packet at a project setting, and the supplementary cap; W2-183 filed
-- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~12:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1027 H, DEC-1163 (9), DEC-860, DEC-974 · DEC-1164 was held until the owner accepted it (2026-11-13, ~16:00)
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~12:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1027 H, DEC-1163 (9), DEC-860, DEC-974 · DEC-1164 was held until the owner accepted it (2026-11-13, ~16:00) · **Class:** superseded by EMERGENCY-2 §5.5 (DEC-1211)
 - **Decision:** of the two scopes brought for gov context's ceiling (DEC-1027 H refuses most tickets: W2-88 at 56,284 tokens against 6,000; every lead works round it with `--budget`), the owner chose **"add the supplementary cap"**, and a ticket filed for it (W2-183, `DAEO-href`):
   - (1) `gov close` builds its context packet at a project setting, `budgets.close_context_tokens` in `governance/project/facts.yaml` (65536 here; corrected 13:25 from `context.close_tokens`: the kernel's facts schema admits no new top-level key, `budgets:` admits it), so closes stop refusing on the ceiling; with no setting, the default of 6,000 applies.
   - (2) Every packet carries at most 6,000 tokens of supplementary context above its mandatory part, whatever `--budget` a lead passes.
