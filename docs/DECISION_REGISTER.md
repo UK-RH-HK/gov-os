@@ -228,7 +228,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 
 ### DEC-027 — Root of trust (solo scope)
 - **Superseded by DEC-1214 (2026-11-18, L3 (a): pinned and hash-checked releases, no signing).**
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Class:** superseded by DEC-1214 (L3 (a): pinned and hash-checked releases, no signing)
 - **Decision:** Signed git tags (SSH signing) on `gov-os` releases + file hash manifest verified at install/update. Key rotation/revocation, offline envelopes and bootstrap-mode separation (full A2) DEFERRED.
 
 ---
@@ -438,7 +438,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** Keep the committed `.claude/settings.json` (deny rules for `docs/source/`). Keep the untracked, gitignored `.claude/settings.local.json` (per-user; Claude Code writes approvals there). Remove `.vscode/` and ignore it. Remove the empty `.claude/worktrees/`.
 
 ### DEC-064 — Full scope, built in waves, released once
-- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER · **Class:** superseded by EMERGENCY-2 §8.1 (DEC-1211)
 - **Decision:** Every capability in Contract v3 that survives ADR-0001 is in scope, including the full 26-dimension readiness contract and everything previously marked "Later". The Gov OS is built in three waves (Wave 1 Integrate, Wave 2 Strengthen, Wave 3 Complete), each ending in an exit check, and released **once** as Release 1 (signed `v1.0.0`) after qualification (DEC-067). Adoption into product repositories starts only after Release 1. Supersedes the "R1 → R2 if friction → Later if needed" framing of architecture v0.1 and S0a Q4's demotions.
 - **Consequence:** DEC-001's ~3k-line revisit trigger becomes a per-wave review (glue ≈ 4.5k LOC across three waves).
 
