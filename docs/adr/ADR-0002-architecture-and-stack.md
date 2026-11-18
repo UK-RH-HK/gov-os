@@ -13,6 +13,8 @@ state_class: AUTHORITATIVE
 
 # ADR-0002 — Architecture and stack
 
+> **Amendment, 2026-11-18 (EMERGENCY-2, DEC-1211; owner's decision DEC-1214 G5).** The L3 enforcement layer's guard and OS sandbox, and every statement in this ADR that rests on them, are retired by EMERGENCY-2 §2; Charter v6 §2 and Contract v5 §2 Boundary state the boundary. The layers' other content stands. A full rewrite of this ADR is a later chore (audit 7 C-4).
+
 Status ACCEPTED by the owner on 2026-11-09 (DEC-1098 (5)), to be re-read at the lift's re-pin; refreshed 2026-11-08 (DEC-1093 (3)). Every decided change from the text
 of 2026-10-10 cites its decision (descriptive updates cite their source); `CHANGES.md` beside the draft lists them old → new.
 

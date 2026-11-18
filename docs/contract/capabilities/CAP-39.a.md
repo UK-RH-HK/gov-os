@@ -3,14 +3,14 @@ id: CAP-39.a
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite
+title: Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard
 depends_on:
 - CAP-39
 ---
 
-# CAP-39.a: Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite
+# CAP-39.a: Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard
 
 A covers item of CAP-39 (Governance health scheduler (G0-G6 tiers)). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite
+- **Item:** Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard
 - **Wave:** W1

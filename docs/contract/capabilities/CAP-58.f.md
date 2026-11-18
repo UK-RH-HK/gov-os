@@ -3,14 +3,14 @@ id: CAP-58.f
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook
+title: 'Non-goal: the containment check on `PostToolUseFailure`: a hook-time check; the landing judges commits instead'
 depends_on:
 - CAP-58
 ---
 
-# CAP-58.f: The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook
+# CAP-58.f: Non-goal: the containment check on `PostToolUseFailure`: a hook-time check; the landing judges commits instead
 
-A covers item of CAP-58 (Path guards as default-deny allow-lists). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-58 (Containment judged at the landing). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook
-- **Wave:** W1
+- **Item:** Non-goal: the containment check on `PostToolUseFailure`: a hook-time check; the landing judges commits instead
+- **Wave:** NONE

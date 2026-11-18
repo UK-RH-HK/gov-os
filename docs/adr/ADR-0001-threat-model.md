@@ -13,6 +13,8 @@ state_class: AUTHORITATIVE
 
 # ADR-0001 — Threat model
 
+> **Amendment, 2026-11-18 (EMERGENCY-2, DEC-1211; owner's decision DEC-1214 G5).** The threat model stands. Where this ADR names a guard, a sandbox or hooks as guardrails, those are retired: Charter v6 §2 states the boundary now (git history, the owner's push and release, two deny lines, hourly bundles; mistakes are caught at the landing).
+
 ## Context and Problem Statement
 
 The Rust Gov OS spent Phase 2 (about 97 agent runs, eight review rounds) trying to make a process that runs with the

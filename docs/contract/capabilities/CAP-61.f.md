@@ -3,14 +3,14 @@ id: CAP-61.f
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals
+title: 'Non-goal: the untested sandbox cases of EXP-002: there is no sandbox to test'
 depends_on:
 - CAP-61
 ---
 
-# CAP-61.f: The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals
+# CAP-61.f: Non-goal: the untested sandbox cases of EXP-002: there is no sandbox to test
 
-A covers item of CAP-61 (Worker session launcher and OS sandbox). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-61 (Worker session launcher). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals
-- **Wave:** W2
+- **Item:** Non-goal: the untested sandbox cases of EXP-002: there is no sandbox to test
+- **Wave:** NONE

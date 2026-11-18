@@ -12,8 +12,8 @@ depends_on:
 
 Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
-- **Outcome:** A session cannot run a Bash command outside the sandbox by asking for it.
-- **Acceptance:** A Bash call carrying `dangerouslyDisableSandbox: true` is denied by the guard's PreToolUse hook, whatever the role.
-- **Wave:** W1
-- **Disposition:** KEPT
+- **Outcome:** (none — non-goal)
+- **Acceptance:** No file of the kernel implements a sandbox or the denial of its escape hatch; the release acceptance finds none (EMERGENCY-2 §2.2).
+- **Wave:** NONE
+- **Disposition:** DROP
 - **Covers:** CAP-62.a

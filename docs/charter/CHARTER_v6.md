@@ -39,13 +39,19 @@ vendor account (DEC-057).
 
 The Gov OS guards against **mistakes and drift**, not against an adversary running with the owner's privileges. A
 process with the owner's OS privileges can defeat any in-process check, so the Gov OS does not try to be a security
-boundary against it. Hooks and guards are guardrails that catch mistakes early.
+boundary against it. There is no guard, no sandbox, no box and no permission prompt: mistakes are caught and corrected
+by the deterministic landing and the transcript scan, not prevented (EMERGENCY-2 §2, DEC-1211).
 
-The hard boundary has three parts:
+The hard boundary has four parts:
 - git history;
+- the owner's own `git push` and release, from his own terminal, with two settings deny lines (`git push` and `sudo`)
+  that hold in every permission mode;
+- an hourly `git bundle` of each repository, kept outside the tree;
 - the lefthook pre-push gate (G3) on the owner's machine, with GitHub Actions CI (G4–G5) as a visible advisory result
-  on every push;
-- the rule that only the owner merges, and only on green.
+  on every push.
+
+The landing merges into integration; only the owner pushes. Agents have full permission in the repository, worktree and
+run folder they work in; sessions stay apart by where they start, the folders they are given and their brief.
 
 `main` is not branch-protected (no GitHub Pro); enabling protection later changes no other decision (DEC-075).
 Approvals are facts only when they come from the owner's git account. No in-process trust classes, root-of-trust
@@ -70,8 +76,8 @@ Full statement: [ADR-0001](../adr/ADR-0001-threat-model.md) (DEC-039 as amended 
    DEC-086). The context packet is at most ~6k tokens. Packets are delivered as a file path plus a short summary.
 6. **Retrieval is complete, not top-k.** A batch size is never an evidence limit. Every answer carries a stopping
    reason from a fixed list, and NOT_FOUND is never proof of absence (DEC-030, DEC-080).
-7. **Paths are allowed, not forbidden.** Write guards are default-deny allow-lists. Checks derive their scope from the
-   repository, never from a hand-kept list (DEC-041).
+7. **Paths are allowed, not forbidden.** Paths are declared on the ticket and checked at the landing; nothing is refused
+   at write time. Checks derive their scope from the repository, never from a hand-kept list (DEC-041).
 8. **Assemble, then glue.** Mature tools do the heavy lifting. The `gov` CLI is thin glue behind the API-0002
    envelope. The owner approves every tool install (DEC-001, DEC-083).
 9. **Delete before you wrap.** A loop that does not converge goes to the owner, who may have it fixed differently,
@@ -196,14 +202,16 @@ from kernel role files plus the project roster. It carries:
 
 Readiness gaps generate linked tickets from Wave 1 (DEC-089).
 
-**Until Release 1** (DEC-073). An operator console session acts for the owner at the terminal. Each repository has its
-own session. The Gov OS's own Wave 1 bootstraps MR-3 with settings deny rules and an operator diff check, then runs
-under its own guard (DEC-084).
+**The owner's operator.** The owner's operator is his own interactive session, with full permission across WSL. The
+operator agent, its cron launcher and its lock are retired with the ACT pipeline; there is no guard (EMERGENCY-2 §2.6,
+§2.10).
 
 ## 7. Non-goals
 
 | Non-goal | Why | Decision |
 |---|---|---|
+| A write guard, an OS sandbox, a box, permission prompts and permission editing (CAP-58, CAP-61, CAP-62) | Prevention by permission failed the owner's aim: it cost more than the mistakes it stopped; the landing catches and corrects | DEC-1211 (EMERGENCY-2 §2.2) |
+| The ACT pipeline, the class rules, the approved lists and the operator agent | A two-line change went through a full decision loop | DEC-1211 (EMERGENCY-2 §2.10) |
 | Plugin trust boundary: hash-binding, descriptor security, self-attestation prevention (CAP-26) | Defends against a same-privilege adversary | DEC-039, DEC-075 (ADR-0001) |
 | Below-floor recovery, break-glass, DEGRADED mode (CAP-60) | Rests on the signed-release-root trust chain, which is not built | DEC-039 (ADR-0001) |
 | Full root of trust: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation (CAP-02 beyond its LITE form) | Same-privilege adversary; the LITE form is SSH-signed tags plus a hash manifest | DEC-027, DEC-074 Q11 |

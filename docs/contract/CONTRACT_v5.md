@@ -31,11 +31,11 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
-| W1 | 38 | 4 | 0 | 42 |
+| W1 | 37 | 4 | 0 | 41 |
 | W2 | 6 | 0 | 0 | 6 |
 | W3 | 12 | 0 | 0 | 12 |
-| NONE | 0 | 0 | 2 | 2 |
-| **All** | 56 | 4 | 2 | 62 |
+| NONE | 0 | 0 | 3 | 3 |
+| **All** | 55 | 4 | 3 | 62 |
 
 DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1. Version 4.1 adds CAP-61 and CAP-62 to Wave 1 (DEC-152, DEC-153).
 
@@ -44,7 +44,7 @@ DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation valida
 - **Scale envelope** (DEC-078). Tested up to ≈ 80k nodes / 270k edges of code graph at ≈ 2.2 GB peak RSS for codebase-memory-mcp; larger graphs are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder gets its own index.
 - **RAM budget** (DEC-078). Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare; incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker, VRAM peak ≈ 5.2 of 16 GiB.
 - **Token budget** (DEC-004, DEC-086). Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md ≤ ~1.5k tokens. A breach is a health finding, never a silent cost.
-- **Boundary** (DEC-039, DEC-075, DEC-087, DEC-152, DEC-156, DEC-161). Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner's machine, GitHub Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and only on green. `main` is not protected; enabling protection later changes no other decision. Containment has two guardrail layers, neither of them a security boundary: in a worker session started by the launcher the OS sandbox is the outer wall for everything a Bash command does (writes outside the repository, installs, network, reads of hidden paths), and the guard with the permission rules is the wall for the file tools (Read, Edit, Write), which run outside the sandbox; the orchestrator's own session is not sandboxed and runs under the guard alone (DEC-152, DEC-156, DEC-161).
+- **Boundary** (DEC-039, DEC-075, DEC-087, DEC-848, DEC-1211). No guard, no sandbox, no box and no permission prompts (EMERGENCY-2 §2). Agents have full permission in the repository, the worktree and the run folder they work in; sessions stay apart by where each starts, the folders it is given and its brief, and nothing enforces it. Mistakes are caught and corrected at the landing and by the transcript scan, not prevented. The hard boundary is git history; the owner's own `git push` and release from his own terminal; two settings deny lines, `git push` and `sudo`, which hold in every permission mode; and an hourly `git bundle` of each repository, kept outside the tree. The landing merges into integration and only the owner pushes. The lefthook pre-push gate G3 on the owner's machine and GitHub Actions CI G4–G5 stay as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks). `main` is not protected; enabling protection later changes no other decision.
 - **Loop budget** (DEC-044, DEC-096). Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) continues until it converges or until three consecutive iterations fail to converge; the third failure produces an escalation package for the owner (each iteration's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides. The iteration count and budget are held by the orchestrator or gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).
 - **Tool installs** (DEC-083, DEC-157, DEC-163). The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version, source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`, and the sandbox's write fence enforces this (DEC-157, DEC-158, DEC-163).
 
@@ -365,7 +365,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-22.a` [W1] Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced by W1-33's generated definitions — Contract v3 E2; Framework v4.1.2 §24; DEC-119; DEC-154 · delivered by W1-05, W1-33
   - `CAP-22.b` [W2] Typed handoff records readable by a fresh agent — Contract v3 E3; Framework v4.1.2 §25
   - `CAP-22.c` [W2] Distinct test execution and integration roles — MR-5; DEC-094
-  - `CAP-22.d` [W1] A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research`, the guard knows the role, its writes are held to its ticket's `allowed_paths` (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32) stays W3 — DEC-163; DEC-158 · delivered by W1-46
+  - `CAP-22.d` [W1] A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research` in its own experiment folder or worktree, its ticket's `allowed_paths` judged at the landing as a notice; no guard and no network allowlist; the full research lifecycle (CAP-32) stays W3 — DEC-163; DEC-158; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-46
 - **Scenarios:** dev CHAOS-X-02 · qual CHAOS-X-Q02
 
 ### CAP-23 — Concurrency and task claims
@@ -409,9 +409,9 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-25.b` [W1] Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the owner — Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083 · delivered by W1-04
   - `CAP-25.c` [NONE] Non-goal: automated install classification, argv analysis, authority envelopes — DEC-083; OWNER-DECISION-P2-0003
   - `CAP-25.d` [W1] Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an install by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval; worker roles never install system-wide — DEC-153; DEC-157; DEC-209 · delivered by W1-48
-  - `CAP-25.e` [W1] The research role may install only inside its own experiment folder (a venv or local prefix within its ticket's `allowed_paths`); a system-wide install is denied to it; the sandbox's write fence enforces this: the sandbox stops a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one to a path that existed at launch elsewhere inside it; a path created later is covered by the guard's per-ticket allow-list. It is the one exception to the denial in CAP-25.b — DEC-163; DEC-157 · delivered by W1-46
-  - `CAP-25.f` [W1] The committed `.claude/settings.json` carries no install or download ask rule; the guard's install rule decides install commands alone, and in a launched worker session the sandbox backs it — DEC-172 · delivered by W1-47
-  - `CAP-25.g` [W1] The guard's install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs: `ask` for the orchestrator, denied for engineer, independent test designer and independent auditor, and let through for the research role inside its experiment folder (`CAP-25.e`) — DEC-174; DEC-083; DEC-163 · delivered by W1-47
+  - `CAP-25.e` [NONE] Non-goal: the research role's install fence (the sandbox write fence and the generated `Edit` deny rules): an install by the research role is free inside its repository, worktree or venv (CAP-25.b) — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-25.f` [NONE] Non-goal: the committed settings carry no install ask rule so that the guard's install rule decides alone: no guard, no install rule — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-25.g` [NONE] Non-goal: the guard's install rule for `uv add`, `uv sync`, `uv run --with` and `uvx`: no guard — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev CHAOS-A-05, CHAOS-B-04, CHAOS-B-05, CHAOS-B-14, B-10, AUDIT-B-03 · qual CHAOS-X-Q05
 
 ### CAP-26 — Plugin trust boundary (hash-binding, descriptor security)
@@ -509,7 +509,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 - **Covers:**
   - `CAP-32.a` [W3] Research becomes evidence records separate from authority — Contract v3 J1; Framework v4.1.2 §45
   - `CAP-32.b` [W3] Experiment lifecycle; discovery flow — Contract v3 J2; Framework v4.1.2 §46
-  - `CAP-32.c` [W1] Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point; they run in sandboxes outside production paths and leave an evidence record (what was tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P — DEC-102 · delivered by W1-35
+  - `CAP-32.c` [W1] Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point; they run in their own experiment folder or worktree, outside production paths, and leave an evidence record (what was tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P — DEC-102; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-35
   - `CAP-32.d` [W2] `gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way — DEC-166
 - **Scenarios:** dev A-X-02 · qual AUDIT-A-Q02, AUDIT-A-Q06, AUDIT-A-Q20, AUDIT-A-Q21, AUDIT-A-Q23, AUDIT-A-Q24, AUDIT-A-Q38, AUDIT-A-Q43, CIT-B-Q01
 
@@ -601,7 +601,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 - **Sources:** Contract v3 Gate O1, O2, O3, O4; Framework v4.1.2 §62-64; DEC-042 (builder tests are regression evidence only); DEC-083; DEC-136; DEC-137
 - **Covers:**
   - `CAP-38.a` [W1] Product test families — Contract v3 O1; Framework v4.1.2 §62 · delivered by W1-30
-  - `CAP-38.b` [W1] Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility — Contract v3 O2; Framework v4.1.2 §63 · delivered by W1-26, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-30, W1-35, W1-36, W1-38, W1-42
+  - `CAP-38.b` [W1] Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility; authority/role limits and mutation scope are landing checks (CAP-58.h, MR-3), not test families — Contract v3 O2; Framework v4.1.2 §63; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-26, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-30, W1-35, W1-36, W1-38, W1-42
   - `CAP-38.c` [W1] Independent test authorship; builder tests are regression evidence only — Contract v3 O3; DEC-042 · delivered by W1-30, W1-02
   - `CAP-38.d` [W1] Governance suite currency — Contract v3 O4; Framework v4.1.2 §64 · delivered by W1-30
   - `CAP-38.e` [W1] A case the orchestrator's review finds that the acceptance tests miss goes to the next test design batch as a described behaviour, never as code; the test designer decides from the specification whether it becomes an acceptance test and reports a specification gap — DEC-136 · delivered by W1-35
@@ -617,7 +617,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate O5; Framework v4.1.2 §62-64; DEC-007; DEC-075; DEC-087
 - **Covers:**
-  - `CAP-39.a` [W1] Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite — Contract v3 O5 · delivered by W1-40, W1-02
+  - `CAP-39.a` [W1] Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard — Contract v3 O5; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-40, W1-02
   - `CAP-39.b` [W3] G6 qualification (synthetic repos, chaos, soak, hidden tests) — Contract v3 O5; DEC-067
   - `CAP-39.c` [W3] Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes; cache keyed by content/policy/framework hashes — Contract v3 O5
   - `CAP-39.d` [W1] RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded — Contract v3 O5 · delivered by W1-26
@@ -635,7 +635,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-40.a` [W1] Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions — Contract v3 P1; Framework v4.1.2 §65 · delivered by W1-31
   - `CAP-40.b` [W3] Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate, human-gate concentration, retrieval misses, cost by task/feature, first-pass completion — Contract v3 P2; Framework v4.1.2 §66
   - `CAP-40.c` [W1] Wave 1 learning metrics per ticket: KPI disputes raised by the test designer, acceptance tests rewritten after implementation began (with the reason), and governance share; all three reported at the Wave 1 exit; only governance share has a threshold (≤ 15 %) — DEC-106; DEC-086 · delivered by W1-31, W1-42
-  - `CAP-40.d` [W1] For a launched worker session the sandbox's instruction tokens in the system prompt are reported as a separate line of the ticket's telemetry record, not inside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures — DEC-170; DEC-086; EXP-001 §3.6 · delivered by W1-31
+  - `CAP-40.d` [NONE] Non-goal: the sandbox's instruction tokens as a separate line of the telemetry record: there is no sandbox — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev CHAOS-A-12, ISO-X-03, SOAK-X-01 · qual GATE-B-Q01, GATE-B-Q03, GATE-B-Q04, SOAK-X-Q01
 
 ### CAP-41 — Lesson records with scope
@@ -813,11 +813,11 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 ### CAP-52 — Model-agnostic adapters (provider, IDE, CLI)
 
 - **Outcome:** The owner can use Claude Code or an AGENTS.md-reading harness with the same rules, generated from one source.
-- **Acceptance:** `rulesync generate` produces CLAUDE.md, AGENTS.md and `.claude/`; CI fails when a generated file differs from its source; the Claude Code adapter carries every hook and deny rule.
+- **Acceptance:** `rulesync generate` produces CLAUDE.md, AGENTS.md and `.claude/`; CI fails when a generated file differs from its source; the Claude Code adapter carries the checkpoint hooks and the two deny lines (`git push`, `sudo`).
 - **Wave:** W1
 - **Provider:** rulesync 24.0.0, W1-38
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate A1 (model-agnostic); Framework v4.1.2 §4, §22; OWNER-LAUNCHER-BR-0001 (Claude Code first, others later); DEC-022; DEC-074
+- **Sources:** Contract v3 Gate A1 (model-agnostic); Framework v4.1.2 §4, §22; OWNER-LAUNCHER-BR-0001 (Claude Code first, others later); DEC-022; DEC-074; EMERGENCY-2 §2.2, §2.4 (DEC-1211)
 - **Covers:**
   - `CAP-52.a` [W1] Model-agnostic adapters for Claude Code and AGENTS.md from one source — Contract v3 A1; Framework v4.1.2 §4, §22; DEC-074 Q6 · delivered by W1-38
   - `CAP-52.b` [W1] Claude Code first, others later — OWNER-LAUNCHER-BR-0001 · delivered by W1-38
@@ -886,23 +886,23 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-57.a` [W1] Deterministic closure over referenced ids to radius-scaled depth; synthesis citation check — DEC-033; DEC-036 · delivered by W1-20, W1-22
 - **Scenarios:** dev RETR-X-03 · qual RETR-X-Q03
 
-### CAP-58 — Path guards as default-deny allow-lists
+### CAP-58 — Containment judged at the landing
 
-- **Outcome:** An agent can write only inside its task's declared paths; everything else is denied. The orchestrator is the one exception: it may write anywhere in the repository except `tests/acceptance/**`.
-- **Acceptance:** An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard, and a Bash form the guard cannot parse is caught by the post-command containment check; in a launched worker session a Bash write outside the repository is stopped by the OS sandbox, and a file-tool write outside it by the permission rules and the guard.
-- **Wave:** W1
-- **Provider:** W1-02, W1-03, W1-01, W1-26, W1-33, W1-45, W1-46, W1-47, W1-50, W3: lessons-inbox guard exception
+- **Outcome:** An agent works inside its task's declared paths. A change outside them is a notice in the landing's record; only a change that breaks test authorship is refused (MR-3).
+- **Acceptance:** At the landing, each commit's paths are judged against the allowed paths of its `Role` and `Task` trailers: a path outside them is a notice in the land record and never a refusal; a commit that changes `tests/acceptance/` without `Role: independent-test-designer` (or the owner's `Role: owner`) is refused, naming the commit. Nothing is refused at write time.
+- **Wave:** W1 (the guard and its allow-lists are retired (EMERGENCY-2 §2.2); containment is a landing check (NEW-1, CAP-63))
+- **Provider:** W1-50, W2-115b
 - **Disposition:** KEPT
-- **Sources:** DEC-041 (default-deny allow-lists, derived not enumerated); DEC-076; DEC-152; DEC-153; DEC-156; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.4); DEC-165; DEC-171; DEC-255
+- **Sources:** DEC-041 (default-deny allow-lists, derived not enumerated); DEC-076; DEC-152; DEC-153; DEC-156; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.4); DEC-165; DEC-171; DEC-255; EMERGENCY-2 §2.1, §2.2, §4.3, §4.4 (DEC-1211)
 - **Covers:**
-  - `CAP-58.a` [W1] Default-deny write allow-lists per role and ticket, except the orchestrator (`CAP-58.e`); checks derived, not enumerated — DEC-041; DEC-076; DEC-156 · delivered by W1-02, W1-03, W1-26
-  - `CAP-58.b` [W1] Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them; a launched worker session's network grant comes from the launcher's network profile (`CAP-61.c`), which the role definition names — Framework v4.1.2 §32; DEC-158; DEC-163 · delivered by W1-33
-  - `CAP-58.c` [W1] A session with no or an unknown role has no write privilege — OWNER-DECISION-P2-0001 BC-P2-08 · delivered by W1-02
-  - `CAP-58.d` [W1] Claim split by tool: in a launched worker session the OS sandbox stops a Bash write outside the repository without parsing the command; the file tools (Read, Edit, Write) run outside the sandbox and are held by the permission rules and the guard; `Edit(...)` and `Read(...)` deny rules bind both layers — DEC-152; DEC-161; EXP-001 §5.4 · delivered by W1-46
-  - `CAP-58.e` [W1] Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket's `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding (DEC-171) — DEC-150; DEC-156; DEC-171 · delivered by W1-45
-  - `CAP-58.f` [W1] The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook — DEC-153; EXP-001 §5.4 · delivered by W1-47
-  - `CAP-58.g` [W3] The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write, as a guard exception — DEC-165
-  - `CAP-58.h` [W1] Containment attribution by commit trailers: a forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit, each commit's paths against the allowed paths of its own `Role` and `Task` trailers and not against the caller; a merge commit is not a finding when every commit it brings passes; a commit with no `Role` or `Task` trailer is judged against the caller — DEC-255; DEC-182 · delivered by W1-50
+  - `CAP-58.a` [NONE] Non-goal: default-deny write allow-lists per role and ticket: the guard is retired — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.b` [NONE] Non-goal: permission classes enforced as role permissions by the guard: no guard, no permission editing — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.c` [NONE] Non-goal: a session with no or an unknown role has no write privilege: nothing refuses a write; the landing judges the commit — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.d` [NONE] Non-goal: the claim split by tool between the OS sandbox and the guard: neither exists — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.e` [NONE] Non-goal: the orchestrator's write scope under the guard: there is no guard to except it from — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.f` [NONE] Non-goal: the containment check on `PostToolUseFailure`: a hook-time check; the landing judges commits instead — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.g` [NONE] Non-goal: the lessons inbox as a guard exception: there is no guard — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-58.h` [W1] Containment judged at the landing by commit trailers: a forward HEAD move, including an integration merge, is judged commit by commit, each commit's paths against the allowed paths of its own `Role` and `Task` trailers; a path outside them is a notice, never a refusal; only a test-authorship breach (MR-3) is refused; a merge commit is not a finding when every commit it brings passes; a commit with no `Role` or `Task` trailer is judged against the caller — DEC-255; DEC-182; EMERGENCY-2 §4.3 (DEC-1211) · delivered by W1-50, W2-115b
 - **Scenarios:** dev MR-A-01, CHAOS-A-13, CHAOS-A-14, MR-B-01, CHAOS-B-13, CHAOS-B-14, CHAOS-B-15, A-X-02 · qual MR-A-Q01, SEC-A-Q02, AUDIT-A-Q49, SEC-A-Q06, MR-B-Q02, SOAK-X-Q02
 
 ### CAP-59 — Review-repair loop budget
@@ -931,31 +931,31 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-60.a` [NONE] Non-goal: below-floor recovery, break-glass, DEGRADED mode — OWNER-DECISION-0006; OWNER-DECISION-0007; DEC-039
 - **Scenarios:** dev — · qual —
 
-### CAP-61 — Worker session launcher and OS sandbox
+### CAP-61 — Worker session launcher
 
-- **Outcome:** The orchestrator can start a worker session (engineer, independent test designer, independent auditor, research or experiment) that runs inside the OS sandbox with its role's network profile, and cannot start one without it.
-- **Acceptance:** `gov launch` refuses to start a worker session unless the sandbox is enabled, strict (`allowUnsandboxedCommands: false`, network `strictAllowlist`) and fail-closed (`failIfUnavailable: true`); a launched worker's Bash command cannot write outside the repository, its network profile applies, and its `GOV_ROLE` and `GOV_TICKET` reach the guard.
-- **Wave:** W1 (the untested sandbox cases are a W2 experiment, EXP-002 (DEC-160, DEC-164))
+- **Outcome:** The orchestrator can start a worker session (engineer, independent test designer, independent auditor, research or experiment) in its own worktree with its role file and the model and effort the owner's rubric gives it, and with no permission prompt.
+- **Acceptance:** `gov launch` starts a worker in its worktree with its role file, `GOV_ROLE`, `GOV_TICKET`, its own temp folder and the rubric's model and effort, with no permission prompt; it refuses a launch whose model or effort the rubric does not give for that role.
+- **Wave:** W1
 - **Provider:** Claude Code sandbox (bubblewrap 0.9.0, socat 1.8.0.0), W1-46, W1-48
 - **Disposition:** KEPT
-- **Sources:** DEC-138; DEC-141; DEC-152; DEC-153; DEC-158; DEC-159; DEC-160; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.2–5.5); DEC-163; DEC-164
+- **Sources:** DEC-138; DEC-141; DEC-152; DEC-153; DEC-158; DEC-159; DEC-160; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.2–5.5); DEC-163; DEC-164; EMERGENCY-2 §2.2, §2.3, §6.1 (DEC-1211)
 - **Covers:**
-  - `CAP-61.a` [W1] The launcher refuses to start a worker session unless the sandbox is on, strict and fail-closed: enabled, `failIfUnavailable: true`, `allowUnsandboxedCommands: false`, network `strictAllowlist`; the configuration is passed through `--settings`, never read from the repository, whose settings carry no sandbox block; the launcher sets no `excludedCommands` — DEC-152; DEC-153; DEC-161; DEC-164; EXP-001 §5.2 · delivered by W1-46
-  - `CAP-61.b` [W1] Per-role `--settings`: the sandbox block plus the role's `Edit` deny rules; the launcher sets `GOV_ROLE` and `GOV_TICKET`, and both reach the guard; a launched worker is shown to be sandboxed. The sandbox applies to launched worker sessions only; in-session subagents remain for read-only work (review, exploration, web research) — DEC-153; DEC-161; EXP-001 §5.3 · delivered by W1-46
-  - `CAP-61.c` [W1] Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard's per-ticket allow-list, not by the list; the list's exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox — DEC-158; DEC-161; DEC-163; EXP-001 §1, §3.4, §5.3 · delivered by W1-46
+  - `CAP-61.a` [NONE] Non-goal: the launcher refuses a worker unless the OS sandbox is on, strict and fail-closed: there is no sandbox — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-61.b` [W1] `gov launch` starts a worker in its worktree with its role file, `GOV_ROLE`, `GOV_TICKET` and the rubric's model and effort; in-session subagents remain for read-only work (review, exploration, web research); no permission prompt, no per-role `--settings` sandbox block — DEC-153; DEC-161; EXP-001 §5.3; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-46
+  - `CAP-61.c` [NONE] Non-goal: the network profile per role, held by the sandbox and generated `Edit` deny rules: no sandbox, no allowlist — EMERGENCY-2 §2.2 (DEC-1211)
   - `CAP-61.d` [W1] The launcher sets a per-session temp directory for each worker session; if the acceptance test shows it cannot be overridden, the shared `$TMPDIR` is recorded as a residual — DEC-159 · delivered by W1-46
   - `CAP-61.e` [W1] Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs is aligned with the VS Code extension's bundled version — DEC-153; EXP-001 §5.5 · delivered by W1-48
-  - `CAP-61.f` [W2] The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals — DEC-160; DEC-164; EXP-001 §4
+  - `CAP-61.f` [NONE] Non-goal: the untested sandbox cases of EXP-002: there is no sandbox to test — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev — · qual —
 
 ### CAP-62 — Sandbox escape hatch denied
 
-- **Outcome:** A session cannot run a Bash command outside the sandbox by asking for it.
-- **Acceptance:** A Bash call carrying `dangerouslyDisableSandbox: true` is denied by the guard's PreToolUse hook, whatever the role.
-- **Wave:** W1
-- **Provider:** W1-47
-- **Disposition:** KEPT
-- **Sources:** DEC-152; DEC-153; EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
+- **Outcome:** (none — non-goal)
+- **Acceptance:** No file of the kernel implements a sandbox or the denial of its escape hatch; the release acceptance finds none (EMERGENCY-2 §2.2).
+- **Wave:** NONE (dropped)
+- **Provider:** none (non-goal)
+- **Disposition:** DROP — Non-goal: the sandbox escape hatch is moot where there is no sandbox (EMERGENCY-2 §2.2).
+- **Sources:** DEC-152; DEC-153; EXP-001 (spike-sandbox/EVIDENCE.md §5.4); EMERGENCY-2 §2.2 (DEC-1211)
 - **Covers:**
-  - `CAP-62.a` [W1] The guard denies any Bash call carrying `dangerouslyDisableSandbox: true`, as defence in depth behind strict mode — DEC-153; EXP-001 §5.4 · delivered by W1-47
+  - `CAP-62.a` [NONE] Non-goal: the guard denies a Bash call carrying `dangerouslyDisableSandbox: true`: no sandbox, no guard — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev — · qual —
