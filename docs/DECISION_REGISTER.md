@@ -15505,6 +15505,16 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-18 with his page (the codes above, his notes included); the incident behind it: Emergency 2's audits 01 to 09 (`docs/emergency-2/audits/`) and DEC-1209's emergency.
 - **Governing sources:** docs/emergency-2/audits/OWNER-DECISIONS-2026-11-18.md; docs/emergency-2/audits/DECISIONS-FOR-THE-OWNER.md; audits 01 to 09.
 
+### DEC-1215 — Temporary: every Opus role runs Claude Fable 5.2 at high effort until the weekly reset; no daily budget, no rationing, no reserve; the 99 % push
+- **Status:** ACCEPTED (owner, 2026-11-18 night, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; **temporary**: item (1) ends at the weekly reset, Sunday 2026-11-22 09:00 London, or when the owner's two Fable resets are used, whichever comes first) · **Under:** DEC-1214, DEC-1212 · **Changes:** DEC-1212 (3) and DEC-1214 K1 (the Opus rows, while (1) lasts); the budget of `log/budget.md` and DEC-1212 (4)'s daily budget and reserve (ended)
+- **Decision:**
+  - (1) **Models, temporary:** every role that runs Opus by the rubric (the CTO, the EXAMIN CTO, C3 roles) runs `claude-fable-5-2` at high effort; Sonnet roles stay on Sonnet; the memory measure's reader and grader stay as DEC-1098 defines them, so its figure stays comparable. Checked first: Claude Code answers on `claude-fable-5-2` here, and `gov launch` accepts the id. Enforced by `governance/project/model-substitution.yaml`, read by `gov launch` (`src/gov/launch/role.py` `substitute`) and the helper model rule (`.claude/hooks/agent_model.py`: an Opus exception is Fable's, Opus refused with the hint), and by `start_cto.sh`.
+  - (2) **Revert, written down:** set `active: false` in `governance/project/model-substitution.yaml` (its `until` also ends it by itself at the reset); the two CTOs' start lines go back to `claude-opus-5-5`; record the revert here. Everything then returns to the rubric as it stands (DEC-1214 K1).
+  - (3) **Usage:** no daily budget, no rationing and no reserve; build at full pace with both CTOs. When the plan reaches 99 %, the CTO pushes the owner, who resets it (a Fable reset first); no work stops or waits for usage.
+  - (4) **The handover now:** the CTO writes its checkpoint and handover, starts a fresh CTO on Fable at high effort in tmux and retires once it has taken over, no lead or worker stopped; the new CTO restarts the EXAMIN CTO on Fable the same way, from its checkpoint, at a quiet point in its work.
+- **Basis:** the owner's messages of 2026-11-18 night ("Model change, temporary, my decision: every role that runs Opus today ... runs Claude Fable 5.2 ... at high effort instead, until the weekly reset ... or until my two Fable resets are used"; "no daily budget, no rationing and no reserve"); the incident behind (3): Wednesday's daily budget stopped new work at 21:00 with the build list open.
+- **Governing sources:** governance/project/model-substitution.yaml; docs/emergency-2/CTO-HANDOVER.md; DEC-1212; DEC-1214.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
