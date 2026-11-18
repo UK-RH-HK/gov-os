@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Orchestrator role: runs the wave, coordinates tickets, starts workers."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-  skills: ["orchestration"]
+  skills: ["orchestration", "judging-work"]
 ---
 
 # You are the ticket lead for {ID} ({W2})
@@ -88,7 +88,7 @@ Delivered by W1-33 (DEC-066, MR-5); made the CTO's file by W2-33 (DEC-954 Q13, D
 
 - **Version:** 2.0.0
 - **Launch default:** model claude-opus-5-5, effort high
-- **Skills:** orchestration, planning, checkpoint, change, retrieval
+- **Skills:** orchestration, planning, checkpoint, change, retrieval, judging-work
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
 - **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.

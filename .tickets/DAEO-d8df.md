@@ -38,6 +38,17 @@ allowed_paths:
 - tests/unit/launch/test_w2_195*
 - tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py
 - docs/changes/W2-195-CIT-P.md
+- .rulesync/skills/judging-work/SKILL.md  # Gov OS's own copies, so its own judging briefs build after the land (EMERGENCY-2 2.10: copies by ordinary commits)
+- .claude/skills/judging-work/SKILL.md
+- .rulesync/subagents/independent-auditor.md
+- .rulesync/subagents/orchestrator.md
+- .rulesync/subagents/qa-engineer.md
+- .rulesync/subagents/ticket-lead.md
+- .claude/agents/independent-auditor.md
+- .claude/agents/orchestrator.md
+- .claude/agents/qa-engineer.md
+- .claude/agents/ticket-lead.md
+- "tests/acceptance/W2-195/**"  # the test designer re-pins the trimmed skill (A-13)
 reads:
 - governance/project/orchestration/packages/P-GOLDEN-RULE-1.md
 - governance/project/orchestration/packages/judging-work.SKILL.md
