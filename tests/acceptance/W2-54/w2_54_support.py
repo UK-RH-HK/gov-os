@@ -1399,6 +1399,9 @@ def runtime_digest(project):
 # file under .gov-runtime/ a read wrote that is not the store".
 
 RUNTIME_REL = ".gov-runtime"
+# W2-197's memory-use log, written by every `gov retrieve`: a log, not a derived file (EMERGENCY-2 5.6), so this
+# KPI's counts leave it out.
+LOG_REL = ".gov-runtime/memory-use.jsonl"
 STORE_PREFIX = "store.db"
 # The public setting that lowers the cache's bound, in bytes (README, "The bound"): an interface this KPI needs.
 CACHE_BOUND_SETTING = "GOV_QUERY_VECTOR_CACHE_MAX_BYTES"
@@ -1410,7 +1413,8 @@ def project_tree(project):
     """``relative path -> sha256`` of every file of ``project``, git's own folder left out."""
     project = Path(project)
     return {path.relative_to(project).as_posix(): sha256(path) for path in sorted(project.rglob("*"))
-            if path.is_file() and ".git" not in path.relative_to(project).parts}
+            if path.is_file() and ".git" not in path.relative_to(project).parts
+            and path.relative_to(project).as_posix() != LOG_REL}
 
 
 def tree_change(before, after):
@@ -1429,7 +1433,8 @@ def runtime_others(project):
     if not base.is_dir():
         return []
     return sorted(path.relative_to(project).as_posix() for path in base.rglob("*")
-                  if path.is_file() and not path.name.startswith(STORE_PREFIX))
+                  if path.is_file() and not path.name.startswith(STORE_PREFIX)
+                  and path.relative_to(project).as_posix() != LOG_REL)
 
 
 def others_size(project):
