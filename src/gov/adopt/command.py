@@ -1,8 +1,12 @@
 """``gov adopt --lite`` as a command module (W1-41, DEC-090, DEC-517). The convention is in ``gov.cli.main``.
 
-``gov adopt --lite --stage <A0|A1|A2|A3|A4|A5|A6|A7|A8|A9|A10|MA> [--map <file>] [--verdict <path>]`` runs one stage of
-the adoption of the project, which commits its evidence record under ``governance/adoption/`` and refuses without the
-record of the stage before it. ``gov adopt`` without ``--lite`` stays reserved: the full transaction is Wave 3.
+``gov adopt --lite --stage <A0|A1|A2|AS|A3|A4|A5|A6|A7|A8|A9|A10|MA> [--map <file>] [--verdict <path>]`` runs one stage
+of the adoption of the project, which commits its evidence record under ``governance/adoption/`` and refuses without
+the record of the stage before it. ``gov adopt`` without ``--lite`` stays reserved: the full transaction is Wave 3.
+
+W2-192: ``AS`` is the spec audit (DEC-1200), after A2 and before A3: ``AS-spec-audit.md`` lists the specs, what is
+built of each, the tickets, and each gap as a question to the owner; A3 refuses without it (``spec_audit``). AS is a
+side record: its chain is A0-A2 and it stands on A2's record; no stage after A3 reads it.
 
 W2-88: ``MA --out <folder>`` is the memory assessment and the refactoring plan (files under ``<folder>`` outside the
 project, none in it); A3 takes ``--assessment <folder>`` and cites that assessment; ``A9 --out <folder> [--decision
@@ -17,7 +21,7 @@ from __future__ import annotations
 from pathlib import Path
 
 ACT_PATHS = ("**",)  # A6 moves and A8 retires what the audited path map names, wherever it lies in the project
-STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "MA")
+STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "MA")
 _parser = None  # the command's own parser, kept for the usage error of --lite without --stage
 
 

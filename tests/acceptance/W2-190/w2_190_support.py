@@ -116,7 +116,11 @@ def assert_planted(root):
 
 
 def prepare(base_dir):
-    """The planted project, committed, with A0, A1 and A2 run: what every case copies. Returns the project's path."""
+    """The planted project, committed, with A0, A1 and A2 run: what every case copies. Returns the project's path.
+
+    Stage AS (the spec audit, DEC-1200) stands between A2 and A3: ``w2_23_support.Adoption.run`` runs it at once after the A2
+    that succeeded here, where the head offers it, so every copy of this project is ready for A3 (each case's assertion is
+    as it was)."""
     box = base.make_box(Path(base_dir) / "prepare-box")
     project = base.plant_project(Path(base_dir) / "project", extra=documents(), patterns=PATTERNS, ignored=False)
     assert_planted(project)

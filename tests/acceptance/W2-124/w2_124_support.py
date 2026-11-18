@@ -451,11 +451,22 @@ def frontmatter(text):
 
 
 class Adoption:
-    """``gov adopt --lite --stage <A> --json`` one stage per call; the embedding endpoint is at ``host``."""
+    """``gov adopt --lite --stage <A> --json`` one stage per call; the embedding endpoint is at ``host``.
+
+    Stage AS (the spec audit, DEC-1200) stands after A2 and before A3: ``gov adopt --lite --stage A3`` refuses with
+    ``ADOPT_STAGE_MISSING`` until AS's record is committed. So that every case reaches what it checks, ``run`` runs AS once,
+    at once after an A2 that succeeded, where the head offers it (so ``through`` and a case's own ``run("A2")`` are both
+    covered, and a HEAD a case records after A2 already holds AS's commit). Where the head does not offer AS (argparse:
+    invalid choice, exit 2) nothing else changes. The AS run is kept in ``as_run`` and ``runs["AS"]``. W2-88's driver, a
+    subclass, gets AS from here (its own guard on ``as_run`` keeps it to one run). A suite that must see A3 without AS sets
+    ``run_as_after_a2 = False`` on a subclass."""
+
+    run_as_after_a2 = True
 
     def __init__(self, project, box, host):
         self.project, self.box, self.host = Path(project), box, host
         self.runs = {}
+        self.as_run = None      # the AS run, once it was tried (a refusal or "not offered" included)
 
     def env(self):
         folders = [str(self.box.tools), str(Path(sys.executable).parent),
@@ -467,6 +478,8 @@ class Adoption:
         run = gov(self.project, self.env(), "adopt", "--lite", "--stage", stage, *extra, "--json",
                   "--session", ADOPTER)
         self.runs[stage] = run
+        if stage == "A2" and run.returncode == 0 and self.run_as_after_a2 and self.as_run is None:
+            self.as_run = self.run("AS")    # not asserted here: a refused or missing AS shows as A3's own refusal
         return run
 
     def write_verdict(self):

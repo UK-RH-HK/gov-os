@@ -25,6 +25,12 @@ allowed_paths:
 - "tests/acceptance/W2-23/*support*.py"
 - "tests/acceptance/W2-88/*support*.py"
 - "tests/acceptance/W2-190/*support*.py"
+- tests/unit/adopt/test_adopt.py  # the unit stage helper runs AS after A2 (EMERGENCY-2 6.1, the path case P-W2-192-P3)
+- "tests/acceptance/W2-124/*support*.py"  # the acceptance adoption driver runs AS after A2 (P-W2-192-P3)
+- template/governance/kernel/skills/adopt/SKILL.md  # CIT-P part A, the CTO's call (EMERGENCY-2 3.5)
+- .rulesync/skills/adopt/SKILL.md
+- template/.rulesync/skills/adopt/SKILL.md
+- .claude/skills/adopt/SKILL.md
 reads:
 - template/governance/kernel/skills/adopt/SKILL.md
 - src/gov/adopt/**

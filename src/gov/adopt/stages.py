@@ -18,7 +18,7 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
-from gov.adopt import lite_gates, project, safety
+from gov.adopt import lite_gates, project, safety, spec_audit
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
 from gov.adopt import coordination as roster_key
@@ -66,7 +66,10 @@ def run(root: Path, args, config: dict) -> dict:
     tracked = project.tree(root)
     if args.stage in lite_gates.GATES:  # A7 and A10 are in no chain: each reads the records it stands on itself
         return STAGE[args.stage](Run(root, args, config, args.stage, tracked, {}, {}))
-    records, hashes = project.chain(root, tracked, args.stage)
+    if args.stage == "AS":  # W2-192: a side record: its own chain is A0, A1, A2
+        records, hashes = spec_audit.chain(root, tracked)
+    else:
+        records, hashes = project.chain(root, tracked, args.stage)
     stage = STAGE[args.stage]
     return stage(Run(root, args, config, args.stage, tracked, records, hashes))
 
@@ -469,6 +472,7 @@ def _assessment(run: Run) -> dict:
 
 
 def a3(run: Run) -> dict:
+    audited = spec_audit.gate(run)  # W2-192 S3: AS is recorded, stands on A2, is complete, before any other check
     cited = _assessment(run)  # before anything is recorded
     _embedding_policies(run.config)
     proposal = _proposal(run.args.map)
@@ -499,6 +503,7 @@ def a3(run: Run) -> dict:
             entry["batch"] = last  # what A6 executes and the proposal put in no batch: one batch after the others
     artefacts = [entries.get(rel, {"path": rel, "action": "KEEP"}) for rel in inventory]
     return run.finish({"proposal_sha256": project.sha256(Path(run.args.map).read_bytes()), **cited,
+                       "spec_audit": audited,
                        "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts})
 
 
@@ -709,5 +714,5 @@ def a8(run: Run) -> dict:
     return legacy.retire(run)
 
 
-STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
+STAGE = {"A0": a0, "A1": a1, "A2": a2, "AS": spec_audit.stage, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
          "A9": a9, "A10": lite_gates.gate, "MA": ma}

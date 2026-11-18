@@ -27,6 +27,16 @@ Wave 1 delivers `gov adopt --lite`, covering stages A0–A4, A6, A8 and A5:
 
 Each stage writes an evidence record. `gov doctor` reports the current adoption level (CAP-54).
 
+## Stage AS: the spec audit (DEC-1200 (4))
+
+After A2 and before A3, `gov adopt --lite --stage AS` audits the repository's specs against its code, so that the path map and A5's review see which specs are alive. It reads A1's inventory and A2's classes and commits `governance/adoption/AS-spec-audit.md`, which stands on A2's record. A3 refuses to run before that record is committed, or when it no longer stands on A2's record as that record now is, and A3's record names the AS record it read. AS is a side record of the chain: the stages after A3 do not read it, so an adoption recorded before AS existed goes on, and AS can be run there at any time after A2.
+
+- **The record** lists every spec found (path, title, its stated wave or status); each spec built, partly built or not built, with its evidence (code paths, tests, commits); the tickets found, done or not, by wave; the specs with no code; the code with no spec (the top-level code modules no spec names); and each gap as one question to the owner, with a place for the answer.
+- **Built or not** is judged from code paths, tests and commits only, never by a model.
+- **The lite checks:** the record names every spec and every top-level code module the inventory holds, and every gap carries a question. A3 refuses a record that fails either, and records nothing.
+- **AS changes nothing else:** it writes only under `governance/adoption/`, changes no spec and no code, and closes no gap. A gap's answer is the owner's (how and when the spec is established, or the code retired), recorded beside its question when it comes.
+- **No auditor session in the lite form:** the path map's reviewer at A5 reads the AS record with the path map.
+
 ## Embedding policy (DEC-694, DEC-700)
 
 Every namespace of the target path map states its `embedding_policy`, as one of two values, written exactly so:
@@ -73,4 +83,4 @@ The tool is `gov adopt`. Its list option prints, for each open or in-progress ti
 
 ## Governing sources
 
-DEC-006, DEC-090, DEC-388, DEC-694, DEC-700, DEC-1050, DEC-1071, DEC-1072, DEC-1074, DEC-1083, DEC-1098, DEC-1101, DEC-1125, DEC-1130, DEC-1179, CAP-44, CAP-54.
+DEC-006, DEC-090, DEC-388, DEC-694, DEC-700, DEC-1050, DEC-1071, DEC-1072, DEC-1074, DEC-1083, DEC-1098, DEC-1101, DEC-1125, DEC-1130, DEC-1179, DEC-1200, CAP-44, CAP-54.
