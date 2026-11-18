@@ -129,6 +129,22 @@ def test_dispatch_breaks_a_loop_through_a_pin_that_is_not_its_environment_s(tmp_
     assert dispatch.target(str(repo), environ, "/usr") is None
 
 
+def test_gov_started_in_a_subfolder_of_a_pinned_repository_reruns_the_pin_with_its_arguments(tmp_path):
+    repo = tmp_path / "repo"
+    (repo / "sub").mkdir(parents=True)
+    git(repo, "init", "-q")
+    env, link = _fake_pin(repo)
+    (env / "bin" / "gov").write_text('#!/bin/sh\necho "pinned $* PYTHONPATH=${PYTHONPATH-unset}"\n', encoding="utf-8")
+    (env / "bin" / "gov").chmod(0o755)
+    run = lambda **extra: subprocess.run(  # noqa: E731
+        [sys.executable, "-m", "gov.cli.main", "--version"], cwd=str(repo / "sub"), capture_output=True, text=True,
+        env={**os.environ, "PYTHONPATH": str(REPO / "src"), **extra})
+    done = run()
+    assert done.returncode == 0 and done.stdout.strip() == "pinned --version PYTHONPATH=unset", done.stderr
+    done = run(GOV_PIN="off")
+    assert done.stdout.startswith("gov ") and "pinned" not in done.stdout
+
+
 # --------------------------------------------------------------------------
 # The release: the wheel kept, the record verified at its tag
 # --------------------------------------------------------------------------
