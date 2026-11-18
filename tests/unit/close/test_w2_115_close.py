@@ -33,11 +33,20 @@ def _record(repo):
 
 @pytest.fixture
 def no_lists(monkeypatch):
-    """The scoped close reads and writes no accepted-reds or load-sensitive list: every reader of them fails."""
+    """The scoped close reads no load-sensitive list and writes no list; of the accepted reds it reads only the
+    counted entries (W2-194 S3), none in these projects: every other reader of the lists fails."""
     def refuse(*a, **k):
         raise AssertionError("a list of the strict close was read")
-    for name in [n for n in dir(ratchet) if not n.startswith("__") and callable(getattr(ratchet, n))]:
+    real = ratchet.counted_entries
+
+    def counted(root, key, commit="HEAD"):
+        assert key == ratchet.ACCEPTED_REDS, f"the scoped close read {key}"
+        found = real(root, key, commit)
+        assert found == ([], []), found
+        return found
+    for name in ("apply_accepted_reds", "covers"):
         monkeypatch.setattr(ratchet, name, refuse)
+    monkeypatch.setattr(ratchet, "counted_entries", counted)
     monkeypatch.setattr(gates, "check_ratchet_lists", refuse)
 
 
@@ -91,16 +100,31 @@ def test_s5_an_unowned_red_is_named_opened_and_never_refuses(tmp_path, no_lists)
     assert red["test"] in text and "AssertionError" in text
 
 
-def test_f1_with_no_green_record_a_red_the_oldest_own_parent_has_is_caused_and_never_closes(tmp_path, no_lists):
-    """P1-K (a), R2-1: no green base on HEAD's line, so no head without the change; the red is red on the parent of
-    the ticket's oldest own commit too, yet it is the change's: refused, no record, no repair ticket."""
+def test_s3_with_no_green_record_a_red_the_oldest_own_parent_has_is_not_the_changes(tmp_path, no_lists):
+    """W2-193 S3 (supersedes DEC-1150 (2)): no green base on HEAD's line, so the red is judged at the parent of the
+    ticket's oldest own commit; red there with the same failure type, it is not the change's: the close passes,
+    names the base and where it came from, and opens a repair ticket for the red."""
     repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN})
+    parent = repo.git("rev-parse", "HEAD").strip()
     change(repo, {"src/pkg/feature.py": FEATURE})
+    command.run(repo.root, _args(), CONFIG)
+    record = _record(repo)
+    assert record["base"] == parent and record["base_from"] == "ticket" and record["base_run"] is None
+    [red] = record["reds"]
+    assert red["caused"] is False and red["repair_ticket"]
+
+
+def test_f1_with_no_green_record_a_red_the_oldest_own_parent_lacks_is_caused(tmp_path, no_lists):
+    """W2-193 F1: judged at the ticket's parent, a red green there is the change's: refused, no record, no repair
+    ticket."""
+    repo = project(tmp_path)
+    change(repo, {f"{OWN_SUITE}test_broken.py": "from pkg.feature import twice\n\n\ndef test_broken():\n"
+                                                "    assert twice(1) == 3\n"})
     with pytest.raises(GovError) as raised:
         command.run(repo.root, _args(), CONFIG)
     assert raised.value.code == "RED_CAUSED"
     [red] = raised.value.details["reds"]
-    assert red["caused"] is True and "no green base on HEAD's line" in red["reason"]
+    assert red["caused"] is True and raised.value.details["base_from"] == "ticket"
     assert not red.get("repair_ticket")
     assert not (repo.root / f"docs/close/{TICKET}").exists()
     assert sorted(p.name for p in (repo.root / ".tickets").glob("*.md")) == [f"{TICKET}.md"]
