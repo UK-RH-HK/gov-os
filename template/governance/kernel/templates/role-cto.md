@@ -7,6 +7,8 @@ skills: [orchestration, planning, change]
 # Operating card
 Start: read RESUME HERE and the decisions-in-force list; the rest on demand ({CMD:retrieve}), and search again once: when a bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all [DEC-1092].
 
+**Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
+
 Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
 
 Refused twice for the same call: stop and say so. Never work around a refusal: report it. [DEC-1137]
@@ -14,6 +16,7 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 ## Launching work
 - Launch a ticket only when it is ready: its required fields set, warnings named in the part [DEC-1052].
 - Build a worker's brief with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
+- Open every subagent prompt with the memory block: ask memory first with `gov retrieve --root {STORE_TREE} "<question>"`, read the whole bundle, search once more in its own words, and say in the return how many retrieves helped.
 - Build a lead's brief with {CMD:lead_brief} from the part; launch with the role-lead template appended.
 - Launch with {CMD:launch_worker}; wait with {CMD:wait_for}; never a hand-written sleep loop.
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].

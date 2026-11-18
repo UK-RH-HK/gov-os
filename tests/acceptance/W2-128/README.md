@@ -199,7 +199,7 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S21 | `test_w2_128_rows.py::test_row_4_a_pair_runs_under_its_ticket_s_own_id[role-lead]` | red | the file does not exist |
 | S21 | `test_w2_128_rows.py::test_row_4_a_pair_runs_under_its_ticket_s_own_id[role-cto]` | red | the file does not exist |
 | S21 | `test_w2_128_rows.py::test_row_5_t0_no_merge_inside_the_sandbox` | red | `brief.md` does not exist |
-| S21 | `test_w2_128_rows.py::test_row_6_t0_and_facts_the_pytest_marker_form_empty_home_and_no_retrieve_in_the_sandbox` | red | `facts.yaml` does not exist |
+| S21 | `test_w2_128_rows.py::test_row_6_t0_and_facts_the_pytest_marker_form_empty_home_and_memory_first` | red | `facts.yaml` does not exist; revised for W2-197 (EMERGENCY-2 5.4): red on W2-197's base, where brief.md still says no gov retrieve in the sandbox |
 | S21 | `test_w2_128_rows.py::test_row_7_t4_the_readme_map_names_every_case_by_its_full_node_id` | red | `role-test-designer.md` does not exist |
 | S21 | `test_w2_128_rows.py::test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line[role-lead]` | green (revised, DEC-1163 (1), W2-182) | red only when the "until W2-56" line is planted back into the template |
 | S21 | `test_w2_128_rows.py::test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line[role-cto]` | green (revised, DEC-1163 (1), W2-182) | red only when the "until W2-56" line is planted back into the template |
@@ -329,6 +329,24 @@ sandbox: **121 collected, 10 failed, 111 passed** (15 s); the exclusion left not
   inside the ticket sentence; the permitting sentence removed; refusal (c) or (d) dropped; `task: '{ID}'` kept; the
   comment removed; version 1.2.1; an unrelated orchestration line changed or one added; a test-design Inputs line
   changed. Two allowed changes stayed green: an Inputs line re-cited to CAP-38.c, the temp-hygiene line dropped.
+
+## Revised for W2-197 (EMERGENCY-2 5.4; DAEO-3d3o, 2026-11-17)
+
+By W2-197's independent test designer, in the same commit series as W2-197's own cases (the implementation was not
+read). W2-197 S3 makes T-0 say memory first for everyone and removes "No `gov retrieve` in the sandbox" and every
+outside/inside-the-sandbox split for retrieve (audit 2 R18, F-C).
+
+- **Row 6** (`test_w2_128_rows.py`), renamed from `..._and_no_retrieve_in_the_sandbox` to `..._and_memory_first`:
+  its third part required brief.md to say no gov retrieve in the sandbox; it now requires the opposite: no unit of
+  brief.md that names retrieve and the sandbox carries a negation (`NEGATION`, "outside" included), and a unit holds
+  "Ask memory first" with the retrieve command (`{CMD:retrieve}` read as its run form). The pytest marker form and the
+  empty `HOME` are required as before. Red on W2-197's base (`067cd2946`) for that reason alone.
+- **Checked, unchanged:** S20 ("Ask memory first" in Commands, the next line the search-again-once line) holds for the
+  new T-0 as W2-197 S3 states it; S6 (a check naming gov retrieve must be `--help`) and F1 (every gov command a
+  template names is in facts) are unchanged by W2-197's text (the retrieve form's `check` stays `gov retrieve --help`);
+  S5 (every key in keys.yaml) asks keys.yaml to hold `MEMORY_BLOCK`, which W2-197 S7 adds. S2's prose budget: the
+  shared memory line adds about 235 characters to each role template; role-reviewer is at 3,188 of 3,500 on the base.
+  No other expectation was lowered.
 
 ## Notes and limits
 

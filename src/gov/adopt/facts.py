@@ -41,7 +41,7 @@ paths:
 COMMANDS = {
     "identity": None,
     "where": None,
-    "retrieve": ('gov retrieve "{QUESTION}"', "gov retrieve --help"),
+    "retrieve": ('gov retrieve "<question>"', "gov retrieve --help"),
     "context": ("gov context {ID} --role {WORKER_ROLE}", "gov context --help"),
     "links": ("gov links --since {BASE}", "gov links --help"),
     "accept": ("gov accept {ID} --root {WRITE_TREE}", "gov accept --help"),

@@ -52,7 +52,15 @@ def test_row_5_t0_no_merge_inside_the_sandbox():
     _cited(hits, "brief", 5)
 
 
-def test_row_6_t0_and_facts_the_pytest_marker_form_empty_home_and_no_retrieve_in_the_sandbox():
+def test_row_6_t0_and_facts_the_pytest_marker_form_empty_home_and_memory_first():
+    """Row 6: T-0 and facts carry the pytest marker form with an empty HOME.
+
+    Revised for W2-197 (EMERGENCY-2 5.4; DAEO-3d3o S3): the case required brief.md to say "no gov retrieve in the
+    sandbox" (row 6's third part). W2-197 reverses it: T-0 says memory first for everyone, with no sandbox split for
+    retrieve. The case now requires the opposite: no unit of brief.md denies or splits retrieve by the sandbox, and a
+    unit holds "Ask memory first" with the retrieve command ({CMD:retrieve} read as its run form). The marker form and
+    the empty HOME are required as before.
+    """
     form = re.compile(r"""-m\s+["']not local_only["'].*-k\s+["']not real and not green_here and not time_limit["']""")
     entry = s.commands().get("pytest_folder")
     assert isinstance(entry, dict) and form.search(str(entry.get("run", ""))), \
@@ -61,8 +69,10 @@ def test_row_6_t0_and_facts_the_pytest_marker_form_empty_home_and_no_retrieve_in
     hits = [unit for unit in s.units(s.template("brief")) if form.search(s.expanded(unit, data))
             and "HOME" in s.expanded(unit, data)]
     _cited(hits, "brief", 6)
-    retrieve = [unit for unit in s.units_with("brief", "retrieve", "sandbox") if s.NEGATION.search(unit)]
-    assert retrieve, "brief.md does not say no gov retrieve in the sandbox (D5 row 6)"
+    retrieve_off = [unit for unit in s.units_with("brief", "retrieve", "sandbox") if s.NEGATION.search(unit)]
+    assert not retrieve_off, f"brief.md still denies or splits gov retrieve by the sandbox (W2-197 S3): {retrieve_off}"
+    first = s.units_with("brief", "ask memory first", "gov retrieve")
+    assert first, "brief.md has no 'Ask memory first' unit naming the retrieve command (W2-197 S3)"
 
 
 def test_row_7_t4_the_readme_map_names_every_case_by_its_full_node_id():
