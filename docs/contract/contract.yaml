@@ -3633,3 +3633,277 @@ capabilities:
     item: 'Non-goal: the guard denies a Bash call carrying `dangerouslyDisableSandbox: true`: no sandbox, no guard'
     source: EMERGENCY-2 §2.2 (DEC-1211)
     wave: NONE
+- id: CAP-63
+  title: The landing
+  outcome: 'A ticket lands by one deterministic action, in minutes, in Gov OS and in an adopted repository: the merge, the
+    impact-selected tests, the path and authorship checks and the close record are one step.'
+  acceptance: '`gov queue` merges a ticket''s branch into integration, runs the impact-selected tests on the merged result,
+    checks trailers, paths, test authorship, a committed tree, store freshness and disk, writes the ticket''s close record
+    itself and closes the ticket at the land; the merge, tests and checks of one EXAMIN feature ticket finish in minutes;
+    a red landing names its cause.'
+  wave: W2
+  provider:
+  - W2-115b (gov queue)
+  - W2-193
+  - W2-194
+  sources:
+  - EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+  - DEC-1214 L1, L2, Q-CLOSE
+  - DEC-906
+  - DEC-1052
+  - DEC-1116
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-63.a
+    item: The landing merges, runs the impact-selected tests on the merged result and checks trailers, containment (a notice),
+      test authorship, a committed tree, store freshness and disk
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-115b
+  - id: CAP-63.b
+    item: The landing writes the ticket's close record and closes the ticket at the land; no separate close step carries weight
+      of its own (DEC-1214 L2)
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-115b
+  - id: CAP-63.c
+    item: A red landing is fixed by finding and removing its cause; the fix lands without a new ticket; a red already on the
+      base is recorded as a known base red (DEC-1214 Q-CLOSE)
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-193
+    - W2-194
+  - id: CAP-63.d
+    item: The landing exists in an adopted repository (`gov queue`), not only among Gov OS's own tools
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-115b
+- id: CAP-64
+  title: The run-time tool
+  outcome: 'The work keeps going without the owner as the relay: ready tickets start in the slots the machine has, a finished
+    session is told to its lead, and a stalled session is woken.'
+  acceptance: 'RT-1 to RT-8 each pass their own verify (EMERGENCY-2 §6.3): no ready ticket waits more than 10 minutes while
+    the machine has room for it; the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing;
+    slots come from the CPU, RAM and GPU detected at start; zero GPU spill events; a session resumes after a compaction, restart
+    or crash at its recorded next step; messages go through per-session inbox files and none passes through the owner; one
+    watcher process; the launcher states the rubric''s model and effort.'
+  wave: W2
+  provider:
+  - W2-121c
+  - W2-121d
+  - W2-156
+  sources:
+  - EMERGENCY-2 §6.3, A-5 (DEC-1211)
+  - DEC-1007
+  - DEC-1030
+  - DEC-1214 T1, T2, T3
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-64.a
+    item: 'RT-1: no ready ticket waits more than 10 minutes while the machine has room for it (verify: a week of the tool''s
+      log)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.b
+    item: 'RT-2: the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing (verify: finish
+      times against message times)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+    - W2-121d
+  - id: CAP-64.c
+    item: 'RT-3: slots come from the CPU, RAM and GPU detected at start, with no machine-specific constant (verify: one configuration
+      runs on two simulated machine profiles)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.d
+    item: 'RT-4: zero GPU spill events; embedders and rerankers stay on the GPU, even if that limits parallel leads (verify:
+      the GPU log; DEC-1214 T3)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.e
+    item: 'RT-5: after a compaction, restart or crash a session resumes at the recorded next step without the owner restating
+      it (CAP-37; verify: a forced compaction and a killed session)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.f
+    item: 'RT-6: messages between CTOs, leads, workers and the operator go through per-session inbox files with a read mark;
+      none passes through the owner (verify: a week of owner messages carries no relays)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.g
+    item: 'RT-7: one state file and one wake rule replace today''s watcher layers (verify: one watcher process)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+    - W2-121d
+  - id: CAP-64.h
+    item: 'RT-8: the launcher picks the model and effort from the rubric and states them (verify: the launch log)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.i
+    item: A stalled session is detected by the dispatcher's cron pass, a shell script that costs no model (DEC-1214 T1)
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.j
+    item: The owner is pushed to his phone when the CTO needs his decision (features, specs, KPIs, data and measurement, P1
+      decisions touching the core or the kernel) (DEC-1214 T2)
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+- id: CAP-65
+  title: Memory by construction
+  outcome: Every agent uses memory because its brief carries it, not because it remembers to ask.
+  acceptance: Every brief `gov brief` writes holds the ticket's whole retrieval bundle and no unfilled `{…}` placeholder;
+    every role template and every skill says memory first and none forbids `gov retrieve`; the memory-use log has a line for
+    each retrieve.
+  wave: W2
+  provider:
+  - W2-197
+  sources:
+  - EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+  - DEC-836
+  - DEC-1210
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-65.a
+    item: Every brief carries the ticket's retrieval bundle, uncut (CAP-15)
+    source: EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-197
+  - id: CAP-65.b
+    item: Every template and every skill says memory first; the brief template no longer says "No `gov retrieve` in the sandbox"
+    source: EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-197
+  - id: CAP-65.c
+    item: 'A memory-use log records each retrieve: who asked, when, the question and what came back'
+    source: EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-197
+- id: CAP-66
+  title: The hidden-set scan
+  outcome: A hidden question set that an agent has read is detected, and its measure is void.
+  acceptance: The transcripts written between a set's writing and the end of its measure contain neither its path nor its
+    question ids, or the measure is void; the memory reader runs with only the memory tool and the gold sits outside the index.
+  wave: W2
+  provider:
+  - 'W2: the transcript scan (A-12)'
+  sources:
+  - EMERGENCY-2 §2.7, A-12 (DEC-1211)
+  - DEC-1214 E3
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-66.a
+    item: The transcript scan reads every transcript written between the set's writing and the end of its measure, looking
+      for the set's path and its question ids; a hit voids the measure
+    source: EMERGENCY-2 §2.7, A-12 (DEC-1211)
+    wave: W2
+  - id: CAP-66.b
+    item: The memory reader runs with only the memory tool, and the gold sits outside the index and outside the clone
+    source: EMERGENCY-2 §2.7, A-12 (DEC-1211)
+    wave: W2
+- id: CAP-67
+  title: Backups
+  outcome: The owner can recover any repository from a bundle less than an hour old.
+  acceptance: Each repository has a `git bundle` kept outside its tree that is less than an hour old.
+  wave: W2
+  provider:
+  - 'W2: the hourly bundle job'
+  sources:
+  - EMERGENCY-2 §2.8 (DEC-1211)
+  - DEC-848
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-67.a
+    item: An hourly `git bundle` of each repository, kept outside the tree
+    source: EMERGENCY-2 §2.8 (DEC-1211)
+    wave: W2
+- id: CAP-68
+  title: The basis line
+  outcome: No new rule arrives without the incident behind it.
+  acceptance: A decision record that adds a rule names its incident in a basis line, `gov check` fails a decision-record commit
+    without one, and a weekly basis review lists the rules added since the last.
+  wave: W2
+  provider:
+  - 'W2: the basis-line check (A-8)'
+  sources:
+  - EMERGENCY-2 §10.1, A-8 (DEC-1211)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-68.a
+    item: A new rule's decision record names its incident, checked by code at the decision-record commit
+    source: EMERGENCY-2 §10.1, A-8 (DEC-1211)
+    wave: W2
+  - id: CAP-68.b
+    item: A weekly basis review lists the rules added since the last review
+    source: EMERGENCY-2 §10.1, A-8 (DEC-1211)
+    wave: W2
+- id: CAP-69
+  title: Transcripts kept
+  outcome: The owner can see what any session did for a year.
+  acceptance: The harness setting `cleanupPeriodDays` is 365 in the owner's settings.
+  wave: W1
+  wave_note: 'built: the owner''s setting'
+  provider:
+  - the owner's `~/.claude/settings.json`
+  sources:
+  - EMERGENCY-2 §10.3 (DEC-1211)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-69.a
+    item: Transcripts are kept for 365 days
+    source: EMERGENCY-2 §10.3 (DEC-1211)
+    wave: W1

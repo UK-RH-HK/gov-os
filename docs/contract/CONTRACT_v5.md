@@ -31,11 +31,11 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
-| W1 | 36 | 4 | 0 | 40 |
-| W2 | 12 | 0 | 0 | 12 |
+| W1 | 37 | 4 | 0 | 41 |
+| W2 | 18 | 0 | 0 | 18 |
 | W3 | 7 | 0 | 0 | 7 |
 | NONE | 0 | 0 | 3 | 3 |
-| **All** | 55 | 4 | 3 | 62 |
+| **All** | 62 | 4 | 3 | 69 |
 
 DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1. Version 4.1 adds CAP-61 and CAP-62 to Wave 1 (DEC-152, DEC-153).
 
@@ -959,4 +959,104 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Sources:** DEC-152; DEC-153; EXP-001 (spike-sandbox/EVIDENCE.md §5.4); EMERGENCY-2 §2.2 (DEC-1211)
 - **Covers:**
   - `CAP-62.a` [NONE] Non-goal: the guard denies a Bash call carrying `dangerouslyDisableSandbox: true`: no sandbox, no guard — EMERGENCY-2 §2.2 (DEC-1211)
+- **Scenarios:** dev — · qual —
+
+### CAP-63 — The landing
+
+- **Outcome:** A ticket lands by one deterministic action, in minutes, in Gov OS and in an adopted repository: the merge, the impact-selected tests, the path and authorship checks and the close record are one step.
+- **Acceptance:** `gov queue` merges a ticket's branch into integration, runs the impact-selected tests on the merged result, checks trailers, paths, test authorship, a committed tree, store freshness and disk, writes the ticket's close record itself and closes the ticket at the land; the merge, tests and checks of one EXAMIN feature ticket finish in minutes; a red landing names its cause.
+- **Wave:** W2
+- **Provider:** W2-115b (gov queue), W2-193, W2-194
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §4.3, §4.4 (DEC-1211); DEC-1214 L1, L2, Q-CLOSE; DEC-906; DEC-1052; DEC-1116
+- **Covers:**
+  - `CAP-63.a` [W2] The landing merges, runs the impact-selected tests on the merged result and checks trailers, containment (a notice), test authorship, a committed tree, store freshness and disk — EMERGENCY-2 §4.3, §4.4 (DEC-1211) · delivered by W2-115b
+  - `CAP-63.b` [W2] The landing writes the ticket's close record and closes the ticket at the land; no separate close step carries weight of its own (DEC-1214 L2) — EMERGENCY-2 §4.3, §4.4 (DEC-1211) · delivered by W2-115b
+  - `CAP-63.c` [W2] A red landing is fixed by finding and removing its cause; the fix lands without a new ticket; a red already on the base is recorded as a known base red (DEC-1214 Q-CLOSE) — EMERGENCY-2 §4.3, §4.4 (DEC-1211) · delivered by W2-193, W2-194
+  - `CAP-63.d` [W2] The landing exists in an adopted repository (`gov queue`), not only among Gov OS's own tools — EMERGENCY-2 §4.3, §4.4 (DEC-1211) · delivered by W2-115b
+- **Scenarios:** dev — · qual —
+
+### CAP-64 — The run-time tool
+
+- **Outcome:** The work keeps going without the owner as the relay: ready tickets start in the slots the machine has, a finished session is told to its lead, and a stalled session is woken.
+- **Acceptance:** RT-1 to RT-8 each pass their own verify (EMERGENCY-2 §6.3): no ready ticket waits more than 10 minutes while the machine has room for it; the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing; slots come from the CPU, RAM and GPU detected at start; zero GPU spill events; a session resumes after a compaction, restart or crash at its recorded next step; messages go through per-session inbox files and none passes through the owner; one watcher process; the launcher states the rubric's model and effort.
+- **Wave:** W2
+- **Provider:** W2-121c, W2-121d, W2-156
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §6.3, A-5 (DEC-1211); DEC-1007; DEC-1030; DEC-1214 T1, T2, T3
+- **Covers:**
+  - `CAP-64.a` [W2] RT-1: no ready ticket waits more than 10 minutes while the machine has room for it (verify: a week of the tool's log) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.b` [W2] RT-2: the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing (verify: finish times against message times) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c, W2-121d
+  - `CAP-64.c` [W2] RT-3: slots come from the CPU, RAM and GPU detected at start, with no machine-specific constant (verify: one configuration runs on two simulated machine profiles) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.d` [W2] RT-4: zero GPU spill events; embedders and rerankers stay on the GPU, even if that limits parallel leads (verify: the GPU log; DEC-1214 T3) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.e` [W2] RT-5: after a compaction, restart or crash a session resumes at the recorded next step without the owner restating it (CAP-37; verify: a forced compaction and a killed session) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.f` [W2] RT-6: messages between CTOs, leads, workers and the operator go through per-session inbox files with a read mark; none passes through the owner (verify: a week of owner messages carries no relays) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.g` [W2] RT-7: one state file and one wake rule replace today's watcher layers (verify: one watcher process) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c, W2-121d
+  - `CAP-64.h` [W2] RT-8: the launcher picks the model and effort from the rubric and states them (verify: the launch log) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.i` [W2] A stalled session is detected by the dispatcher's cron pass, a shell script that costs no model (DEC-1214 T1) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+  - `CAP-64.j` [W2] The owner is pushed to his phone when the CTO needs his decision (features, specs, KPIs, data and measurement, P1 decisions touching the core or the kernel) (DEC-1214 T2) — EMERGENCY-2 §6.3, A-5 (DEC-1211) · delivered by W2-121c
+- **Scenarios:** dev — · qual —
+
+### CAP-65 — Memory by construction
+
+- **Outcome:** Every agent uses memory because its brief carries it, not because it remembers to ask.
+- **Acceptance:** Every brief `gov brief` writes holds the ticket's whole retrieval bundle and no unfilled `{…}` placeholder; every role template and every skill says memory first and none forbids `gov retrieve`; the memory-use log has a line for each retrieve.
+- **Wave:** W2
+- **Provider:** W2-197
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211); DEC-836; DEC-1210
+- **Covers:**
+  - `CAP-65.a` [W2] Every brief carries the ticket's retrieval bundle, uncut (CAP-15) — EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211) · delivered by W2-197
+  - `CAP-65.b` [W2] Every template and every skill says memory first; the brief template no longer says "No `gov retrieve` in the sandbox" — EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211) · delivered by W2-197
+  - `CAP-65.c` [W2] A memory-use log records each retrieve: who asked, when, the question and what came back — EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211) · delivered by W2-197
+- **Scenarios:** dev — · qual —
+
+### CAP-66 — The hidden-set scan
+
+- **Outcome:** A hidden question set that an agent has read is detected, and its measure is void.
+- **Acceptance:** The transcripts written between a set's writing and the end of its measure contain neither its path nor its question ids, or the measure is void; the memory reader runs with only the memory tool and the gold sits outside the index.
+- **Wave:** W2
+- **Provider:** W2: the transcript scan (A-12)
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §2.7, A-12 (DEC-1211); DEC-1214 E3
+- **Covers:**
+  - `CAP-66.a` [W2] The transcript scan reads every transcript written between the set's writing and the end of its measure, looking for the set's path and its question ids; a hit voids the measure — EMERGENCY-2 §2.7, A-12 (DEC-1211)
+  - `CAP-66.b` [W2] The memory reader runs with only the memory tool, and the gold sits outside the index and outside the clone — EMERGENCY-2 §2.7, A-12 (DEC-1211)
+- **Scenarios:** dev — · qual —
+
+### CAP-67 — Backups
+
+- **Outcome:** The owner can recover any repository from a bundle less than an hour old.
+- **Acceptance:** Each repository has a `git bundle` kept outside its tree that is less than an hour old.
+- **Wave:** W2
+- **Provider:** W2: the hourly bundle job
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §2.8 (DEC-1211); DEC-848
+- **Covers:**
+  - `CAP-67.a` [W2] An hourly `git bundle` of each repository, kept outside the tree — EMERGENCY-2 §2.8 (DEC-1211)
+- **Scenarios:** dev — · qual —
+
+### CAP-68 — The basis line
+
+- **Outcome:** No new rule arrives without the incident behind it.
+- **Acceptance:** A decision record that adds a rule names its incident in a basis line, `gov check` fails a decision-record commit without one, and a weekly basis review lists the rules added since the last.
+- **Wave:** W2
+- **Provider:** W2: the basis-line check (A-8)
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §10.1, A-8 (DEC-1211)
+- **Covers:**
+  - `CAP-68.a` [W2] A new rule's decision record names its incident, checked by code at the decision-record commit — EMERGENCY-2 §10.1, A-8 (DEC-1211)
+  - `CAP-68.b` [W2] A weekly basis review lists the rules added since the last review — EMERGENCY-2 §10.1, A-8 (DEC-1211)
+- **Scenarios:** dev — · qual —
+
+### CAP-69 — Transcripts kept
+
+- **Outcome:** The owner can see what any session did for a year.
+- **Acceptance:** The harness setting `cleanupPeriodDays` is 365 in the owner's settings.
+- **Wave:** W1 (built: the owner's setting)
+- **Provider:** the owner's `~/.claude/settings.json`
+- **Disposition:** KEPT
+- **Sources:** EMERGENCY-2 §10.3 (DEC-1211)
+- **Covers:**
+  - `CAP-69.a` [W1] Transcripts are kept for 365 days — EMERGENCY-2 §10.3 (DEC-1211)
 - **Scenarios:** dev — · qual —
