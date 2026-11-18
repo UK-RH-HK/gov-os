@@ -1,9 +1,9 @@
 # Contract v4 — machine-readable. Same content as CONTRACT_v4.md.
 id: CONTRACT-v4
 status: ACCEPTED
-version: '4.3'
+version: '4.4'
 date: '2026-09-30'
-revised: '2026-11-09'
+revised: '2026-11-18'
 change_log:
 - version: '4.0'
   date: '2026-09-30'
@@ -35,6 +35,11 @@ change_log:
     source is the release''s manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part
     of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers
     items (W2 20 → 19, W3 38 → 39).'
+- version: '4.4'
+  date: '2026-11-18'
+  change: 'W2-192 specification change (docs/changes/W2-192-CIT-P.md), approved by the owner (DEC-1213). Carries DEC-1200
+    (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3.
+    62 capabilities; 215 covers items (W2 19 → 20).'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -2612,13 +2617,14 @@ capabilities:
   wave: W3
   wave_note: W1 delivers gov init (copier copy) and adoption stages A0-A6 and A8 with baseline, rollback points and the A5
     independent path-map review (W1-39, W1-41); the lite A7 and A10 gates and the lite verdict are W2 (CAP-44.f, CAP-44.h;
-    DEC-722); A9, A11, the full A7 and A10 gates and the verdict with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47
+    DEC-722); stage AS, the lite spec audit, is W2 (CAP-44.m; DEC-1200); A9, A11, the full A7 and A10 gates and the verdict with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47
     (CAP-44.k, CAP-44.l; DEC-090)
   provider:
   - Copier 9.18.2
   - W1-39
   - W1-41
   - 'W2: lite A7/A10 gates + lite verdict (DEC-722)'
+  - 'W2: stage AS, the lite spec audit (W2-192, DEC-1200)'
   - 'W3: A9/A11 + full A7/A10 gates + full verdict (with CAP-47)'
   sources:
   - Contract v3 Gate S3, S4
@@ -2629,6 +2635,7 @@ capabilities:
   - DEC-023
   - DEC-090
   - DEC-722
+  - DEC-1200
   scenarios:
     dev:
     - B-01
@@ -2726,6 +2733,18 @@ capabilities:
       conditions, after A0–A11
     source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
     wave: W3
+  - id: CAP-44.m
+    item: 'AS spec audit, lite: after A2 and before A3, `gov adopt --lite --stage AS` records every spec found (path, title,
+      its stated wave or status), each built, partly built or not built with evidence (code paths, tests, commits), the
+      tickets found done or not by wave, the specs with no code, the code with no spec (top-level code modules no spec
+      names), and each gap as one question to the owner with a place for the answer; the lite checks (every spec and every
+      top-level code module the inventory holds named, every gap with a question) refuse a record that fails either; A3
+      refuses to run before AS is recorded; built or not is judged from code paths, tests and commits, never by a model;
+      the path map''s reviewer at A5 reads the record'
+    source: DEC-1200; P-ADOPT-SPEC-AUDIT-1
+    wave: W2
+    provider:
+    - W2-192
 - id: CAP-45
   title: gov update lifecycle
   outcome: The owner can update the Gov OS in a repository without losing overlay configuration.
