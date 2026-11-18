@@ -131,6 +131,7 @@ counts as before; no other case changed).
   DEC-989<-DEC-1141) may stay out of a marks commit when it keeps the old line whole (an append) and adds no census
   pair of that entry. An edit in the middle of the line, or a census pair appended outside a marks commit, fails; in a
   named marks commit the check is as before (append or decided status).
+  The appended ` · **Class:** ...` segment (audit 8's class, DEC-1214 G4, from that text to the end of the line) is the owner's classification, not a clean-up mark: ids only inside it do not count as a census pair, and a case on a planted line proves both directions.
 - Findings 3 and 4 (S2, the two follow-up marks): the Verify names the pairs (DEC-1115<-DEC-1122, DEC-026<-DEC-086),
   not the mark's wording, which the independent auditor may correct (S3). The case no longer fixes the appended text:
   exactly one follow-up marks commit, after both clean-up commits, appends to the old line a mark that makes the line
@@ -173,6 +174,7 @@ record, the case reads the record first and fails (never skips).
 | S1 | `test_w2_130_marks.py::test_s1_each_of_the_87_names_every_changer_the_census_states_on_its_own_status_line` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S1 | `test_w2_130_marks.py::test_s1_the_marks_e12f8a30c_adds_equal_patches_a0_a1_a2_after_the_audits_drops_and_rewrites` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
 | S1 | `test_w2_130_marks.py::test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_and_append_only` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |
+| S1 | `test_w2_130_marks.py::test_s1_a_class_segment_naming_a_census_changer_is_not_a_mark_but_the_same_id_elsewhere_in_the_tail_is` | green | green by design: the Class-segment rule on a planted status line (a tail that is only a Class segment naming a census changer passes; the same changer named outside it, or an edit in the middle, fails) |
 | S2 | `test_w2_130_marks.py::test_s2_gov_links_reports_no_unmarked_change_but_the_eight_pairs_the_auditor_judged_wrong` | red | HEAD reports UNMARKED_CHANGE for DEC-026<-DEC-086 and DEC-1115<-DEC-1122 besides the 8 (not yet marked); a pair whose later decision is recorded as the owner's counts as marked (rule, not a pinned list) |
 | S2 | `test_w2_130_marks.py::test_s2_a_pair_is_a_marked_change_only_when_its_later_decision_is_recorded_as_the_owners` | green | green by design: the owner-decision rule on a planted register (a changer recorded as the owner's by `ACCEPTED (owner` or `Decided-by: owner` is a marked change; any other changer, or one the register lacks, is not) |
 | S2 | `test_w2_130_marks.py::test_s2_judged_wrong_holds_the_eight_gov_links_pairs_each_with_the_auditors_verdict` | red | `docs/research/W2-130-link-cleanup.md` does not exist (the block this case reads is missing: the case fails, never skips) |

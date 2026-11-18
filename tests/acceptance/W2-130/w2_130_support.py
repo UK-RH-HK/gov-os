@@ -675,6 +675,27 @@ def not_owner_marked(pairs, register_text: str) -> list[tuple[str, str]]:
     return sorted(pair_ for pair_ in pairs if not owner_decided(lines.get(pair_[1], "")))
 
 
+CLASS_SEGMENT = " \u00b7 **Class:**"
+
+
+def outside_marks_problem(old: str, new: str, census_ids) -> str | None:
+    """Why a status-line change made outside a marks commit is refused, or ``None`` when it is allowed.
+
+    It must keep the old line whole (an append) and its appended tail must name none of ``census_ids`` (the census
+    changers of that entry). The ids inside the appended `` \u00b7 **Class:** ...`` segment (from that text to the end of
+    the line, the form ``docs/emergency-2/audits/08-apply.py`` writes) are audit 8's classification of the entry
+    (DEC-1214 G4), not a clean-up mark, and do not count."""
+    if not new.startswith(old):
+        return "edited outside a marks commit, not an append"
+    tail = new[len(old):]
+    cut = tail.find(CLASS_SEGMENT)
+    if cut != -1:
+        tail = tail[:cut]
+    if set(ids_in(tail)) & set(census_ids):
+        return "a census pair marked outside a marks commit"
+    return None
+
+
 def by_pair(findings: list[dict], code: str = "UNMARKED_CHANGE") -> dict:
     return {(f["ids"][0], f["ids"][1]): f for f in findings if f["code"] == code}
 
