@@ -1,5 +1,5 @@
-"""The memory-use log (W2-197 S8, S9, F2; EMERGENCY-2 5.6): one JSON line per ``gov retrieve`` call and per ``gov brief``
-memory retrieval, and the reader the digest counts it with.
+"""The memory-use log (W2-197 S8, S9, F2; EMERGENCY-2 5.6): one JSON line per ``gov retrieve`` call and per
+``gov brief`` memory retrieval, and the reader the digest counts it with.
 
 The log is ``GOV_MEMORY_LOG`` when set, else ``<main worktree>/.gov-runtime/memory-use.jsonl``: the main worktree of
 the caller's tree is the parent of ``git rev-parse --git-common-dir``; a tree outside git is its own. A record holds

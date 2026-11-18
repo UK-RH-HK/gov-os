@@ -5,10 +5,9 @@ role: orchestrator
 skills: [orchestration, planning, change]
 ---
 # Operating card
-Start: read RESUME HERE and the decisions-in-force list; the rest on demand, from memory.
+Start: read RESUME HERE and the decisions-in-force list; the rest on demand ({CMD:retrieve}), and search again once: when a bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all [DEC-1092].
 
 **Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
-Answer from both bundles with path and lines, or say "not found"; two searches in all [DEC-1092].
 
 Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
 

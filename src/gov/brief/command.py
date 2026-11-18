@@ -1,5 +1,5 @@
-"""``gov brief <role> <ticket> [--run <kind>] [--part <file>] [--repair <file>] [--store <dir>] [--root <repo>] [--json]``
-(W2-152, W2-197).
+"""``gov brief <role> <ticket> [--run <kind>] [--part <file>] [--repair <file>] [--store <dir>] [--root <repo>]
+[--json]`` (W2-152, W2-197).
 
 Prints the filled T-0 (``template/governance/kernel/templates/brief.md``) for the role, from the ticket file,
 ``governance/project/facts.yaml`` and the kernel templates; for a lead, the one run block of T-7 that ``--run``
@@ -7,10 +7,11 @@ names follows it. Without ``--json`` stdout is the brief alone, and the ready ch
 stderr, each ``gov brief: <CODE> <detail>``; with ``--json``, gov's envelope with ``result.brief``,
 ``result.warnings``, ``result.size``, ``result.budget`` and ``result.memory`` (W2-197 S1: the ticket's retrieval, as
 ``gov.brief.memory.public`` gives it). A store that is missing or cannot be read is the warning
-``gov brief: MEMORY_UNAVAILABLE <detail>`` and the block's not-reached line, never a refusal (F1). A ticket that is not READY, a placeholder left over, a KPI
-line without a verify or an "until <ticket>" line whose ticket is closed is refused: ``GovError("BRIEF_NOT_READY")``
-with ``details.findings`` (each ``{code, detail}``), nothing on stdout but ``--json``'s envelope. It writes one file
-only: the retrieval's line in the memory-use log (``gov.memory_use``, S8), which never changes what is printed (F2).
+``gov brief: MEMORY_UNAVAILABLE <detail>`` and the block's not-reached line, never a refusal (F1). A ticket that is
+not READY, a placeholder left over, a KPI line without a verify or an "until <ticket>" line whose ticket is closed is
+refused: ``GovError("BRIEF_NOT_READY")`` with ``details.findings`` (each ``{code, detail}``), nothing on stdout but
+``--json``'s envelope. It writes one file only: the retrieval's line in the memory-use log (``gov.memory_use``, S8),
+which never changes what is printed (F2).
 """
 
 from __future__ import annotations
