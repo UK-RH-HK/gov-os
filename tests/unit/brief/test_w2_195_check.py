@@ -15,8 +15,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from test_w2_195_inject import (JUDGING, KERNEL_REL, PRELOADED_REL, kernel_bytes, plant,  # noqa: E402
-                                rulesync_form)
+from test_w2_195_inject import (JUDGING, KERNEL_REL, PRELOADED_REL, VERSION, bumped, kernel_bytes,  # noqa: E402
+                                plant, rulesync_form)
 
 from gov.brief.build import build  # noqa: E402
 from gov.cli.errors import GovError  # noqa: E402
@@ -35,13 +35,13 @@ def _preloaded_removed(root: Path) -> None:
 
 def _preloaded_other_version(root: Path) -> None:
     copy = root / PRELOADED_REL
-    copy.write_bytes(copy.read_bytes().replace(b'version: "1.0.0"', b'version: "0.9.0"'))
+    copy.write_bytes(copy.read_bytes().replace(f'version: "{VERSION}"'.encode(), b'version: "0.9.0"'))
     assert b"0.9.0" in copy.read_bytes()
 
 
 def _preloaded_no_version(root: Path) -> None:
     copy = root / PRELOADED_REL
-    copy.write_bytes(copy.read_bytes().replace(b'  version: "1.0.0"\n', b""))
+    copy.write_bytes(copy.read_bytes().replace(f'  version: "{VERSION}"\n'.encode(), b""))
     assert b"version" not in copy.read_bytes().split(b"\n---\n")[0]
 
 
@@ -62,7 +62,7 @@ def _fourth_heading_reworded(root: Path) -> None:
 
 def _kernel_no_version(root: Path) -> None:
     path = root / KERNEL_REL
-    data = path.read_bytes().replace(b'version: "1.0.0"\nmetadata:\n  version: "1.0.0"\n', b"")
+    data = path.read_bytes().replace(f'version: "{VERSION}"\nmetadata:\n  version: "{VERSION}"\n'.encode(), b"")
     assert b"version" not in data.split(b"\n---\n")[0]
     path.write_bytes(data)
 
@@ -116,13 +116,16 @@ def test_the_command_refuses_with_the_code_and_prints_no_brief(tmp_path, capsys,
 def test_the_command_prints_a_judging_brief_with_the_skill(tmp_path, capsys):
     root = plant(tmp_path)
     assert main(_args("qa-engineer", None, root)) == 0
-    assert "## 3. How reviews converge" in capsys.readouterr().out
+    third = [line for line in kernel_bytes().decode("utf-8").split("\n") if line.startswith("## 3. ")]
+    assert len(third) == 1 and third[0] in capsys.readouterr().out
 
 
 def test_the_refusal_names_what_is_missing(tmp_path):
     root = plant(tmp_path)
-    (root / PRELOADED_REL).write_bytes(rulesync_form(kernel_bytes()).replace(b"1.0.0", b"2.0.0"))
+    other = bumped(VERSION)
+    (root / PRELOADED_REL).write_bytes(rulesync_form(kernel_bytes()).replace(f'"{VERSION}"'.encode(),
+                                                                             f'"{other}"'.encode()))
     with pytest.raises(GovError) as raised:
         build(root, "independent-auditor", "W2-900")
-    assert "2.0.0" in raised.value.message and "1.0.0" in raised.value.message
+    assert f"version {other}," in raised.value.message and f"version {VERSION}" in raised.value.message
     assert PRELOADED_REL in raised.value.message

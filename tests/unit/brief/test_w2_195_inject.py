@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -21,7 +22,10 @@ REPO = Path(__file__).resolve().parents[3]
 KERNEL_REL = "template/governance/kernel/skills/judging-work/SKILL.md"
 ADOPTED_REL = "governance/kernel/skills/judging-work/SKILL.md"
 PRELOADED_REL = ".claude/skills/judging-work/SKILL.md"
-SECTIONS_SHA_1_0_0 = "36f94490027fdaaddb32105e651621a7a83af7d82fdb36a31a8263df79ec7ac3"
+# The approved text's bytes (the trimmed text of ef82e15fa) and its sections 1 to 3: the approval is on the committed
+# bytes, so these two stay pinned; every version a test names is read from the file instead (version_in).
+APPROVED_SHA = "34ae6c218ab35191e3e5ac3e3443a0118b86017a91d94b8adb5919ce76f3a4d5"
+SECTIONS_SHA = "9844057dfd42a23da972e805a40aee0fd7c498a2b5daf2186bfca1049a9d9d98"
 
 T0 = """---
 name: brief
@@ -57,6 +61,30 @@ def kernel_bytes() -> bytes:
     return (REPO / KERNEL_REL).read_bytes()
 
 
+def version_in(data: bytes) -> str:
+    """The version a skill file's front matter states on its top-level ``version:`` line, read by the test itself."""
+    match = re.search(rb'^version: "([^"]+)"$', data.split(b"\n---\n", 1)[0], re.M)
+    assert match, "the skill file states no top-level version"
+    return match.group(1).decode("utf-8")
+
+
+def bumped(version: str) -> str:
+    """Another version than ``version``: its last number plus one (1.1.0 -> 1.1.1)."""
+    head, _, last = version.rpartition(".")
+    return f"{head}.{int(last) + 1}"
+
+
+def with_version(data: bytes, new: str) -> bytes:
+    """``data`` with every ``version: "<its version>"`` line (top-level and ``metadata``) stating ``new``."""
+    old = version_in(data)
+    out = data.replace(f'version: "{old}"'.encode(), f'version: "{new}"'.encode())
+    assert out != data
+    return out
+
+
+VERSION = version_in(kernel_bytes())
+
+
 def rulesync_form(data: bytes) -> bytes:
     """The generated copy's form: front matter name, description and metadata.version only, no top-level version,
     the blank line after the front matter dropped (as rulesync writes ``.claude/skills/``)."""
@@ -67,9 +95,9 @@ def rulesync_form(data: bytes) -> bytes:
     return ("---\n" + "\n".join(front) + "\n---\n" + body.lstrip("\n")).encode("utf-8")
 
 
-def changed_1_0_1() -> bytes:
-    """A version 1.0.1 copy with one word of section 2 changed: what a brief built from a constant would miss."""
-    data = kernel_bytes().replace(b'version: "1.0.0"', b'version: "1.0.1"')
+def changed_copy() -> bytes:
+    """A copy of the next version with one word of section 2 changed: what a brief built from a constant would miss."""
+    data = with_version(kernel_bytes(), bumped(VERSION))
     data = data.replace(b"Ask of every finding, word for word:", b"Ask of each finding, word for word:")
     assert data != kernel_bytes()
     return data
@@ -111,23 +139,22 @@ def brief_of(root: Path, role: str, run: str | None) -> str:
 
 
 def test_the_kernel_skill_in_this_tree_is_the_approved_text_quoted():
-    assert hashlib.sha256(kernel_bytes()).hexdigest() == \
-        "3fd8864b4b095b01b8748da01acd6a5a0dbd1295aa28ee7e97007dc21d48bf4d"
-    assert hashlib.sha256(sections_of(kernel_bytes())).hexdigest() == SECTIONS_SHA_1_0_0
+    assert hashlib.sha256(kernel_bytes()).hexdigest() == APPROVED_SHA
+    assert hashlib.sha256(sections_of(kernel_bytes())).hexdigest() == SECTIONS_SHA
 
 
 @pytest.mark.parametrize("role, run", JUDGING)
 def test_a_judging_brief_holds_sections_1_to_3_byte_for_byte_and_its_version(tmp_path, role, run):
     brief = brief_of(plant(tmp_path), role, run)
     assert sections_of(kernel_bytes()).decode("utf-8") in brief
-    named = [line for line in brief.split("\n") if "judging-work" in line and "version 1.0.0" in line]
-    assert named == [f"Judging work: the judging-work skill, version 1.0.0 (sections 1 to 3 of {KERNEL_REL}, "
+    named = [line for line in brief.split("\n") if "judging-work" in line and f"version {VERSION}" in line]
+    assert named == [f"Judging work: the judging-work skill, version {VERSION} (sections 1 to 3 of {KERNEL_REL}, "
                      f"verbatim):"]
 
 
 @pytest.mark.parametrize("role, run", JUDGING)
 def test_f1_the_carried_sections_hash_as_the_installed_files_sections(tmp_path, role, run):
-    for kernel, version in ((kernel_bytes(), "1.0.0"), (changed_1_0_1(), "1.0.1")):
+    for kernel, version in ((kernel_bytes(), VERSION), (changed_copy(), bumped(VERSION))):
         shutil.rmtree(tmp_path / "repo", ignore_errors=True)
         brief = brief_of(plant(tmp_path, kernel=kernel), role, run).encode("utf-8")
         start = brief.index(b"\n## 1. The threat model\n") + 1
@@ -135,7 +162,7 @@ def test_f1_the_carried_sections_hash_as_the_installed_files_sections(tmp_path, 
         assert hashlib.sha256(carried).hexdigest() == hashlib.sha256(sections_of(kernel)).hexdigest()
         assert f"version {version} ".encode() in brief
     assert hashlib.sha256(sections_of(kernel_bytes())).hexdigest() != hashlib.sha256(
-        sections_of(changed_1_0_1())).hexdigest()
+        sections_of(changed_copy())).hexdigest()
 
 
 @pytest.mark.parametrize("role, run", NOT_JUDGING)
@@ -160,7 +187,7 @@ def test_in_an_adopted_tree_the_brief_reads_governance_kernel(tmp_path):
 
 def test_a_preloaded_copy_with_a_top_level_version_passes_too(tmp_path):
     brief = brief_of(plant(tmp_path, preloaded=kernel_bytes()), "qa-engineer", None)
-    assert "version 1.0.0" in brief
+    assert f"version {VERSION} " in brief
 
 
 def test_the_qa_engineer_is_a_brief_role_on_the_reviewer_template():

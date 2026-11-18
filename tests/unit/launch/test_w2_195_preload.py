@@ -20,6 +20,16 @@ from gov.adapters import portability  # noqa: E402
 from gov.launch import role  # noqa: E402
 
 KERNEL = REPO / "template/governance/kernel/skills/judging-work/SKILL.md"
+
+
+def _version_in(data: bytes) -> str:
+    """The version the skill file's front matter states on its top-level ``version:`` line, read by the test."""
+    match = re.search(rb'^version: "([^"]+)"$', data.split(b"\n---\n", 1)[0], re.M)
+    assert match, "the skill file states no top-level version"
+    return match.group(1).decode("utf-8")
+
+
+VERSION = _version_in(KERNEL.read_bytes())  # read from the file, never pinned
 FOUR = ("independent-auditor", "qa-engineer", "orchestrator", "ticket-lead")
 OLD = {"independent-auditor": ["audit", "retrieval"], "qa-engineer": ["qa-review"],
        "orchestrator": ["orchestration", "planning", "checkpoint", "change", "retrieval"],
@@ -59,7 +69,10 @@ def test_the_rulesync_mirror_preloads_judging_work_and_is_still_the_composition(
     assert mirror.read_text(encoding="utf-8") == portability.compose(REPO / "template", name)
 
 
-BEFORE = "bc91df0ab"  # the ticket's base, before any kernel change of W2-195
+# The base these files are compared with: w2/integrate's head as last merged into the ticket branch (5d95aad65 merged
+# 9ef5cba29), which holds none of W2-195's kernel changes, so the merged-in lines of other tickets (DEC-1209's line in
+# the orchestrator mirror) are not counted as W2-195's.
+BEFORE = "9ef5cba29"
 
 
 def _at_base(rel: str) -> list[str]:
@@ -112,6 +125,6 @@ def test_read_role_of_a_judging_role_carries_judging_work_named_with_its_version
     loaded = role.read_role(plant(tmp_path, name, "- **Skills:** judging-work"), name)
     entry = [skill for skill in loaded["skills"] if skill["name"] == "judging-work"]
     assert len(entry) == 1
-    assert (entry[0]["named"], entry[0]["version"], entry[0]["path"]) == (True, "1.0.0",
+    assert (entry[0]["named"], entry[0]["version"], entry[0]["path"]) == (True, VERSION,
                                                                           ".claude/skills/judging-work/SKILL.md")
     assert loaded["appended"].endswith(KERNEL.read_bytes())

@@ -18,17 +18,25 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.cli.errors import GovError  # noqa: E402
 from gov.launch import role  # noqa: E402
 
-from .test_w2_195_preload import KERNEL, plant  # noqa: E402
+from .test_w2_195_preload import KERNEL, VERSION, plant  # noqa: E402
 
 CODE = "LAUNCH_JUDGING_RULE_MISSING"
 JUDGES = ("independent-auditor", "qa-engineer")
 WITH = "- **Skills:** judging-work"
 PRELOADED = role.SKILLS_REL + "/judging-work/SKILL.md"
 KERNEL_REL = "template/governance/kernel/skills/judging-work/SKILL.md"
+OTHER = f"{VERSION}-other"  # a version the kernel file never states
+
+
+def _versioned(data: bytes, version: str) -> bytes:
+    """``data`` with each ``version: "<the kernel's version>"`` line (top-level and metadata) stating ``version``."""
+    out = data.replace(f'version: "{VERSION}"'.encode(), f'version: "{version}"'.encode())
+    assert out != data
+    return out
 
 
 def _rulesync_form(data: bytes) -> bytes:
-    return data.replace(b'version: "1.0.0"\nmetadata:', b"metadata:").replace(b"---\n\n#", b"---\n#")
+    return data.replace(f'version: "{VERSION}"\nmetadata:'.encode(), b"metadata:").replace(b"---\n\n#", b"---\n#")
 
 
 def _lacks(tmp_path, name):
@@ -46,7 +54,7 @@ def _copy_removed(tmp_path, name):
 
 
 def _other_version(tmp_path, name):
-    return plant(tmp_path, name, WITH, preloaded=_rulesync_form(KERNEL.read_bytes()).replace(b"1.0.0", b"0.9.0"))
+    return plant(tmp_path, name, WITH, preloaded=_versioned(_rulesync_form(KERNEL.read_bytes()), OTHER))
 
 
 def _kernel_removed(tmp_path, name):
@@ -56,7 +64,7 @@ def _kernel_removed(tmp_path, name):
 
 
 def _kernel_other_version(tmp_path, name):
-    return plant(tmp_path, name, WITH, kernel=KERNEL.read_bytes().replace(b"1.0.0", b"1.0.1"),
+    return plant(tmp_path, name, WITH, kernel=_versioned(KERNEL.read_bytes(), OTHER),
                  preloaded=KERNEL.read_bytes())
 
 
@@ -88,9 +96,9 @@ def test_the_judging_code_wins_over_the_generic_not_at_refusal(tmp_path, name):
 @pytest.mark.parametrize("name", JUDGES)
 def test_a_preloaded_copy_in_rulesyncs_form_passes(tmp_path, name):
     tree = plant(tmp_path, name, WITH, preloaded=_rulesync_form(KERNEL.read_bytes()))
-    assert b'\nversion: "1.0.0"' not in (tree / PRELOADED).read_bytes()
+    assert f'\nversion: "{VERSION}"'.encode() not in (tree / PRELOADED).read_bytes()
     entry = [skill for skill in role.read_role(tree, name)["skills"] if skill["name"] == "judging-work"]
-    assert entry[0]["named"] is True and entry[0]["version"] == "1.0.0"
+    assert entry[0]["named"] is True and entry[0]["version"] == VERSION
 
 
 def test_an_adopted_tree_compares_with_its_governance_kernel(tmp_path):
