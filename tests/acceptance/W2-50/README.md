@@ -16,6 +16,13 @@ Kept, without their write-list asserts: the folder's name (`launch::test_a_ticke
 launcher's folder cases in `test_w2_50_review_findings.py` (the folder made or not made, exactly one folder under the
 root, the session's own temp folder). The rows below that name the write list are the record of their time.
 
+**Rewritten 2026-11-18 (EMERGENCY-2 6.1; the sandbox retired in e7777f434 / 85710e6e6).**
+`last::test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder` (3 forms) no longer asks that a write
+list hold the session's temp folder (there is none); it keeps the checks that the launch adds no entry at or under the
+root and leaves the folder's content unchanged, and its temp-folder check is the one `test_w2_50_review_findings.py`
+already has: the session gets a TMPDIR of its own, not the launcher's. The rows below that say "keeps the temp folder"
+for it are the record of their time.
+
 **636 cases in 13 files** (613 in 12 files before the owner's DEC-853, and 23 cases in
 `test_w2_50_secrets_scan_scale.py` for it, **tests added for the owner's DEC-853, before its implementation**; see the
 section of that name): the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
