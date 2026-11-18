@@ -83,9 +83,26 @@ def roster_prompt(project_root: str) -> str:
     return prompt.strip() if isinstance(prompt, str) else ""
 
 
+def _gov_os_source_tree(project_root: str) -> bool:
+    """The Gov OS source tree itself (copier.yml, template/ and src/gov/ at its root): the one project whose src/ a
+    hook puts on the import path (W2-18); a product's own package named gov is never imported."""
+    return (os.path.isfile(os.path.join(project_root, "copier.yml"))
+            and os.path.isdir(os.path.join(project_root, "template"))
+            and os.path.isdir(os.path.join(project_root, "src", "gov")))
+
+
+def _no_gov(exc: BaseException, what: str) -> bool:
+    """For an import of gov that failed: one line on stderr naming what was looked for, and True (W2-18)."""
+    if not isinstance(exc, ImportError) or not (getattr(exc, "name", None) or "").split(".")[0] == "gov":
+        return False
+    sys.stderr.write(f"gov hook: no gov importable by {sys.executable} (looked on its import path for "
+                     f"{exc.name}); {what}\n")
+    return True
+
+
 def _add_src(project_root: str) -> None:
     src_dir = os.path.join(project_root, "src")
-    if os.path.isdir(src_dir) and src_dir not in sys.path:
+    if _gov_os_source_tree(project_root) and src_dir not in sys.path:
         sys.path.insert(0, src_dir)
 
 
@@ -167,8 +184,8 @@ def main() -> None:
                 f"Checkpoint resume: ticket={b['ticket']}, "
                 f"next_action={b['next_action']}, "
                 f"path={b.get('path', '')}")
-        except Exception:
-            pass
+        except Exception as exc:
+            _no_gov(exc, "the checkpoint resume brief was not added")
 
     critical_text = "\n\n".join(critical_parts)
     optional_text = "\n\n".join(optional_parts)
