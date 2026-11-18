@@ -71,10 +71,15 @@ envelope:
       are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder
       gets its own index.
   ram_budget:
-    decision: DEC-078
+    decision:
+    - DEC-078
+    - DEC-1065
+    - DEC-1211
     statement: Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare;
       incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker,
-      VRAM peak ≈ 5.2 of 16 GiB.
+      VRAM peak ≈ 5.2 of 16 GiB. Embedders and rerankers stay resident on the GPU and never spill to the CPU (RT-4); there
+      is no CPU fallback (DEC-1065). Slots come from the CPU, RAM and GPU the run-time tool detects at start, with no machine-specific
+      constant (RT-3).
   token_budget:
     decision:
     - DEC-004
@@ -461,16 +466,17 @@ capabilities:
     - W1-15
 - id: CAP-04
   title: Budget and resource governance
-  outcome: The owner can set token and cost budgets per task; crossing one raises a decision package instead of continuing
-    silently.
-  acceptance: A task configured with a token budget that its run exceeds stops at the next `gov close` or hook boundary and
-    surfaces a decision package; the breach is recorded in the ticket.
+  outcome: The owner can see what a ticket costs against its projection, and a ticket that runs away is held once instead
+    of continuing silently.
+  acceptance: A ticket whose measured cost passes twice its projection holds its next launch and goes to the inbox once; usage
+    is recorded and reported weekly and never holds, refuses or stops a lead or a worker (W2-156, DEC-1149 (3)).
   wave: W2
-  wave_note: W1 measures the governance share (W1-31); the halting budget gate is W2
+  wave_note: W1 measures the governance share (W1-31); the runaway brake is W2 (W2-156); budgets per task wait for friction
+    (EMERGENCY-2 §6.2 A-1)
   provider:
   - ccusage (pinned, DEC-086)
   - W1-31
-  - 'W2: budget gate in gov close/status'
+  - W2-156 (the runaway brake)
   - W1-21
   sources:
   - Contract v3 Gate A4
@@ -479,6 +485,7 @@ capabilities:
   - DEC-004, DEC-031
   - DEC-083
   - DEC-086
+  - DEC-1149; EMERGENCY-2 §6.2 A-1, §10.2 (DEC-1211)
   scenarios:
     dev:
     - SOAK-X-01
@@ -488,24 +495,28 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-04.a
-    item: Token/cost budgets per task with executable thresholds
-    source: Contract v3 A4; Framework v4.1.2 §73
+    item: Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's
+      spend brake covers it, EMERGENCY-2 §6.2 A-1)
+    source: Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211)
     wave: W2
   - id: CAP-04.b
-    item: Governance share ≤ 10–15 % measured per ticket (DEC-086)
-    source: OWNER-DIRECTION-P2-0009 §11; DEC-004
+    item: Governance share ≤ 15 %, reported weekly with its baseline (56 %), by P1's method until `gov telemetry` measures
+      it (DEC-086; EMERGENCY-2 §10.2, A-7)
+    source: OWNER-DIRECTION-P2-0009 §11; DEC-004; EMERGENCY-2 §10.2 (DEC-1211)
     wave: W1
     provider:
     - W1-31
   - id: CAP-04.c
-    item: 'Two budgets: retrieval spend vs final packet; hitting the spend budget is a governed event'
-    source: DEC-031
+    item: Retrieval spend budget scaled by impact radius; hitting it is a governed event, never silent truncation; there is
+      no packet ceiling (the final-packet budget of DEC-031 is superseded by EMERGENCY-2 §5.5)
+    source: DEC-031; EMERGENCY-2 §5.5 (DEC-1211)
     wave: W1
     provider:
     - W1-21
   - id: CAP-04.d
-    item: Exceeding a delegated limit raises a decision package
-    source: Contract v3 A4
+    item: Exceeding a delegated limit raises a decision package (built only if friction asks; until then the run-time tool's
+      spend brake covers it, EMERGENCY-2 §6.2 A-1)
+    source: Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211)
     wave: W2
 - id: CAP-05
   title: Emergency controls (pause/freeze/cancel/rollback)
@@ -1368,7 +1379,7 @@ capabilities:
     (DEC-094), are W2
   provider:
   - W1-25
-  - 'W2: typed handoff records'
+  - W2-121c (inbox files)
   - W1-33
   - W1-05
   - W1-46
@@ -1397,12 +1408,15 @@ capabilities:
     - W1-05
     - W1-33
   - id: CAP-22.b
-    item: Typed handoff records readable by a fresh agent
-    source: Contract v3 E3; Framework v4.1.2 §25
+    item: 'A handoff is the worker''s return contract (CAP-37.d) plus the run-time tool''s per-session inbox files with a
+      read mark (RT-6): a finished worker''s return reaches its lead''s inbox file and no owner message relays it'
+    source: Contract v3 E3; Framework v4.1.2 §25; EMERGENCY-2 §6.3 (DEC-1211)
     wave: W2
+    provider:
+    - W2-121c
   - id: CAP-22.c
     item: Distinct test execution and integration roles
-    source: MR-5; DEC-094
+    source: MR-5; DEC-094; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W2
   - id: CAP-22.d
     item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment
@@ -1417,14 +1431,14 @@ capabilities:
   outcome: Two agents cannot both take the same task.
   acceptance: A second agent claiming a ticket already claimed by another gets a collision error naming the holder, and the
     ticket is absent from its ready queue.
-  wave: W3
+  wave: W2
   wave_note: the exclusive claim lock (G-03) is delivered in W1-09; a light form of parallel tickets runs in Wave 1 (DEC-235);
-    parallel-agent concurrency and the claims role are W3
+    the run-time tool dispatches ready tickets into slots from the machine it detects (RT-1, RT-3, W2-121c)
   provider:
   - ticket v0.3.2
   - W1-09
   - W1-42
-  - 'W3: gov claim + claims/concurrency role'
+  - W2-121c, W2-121d (the run-time tool)
   sources:
   - Contract v3 Gate E4
   - Framework v4.1.2 §44
@@ -1432,6 +1446,7 @@ capabilities:
   - DEC-074
   - DEC-076
   - DEC-235
+  - EMERGENCY-2 §6.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-X-03
@@ -1447,9 +1462,13 @@ capabilities:
     provider:
     - W1-09
   - id: CAP-23.b
-    item: Parallel-agent concurrency and the claims role
-    source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
-    wave: W3
+    item: The run-time tool dispatches ready tickets into slots from the CPU, RAM and GPU it detects (RT-1, RT-3); the claim
+      lock (CAP-23.a) keeps two agents off one ticket
+    source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066; EMERGENCY-2 §6.3 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+    - W2-121d
   - id: CAP-23.c
     item: 'Parallel tickets: each ticket in its own worktree with a ticket lead; the landing merges it into the integration
       branch, runs the impact-selected tests and checks paths and test authorship (NEW-1); the number in flight comes from
@@ -1638,7 +1657,8 @@ capabilities:
     - MR-X-Q01
   disposition:
     class: LITE
-    lite_form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric.
+    lite_form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric; the minimal per-session
+      inbox files inside the run-time tool are in scope (RT-6) and are not an A2A layer.
   covers:
   - id: CAP-27.a
     item: Read commands never mutate
@@ -2122,19 +2142,21 @@ capabilities:
     provider:
     - W1-09
 - id: CAP-35
-  title: Model routing (T0-T3 tiers, reasoning levels)
-  outcome: The owner can route each role and task class to a model tier.
-  acceptance: With the routing configuration set, an orchestration task runs on the T3 tier and a documentation task on T1,
-    as recorded in telemetry.
-  wave: W3
+  title: Model routing from the owner's rubric
+  outcome: The owner can route each role and task class to a model and effort through his rubric, and no session chooses its
+    own.
+  acceptance: Every launch takes its model and effort from the owner's rubric (DEC-1120, DEC-1212) and states them in the
+    launch log (RT-8); a launch that names another model is refused.
+  wave: W2
   provider:
-  - 'W3: role model tiers + routing config'
+  - W2-121c (the launcher states the rubric's model and effort)
   sources:
   - Contract v3 Gate M1, M2, M3
   - Framework v4.1.2 §55-57
   - DEC-010
   - DEC-018
   - DEC-083
+  - DEC-1120; DEC-1212; DEC-1214 K1; EMERGENCY-2 §6.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-A-04
@@ -2145,17 +2167,23 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-35.a
-    item: Capability tiers T0–T3
-    source: Contract v3 M1; Framework v4.1.2 §55
-    wave: W3
+    item: The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form)
+    source: Contract v3 M1; Framework v4.1.2 §55; DEC-1120
+    wave: W2
+    provider:
+    - W2-121c
   - id: CAP-35.b
-    item: Task reasoning requirement low/medium/high/extra-high declared and enforced
-    source: Contract v3 M2; Framework v4.1.2 §56
-    wave: W3
+    item: Effort is declared by the rubric and enforced by the launcher, not chosen by the session
+    source: Contract v3 M2; Framework v4.1.2 §56; DEC-1120
+    wave: W2
+    provider:
+    - W2-121c
   - id: CAP-35.c
-    item: 'Role defaults: minimum tier and default reasoning per role'
-    source: Contract v3 M3; Framework v4.1.2 §57
-    wave: W3
+    item: 'Role defaults: the rubric''s model and effort per role'
+    source: Contract v3 M3; Framework v4.1.2 §57; DEC-1120
+    wave: W2
+    provider:
+    - W2-121c
 - id: CAP-36
   title: Empirical model routing telemetry
   outcome: The owner can compare cost and pass/fail per model per task class from real runs.
@@ -2182,8 +2210,8 @@ capabilities:
 - id: CAP-37
   title: Structured checkpoints and mandatory triggers
   outcome: An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
-  acceptance: After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes
-    the ticket at the recorded next step.
+  acceptance: After every ticket transition a checkpoint file exists; after a forced compaction and after a killed session,
+    a session resumes at the checkpoint's recorded next step without the owner restating it (RT-5).
   wave: W1
   wave_note: model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in
     `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156)
@@ -2200,6 +2228,7 @@ capabilities:
   - DEC-150
   - DEC-156
   - DEC-248
+  - EMERGENCY-2 §6.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-A-01
@@ -2238,9 +2267,8 @@ capabilities:
     - W1-25
     - W1-29
   - id: CAP-37.c
-    item: 'Provider-independent watchdog: not only proprietary hooks; marks stale; checkpoints on context utilisation; blocks
-      handoff/close when freshness violates policy'
-    source: Contract v3 N3; Framework v4.1.2 §60
+    item: The run-time tool's one state file and one wake rule mark a stale session and wake it (RT-5, RT-7); nothing is blocked
+    source: Contract v3 N3; Framework v4.1.2 §60; EMERGENCY-2 §6.3 (DEC-1211)
     wave: W1
     provider:
     - W1-25
@@ -2263,12 +2291,11 @@ capabilities:
     provider:
     - W1-25
   - id: CAP-37.g
-    item: 'Light auto-resume hooks, a light form brought forward into Wave 1: a PreCompact hook ensures the checkpoint is
-      current (the orchestrator''s, and in a worktree the lead''s); a SessionStart hook on compact, clear and resume injects
-      the prompt path and the checkpoint''s RESUME HERE section within the hook''s size cap; after a forced compaction the
-      session knows the active tickets, the open owner decisions and the loop counts without the owner restating them; W1-29
-      upgrades the injection to the full context packet'
-    source: DEC-248; DEC-208
+    item: 'Auto-resume hooks: a PreCompact hook ensures the checkpoint is current (the orchestrator''s, and in a worktree
+      the lead''s); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint''s RESUME
+      HERE section; after a forced compaction the session knows the active tickets, the open owner decisions and the round
+      counts without the owner restating them; there is no context packet (EMERGENCY-2 §5.5)'
+    source: DEC-248; DEC-208; EMERGENCY-2 §5.5, §6.1 (DEC-1211); DEC-837
     wave: W1
     provider:
     - W1-49
@@ -2473,7 +2500,7 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-40.a
-    item: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens
+    item: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, brief id, retrieval queries/hits, tokens
       in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions'
     source: Contract v3 P1; Framework v4.1.2 §65
     wave: W1
@@ -2485,10 +2512,9 @@ capabilities:
     source: Contract v3 P2; Framework v4.1.2 §66
     wave: W3
   - id: CAP-40.c
-    item: 'Wave 1 learning metrics per ticket: KPI disputes raised by the test designer, acceptance tests rewritten after
-      implementation began (with the reason), and governance share; all three reported at the Wave 1 exit; only governance
-      share has a threshold (≤ 15 %)'
-    source: DEC-106; DEC-086
+    item: 'The weekly measures with their baselines: product share of spend, governance share (≤ 15 %), owner messages per
+      day, time and cost per ticket, landing time, memory use (EMERGENCY-2 §10.2)'
+    source: DEC-106; DEC-086; EMERGENCY-2 §10.2 (DEC-1211)
     wave: W1
     provider:
     - W1-31

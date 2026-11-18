@@ -3,14 +3,14 @@ id: CAP-35.a
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: Capability tiers T0–T3
+title: The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form)
 depends_on:
 - CAP-35
 ---
 
-# CAP-35.a: Capability tiers T0–T3
+# CAP-35.a: The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form)
 
-A covers item of CAP-35 (Model routing (T0-T3 tiers, reasoning levels)). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-35 (Model routing from the owner's rubric). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Capability tiers T0–T3
-- **Wave:** W3
+- **Item:** The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form)
+- **Wave:** W2

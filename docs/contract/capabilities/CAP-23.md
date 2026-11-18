@@ -14,6 +14,6 @@ Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which i
 
 - **Outcome:** Two agents cannot both take the same task.
 - **Acceptance:** A second agent claiming a ticket already claimed by another gets a collision error naming the holder, and the ticket is absent from its ready queue.
-- **Wave:** W3
+- **Wave:** W2
 - **Disposition:** KEPT
 - **Covers:** CAP-23.a, CAP-23.b, CAP-23.c

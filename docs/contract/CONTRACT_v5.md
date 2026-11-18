@@ -32,8 +32,8 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
 | W1 | 36 | 4 | 0 | 40 |
-| W2 | 10 | 0 | 0 | 10 |
-| W3 | 9 | 0 | 0 | 9 |
+| W2 | 12 | 0 | 0 | 12 |
+| W3 | 7 | 0 | 0 | 7 |
 | NONE | 0 | 0 | 3 | 3 |
 | **All** | 55 | 4 | 3 | 62 |
 
@@ -42,7 +42,7 @@ DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation valida
 ## 2. Envelope and boundary
 
 - **Scale envelope** (DEC-078). Tested up to ≈ 80k nodes / 270k edges of code graph at ≈ 2.2 GB peak RSS for codebase-memory-mcp; larger graphs are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder gets its own index.
-- **RAM budget** (DEC-078). Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare; incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker, VRAM peak ≈ 5.2 of 16 GiB.
+- **RAM budget** (DEC-078, DEC-1065, DEC-1211). Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare; incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker, VRAM peak ≈ 5.2 of 16 GiB. Embedders and rerankers stay resident on the GPU and never spill to the CPU (RT-4); there is no CPU fallback (DEC-1065). Slots come from the CPU, RAM and GPU the run-time tool detects at start, with no machine-specific constant (RT-3).
 - **Token budget** (DEC-004, DEC-086, DEC-1211, DEC-1214). Governance tokens ≤ 15 % of a ticket's fresh input + output tokens, reported weekly with its baseline (56 % before EMERGENCY-2) by P1's method until `gov telemetry` measures it (EMERGENCY-2 §10.2, A-7). Governance tokens = text the Gov OS injects or returns (instruction files, the brief, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. AGENTS.md ≤ ~1.5k tokens. There is no context packet and no packet ceiling anywhere: `gov context` is retired (DEC-1214 M1), and the brief carries the ticket's retrieval uncut. A breach is a health finding, never a silent cost.
 - **Boundary** (DEC-039, DEC-075, DEC-087, DEC-848, DEC-1211). No guard, no sandbox, no box and no permission prompts (EMERGENCY-2 §2). Agents have full permission in the repository, the worktree and the run folder they work in; sessions stay apart by where each starts, the folders it is given and its brief, and nothing enforces it. Mistakes are caught and corrected at the landing and by the transcript scan, not prevented. The hard boundary is git history; the owner's own `git push` and release from his own terminal; two settings deny lines, `git push` and `sudo`, which hold in every permission mode; and an hourly `git bundle` of each repository, kept outside the tree. The landing merges into integration and only the owner pushes. The lefthook pre-push gate G3 on the owner's machine and GitHub Actions CI G4–G5 stay as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks). `main` is not protected; enabling protection later changes no other decision.
 - **Loop budget** (DEC-044, DEC-096, DEC-1204, DEC-1211). Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) runs at most two rounds; if the second does not converge there is one escalation package for the owner (each round's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides once. READY is computed by code from the reviewers' verdict blocks. The round count and budget are held by the orchestrator or gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).
@@ -110,17 +110,17 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 
 ### CAP-04 — Budget and resource governance
 
-- **Outcome:** The owner can set token and cost budgets per task; crossing one raises a decision package instead of continuing silently.
-- **Acceptance:** A task configured with a token budget that its run exceeds stops at the next `gov close` or hook boundary and surfaces a decision package; the breach is recorded in the ticket.
-- **Wave:** W2 (W1 measures the governance share (W1-31); the halting budget gate is W2)
-- **Provider:** ccusage (pinned, DEC-086), W1-31, W2: budget gate in gov close/status, W1-21
+- **Outcome:** The owner can see what a ticket costs against its projection, and a ticket that runs away is held once instead of continuing silently.
+- **Acceptance:** A ticket whose measured cost passes twice its projection holds its next launch and goes to the inbox once; usage is recorded and reported weekly and never holds, refuses or stops a lead or a worker (W2-156, DEC-1149 (3)).
+- **Wave:** W2 (W1 measures the governance share (W1-31); the runaway brake is W2 (W2-156); budgets per task wait for friction (EMERGENCY-2 §6.2 A-1))
+- **Provider:** ccusage (pinned, DEC-086), W1-31, W2-156 (the runaway brake), W1-21
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate A4; Framework v4.1.2 §73; OWNER-DIRECTION-P2-0009 §11 (10-15% overhead target); DEC-004, DEC-031; DEC-083; DEC-086
+- **Sources:** Contract v3 Gate A4; Framework v4.1.2 §73; OWNER-DIRECTION-P2-0009 §11 (10-15% overhead target); DEC-004, DEC-031; DEC-083; DEC-086; DEC-1149; EMERGENCY-2 §6.2 A-1, §10.2 (DEC-1211)
 - **Covers:**
-  - `CAP-04.a` [W2] Token/cost budgets per task with executable thresholds — Contract v3 A4; Framework v4.1.2 §73
-  - `CAP-04.b` [W1] Governance share ≤ 10–15 % measured per ticket (DEC-086) — OWNER-DIRECTION-P2-0009 §11; DEC-004 · delivered by W1-31
-  - `CAP-04.c` [W1] Two budgets: retrieval spend vs final packet; hitting the spend budget is a governed event — DEC-031 · delivered by W1-21
-  - `CAP-04.d` [W2] Exceeding a delegated limit raises a decision package — Contract v3 A4
+  - `CAP-04.a` [W2] Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1) — Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211)
+  - `CAP-04.b` [W1] Governance share ≤ 15 %, reported weekly with its baseline (56 %), by P1's method until `gov telemetry` measures it (DEC-086; EMERGENCY-2 §10.2, A-7) — OWNER-DIRECTION-P2-0009 §11; DEC-004; EMERGENCY-2 §10.2 (DEC-1211) · delivered by W1-31
+  - `CAP-04.c` [W1] Retrieval spend budget scaled by impact radius; hitting it is a governed event, never silent truncation; there is no packet ceiling (the final-packet budget of DEC-031 is superseded by EMERGENCY-2 §5.5) — DEC-031; EMERGENCY-2 §5.5 (DEC-1211) · delivered by W1-21
+  - `CAP-04.d` [W2] Exceeding a delegated limit raises a decision package (built only if friction asks; until then the run-time tool's spend brake covers it, EMERGENCY-2 §6.2 A-1) — Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211)
 - **Scenarios:** dev SOAK-X-01 · qual SOAK-X-Q01
 
 ### CAP-05 — Emergency controls (pause/freeze/cancel/rollback)
@@ -358,13 +358,13 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Outcome:** An agent can hand work to a fresh agent in a typed record the receiver can act on without the sender's chat.
 - **Acceptance:** A fresh agent B, given only the handoff record and the repository, states the task, inputs, open questions and next step identically to agent A's record.
 - **Wave:** W2 (W1 hands off through checkpoints; typed handoff records and specialist roles, including test execution and integration (DEC-094), are W2)
-- **Provider:** W1-25, W2: typed handoff records, W1-33, W1-05, W1-46
+- **Provider:** W1-25, W2-121c (inbox files), W1-33, W1-05, W1-46
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate E2, E3; Framework v4.1.2 §24, §25; DEC-066; DEC-094; DEC-119; DEC-154; DEC-163
 - **Covers:**
   - `CAP-22.a` [W1] Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced by W1-33's generated definitions — Contract v3 E2; Framework v4.1.2 §24; DEC-119; DEC-154 · delivered by W1-05, W1-33
-  - `CAP-22.b` [W2] Typed handoff records readable by a fresh agent — Contract v3 E3; Framework v4.1.2 §25
-  - `CAP-22.c` [W2] Distinct test execution and integration roles — MR-5; DEC-094
+  - `CAP-22.b` [W2] A handoff is the worker's return contract (CAP-37.d) plus the run-time tool's per-session inbox files with a read mark (RT-6): a finished worker's return reaches its lead's inbox file and no owner message relays it — Contract v3 E3; Framework v4.1.2 §25; EMERGENCY-2 §6.3 (DEC-1211) · delivered by W2-121c
+  - `CAP-22.c` [W2] Distinct test execution and integration roles — MR-5; DEC-094; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-22.d` [W1] A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research` in its own experiment folder or worktree, its ticket's `allowed_paths` judged at the landing as a notice; no guard and no network allowlist; the full research lifecycle (CAP-32) stays W3 — DEC-163; DEC-158; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-46
 - **Scenarios:** dev CHAOS-X-02 · qual CHAOS-X-Q02
 
@@ -372,13 +372,13 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 
 - **Outcome:** Two agents cannot both take the same task.
 - **Acceptance:** A second agent claiming a ticket already claimed by another gets a collision error naming the holder, and the ticket is absent from its ready queue.
-- **Wave:** W3 (the exclusive claim lock (G-03) is delivered in W1-09; a light form of parallel tickets runs in Wave 1 (DEC-235); parallel-agent concurrency and the claims role are W3)
-- **Provider:** ticket v0.3.2, W1-09, W1-42, W3: gov claim + claims/concurrency role
+- **Wave:** W2 (the exclusive claim lock (G-03) is delivered in W1-09; a light form of parallel tickets runs in Wave 1 (DEC-235); the run-time tool dispatches ready tickets into slots from the machine it detects (RT-1, RT-3, W2-121c))
+- **Provider:** ticket v0.3.2, W1-09, W1-42, W2-121c, W2-121d (the run-time tool)
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate E4; Framework v4.1.2 §44; DEC-066; DEC-074; DEC-076; DEC-235
+- **Sources:** Contract v3 Gate E4; Framework v4.1.2 §44; DEC-066; DEC-074; DEC-076; DEC-235; EMERGENCY-2 §6.3 (DEC-1211)
 - **Covers:**
   - `CAP-23.a` [W1] Exclusive claim lock with holder named — Contract v3 E4; G-03 · delivered by W1-09
-  - `CAP-23.b` [W3] Parallel-agent concurrency and the claims role — Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
+  - `CAP-23.b` [W2] The run-time tool dispatches ready tickets into slots from the CPU, RAM and GPU it detects (RT-1, RT-3); the claim lock (CAP-23.a) keeps two agents off one ticket — Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066; EMERGENCY-2 §6.3 (DEC-1211) · delivered by W2-121c, W2-121d
   - `CAP-23.c` [W2] Parallel tickets: each ticket in its own worktree with a ticket lead; the landing merges it into the integration branch, runs the impact-selected tests and checks paths and test authorship (NEW-1); the number in flight comes from the machine's slots, not from a constant — DEC-235; DEC-236; EMERGENCY-2 §4 (DEC-1211) · delivered by W1-42
 - **Scenarios:** dev CHAOS-X-03 · qual CHAOS-X-Q03
 
@@ -432,7 +432,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Acceptance:** Every `gov` read command (status, check, readiness, doctor, context --dry-run, closure, retrieve) leaves `git status --porcelain` empty.
 - **Wave:** W1
 - **Provider:** W1-07, W1-32
-- **Disposition:** LITE — lite form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric.
+- **Disposition:** LITE — lite form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric; the minimal per-session inbox files inside the run-time tool are in scope (RT-6) and are not an A2A layer.
 - **Sources:** Contract v3 Gate F5; Framework v4.1.2 §31; DEC-074
 - **Covers:**
   - `CAP-27.a` [W1] Read commands never mutate — Contract v3 F5 (LITE); Framework v4.1.2 §31 · delivered by W1-07, W1-32
@@ -547,18 +547,18 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-34.e` [W1] Non-global blocking — Contract v3 L4; Framework v4.1.2 §53 · delivered by W1-09
 - **Scenarios:** dev MR-A-03, CHAOS-A-06, CHAOS-A-07, CHAOS-A-08, CHAOS-A-15, GATE-A-01, MR-B-03, CHAOS-B-06, CHAOS-B-07, CHAOS-B-08, GATE-B-01, GATE-B-02 (+2 not listed in the matrix row) · qual MR-A-Q03, CHAOS-A-Q13, GATE-A-Q01, GATE-A-Q02, GATE-A-Q03, GATE-A-Q04, A-Q01, MR-B-Q05, AUDIT-B-Q01, AUDIT-B-Q05, AUDIT-B-Q08, AUDIT-B-Q14 (+6 not listed in the matrix row)
 
-### CAP-35 — Model routing (T0-T3 tiers, reasoning levels)
+### CAP-35 — Model routing from the owner's rubric
 
-- **Outcome:** The owner can route each role and task class to a model tier.
-- **Acceptance:** With the routing configuration set, an orchestration task runs on the T3 tier and a documentation task on T1, as recorded in telemetry.
-- **Wave:** W3
-- **Provider:** W3: role model tiers + routing config
+- **Outcome:** The owner can route each role and task class to a model and effort through his rubric, and no session chooses its own.
+- **Acceptance:** Every launch takes its model and effort from the owner's rubric (DEC-1120, DEC-1212) and states them in the launch log (RT-8); a launch that names another model is refused.
+- **Wave:** W2
+- **Provider:** W2-121c (the launcher states the rubric's model and effort)
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate M1, M2, M3; Framework v4.1.2 §55-57; DEC-010; DEC-018; DEC-083
+- **Sources:** Contract v3 Gate M1, M2, M3; Framework v4.1.2 §55-57; DEC-010; DEC-018; DEC-083; DEC-1120; DEC-1212; DEC-1214 K1; EMERGENCY-2 §6.3 (DEC-1211)
 - **Covers:**
-  - `CAP-35.a` [W3] Capability tiers T0–T3 — Contract v3 M1; Framework v4.1.2 §55
-  - `CAP-35.b` [W3] Task reasoning requirement low/medium/high/extra-high declared and enforced — Contract v3 M2; Framework v4.1.2 §56
-  - `CAP-35.c` [W3] Role defaults: minimum tier and default reasoning per role — Contract v3 M3; Framework v4.1.2 §57
+  - `CAP-35.a` [W2] The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form) — Contract v3 M1; Framework v4.1.2 §55; DEC-1120 · delivered by W2-121c
+  - `CAP-35.b` [W2] Effort is declared by the rubric and enforced by the launcher, not chosen by the session — Contract v3 M2; Framework v4.1.2 §56; DEC-1120 · delivered by W2-121c
+  - `CAP-35.c` [W2] Role defaults: the rubric's model and effort per role — Contract v3 M3; Framework v4.1.2 §57; DEC-1120 · delivered by W2-121c
 - **Scenarios:** dev CHAOS-A-04, ISO-X-03 · qual CHAOS-X-Q06
 
 ### CAP-36 — Empirical model routing telemetry
@@ -576,19 +576,19 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 ### CAP-37 — Structured checkpoints and mandatory triggers
 
 - **Outcome:** An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
-- **Acceptance:** After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes the ticket at the recorded next step.
+- **Acceptance:** After every ticket transition a checkpoint file exists; after a forced compaction and after a killed session, a session resumes at the checkpoint's recorded next step without the owner restating it (RT-5).
 - **Wave:** W1 (model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156))
 - **Provider:** W1-25, W1-29, W1-49
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate N1, N2, N3, N4; Framework v4.1.2 §59-61; OWNER-DIRECTION-BR-0004 (checkpoint discipline); OWNER-DIRECTION-BR-0006 §7, §8; DEC-025; DEC-150; DEC-156; DEC-248
+- **Sources:** Contract v3 Gate N1, N2, N3, N4; Framework v4.1.2 §59-61; OWNER-DIRECTION-BR-0004 (checkpoint discipline); OWNER-DIRECTION-BR-0006 §7, §8; DEC-025; DEC-150; DEC-156; DEC-248; EMERGENCY-2 §6.3 (DEC-1211)
 - **Covers:**
   - `CAP-37.a` [W1] Structured checkpoint in the repository with input ids/versions/hashes — Contract v3 N1, W9; Framework v4.1.2 §59 · delivered by W1-25
   - `CAP-37.b` [W1] Mandatory triggers incl. ticket transition, compaction, stop — Contract v3 N2; Framework v4.1.2 §60 · delivered by W1-25, W1-29
-  - `CAP-37.c` [W1] Provider-independent watchdog: not only proprietary hooks; marks stale; checkpoints on context utilisation; blocks handoff/close when freshness violates policy — Contract v3 N3; Framework v4.1.2 §60 · delivered by W1-25, W1-29
+  - `CAP-37.c` [W1] The run-time tool's one state file and one wake rule mark a stale session and wake it (RT-5, RT-7); nothing is blocked — Contract v3 N3; Framework v4.1.2 §60; EMERGENCY-2 §6.3 (DEC-1211) · delivered by W1-25, W1-29
   - `CAP-37.d` [W1] Worker return contract: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action — Contract v3 N4; Framework v4.1.2 §61 · delivered by W1-29
   - `CAP-37.e` [W2] Model/provider switch reconstructs the same inputs — Contract v3 W9
   - `CAP-37.f` [W1] Checkpoint discipline; resume after crash — OWNER-DIRECTION-BR-0004; OWNER-DIRECTION-BR-0006 §7, §8 · delivered by W1-25
-  - `CAP-37.g` [W1] Light auto-resume hooks, a light form brought forward into Wave 1: a PreCompact hook ensures the checkpoint is current (the orchestrator's, and in a worktree the lead's); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint's RESUME HERE section within the hook's size cap; after a forced compaction the session knows the active tickets, the open owner decisions and the loop counts without the owner restating them; W1-29 upgrades the injection to the full context packet — DEC-248; DEC-208 · delivered by W1-49
+  - `CAP-37.g` [W1] Auto-resume hooks: a PreCompact hook ensures the checkpoint is current (the orchestrator's, and in a worktree the lead's); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint's RESUME HERE section; after a forced compaction the session knows the active tickets, the open owner decisions and the round counts without the owner restating them; there is no context packet (EMERGENCY-2 §5.5) — DEC-248; DEC-208; EMERGENCY-2 §5.5, §6.1 (DEC-1211); DEC-837 · delivered by W1-49
 - **Scenarios:** dev CHAOS-A-01, CHAOS-A-04, ISO-X-01, ISO-X-03, CHAOS-X-02 · qual CHAOS-A-Q01, CIT-A-Q02, CIT-A-Q04, SOAK-A-Q01, A-Q03, AUDIT-A-Q36, CHAOS-B-Q01, CHAOS-B-Q03, CHAOS-B-Q04, CHAOS-B-Q05, CHAOS-B-Q10, CHAOS-B-Q11 (+6 not listed in the matrix row)
 
 ### CAP-38 — Verification test families (product and governance)
@@ -633,9 +633,9 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate P1, P2; Framework v4.1.2 §65, §66; DEC-026; DEC-086; DEC-106; DEC-170
 - **Covers:**
-  - `CAP-40.a` [W1] Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions — Contract v3 P1; Framework v4.1.2 §65 · delivered by W1-31
+  - `CAP-40.a` [W1] Per ticket: agent/session/model/provider, role/task, skill/tool versions, brief id, retrieval queries/hits, tokens in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions — Contract v3 P1; Framework v4.1.2 §65 · delivered by W1-31
   - `CAP-40.b` [W3] Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate, human-gate concentration, retrieval misses, cost by task/feature, first-pass completion — Contract v3 P2; Framework v4.1.2 §66
-  - `CAP-40.c` [W1] Wave 1 learning metrics per ticket: KPI disputes raised by the test designer, acceptance tests rewritten after implementation began (with the reason), and governance share; all three reported at the Wave 1 exit; only governance share has a threshold (≤ 15 %) — DEC-106; DEC-086 · delivered by W1-31, W1-42
+  - `CAP-40.c` [W1] The weekly measures with their baselines: product share of spend, governance share (≤ 15 %), owner messages per day, time and cost per ticket, landing time, memory use (EMERGENCY-2 §10.2) — DEC-106; DEC-086; EMERGENCY-2 §10.2 (DEC-1211) · delivered by W1-31, W1-42
   - `CAP-40.d` [NONE] Non-goal: the sandbox's instruction tokens as a separate line of the telemetry record: there is no sandbox — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev CHAOS-A-12, ISO-X-03, SOAK-X-01 · qual GATE-B-Q01, GATE-B-Q03, GATE-B-Q04, SOAK-X-Q01
 
