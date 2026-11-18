@@ -1,6 +1,6 @@
 ---
 id: DAEO-yadm
-status: deferred
+status: moved
 deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-34
-tags: [implementation, standard, wave-3, deferred]
+tags: [implementation, standard, folded]
 wbs_id: W2-34
 title: gov readiness --generate
 class: implementation
@@ -87,3 +87,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-34), as approved (DEC-729). The list row
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.
 
 **Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-34 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
+
+**Folded into W2-36 (DAEO-w19l), `gov discover`, 2026-11-18 (the CTO's brief to W2-36's ticket lead; EMERGENCY-2 §6.2 A-4 "W2-34 fold into W2-36"; audit 4 Table 1, audit 7 MR-2 and CAP-30.c).** Status `moved`; not closed here, and no work happens under this ticket. Its lines:
+- **Carried:** "one linked gap ticket per required open row, with its dependencies; a second run creates none" (CAP-30.c, MR-2, W2-M283) is W2-36's fourth success line, as `gov discover --generate <change>` (no `gov readiness --generate`: generation lives in `gov discover`, as audit 7's re-baselined CAP-30.c says).
+- **Not carried, already built:** "a MISSING required row keeps production tickets out of READY" (W2-M274) is MR-1, built in Wave 1 (W1-43 OK; the READY rule's `SPEC_NOT_CLOSED`, `src/gov/tasks/queue.py`); the feature ticket W2-36 writes names its specification, so the rule holds it.
+- **Not carried, Wave 3 by friction:** the openspec bridge's three lines (the delivered `tasks.md` template accepted, W2-H051; a direct `openspec archive` or hand-set status not bypassing readiness, W2-H015; the bridge checking the role against the roster, W2-M082) are not the spec-and-KPI pillar; they come back as fixes (EMERGENCY-2 §4.2) if an adopted repository hits them.
