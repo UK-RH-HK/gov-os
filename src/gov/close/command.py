@@ -874,7 +874,10 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     from gov.close.pytest_plugin import gov_close_results as results, gov_close_serial_only as serial_only
 
     counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}  # a skip is counted, not refused (DEC-500)
-    if not test_path.is_dir():
+    # W2-191 (DEC-1199 (2)): where ``test_path`` is no folder and the scope puts targets outside ``tests/`` on the
+    # line, the run starts on those alone: a project whose suites all live elsewhere is not skipped
+    outside = _outside_targets(root, scope, ignore) if scope is not None else []
+    if not test_path.is_dir() and not (none_collected_ok and outside):
         if none_collected_ok:
             return [], counts
         raise GovError("TESTS_MISSING", f"{test_path} is not a folder",
@@ -894,7 +897,10 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     env["PYTHONPATH"] = str(root / "src")
     pytest = [sys.executable, "-m", "pytest"]
     options = ["-q", "-p", "no:cacheprovider", "--tb=line", "--no-header"]
-    whole = [str(test_path)] + (["--ignore", str(ignore)] if ignore is not None else [])
+    if test_path.is_dir():
+        whole = [str(test_path)] + (["--ignore", str(ignore)] if ignore is not None else [])
+    else:  # no ``tests`` positional, and no ``--ignore`` of a folder under it
+        whole = []
     if scope is not None:  # W2-66: the selection, the per-test limit and the check result
         whole += _scope_form(root, scope, ignore)
         options += _scope_limit(root, scope, env)
@@ -1389,7 +1395,12 @@ def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
 
 def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
     """The regression run's ``--ignore`` and ``--deselect`` options; none for the acceptance run. A node id is
-    given as the project's and as the ``tests`` folder's, the run's root folder where the project names none."""
+    given as the project's and as the ``tests`` folder's, the run's root folder where the project names none.
+
+    W2-191 (DEC-1199 (2)): the run is ``pytest tests``, which never reaches a selected target outside ``tests/``
+    (the test map takes any project-relative target); each is given after the options as a positional target of
+    its own (the folder or file whole, a node id that node), the reusing close's record-reading ones among them
+    (its ``selected``). One the run ignores (the ticket's own suite, which the acceptance run holds) is not."""
     if ignore is None:
         return []
     form = [f"--ignore={root / rel}" for rel in scope["ignore"] if (root / rel).resolve() != Path(ignore).resolve()]
@@ -1397,7 +1408,26 @@ def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
         form.append(f"--deselect={node}")
         if node.startswith("tests/"):
             form.append(f"--deselect={node[len('tests/'):]}")
-    return form
+    return form + _outside_targets(root, scope, ignore)
+
+
+def _outside_targets(root: Path, scope: dict, ignore: Path | None) -> list[str]:
+    """The positional pytest targets of the selected targets outside ``tests/`` (``_scope_form``), in the order
+    selected; none for the acceptance run (no ``ignore``)."""
+    if ignore is None:
+        return []
+    found: list[str] = []
+    skipped = [Path(ignore).resolve()] + [(root / rel).resolve() for rel in scope["ignore"]]
+    for entry in scope.get("selected") or []:
+        path, sep, case = entry["target"].partition("::")
+        if path.rstrip("/") == _select.FULL_TARGET or path.startswith(_select.FULL_TARGET + "/"):
+            continue  # under tests/, the run collects it already
+        place = root / path
+        if any(place.resolve() == s or s in place.resolve().parents for s in skipped):
+            continue
+        if (target := f"{place}{sep}{case}") not in found:
+            found.append(target)
+    return found
 
 
 def _scope_limit(root: Path, scope: dict, env: dict) -> list[str]:

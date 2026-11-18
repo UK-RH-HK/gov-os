@@ -84,7 +84,35 @@ def load_map(root: Path) -> tuple[dict | None, str | None]:
         jsonschema.Draft202012Validator(schema).validate(data)
     except Exception:  # noqa: BLE001 - an invalid map, or a schema that cannot judge it: both run everything
         return None, "TEST_MAP_UNREADABLE"
+    # DEC-1199 (2): a target is any project-relative path; a project may carry an older or edited schema copy, so
+    # the loader refuses one that leaves the project whatever the schema says
+    if any(escapes(root, target) for target in map_targets(data)):
+        return None, "TEST_MAP_UNREADABLE"
     return data, None
+
+
+def map_targets(test_map: dict) -> list[str]:
+    """Every target the map names: ``record_reading``, ``every_close`` and each coupling's ``suites``."""
+    found = list(test_map.get("record_reading") or []) + list(test_map.get("every_close") or [])
+    for coupling in test_map.get("couplings") or []:
+        found += list(coupling.get("suites") or []) if isinstance(coupling, dict) else []
+    return found
+
+
+def escapes(root: Path, target: str) -> bool:
+    """Whether a map target (its path part, before ``::``) is not a path inside the project: absolute, holding a
+    ``..`` segment, or resolving, through any link on the way, to a place outside the project's root. A target
+    that names nothing is no escape here: ``unresolved`` refuses it at the selection."""
+    if not isinstance(target, str):  # a schema copy that judges no type: nothing to resolve is no target
+        return True
+    path = target.partition("::")[0]
+    if path.startswith(("/", "\\")) or re.match(r"[A-Za-z]:", path) or ".." in re.split(r"[/\\]", path):
+        return True
+    try:
+        Path(root).resolve().joinpath(path).resolve().relative_to(Path(root).resolve())
+    except (OSError, ValueError, RuntimeError):  # outside the root, or a path that cannot be resolved
+        return True
+    return False
 
 
 def settings(test_map: dict | None) -> tuple[float, str]:
@@ -388,8 +416,11 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False, ticket: str | None =
 
     if why_full:
         select(FULL_TARGET, {"reason": "FULL"})
+        left_out = []
+        if test_map is not None:  # W2-191 F2: the full run holds what ``pytest tests`` never reaches, too
+            left_out = _select_outside(root, test_map, select)
         return {"scope": "full", "why_full": why_full, "base": since, "head": head, "tree": tree, "changed": paths,
-                "selected": _listed(selected), "left_out": [], "ignore": [own], "deselect": [],
+                "selected": _listed(selected), "left_out": left_out, "ignore": [own], "deselect": [],
                 "per_test_timeout": timeout, "distribution": distribution,
                 "tmp_path_retention_policy": RETENTION_POLICY}
 
@@ -427,6 +458,34 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False, ticket: str | None =
             "selected": _listed(selected), "left_out": left_out, "ignore": ignore, "deselect": deselect,
             "per_test_timeout": timeout, "distribution": distribution,
             "tmp_path_retention_policy": RETENTION_POLICY}
+
+
+def outside_tests(target: str) -> bool:
+    """Whether a map target lies outside ``tests/``: its path part, before ``::``, is not ``tests`` or under it."""
+    path = target.partition("::")[0].rstrip("/")
+    return not (path == FULL_TARGET or path.startswith(FULL_TARGET + "/"))
+
+
+def _select_outside(root: Path, test_map: dict, select) -> list[dict]:
+    """W2-191 F2 (DEC-1199 (2), DEC-968): a full plan's selection also names each target of a readable map outside
+    ``tests/`` that the head holds, whatever the change: ``record_reading``, ``every_close`` and the suites of every
+    coupling, through ``select``. A target the head does not hold is selected no more: it is the returned
+    ``left_out``, as ``UNRESOLVED_TARGET`` with its detail. Targets under ``tests/`` add nothing (the full run
+    collects them)."""
+    named = [(t, {"reason": "RECORD_READING"}) for t in test_map.get("record_reading") or []]
+    named += [(t, {"reason": "EVERY_CLOSE"}) for t in test_map.get("every_close") or []]
+    for coupling in test_map.get("couplings") or []:
+        named += [(t, {"reason": "COUPLING", "coupling": coupling["why"]}) for t in coupling["suites"]]
+    named = [(t, why) for t, why in named if outside_tests(t)]
+    gone = dict(unresolved(root, list(dict.fromkeys(t for t, _ in named))))
+    left_out = []
+    for target, why in named:
+        if target in gone:
+            if not any(entry["target"] == target for entry in left_out):
+                left_out.append({"target": target, "why": [{"reason": "UNRESOLVED_TARGET", "detail": gone[target]}]})
+        else:
+            select(target, why)
+    return left_out
 
 
 def _listed(selected: dict) -> list[dict]:
