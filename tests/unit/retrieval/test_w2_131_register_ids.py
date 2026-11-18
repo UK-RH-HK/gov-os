@@ -158,7 +158,12 @@ def _before(monkeypatch):
         pytest.skip(f"the history does not hold {BEFORE[:12]}: {shown.stderr.strip()}")
     spec = importlib.util.spec_from_loader("gov.retrieval._retrieve_before_w2_131", loader=None)
     module = importlib.util.module_from_spec(spec)
-    exec(compile(shown.stdout, "retrieve_before_w2_131.py", "exec"), module.__dict__)
+    # the old source imports role_paths from gov.guard; the guard left the product (DAEO-gr7t) and role_paths is
+    # gov.util.role_paths: the one import line is rewritten, and a source that no longer has it fails loudly
+    stale, moved = "from gov.guard import role_paths", "from gov.util import role_paths"
+    assert stale in shown.stdout, f"the old retrieve.py no longer holds {stale!r}: update this rewrite"
+    source = shown.stdout.replace(stale, moved)
+    exec(compile(source, "retrieve_before_w2_131.py", "exec"), module.__dict__)
     _stand_ins(monkeypatch, module)
     return module
 
