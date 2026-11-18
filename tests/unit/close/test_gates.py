@@ -12,7 +12,7 @@ from gov.close import command
 from gov.close import repo as close_repo
 from gov.close.command import (NOT_MEASURED, _check_containment, _check_probe, _check_trailers, _commit_models,
                                _commits_since, _Finding, _git, _ticket_commits)
-from gov.guard.containment import ContainmentError
+from gov.containment import ContainmentError
 
 TICKET = "T-0001"
 TRAILERS = (f"Task: {TICKET}", "Role: engineer", "Implements: CAP-01")
@@ -26,7 +26,7 @@ Judged = namedtuple("Judged", "commit paths reason")
                                   "governance/project/x.md", "template/a.md", "README.md", "src/in/paths.py"])
 def test_every_finding_of_the_judgement_refuses_as_returned(path):
     judged = [Judged("c" * 40, [path], "outside the ticket's paths")]
-    with patch("gov.guard.containment.judge_commits", return_value=judged) as judge:
+    with patch("gov.containment.judge_commits", return_value=judged) as judge:
         with pytest.raises(_Finding) as raised:
             _check_containment("/p", [{"sha": "c" * 40}])
     judge.assert_called_once_with("/p", ["c" * 40])
@@ -38,12 +38,12 @@ def test_every_finding_of_the_judgement_refuses_as_returned(path):
 
 
 def test_no_finding_passes():
-    with patch("gov.guard.containment.judge_commits", return_value=[]):
+    with patch("gov.containment.judge_commits", return_value=[]):
         _check_containment("/p", [{"sha": "c" * 40}])
 
 
 def test_a_judgement_that_cannot_run_is_an_error_not_a_pass():
-    with patch("gov.guard.containment.judge_commits", side_effect=ContainmentError("git failed")):
+    with patch("gov.containment.judge_commits", side_effect=ContainmentError("git failed")):
         with pytest.raises(GovError) as raised:
             _check_containment("/p", [{"sha": "c" * 40}])
     assert raised.value.code == "CONTAINMENT_ERROR" and "git failed" in raised.value.message

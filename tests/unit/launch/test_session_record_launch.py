@@ -23,7 +23,7 @@ sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "tests" / "unit" / "telemetry"))
 
 from gov.cli.errors import GovError  # noqa: E402
-from gov.guard import decide  # noqa: E402
+from gov.containment import scope as decide  # noqa: E402
 from gov.launch import launcher, session_record as sr  # noqa: E402
 from test_sessionlog_w2_60b import SECRET, Log  # noqa: E402
 

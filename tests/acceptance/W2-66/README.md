@@ -1,5 +1,7 @@
 # W2-66 acceptance tests — path-scoped regression at close: selection and evidence
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The case that took a settings change to the guard and sandbox suites, and `src/gov/guard` as a named member of the shared core, are taken out; the file kinds named for W1-28's scan are files that still exist.
+
 Ticket `DAEO-c1uz` (W2-66), profile FULL. Written by the independent test designer (MR-3) before the
 implementation, from the ticket's KPI lines, its card (`docs/plan/WAVE_2_WBS.md` §2), DEC-880 item 2, DEC-883,
 DEC-884, DEC-889, DEC-890, DEC-891, DEC-892, DEC-896 item 2, DEC-899 (P-IS-1 and P-IS-2, both (a)), lens I's

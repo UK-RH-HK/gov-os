@@ -64,7 +64,7 @@ TICKET = support.TICKET
 AS_ORCHESTRATOR = support.AS_ORCHESTRATOR
 NO_TRAILERS = support.NO_TRAILERS
 
-MODULE = "gov.guard.containment_merge"
+MODULE = "gov.containment.merge"
 SOURCES = check_support.REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL
 
 READ_BOUND_S = check_support.HOOK_TIMEOUT_S / 3
@@ -72,7 +72,7 @@ READ_BOUND_S = check_support.HOOK_TIMEOUT_S / 3
 
 @pytest.fixture()
 def helper(monkeypatch):
-    """``helper()`` -> the module ``gov.guard.containment_merge``, imported from this repository's ``src`` when
+    """``helper()`` -> the module ``gov.containment.merge``, imported from this repository's ``src`` when
     it is first called, in a process that says nothing of a caller."""
     for name in (check_support.ROLE_ENV, check_support.TICKET_ENV, "CLAUDE_PROJECT_DIR"):
         monkeypatch.delenv(name, raising=False)
@@ -156,31 +156,6 @@ WITH_OR_WITHOUT_TRAILERS = {
 }
 
 
-@pytest.mark.parametrize("case", sorted(WITH_OR_WITHOUT_TRAILERS), ids=sorted(WITH_OR_WITHOUT_TRAILERS))
-def test_a_move_to_a_merge_commit_with_very_many_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit(
-        project, sandbox, call, case):
-    """Review finding, DEC-403. In the orchestrator's own call a merge commit with 150 parents holds the tree
-    from before a test designer's change of an acceptance test, and ``main`` is moved to it. The post-command
-    hook ends by itself within the harness's limit and the call adds a finding: one that names the undone test,
-    or one for the move as a whole. Which of the two is not pinned."""
-    shape = symmetric.merge_commit_with_very_many_parents(project, sandbox, WITH_OR_WITHOUT_TRAILERS[case])
-    before = check_support.git(project, "rev-parse", "HEAD").strip()
-    result, _ = call(project, shape.command, ORCHESTRATOR, TICKET)
-    symmetric.assert_very_many_parents(project, shape, before)
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    assert result.returncode is not None, (
-        f"{what}: the post-command hook did not end within the harness's limit of "
-        f"{check_support.HOOK_TIMEOUT_S:g} s and was stopped; the findings it added until then: "
-        f"{list(result.new_lines)}. A hook that is stopped judges nothing: the test stays undone, unseen"
-    )
-    findings = check_support.new_findings(result, what)
-    assert findings, (
-        f"{what}: the hook ended after {result.seconds:.1f} s and no finding was added to "
-        f"{check_support.FINDINGS_REL}, neither one that names {shape.undone} nor one for the move as a whole: "
-        f"{result.describe()}"
-    )
-
-
 # --------------------------------------------------------------------------
 # 1. A merge commit with very many parents, through the helper
 # --------------------------------------------------------------------------
@@ -250,20 +225,6 @@ def test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_an
 # 1. The other side: an ordinary octopus merge of eight branches
 # --------------------------------------------------------------------------
 
-def test_an_ordinary_octopus_merge_of_eight_branches_with_commits_inside_their_own_paths_is_silent(project, sandbox,
-                                                                                                  call):
-    """One ``git merge`` of eight branches in the orchestrator's own call: a merge commit with nine parents
-    that holds every side's change. Each branch has one commit inside the allowed paths of its own trailers;
-    one is a test designer's new acceptance test. Every path that differs from a parent is brought by the
-    parent that changed it: the check is silent."""
-    shape = symmetric.octopus_of_eight_branches(project, sandbox)
-    before = check_support.git(project, "rev-parse", "HEAD").strip()
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    symmetric.assert_octopus_of_eight(project, shape, before)
-    assert check_support.read(project, support.NEW_TEST), f"the merge did not bring in {support.NEW_TEST}"
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 def test_read_merge_finds_no_own_change_in_an_ordinary_octopus_merge_of_eight_branches(project, sandbox, helper):

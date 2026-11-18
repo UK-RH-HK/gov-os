@@ -14,7 +14,8 @@ import pytest
 from gov.close import batch, nightly, repo, tool, traceability
 from gov.close.command import _started
 from gov.decisions import checker
-from gov.guard import containment, decide
+from gov.containment import commits as containment
+from gov.util import freeze as decide
 from gov.store import loader
 from gov.util import gitenv
 from gov.util.gitenv import git_binary

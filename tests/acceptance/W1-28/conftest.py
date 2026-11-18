@@ -63,12 +63,6 @@ def interface():
     return cli_support.load_interface(support.REPO_ROOT)
 
 
-@pytest.fixture(scope="session")
-def hook():
-    """The guard's PreToolUse hook (W1-02), which reads the flag."""
-    return support.guard_support.hook_entry()
-
-
 @pytest.fixture()
 def sandbox(tmp_path):
     """HOME, TMPDIR, the launcher's directory, the bytecode cache and an unrelated directory, outside the project."""
@@ -76,13 +70,13 @@ def sandbox(tmp_path):
 
 
 @pytest.fixture()
-def raw_project(hook, tmp_path):
+def raw_project(tmp_path):
     """This test's own temporary git repository, whether or not ``gov pause`` is built."""
     return support.make_project(tmp_path / "project")
 
 
 @pytest.fixture(scope="session")
-def built(hook, tmp_path_factory):
+def built(tmp_path_factory):
     """``gov pause`` is built. Until then every test of its behaviour fails here.
 
     The probe is a worker's call (``GOV_ROLE=engineer``) on a throw-away

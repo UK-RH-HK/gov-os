@@ -723,23 +723,6 @@ tests/acceptance/W1-36/test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_
 tests/acceptance/W1-36/test_w1_36_skill_form.py::TestSkillTokenLimit::test_body_at_most_2500_tokens  # cap
 
 # acceptance/W1-38
-tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::test_the_source_s_command_line_is_the_kernel_template_s_form  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_the_fixture_holds_a_product_package_and_the_installed_governance_package  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_a_call_the_guard_lets_through_is_let_through_by_its_own_answer  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_a_call_the_guard_refuses_is_refused_by_its_written_refusal  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_every_guard_hook_entry_of_the_source_carries_the_time_limit  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_one_source_entry_without_the_whole_number_60_is_found  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_a_limit_written_as_a_fraction_in_the_source_file_is_found  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_a_source_entry_that_runs_no_kernel_hook_is_left_as_it_is  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_every_guard_hook_entry_of_the_generated_settings_carries_the_time_limit  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_generated_settings_run_the_containment_program_after_a_failed_bash_call  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_generated_settings_register_what_the_kernel_template_s_settings_register  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_three_events_compared_are_the_kernel_template_s_guard_events  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestRulesyncPassesBothThrough::test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestFailedCommandInAGeneratedProject::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestFailedCommandInAGeneratedProject::test_an_acceptance_test_changed_by_a_failed_command_is_restored  # cap
-tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestFailedCommandInAGeneratedProject::test_a_failed_command_that_stays_in_scope_is_left_alone  # cap
 tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSkillGeneration::test_skill_body_matches_source  # cap
 tests/acceptance/W1-38/test_w1_38_rulesync.py::TestVendoredSkillRegistration::test_vendored_skill_is_the_kernel_copy  # cap
 tests/acceptance/W1-38/test_w1_38_rulesync.py::TestClaudeMdAndAgentsMd::test_agents_md_carries_the_root_rule  # cap
@@ -779,16 +762,10 @@ tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheRuleIsGone::test_t
 tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else  # cap
 tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestEveryOtherRuleStays::test_the_four_other_deny_rules_are_still_generated_and_nothing_else  # cap
 tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestEveryOtherRuleStays::test_the_generated_settings_still_close_the_ticket_folder  # cap
-tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder  # cap
-tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_is_still_refused_outside_the_folder  # cap
-tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_every_other_role_is_refused_a_write_under_the_folder  # cap
-tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_the_engineer_is_let_through_inside_its_ticket  # cap
 tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_close_the_folder_for_every_other_role  # cap
 tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_leave_the_folder_to_the_test_designer  # cap
 tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAProjectMadeFromTheTemplate::test_no_settings_of_a_launched_test_designer_close_the_folder  # cap
 rep: tests/acceptance/W1-38/test_w1_38_heldout_step.py  # one row per parametrised function
-rep: tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py  # one row per parametrised function
-rep: tests/acceptance/W1-38/test_w1_38_hooks_command_line.py  # one row per parametrised function
 
 # acceptance/W1-39
 tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_file_hidden_from_git_by_an_ignore_rule_is_still_drift_naming_it  # cap
@@ -803,10 +780,6 @@ tests/acceptance/W1-39/test_w1_39_drift.py::test_deleting_the_lock_does_not_sile
 tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured  # cap
 tests/acceptance/W1-39/test_w1_39_drift.py::test_a_lock_without_manifest_entries_is_not_a_match  # cap
 tests/acceptance/W1-39/test_w1_39_drift.py::test_a_lock_that_is_not_readable_as_a_map_is_not_a_match  # cap
-tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_created_project_has_the_time_limit_on_every_guard_hook_entry  # cap
-tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_project_that_had_settings_of_its_own_gets_the_time_limit_on_the_guard_s_entries  # cap
-tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_copy_leaves_a_project_s_own_settings_as_they_were  # cap
-tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_project_of_an_earlier_release_gets_the_time_limit_by_an_update  # cap
 tests/acceptance/W1-39/test_w1_39_layout.py::test_a_created_project_holds_only_the_product_layout  # cap
 tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_the_lock_refers_to_the_answers_file  # cap
 tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_doctor_fails_when_the_locks_tag_or_commit_disagrees_with_the_install  # cap
@@ -951,7 +924,6 @@ rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_a_missing_checkpoint_
 rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_without_tk_the_block_says_so_and_holds_the_rest  # one row
 rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_a_workers_compaction_is_not_blocked_and_appends_nothing  # one row
 rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_sessionstart_hook_is_registered_for_compact_clear_and_resume  # one row
-rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_guard_hooks_stay_registered_in_the_kernel_s_wiring  # one row
 rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_missing_checkpoint_does_not_fail_the_hook  # one row
 rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_in_a_worktree_the_leads_section_is_injected  # one row
 rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_checkpoint_that_cannot_be_read_does_not_fail_the_hook  # one row
@@ -979,10 +951,7 @@ rep: tests/acceptance/W2-04/test_w2_04_refusal.py  # one row per parametrised fu
 tests/acceptance/W2-05/test_w2_05_planted.py::test_a_hooked_commit_in_a_linked_worktree_scans_the_index_git_gives_it  # cap
 tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_under_planted_trace_variables_writes_no_trace  # cap
 tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_in_a_partial_clone_fetches_nothing  # cap
-tests/acceptance/W2-05/test_w2_05_planted.py::test_the_containment_check_catches_the_change_whatever_its_environment_holds  # cap
 tests/acceptance/W2-05/test_w2_05_planted.py::test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment  # cap
-tests/acceptance/W2-05/test_w2_05_planted.py::test_the_guard_hook_does_not_run_the_git_first_on_path  # cap
-tests/acceptance/W2-05/test_w2_05_planted.py::test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs  # cap
 tests/acceptance/W2-05/test_w2_05_sweep.py::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep  # cap
 tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_sweep_lists_the_starts_of_the_code_index_tool_as_calls_that_start_git  # cap
 tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_one_helper_is_there_and_the_sweep_names_it  # cap
@@ -1107,7 +1076,6 @@ rep: tests/acceptance/W2-57/test_w2_57_rulesync_probe.py::test_a_late_answer_is_
 
 # acceptance/W2-61
 rep: tests/acceptance/W2-61/test_w2_61_any_set.py  # one row per parametrised function
-rep: tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py::test_the_measure_refuses_the_hidden_part_to_a_measured_session  # one row
 rep: tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py::test_an_error_on_a_hidden_question_names_only_its_id  # one row
 rep: tests/acceptance/W2-61/test_w2_61_sources_matched.py  # one row per parametrised function
 

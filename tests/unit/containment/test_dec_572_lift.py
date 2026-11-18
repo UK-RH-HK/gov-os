@@ -40,14 +40,14 @@ def _both_sides(tmp_path, side=ORCHESTRATOR):
 
 
 def test_a_ticket_file_held_as_one_parent_has_it_is_no_finding(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project, _ = _both_sides(tmp_path)
     merge = _merge_taking(project, "side", "side")
     assert judge_commits(str(project), [merge]) == []
 
 
 def test_a_worker_s_commit_that_brought_the_version_is_named(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project, brought = _both_sides(tmp_path, side=ENGINEER)
     merge = _merge_taking(project, "side", "side")
     (finding,) = judge_commits(str(project), [merge])
@@ -59,7 +59,7 @@ def test_the_lift_is_not_applied_inside_the_lift(tmp_path):
     """A merge commit on the merged side that is itself the lifted shape
     is no finding alone, and does not pass as a commit that brought the
     version: the outer merge commit's finding names it."""
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project, _ = _both_sides(tmp_path)
     _git(project, "checkout", "-q", "-b", "inner", "main~1")
     (project / TICKET_FILE).write_text(
@@ -75,7 +75,7 @@ def test_the_lift_is_not_applied_inside_the_lift(tmp_path):
 
 
 def test_no_lift_beyond_the_bound_of_git_processes(tmp_path, monkeypatch):
-    from gov.guard import containment
+    from gov.containment import commits as containment
     project, _ = _both_sides(tmp_path)
     merge = _merge_taking(project, "side", "side")
     monkeypatch.setattr(containment, "_LIFT_PROCESSES", 7)

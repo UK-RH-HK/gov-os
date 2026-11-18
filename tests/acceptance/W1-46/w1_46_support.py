@@ -84,7 +84,6 @@ TEST_DESIGNER = "independent-test-designer"
 AUDITOR = "independent-auditor"
 RESEARCH = "research"
 WORKER_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR, RESEARCH)
-EMPTY_ALLOWLIST_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR)
 NOT_LAUNCHED = ("orchestrator", "no-such-role")   # owner decision, DEC-386: product-spec is launched (W1-28)
 
 RESEARCH_TICKET = "DAEO-zz97"
@@ -95,13 +94,6 @@ TICKET_OF = {
     TEST_DESIGNER: check_support.TICKET_ID,
     AUDITOR: check_support.AUDITOR_TICKET_ID,
     RESEARCH: RESEARCH_TICKET,
-}
-# A path inside each role's write scope, as the guard decides it from the fixture tickets.
-OWN_PATH = {
-    ENGINEER: "src/gov/guard/new_module.py",
-    TEST_DESIGNER: "tests/acceptance/W1-90/test_new.py",
-    AUDITOR: "docs/audit/report.md",
-    RESEARCH: f"{EXPERIMENT_REL}/notes.md",
 }
 
 # Copied from this repository, file by file, from git's listing. Never ``governance/project/held-out.yaml``.
@@ -148,15 +140,6 @@ RUNTIME_FILES = {
     ".gov-runtime/scratch/w1-46/seed.txt": "seed\n",
 }
 
-# The starting hosts of the research allowlist (DEC-241 less DEC-316's), which the live research probe asks.
-STARTING_HOSTS = (
-    "github.com", "api.github.com", "raw.githubusercontent.com", "objects.githubusercontent.com",
-    "codeload.github.com", "pypi.org", "files.pythonhosted.org", "registry.npmjs.org", "huggingface.co",
-    "arxiv.org", "export.arxiv.org", "docs.python.org", "docs.rs", "crates.io",
-    "static.crates.io", "developer.mozilla.org",
-)
-# One subdomain of readthedocs.io, which the live research probe asks.
-READTHEDOCS_HOST = "docs.readthedocs.io"
 
 COMMAND_TIMEOUT_S = 60.0
 HOOK_TIMEOUT_S = 30.0
@@ -531,12 +514,6 @@ def caller_args_then_template_pair(argv, args, role=None):
 # What the built settings say
 # --------------------------------------------------------------------------
 
-def allowed_domains(settings):
-    network = settings.get("sandbox", {}).get("network", {})
-    domains = network.get("allowedDomains", []) if isinstance(network, dict) else []
-    assert isinstance(domains, list), f"sandbox.network.allowedDomains is not a list: {domains!r}"
-    return domains
-
 
 def hook_keys(settings):
     """The keys of ``settings`` that register a hook or switch the hooks on or off."""
@@ -687,30 +664,6 @@ def ask_guard(project, sandbox, tool_name, tool_input, role, ticket, cwd=None, m
 # --------------------------------------------------------------------------
 # A wheel made by hand, for the install of the local_only research session (no network, no build tool)
 # --------------------------------------------------------------------------
-
-WHEEL_NAME = "w1_46_probe-0.1-py3-none-any.whl"
-WHEEL_PACKAGE = "w1_46_probe"
-
-
-def write_probe_wheel(directory):
-    files = {
-        f"{WHEEL_PACKAGE}/__init__.py": "VALUE = 1\n",
-        f"{WHEEL_PACKAGE}-0.1.dist-info/METADATA": f"Metadata-Version: 2.1\nName: {WHEEL_PACKAGE}\nVersion: 0.1\n",
-        f"{WHEEL_PACKAGE}-0.1.dist-info/WHEEL":
-            "Wheel-Version: 1.0\nGenerator: w1-46-tests\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
-    }
-    record = []
-    for name, text in files.items():
-        digest = base64.urlsafe_b64encode(hashlib.sha256(text.encode()).digest()).rstrip(b"=").decode()
-        record.append(f"{name},sha256={digest},{len(text.encode())}")
-    record.append(f"{WHEEL_PACKAGE}-0.1.dist-info/RECORD,,")
-    files[f"{WHEEL_PACKAGE}-0.1.dist-info/RECORD"] = "\n".join(record) + "\n"
-    directory = Path(directory)
-    directory.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(directory / WHEEL_NAME, "w") as archive:
-        for name, text in files.items():
-            archive.writestr(name, text)
-    return directory / WHEEL_NAME
 
 
 # --------------------------------------------------------------------------

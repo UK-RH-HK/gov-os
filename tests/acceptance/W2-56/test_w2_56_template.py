@@ -54,11 +54,6 @@ def test_s14_the_template_carries_one_allow_rule_bash_gov_launch():
     assert allow == [RULE], f"the template's permissions.allow is {allow}, not [{RULE!r}]"
 
 
-def test_s14_guard_the_template_keeps_its_hooks():
-    hooks = _template().get("hooks") or {}
-    assert hooks.get("PreToolUse"), "the template's settings lost their PreToolUse hook"
-
-
 def test_f6_the_template_admits_gov_launch_and_no_raw_claude_launch():
     allow = _allow(_template())
     blocked = [command for command in LAUNCHES if not any(_admits(rule, command) for rule in allow)]

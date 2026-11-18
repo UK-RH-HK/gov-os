@@ -6,7 +6,7 @@ Three comparisons, each a finding when it fails or cannot be made:
    with its source's ``claudecode.tools`` (DEC-471);
 3. the generated files, byte for byte, with what rulesync generates from the sources into an empty
    temporary folder; a file of the generated folders that rulesync does not write has no source.
-   When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
+   When the project has a held-out file, the held-out generator's step (``gov.util.heldout``) is
    applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
 A role with a kernel role template (W2-153, DEC-1050) has its source compared with ``compose(root, role)``: the
 source's own rulesync front matter, with the role's skills list under ``claudecode: skills:`` (where rulesync passes
@@ -36,7 +36,7 @@ from pathlib import Path
 
 import yaml
 
-from gov.guard import heldout
+from gov.util import heldout
 from gov.launch.launcher import ROLE_TEMPLATES, TEMPLATES_REL
 
 REGISTRY = "governance/project/tool-registry.yaml"

@@ -2,13 +2,9 @@
 
 W2-50 makes ``~/gov-os-runs/`` the one durable scratch root outside the
 repository: a session writes only under ``~/gov-os-runs/<its own ticket>/``
-(DEC-728). The tests drive three public interfaces and nothing else:
+(DEC-728). The tests drive two public interfaces and nothing else:
 
-- **the guard**, the kernel's PreToolUse hook
-  (``template/governance/kernel/hooks/pretooluse.py``), run as the harness
-  runs it, with the call on stdin, as W1-03's suite runs it. The one file is
-  copied into the temporary project at ``governance/kernel/hooks/``, where a
-  product repository has it;
+- (the guard, the kernel's PreToolUse hook, is retired with its cases, EMERGENCY-2 6.1, DAEO-gr7t);
 - **``gov launch``**, with a stand-in for the CLI at ``<HOME>/.local/bin/claude``
   that starts no session (W1-46's way): it records the settings the session
   would have been started with, and does what a plan file asks of a session;
@@ -65,8 +61,6 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-GUARD_SOURCE = REPO_ROOT / "template/governance/kernel/hooks/pretooluse.py"
-GUARD_REL = "governance/kernel/hooks/pretooluse.py"
 CHECK_DECLARATION = REPO_ROOT / "template/governance/kernel/checks/secrets-indexing.yaml"
 GITLEAKS_TEMPLATE = REPO_ROOT / "template/.gitleaks.toml"
 PATH_MAP_TEMPLATE = REPO_ROOT / "template/governance/project/path-map.yaml"
@@ -74,7 +68,6 @@ PYPROJECT = REPO_ROOT / "pyproject.toml"
 
 RUNS = "gov-os-runs"               # the durable scratch root, under HOME (DEC-728)
 WORKTREES = "gov-os-worktrees"
-WORKBENCH = "gov-os-workbench"
 
 ENGINEER = "engineer"
 TEST_DESIGNER = "independent-test-designer"
@@ -233,7 +226,6 @@ def base_environment(sandbox, role=None, ticket=None, project=None):
 # The fixture project, from scratch
 # --------------------------------------------------------------------------
 
-GUARD_COMMAND = f'python3 "$CLAUDE_PROJECT_DIR"/{GUARD_REL}'
 PROJECT_FILES = {
     "README.md": "# W2-50 fixture project\n",
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
@@ -263,7 +255,6 @@ PROJECT_FILES.update({f".claude/templates/{stem}.md": (KERNEL_TEMPLATES / f"{ste
                       for stem in TEMPLATE_STEMS})
 # Single named files of this repository the fixture project holds where a product repository has them.
 COPIED_FILES = {
-    GUARD_REL: GUARD_SOURCE,
     "template/governance/kernel/launch/research-allowlist.yaml":
         REPO_ROOT / "template/governance/kernel/launch/research-allowlist.yaml",   # read by a research launch
 }
@@ -287,15 +278,13 @@ def write(path, text):
 
 
 def make_project(sandbox, extra=None):
-    """The committed fixture project at ``~/gov-os-worktrees/W2-90`` with the guard registered for every tool."""
+    """The committed fixture project at ``~/gov-os-worktrees/W2-90`` (no guard is registered: it is retired)."""
     project = sandbox.project
     files = dict(PROJECT_FILES)
     files.update(extra or {})
     for ticket in TICKETS:
         files[f".tickets/{ticket.tk}.md"] = ticket_text(ticket)
-    files[".claude/settings.json"] = json.dumps({"hooks": {
-        "PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": GUARD_COMMAND}]}],
-    }}, indent=2) + "\n"
+    files[".claude/settings.json"] = "{}\n"   # no guard is registered (EMERGENCY-2 6.1, DAEO-gr7t)
     for rel, text in files.items():
         write(project / rel, text)
     for rel, source in COPIED_FILES.items():
@@ -308,107 +297,11 @@ def make_project(sandbox, extra=None):
 
 
 # --------------------------------------------------------------------------
-# The guard
+# Quoting
 # --------------------------------------------------------------------------
-
-@dataclass(frozen=True)
-class Decision:
-    decision: str    # allow | ask | deny | error
-    reason: str
-    returncode: int | None
-    stdout: str
-    stderr: str
-
-    def describe(self):
-        return (f"decision={self.decision} exit={self.returncode} reason={self.reason[:400]!r} "
-                f"stderr={self.stderr.strip()[:300]!r}")
-
-
-def _decision(returncode, stdout, stderr):
-    if returncode is None:
-        return "error", "timed out"
-    if returncode == 2:
-        return "deny", stderr.strip()
-    if returncode != 0:
-        return "error", stderr.strip()
-    try:
-        data = json.loads(stdout.strip() or "null")
-    except ValueError:
-        return "allow", ""
-    specific = data.get("hookSpecificOutput") if isinstance(data, dict) else None
-    if isinstance(specific, dict) and specific.get("permissionDecision") in ("deny", "ask"):
-        return specific["permissionDecision"], str(specific.get("permissionDecisionReason") or "")
-    return "allow", ""
-
-
-_CALLS = iter(range(1, 10_000_000))
-
-
-def ask_guard(sandbox, tool_name, tool_input, role, ticket, project=None):
-    """Run the project's guard once, as the harness does before a call. ``ticket`` is a tk id, ``""`` or None."""
-    project = Path(project or sandbox.project)
-    data = {
-        "session_id": "w2-50-acceptance-session",
-        "transcript_path": str(sandbox.elsewhere / "transcript.jsonl"),
-        "cwd": str(project),
-        "permission_mode": "default",
-        "hook_event_name": "PreToolUse",
-        "tool_name": tool_name,
-        "tool_input": tool_input,
-        "tool_use_id": f"toolu_w2_50_{next(_CALLS):06d}",
-    }
-    try:
-        proc = subprocess.run([sys.executable, str(project / GUARD_REL)], input=json.dumps(data),
-                              capture_output=True, text=True, cwd=str(project),
-                              env=base_environment(sandbox, role, ticket, project), timeout=COMMAND_TIMEOUT_S)
-        returncode, stdout, stderr = proc.returncode, proc.stdout, proc.stderr
-    except subprocess.TimeoutExpired:
-        returncode, stdout, stderr = None, "", "timed out"
-    decision, reason = _decision(returncode, stdout, stderr)
-    return Decision(decision, reason, returncode, stdout, stderr)
-
-
-def tool_input(tool_name, target):
-    """The input of a Write or Edit call on ``target``, or of a Bash call whose command is ``target``."""
-    if tool_name == "Write":
-        return {"file_path": str(target), "content": "written by the W2-50 acceptance test\n"}
-    if tool_name == "Edit":
-        return {"file_path": str(target), "old_string": "a", "new_string": "b"}
-    if tool_name == "Bash":
-        return {"command": str(target), "description": "W2-50 acceptance call"}
-    raise ValueError(tool_name)
-
 
 def q(path):
     return shlex.quote(str(path))
-
-
-def assert_allowed(result, what):
-    assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
-
-
-def assert_refused(result, what, *names):
-    """Refused, with a reason: the refusal's text is not empty and names the target or why.
-
-    ``names`` are strings of which the reason must hold one: the path as given,
-    a form of it, or a word that says why. The guard's own wording is not
-    prescribed.
-    """
-    assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
-    reason = result.reason.strip()
-    assert reason, f"{what} was refused without a reason: {result.describe()}"
-    if names:
-        assert any(str(name) in reason for name in names if name), (
-            f"{what}: the refusal's reason names neither the target nor why (one of {[str(n) for n in names]}): "
-            f"{reason[:400]!r}")
-
-
-def why_words(path, sandbox):
-    """What a refusal of ``path`` may name: the path, its normal and real forms, the root's name, a reason word."""
-    path = str(path)
-    words = {path, os.path.normpath(path), os.path.realpath(path), RUNS, WORKBENCH, WORKTREES, "ticket",
-             "outside", "role"}
-    return sorted(words)
 
 
 # --------------------------------------------------------------------------

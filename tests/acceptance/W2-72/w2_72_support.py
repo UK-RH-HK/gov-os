@@ -6,13 +6,11 @@ merge commit holds exactly git's own merge of that file: the blob ``git merge-tr
 <other parent>`` writes for it, with no conflict on that file. Any file that differs from git's own merge is
 still caught as before (DEC-410).
 
-The tests drive the two public interfaces the W1-50 suite drives:
+The tests drive the public interface the W1-50 suite drives: ``gov.containment.commits.judge_commits`` (DEC-453), the
+close's read-only containment gate. (The post-command check, through the kernel's hooks, is retired with them,
+EMERGENCY-2 6.1, DAEO-gr7t: the cases that ran it are deleted.)
 
-- the containment post-command check, through the kernel's hooks around one Bash call of an orchestrator
-  session in a throw-away project (``tests/acceptance/W1-03/w1_03_support.py``, ``tests/acceptance/W1-50/``);
-- ``gov.guard.containment.judge_commits`` (DEC-453), the close's read-only containment gate.
-
-``gov.guard.containment_merge.read_merge``, through which the approval check reads merges, is read to show that
+``gov.containment.merge.read_merge``, through which the approval check reads merges, is read to show that
 its answer is unchanged (DEC-918 item 4).
 
 **The merges.** As a ticket lead merges ``w2/integrate`` back into its ticket's branch: the checked-out branch
@@ -526,19 +524,6 @@ def new_test_text():
     return "".join(f"NEW_{n} = {n}\n" for n in range(1, LINES + 1))
 
 
-def merge_head(root):
-    """The commit a merge in progress merges (``MERGE_HEAD``); ``None`` when no merge is in progress."""
-    proc = git_run(root, "rev-parse", "-q", "--verify", "MERGE_HEAD")
-    return proc.stdout.strip() if proc.returncode == 0 else None
-
-
-def unmerged_paths(root):
-    """The paths the index holds unmerged (conflicted), sorted."""
-    proc = git_run(root, "ls-files", "-u", "-z")
-    assert proc.returncode == 0, f"git ls-files -u failed: {proc.stderr.strip()}"
-    return tuple(sorted({entry.split("\t", 1)[1] for entry in proc.stdout.split("\0") if entry}))
-
-
 def index_entries(root):
     """``git ls-files -s``: every entry of the index with its mode, blob and stage."""
     proc = git_run(root, "ls-files", "-s")
@@ -556,120 +541,6 @@ def folder_listing(root, tree_ish, folder=FOLDER):
 def snapshot(root):
     """HEAD, ``git status`` with every file listed, the watched files' content, and the index."""
     return check_support.state(root, WATCHED_ACROSS), index_entries(root)
-
-
-@dataclass(frozen=True)
-class Observed:
-    """One Bash call between the kernel's two hooks, as it went."""
-    command: str
-    exit_code: int            # the command's own; not 0: the harness sends PostToolUseFailure
-    result: object            # the containment check's result (``check_support.HookResult``)
-    left: tuple               # ``snapshot`` between the command and the check
-    after: tuple              # ``snapshot`` after the check
-    merging: str | None       # MERGE_HEAD between the command and the check
-    unmerged: tuple           # the unmerged paths between the command and the check
-
-    def kept(self):
-        """The check moved nothing: HEAD, the index, the working tree as the command left them."""
-        return self.after == self.left
-
-    def told(self, label):
-        """What the agent was told and what was recorded, for a message."""
-        return (f"{label} (`{self.command}`, exit {self.exit_code}): the agent was told {self.result.report!r} "
-                f"(hook exit {self.result.returncode}); findings recorded: {list(self.result.new_lines)}")
-
-    def change(self):
-        """What the check changed, for a message."""
-        (_, status_left, contents_left), index_left = self.left
-        (_, status_after, contents_after), index_after = self.after
-        changed = [path for path in contents_left if contents_left[path] != contents_after[path]]
-        lines_left, lines_after = set(index_left.splitlines()), set(index_after.splitlines())
-        return (f"files changed by the check: {changed}; git status after the command:\n{status_left}"
-                f"after the check:\n{status_after}index entries the check took out: {sorted(lines_left - lines_after)}"
-                f"; put in: {sorted(lines_after - lines_left)}")
-
-
-def bash_call(project, sandbox, command, role, ticket):
-    """One Bash call of a session: the PreToolUse hook, ``command`` for real, the containment check (PostToolUse,
-    or PostToolUseFailure when the command failed, as the harness sends it). Nothing is asked of where the call
-    leaves HEAD or the tree; the caller's guards read that from ``Observed``."""
-    seen = len(check_support.finding_lines(project))
-    the_call = check_support.script_call(sandbox, command)
-    guard = check_support.run_guard(project, the_call, sandbox, role=role, ticket=ticket)
-    check_support.assert_let_through(guard, the_call)
-    bash = check_support.run_bash(project, the_call.command, sandbox)
-    left = snapshot(project)
-    merging, unmerged = merge_head(project), unmerged_paths(project)
-    result = check_support.run_check(project, the_call, sandbox, role=role, ticket=ticket, bash=bash,
-                                     failed=bash.returncode != 0, seen=seen)
-    return Observed(command, bash.returncode, result, left, snapshot(project), merging, unmerged)
-
-
-def commit_the_merge(trailers=AS_ORCHESTRATOR, before_the_commit=""):
-    """Shell: commit the merge in progress with ``trailers``; ``before_the_commit`` (shell) runs first."""
-    command = (before_the_commit + " && ") if before_the_commit else ""
-    return command + f"git commit -q -m {shlex.quote('Merge ' + BRANCH)}" + support._trailer_options(trailers)
-
-
-START_THE_MERGE = f"git merge -q --no-ff --no-commit {shlex.quote(BRANCH)}"
-STAGE_THE_TESTS = f"git add -A -- {shlex.quote(ACCEPTANCE)}"
-
-
-@dataclass(frozen=True)
-class TwoCalls:
-    """A history whose merge of ``BRANCH`` is made over two Bash calls: ``first`` starts it and stops before
-    the commit (exiting ``first_exit``), ``second`` commits it."""
-    name: str
-    first: str
-    second: str
-    paths: tuple              # the acceptance paths the merge combines or brings: git's own merge of each is kept
-    what: str
-    first_exit: int = 0
-    conflicted: tuple = ()    # the paths git's own merge reports as conflicted
-
-
-def _merge_back_history(project, sandbox, conflict_on_the_source):
-    """A test designer's twenty-line acceptance test on ``main``. Since the fork the merged side changed its
-    line 2 and added a new acceptance test (test designer's commits); ``main`` changed its line 19 (a test
-    designer's commit). With ``conflict_on_the_source``, engineers changed the source file on both sides, each
-    in its own way; without, the merged side has an engineer's ``pyproject.toml``."""
-    _the_test_on_main(project, sandbox)
-    branch = [edit(MERGED_TEST, 2, "the-merged-side", AS_DESIGNER),
-              write_and_commit(NEW_TEST, new_test_text(), AS_DESIGNER, "a new acceptance test on the merged side")]
-    main = [edit(MERGED_TEST, 19, "main", AS_DESIGNER)]
-    if conflict_on_the_source:
-        branch.append(f"echo \"VALUE = 'the merged side'\" > {SOURCE} && "
-                      + support.commit_paths([SOURCE], AS_ENGINEER, subject="the merged side's engineer"))
-        main.append(f"echo \"VALUE = 'main'\" > {SOURCE} && "
-                    + support.commit_paths([SOURCE], AS_ENGINEER, subject="main's engineer"))
-    else:
-        branch.append(support.commit(ALSO, AS_ENGINEER, subject="the merged side's other work"))
-    _two_sides(project, sandbox, branch, main)
-
-
-def two_calls_with_a_conflict_on_the_source(project, sandbox):
-    """F1 (a), as in ``03f470a5``: the first call's merge stops on a conflict in the source file; git combines
-    the acceptance test both sides changed and brings the new one cleanly. The second call resolves the source
-    file by hand, stages it and commits the merge."""
-    _merge_back_history(project, sandbox, conflict_on_the_source=True)
-    resolve = f"echo \"VALUE = 'both'\" > {SOURCE} && git add -- {SOURCE}"
-    return TwoCalls("a-conflict-on-the-source-file-resolved-in-the-second-call", START_THE_MERGE,
-                    commit_the_merge(before_the_commit=resolve), (MERGED_TEST, NEW_TEST),
-                    first_exit=1, conflicted=(SOURCE,),
-                    what=f"a merge-back of {BRANCH} over two calls: `git merge --no-ff --no-commit` stops on a "
-                         f"conflict in {SOURCE} (both sides' engineers changed it), while git combines two test "
-                         f"designers' edits of {MERGED_TEST} and brings the merged side's new {NEW_TEST}; the "
-                         f"second call resolves {SOURCE} by hand and commits the merge")
-
-
-def two_calls_with_no_conflict(project, sandbox):
-    """F1 (b): the same with no conflict at all; the second call is ``git commit`` with the trailers."""
-    _merge_back_history(project, sandbox, conflict_on_the_source=False)
-    return TwoCalls("no-conflict-and-the-commit-in-the-second-call", START_THE_MERGE, commit_the_merge(),
-                    (MERGED_TEST, NEW_TEST),
-                    what=f"a merge-back of {BRANCH} over two calls: `git merge --no-ff --no-commit` combines two "
-                         f"test designers' edits of {MERGED_TEST} and brings the merged side's new {NEW_TEST} "
-                         f"without a conflict; the second call is `git commit` with the trailers")
 
 
 def renamed(line_2=None):
@@ -705,125 +576,9 @@ def clean_merge_across_a_rename(project, sandbox):
                  what=RENAMED_ON_THE_MERGED_SIDE)
 
 
-def two_calls_across_a_rename(project, sandbox):
-    """F4 over two calls (the form of F1 (b)): ``git merge --no-ff --no-commit``, then ``git commit``."""
-    _rename_on_the_merged_side_history(project, sandbox)
-    return TwoCalls("git-s-own-merge-across-a-rename-over-two-calls", START_THE_MERGE, commit_the_merge(),
-                    (MERGED_TEST, RENAMED_TEST), what=RENAMED_ON_THE_MERGED_SIDE + ", made over two calls")
-
-
-TWO_CALLS = {
-    "a-conflict-on-the-source-file-resolved-in-the-second-call": two_calls_with_a_conflict_on_the_source,
-    "no-conflict-and-the-commit-in-the-second-call": two_calls_with_no_conflict,
-}
-
-
-def history_of_two_calls_with_no_conflict(project, sandbox):
-    """The history of F1 (b), for the cases that change something in the flow."""
-    _merge_back_history(project, sandbox, conflict_on_the_source=False)
-
-
 def by_hand(path=MERGED_TEST):
     """Shell: line 10 of ``path`` changed by hand in the working tree; nothing is staged."""
     return set_line(path, 10, "by-hand")
-
-
-@dataclass(frozen=True)
-class HandWrite:
-    """Where the hand write of ``MERGED_TEST`` falls in a merge made over several calls: ``calls`` in order, the
-    last one commits the merge; the check of call ``caught_in`` (0 the first) sees the hand write."""
-    calls: tuple
-    caught_in: int
-    words: str
-
-
-# The merge of F1 (b) with one more line of MERGED_TEST changed by hand: content that differs from git's own merge
-# of HEAD and BRANCH. A call that commits stages the acceptance tests as the tree holds them.
-HAND_WRITES = {
-    "in-the-first-call-after-the-merge": HandWrite(
-        (f"{START_THE_MERGE} && {by_hand()}", commit_the_merge(before_the_commit=STAGE_THE_TESTS)), 0,
-        "the first call starts the merge and then changes line 10 by hand; the second commits the merge"),
-    "in-a-call-of-its-own-between": HandWrite(
-        (START_THE_MERGE, by_hand(), commit_the_merge(before_the_commit=STAGE_THE_TESTS)), 1,
-        "the first call starts the merge, a second changes line 10 by hand, a third commits the merge"),
-    "in-the-commit-s-call-before-the-commit": HandWrite(
-        (START_THE_MERGE, commit_the_merge(before_the_commit=f"{by_hand()} && {STAGE_THE_TESTS}")), 1,
-        "the first call starts the merge; the second changes line 10 by hand and commits the merge"),
-}
-
-
-def history_of_a_conflict_in_the_test(project, sandbox):
-    """Both sides' test designers changed line 2 of the acceptance test, each in its own way; the merged side
-    also got an engineer's ``pyproject.toml``. Git reports the conflict on the test."""
-    _the_test_on_main(project, sandbox)
-    _two_sides(project, sandbox,
-               (edit(MERGED_TEST, 2, "the-merged-side", AS_DESIGNER),
-                support.commit(ALSO, AS_ENGINEER, subject="the merged side's other work")),
-               (edit(MERGED_TEST, 2, "main", AS_DESIGNER),))
-
-
-def resolution_of_the_conflicted_test(project, name):
-    """Shell for the second call: ``MERGED_TEST`` written as ``name`` says, whatever the index holds for it."""
-    if name == "the-first-parent-s-version-whole":
-        return f"git show HEAD:{MERGED_TEST} > {MERGED_TEST}"
-    if name == "the-merged-side-s-version-whole":
-        return f"git show {shlex.quote(BRANCH)}:{MERGED_TEST} > {MERGED_TEST}"
-    assert name == "held-as-git-writes-it-with-its-markers", name
-    own = git_s_own_merge(project, full_id(project, "HEAD"), full_id(project, BRANCH))
-    blob = content_at(project, own.tree, MERGED_TEST).split()[2]
-    return f"git cat-file blob {blob} > {MERGED_TEST}"
-
-
-RESOLUTIONS_OVER_TWO_CALLS = ("the-first-parent-s-version-whole", "the-merged-side-s-version-whole",
-                              "held-as-git-writes-it-with-its-markers")
-
-
-def merge_back_over_two_calls(project, sandbox, judge, shape):
-    """Run ``shape``'s two calls in the orchestrator's session and return what DEC-918 item 1 finds wrong: each
-    call's check must stay silent and move nothing; the merge commit must hold git's own merge of every path of
-    ``shape.paths``, with the tree and the index equal to it; ``judge_commits`` must return no finding for it.
-
-    Returns (problems, a message that shows both calls' agent-facing text and finding records)."""
-    before, side = full_id(project, "HEAD"), full_id(project, BRANCH)
-    own = git_s_own_merge(project, before, side)
-    assert own.conflicted == shape.conflicted, (
-        f"the fixture is wrong: {shape.what}: git's own merge reports the conflicts {own.conflicted}"
-    )
-    assert any(content_at(project, own.tree, path) for path in shape.paths), (
-        f"the fixture is wrong: {shape.what}: git's own merge holds none of {shape.paths}"
-    )
-    first = bash_call(project, sandbox, shape.first, ORCHESTRATOR, TICKET)
-    assert (first.exit_code, first.merging, first.unmerged, first.left[0][0]) == (
-        shape.first_exit, side, shape.conflicted, (before, "main")), (
-        f"the fixture is wrong: {shape.what}: the first call exits {first.exit_code}, leaves MERGE_HEAD "
-        f"{first.merging}, the unmerged paths {first.unmerged} and HEAD {first.left[0][0]}"
-    )
-    second = bash_call(project, sandbox, shape.second, ORCHESTRATOR, TICKET)
-    assert second.exit_code == 0, f"the fixture is wrong: {shape.what}: the second call failed: {second.told('')}"
-    merge_id = full_id(project, "HEAD")
-    assert parents_of(project, merge_id) == [before, side] and trailer_values(project, merge_id, "Role") == [
-        ORCHESTRATOR] and trailer_values(project, merge_id, "Task") == [TICKET], (
-        f"the fixture is wrong: {shape.what}: the second call did not commit the merge with the trailers"
-    )
-    problems = []
-    for label, seen in (("the first call", first), ("the second call", second)):
-        result = seen.result
-        if result.outcome != "silent" or result.returncode != 0 or result.new_lines:
-            problems.append(f"{label}'s check did not stay silent ({result.describe()})")
-        if not seen.kept():
-            problems.append(f"{label}'s check changed the tree or the index ({seen.change()})")
-    for path in shape.paths:
-        held, git_s = content_at(project, merge_id, path), content_at(project, own.tree, path)
-        if held != git_s:
-            problems.append(f"the merge commit holds {held} for {path}, git's own merge {git_s}")
-    status = check_support.porcelain_all(project)
-    if status:
-        problems.append(f"the tree or the index differs from the merge commit:\n{status}")
-    findings = judge(project, [merge_id])
-    if findings:
-        problems.append(f"judge_commits on the merge commit returns "
-                        f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}")
-    return problems, f"{first.told('The first call')}. {second.told('The second call')}"
 
 
 # --------------------------------------------------------------------------
@@ -1160,8 +915,8 @@ def judge_in_a_process(root, commit_ids, environment=None, git_dirs=None):
     program = (
         "import json, sys\n"
         + seam +
-        "from gov.guard.containment import judge_commits\n"
-        "import gov.guard.containment as module\n"
+        "from gov.containment.commits import judge_commits\n"
+        "import gov.containment.commits as module\n"
         f"assert module.__file__.startswith({str(SOURCES)!r}), module.__file__\n"
         "findings = judge_commits(sys.argv[1], sys.argv[2:])\n"
         "print(json.dumps([[f.commit, sorted(f.paths), f.reason] for f in findings]))\n"
@@ -1180,33 +935,10 @@ def judge_in_a_process(root, commit_ids, environment=None, git_dirs=None):
 # Findings of the check, by the commit they are for
 # --------------------------------------------------------------------------
 
-def findings_for(result, commit_id, what):
-    """The findings this call added whose ``reason`` is for the commit (``commit <12 digits>``)."""
-    return [f for f in check_support.new_findings(result, what) if f"commit {commit_id[:12]}" in f["reason"]]
-
 
 # --------------------------------------------------------------------------
 # Fixtures: each test module imports those it uses by name
 # --------------------------------------------------------------------------
-
-def _entry(find):
-    try:
-        return find()
-    except check_support.HookMissing as exc:
-        reason = str(exc)
-    pytest.fail(reason, pytrace=False)
-
-
-@pytest.fixture(scope="session")
-def hook():
-    """The containment check's PostToolUse hook script in the kernel template."""
-    return _entry(check_support.hook_entry)
-
-
-@pytest.fixture(scope="session")
-def guard_hook(hook):
-    """The kernel's PreToolUse hook script, where the check takes its before-snapshot (DEC-126)."""
-    return _entry(check_support.guard_entry)
 
 
 @pytest.fixture()
@@ -1216,44 +948,9 @@ def sandbox(tmp_path):
 
 
 @pytest.fixture()
-def project(hook, guard_hook, tmp_path):
+def project(tmp_path):
     """A committed project on ``main`` with a clean working tree and the fixture tickets, all in progress."""
     return check_support.make_project(tmp_path / "project")
-
-
-@pytest.fixture()
-def call(sandbox):
-    """``call(project, command, role, ticket, check_environment=None, before_the_check=None)`` -> (result, state
-    after).
-
-    One whole Bash call that moves ``HEAD`` on the same branch and leaves a clean tree: the PreToolUse hook,
-    the command for real, the PostToolUse hook (the containment check). ``state after`` is taken between the
-    command and the check. ``check_environment`` replaces variables of the check's environment only.
-    ``before_the_check`` (no arguments) runs after ``state after`` is taken and before the check; it moves no
-    ref, index entry or file of the working tree.
-    """
-
-    def _call(project, command, role, ticket, check_environment=None, before_the_check=None):
-        seen = len(check_support.finding_lines(project))
-        before = check_support.head(project)
-        the_call = check_support.script_call(sandbox, command)
-        guard = check_support.run_guard(project, the_call, sandbox, role=role, ticket=ticket)
-        check_support.assert_let_through(guard, the_call)
-        bash = check_support.run_bash(project, the_call.command, sandbox)
-        assert bash.returncode == 0, (
-            f"the fixture command `{command}` failed: {bash.stdout.strip()!r} {bash.stderr.strip()!r}"
-        )
-        left = check_support.state(project, WATCHED)
-        assert left[0][0] != before[0], f"the fixture command `{command}` did not move HEAD"
-        assert left[0][1] == before[1], f"the fixture command `{command}` left the branch {before[1]!r}"
-        assert left[1] == "", f"the fixture command `{command}` left uncommitted changes:\n{left[1]}"
-        if before_the_check is not None:
-            before_the_check()
-        result = check_support.run_check(project, the_call, sandbox, role=role, ticket=ticket, bash=bash, seen=seen,
-                                         environment=check_environment)
-        return result, left
-
-    return _call
 
 
 def _caller_free(monkeypatch):
@@ -1280,23 +977,23 @@ def _imported(name, function):
 
 @pytest.fixture()
 def judge(monkeypatch):
-    """``judge(root, commit_ids)`` -> the findings of ``gov.guard.containment.judge_commits`` (DEC-453),
+    """``judge(root, commit_ids)`` -> the findings of ``gov.containment.commits.judge_commits`` (DEC-453),
     imported from this worktree's ``src`` in a process that says nothing of a caller."""
     _caller_free(monkeypatch)
 
     def _judge(root, commit_ids):
-        return _imported("gov.guard.containment", "judge_commits")(str(root), list(commit_ids))
+        return _imported("gov.containment.commits", "judge_commits")(str(root), list(commit_ids))
 
     return _judge
 
 
 @pytest.fixture()
 def read_merge(monkeypatch):
-    """``read_merge(root, commit_id)`` -> ``gov.guard.containment_merge.read_merge`` (DEC-398), the reader the
+    """``read_merge(root, commit_id)`` -> ``gov.containment.merge.read_merge`` (DEC-398), the reader the
     approval check reads merges through, imported from this worktree's ``src``."""
     _caller_free(monkeypatch)
 
     def _read(root, commit_id):
-        return _imported("gov.guard.containment_merge", "read_merge")(str(root), commit_id)
+        return _imported("gov.containment.merge", "read_merge")(str(root), commit_id)
 
     return _read

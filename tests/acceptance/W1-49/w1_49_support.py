@@ -41,8 +41,6 @@ SETTINGS_REL = ".claude/settings.json"
 HOOKS_REL = "template/governance/kernel/hooks"
 PRECOMPACT_REL = f"{HOOKS_REL}/precompact.py"
 SESSIONSTART_REL = f"{HOOKS_REL}/sessionstart.py"
-GUARD_REL = f"{HOOKS_REL}/pretooluse.py"
-CONTAINMENT_REL = f"{HOOKS_REL}/posttooluse.py"
 
 PROMPT_REL = "governance/project/prompts/w1-orchestrator.md"
 # W2-62 (DEC-837, W2-M373): the hook names the prompt the project's roster names, so the fixture's roster names its

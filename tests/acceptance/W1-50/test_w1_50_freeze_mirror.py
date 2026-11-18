@@ -176,34 +176,6 @@ def test_mirror_keyed_differently_for_different_repos(sandbox, tmp_path):
 # Tests — the guard reads frozen/not-frozen from flag, mirror, or both
 # ---------------------------------------------------------------------------
 
-def test_guard_frozen_when_only_mirror_exists(project, sandbox):
-    """Flag absent, mirror present: the guard reads frozen (DEC-429)."""
-    assert not fs.flag(project).exists(), "fixture: the flag should not exist"
-    _put_mirror(project, sandbox.home)
-    result = fs.guard_write(project, sandbox)
-    fs.assert_frozen(result, "mirror present, flag absent")
-
-
-def test_guard_frozen_when_only_flag_exists(project, sandbox):
-    """Mirror absent, flag present: frozen (existing behaviour, must stay)."""
-    fs.put_flag(project)
-    result = fs.guard_write(project, sandbox)
-    fs.assert_frozen(result, "flag present, no mirror")
-
-
-def test_guard_frozen_when_both_exist(project, sandbox):
-    """Both flag and mirror present: frozen."""
-    fs.put_flag(project)
-    _put_mirror(project, sandbox.home)
-    result = fs.guard_write(project, sandbox)
-    fs.assert_frozen(result, "both flag and mirror present")
-
-
-def test_not_frozen_when_neither_exists(project, sandbox):
-    """Neither flag nor mirror: not frozen (existing behaviour, must stay)."""
-    assert not fs.flag(project).exists()
-    result = fs.guard_write(project, sandbox)
-    fs.assert_not_frozen(result, "neither flag nor mirror")
 
 
 # ---------------------------------------------------------------------------
@@ -277,16 +249,3 @@ def test_mirror_content_is_the_same_marker_line_as_the_flag(project, sandbox, do
         f"both must carry the same marker line (DEC-429)"
     )
 
-
-def test_guard_fails_closed_on_unreadable_mirror_folder(project, sandbox):
-    """An unreadable mirror folder: the guard treats the project as frozen.
-
-    DEC-429: fail closed where the guard cannot tell.
-    """
-    mirror = _put_mirror(project, sandbox.home)
-    mirror.parent.chmod(0o000)
-    try:
-        result = fs.guard_write(project, sandbox)
-        fs.assert_frozen(result, "unreadable mirror folder")
-    finally:
-        mirror.parent.chmod(0o755)

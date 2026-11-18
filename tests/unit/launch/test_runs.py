@@ -16,7 +16,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
-from gov.guard import runs  # noqa: E402
+from gov.util import runs  # noqa: E402
 from gov.launch import launcher  # noqa: E402
 
 TICKET = "---\nid: TST-a001\nstatus: in_progress\nexternal-ref: W2-90\nrole: engineer\nallowed_paths:\n- src/**\n---\n"

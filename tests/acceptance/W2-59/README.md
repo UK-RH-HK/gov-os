@@ -1,5 +1,7 @@
 # W2-59 acceptance tests: the pinned judge, the hook lines and the packaging gaps
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The case that counted the seven governance hook lines, the case that asked the pre-tool line to block without a pin, and `test_w2_59_hook_lines_worker_env.py` are deleted; the pin's interpreter and package are held for the lifecycle lines that remain.
+
 Ticket: `DAEO-kh9l` (W2-59) · Profile: STANDARD (DEC-221) · Sources: DEC-822 (items 1 to 3, step 2), DEC-835,
 DEC-831, DEC-732, DEC-579 · Author: independent test designer (MR-3), written before the implementation, run 1;
 run 2 (a fresh test designer, after the implementation, from the CIT-P review's finding as a described behaviour,
@@ -69,7 +71,7 @@ Cases: 39 in the full run, 3 in `breadth`, 4 in `lifted`.
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
 | S1: The runner runs every declared check with the pinned interpreter and package; only the code under test comes from the tree [DEC-822 item 3]. | `test_w2_59_judge_checks.py::test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath` (1 of 2) | part A's row, by its words |
-| S2: The hook command lines call the pin's environment [DEC-822 step 2], after the independent test designer has checked W1-38's hook-source tests a... | none: the line's feature is lifted (`--optin=lifted`): `test_w2_59_hook_lines.py` (15), `test_w2_59_hook_lines_worker_env.py` (8), every line but the Stop hook's; the Stop line's rows are **lifted only*... | lifted |
+| S2: The hook command lines call the pin's environment [DEC-822 step 2], after the independent test designer has checked W1-38's hook-source tests a... | none: the line's feature is lifted (`--optin=lifted`): `test_w2_59_hook_lines.py` (15), every line but the Stop hook's; the Stop line's rows are **lifted only*... | lifted |
 | S3: Every module that finds the repository from its own install path finds it from the project root instead (today src/gov/retrieval/canary.py:10 a... | `test_w2_59_project_root.py::test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files` (1 of 2), `test_w2_59_project_root.py::test_doctor_reads_the_canary_declarations_of_the_project_under_check` (1 of 2) | part A's row, by its words |
 | S4: retrieve_baseline.yaml is shipped as package data, proven from an installed wheel [DEC-835]. | `test_w2_59_baseline.py::test_the_wheel_ships_the_baseline_in_the_retrieval_package` | part A's row, by its words |
 | S5: gov --version names the version and the commit. | `test_w2_59_version.py::test_the_installed_pin_names_its_version_and_never_a_wrong_commit` | part A's row, by its words |
@@ -106,13 +108,11 @@ simulation in a scratch folder (not committed) showed a corrected runner turning
 
 | Case | Red reason seen |
 |---|---|
-| `test_the_source_holds_the_seven_governance_hook_lines` | **green**: a guard that the parametrised cases cover all seven lines |
 | `test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path[...]` × 7 | red × 3 (preToolUse, postToolUse, postToolUseFailure: `PYTHONPATH="$CLAUDE_PROJECT_DIR/src"`); **green × 4** (preCompact, sessionStart, stop, subagentStop name no `PYTHONPATH` and no pin path today; they guard the new lines against a versioned pin path such as `pin-fecb870c`) |
 | `test_the_line_starts_its_program_with_the_pin_s_interpreter[...]` × 7 | each line started the decoy `python3` first on `PATH` |
 | `test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[...]` × 6 | preToolUse and both after-call lines imported the project's `src/gov`; preCompact, sessionStart and stop did not import the pin's package (the system `python3` has none). subagentStop imports no governance package and has no case here |
-| `test_without_a_pin_the_pretooluse_line_blocks_the_call[preToolUse[0]]` | with no pin, the line fell back to the project's `src/gov` and the `python3` on `PATH` (it does exit 2, so the blocking assertion alone would pass) |
-| `test_without_a_pin_the_after_call_lines_do_not_end_silently[...]` × 2 | the same fallback |
-| `test_the_line_follows_the_owner_s_rollback_to_an_editable_install[preToolUse[0]]` | the line started the `python3` first on `PATH` |
+|  × 2 | the same fallback |
+| retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | the line started the `python3` first on `PATH` |
 
 Choices, stated:
 - **Fail closed.** With no `gov` link and no `gov` on `PATH`, the preToolUse line must block: exit 2 or a deny
@@ -156,14 +156,10 @@ whenever an interpreter starts with the folder on its import path. The refused c
 
 | Case | Behaviour item | Red reason seen at `9b9faac3` |
 |---|---|---|
-| `test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]` | 1 | **fail-open:** the line imported the project's `src/gov` and its edited guard decided; the refused write was let through (exit 0, nothing on standard output) |
 | `...[preToolUse[0]-no-pythonpath]` | 1, the control | **green**: without the inherited variable the pin's guard decides and denies, as KPI 2's run-1 cases already require |
-| `test_with_a_worker_s_pythonpath_and_no_pin_the_guard_line_still_blocks[preToolUse[0]]` | 1, never fail open | **green**: with no `gov` to be found the line blocks before it starts any interpreter, so the inherited path is never read; kept as the guard against a fix that falls back |
-| `test_after_the_rollback_with_a_worker_s_pythonpath_the_guard_line_runs_the_editable_install[preToolUse[0]]` | 1, the rollback | the line imported the inherited path's `gov`, not the rollback's (DEC-605) package |
-| `test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[0]]`, `[postToolUseFailure[0]]`, `[stop[0]]` | 2 | the program imported the inherited path's `gov` (here the project's `src`), not the pin's |
+| `[postToolUseFailure[0]]`, `[stop[0]]` | 2 | the program imported the inherited path's `gov` (here the project's `src`), not the pin's |
 | `...[preCompact[0]]`, `[sessionStart[0]]` | 2 | the program imported the inherited path's `gov` (here a folder outside the project, see below) |
 | `...[subagentStop[0]]` | 2 | the pin's interpreter started with the inherited folder on its import path (its `sitecustomize` ran) |
-| `test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]` | 3 | the project's `gov` decided the call (the same cause as the first row); with the simulated fix below the whole case, its second half included, passes |
 
 Choices, stated:
 - **Which install's code ran** is shown by markers, as in run 1: `pin-gov-` (the pin's installed package imported),

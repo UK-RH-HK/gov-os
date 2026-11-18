@@ -22,7 +22,7 @@ WIDEST = ("src/gov/config/loader.py", "src/gov/tasks/tickets.py", "src/gov/store
 # ``src/gov/errors.py`` of the KPI line does not exist; the envelope's error module is ``src/gov/cli/errors.py``
 # (I4 F12 counts it under the CLI). README, "Discoveries".
 CLI_CORE = ("src/gov/cli/main.py", "src/gov/cli/errors.py")
-SHARED_CORE_FOLDERS = ("src/gov/close", "src/gov/guard", "src/gov/check", "src/gov/records",
+SHARED_CORE_FOLDERS = ("src/gov/close", "src/gov/check", "src/gov/records",
                        "template/governance/kernel/hooks", "src/gov/hooks")
 MAPS = (support.PATH_MAP_REL, support.TEST_MAP_REL)
 
@@ -435,9 +435,9 @@ W1_28_SCANNING_CASES = ("test_the_check_finds_the_copying_fixtures_of_the_earlie
 # folder: (kind, path, whether the path is tracked today).
 W1_28_SCANNED = (
     ("conftest", "tests/acceptance/W1-05/conftest.py", True),
-    ("test-file", "tests/acceptance/W1-05/test_w1_05_live_hooks.py", True),
+    ("test-file", "tests/acceptance/W1-05/test_w1_05_switch_over_record.py", True),
     ("support-module", "tests/acceptance/W1-05/w1_05_support.py", True),
-    ("other-module", "tests/acceptance/W1-47/w1_47_hook_time_limit.py", True),
+    ("other-module", "tests/acceptance/W1-50/w1_50_freeze_lift.py", True),
     ("new-suite-folder", "tests/acceptance/W3-99/test_w3_99_first.py", False),
     ("new-suite-folder-conftest", "tests/acceptance/W3-99/conftest.py", False),
     ("below-a-suite-folder", "tests/acceptance/W1-05/fixtures/w1_05_tree.py", False),

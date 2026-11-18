@@ -73,16 +73,6 @@ def test_s14_f6_guard_a_planted_used_marker_makes_the_runner_refuse(pworld, sub)
     assert run.code == 3 and "USED" in run.lines, f"{sub} with USED present: {run}"
 
 
-def test_s14_f6_guard_a_measured_role_is_refused_a_read_of_the_set_and_the_orchestrator_is_not(pworld):
-    """ACT-GUARD-SETS-1 (existing, I7): ``gov.guard.reads.parts`` lists the protected parts of a session; the planted set's
-    entry measures the engineer, so the engineer has a protected part (the hidden globs) and the orchestrator has none."""
-    from gov.guard import reads
-    engineer = reads.parts(str(pworld.repo), "engineer", None)
-    orchestrator = reads.parts(str(pworld.repo), "orchestrator", None)
-    assert engineer, "the engineer, a role the planted set measures, is refused nothing"
-    assert not orchestrator, "the orchestrator, a role no set measures, is refused a part"
-
-
 # ---- S15: the bar ----------------------------------------------------------------------------------------------
 
 @pytest.mark.parametrize("n, drops", [(40, ()), (37, ("q27", "q33", "q34"))])

@@ -41,37 +41,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import w2_72_support as support  # noqa: E402
-from w2_72_support import call, guard_hook, hook, judge, project, sandbox  # noqa: E402,F401  fixtures
+from w2_72_support import judge, project, sandbox  # noqa: E402,F401  fixtures
 
 check_support = support.check_support
 
 ORCHESTRATOR = support.ORCHESTRATOR
 TICKET = support.TICKET
-
-
-@pytest.mark.parametrize("case", sorted(support.DROPPED), ids=sorted(support.DROPPED))
-def test_the_live_check_flags_a_drop_behind_a_rename_or_a_directory(project, sandbox, call, case):
-    """Reported and recorded as flagged, in a finding for the merge commit that names a path of the test;
-    nothing moved."""
-    shape = support.DROPPED[case](project, sandbox)
-    before = support.full_id(project, "HEAD")
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    merge_id = support.full_id(project, "HEAD")
-    support.assert_moved_shape(project, shape, before, merge_id)
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    findings = check_support.new_findings(result, what)
-    assert result.outcome == "report" and any(path in result.report for path in shape.paths), (
-        f"{what}: the agent is told nothing of {shape.paths}: {result.describe()}; findings: "
-        f"{[(f['paths'], f['action'], f['reason']) for f in findings]}"
-    )
-    for_the_merge = support.findings_for(result, merge_id, what)
-    named = [path for f in for_the_merge for path in check_support.finding_paths(result, f)
-             if support.is_the_test_s(path, shape.paths)]
-    assert named and all(f["action"] == check_support.FLAGGED for f in for_the_merge), (
-        f"{what}: no finding for the merge commit {merge_id[:12]}, flagged, names a path of the test "
-        f"{shape.paths}; findings: {[(f['paths'], f['action'], f['reason']) for f in findings]}"
-    )
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 @pytest.mark.parametrize("case", sorted(support.DROPPED), ids=sorted(support.DROPPED))

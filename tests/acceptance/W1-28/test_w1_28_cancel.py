@@ -58,7 +58,6 @@ def test_cancel_agents_sets_the_freeze_flag(project, sandbox, pause, interface, 
     assert not support.is_paused(project)
     _cancel(pause, interface)
     assert support.flag(project).is_file(), f"gov pause --cancel-agents did not set {support.FREEZE_FLAG_REL}"
-    support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER), "after --cancel-agents, the write")
 
 
 def test_the_cancel_is_recorded_by_one_commit_per_released_ticket(project, pause, interface, claims):

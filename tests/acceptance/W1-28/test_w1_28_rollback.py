@@ -147,7 +147,6 @@ def test_rollback_sets_the_freeze_flag(project, sandbox, pause, interface, histo
     assert not support.is_paused(project)
     _rollback(pause, interface)
     assert support.flag(project).is_file(), f"gov pause --rollback did not set {support.FREEZE_FLAG_REL}"
-    support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER), "after --rollback, the write")
 
 
 def test_rollback_runs_on_a_paused_project(paused, pause, interface, history):
@@ -270,8 +269,6 @@ def test_a_conflicting_revert_aborts_everything_with_an_error(project, sandbox, 
     assert support.ticket_files(project) == tickets, "an aborted rollback was recorded in a ticket"
     assert support.flag(project).is_file(), \
         f"a rollback that ended in a conflicting revert left no {support.FREEZE_FLAG_REL} (DEC-378)\n{run.describe()}"
-    support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER),
-                          "after a rollback that ended in a conflict, the write")
 
 
 def test_rollback_of_an_unknown_ticket_is_an_error(project, pause, interface, history):

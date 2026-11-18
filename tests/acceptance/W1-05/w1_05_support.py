@@ -53,13 +53,6 @@ ROLES = (ORCHESTRATOR, ENGINEER, PRODUCT_SPEC, TEST_DESIGNER, AUDITOR)
 
 WRITE_TOOLS = ("Edit", "Write", "NotebookEdit", "Bash")
 FILE_TOOLS = ("Edit", "Write", "NotebookEdit")
-READ_ONLY_TOOLS = ("Read", "Grep", "Glob")
-# "Every tool" cannot be listed, so the tests ask for these names: the write and
-# read-only tools, other tools of the harness, a tool of an MCP server, and a
-# name that no list written today can hold.
-OTHER_TOOLS = ("Agent", "Task", "TodoWrite", "WebFetch", "WebSearch", "mcp__github__create_issue",
-               "ToolAddedAfterTheSwitchOver")
-EVERY_TOOL = WRITE_TOOLS + READ_ONLY_TOOLS + OTHER_TOOLS
 
 COMMAND_TIMEOUT_S = 30.0
 SESSION_ID = "w1-05-acceptance-session"
@@ -69,7 +62,6 @@ SUBAGENT_ID = "agent-w1-05-acceptance"
 # A ticket added to the copy only, so that a role has something to work on.
 FIXTURE_TICKET_ID = "DAEO-zz90"
 FIXTURE_TICKET_PATHS = ("src/gov/guard/**", "tests/unit/guard/**")
-FIXTURE_SOURCE = "src/gov/guard/decide.py"
 
 
 # --------------------------------------------------------------------------
@@ -117,17 +109,6 @@ def hook_commands(settings, event, tool_name):
                     and isinstance(hook.get("command"), str) and hook["command"].strip():
                 commands.append(hook["command"])
     return commands
-
-
-def is_switched_over(settings):
-    """The guard is wired before every write tool and the containment check after Bash."""
-    return (all(hook_commands(settings, "PreToolUse", tool) for tool in WRITE_TOOLS)
-            and bool(hook_commands(settings, "PostToolUse", "Bash")))
-
-
-def is_wired_for_every_tool(settings):
-    """Switched over, and a PreToolUse command runs for every tool, not for the write tools alone (DEC-142, DEC-144)."""
-    return is_switched_over(settings) and all(hook_commands(settings, "PreToolUse", tool) for tool in EVERY_TOOL)
 
 
 # --------------------------------------------------------------------------
@@ -260,27 +241,6 @@ def fixture_ticket_text():
 # it is the CTO, the one session whose install the kernel guard asks the owner about.
 ORCHESTRATOR_TICKET_ID = "DAEO-zz91"
 ROSTER_REL = "governance/project/roster.yaml"
-
-
-def orchestrator_ticket_text():
-    """``DAEO-zz91``: the fixture ticket's form, for the orchestrator, on ``governance/project/**``."""
-    return (
-        fixture_ticket_text()
-        .replace(f"id: {FIXTURE_TICKET_ID}\n", f"id: {ORCHESTRATOR_TICKET_ID}\n")
-        .replace("assignee: engineer\n", "assignee: orchestrator\n")
-        .replace("role: engineer\n", "role: orchestrator\n")
-        .replace("W1-90", "W1-91")
-        .replace("".join(f"- {p}\n" for p in FIXTURE_TICKET_PATHS), "- governance/project/**\n")
-        .replace("Switch-over fixture ticket", "Coordination fixture ticket")
-    )
-
-
-def coordination_files():
-    """The orchestrator's ticket and the roster that names it as the coordination ticket."""
-    return {
-        f".tickets/{ORCHESTRATOR_TICKET_ID}.md": orchestrator_ticket_text(),
-        ROSTER_REL: f"coordination_ticket: {ORCHESTRATOR_TICKET_ID}\n",
-    }
 
 
 def strip_held_out_rules(project):
@@ -471,41 +431,6 @@ def pre_tool_use(project, settings, sandbox, tool_name, tool_input, role=None, t
     return _combined(run_commands(project, commands, stdin_object, sandbox, role, ticket))
 
 
-def timed_pre_tool_use(project, settings, sandbox, tool_name, tool_input, role=None, ticket=None, subagent=None):
-    """One call's wait for its PreToolUse hooks, as the harness makes it. Returns ``(Decision, seconds)``.
-
-    The harness starts every command registered for the tool at once and waits
-    for all of them. The time is the wall-clock time from the first start to the
-    last exit, with the shell that runs each command.
-    """
-    commands = hook_commands(settings, "PreToolUse", tool_name)
-    payload = json.dumps(hook_input(project, sandbox, "PreToolUse", tool_name, tool_input, subagent))
-    env = command_environment(project, sandbox, role, ticket)
-    started = time.perf_counter()
-    running = []
-    for command in commands:
-        proc = subprocess.Popen(["sh", "-c", command], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE, text=True, cwd=str(project), env=env)
-        try:
-            proc.stdin.write(payload)
-            proc.stdin.close()
-        except OSError:
-            pass   # the command ended without reading its input
-        proc.stdin = None
-        running.append(proc)
-    results = []
-    for command, proc in zip(commands, running):
-        # communicate() returns when the command closes its output; wait(timeout=...) would poll, up to 50 ms late.
-        try:
-            stdout, stderr = proc.communicate(timeout=COMMAND_TIMEOUT_S)
-            results.append(CommandResult(command, proc.returncode, stdout, stderr))
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.communicate()
-            results.append(CommandResult(command, None, "", "timed out"))
-    return _combined(results), time.perf_counter() - started
-
-
 def p95(samples):
     """The 95th percentile by nearest rank, as in W1-02's tests."""
     ordered = sorted(samples)
@@ -590,17 +515,6 @@ def write_input(tool_name, path):
 
 def bash_input(command):
     return {"command": command, "description": "W1-05 acceptance attempt"}
-
-
-def read_input(tool_name, project):
-    """The input of a read-only tool that looks at the copy."""
-    if tool_name == "Read":
-        return {"file_path": str(Path(project) / "README.md")}
-    if tool_name == "Grep":
-        return {"pattern": "guard", "path": str(Path(project) / "src")}
-    if tool_name == "Glob":
-        return {"pattern": "**/*.py", "path": str(project)}
-    raise ValueError(tool_name)
 
 
 # --------------------------------------------------------------------------

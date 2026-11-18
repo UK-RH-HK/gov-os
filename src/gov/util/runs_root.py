@@ -1,7 +1,7 @@
 """The durable scratch root ``~/gov-os-runs`` (W2-50, DEC-728; moved here by W2-150).
 
 Moved from ``gov.guard.runs`` unchanged (DEC-1039 (2)), so that the secrets scan can name the root without importing
-the guard; ``gov.guard.runs`` imports both names from here. The standard library only.
+the guard; ``gov.util.runs`` imports both names from here. The standard library only.
 """
 
 from __future__ import annotations

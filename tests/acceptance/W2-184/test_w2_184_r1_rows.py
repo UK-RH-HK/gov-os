@@ -30,7 +30,7 @@ PROBE_BESIDE = "docs/probes/DAEO-6f0s/**  # the probe record"
 
 def _ticket(tmp_path, allowed, profile):
     """The ticket's front-matter map as the guard's loader returns it (a ticket file planted in a tree of its own)."""
-    from gov.guard.decide import _load_ticket
+    from gov.util.tickets import _load_ticket
     tree = tmp_path / "ticket-tree"
     tk = "DAEO-r1a1"
     s.b.write(tree / ".tickets" / f"{tk}.md", s.ticket_text(tk, ENG, allowed, profile, "implementation"))

@@ -37,7 +37,6 @@ KNOWN_COPIERS = {
     "W1-05/w1_05_support.py::copy_working_tree",
     "W1-07/w1_07_support.py::copy_working_tree",
     "W1-46/w1_46_support.py::make_project",
-    "W1-47/w1_47_support.py::make_wired_copy",
     "W1-49/w1_49_support.py::make_project",
 }
 

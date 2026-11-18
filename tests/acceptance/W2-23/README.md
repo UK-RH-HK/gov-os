@@ -1,5 +1,7 @@
 # W2-23 acceptance tests: adoption safety on a planted repository
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The adapters case no longer asks for a generated PreToolUse entry after the programme's.
+
 Ticket `DAEO-kmcr` (W2-23), profile FULL. Written by an independent test designer (MR-3) before the implementation,
 from the ticket's KPI lines (S1-S7, F1) and its `## Interface` (items 1-7, DEC-1052; the CTO's delegated decision,
 DEC-1112 (3)), without reading the implementation (DEC-820, DEC-963). Sources: DEC-729, DEC-1052, DEC-954, DEC-315,

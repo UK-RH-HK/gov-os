@@ -25,11 +25,8 @@ SRC = REPO_ROOT / "src"
 KERNEL_SKILLS = "template/governance/kernel/skills"
 SKILLS_ROOT = Path(os.environ.get("W2_101_SKILLS_DIR") or REPO_ROOT / KERNEL_SKILLS)
 SKILLS = ("frontend", "ui-ux", "devops")
-COPY_ROOTS = (".rulesync/skills", "template/.rulesync/skills", ".claude/skills")
 CHECK_NAME = "check_domain_skill.py"
 
-# I1: the template's eight sections, in order; the five parts; the area's named points
-SECTIONS = ("When / not when", "Inputs", "Steps", "Done when", "Output and handover", "Escalation", "Never", "Sources")
 SECTION_PATTERNS = (("When / not when", r"when\s*/\s*not when"), ("Inputs", r"inputs?\b"), ("Steps", r"steps\b"),
                     ("Done when", r"done when"), ("Output and handover", r"output and handover"),
                     ("Escalation", r"escalation"), ("Never", r"never\b"), ("Sources", r"sources\b"))
@@ -488,43 +485,3 @@ def skilleval(project, base, stub, skill_rel, *options):
 # The guard (S2): this repository's live hook run on a planted tree, as Claude Code runs it
 # --------------------------------------------------------------------------------------------------------------
 
-HOOK = REPO_ROOT / ".claude" / "hooks" / "pretooluse.py"
-ENGINEER_TICKET = "DAEO-w101p"
-
-
-def plant_guard_tree(path, skill_text=None):
-    """A planted project (a path map, a held-out list, an engineer ticket, a few files; one commit). With
-    ``skill_text`` a ``.claude/skills/frontend/SKILL.md`` holding it is placed: the engineer's skill loaded."""
-    path = Path(path)
-    files = {
-        "governance/project/path-map.yaml": "state_class: AUTHORITATIVE\nnamespaces: {}\n",
-        "governance/project/held-out.yaml": f"held_out_paths:\n  - {path.parent / (path.name + '-held')}\n",
-        "README.md": "planted\n", "src/app/ui.py": "x = 1\n", ".env": "TOKEN=planted\n",
-        "deploy/server.key": "planted\n", "tests/acceptance/W2-101P/test_a.py": "x = 1\n",
-        f".tickets/{ENGINEER_TICKET}.md": (f"---\nid: {ENGINEER_TICKET}\nstatus: in_progress\nwbs_id: W2-101P\n"
-                                          "role: engineer\nskills: [frontend]\nallowed_paths:\n- src/app/**\n---\n# W2-101P\n"),
-    }
-    if skill_text is not None:
-        files[".claude/skills/frontend/SKILL.md"] = skill_text
-    for rel, text in files.items():
-        (path / rel).parent.mkdir(parents=True, exist_ok=True)
-        (path / rel).write_text(text, encoding="utf-8")
-    git(path, "init", "-q", "-b", "w2/integrate")
-    git(path, "add", "-A")
-    git(path, "commit", "-q", "-m", "base", "--trailer", "Task: DAEO-sdxk", "--trailer", "Role: orchestrator")
-    return os.path.realpath(path)
-
-
-def guard_decision(root, tool, tin, role="engineer"):
-    """The live hook's decision on one call in ``root``: ``"allow"``, ``"deny"`` or ``"ask"``."""
-    event = {"tool_name": tool, "tool_input": tin, "cwd": root, "session_id": "w2-101", "hook_event_name": "PreToolUse"}
-    env = {k: v for k, v in os.environ.items() if not k.startswith(("PYTHON", "GOV_", "CLAUDE_"))}
-    env.update(PYTHONPATH=str(SRC), GOV_ROLE=role, GOV_TICKET=ENGINEER_TICKET, CLAUDE_PROJECT_DIR=root)
-    done = subprocess.run([sys.executable, str(need(HOOK))], input=json.dumps(event), capture_output=True, text=True,
-                          env=env, timeout=60)
-    if done.returncode == 2:
-        return "deny"
-    assert done.returncode == 0, f"the hook failed: {done.stderr[-400:]}"
-    if not done.stdout.strip():
-        return "allow"
-    return json.loads(done.stdout)["hookSpecificOutput"]["permissionDecision"]

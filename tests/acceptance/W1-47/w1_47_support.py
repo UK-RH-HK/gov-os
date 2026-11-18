@@ -66,9 +66,6 @@ CONFIG_KEY = "held_out_paths"
 SETTINGS_REL = ".claude/settings.json"
 TEMPLATE_KERNEL_REL = "template/governance/kernel"
 TEMPLATE_SETTINGS_REL = f"{TEMPLATE_KERNEL_REL}/settings.json"
-CONTAINMENT_HOOK_STEM = "posttooluse"
-GUARD_HOOK_STEM = "pretooluse"
-PROJECT_DIR_VARIABLE = "CLAUDE_PROJECT_DIR"
 
 ENGINEER = check_support.ENGINEER
 ORCHESTRATOR = check_support.ORCHESTRATOR
@@ -85,16 +82,6 @@ TICKET_OF = {
     AUDITOR: check_support.AUDITOR_TICKET_ID,
 }
 
-# Who makes a call: name -> (GOV_ROLE, GOV_TICKET, subagent type). "Every role" in the KPIs is the five
-# known roles; a session that declares no role is started in the repository root as well.
-EVERY_ROLE = {role: (role, ticket, None) for role, ticket in TICKET_OF.items()}
-NO_ROLE = {"no-role": (None, None, None)}
-SUBAGENTS = {
-    "engineer-subagent-of-the-orchestrator": (ORCHESTRATOR, TICKET_OF[ORCHESTRATOR], ENGINEER),
-    "untyped-subagent-of-the-orchestrator": (ORCHESTRATOR, TICKET_OF[ORCHESTRATOR], "general-purpose"),
-}
-EVERY_SESSION = {**EVERY_ROLE, **NO_ROLE}
-EVERY_ACTOR = {**EVERY_ROLE, **NO_ROLE, **SUBAGENTS}
 
 # Every permission mode of the harness, as in W1-04's tests.
 PERMISSION_MODES = ("default", "acceptEdits", "auto", "dontAsk", "bypassPermissions", "plan")
@@ -102,31 +89,6 @@ PERMISSION_MODES = ("default", "acceptEdits", "auto", "dontAsk", "bypassPermissi
 HOOK_TIMEOUT_S = 30.0
 SESSION_ID = "w1-47-acceptance-session"
 SUBAGENT_ID = "agent-w1-47-acceptance"
-
-# The eleven Bash ask rules DEC-172 withdraws, as the prefix each one matches.
-WITHDRAWN_ASK_PREFIXES = (
-    "pip", "pip3", "python -m pip", "python3 -m pip", "uv", "npm install", "cargo install",
-    "apt", "apt-get", "curl", "wget",
-)
-# The deny rules the committed settings carried when the ticket was written; all of them stay.
-KEPT_DENY_RULES = (
-    "Read(./docs/source/**)",
-    "Edit(./docs/source/**)",
-    "Edit(**/.env*)",
-    "Edit(**/*.pem)",
-    "Edit(**/*.key)",
-    "Edit(config/secrets*)",
-    "Bash(sudo:*)",
-)
-# The ticket's ``allowed_paths``, without the two files that may carry a held-out path.
-IMPLEMENTATION_GLOBS = (
-    "src/gov/guard/**/*",
-    "template/governance/kernel/hooks/pretooluse*",
-    "template/governance/kernel/hooks/posttooluse*",
-    "template/governance/kernel/settings*",
-    "tests/unit/guard/**/*",
-    "tests/unit/install/**/*",
-)
 
 
 # --------------------------------------------------------------------------
@@ -236,73 +198,6 @@ def split_rule(rule):
     return (match.group(1), match.group(2)) if match else (None, None)
 
 
-def bash_rule_prefix(rule):
-    """The command prefix a Bash rule matches, without its wildcard; ``None`` for a rule of another tool."""
-    tool, spec = split_rule(rule)
-    if tool != "Bash":
-        return None
-    if spec is None:
-        return ""
-    spec = spec.strip()
-    for wildcard in (":*", " *", "*"):
-        if spec.endswith(wildcard):
-            spec = spec[: -len(wildcard)]
-            break
-    return " ".join(spec.split())
-
-
-def is_withdrawn_install_rule(rule):
-    """A Bash rule on one of the eleven prefixes DEC-172 names, or on a longer command that begins with one."""
-    prefix = bash_rule_prefix(rule)
-    if prefix is None:
-        return False
-    return any(prefix == withdrawn or prefix.startswith(withdrawn + " ") for withdrawn in WITHDRAWN_ASK_PREFIXES)
-
-
-def held_out_read_rules(settings, value):
-    """The ``Read`` deny rules built from one configured path.
-
-    The absolute form of a path in a permission rule is ``//<path>``: the rule
-    is ``Read(/`` + the configured value + ``)``, where the value may be
-    followed by ``/`` or ``/**`` to cover what is under the directory.
-    """
-    value = value.rstrip("/")
-    wanted = {f"/{value}{suffix}" for suffix in ("", "/", "/**")}
-    found = []
-    for rule in permission_rules(settings, "deny"):
-        tool, spec = split_rule(rule)
-        if tool == "Read" and spec is not None and spec.strip() in wanted:
-            found.append(rule)
-    return found
-
-
-def load_template_settings(root=REPO_ROOT):
-    """``template/governance/kernel/settings.json``, parsed (DEC-217)."""
-    path = Path(root) / TEMPLATE_SETTINGS_REL
-    if not path.is_file():
-        pytest.fail(f"{TEMPLATE_SETTINGS_REL} does not exist: the kernel template has no settings file",
-                    pytrace=False)
-    return load_json_object(path, TEMPLATE_SETTINGS_REL)
-
-
-def containment_commands(settings, event):
-    """The commands registered for ``event`` on Bash that run the containment hook."""
-    return [command for command in live_support.hook_commands(settings, event, "Bash")
-            if CONTAINMENT_HOOK_STEM in command]
-
-
-def every_hook_command(settings):
-    """Every command a settings file registers, whatever the event and the matcher."""
-    hooks = settings.get("hooks")
-    commands = []
-    for entries in hooks.values() if isinstance(hooks, dict) else []:
-        for entry in entries if isinstance(entries, list) else []:
-            for hook in entry.get("hooks", []) if isinstance(entry, dict) else []:
-                if isinstance(hook, dict) and isinstance(hook.get("command"), str):
-                    commands.append(hook["command"])
-    return commands
-
-
 # --------------------------------------------------------------------------
 # The commands of a settings file, run in a project that has the kernel installed
 # --------------------------------------------------------------------------
@@ -373,19 +268,6 @@ def run_registered(project, settings, sandbox, event, tool_name, tool_input, rol
         except subprocess.TimeoutExpired:
             results.append(GuardResult("timeout", None, "", "timed out"))
     return results
-
-
-def combined_decision(results):
-    """What the harness makes of several PreToolUse results: the strictest one; ``none`` when no command ran."""
-    decisions = [result.decision for result in results]
-    for outcome in ("deny", "timeout", "error", "ask"):
-        if outcome in decisions:
-            return outcome
-    return "allow" if decisions else "none"
-
-
-def describe_all(results):
-    return "; ".join(result.describe() for result in results) or "no command is registered"
 
 
 def report_text(results):
@@ -478,15 +360,6 @@ def bash_input(command, **extra):
 
 def write_input(tool_name, path):
     return live_support.write_input(tool_name, path)
-
-
-def assert_denied_by_rule(result, what):
-    """The hook answered with a deny decision of its own: exit code 0 and ``permissionDecision: deny``.
-
-    Exit code 2 also stops a call, but it is the hook's report of its own
-    failure (DEC-110), not a rule. A rule this ticket adds must decide.
-    """
-    assert result.decision == "deny" and result.returncode == 0, f"{what} was not denied by a rule: {result.describe()}"
 
 
 def assert_allowed(result, what):

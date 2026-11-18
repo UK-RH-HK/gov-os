@@ -181,7 +181,7 @@ def _tree(tmp_path, text=None):
 
 
 def _front(root, tk, **kw):
-    from gov.guard.decide import _load_ticket
+    from gov.util.tickets import _load_ticket
     s.b.write(root / ".tickets" / f"{tk}.md", s.ticket_text(tk, ENG, kw.get("allowed", ["notes/x/**"]),
                                                             kw.get("profile", "STANDARD"), kw.get("kind", "implementation")))
     return _load_ticket(str(root), tk)

@@ -88,8 +88,8 @@ def written_paths(root: Path) -> list[str]:
 
     paths = [GITLEAKS, ".gitignore"]
     if (root / tickets.TK_REL).is_file():  # A0 creates the coordination ticket and the roster's key only with tk
-        from gov.guard import install
-        paths += [install.ROSTER, f"{tickets.TICKETS_REL}/t-0000.md"]
+        from gov.adopt import coordination
+        paths += [coordination.ROSTER, f"{tickets.TICKETS_REL}/t-0000.md"]
     paths += [project.record_path(stage) for stage in project.STAGES]
     paths += [lite_gates.record_path(gate) for gate in lite_gates.GATES]
     paths += [f"{project.FOLDER}/packages/DP-ADOPT-00000000.md", legacy.CIT_E]
