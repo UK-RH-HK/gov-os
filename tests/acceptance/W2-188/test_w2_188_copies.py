@@ -34,26 +34,41 @@ def test_s4_the_copies_carry_a_kernel_skill_changed_from_the_base():
     assert not stale, f"{' and '.join(stale)} do not carry the changed kernel skill"
 
 
+# Rewrite-Reason: W2-192 (commit e64430373, DAEO-mpq2: stage AS, CIT-P part A's bytes) moved the adopt skill's version
+# from 1.1.0 (W2-188) to 1.2.0; the pins follow the skill as it stands, and W2-188 reopens at the lift (DEC-1210 (8)).
+SKILL_VERSION = "1.2.0"
+
+
 def test_s4_the_version_is_1_1_0_in_the_front_matter_of_each_copy():
+    """The case keeps its W2-188 id. It pins the version the three copies carry now: `1.2.0`, not W2-188's `1.1.0`,
+    because W2-192 (commit e64430373) added stage AS and raised the version again."""
     problems = []
     for rel in support.ALL_REL:
         lines = support.front_matter(support.read(rel))
-        if not any(re.fullmatch(r'version:\s*"1\.1\.0"\s*', line) for line in lines):
+        if not any(re.fullmatch(rf'version:\s*"{re.escape(SKILL_VERSION)}"\s*', line) for line in lines):
             found = next((line for line in lines if line.startswith("version:")), "no version line")
-            problems.append(f'{rel}: `{found}`, not `version: "1.1.0"`')
+            problems.append(f'{rel}: `{found}`, not `version: "{SKILL_VERSION}"`')
     assert not problems, "; ".join(problems)
 
 
+# Rewrite-Reason: W2-192 (commit e64430373, DAEO-mpq2) changed the same skill after W2-188: stage AS, a 10-line
+# insertion after base line 29, and step 6's 2-line insertion after base line 60 are W2-192's; the four hunks of
+# W2-188 keep their positions; DEC-1210 (8).
 def test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_places():
-    """Line 4 (the version), line 58 (step 6), an insertion after line 59 or 60 (the paragraph), line 74 (the sources)."""
+    """The case keeps its W2-188 id. Against W2-188's base, the diff has five hunks now: W2-188's four (line 4 the
+    version, line 58 step 6, an insertion after base line 59 or 60 the paragraph, line 74 the sources line) and
+    W2-192's stage AS insertion between them (a pure insertion after base line 29, 10 lines). The version and step 6
+    hunks keep W2-188's positions; a sixth hunk, or a moved one, is red."""
     hunks = support.kernel_hunks()
-    assert len(hunks) == 4, f"`git diff --unified=0 <base>` of the kernel skill has {len(hunks)} hunks, not 4: {hunks}"
-    (v_old, v_len, _, _), (s_old, s_len, _, _), (p_old, p_len, _, p_new), (g_old, g_len, _, _) = hunks
+    assert len(hunks) == 5, f"`git diff --unified=0 <base>` of the kernel skill has {len(hunks)} hunks, not 5: {hunks}"
+    (v_old, v_len, _, _), (as_old, as_len, _, as_new), (s_old, s_len, _, _), (p_old, p_len, _, p_new), (g_old, g_len, _, _) = hunks
     assert (v_old, v_len) == (4, 1), f"hunk 1 is not the version line (base line 4): base lines {v_old}+{v_len}"
-    assert (s_old, s_len) == (58, 1), f"hunk 2 is not step 6 (base line 58): base lines {s_old}+{s_len}"
+    assert (as_old, as_len, as_new) == (29, 0, 10), (
+        f"hunk 2 is not W2-192's stage AS insertion (10 lines after base line 29): base {as_old}+{as_len}, {as_new} added")
+    assert (s_old, s_len) == (58, 1), f"hunk 3 is not step 6 (base line 58): base lines {s_old}+{s_len}"
     assert p_len == 0 and p_old in (59, 60) and p_new > 0, (
-        f"hunk 3 is not a pure insertion after step 7 (base line 59 or 60): base {p_old}+{p_len}, {p_new} lines added")
-    assert (g_old, g_len) == (74, 1), f"hunk 4 is not the sources line (base line 74): base lines {g_old}+{g_len}"
+        f"hunk 4 is not a pure insertion after step 7 (base line 59 or 60): base {p_old}+{p_len}, {p_new} lines added")
+    assert (g_old, g_len) == (74, 1), f"hunk 5 is not the sources line (base line 74): base lines {g_old}+{g_len}"
 
 
 def test_s4_the_sources_line_gains_dec_1101_dec_1125_and_dec_1179_in_numeric_order_and_keeps_every_id():
@@ -110,20 +125,24 @@ def test_f1_no_copy_names_a_memaudit_subcommand_or_standing_declare():
 # the owner approved (sha256 6a884cf1...9489, DEC-1181 (1)); P-C12-1 (a), DEC-1156 (7).
 ACT_CLAUDE_COPY_SHA256 = "65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc"
 ACT_SUBJECT_MARK = "ACT-CLAUDE-COPIES-"
+# Rewrite-Reason: W2-192 (commit e64430373, DAEO-mpq2) regenerated the `.claude` copy again, from the kernel skill with
+# stage AS (CIT-P part A's bytes, version 1.2.0): the later copies ACT's after-bytes. DEC-1210 (8).
+ACT_CLAUDE_COPY_SHA256_W2_192 = "93b04fc62be1fe6d0e125ff47a2d890367284f1970b7d34dfd0f4366c987dc5d"
 
 
 def test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_after_bytes():
     """Guard (holds on the base): the `.claude` copy is the base's bytes, or exactly the copies ACT's after-bytes
-    (sha256 `65d6abd9...dbc`, the ACT's regeneration after the owner's approval); any other bytes mean the ticket
+    (sha256 `65d6abd9...dbc`, the ACT's regeneration after the owner's approval), or exactly the later copies ACT's
+    after-bytes (sha256 `93b04fc6...c5d`, commit e64430373, W2-192's stage AS); any other bytes mean the ticket
     wrote it."""
     now = support.read_bytes(support.CLAUDE_COPY_REL)
     then = support.base_blob(support.CLAUDE_COPY_REL)
     if now == then:
         return
     found = support.sha256_of(now)
-    assert found == ACT_CLAUDE_COPY_SHA256, (
+    assert found in (ACT_CLAUDE_COPY_SHA256, ACT_CLAUDE_COPY_SHA256_W2_192), (
         f"{support.CLAUDE_COPY_REL} has sha256 {found}: neither the base's ({support.sha256_of(then)}) "
-        f"nor the copies ACT's after-bytes ({ACT_CLAUDE_COPY_SHA256})")
+        f"nor a copies ACT's after-bytes ({ACT_CLAUDE_COPY_SHA256}, {ACT_CLAUDE_COPY_SHA256_W2_192})")
 
 
 def test_f2_no_commit_of_the_ticket_outside_the_test_designer_or_the_copies_act_touches_claude_or_tests():
