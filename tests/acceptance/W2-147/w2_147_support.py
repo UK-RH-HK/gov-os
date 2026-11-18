@@ -27,6 +27,12 @@ from pathlib import Path
 
 import yaml
 
+_COMPAT = str(Path(__file__).resolve().parents[1] / "W2-131")
+if _COMPAT not in sys.path:
+    sys.path.insert(0, _COMPAT)
+
+from w2_131_old_guard_names import old_guard_names  # noqa: E402  (the retired gov.guard, for the historical blobs)
+
 REPO = Path(__file__).resolve().parents[3]
 PIN = "003f0bc23d47"  # w2/integrate's head on 2026-11-09; src/gov/plan last changed at 69aa361ab73c (W2-136)
 PLAN_FILES = ("__init__", "overlap", "tickets", "derive", "render", "command")
@@ -123,7 +129,8 @@ def load_today():
         module.__file__ = f"<{PIN}:src/gov/plan/{name}.py>"
         module.__package__ = TODAY
         sys.modules[module.__name__] = module
-        exec(compile(source, module.__file__, "exec"), module.__dict__)
+        with old_guard_names():
+            exec(compile(source, module.__file__, "exec"), module.__dict__)
         setattr(package, name, module)
     return sys.modules[f"{TODAY}.command"]
 
