@@ -3,7 +3,7 @@
 Delivered by W1-33 (DEC-066, MR-5); made the CTO's file by W2-33 (DEC-954 Q13, DEC-957). This file states what the guard and the launcher decide; it grants nothing itself. The role id stays `orchestrator`. A ticket lead has its own role file, `ticket-lead.md`; a stream's Senior Engineer has `senior-engineer.md`.
 
 - **Version:** 2.0.0
-- **Launch default:** model claude-opus-5-5, effort high
+- **Launch default:** model claude-sonnet-5-5, effort high (the owner, 2026-11-18: every lead on Sonnet, the trial of audit 09 decision 3)
 - **Skills:** orchestration, planning, checkpoint, change, retrieval
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.

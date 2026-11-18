@@ -292,11 +292,11 @@ def test_the_dispatchers_lead_form_is_otherwise_the_same_command():
     command = [line for line in lines[start:start + 7]
                if "--append-system-prompt-file" not in line and not line.startswith("  --add-dir ")]
     assert command[:4] == [
-        "exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json "
+        "exec /home/usain/.local/bin/claude -p --model claude-sonnet-5-5 --effort high --output-format json "
         f"--permission-mode {mode} \\",
         '  --allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob" \\',
         '  --settings "{\\"env\\":{\\"GOV_ROLE\\":\\"orchestrator\\",\\"GOV_TICKET\\":\\"$ID\\",'
-        '\\"CLAUDE_CODE_SUBAGENT_MODEL\\":\\"claude-opus-5-5\\"}}" \\',
+        '\\"CLAUDE_CODE_SUBAGENT_MODEL\\":\\"claude-sonnet-5-5\\"}}" \\',
         '  < "$ORCH/briefs/$BRIEF" > "$ORCH/log/$LOGF"',
     ]
 
