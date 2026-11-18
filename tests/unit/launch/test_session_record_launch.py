@@ -21,11 +21,13 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "tests" / "unit" / "telemetry"))
+sys.path.insert(0, str(REPO / "tests" / "unit" / "launch"))  # test_w2_195_preload, also when imported as a top module
 
 from gov.cli.errors import GovError  # noqa: E402
 from gov.guard import decide  # noqa: E402
 from gov.launch import launcher, session_record as sr  # noqa: E402
 from test_sessionlog_w2_60b import SECRET, Log  # noqa: E402
+from test_w2_195_preload import install_judging_skill  # noqa: E402
 
 ROLES_REL = Path("template/governance/kernel/roles")
 REAL_POPEN = subprocess.Popen  # taken before the fixture puts the stand-in in its place
@@ -115,6 +117,7 @@ def project(tmp_path, monkeypatch):
         _role(project, role, "- **Authority level:** worker, with no approval authority.\n")
     for role in ("independent-test-designer", "independent-auditor"):
         _role(project, role, "- **Authority level:** worker, independent of the builders.\n")
+    install_judging_skill(project)  # a judging role launches with the judging-work skill (W2-195, DEC-1204 (5))
     _ticket(project, TICKET, "engineer")
     _ticket(project, SPEC_TICKET, "product-spec")
     Session.made, Session.plan, Session.log = [], staticmethod(lambda session: 0), None
