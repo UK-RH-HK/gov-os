@@ -16,8 +16,8 @@ Before grepping for a concept: `gov retrieve --root /home/usain/gov-os-worktrees
 
 ## The flow (§4.3); no review (§3.6)
 1. **Spec and KPIs.** From the ticket. Where EMERGENCY-2 changes what the ticket must do, rewrite its KPI lines in your branch's ticket file (each line observable, each with its verify); the CTO approves them by this brief. A ticket that is deferred becomes `in_progress` in your branch.
-2. **Independent test designer.** Launch one subagent (Agent tool, `subagent_type: independent-test-designer`, model opus) with the ticket, its KPI lines, the interface (where it lives, command names, error names, signatures) and this brief's rules. It writes the acceptance tests under `tests/acceptance/<W2>/`, red on the base, maps each KPI line to its tests (the README form other ticket folders use, so `gov accept` reads it), sets the ticket's `acceptance_tests.path`, and commits with `Role: independent-test-designer`. It does not read implementation written after the base.
-3. **Engineer.** Then one subagent (`subagent_type: engineer`, model opus; sonnet for text-only work) builds until `gov accept <W2> --root <your worktree>` is green (`PYTHONPATH=<worktree>/src python3 -m gov.cli.main accept ...` runs your branch's code). It never edits `tests/acceptance/`; it adds unit tests where useful; commits with `Role: engineer`. If a test is wrong, the engineer says so and you send it back to the test designer, never edit it yourself.
+2. **Independent test designer.** Launch one subagent (Agent tool, `subagent_type: independent-test-designer`, no `model`: helpers run Sonnet, the owner's rule of 2026-11-18, enforced by a hook) with the ticket, its KPI lines, the interface (where it lives, command names, error names, signatures) and this brief's rules. It writes the acceptance tests under `tests/acceptance/<W2>/`, red on the base, maps each KPI line to its tests (the README form other ticket folders use, so `gov accept` reads it), sets the ticket's `acceptance_tests.path`, and commits with `Role: independent-test-designer`. It does not read implementation written after the base.
+3. **Engineer.** Then one subagent (`subagent_type: engineer`, no `model`: Sonnet) builds until `gov accept <W2> --root <your worktree>` is green (`PYTHONPATH=<worktree>/src python3 -m gov.cli.main accept ...` runs your branch's code). It never edits `tests/acceptance/`; it adds unit tests where useful; commits with `Role: engineer`. If a test is wrong, the engineer says so and you send it back to the test designer, never edit it yourself.
 4. **Green.** You run `gov accept`, the unit and acceptance tests of every package your change touches, and `tests/unit/optin`. A red that is the change's: back to the engineer. A red that is not (it is red on `w2/integrate` too): note it, don't fix it.
 5. **Return** to the CTO (your final message): branch and head; what is built against each KPI line; the green evidence (summary lines); reds not yours; anything that needs the owner, as one line with options. Short.
 
@@ -31,3 +31,8 @@ Task: <ticket id, e.g. DAEO-7jln>
 Role: <orchestrator | independent-test-designer | engineer>
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
+
+## Models (the owner, 2026-11-18, audit 09 decisions 2 and 3)
+Every session runs the model and effort the rubric gives its role; none chooses its own. Leads and every helper run
+Sonnet; a spawn naming another model is refused by `.claude/hooks/agent_model.py`. An exception goes to the owner as one
+line through the CTO. Watch the quality: if Sonnet's work drops for a role, say so in your return.
