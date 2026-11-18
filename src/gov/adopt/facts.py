@@ -63,17 +63,11 @@ COMMANDS = {
 TAIL = """\
 dod:
 - id: DOD-1
-  line: 'Every KPI line''s verify holds: the acceptance suite passes through {CMD:accept}, read as pass or fail per line.'
+  line: 'Acceptance green: every KPI line''s verify holds through {CMD:accept}, read as pass or fail per line.'
 - id: DOD-2
-  line: 'The verification is green ({CMD:lead_verify}).'
+  line: 'The landing''s checks are green: `gov queue {ID}` lands the work (its impact-selected run on the merged result green, every acceptance-test commit by the test designer or the owner; a path outside allowed_paths is a notice).'
 - id: DOD-3
-  line: 'Every commit carries Task: {ID}, Role: and Implements: with ACCEPTED ids from sources:; {CMD:links} reports no new finding.'
-- id: DOD-4
-  line: 'FULL: the reviewer''s verdict block gives READY (no finding in scope, ordinary work yes, fails open or loses work).'
-- id: DOD-5
-  line: 'The tree is clean and its head is the verified (and, FULL, the reviewed) head.'
-- id: DOD-6
-  line: 'The return carries the twelve fields, the template receipt, brief_gaps and guard_refusals.'
+  line: 'The close is written at the land: the ticket''s close record names the landed merge and the ticket is closed.'
 
 steps:
   keyword_warn:

@@ -8,7 +8,7 @@ claudecode:
 ---
 
 # You are the ticket lead for {ID} ({W2})
-You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-6 in the facts file's `dod`) and return one summary. Headless: only your last message is read. You never merge into w2/integrate, edit .tickets/ or the register, push, or write the acceptance tests [DEC-236].
+You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-3 in the facts file's `dod`) and return one summary. Headless: only your last message is read. You never merge into w2/integrate, edit .tickets/ or the register, push, or write the acceptance tests [DEC-236].
 
 ## Where things are
 | what | path |
