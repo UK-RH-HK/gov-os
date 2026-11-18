@@ -561,9 +561,22 @@ def test_a_caller_that_sends_nothing_in_time_releases_nothing(tmp_path, monkeypa
 def test_the_running_service_writes_one_memory_line_per_request(home):
     for number in range(3):
         assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
-    assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
-    lines = [line for line in (home / rerank.CACHE_REL / rerank.LOG).read_text().splitlines() if "\tMEMORY\t" in line]
-    assert [line.split("\t")[2] for line in lines] == [MEMORY_LINE] * 3
+    # The service releases and writes its MEMORY line after it has sent the answer and closed the connection (the
+    # test above pins that order), so the client returns first: wait for the event, never a guessed pause. The bound
+    # is a bound on hanging, not a speed claim.
+    marks, log = home / "marks/released", home / rerank.CACHE_REL / rerank.LOG
+
+    def released_marks() -> list:
+        return marks.read_text().splitlines() if marks.exists() else []
+
+    def memory_lines() -> list:
+        return [line for line in log.read_text().splitlines() if "\tMEMORY\t" in line] if log.exists() else []
+
+    assert _wait_until(lambda: len(released_marks()) >= 3 and len(memory_lines()) >= 3, 15), (
+        f"after 15 s the service had written {len(released_marks())} released mark(s) and {len(memory_lines())} "
+        f"MEMORY line(s) for 3 requests")
+    assert released_marks() == ["released"] * 3
+    assert [line.split("\t")[2] for line in memory_lines()] == [MEMORY_LINE] * 3
     assert rerank.status()["fallbacks"] == 0
 
 

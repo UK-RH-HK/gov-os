@@ -585,8 +585,20 @@ class TestRulesyncSources:
         )
 
     def test_the_orchestrator_roles_rulesync_source_carries_the_role_files_body(self):
+        # Rewrite: W2-153 (e57be0ee8, DEC-1050, DEC-1052). The orchestrator's source is composed: the ticket lead's
+        # role template (role-lead.md, its body), one blank line, then the role file's body (the composition the
+        # adapter-portability check compares, DEC-1112 (3)). The case read the source as the role file's body alone.
+        # It still proves the source carries the role file's body, now at its end, after the template's text.
         kernel_body = support.split_frontmatter(support.read(support.ROLE_REL))[1]
+        template_body = support.split_frontmatter(support.read(support.ROLE_TEMPLATE_REL))[1]
         source_body = support.split_frontmatter(support.read(support.SOURCE_ROLE_REL))[1]
-        assert source_body == kernel_body, (
-            f"the body of {support.SOURCE_ROLE_REL} is not the text of {support.ROLE_REL}"
+        assert source_body.endswith(kernel_body), (
+            f"the body of {support.SOURCE_ROLE_REL} does not end with the text of {support.ROLE_REL}"
+        )
+        assert source_body.startswith(template_body.rstrip("\n")), (
+            f"the body of {support.SOURCE_ROLE_REL} does not begin with the text of {support.ROLE_TEMPLATE_REL}"
+        )
+        assert source_body == template_body.rstrip("\n") + "\n\n" + kernel_body, (
+            f"the body of {support.SOURCE_ROLE_REL} is not {support.ROLE_TEMPLATE_REL}'s body, one blank line and "
+            f"the text of {support.ROLE_REL}"
         )

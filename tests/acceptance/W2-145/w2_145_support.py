@@ -139,6 +139,26 @@ class Session(base.Session):
         self.launched = time.monotonic()
         self.seconds = None
 
+    def wait(self, timeout: float = HUNG_S) -> dict:
+        """The base report, with ``seconds`` the search's own time: the call's wall time, on the monotonic clock
+        (``t1 - t0``, the session's own stamps around the call alone: the machine's wall clock steps by seconds, and
+        a step is not the search's time), less the time the session's thread spent waiting on a run queue for a CPU
+        (``queued``). The wall time stays in ``wall``. Rewrite (W2-145 S4 under load): the bounds are KPI lines and
+        stay as they were, but a loaded machine keeps a process off the CPU for seconds, which is not the search's
+        time. A search that sleeps or waits past its bound has no run-queue wait to take out and still fails."""
+        report = super().wait(timeout)
+        t0, t1, queued = report.get("t0"), report.get("t1"), report.get("queued")
+        wall = t1 - t0 if isinstance(t0, (int, float)) and isinstance(t1, (int, float)) else report["seconds"]
+        queued = float(queued) if isinstance(queued, (int, float)) and queued > 0 else 0.0
+        report["wall"], report["queued"] = wall, queued
+        report["seconds"] = max(0.0, wall - queued)
+        return report
+
+
+def spent(report: dict) -> str:
+    """The search's own seconds for a failure message, with the wall time and the queue wait it is taken from."""
+    return f"{report['seconds']:.1f} s (wall {report['wall']:.1f} s less {report['queued']:.1f} s waiting for a CPU)"
+
 
 class Box(base.Box):
     """A W2-112 box with W2-145's recorders, a short request time limit and ``slots`` GPU slots."""

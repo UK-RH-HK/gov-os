@@ -11,6 +11,7 @@ import math
 import os
 import re
 import shutil
+import sys
 from pathlib import Path
 
 import pytest
@@ -648,19 +649,52 @@ class TestImpactAssessment:
 # Edge case: referenced gov commands are known (RESERVED_COMMANDS)
 # ============================================================================
 
+def _recorded_gov_commands():
+    """The twelve reserved commands and every command the command list records, read from its source of truth."""
+    src = str(REPO_ROOT / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from gov.check.commands import GOV_COMMANDS
+
+    return tuple(RESERVED_COMMANDS) + tuple(GOV_COMMANDS)
+
+
+def _unknown_gov_commands(text):
+    """The `gov <cmd>` references of a skill text that no list records (hyphenated names are read whole)."""
+    known = set(_recorded_gov_commands())
+    return [c for c in re.findall(r"`gov\s+([\w-]+)`", text) if c not in known]
+
+
 class TestReferencedCommands:
-    """covers: S8 (command-exists part)"""
+    """covers: S8 (command-exists part)
+
+    Rewrite (W2-37, DEC-167, DEC-812 item 6; DEC-542): the change skill names `gov impact`, a command the command list
+    records beside the twelve reserved ones. The case judged the twelve only, so a recorded command read as unknown. It
+    now accepts the twelve plus `gov.check.commands.GOV_COMMANDS`, and a command no list records still fails.
+    """
 
     @pytest.mark.parametrize("skill_name", SKILL_NAMES)
     def test_referenced_commands_are_known(self, skill_texts, skill_name):
         _, _, full_text = skill_texts[skill_name]
-        gov_cmd_pattern = re.compile(r"`gov\s+(\w+)`")
-        matches = gov_cmd_pattern.findall(full_text)
-        for cmd in matches:
-            assert cmd in RESERVED_COMMANDS, (
-                f"{skill_name}: references `gov {cmd}` which is not in "
-                f"RESERVED_COMMANDS ({RESERVED_COMMANDS})"
-            )
+        unknown = _unknown_gov_commands(full_text)
+        assert not unknown, (
+            f"{skill_name}: references {['gov ' + c for c in unknown]} which no list records "
+            f"(RESERVED_COMMANDS {RESERVED_COMMANDS} plus the recorded commands)"
+        )
+
+    def test_the_change_skill_s_impact_command_is_a_recorded_one(self, skill_texts):
+        _, _, full_text = skill_texts["change"]
+        assert "`gov impact`" in full_text
+        assert "impact" not in RESERVED_COMMANDS
+        assert "impact" in _recorded_gov_commands()
+
+    def test_a_planted_skill_naming_a_command_no_list_records_is_unknown(self):
+        planted = "# Skill\n\nRun `gov frobnicate` then `gov impact` and `gov close`.\n"
+        assert _unknown_gov_commands(planted) == ["frobnicate"]
+
+    def test_a_planted_skill_naming_only_recorded_commands_has_none_unknown(self):
+        planted = "# Skill\n\nRun `gov status`, `gov impact`, `gov spend` and `gov session-watch`.\n"
+        assert _unknown_gov_commands(planted) == []
 
 
 # ============================================================================

@@ -2,6 +2,8 @@
 
 **Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The template's `posttooluse.py` entry is no longer asked for, and the kernel's hook scripts are five.
 
+**Rewrite (EMERGENCY-2 6.1, f827247cc):** that commit deleted `tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py`, which S3's third row named, so the folder collected an error and `gov accept W2-185` stopped. The row is dropped (no live case of W1-38 judges a Bash call after a change of directory); S3 keeps W1-38's one remaining case, `TestHookStubs`.
+
 Profile STANDARD, class C2. Decisions: DEC-1167 (4), DEC-1163 (6) E (a), DEC-971 item 3, DEC-805, DEC-1156 (7).
 Written from the ticket's KPI lines and the code as it stands on the base `31eab2103` (never from the engineer's branch).
 
@@ -31,7 +33,6 @@ the file does not hold.
 | S2 | `tests/unit/gitenv/test_program_env.py::test_this_repository_s_two_hooks_sources_agree` | green on the base; red with S1's line alone (the same finding), green with S1 and S2 |
 | S3 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_s3_the_w1_38_fixture_copies_exactly_the_kernel_hooks` | red with the fixture as it stood on the base: `HOOK_SCRIPTS [...six...] is not the kernel's [...seven, context_watch.py first...]`; this branch's fixture revision turns it green |
 | S3 | `tests/acceptance/W1-38/test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist` | green on the base; red with S1's line and a six-hook fixture: `hook scripts in .claude/settings.json do not exist: ['governance/kernel/hooks/context_watch.py']` |
-| S3 | `tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestABashCallAfterAChangeOfDirectory::test_an_ordinary_allowed_call_is_not_blocked` | green on the base; red with S1's line and a six-hook fixture: the PostToolUse command ends with `[Errno 2] No such file ... governance/kernel/hooks/context_watch.py` |
 | F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_f1_an_extra_matcher_on_the_root_s_post_tool_use_is_a_finding` | green on the base (the base already finds a drift there); stays a finding when S2 lands |
 | F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_f1_a_second_template_stop_entry_with_a_matcher_is_a_finding` | green on the base (a `stop` event is compared today); stays a finding |
 | F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_f1_an_event_only_the_template_has_is_a_finding` | green on the base; stays a finding |
@@ -52,7 +53,7 @@ the file does not hold.
   `postToolUseFailure` carrying only `posttooluse.py`, and none for a template with only `posttooluse.py` entries where the
   root has no such event. The two existing cases of the Verify clause judge the live sources.
 - S3: `w1_38_support.HOOK_SCRIPTS`, and the files `build_project_from_template` copies to `governance/kernel/hooks/`, are
-  exactly the `*.py` of `template/governance/kernel/hooks/`; the two W1-38 cases judge that the generated settings name
+  exactly the `*.py` of `template/governance/kernel/hooks/`; the W1-38 case judges that the generated settings name
   only copied scripts.
 - F1: each planted drift is a finding that names its event (`postToolUse` is told from `postToolUseFailure`): an extra
   matcher on the root's `postToolUse`; a second template `stop` entry with a matcher; an event only the template has; a
@@ -63,7 +64,7 @@ the file does not hold.
 | Break | Result |
 |---|---|
 | an eighth hook script (`eighth_hook.py`) with no wiring, S1's line planted | W2-23 S6 red: `do not reach the seven kernel hooks: ['eighth_hook.py']` |
-| S1's line planted, W1-38's fixture with six hooks | both W1-38 cases red (messages above) and the S3 case red; with the seven-hook fixture they pass |
+| S1's line planted, W1-38's fixture with six hooks | the W1-38 case red (message above) and the S3 case red; with the seven-hook fixture they pass (shown while the second W1-38 case still existed; it was deleted by f827247cc) |
 | S1's line planted, today's `portability.py` | the W2-05 and program_env cases red (`HOOKS_MATCHER_DIFFERS`, postToolUse); with a per-hook exemption (a reference one, scratch only) they pass, and so do this folder's 13 cases |
 | an extra matcher on the root's `postToolUse`; a template hook in another event | the F1 cases above: each gives a hooks finding |
 

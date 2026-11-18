@@ -38,6 +38,8 @@ EXISTING_CHECK_REL = f"{CHECKS_REL}/skill-regression-a.yaml"
 SOURCE_SKILL_REL = f"template/.rulesync/skills/{SKILL_NAME}/SKILL.md"
 SOURCE_SUBAGENTS_REL = "template/.rulesync/subagents"
 SOURCE_ROLE_REL = f"{SOURCE_SUBAGENTS_REL}/orchestrator.md"
+# W2-153 (DEC-1050): the role template the orchestrator's source is composed from, ahead of the role file's body.
+ROLE_TEMPLATE_REL = f"{TEMPLATES_REL}/role-lead.md"
 
 # The five brief templates: the file names are this suite's public interface (README).
 BRIEFS = {
@@ -161,11 +163,18 @@ ROWS = {
     "the ticket loop": {
         "ids": ("DEC-413", "DEC-096"),
         "clauses": (
-            ("tests first, by a fresh test designer", [r"test designer", r"fresh", r"first|before"]),
+            # Rewrite-Reason: DEC-959 item 7 retired "tests first": the work order is in parallel, a fresh test designer
+            # and a fresh implementer at the same time, neither reading the other's work. The clause is that rule.
+            ("a fresh test designer and a fresh implementer in parallel, neither reading the other's work",
+             [r"fresh test designer", r"fresh implementer", r"(in parallel|at the same time)",
+              r"neither reading the other'?s work"]),
             ("checked red for the stated reason", [r"\bred\b", r"reason"]),
             ("a fresh implementer", [r"fresh", r"implementer|engineer|product-spec"]),
-            ("verify on the ticket's tests, every earlier suite and the builder tests",
-             [r"ticket's (own )?(acceptance )?tests|acceptance tests", r"earlier|previous|other", r"builder"]),
+            # Rewrite-Reason: DEC-968 with MR-3 retired "every earlier suite and the builder tests" from the loop's
+            # verification: it is one scoped verification after the tests are checked red (a close runs the scoped
+            # set, the next nightly the full regression; the integration row's close clause pins that).
+            ("one scoped verification, after the tests are checked red",
+             [r"\bred\b", r"then one scoped verification"]),
             ("a second review is the last", [r"second", r"review", r"last|final|no (third|further)"]),
             ("after it only fail-open holes and losses of work are fixed",
              [r"fail[- ]open", r"los(s|ses|e|es|t|ing)\b", r"work"]),
@@ -204,7 +213,10 @@ ROWS = {
             ("a P1 may bypass", [r"(?-i:\bP1\b)", r"bypass|exceed|above|beyond|outside"]),
             ("the digest of delegated decisions", [r"digest", r"delegat"]),
             ("owner answers are recorded as accepted", [r"owner", r"answer", r"accept"]),
-            ("with their own commit trailer", [r"trailer", r"decision|answer", r"\b(own|separate|its)\b"]),
+            # Rewrite-Reason: DEC-861 and DEC-862 (MR-6): an owner answer is recorded in a commit of its own, the
+            # orchestrator's decision-record commit, never `Role: owner`; the rule held in other words than "trailer".
+            ("a commit of its own, never `Role: owner`",
+             [r"owner answer", r"decision register", r"commit of its own", r"never `?Role: owner`?"]),
         ),
         # The package's fields: one document of the corpus names all of them.
         "one_document": (
