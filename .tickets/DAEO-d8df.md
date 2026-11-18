@@ -48,7 +48,7 @@ allowed_paths:
 - .claude/agents/orchestrator.md
 - .claude/agents/qa-engineer.md
 - .claude/agents/ticket-lead.md
-- "tests/acceptance/W2-195/**"  # the test designer re-pins the trimmed skill (A-13)
+- .claude/templates/role-reviewer.md  # Gov OS's byte copy of the kernel reviewer template (EMERGENCY-2 2.10)
 - tests/unit/launch/test_w2_184_launch.py  # their planted independent-auditor role files gain the skill (S3's launch check; the lead's path case)
 - tests/unit/launch/test_w2_184_r_fixes.py
 - tests/unit/launch/test_session_record_launch.py
