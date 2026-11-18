@@ -739,20 +739,10 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
         "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}})
-    _say(_rubric_line(model, effort, chosen))
     head = [*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
-
-
-def _rubric_line(model: str, effort: str, chosen: dict) -> str:
-    """W2-121c RT-8: the one line naming the session's model and effort, where each came from, the ticket's
-    criticality and the rubric file (or that there is none)."""
-    rubric = (f"criticality {chosen['criticality']}, rubric {chosen['rubric']}" if chosen.get("rubric")
-              else "no rubric: the role's default")
-    return (f"gov launch: model {model} ({chosen['model_source']}), effort {effort} ({chosen['effort_source']}), "
-            f"{rubric}\n")
 
 
 def _end_message(entry: dict | None, code) -> None:

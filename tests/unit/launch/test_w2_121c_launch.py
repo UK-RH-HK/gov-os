@@ -1,4 +1,4 @@
-"""W2-121c builder tests: the launcher's end message (RT-2) and its model-and-effort line (RT-8).
+"""W2-121c builder tests: the launcher's end message (RT-2) and the launch record's rubric (RT-8, a quiet launch).
 
 A stand-in replaces ``subprocess.Popen`` (from W2-184's builder tests) and runs a real short process, so the session has
 a pid and a registry entry; everything is under a temporary HOME.
@@ -61,20 +61,21 @@ def test_a_failed_send_keeps_the_exit_code(project, monkeypatch):
     assert launcher.launch(project.root, "engineer", "T-1", []) == 3
 
 
-def test_the_line_names_model_effort_sources_class_and_rubric(project, capfd):
+def test_the_record_names_model_effort_sources_class_and_rubric_and_the_launch_is_quiet(project, capfd):
     project.ticket()
     launcher.launch(project.root, "engineer", "T-1", [])
-    err = capfd.readouterr().err
-    line = next(x for x in err.splitlines() if "model claude-" in x)
-    for word in ("claude-sonnet-5-5", "effort high", "by criticality", "C2", "governance/project/criticality.yaml"):
-        assert word in line
-    assert project.records()[-1]["rubric"] == "governance/project/criticality.yaml"
+    out, err = capfd.readouterr()
+    assert (out, err) == ("", "")
+    record = project.records()[-1]
+    assert (record["model"], record["model_source"], record["effort"], record["effort_source"]) == \
+        ("claude-sonnet-5-5", "by criticality", "high", "by criticality")
+    assert record["criticality"] == "C2" and record["rubric"] == "governance/project/criticality.yaml"
 
 
-def test_no_rubric_says_the_role_default(project, capfd):
+def test_no_rubric_is_null_and_the_role_default(project, capfd):
     (project.root / "governance/project/criticality.yaml").unlink()
     project.ticket()
     launcher.launch(project.root, "engineer", "T-1", [])
-    line = next(x for x in capfd.readouterr().err.splitlines() if "model claude-" in x)
-    assert "no rubric: the role's default" in line
-    assert project.records()[-1]["rubric"] is None
+    assert capfd.readouterr() == ("", "")
+    record = project.records()[-1]
+    assert record["rubric"] is None and record["model_source"] == "role default"
