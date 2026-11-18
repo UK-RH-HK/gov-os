@@ -3,8 +3,9 @@
 Every record is validated through check-jsonschema, the validator the tool registry pins (DEC-074), not a subset of
 it (DEC-872 item 2, lens G R2 (a)). Each record's frontmatter is written out as one JSON instance; one validator
 process per schema file per kernel layout takes all of that schema's records. A validator that is absent, fails,
-answers what cannot be read or is not the pinned version is a finding, never a pass. ``docs/imported/`` is left out
-by name, as history (DEC-844).
+answers what cannot be read or is not the pinned version is a finding, never a pass. Two history folders are left out
+by name, each counted and stated with its reason in the result: ``docs/imported/`` (DEC-844) and
+``docs/emergency-2/archive/`` (EMERGENCY-2 section 11.1, 11.3: the archive is history, its files kept as they were).
 """
 from __future__ import annotations
 
@@ -62,9 +63,14 @@ SHARED_FIELDS = ("id", "type", "status", "state_class")
 # is an audit report.
 AUDIT_REPORT_DIR, AUDIT_REPORT_TYPE = "docs/audit", "audit-report"
 
-# The one folder left out (DEC-844): imported records are history, kept as they came.
+# The history folders left out, as (folder, why), in the order the result states them. Imported records are history,
+# kept as they came (DEC-844); the EMERGENCY-2 archive is history too, kept as it was (EMERGENCY-2 11.1, 11.3).
 IMPORTED_DIR = "docs/imported"
 LEFT_OUT_WHY = "history (DEC-844): imported records are kept as they came and are not held to the schemas"
+ARCHIVE_DIR = "docs/emergency-2/archive"
+ARCHIVE_WHY = ("history (EMERGENCY-2 sections 11.1, 11.3): the archive is kept as it was and is not held to the "
+               "schemas")
+LEFT_OUT_DIRS = ((IMPORTED_DIR, LEFT_OUT_WHY), (ARCHIVE_DIR, ARCHIVE_WHY))
 
 # The validator and its pin (DEC-074): the registry is read, never written.
 VALIDATOR = "check-jsonschema"
@@ -238,15 +244,16 @@ def run(root: Path) -> tuple[list[dict], dict]:
     per_record: dict[str, list[dict]] = {}
     records: list[tuple[str, str, str]] = []  # (rel, type, schema file)
     fronts: dict[str, dict] = {}
-    left_out = 0
+    left_out = {folder: 0 for folder, _ in LEFT_OUT_DIRS}
     for record_dir in RECORD_PATHS:
         base = root / record_dir
         if not base.is_dir():
             continue
         for md_file in sorted(base.rglob("*.md")):
             rel = md_file.relative_to(root).as_posix()
-            if md_file.is_relative_to(root / IMPORTED_DIR):
-                left_out += 1
+            history = next((folder for folder, _ in LEFT_OUT_DIRS if md_file.is_relative_to(root / folder)), None)
+            if history:
+                left_out[history] += 1
                 continue
             try:
                 front, unreadable = _frontmatter(md_file.read_text(encoding="utf-8"))
@@ -280,7 +287,8 @@ def run(root: Path) -> tuple[list[dict], dict]:
 
     program, stated, stops = _validator(root)
     result = {"check": "core-schema", "records_validated": 0,
-              "left_out": [{"path": f"{IMPORTED_DIR}/", "files": left_out, "why": LEFT_OUT_WHY}],
+              "left_out": [{"path": f"{folder}/", "files": left_out[folder], "why": why}
+                           for folder, why in LEFT_OUT_DIRS],
               "validator": stated}
     if stops:
         stopped = [{**stop, "records": len(records)} for stop in stops]
