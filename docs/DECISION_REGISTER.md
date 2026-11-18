@@ -109,7 +109,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates:** B3, C1, C2, C6, W1–W3, W10
 
 ### DEC-013 — Task DAG & claims: beads_rust (`br`) — *changed from earlier recommendation of `bd`*
-- **Status:** SUPERSEDED by DEC-074 (DEC-074's tool choice; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** SUPERSEDED by DEC-074 (DEC-074's tool choice; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** history (settled by DEC-074)
 - **Decision:** Use `br` (beads_rust), which freezes the "classic" SQLite + JSONL architecture: JSONL tracked in git, SQLite local; no daemon, no auto-git, no auto-commit/push. [E-BR]
 - **Why changed:** Upstream `bd` moved to Dolt; some community tooling reports regressions after `bd` switched to server mode and recommends `br` or pinning `bd` 0.49.x. [E-BR-GUI] The classic model matches our rule that git is authoritative and SQLite is derived (Gate B3), and that the Governance OS — not the tracker — controls commits.
 - **Known limitation:** agents do not spontaneously use the tracker; instructions fade over long sessions. [E-BEADS-USE] → SessionStart hook must inject `br ready`; task-close enforced by `gov close`.
@@ -189,7 +189,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Default until triggered:** DEC-019 path.
 
 ### DEC-021 — Rejected for the authority layer
-- **Status:** REJECTED (for authority) · **Basis:** ESTABLISHED
+- **Status:** REJECTED (for authority) · **Basis:** ESTABLISHED · **Class:** history
 - **Graphiti / Zep:** each episode requires asynchronous LLM processing (~25s locally); works best with structured-output-capable services, smaller models cause ingestion failures. Non-deterministic and token-consuming. [E-GRAPHITI] May be reconsidered for *episodic/lesson* memory only.
 - **LightRAG / Microsoft GraphRAG / Cognee:** LLM-extracted entity graphs — same objection. LightRAG merged multimodal parsing (MinerU/Docling) in May 2026 and now overlaps RAGFlow for compact stacks; a candidate alternative to DEC-020 for the research facet only. [E-LIGHTRAG]
 - **BMAD:** many personas → more tokens per cycle and handoff failures as a debugging surface. [E-BMAD]
@@ -323,7 +323,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Rationale:** Phase 2 showed builder property tests quantify over the implementation's own domain; the owner's OD-P2-10 recorded that independence without relevant context produces architectural ignorance.
 
 ### DEC-043 — Products resume immediately; the glue is built from real friction
-- **Status:** SUPERSEDED by DEC-064 (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION
+- **Status:** SUPERSEDED by DEC-064 (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Class:** history (settled by DEC-064)
 - **Decision:** Product A work restarts as soon as the off-the-shelf layer is installed (short CLAUDE.md/AGENTS.md, `br`, OpenSpec, codebase-memory-mcp, gitleaks). `gov` commands are added only when a real product task shows the need. Product B follows once Product A has run one real feature end to end.
 - **Rationale:** The Rust Gov OS was never exercised on real work, including its own orchestration (which ran on Python scripts and an HTML panel). Dogfooding from day one prevents speculative scope.
 
@@ -336,7 +336,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** Framework v4.1.2, the two protocols and Contract v3 are copied unchanged (with SHA-256 sums) into `docs/source/originals/` of the new repository as owner reference. No agent reads them by default. Lean successors are authored with the owner: Framework v5 (short operating model), a Solo Core acceptance profile derived from §6 of this register, and a new control panel.
 
 ### DEC-046 — Assets carried from the Rust repository
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (records reviewed)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (records reviewed) · **Class:** history
 - **Carry as principles/specs:** D-0007 trust direction (simplified: "approved/verified/registered" facts come only from git records plus owner-signed commits or PR approvals); D-0003 enforcement map (every policy key maps to an executable check or is declared informational); D-0005/D-0006 fail-closed pinned embedder with benchmark; API-0002 CLI JSON envelope and exit codes 0–4 as the `gov` interface; the record schema conventions (supersedes / amends / state_class, amendments by new record); L-0074 and the Phase-2 root-cause lessons as `docs/lessons/`.
 - **Carry as archived reference only:** ARCH-0003 and the R1-accepted SRR implementation (candidate for R2 release signing later); the trust-architecture existing-solutions review; the performance diagnostic.
 - **Leave behind:** D-0008 / ARCH-0002 (CP-1), D-0010/D-0011 plugin and tool-install machinery, the 61-prompt V8.x control panel.
@@ -365,11 +365,11 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** Nothing is deleted. The existing repository is kept with its full history. After the DEC-052 inventory and owner review, an annotated archive tag marks the pre-restructure state, every existing branch is kept, and the working tree of the new default branch is restructured to useful outputs only. Everything else leaves the working tree and remains reachable through the tag and branches. No history is rewritten. No `archive/` directory is created inside the working tree (it would be visible to agents and indexers). Untracked build output, caches and stale worktrees are reclaimed.
 
 ### DEC-052 — Read-only inventory before any restructure
-- **Status:** ACCEPTED (owner) · **Basis:** OWNER + SUGGESTION (method)
+- **Status:** ACCEPTED (owner) · **Basis:** OWNER + SUGGESTION (method) · **Class:** history
 - **Decision:** A fresh, read-only Claude Code session produces a complete inventory (every ref and tracked path classified; 0 unclassified) with dispositions KEEP_ACTIVE / KEEP_REFERENCE / ADAPT / ARCHIVE / DISCARD_UNTRACKED / OWNER_DECISION, reuse evidence, the recommended base ref and at most 10 owner questions. The session runs with its working directory outside the repository (`~/gov-os-inventory`, repository added with `--add-dir`) so the old project's CLAUDE.md, hooks and per-project memory do not load, under guardrail permissions (`inventory-settings.json`) and the prompt `INVENTORY_SESSION_PROMPT.md`. Repository content is treated as data, not instructions. `collect_gov_seed.sh` is superseded by the inventory's KEEP lists.
 
 ### DEC-053 — Owner answers to the inventory questions (2026-09-29)
-- **Status:** ACCEPTED (owner) · **Basis:** OWNER, on the inventory's defaults with Claude's amendments · **Changed by:** its Q7 reversed by DEC-165, for framework lessons only (shown by DEC-825, 2026-10-19)
+- **Status:** ACCEPTED (owner) · **Basis:** OWNER, on the inventory's defaults with Claude's amendments · **Changed by:** its Q7 reversed by DEC-165, for framework lessons only (shown by DEC-825, 2026-10-19) · **Class:** history
 - Q1: disable the bridge checkpoint hook before any restructure; let the uncommitted `BR-CP-0058.yaml` go.
 - Q2: base = current tip of `bridge/p2-context-retrieval` (`1ab6782`, or a later tip whose extra commits touch only bridge `CHECKPOINTS/`). Annotated tag `archive/gov-os-v4-final` at the base. `main` fast-forwarded to the base and restructured. All other local branches moved to the hidden namespace `refs/archive/heads/*` (kept, protected from gc, not shown by `git branch`). Tags and `refs/safe-hold/*` kept.
 - Q3: reclaim untracked material (worktrees, `target/`, stale registrations, `~/.cache/gov-bridge`, `~/.cache/gov`) after the tag and namespace move exist.
@@ -382,7 +382,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - Q10: revoke the DeepSeek key at the provider, then delete the file; delete the sealed oracle after the tag exists; leave transcripts.
 
 ### DEC-054 — What stays in the working tree: buckets and derivation
-- **Status:** ACCEPTED (owner) · **Basis:** SUGGESTION, accepted
+- **Status:** ACCEPTED (owner) · **Basis:** SUGGESTION, accepted · **Class:** history
 - **In tree, active:** R004, R009, R013, R016–R018, R020, R039, R059, R060, R064, R076, plus the tests of these modules. The Python set is the **static import closure** of the kept govbridge modules (lexical, semantic/modelpin, semantic/profile, authority), plus the config and schema files they reference by name, plus the test files whose imports fall inside that closure. Derived, never hand-enumerated (L-0074).
 - **In tree, reference only:** R001, R002, R053, R054, V8.2, V8.3 MASTER_DRAFT_v2.
 - **Seeds (read from the archive, not copied):** R006–R008, R011, R025, R026, R032, R055, R057, R058, R085, R084 query classes.
@@ -392,7 +392,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Rule:** the Rust port rows are not ported; the new `gov` is written fresh and consults the archive when needed.
 
 ### DEC-055 — Pre-restructure maintenance
-- **Status:** ACCEPTED (owner) · **Basis:** SUGGESTION, accepted
+- **Status:** ACCEPTED (owner) · **Basis:** SUGGESTION, accepted · **Class:** history
 - **Decision:** Neutralise the hook script (renamed, reversible), remove its wiring from the repo's untracked `.claude/settings.local.json` (backup kept), install gitleaks to `~/.local/bin` with checksum verification, and take a `git bundle --all` backup before any ref surgery. Old per-project Claude Code auto-memory for this repository path, if present, is moved aside only with explicit owner approval.
 
 ### DEC-056 — Restructure executed (record of facts, 2026-09-29)
@@ -407,7 +407,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Open:** DEC-039 (threat model) becomes ADR-0001 on owner acceptance; Product A not yet named (OQ-04).
 
 ### DEC-057 — S0 research and discovery before any rebuild
-- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER · **Class:** history
 - **Decision:** Before building, a research phase establishes (a) a capability catalogue re-expressed from the owner's originals and owner records, with each capability marked CORE / LATER / DROP against ADR-0001, and (b) the tool landscape per capability category with footprint (disk, RAM, VRAM, Docker), cost, maintenance, harness- and language-agnosticism, and where state lives. S0a is desk research (web allowed, no installs); an owner gate approves the shortlist; S0b is a hands-on bake-off on the repository fixtures with measured resource and token costs. The new S1 is drafted from S0 outputs.
 - **Framing carried into S0:** the Gov OS extends agents' context and memory; authoritative memory and context live in the repository (git-tracked records, rebuildable derived indexes), never in the agent or a vendor account; it must be agnostic to project type (an MCP server, a dashboard, a physics kernel, an operating system), language and agent harness.
 
@@ -426,7 +426,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** There is one Gov OS release line for every project type. Projects differ only in their committed overlay configuration (path map, enabled capabilities such as code-intelligence languages or a research corpus, policy strengths). The choice of which product adopts first is a sequencing decision for dogfooding, not a variant. OQ-04 is deferred to the adoption stage.
 
 ### DEC-061 — One workbench folder for out-of-repo sessions
-- **Status:** ACCEPTED (owner, 2026-09-29)
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Class:** history
 - **Decision:** `~/gov-os-inventory` is renamed `~/gov-os-workbench` and holds every out-of-repo session: `inventory/` (the completed inventory), `restructure/` (bundle, ref snapshot, scripts, leftovers), `input/` (register), `s0a/`, later `s0b/`. A symlink `~/gov-os-inventory → ~/gov-os-workbench` keeps the bundle path cited in `docs/SOURCES.md` valid. Session settings deny edits to `inventory/`, `restructure/`, `input/` and `.claude/`.
 
 ### DEC-062 — GitHub access through `gh` with a read-only fine-grained token
@@ -434,7 +434,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** Research sessions read GitHub metadata through the GitHub CLI authenticated with a fine-grained token limited to public repositories, read-only, with an expiry. The token lives in the `gh` credential store, never in a repository, a workbench file or a prompt. Any older token found in plaintext is revoked. The earlier ad-hoc GitHub harness is not revived.
 
 ### DEC-063 — Repository settings files
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-09-29)
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-09-29) · **Class:** history (one-off, done)
 - **Decision:** Keep the committed `.claude/settings.json` (deny rules for `docs/source/`). Keep the untracked, gitignored `.claude/settings.local.json` (per-user; Claude Code writes approvals there). Remove `.vscode/` and ignore it. Remove the empty `.claude/worktrees/`.
 
 ### DEC-064 — Full scope, built in waves, released once
@@ -457,7 +457,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** Roles are subagent definitions generated by rulesync from kernel role files plus a project roster; each carries purpose, allowed-path pattern, tools, model tier, authority level and handoff format. Wave 1: orchestrator, product/specification, independent test designer, engineer, independent auditor. Wave 2: architecture, frontend, backend, database/data, integration/API, DevOps/SRE, security, performance, UX, typed handoffs. Wave 3: research, AI/ML, data author, change controller, memory/knowledge, tooling, release, claims/concurrency. `gov doctor` (installation health), discovery skill + `gov readiness`, `gov impact` (CIT-P), OpenSpec apply/archive + `gov close` (CIT-E), and the audit skill with an Independent Auditor role are separate.
 
 ### DEC-067 — Two layers of testing; Gate V returns as qualification
-- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER, from the old control panel's Phase 4 (AQ-1) and Contract v3 Gate V
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER, from the old control panel's Phase 4 (AQ-1) and Contract v3 Gate V · **Class:** history
 - **Decision:** Layer 1 = mechanism fixtures and per-wave tests in CI. Layer 2 = two synthetic programmes of different shape and aim: **Programme A**, greenfield R&D build (idea → release through the spec-first cycle, a customer gate, a mid-programme change); **Programme B**, brownfield adoption and recovery (scattered legacy platform with planted hazards). Each has a dev tier (open, used during S0b2 and the waves), a qualification tier and an optional stress tier, a simulated customer, and chaos/recovery/soak/isolation scenarios. The held-out oracle (fault manifest, path-map and memory oracles, gold answers, forbidden outcomes, customer answer key, scorecard) lives in `~/gov-os-workbench/qualification-oracle/`; builder sessions are denied read access and the architect sees only the coverage matrix and scorecard format. CAP-49 changes from DROP to KEPT (as qualification). The G6 chaos/soak tier moves into qualification. Scenarios phrased as attacks in the old brief become mistake scenarios under ADR-0001.
 
 ### DEC-068 — S0b split into S0b1 and S0b2
@@ -481,7 +481,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - The matrix still shows S0a's CORE/LATER labels; Contract v4 relabels them by wave (DEC-064).
 
 ### DEC-072 — S0b2 scope and guardrails
-- **Status:** ACCEPTED (owner, by running it) · **Basis:** SUGGESTION
+- **Status:** ACCEPTED (owner, by running it) · **Basis:** SUGGESTION · **Class:** history
 - **Decision:** S0b2 installs the stack user-level (owner approves each install; versions pinned; uninstall commands recorded), runs twelve integration checks (I-01…I-12) on sandbox clones of the dev tiers, decides the four open choices by BAKEOFF_PLAN's fixed rules (retrieval tie-break now "shared store", since Node ≥ 20.19 is needed for OpenSpec anyway), compiles the dev tiers' Rust and TypeScript for the first time, and measures resources. The scale probe indexes an owner-generated qual tier of Programme B in `s0b2/probe/`; the session may not read its contents or the oracle. beads_rust excluded (Q2). Running S0b2 accepts S0a Q2, Q6 (probe on the qual tier) and Q7 (user-level, approved installs); Q1, Q3, Q5, Q8, Q9 settle in S1; Q4 is superseded by DEC-064.
 
 ### DEC-073 — Operating model until the Gov OS lands
@@ -499,7 +499,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** Without GitHub Pro, `main` is not protected. The boundary is: the lefthook pre-push gate (G3) on the owner's machine, GitHub Actions CI (G4–G5) as a visible advisory result on every push, and the owner's rule that only the owner merges, and only on green. ADR-0001 and Contract v4 state this explicitly. Enabling protection later changes no other decision.
 
 ### DEC-076 — Wave 1 adjustments from S0b2
-- **Status:** ACCEPTED (owner, via Q-answers) · **Basis:** SUGGESTION
+- **Status:** ACCEPTED (owner, via Q-answers) · **Basis:** SUGGESTION · **Class:** history
 - G-02 (post-command `git status` containment against `allowed_paths`) moves from W2 to **W1**: it is the non-enumerative enforcement of MR-3.
 - codebase-memory in W1 must prove (a) a per-repository home isolates `list_projects`, and (b) the pre-index secret filter or an ignore mechanism keeps secrets out of its index.
 - S0b2's glue list and the stack plan's components are merged into one numbered W1 task list in S1 (the two G-numberings collide).
@@ -516,7 +516,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Envelope for Contract v4:** tested up to ≈ 80k nodes / 270k edges at ≈ 2.2 GB peak; larger graphs are measured before adoption. Worst-case RAM with IDE + models + a full index run ≈ 12.5 GB of 15.5 GiB (≈ 2.5 GiB spare); incremental updates are far smaller. `workspace` holds several projects; each gets its own index when adopted. Probe indexes and all codebase-memory logs deleted afterwards.
 
 ### DEC-079 — Private GitHub remote established
-- **Status:** DONE (2026-09-30)
+- **Status:** DONE (2026-09-30) · **Class:** history (one-off, done)
 - `UK-RH-HK/gov-os` (private). `main` pushed through the per-repository deploy key (`~/.ssh/gov_os_deploy`, host alias `github-gov-os`); no tags or other refs pushed. GitHub's ED25519 host key verified.
 
 ### DEC-080 — Retrieval completeness entirely in Wave 1
@@ -528,7 +528,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** S1 is one session and one author (subagents only for mechanical extraction, counting and validation), running from `~/gov-os-workbench/s1/` with the Gov OS repository as an additional directory. It applies MR-1 and MR-6 to the Gov OS itself: it builds the Gov OS's own 26-dimension readiness table, asks the owner only what the sources don't answer, as ranked decision packages, and records the answers. It then writes Charter v5, Contract v4 (all 60 capabilities, with waves, acceptance checks, providers, sources and scenario ids), ADR-0001, ADR-0002, and the Wave 1 WBS as tickets with KPIs, roles and allowed paths. Everything goes on branch `s1/spec` of the Gov OS repository, and the register is committed as `docs/DECISION_REGISTER.md`. S1 does not push, merge, implement, or write acceptance tests (those are the Independent Test Designer's, MR-3).
 
 ### DEC-082 — How S1-A runs, and what closes S1
-- **Status:** ACCEPTED (owner, by running it) · **Basis:** SUGGESTION, implementing DEC-070 · **Changed by:** DEC-096
+- **Status:** ACCEPTED (owner, by running it) · **Basis:** SUGGESTION, implementing DEC-070 · **Changed by:** DEC-096 · **Class:** history
 - **Decision:** S1-A is a fresh, read-only session in `~/gov-os-workbench/s1a/`. It builds its own traceability matrix from the originals **before** looking at S1's source map. Its yardstick is the originals plus decisions whose status is ACCEPTED or DONE; PROPOSED entries justify nothing. Verdict: ACCEPT, ACCEPT_WITH_FINDINGS or REJECT, at most two rounds. After closure, the owner merges `s1/spec` into `main`; then `docs/source/` is archived (removed from the working tree, reachable through the tag); then Wave 1 starts.
 
 ## 5. Proposed Contract v3 amendments
@@ -856,7 +856,7 @@ round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
   integration/API.
 
 ### DEC-095 — DEC-040 status
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-8 option (a)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-8 option (a) · **Class:** history
 - **Decision:** DEC-040 is ACCEPTED as amended by DEC-083. Its v0.12 text above stays verbatim; this entry is the status
   change.
 
@@ -1419,7 +1419,7 @@ in `docs/changes/S2-CIT-E.md`.
      extension's bundled version. The spike saw 2.1.284 on the CLI; the test designer saw 2.1.286.
 
 ### DEC-154 — The W1-05 provider change
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief · **Implements:** DEC-119
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief · **Implements:** DEC-119 · **Class:** history
 - **Decision:** W1-05 delivered minimal role subagent definitions in `.claude/agents/`; W1-33 replaces them. The
   providers in Contract v4 are updated to match.
 
@@ -1550,7 +1550,7 @@ DEC-163 (the "DEC-159" in the owner's message was a numbering slip); and W1-46's
 on W1-47.
 
 ### DEC-168 — Scope and severity are in the Wave 1 lesson schema
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to S2 · **Refines:** DEC-165
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to S2 · **Refines:** DEC-165 · **Class:** history
 - **Decision:** W1-08's lesson schema carries scope and severity now, in Wave 1, so that no migration is needed later.
   The lesson loop itself stays in Wave 3.
 
@@ -1792,13 +1792,13 @@ Owner answers of 2026-10-03 to the orchestrator's install package for W1-06 (`DA
 designer's four packages (DP-1…DP-4).
 
 ### DEC-192 — Install approved: ccusage 20.0.26
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-06 install package · **Under:** DEC-083, DEC-086 · **Changed by:** corrected by DEC-202 (shown by DEC-825, 2026-10-19)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-06 install package · **Under:** DEC-083, DEC-086 · **Changed by:** corrected by DEC-202 (shown by DEC-825, 2026-10-19) · **Class:** history (settled by DEC-202)
 - **Decision:** The orchestrator installs ccusage 20.0.26 with
   `~/.nvm/versions/node/v22.23.3/bin/npm install -g ccusage@20.0.26` (ADR-0002's Node 22). It is uninstalled with
   the same npm. This entry is the owner approval the registry cites.
 
 ### DEC-193 — Download approved: the Superpowers v6.4.2 source
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-06 install package · **Under:** DEC-083, DEC-074 Q5
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-06 install package · **Under:** DEC-083, DEC-074 Q5 · **Class:** history
 - **Decision:** The orchestrator runs `git clone --depth 1 --branch v6.4.2 https://github.com/obra/superpowers` into
   `.gov-runtime/scratch/orchestrator/vendor-src/superpowers/`. This entry is the owner approval the registry cites
   for Superpowers v6.4.2.
@@ -1866,7 +1866,7 @@ orchestrator reported about the registry.
   original install dates were not recorded. PyYAML's install and uninstall are `sudo apt-get` owner actions.
 
 ### DEC-202 — Node 22 installs carry the PATH prefix
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Corrects:** DEC-192 (the command's form)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Corrects:** DEC-192 (the command's form) · **Class:** history
 - **Decision:**
   - The ccusage commands carry the prefix `PATH=~/.nvm/versions/node/v22.23.3/bin:$PATH`, because npm's script runs
     the first `node` on `PATH`. The command approved in DEC-192 lacked it; the orchestrator's correction (the copy
@@ -1884,7 +1884,7 @@ Owner answers of 2026-10-03 to the orchestrator's install package for W1-48 (`DA
 reported at W1-06's close, and on the orchestrator's context limit.
 
 ### DEC-203 — Install approved and made by the owner: Claude Code 2.1.288
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package option (b) · **Under:** DEC-083, DEC-153, DEC-196, DEC-197
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package option (b) · **Under:** DEC-083, DEC-153, DEC-196, DEC-197 · **Class:** history
 - **Decision:**
   - The owner updated the Claude Code CLI from 2.1.284 to 2.1.288 with `claude install 2.1.288`, through the
     operator console, outside every agent session, as an owner action. No agent session installed it.
@@ -1896,7 +1896,7 @@ reported at W1-06's close, and on the orchestrator's context limit.
   - bubblewrap 0.9.0 and socat 1.8.0.0 enter the registry as owner installs under DEC-141.
 
 ### DEC-204 — The stale npm copy of Claude Code 2.1.59 is removed
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package · **Class:** history
 - **Decision:** The owner removed the npm global `@anthropic-ai/claude-code` 2.1.59 under Node v18.20.8. The removal
   is noted in `governance/project/bootstrap.md`.
 
@@ -1997,12 +1997,12 @@ Owner answers of 2026-10-04 to the test designer's packages DP-1…DP-6 on W1-47
 (`DAEO-0qs5`). The entries never name the held-out path; it is held in `governance/project/held-out.yaml` only.
 
 ### DEC-213 — W1-47 DP-6: the qualification oracle is outside the repository
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-6 (P1) option 1 · **Under:** DEC-162
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-6 (P1) option 1 · **Under:** DEC-162 · **Class:** history
 - **Decision:** The qualification oracle is outside the repository, so W1-05's fixture, which copies the working
   tree, never copies it. Nothing changes.
 
 ### DEC-214 — W1-48 DP-3: the recorded version with another sha256 fails for the CLI and is drift for the extension
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-48 package DP-3 option (c) · **Refines:** DEC-210 · **Under:** DEC-196, DEC-205
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-48 package DP-3 option (c) · **Refines:** DEC-210 · **Under:** DEC-196, DEC-205 · **Class:** history
 - **Decision:**
   - For the CLI at `~/.local/bin/claude`, the recorded version with a different sha256 is a hard failure.
   - For the active extension's bundled binary it is drift, reported by `gov doctor`.
@@ -2615,7 +2615,7 @@ with its DONE. The designer's, the repair worker's, the lead's and the orchestra
 confidence is medium-high, and the choice is reversible: no reader of the key exists yet.
 
 ### DEC-265 — W1-08 DP-10: `languages` is required only when `code_intelligence` is enabled
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-10 option (a); confidence medium-high · **Under:** DEC-251, CAP-06.e
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-10 option (a); confidence medium-high · **Under:** DEC-251, CAP-06.e · **Class:** history
 - **Decision:** When `code_intelligence` has `enabled: true`, `languages` is required and is a non-empty list of
   strings. When it has `enabled: false`, `languages` may be left out or be any list of strings. The schema is
   already written this way. The one test case for the disabled form goes to the next test design batch that
@@ -3319,7 +3319,7 @@ orchestrator prompt v4.1, section 6).
   code 1 to 4 reads the output: a refusal prints the envelope.
 
 ### DEC-333 — W1-46 DP-18: the experiments root is `experiments/` in Wave 1
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-18 option (a); confidence medium · **Under:** DEC-273
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-18 option (a); confidence medium · **Under:** DEC-273 · **Class:** history
 - **Decision:** The experiments root is the fixed name `experiments/` in Wave 1, as built. A project key that names
   another root waits for a project that needs one.
 
@@ -3650,7 +3650,7 @@ is medium-high, and both are reversible. The other six (DP-1, DP-2, DP-3, DP-5, 
 freeze flag or what a rollback does to history, and go to the owner.
 
 ### DEC-357 — W1-28 DP-4 and DP-7: `--cancel-agents` releases locks only, and "the same result on repeat" means the same state
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 packages DP-4 option (a) and DP-7 option (a); confidence medium-high · **Under:** CAP-05.b, CAP-05.d, DEC-292
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 packages DP-4 option (a) and DP-7 option (a); confidence medium-high · **Under:** CAP-05.b, CAP-05.d, DEC-292 · **Class:** history
 - **Decision:**
   - `gov pause --cancel-agents` releases the claim locks under `.tickets/.claims/` and records the sessions that
     held them. It does not change a ticket's status: a ticket left `in_progress` is set back by hand, which is a
@@ -4126,7 +4126,7 @@ The owner's actions through the operator and the owner's answers to the packages
 orchestrator. Where an answer leaves the ticket to the orchestrator, the choice is named in the entry.
 
 ### DEC-395 — Temp folders cleared; temp hygiene delegated to the orchestrator
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-376 · **Under:** DEC-385, DEC-386
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-376 · **Under:** DEC-385, DEC-386 · **Class:** history
 - **Decision:**
   - Done by the owner through the operator: `/tmp/pytest-of-usain` and all 113 `/tmp/gov-launch-*` folders are
     removed (about 31 GB). `.git/config.lock` had already gone and no lock file remains. `w1/integrate` is pushed at
@@ -4142,7 +4142,7 @@ orchestrator. Where an answer leaves the ticket to the orchestrator, the choice 
   list. W1-20 is then merged and closed.
 
 ### DEC-397 — W1-19 installs: approved (DEC-083)
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-384 · **Under:** DEC-083, DEC-195, DEC-074
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-384 · **Under:** DEC-083, DEC-195, DEC-074 · **Class:** history
 - **Decision:**
   - Ollama 0.35.0 and `qwen3-embedding:0.6b` are approved for use as verified on disk; the embedding model gets its
     row in the tool registry.
@@ -4394,7 +4394,7 @@ Given by the owner on 2026-10-06, after the W1-50 freeze branch's second round, 
 fourth round.
 
 ### DEC-411 — DEC-409 amends DEC-365, not DEC-367
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** owner answer · **Under:** DEC-409
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** owner answer · **Under:** DEC-409 · **Class:** history
 - **Decision:** DEC-409 amends DEC-365 (the W1-28 DP-3 answer). DEC-367 stays unchanged.
 
 ### DEC-412 — W1-50 DP-F6: the freeze branch is rebuilt; rewriting an unpushed ticket branch is allowed
@@ -5510,7 +5510,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 134. One delegated decision on W1-31: the log forms a second specimen shows, and the smaller fields (register v0.134, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-501 — W1-31: hook runs of every event and `gov` commands in every plain form are counted from a second specimen; where a form allows two readings the counter takes the larger; the estimate's formula is the owner's
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-31 lead's packages P-2 to P-7 of its second return (`log/W1-31-lead-run2.json`); a second specimen made by the orchestrator as DEC-495 prescribes (one short headless session in a throwaway project in `/tmp`, Claude Code 2.1.288, with hooks on six events, one that blocks and one that fails, four forms of a `gov` command, one sub-agent and one compaction; its reduced copy is `specimen/session-specimen-2.jsonl` with the sub-agent's log, the settings, the hook script and the prompt beside it). The lead's P-1 (what the estimated part stands on) defines a figure the exit is judged by: it is with the owner and is not decided here · **Refines:** DEC-491, DEC-495 · **Changed by:** corrected by DEC-502 (shown by DEC-825, 2026-10-19)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-31 lead's packages P-2 to P-7 of its second return (`log/W1-31-lead-run2.json`); a second specimen made by the orchestrator as DEC-495 prescribes (one short headless session in a throwaway project in `/tmp`, Claude Code 2.1.288, with hooks on six events, one that blocks and one that fails, four forms of a `gov` command, one sub-agent and one compaction; its reduced copy is `specimen/session-specimen-2.jsonl` with the sub-agent's log, the settings, the hook script and the prompt beside it). The lead's P-1 (what the estimated part stands on) defines a figure the exit is judged by: it is with the owner and is not decided here · **Refines:** DEC-491, DEC-495 · **Changed by:** corrected by DEC-502 (shown by DEC-825, 2026-10-19) · **Class:** history (settled by DEC-502)
 - **Decision:**
   - **Hook runs (P-2).** As the second specimen shows them: a successful run of any event without a following added-context line added nothing and counts 0 (Stop and SubagentStop in the specimen); added context of PreToolUse counts as hook output like PostToolUse's; SessionStart's added context counts again each time it is given (after a compaction too); the text of a hook that blocks a tool call reaches the session as that call's error result and counts as hook output; the text of a hook that fails without blocking is counted as hook output too (whether it reaches the model is not shown: the larger reading is taken, and the record says so). A PreCompact hook left no line in the specimen: its output cannot be counted and the record names that as a known gap. Any hook line of a form neither specimen shows still makes hook output "not measured", by name.
   - **Sub-agents.** A sub-agent's lines are in a file of their own under the session's folder (the specimen shows where). They belong to the named session: their hook lines and `gov` results are counted with it. Whether the token cross-check with ccusage covers those files is established by the lead from the tool's own behaviour, or returned.
@@ -5547,7 +5547,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 136. Owner answers: W1-30's leftovers and its close, the probe gate against the probe's order, W1-39's doctor message, the estimate, the held-out file in the guard, the runner's tools (register v0.136, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-503 — W1-30: files that the project's own ignore rules hide are a residual
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-10 option (a) · **Refines:** DEC-500
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-10 option (a) · **Refines:** DEC-500 · **Class:** history
 - **Decision:** That a file ignored by the commit's own ignore rules is in the tree the tests run in, and not in the commit, is a residual. "Tests run in a clean checkout of the commit" goes on the Wave 2 list.
 
 ### DEC-504 — W1-30: the three points the last fix closed in part are residuals; W1-30 closes
@@ -5576,7 +5576,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - Delegated to the orchestrator, stricter-only: the guard refuses any agent tool call whose expanded file targets (globs included, DEC-108) include the project's held-out file under `governance/project/` (the owner's answer names its path). The orchestrator chooses the ticket.
 
 ### DEC-509 — DEC-499 to DEC-502 are accepted
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Ratifies:** DEC-499, DEC-500, DEC-501, DEC-502
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Ratifies:** DEC-499, DEC-500, DEC-501, DEC-502 · **Class:** history
 - **Decision:** DEC-499, DEC-500, DEC-501 and DEC-502 stand as written, including the orchestrator's correction to DEC-501.
 
 ### DEC-510 — Exit package: the tools the CI runner still needs, each as an install for the owner to approve
@@ -5869,7 +5869,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - The generated `.claude/**` output is the owner's to apply at the exit, with the other adapters.
 
 ### DEC-538 — DEC-532, DEC-534 and DEC-535 are accepted
-- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Ratifies:** DEC-532, DEC-534, DEC-535
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Ratifies:** DEC-532, DEC-534, DEC-535 · **Class:** history
 - **Decision:** DEC-532, DEC-534 and DEC-535 stand as written.
 
 ### DEC-539 — How the orchestrator applies DEC-537: the paths W1-35 gains and what the skill may hold
@@ -5886,7 +5886,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 148. Owner answers to package P-19 (W1-32, `gov status`) (register v0.148, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-540 — P-19.1: `gov status` shows the governance share as "not measured", with the counter's reason
-- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 1 option (a) · **Under:** DEC-491
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 1 option (a) · **Under:** DEC-491 · **Class:** history
 - **Decision:** `gov status` shows the governance share as "not measured", with the counter's reason. Per-session attribution stays on the Wave 2 list (the launch record).
 
 ### DEC-541 — P-19.2: the natural-language route to `gov status --json` goes into the W1-35 follow-up; W1-32 closes
@@ -6068,7 +6068,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** Building the two findings of deliberate shape (a serial case that ends its own process with exit code 0; a project file that stands in for the close's plugin) in the follow-up after W1-41, with that follow-up's own probe, is accepted. Until it merges, the orchestrator keeps reading the test runs of each close itself.
 
 ### DEC-560 — Outside sources at this repository's adoption step: two kinds
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-511, DEC-520, DEC-522, DEC-551
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-511, DEC-520, DEC-522, DEC-551 · **Class:** history
 - **Decision:**
   - Decisions and evidence the repository relies on (the `OWNER-…` ids; the evidence record of `EXP-001`) are imported as records, each with its origin path and its sha256 recorded.
   - Ids of the research catalogues (`S0a-G-…`, and S0b2's `G-…`) are listed as external references (DEC-520).
@@ -6105,7 +6105,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** Until it is fixed, W1-16's `test_this_repository_is_not_indexed_by_the_run` is treated like a case of DEC-372: when it fails in a regression or a close it is re-run alone, and it is named for the exit auditor. W1-30 closes now. In the follow-up after W1-41 a test designer narrows the case to watch only the index stores, not the whole runtime folder.
 
 ### DEC-564 — EXP-001's evidence file: its place, and its import at the adoption step
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-152, DEC-560
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-152, DEC-560 · **Class:** history
 - **Decision:** EXP-001's evidence file is at `/home/usain/gov-os-workbench/spike-sandbox/EVIDENCE.md`. It is read by that exact path only; the folder is never listed. It is imported as a record at the adoption step, with its origin path and its sha256 (DEC-560). The orchestrator confirmed on 2026-10-09 that the file exists (266 lines; sha256 `84ce1d1390d40a25ae1b5a8af224db871132ebcd8d5b0842b64796f1e0ad7714`); the import checks the bytes against that value.
 
 ### DEC-565 — The schema findings a probe record adds are known growth; the probe type enters the kernel's record schema in the follow-up after W1-41
@@ -6467,17 +6467,17 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Measured before it (the orchestrator, harness 2.1.288, a throwaway project):** the harness starts every hook in the session's current folder; after one `cd` a hook registered by a relative path cannot start; the failed-call event is raised for a failed Bash command.
 
 ### DEC-604 — P-39: the operator moves the three scratch files out of the runtime folder; briefs and logs name a canary by its id
-- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-39 option (b) · **Under:** DEC-602
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-39 option (b) · **Under:** DEC-602 · **Class:** history
 - **Decision:**
   - The operator moves the three files of the orchestrator's scratch folder in which the secrets-indexing check finds a string out of the runtime folder into `~/gov-os-workbench/archive/orchestrator-logs/`, and each file's original path and sha256 are recorded in `governance/project/bootstrap.md`, so the evidence stays whole and traceable.
   - **New brief rule, from now on:** briefs and logs refer to a canary or planted secret by its id, never by its value.
 
 ### DEC-605 — P-40: `gov` is installed for this user, by the owner
-- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-40 option (a), approved and done · **Under:** DEC-083 · **Changed by:** DEC-822
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-40 option (a), approved and done · **Under:** DEC-083 · **Changed by:** DEC-822 · **Class:** history (settled by DEC-822)
 - **Decision:** The owner installed `gov` through the operator: `python3 -m pip install --user --break-system-packages -e /home/usain/Dynamic-Agentic-Engineering-OS`. Result: gov 0.1.0, its script at `/home/usain/.local/bin/gov`, `import gov` resolving to this repository's `src/gov/__init__.py`, PyYAML already present. The install created the git-ignored metadata folder `src/gov.egg-info/`, which stays. No tracked file changed. It is recorded in the tool registry with this approval, and in the exit package as a runner tool.
 
 ### DEC-606 — DEC-600, DEC-601 and DEC-602 are accepted
-- **Status:** ACCEPTED (owner, 2026-10-10)
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Class:** history
 - **Decision:** The orchestrator's delegated decisions DEC-600, DEC-601 and DEC-602 are accepted.
 
 ### DEC-607 — The run of DEC-603 on `DAEO-7nne` reopened: its bounds
@@ -6545,7 +6545,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 180. Owner answers to P-39 (done) and P-41, on DEC-607 to DEC-610 and on what the dev-tier clone showed; the fix round before adoption (register v0.180, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-611 — P-39 is done: the operator moved the three scratch files into the workbench archive
-- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, done through the operator · **Under:** DEC-604
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, done through the operator · **Under:** DEC-604 · **Class:** history
 - **Decision:** The operator moved the three scratch files into `~/gov-os-workbench/archive/orchestrator-logs/`. Each sha256 matched the orchestrator's expected value before the move, and still matches in the archive:
   - `.gov-runtime/scratch/orchestrator/briefs/W1-15-A5-head.md` (3,420 bytes, `01d488c53cc56f1d6f59ee8a4c89d6f80b45e6a3e2df7b089306d1e28ed45d32`) → `~/gov-os-workbench/archive/orchestrator-logs/W1-15-A5-head.md`
   - `.gov-runtime/scratch/orchestrator/briefs/W1-15-A5.md` (9,720 bytes, `a14cf4dba37034fd7c144e4ae5c421ec0192803576f0764b2d0e82f84b706fae`) → `~/gov-os-workbench/archive/orchestrator-logs/W1-15-A5.md`
@@ -6581,11 +6581,11 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** As proposed: a path map that moves nothing, and an independent auditor's verdict before the migration stage. The old `cli/` tree is retired in this step, unless the auditor finds live code that still uses it.
 
 ### DEC-618 — DEC-607, DEC-608, DEC-609 and DEC-610 are accepted
-- **Status:** ACCEPTED (owner, 2026-10-10)
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Class:** history
 - **Decision:** The orchestrator's delegated decisions DEC-607, DEC-608, DEC-609 and DEC-610 are accepted.
 
 ### DEC-619 — What the dev-tier clone showed is checked in the adoption step and the exit run
-- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER · **Under:** DEC-584, DEC-610
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER · **Under:** DEC-584, DEC-610 · **Class:** history
 - **Decision:** The clone findings (`copier copy` stopping at an existing `.gitignore`, `gov doctor` unhealthy in the clone, the empty lexical index after a rebuild, adapter-portability expecting a product tool registry, `openspec` not on PATH) are each checked in the adoption step and the exit run. Any that holds up and breaks an exit criterion comes to the owner as a package; the rest are classified under section 11 of the orchestrator prompt.
 - **The order from here:** the fix round, the adoption step with the owner's exit package, W1-42, then W1-43.
 
@@ -6683,7 +6683,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 186. This repository is adopted (register v0.186, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-625 — The adoption ran to its last stage; the auditor's verdict is taken as given; the trailers base moves to the adoption's last commit
-- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11; the owner's acceptance is asked) · **Basis:** the eight stage records under `governance/adoption/` (commits `f0d47572` to `1c33dd28`), the auditor's verdict `docs/audit/wave-1/adoption-path-map-verdict.md` (commit `b87ac775`, session `d9976438-5046-42b8-96a2-b28318846ce1`, its return in `log/adoption-auditor.json`), `gov check` on the real store before the stages (`log/check-after-ctx-data.json`) · **Under:** DEC-615, DEC-617, DEC-619, DEC-624
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11; the owner's acceptance is asked) · **Basis:** the eight stage records under `governance/adoption/` (commits `f0d47572` to `1c33dd28`), the auditor's verdict `docs/audit/wave-1/adoption-path-map-verdict.md` (commit `b87ac775`, session `d9976438-5046-42b8-96a2-b28318846ce1`, its return in `log/adoption-auditor.json`), `gov check` on the real store before the stages (`log/check-after-ctx-data.json`) · **Under:** DEC-615, DEC-617, DEC-619, DEC-624 · **Class:** history
 - **Decision:**
   - **The verdict is a pass and stage A5 accepted it:** the path map names for deletion exactly the 116 tracked files of `cli/` and keeps the other 1,596; nothing live uses the tree (no import in `src/`, the packaging holds `src` only, no use in the template, the check declarations, the hooks source, the rulesync sources or the plan's tools; the unit suite with the tree removed: 1,888 passed, 1 skipped). Stage A6 deleted the tree in one batch (`cb2f641e`; rollback ref `refs/gov/adoption/rollback/batch-1`, backup ref `refs/gov/adoption/backup/8b23e345a02b`) and rebuilt the three indexes; stage A8 retired nothing and names the adapter generation as the step that follows, which is the owner's (DEC-616).
   - **The orchestrator's brief was wrong in one word:** it called `cli/` a Rust prototype; the auditor found a Python package (83 Python files with data and fixtures). The decision and the 116 files are the same either way.
@@ -6720,11 +6720,11 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** Option (a). The context-reproducibility check measures the project's own tickets only, not the kernel's template ticket. One short round on a reopened `DAEO-2lwj` covers both P-42 and P-43, test designer first, with a probe.
 
 ### DEC-629 — DEC-620 to DEC-626 are accepted
-- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Class:** history
 - **Decision:** The orchestrator's delegated decisions DEC-620, DEC-621, DEC-622, DEC-623, DEC-624, DEC-625 and DEC-626 are accepted.
 
 ### DEC-630 — The dev tiers variable is set by the operator; the running orchestrator session passes it explicitly
-- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-616
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-616 · **Class:** history
 - **Decision:** `GOV_DEV_TIERS` is set to `/home/usain/gov-os-workbench/synthetic` in the env block of the local settings file under `.claude/`, through the operator. Sessions started after it see it. The orchestrator's session started before it, so it passes `GOV_DEV_TIERS=/home/usain/gov-os-workbench/synthetic` explicitly on any command it runs itself (`gov check` included) until its next fresh session.
 
 ### DEC-631 — The adapter output is not applied blind: a settings comparison first, with no deny value displayed
@@ -6796,11 +6796,11 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** The Claude Code pin is raised to 2.1.292 and the CLI is updated to match (`claude install 2.1.292`, through the operator); then its registry entry is re-recorded. It is done before W1-42's measurements, at a quiet moment the orchestrator announces.
 
 ### DEC-638 — Checklist A6: the `pytest-xdist` checksum mismatch is a Wave 2 residual
-- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Class:** history
 - **Decision:** The `pytest-xdist` checksum mismatch that `gov doctor` reports is a Wave 2 residual, with no step now.
 
 ### DEC-639 — DEC-633 and DEC-634 are accepted
-- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Class:** history
 - **Decision:** The orchestrator's delegated decisions DEC-633 and DEC-634 are accepted.
 
 ### DEC-640 — After the round: the second comparison, then one operator block
@@ -6829,7 +6829,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 192. Owner: DEC-641 accepted (register v0.192, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-642 — DEC-641 is accepted
-- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Class:** history
 - **Decision:** The orchestrator's delegated decision DEC-641 is accepted.
 
 | Version | Date | Change |
@@ -6906,7 +6906,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - **The apply block (A3 steps 1 to 8) is done** through the operator with nothing refused or unexpected: the env names are `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`, `CLAUDE_CODE_SUBAGENT_MODEL` in the owner's user-level settings; the dry run and real run both reported "deny rules: in force 8, generated 8, lost 0, added 0" and "generated files: 44 (new 37, changed 7)"; adapter-portability returned findings `[]`, exit 0 (kernel files 29, generated files 44); commit `8bb34efe` with 45 paths (37 added, 8 modified) and trailers `Task: DAEO-gjjf`, `Role: owner`, `Implements: CAP-44.b`; Claude Code CLI 2.1.292 installed, sha256 `a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`.
 
 ### DEC-649 — Claude Code CLI raised to 2.1.292 (DEC-197, DEC-637)
-- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-083, DEC-197, DEC-203, DEC-637 (DEC-083 added to this line on 2026-10-13 under DEC-665: the record lacked it)
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-083, DEC-197, DEC-203, DEC-637 (DEC-083 added to this line on 2026-10-13 under DEC-665: the record lacked it) · **Class:** history
 - **Decision:** The Claude Code CLI pin is raised to 2.1.292. The binary at `~/.local/share/claude/versions/2.1.292` has sha256 `a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`. The registry entry is updated. This session runs on the new binary.
 
 | Version | Date | Change |
@@ -6930,7 +6930,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - **Wave 2 list addition:** "`gov close` counts adoption-gap refusals toward escalation, against DEC-492." The counter should not count refusals that DEC-492 says are not escalation-worthy; until fixed, the new rule above is the workaround.
 
 ### DEC-652 — All-green `gov check` on the adopted repository noted
-- **Status:** ACCEPTED (owner, 2026-10-12)
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Class:** history
 - **Decision:** The owner notes that `gov check` returned ALL GREEN at `93bcb247` on the adopted repository for the first time. This is the state from which W1-42 (the exit run) starts.
 
 | Version | Date | Change |
@@ -6989,7 +6989,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - row 15 (interfaces) stays as is.
 
 ### DEC-657 — P-3: the ARGUS (b-dev) feature answers
-- **Status:** ACCEPTED (owner, 2026-10-12) · **Basis:** the W1-42 lead's P-3 (specification `ARGUS-sp01`, 13 required rows open, gap tickets `ARGUS-gp01` to `gp13`)
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Basis:** the W1-42 lead's P-3 (specification `ARGUS-sp01`, 13 required rows open, gap tickets `ARGUS-gp01` to `gp13`) · **Class:** history
 - **Decision:** all of the lead's recommendations are accepted:
   - raw data and final images only;
   - the caller states the kind from a fixed list;
@@ -7016,7 +7016,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - B2 (the manual freeze, pause and lift check) comes as plain-terminal steps for the owner himself, on the `a-dev-exit` throwaway clone, with the expected output of each step. The operator cannot lift a freeze, by design (DEC-409).
 
 ### DEC-661 — DEC-654 accepted
-- **Status:** ACCEPTED (owner, 2026-10-12)
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Class:** history
 - **Decision:** the owner accepts the orchestrator's delegated DEC-654 (the lead's P-6 on the Wave 2 list; the lead's deviation recorded for the exit auditor).
 
 | Version | Date | Change |
@@ -7069,7 +7069,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
   - For the record: the close notes of W1-30 and W1-38 said "no code change since the clean regression of DEC-647". That was wrong: the apply commit lay between, and no suite was run after it.
 
 ### DEC-666 — ARGUS: a "now" earlier than `created_at` is refused with `ValueError`
-- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-657 · **Basis:** the W1-42 lead's run 2 package 3, the part left open by DEC-662 (the lead: keep, low confidence; the orchestrator: refuse)
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-657 · **Basis:** the W1-42 lead's run 2 package 3, the part left open by DEC-662 (the lead: keep, low confidence; the orchestrator: refuse) · **Class:** history
 - **Decision:** `retention_decision` refuses a "now" earlier than `created_at` with `ValueError`, as it refuses a missing timestamp.
 
 ### DEC-667 — `gov doctor` exiting 3 on version drift goes to the Wave 2 list, named for the exit auditor
@@ -7125,7 +7125,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
   - If an escalation blocks, the orchestrator stops for the owner (DEC-651).
 
 ### DEC-673 — Durable backups of the W1-42 exit clones are made by the operator, outside the repository
-- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-604, DEC-611 · **Basis:** the orchestrator's report: the two safety copies of the exit clones stood under `.gov-runtime/scratch/orchestrator/`, where the secrets-indexing check found the synthetic programmes' planted secrets in them (ten files) and went red; the orchestrator moved them to its session scratchpad under `/tmp`, so the live clones and their copies are all under `/tmp` now
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-604, DEC-611 · **Basis:** the orchestrator's report: the two safety copies of the exit clones stood under `.gov-runtime/scratch/orchestrator/`, where the secrets-indexing check found the synthetic programmes' planted secrets in them (ten files) and went red; the orchestrator moved them to its session scratchpad under `/tmp`, so the live clones and their copies are all under `/tmp` now · **Class:** history
 - **Decision:**
   - In its next report the orchestrator gives the owner the exact paths of the two live clones and of the two safety copies.
   - The operator copies them to `~/gov-os-workbench/archive/w1-42-exit-clones/`, outside the repository and outside any scanned folder.
@@ -7180,7 +7180,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
   - **The Stop hook is ruled out as a user-level cause:** the owner's user-level settings have no hooks block at all, checked by the operator, so no user-level Stop or SubagentStop hook exists. The case builds its own temporary project, whose settings register PreCompact, SessionStart and PostCompact only.
 
 ### DEC-677 — The exit report states the governance share per ticket as estimated share, measured parts, and the measured total where a close record exists
-- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-086, DEC-106, DEC-655, DEC-663 · **Basis:** the orchestrator's measurement with the merged reader (`log/share-*.json`): no refusal, version 2.1.292 on every ticket; estimated shares of 0.95 % to 4.2 %; the measured total "not measured" on every ticket, for want of a close record and, on three tickets, for an attachment type no specimen shows
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-086, DEC-106, DEC-655, DEC-663 · **Basis:** the orchestrator's measurement with the merged reader (`log/share-*.json`): no refusal, version 2.1.292 on every ticket; estimated shares of 0.95 % to 4.2 %; the measured total "not measured" on every ticket, for want of a close record and, on three tickets, for an attachment type no specimen shows · **Class:** history
 - **Decision:** option (a).
   - The exit report gives, per ticket, the estimated share, the measured parts, and the measured total wherever a close record exists, with "not measured" and its reason elsewhere.
   - The exit auditor judges exit criterion 4 on that.
@@ -7195,15 +7195,15 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 - **Which applied (the orchestrator's reading of a-dev's history, 2026-10-13): option (d).** `540004a` (2026-10-12 11:12, the lead's commit that created the ticket file of ORION-im01) is not the adoption's last commit: the adoption stages A6 (`1aadf0e`) and A8 (`bb1852e`, 2026-10-13 17:41) were committed after it. No trailers base is set. ORION-im01 stays as it is, its refused close reported, with no disposition.
 
 ### DEC-679 — The a-dev namespace that holds the secret-named files is left for Wave 1
-- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-662
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-662 · **Class:** history
 - **Decision:** the permitted roles of that namespace stay as written. A named residual.
 
 ### DEC-680 — DEC-674 accepted
-- **Status:** ACCEPTED (owner, 2026-10-13)
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Class:** history
 - **Decision:** the owner accepts the orchestrator's delegated DEC-674.
 
 ### DEC-681 — The exit clones are backed up outside the repository; the copies go into the exit report's evidence list
-- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-673
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-673 · **Class:** history
 - **Decision and record:** the backups were made through the operator, with `cp -a`, to `~/gov-os-workbench/archive/w1-42-exit-clones/`. The sources under `/tmp` are untouched. Every clone is clean, and the entry counts match the sources:
   - `live/a-dev-exit` at `82dca10` (repair ticket `ade-5rcs`, from `gov close ORION-im01`'s refusal);
   - `live/b-dev-exit` at `fc28272` (repair ticket `bde-0kr6`, from `gov close ARGUS-im01`'s refusal);
@@ -7353,12 +7353,12 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
   - If it does not reproduce, the lead reports that. (Run 6's stand-in did not reproduce it; that result was lost with the clones and is re-measured.)
 
 ### DEC-698 — A backup of both exit clones after every W1-42 run that changes a clone; the operator's heads of DEC-691
-- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-673, DEC-681, DEC-691
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-673, DEC-681, DEC-691 · **Class:** history
 - **Decision:** from now on, after every W1-42 run that changes a clone, the orchestrator tells the owner, and the operator copies both clones into the archive.
 - **The heads of DEC-691's copy, given by the operator:** `~/gov-os-workbench/archive/w1-42-exit-clones/live-run4-a-dev-exit/` holds the a-dev clone with its feature branch at `30996b6` and its main at `2d3d098`, clean. The b-dev clone's copy is `~/gov-os-workbench/archive/w1-42-exit-clones/live/b-dev-exit/` at `fc28272`.
 
 ### DEC-699 — After the restart of 2026-10-14: run 6's clone work is lost and is redone; the clones are restored under `/tmp`
-- **Status:** ACCEPTED (owner, 2026-10-14; the owner's acceptance of `/tmp` was given on the condition, found true by the orchestrator, that a lead can write nowhere else) · **Under:** DEC-673, DEC-687, DEC-693, DEC-698
+- **Status:** ACCEPTED (owner, 2026-10-14; the owner's acceptance of `/tmp` was given on the condition, found true by the orchestrator, that a lead can write nowhere else) · **Under:** DEC-673, DEC-687, DEC-693, DEC-698 · **Class:** history
 - **What happened:** the PC was restarted while W1-42's lead of run 6 was in its final verify, after its report's commit. The restart cleared `/tmp`, and with it both live exit clones. Nothing was running afterwards. The branch `w1/W1-42` stands at `42add8c9`, clean.
 - **What was lost (run 6's work in the clones after the backup's heads):** in a-dev, eight commits on the feature branch and one merge on main (`8efdecc` ADR-012, `8386e8f` ticket ORION-ad04, `9c7afa2` its start, `426dd51` the path-map edit by a product-spec session, `4b16fb5` its close, `2864195` and `c063857` the repair ticket ade-5rcs completed and closed, `0aef4b9` the merge into main), two full rebuilds with embeddings (3,379 vectors), the bare remote `ci-local` under `target/ci-remote.git` with its pushes, `gov ci` in its full form, the two scenario retrievals, `gov doctor`, and the stand-in project of the placeholder check. b-dev was not touched in run 6.
 - **The corrected exit report at `42add8c9` is unverified** until that work is redone and re-measured; it is corrected again from the new results.
@@ -7374,7 +7374,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 ## 211. The W1-41 round of DEC-694: one delegated, stricter-only reading (register v0.211, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-700 — At adoption, a namespace without `embedding_policy` is refused like a namespace with another value
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416 as a stricter-only decision, 2026-10-14; told to the owner, who may replace it) · **Under:** DEC-380, DEC-388, DEC-694
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416 as a stricter-only decision, 2026-10-14; told to the owner, who may replace it) · **Under:** DEC-380, DEC-388, DEC-694 · **Class:** history
 - **Why now:** the owner's scope (DEC-694) has adoption refuse a target path map "where a namespace has another value". The template's own path map states no `embedding_policy` for any namespace, so if a missing field passed, every project adopted from the template would still end with nothing embedded and no refusal: the gap of DEC-686 would stay open.
 - **Decision** (P3, reversible, confidence medium-high; it only makes adoption refuse more, and it does not block the owner's own actions):
   - At adoption's path-map stage a namespace without the field counts as "another value": adoption states every namespace's policy explicitly, as one of `embedded` and `not embedded`.
@@ -7475,7 +7475,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 - **Decision:** option (a). The orchestrator runs `git reset --mixed d6d45759` in the W1-42 worktree, keeping every file on disk. It is an unpushed ticket branch, so this does not rewrite shared history.
 
 ### DEC-711 — The two foreign commits stay in the local object store, named for the exit auditor
-- **Status:** ACCEPTED (owner, 2026-10-15) · **Under:** DEC-604, DEC-673, DEC-710
+- **Status:** ACCEPTED (owner, 2026-10-15) · **Under:** DEC-604, DEC-673, DEC-710 · **Class:** history
 - **Decision:** option (a). `4b051fde` and `dc6aa34c` are left in this repository's local object store, reachable through the reflog, and named for the exit auditor. They were never pushed. The planted key in `dc6aa34c`'s tree (under `tools/deploy_keys/`, named by its folder only) is a synthetic test secret; it was never on disk in a tree of this repository.
 
 ### DEC-712 — The hooks are removed until W1-42 is merged; the hook's git environment is the FIRST item of the Wave 2 list, fixed before any pilot adoption of an owner repository
@@ -7495,7 +7495,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 - **Decision:** option (a). `w1/W1-42` is merged into `w1/integrate` with its three red cases named in the exit report. After the worktree is removed the orchestrator records the worktree list. RETR-X-02 and the per-programme governance share stay as NOT MET evidence for the owner's exit decision.
 
 ### DEC-714 — The intended exit: Wave 1 passes with named, accepted exceptions; an adoption-readiness block opens Wave 2
-- **Status:** ACCEPTED (owner, 2026-10-15) · **Under:** DEC-584, DEC-687, DEC-712, DEC-713
+- **Status:** ACCEPTED (owner, 2026-10-15) · **Under:** DEC-584, DEC-687, DEC-712, DEC-713 · **Class:** history
 - **Decision:** the owner's intended exit is that Wave 1 passes with named, accepted exceptions. Each of these goes into an **adoption-readiness block** that opens Wave 2 and must pass before any pilot adoption:
   - ARGUS's incomplete cycle (b-dev adopted to A2);
   - the three reds left in the a-dev clone: context reproducibility, claims, schema;
@@ -7565,7 +7565,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 ## 220. The owner's exit decision of 2026-10-16: Wave 1 passes with accepted exceptions (register v0.220, prepared by the W1 orchestrator on branch `w1/integrate`, committed by the owner)
 
 ### DEC-718 — Wave 1 passes with accepted exceptions: every finding of the exit audit and every exception of DEC-714 is named with what closes it and its Wave 2 owner; the adoption-readiness block passes before any pilot adoption
-- **Status:** ACCEPTED (owner, 2026-10-16; committed by the owner with `Role: owner`) · **Under:** DEC-412, DEC-465, DEC-565, DEC-584, DEC-626, DEC-704, DEC-712, DEC-714, DEC-715, DEC-716, DEC-717 · **Basis:** the W1-43 exit audit, `docs/audit/wave-1/W1-43-wave-1-exit-audit.md` with its context pack beside it. The owner committed both in a plain terminal as `82459573`, after the auto-mode classifier had refused the auditor's commit and then the operator's, and after the owner had the lefthook hooks uninstalled again (F-M13). The verdict is FAIL as the record stands at `60ea6924`, with no BLOCKER. It has 13 MAJOR findings (F-M1 to F-M13) and 10 MINOR (F-m1 to F-m10). The auditor's option (a): one owner decision, committed with `Role: owner`, accepts the findings as named exceptions, each with what closes it and a Wave 2 owner on one consolidated Wave 2 list. That turns the verdict into PASS WITH ACCEPTED EXCEPTIONS without further audit work. Since the audit the owner has switched auto mode off (`permissions.disableAutoMode`) and made accept-edits the default mode, with an owner-curated allow list; agents may not `git push`. · **Changed by:** DEC-900: item 11's first exception (RETR-X-02) is closed by the owner's AR-9 ruling, the stated gap; W1-42's two accepted reds are retired with their entries. · **Changed by:** DEC-953
+- **Status:** ACCEPTED (owner, 2026-10-16; committed by the owner with `Role: owner`) · **Under:** DEC-412, DEC-465, DEC-565, DEC-584, DEC-626, DEC-704, DEC-712, DEC-714, DEC-715, DEC-716, DEC-717 · **Basis:** the W1-43 exit audit, `docs/audit/wave-1/W1-43-wave-1-exit-audit.md` with its context pack beside it. The owner committed both in a plain terminal as `82459573`, after the auto-mode classifier had refused the auditor's commit and then the operator's, and after the owner had the lefthook hooks uninstalled again (F-M13). The verdict is FAIL as the record stands at `60ea6924`, with no BLOCKER. It has 13 MAJOR findings (F-M1 to F-M13) and 10 MINOR (F-m1 to F-m10). The auditor's option (a): one owner decision, committed with `Role: owner`, accepts the findings as named exceptions, each with what closes it and a Wave 2 owner on one consolidated Wave 2 list. That turns the verdict into PASS WITH ACCEPTED EXCEPTIONS without further audit work. Since the audit the owner has switched auto mode off (`permissions.disableAutoMode`) and made accept-edits the default mode, with an owner-curated allow list; agents may not `git push`. · **Changed by:** DEC-900: item 11's first exception (RETR-X-02) is closed by the owner's AR-9 ruling, the stated gap; W1-42's two accepted reds are retired with their entries. · **Changed by:** DEC-953 · **Class:** history
 - **Decision:**
   1. **Wave 1 passes with accepted exceptions** (the auditor's option (a)). The exit verdict is PASS WITH ACCEPTED EXCEPTIONS. Every finding below is an accepted exception, named with what closes it and its Wave 2 owner.
      - "Wave 2 owner" names the role that does the work. The orchestrator coordinates every item; *owner* marks the owner's own acts.
@@ -7959,7 +7959,7 @@ On 2026-10-16 four lead returns were in:
 The orchestrator put packages P-W2-9 to P-W2-14 to the owner, with a digest of delegated choices. The owner answered every package on 2026-10-17 and asked for one batch, with the Charter amendment.
 
 ### DEC-738 — The orchestrator's delegated choices of 2026-10-16, accepted by the owner
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (delegated by the orchestrator under MR-6 and DEC-220; accepted by the owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-737, DEC-413, DEC-479, DEC-730, DEC-723
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (delegated by the orchestrator under MR-6 and DEC-220; accepted by the owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-737, DEC-413, DEC-479, DEC-730, DEC-723 · **Class:** history (one-off, done)
 - **Decision:**
   1. **Where an engineer ticket's CIT-P and CIT-E are committed (W2-50's P-B (a)).** The guard gives a session paths only when its role is the ticket's `role:`. So on an engineer ticket the engineer commits the CIT-P draft word for word, with the owner's answers, in a commit of its own before any code, and later writes the CIT-E. The same holds for W2-09.
   2. **The plan validator in lead briefs.** No lead or worker runs `docs/plan/tools/validate_s1.py`. It is Wave 1's validator: it fails on Wave 2's tree, and by default it reads `~/gov-os-workbench` and `docs/source/`. A lead names it as not run. This is stricter only.
@@ -8818,7 +8818,7 @@ W2-05's second and last review (DEC-413) failed on F-A (a declared check running
 The orchestrator pointed out that DEC-804 (F-B and D-1 ride along in W2-05's resume) contradicted DEC-801 (deliberate constructions are Wave 3 rows). The owner answered that DEC-801 wins, and made the threat model structural.
 
 ### DEC-807 — F-B and D-1 are Wave 3 rows; F-A stays (DEC-804 amended)
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-801, DEC-804, DEC-803, DEC-710 · **Basis:** DEC-804 contradicted DEC-801; DEC-801 wins.
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-801, DEC-804, DEC-803, DEC-710 · **Basis:** DEC-804 contradicted DEC-801; DEC-801 wins. · **Class:** history (one-off, done)
 - **Decision:**
   1. **F-B** (`GIT_OBJECT_DIRECTORY` or alternates set by hand) **and D-1** (replace refs) are deliberate constructions: rows for the Wave 3 hardening pass (W2-M375, W2-M376), removed from W2-08's entry criteria and from W2-05's resume.
   2. **F-A stays:** a project's own check running git during a hooked commit is what happened for real in Wave 1 (DEC-710), so an honest setup hits it. It remains an entry criterion of W2-08 and rides along in W2-05's resume, with P-1.
@@ -8924,7 +8924,7 @@ The owner committed DEC-782 to DEC-812 (`9d44601d`) and answered the four open p
 - **Decision:** W2-37's allowed paths gain the impact-assessment section of `template/governance/kernel/skills/change/SKILL.md` and that section of its synced copies `template/.rulesync/skills/change/SKILL.md`, `.rulesync/skills/change/SKILL.md` and `.claude/skills/change/SKILL.md` (byte copies, the last rulesync's output). Done in W2-37's resume after W2-03 closes, before its fresh probe (DEC-802).
 
 ### DEC-817 — The owner's exception to accepted recommendations (standing for DEC-814 to DEC-816)
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-801, DEC-802, DEC-768 item 4, DEC-779 · **Basis:** the owner's answer of 2026-10-19.
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-801, DEC-802, DEC-768 item 4, DEC-779 · **Basis:** the owner's answer of 2026-10-19. · **Class:** history (one-off, done)
 - **Decision:** if applying DEC-814, DEC-815 or DEC-816 turns out to add a round, or to loosen the guard, the sandbox or a check, the orchestrator does not apply it: it brings it back to the owner as a package. The orchestrator's reading at the time of staging: none of the three adds a round (each rides in a resume that happens anyway, DEC-802) and none loosens the guard, the sandbox or a check (W2-52's and W2-37's engineers already run in the old form for the code graph, DEC-799; the paths widen by named files only).
 - Next free id: DEC-818.
 
@@ -9011,7 +9011,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   5. The countdown reports the close success rate.
 
 ### DEC-824 — P-S3 (a): Wave 2's working rules are committed, in this batch
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with the files it governs, in the next batch) · **Under:** DEC-819, DEC-724, DEC-731, DEC-732, DEC-733, DEC-738, DEC-673, DEC-780, DEC-799, DEC-801 · **Basis:** P-S3 (lens C F-1, F-2, F-8, F-9, R-1, R-2, R-8; lens E F2, F10, R2, R9).
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with the files it governs, in the next batch) · **Under:** DEC-819, DEC-724, DEC-731, DEC-732, DEC-733, DEC-738, DEC-673, DEC-780, DEC-799, DEC-801 · **Basis:** P-S3 (lens C F-1, F-2, F-8, F-9, R-1, R-2, R-8; lens E F2, F10, R2, R9). · **Class:** history (one-off, done)
 - **Decision, applied in this batch:**
   1. **The w2 prompt becomes v2:** §4 and A5 take the launch forms of DEC-731 and DEC-799; A5 adds DEC-732, DEC-733, DEC-738 item 2 and DEC-673; A1 and A2 state Policy 2 (c) (DEC-820, DEC-826 Q2); A3 carries DEC-801's list of deliberate constructions; §2 and §12 take Policy 2; §7 takes DEC-818; a new §15 holds the orchestrator's standing rules that lived only in its checkpoint (DEC-780's closes, DEC-787 and DEC-788's reports, DEC-798's gate, DEC-819's commits); line 1 names the decisions it carries.
   2. **One canonical judgement text:** `governance/project/briefs/JUDGEMENT.md`. The prompt's §14 is its copy; WBS §0 rule 18 and DEC-801 item 2 point to it.
@@ -9065,7 +9065,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   6. **Wave 2 stays paused** until the owner approves the revised plan. It is written only after lenses F and G have reported, and uses both.
 
 ### DEC-830 — P-S9 (a), without the push: a referee outside the agent's machine
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; tool approval under ADR-0001's install rule, DEC-083) · **Under:** ADR-0001, DEC-712, DEC-804, DEC-497 · **Basis:** P-S9 (lens D F6, F7, R5, R6). · **Changed by:** item 4 corrected by DEC-848: the owner's backup push continues (2026-10-19)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; tool approval under ADR-0001's install rule, DEC-083) · **Under:** ADR-0001, DEC-712, DEC-804, DEC-497 · **Basis:** P-S9 (lens D F6, F7, R5, R6). · **Changed by:** item 4 corrected by DEC-848: the owner's backup push continues (2026-10-19) · **Class:** history
 - **Decision:**
   1. The owner approves pytest, openspec and rulesync for the CI runner (row W2-H002), at the versions pinned in the tool registry; their `ci.yml` lines ride in W2-43, and each install on the runner is recorded in the registry.
   2. The plan states that CI's evidence step stays red until the hooks return (W2-08).
@@ -9108,7 +9108,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. A figure short of 85 or of 99 % after W2-15b is a named residual for the owner, with its cause (DEC-725's finish line), not a new round.
 
 ### DEC-834 — Every estimate is recalibrated after keystone 2 (item 1c)
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-829 item 5, DEC-106 · **Basis:** OWNER, 2026-10-19.
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-829 item 5, DEC-106 · **Basis:** OWNER, 2026-10-19. · **Class:** history (one-off, done)
 - **Decision:** when keystone 2 has landed, the orchestrator recalibrates every estimate in the plan from the measured ticket times (claim to merge) and close times of Wave 2 so far, and reports the old and new figures side by side, with the method.
 
 ### DEC-835 — W2-59's scope is approved, with the two packaging gaps; its CIT-P follows (plan §11 item 7; item 1d)
@@ -9181,7 +9181,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. The tickets that move with them: W2-31, W2-34, W2-35, W2-36, W2-38, W2-39, W2-41, W2-44, and W2-19's Rust and TypeScript half, with their rows and the plan's reasons. W2-33 stays, cut down (DEC-832).
 
 ### DEC-842 — DEC-062 and DEC-140 are withdrawn (plan §11 item 4; item 6)
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-825 item 5 · **Basis:** OWNER, 2026-10-19; the plan's §4.5; lens C F-6 · **Withdraws:** DEC-062, DEC-140.
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-825 item 5 · **Basis:** OWNER, 2026-10-19; the plan's §4.5; lens C F-6 · **Withdraws:** DEC-062, DEC-140. · **Class:** history (one-off, done)
 - **Decision:**
   1. **DEC-062** (GitHub through `gh` with a read-only fine-grained token) is withdrawn: it was PROPOSED and landed nowhere; no session has used GitHub through a token. `gh` is the owner's tool, registered as such in W2-22's registry pass.
   2. **DEC-140** (`Task: decision-record` on residual entries in `bootstrap.md`) is withdrawn: Wave 2 keeps residuals in the list, under W2-00's id (DEC-729); delegated decisions keep `Task: decision-record`.
@@ -12967,7 +12967,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.427 | 2026-11-02 | Orchestrator (delegated): DEC-1044. Next free id: DEC-1045. |
 
 ### DEC-1045 — Gitleaks scanning lifted on this repository (switched off by configuration; the feature stays built); its real-gitleaks tests in the nightly only; a full scan weekly only on the owner's approval
-- **Status:** ACCEPTED (owner, 2026-11-02 ~20:57, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-953 (the lifted gates), DEC-968, DEC-1039, DEC-1041 · **Changes:** DEC-893 and DEC-953 §5 practices 6 and 10 (gitleaks on staged content and on close outputs), DEC-966 item 4's nightly full scan, the landing's gitleaks pre-check (DEC-989's `land.py`), `sync_context.py`'s scan, the rebuild's memory-indexing scan (W1-15, DEC-285 to DEC-290) and the secrets-indexing family check, for this repository only · **Made standing by DEC-1170:** the scan stays off on this repository (private, local, nothing public) · **Changed by:** DEC-1182 (1) (no repository scan on Gov OS at all, weekly included)
+- **Status:** ACCEPTED (owner, 2026-11-02 ~20:57, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-953 (the lifted gates), DEC-968, DEC-1039, DEC-1041 · **Changes:** DEC-893 and DEC-953 §5 practices 6 and 10 (gitleaks on staged content and on close outputs), DEC-966 item 4's nightly full scan, the landing's gitleaks pre-check (DEC-989's `land.py`), `sync_context.py`'s scan, the rebuild's memory-indexing scan (W1-15, DEC-285 to DEC-290) and the secrets-indexing family check, for this repository only · **Made standing by DEC-1170:** the scan stays off on this repository (private, local, nothing public) · **Changed by:** DEC-1182 (1) (no repository scan on Gov OS at all, weekly included) · **Class:** history (settled by DEC-1182)
 - **Decision:** (1) All gitleaks scanning is lifted on this repository: the memory-indexing scan in rebuilds, the landing's pre-check, the scans in the closes, the nightly's scan (and, the orchestrator's reading, the CTO's own staged-content scans before record commits and the record branch's sync). Reason: the repository and its GitHub remote are private and will never be shared, so the scanning costs far more than it protects here. A full scan runs once a week only when the owner approves it. (2) The tests that run the real gitleaks run only in the nightly full suite; between tickets only the scoped tests and the acceptance tests, as decided (DEC-968). (3) The feature stays built in the Gov OS and switched off on this repository by configuration, as DEC-953 did for the other lifted gates: every other repository keeps it on by default; the switch is named wherever it acts (`gov check`, `gov doctor`, a rebuild's report), never silent. (4) Applied now in the CTO's tools and the committed orchestration scripts; in the pinned `gov` from re-pin window 2 (the product's configuration switch is an emergency patch with its tests and one review).
 
 | Version | Date | Change |
