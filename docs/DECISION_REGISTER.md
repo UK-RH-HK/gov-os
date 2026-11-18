@@ -1124,7 +1124,7 @@ The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change u
   (`reverted` or `flagged`) and `reason`.
 
 ### DEC-123 — W1-03 KD-2: the nine I-06 forms are tested by their effect; one accepted residual
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-2 · **Under:** ADR-0001
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-2 · **Under:** ADR-0001 · **Class:** retired
 - **Decision:** All nine I-06 forms are tested by their effect inside the repository. A write outside the repository
   through an opaque form (for example `perl -e` or `$(…)`) is seen by neither the guard nor the containment check.
   That is an accepted residual under ADR-0001.
@@ -1165,7 +1165,7 @@ W1-03's `allowed_paths` change under DEC-126 only.
   `governance/project/tool-registry.yaml`. W1-04 ships no registry file; W1-06 creates it at the first install.
 
 ### DEC-128 — The guard's quoting limit is an accepted residual
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limit reported at the W1-02 repair diff check · **Refines:** DEC-115
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limit reported at the W1-02 repair diff check · **Refines:** DEC-115 · **Class:** retired
 - **Decision:** In a Bash write target, a single-quoted or escaped `$NAME` is expanded by the guard although the shell
   keeps it literal. That is accepted as a residual.
 - **Record:** `governance/project/bootstrap.md`, section "Accepted residual".
@@ -1458,7 +1458,7 @@ in `docs/changes/S2-CIT-E.md`.
   shows the temp directory can't be overridden, the shared `$TMPDIR` is recorded as a residual.
 
 ### DEC-160 — P-4: the untested sandbox cases go to a Wave 2 experiment
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-4 option (a) · **Under:** DEC-102
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-4 option (a) · **Under:** DEC-102 · **Class:** retired
 - **Decision:** `denyWrite` on a path that doesn't exist yet, symlink and hard-link tricks, the seccomp filter and
   `bypassPermissions` mode are tested by a Wave 2 experiment. Until then they are residuals.
 
@@ -1506,7 +1506,7 @@ decision packages DP-1 and DP-2, and three additions the owner made in the same 
   is the per-session temp directory, which a research session also gets. The decision is carried against DEC-158.
 
 ### DEC-164 — DP-2: two more sandbox residuals, and no `excludedCommands`
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-2 · **Extends:** DEC-160 · **Under:** DEC-152, DEC-161
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-2 · **Extends:** DEC-160 · **Under:** DEC-152, DEC-161 · **Class:** retired
 - **Decision:**
   - Two points are open residuals: subagents inside a sandboxed worker session, and `excludedCommands`.
   - Both are added to EXP-002, the Wave 2 sandbox experiment of DEC-160.
@@ -1570,7 +1570,7 @@ Owner confirmations of 2026-10-03 on three points the S2 repair raised (`docs/ch
 confirmed DEC-169 as the owner's decision; its entry is unchanged.
 
 ### DEC-170 — Sandbox instruction tokens are reported apart from the governance share
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-07 · **Under:** DEC-086
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-07 · **Under:** DEC-086 · **Class:** retired
 - **Decision:** Sandbox instruction tokens are reported as a separate line in W1-31, not inside the governance share.
   Whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures.
 
@@ -4170,7 +4170,7 @@ orchestrator. Where an answer leaves the ticket to the orchestrator, the choice 
     W1-50 is merged.
 
 ### DEC-399 — W1-28 DP-15: whole-tree fixtures strip the held-out deny line from copied settings files
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, W1-28 package DP-15 option (a) · **Amends:** DEC-385 · **Under:** CAP-58
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, W1-28 package DP-15 option (a) · **Amends:** DEC-385 · **Under:** CAP-58 · **Class:** retired
 - **Decision:** the fixtures that copy the whole tree strip the held-out deny line from the copied
   `.claude/settings.json`, as W1-46's and W1-47's fixtures do. Nobody displays that line. Ticket (orchestrator):
   W1-50 (`DAEO-xnbx`), in the second branch of DEC-402, as a test designer's revision.
@@ -6342,7 +6342,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** The orchestrator's delegated decision DEC-586 (the packages of the follow-up after W1-41, second run) is accepted.
 
 ### DEC-590 — DEC-587 is accepted; the brace-list shape is a deliberate-shape residual with a proposed fix for Wave 2
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-577, DEC-574
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-577, DEC-574 · **Class:** retired
 - **Decision:** The orchestrator's delegated decision DEC-587 is accepted, including the brace-list shape that still reads a held-out folder from an unsandboxed session, as a deliberate-shape residual. It is on the Wave 2 list with the proposed fix: the guard refuses any shell word whose brace expansion would exceed a fixed number of alternatives, whatever its length.
 
 ### DEC-591 — The secrets-indexing check is measured on a quiet machine before W1-42
@@ -7347,7 +7347,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 - **Decision:** the delegated decision DEC-693 stands as recorded: in the a-dev exit clone the namespaces it names say `embedded`, the others `not embedded`, the namespace of the secret-named files unchanged.
 
 ### DEC-697 — The eleven restores: the trace's reading is accepted pending the lead's reproduction
-- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** MR-3, DEC-688, DEC-693
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** MR-3, DEC-688, DEC-693 · **Class:** retired
 - **Decision:** the trace's reading (the sandbox puts placeholders at a denied folder that does not exist, and the post-command check takes them for a change) is accepted pending the lead's reproduction.
   - If it reproduces, it is recorded as a named residual for Wave 2, the same kind as the freeze-flag placeholder.
   - If it does not reproduce, the lead reports that. (Run 6's stand-in did not reproduce it; that result was lost with the clones and is re-measured.)
@@ -8318,7 +8318,7 @@ The owner committed DEC-750 to DEC-756 as `d2f054b5` (`Role: owner`), accepting 
   3. **List rows:** W2-H056, the older copy-through-a-link hole, closed by W2-50; F3 as W2-L349 and F4 with DEC-751 item 7's FIFO finding as W2-L350. DEC-751 items 5 and 6 and DEC-756 item 2 become W2-M361 to W2-M363 (W2-21).
 
 ### DEC-759 — A guard-hardening pass in Wave 3, ranked high
-- **Status:** ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-718, DEC-728
+- **Status:** ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-718, DEC-728 · **Class:** retired
 - **Decision:** W2-H057 (Wave 3, high): a systematic inventory of every command shape that writes (copy into folders, links, merges, opaque interpreters), each with a test, before qualification. Wave 2's reviews found three such holes: MultiEdit, the merge-back, and the copy through a link.
 
 ### DEC-760 — The load-sensitive list's first entries; W2-50's last round runs beside W2-53
@@ -8434,7 +8434,7 @@ W2-53 was merged into `w2/integrate` at `c9537e39` (`Task: DAEO-7rr2`; its tree 
   4. **The orchestrator's own session stays unsandboxed.**
 
 ### DEC-770 — Standing policy: a guard text-reading hole only an unsandboxed session can reach becomes a row
-- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-769, DEC-759, DEC-413
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-769, DEC-759, DEC-413 · **Class:** retired
 - **Decision:**
   1. **Once leads are sandboxed (W2-21 closed),** a hole in the guard's reading of shell text that only an unsandboxed session can reach (the orchestrator's) becomes a list row, not a new round of the ticket that found it.
   2. **Until W2-21 lands, a hole that leads can reach is still fixed** in the ticket that found it, as now.
@@ -12926,7 +12926,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.422 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1039 gains step (1b), the Gov Load Balancer. Next free id: DEC-1040. |
 
 ### DEC-1040 — P1-INVENTORY-1 (a); the guard's parser misreadings fixed now as an emergency patch (W2-42a), live with re-pin window 2
-- **Status:** ACCEPTED (owner, 2026-11-02 ~20:15, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`) · **Under:** DEC-1039, DEC-1033, DEC-958, DEC-953 item 2, DEC-1028 item 4, DEC-866 · **Changes:** W2-42a (`DAEO-03ub`) from "claim when a K3 slot opens" to an emergency patch now; its KPIs gain the replay line
+- **Status:** ACCEPTED (owner, 2026-11-02 ~20:15, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`) · **Under:** DEC-1039, DEC-1033, DEC-958, DEC-953 item 2, DEC-1028 item 4, DEC-866 · **Changes:** W2-42a (`DAEO-03ub`) from "claim when a K3 slot opens" to an emergency patch now; its KPIs gain the replay line · **Class:** retired
 - **Decision:** (1) **P1-INVENTORY-1 (a), as recommended:** D1 to D3, M1, M2 and R1 to R5 now, by test designers with one independent reviewer, once step 1's fixes are live; M1b at the designer's judgement; M4 to M7 later; M3 optional; M9 after the W2-54 revision (merged `88b33a38`). The code list (the report's §6b) to the senior engineer after the infrastructure is stable. Under DEC-866 only DEC-798 is marked superseded (`87510863`); DEC-466, DEC-947 and DEC-929 are left as they are (lifted as gates by DEC-953, not retired; DEC-466 stays in force for the product). (2) **The guard, in the emergency** (72 of 78 refusals since ACT 1 false): P1-GUARD-PARSER-W2 (W2-42a) is brought into the emergency now, as an emergency patch: the parser's misreadings fixed (heredocs, loops and substitutions, and the read-listing rule's misreads of literal paths), replayed against every logged refusal (each false one must now pass, each true one must still be refused) and the planted cases, with one review; live with re-pin window 2. The five rules stay as they are; only the misreadings go. (3) **Standing for the emergency:** everyone in the emergency works round a false refusal at once (a script file or the Edit tool) and keeps going; never a form chosen to pass a true refusal (DEC-849, DEC-958).
 - **Places (DEC-851):** this entry; the emergency plan's RESUME state; the common emergency brief `briefs/EMG-common.md`; W2-42a's ticket file (its KPI line, its own commit); `packages/P1-INVENTORY-1.md` (decided).
 
@@ -12959,7 +12959,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.426 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861) and delegated: DEC-1043. Next free id: DEC-1044. |
 
 ### DEC-1044 — W2-42a: three builder tests of the old unmatched-glob refusal revised by its engineer (delegated)
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1040: P2, reversible, inside W2-42a's KPI line 4; the engineer's recommendation; confidence high; for the owner to overturn) · **Under:** DEC-1040, DEC-1028 item 4
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1040: P2, reversible, inside W2-42a's KPI line 4; the engineer's recommendation; confidence high; for the owner to overturn) · **Under:** DEC-1040, DEC-1028 item 4 · **Class:** retired
 - **Decision:** W2-42a's KPI line 4 (an unmatched glob is the literal path bash passes, not unresolvable) reverses three builder tests of `tests/unit/guard/test_decide.py` that expect an unmatched glob refused (`test_glob_matching_nothing_denied`, `TestBracketGlob::test_bracket_glob_matching_nothing_denied`, `TestProbe3SymlinkGlobBrace::test_bracket_glob_through_symlink_denied`; in the symlink case bash itself fails on the literal path, so nothing is written). W2-42a's allowed paths gain `tests/unit/guard/test_decide.py`; its engineer revises the three to the literal-path rule, each still checking that a write into a protected folder by that literal path is refused (builder tests, not acceptance tests: MR-3 holds). The W2-42a tests branch merged into `w2/W2-42a` (`5cca6398e8ed`) and TESTS-READY written.
 
 | Version | Date | Change |
@@ -13936,7 +13936,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   without a measured gain).
 
 ### DEC-1099 — The sandbox-and-guard experiment's design approved with its ten answers, run beside D-10; W2-88's memory-standard lines adopted, EXAMIN's copy the practice's first full run; the forecast's five proposals; W2-139 and W2-140 merged before D-10
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (1), (4), DEC-1093 (1), DEC-1091, DEC-820, DEC-873, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after SANDBOX-GUARD-EXP-1, W2-88-STANDARD-1 and FORECAST-W2-1 · **Changed by:** DEC-1176; DEC-1128 (4): the experiment as designed loses set-up B (dropped entirely, not a Wave 3 row); set-up A stays · **Changed by DEC-1202:** (3) W2-82's wait on W2-27 dropped (W2-27 left Wave 2, DEC-1201; W2-82 needs no adopted repository)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (1), (4), DEC-1093 (1), DEC-1091, DEC-820, DEC-873, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after SANDBOX-GUARD-EXP-1, W2-88-STANDARD-1 and FORECAST-W2-1 · **Changed by:** DEC-1176; DEC-1128 (4): the experiment as designed loses set-up B (dropped entirely, not a Wave 3 row); set-up A stays · **Changed by DEC-1202:** (3) W2-82's wait on W2-27 dropped (W2-27 left Wave 2, DEC-1201; W2-82 needs no adopted repository) · **Class:** retired
 - **Decision:**
   - (1) **SANDBOX-GUARD-EXP-1 approved.** Q1: write scope (DEC-820 (4)) is in the bar. Q2: the engineer-tests
     conflict accepted (DEC-873; G-14 for the engineer rests on the hook in both set-ups). Q3: a names-only listing of
@@ -14054,7 +14054,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (no false refusal of honest work; evidence that measures the slot, not the machine).
 
 ### DEC-1106 — W2-148: F15 fixed in one exception round to DEC-1010; the guard's call log by its own ACT; the commit freeze in the operator agent's install folder; F7 kept; then ACT-OPERATOR-1
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1104 (2), DEC-1103 (4), DEC-1010, DEC-1099 (1), DEC-1101 (1), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's review round 2 (not READY on F15)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1104 (2), DEC-1103 (4), DEC-1010, DEC-1099 (1), DEC-1101 (1), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's review round 2 (not READY on F15) · **Class:** retired
 - **Decision:**
   - (1) **F15: fixed now,** one exception round to DEC-1010 for W2-148: the agent restores only its own dry-run change
     (a touched file whose live bytes equal the frozen after-copy); for anything else it writes nothing, refuses, holds
@@ -14071,14 +14071,14 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   logged without their contents).
 
 ### DEC-1107 — W2-148's F21 fixed in one tiny extra round before ACT-OPERATOR-1: the owner-undo and crash-recovery paths exit non-zero and say "refused" whenever they leave another's files
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (1), DEC-1010 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's merge (`511a4a17`)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (1), DEC-1010 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's merge (`511a4a17`) · **Class:** retired
 - **Decision:** (a): one tiny extra round, an exception to DEC-1010, before ACT-OPERATOR-1 installs the agent: a designer
   case first, one engineer pass, a narrow review; the owner-undo and crash-recovery paths exit non-zero and say
   "refused" whenever they leave another's files untouched (the P1 and the held lock as before).
 - **Basis:** question 2 (no success code that could hide someone else's change).
 
 ### DEC-1108 — ACT-GUARD-CALLLOG-1's five answers: the location, fields and limits; W2-148's replay from a corpus checked against the log by sha256 both ways; the plain sha256 kept; the log hidden from the W2-56 tuner in a fresh window; every session refused writes into the log folder
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (2)-(3), DEC-1104 (2), DEC-1099 (1) · **Source:** the owner's message (chat, 2026-11-09), after ACT-GUARD-CALLLOG-1 §7
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (2)-(3), DEC-1104 (2), DEC-1099 (1) · **Source:** the owner's message (chat, 2026-11-09), after ACT-GUARD-CALLLOG-1 §7 · **Class:** retired
 - **Decision:**
   - (1) The log's location (`~/.gov-os/guard-calls/<UTC day>.jsonl`), fields and limits approved.
   - (2) **Option 1:** the CTO's tool builds the 48-hour set of actions in the form W2-148's replay reads, and the
@@ -14093,7 +14093,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   session can rewrite).
 
 ### DEC-1109 — The operator agent's briefs: the reviewer's approved, the operator's approved with one change; the rest of the work restarted in parallel; standing: unblocked work keeps moving while an item waits on the owner
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1101 (2), DEC-1104 (2), DEC-1106, DEC-1098 (6) · **Source:** the owner's message (chat, 2026-11-09), after ACT-OPERATOR-1 (`06596e9d`)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1101 (2), DEC-1104 (2), DEC-1106, DEC-1098 (6) · **Source:** the owner's message (chat, 2026-11-09), after ACT-OPERATOR-1 (`06596e9d`) · **Class:** retired
 - **Decision:**
   - (1) **ACT-OPERATOR-1's fixed briefs:** `reviewer-brief.md` approved as written (`e86703304144…`); `brief.md` approved
     with one change: "unless the program's own output asks for it" becomes "unless the program's final result line asks
@@ -14126,7 +14126,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   compactions cannot erase is enforced by a check, not by memory).
 
 ### DEC-1111 — D-10's red-by-design cases: W1-33's auditor case and W1-05's install case report-only until their features return; W1-46's research-install case open
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (2) OPEN (the owner marked no option) · **Under:** DEC-1104 (1), DEC-1061 (3a), DEC-953 · **Source:** the owner's message (chat, 2026-11-09), after `packages/LIFT-1/D10-REDS.md`
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (2) OPEN (the owner marked no option) · **Under:** DEC-1104 (1), DEC-1061 (3a), DEC-953 · **Source:** the owner's message (chat, 2026-11-09), after `packages/LIFT-1/D10-REDS.md` · **Class:** retired
 - **Decision:**
   - (1) **W1-33's auditor case and W1-05's install case stay report-only until their features return,** each taken out
     of the opt-in list by the switch that turns its feature back on (DEC-953).
@@ -14136,7 +14136,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (no gate that reports a known switch over and over).
 
 ### DEC-1112 — The sandbox experiment narrowed to set-up A (set-up B a Wave 3 row); W2-56 builds on the path-map guard alone; what the CTO brings the owner (standing)
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1098 (4), DEC-1099 (1), DEC-936 item 2.5, DEC-1110 (1), DEC-1111 (2) · **Source:** the owner's message (chat, 2026-11-09), after set-up B's fix pass was stopped by a safety check (the third stop on its replay environment) · **Changed by:** DEC-1128 (4): set-up B dropped entirely, not a Wave 3 row; DEC-1128 (2): the tuned guard's changes go live only on set-up A's 100 % on the path map's actions
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1098 (4), DEC-1099 (1), DEC-936 item 2.5, DEC-1110 (1), DEC-1111 (2) · **Source:** the owner's message (chat, 2026-11-09), after set-up B's fix pass was stopped by a safety check (the third stop on its replay environment) · **Changed by:** DEC-1128 (4): set-up B dropped entirely, not a Wave 3 row; DEC-1128 (2): the tuned guard's changes go live only on set-up A's 100 % on the path map's actions · **Class:** retired
 - **Decision:**
   - (1) **The sandbox experiment: (a).** Set-up A (the path-map guard alone) measured fully, as declared, beside D-10;
     set-up B becomes a Wave 3 row, built by a different route. W2-56 builds on the path-map guard alone, with today's
@@ -15005,7 +15005,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-13 (~14:45).
 
 ### DEC-1168 — SANDBOX-1 B4 (a): W2-186 filed, built after the copy starts, DEC-158 and DEC-1114 S9 amended for one loopback port; W2-94's physical step recorded
-- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~15:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1167 (7), DEC-158, DEC-1114, DEC-1128 (4), DEC-974
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~15:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1167 (7), DEC-158, DEC-1114, DEC-1128 (4), DEC-974 · **Class:** retired
 - **Decision:**
   - (1) **SANDBOX-1-B4 (a):** W2-186 (`DAEO-sq3a`) is filed: the shared reranker also listens on one fixed `127.0.0.1:<port>` with a token; the worker sandbox gets exactly that one `allowedDomains` entry and `sandbox.faults` refuses any other. **DEC-158 is amended:** workers' network allowlist is empty except that one loopback `host:port`, never a bare host. **DEC-1114 S9 is amended** the same way. Built after EXAMIN's copy starts; semantic search in the sandbox (a proxy-aware Ollama client) stays parked.
   - (2) **W2-94's physical step (its S2), by the owner's operator, read only:** the workbench copy is clean at `0a82082495f52df068c3c6b518969b419f02fe95`; `EXAMIN APP` is at `a7cf346c28d7ba7b9edf8a18e1bb6e20ab1b19ca` with the same 6 modified and 40 untracked files as before (46 lines with `-uall`); nothing was changed.
