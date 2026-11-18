@@ -69,8 +69,50 @@ def test_default_path_is_the_main_worktree_of_a_linked_tree(tmp_path, monkeypatc
     git(main_tree, "commit", "-q", "--allow-empty", "-m", "c")
     git(main_tree, "worktree", "add", "-q", "--detach", str(tmp_path / "linked"))
     assert memory_use.log_path(tmp_path / "linked") == main_tree.resolve() / ".gov-runtime/memory-use.jsonl"
+    (tmp_path / "linked" / ".gov-runtime").mkdir()  # an index lives in the linked tree: the read is logged
     memory_use.append(record(), tmp_path / "linked")
     assert len(lines(main_tree / ".gov-runtime/memory-use.jsonl")) == 1
+
+
+def _repo_with_linked(tmp_path) -> tuple[Path, Path]:
+    main_tree = tmp_path / "repo"
+    main_tree.mkdir()
+    git(main_tree, "init", "-q", "-b", "main")
+    git(main_tree, "commit", "-q", "--allow-empty", "-m", "c")
+    git(main_tree, "worktree", "add", "-q", "--detach", str(tmp_path / "linked"))
+    return main_tree, tmp_path / "linked"
+
+
+def test_a_read_in_a_project_without_an_index_writes_no_line_and_makes_no_folder(tmp_path, monkeypatch):
+    monkeypatch.delenv("GOV_MEMORY_LOG", raising=False)
+    main_tree, linked = _repo_with_linked(tmp_path)
+    for tree in (main_tree, linked, tmp_path):
+        memory_use.append(record(), tree)
+    assert not (main_tree / ".gov-runtime").exists() and not (linked / ".gov-runtime").exists()
+    assert not (tmp_path / ".gov-runtime").exists()
+
+
+def test_a_read_tree_with_an_index_logs_to_the_main_tree_that_has_none_yet(tmp_path, monkeypatch):
+    monkeypatch.delenv("GOV_MEMORY_LOG", raising=False)
+    main_tree, linked = _repo_with_linked(tmp_path)
+    (linked / ".gov-runtime").mkdir()
+    memory_use.append(record(), linked)
+    assert len(lines(main_tree / ".gov-runtime/memory-use.jsonl")) == 1
+
+
+def test_a_main_tree_with_an_index_logs_a_read_of_a_linked_tree_without_one(tmp_path, monkeypatch):
+    monkeypatch.delenv("GOV_MEMORY_LOG", raising=False)
+    main_tree, linked = _repo_with_linked(tmp_path)
+    (main_tree / ".gov-runtime").mkdir()
+    memory_use.append(record(), linked)
+    assert len(lines(main_tree / ".gov-runtime/memory-use.jsonl")) == 1
+
+
+def test_a_named_log_is_written_with_no_index_anywhere(tmp_path, monkeypatch):
+    named = tmp_path / "elsewhere" / "log.jsonl"
+    monkeypatch.setenv("GOV_MEMORY_LOG", str(named))
+    memory_use.append(record(), tmp_path)
+    assert len(lines(named)) == 1 and not (tmp_path / ".gov-runtime").exists()
 
 
 def test_default_path_outside_git_is_the_tree_itself(tmp_path, monkeypatch):

@@ -8,6 +8,11 @@ the caller's tree is the parent of ``git rev-parse --git-common-dir``; a tree ou
 ``characters``, ``latency_ms``, ``refusal`` (the error code, else null), ``store_commit``, ``reranked`` and
 ``search_number`` (this session's calls of the command in the log, this one included; null with no session).
 
+In the default place a read in a project without an index writes nothing and makes no ``.gov-runtime/`` folder: the
+line is written only when the tree the read ran against or the main worktree already has a ``.gov-runtime/`` folder
+(a linked worktree indexed in place has one; the main worktree then gets the log). ``GOV_MEMORY_LOG`` is written as
+named.
+
 ``append`` never raises: a log that cannot be written changes nothing a search or a brief prints or exits with (F2).
 """
 
@@ -68,6 +73,10 @@ def append(record: dict, root=None) -> None:
     """Appends ``record`` as one line, with ``ts`` and ``search_number`` set; never raises (F2)."""
     try:
         path = log_path(root)
+        if not os.environ.get(ENV):
+            read_tree = Path(root) if root is not None else Path.cwd()
+            if not (read_tree / ".gov-runtime").is_dir() and not path.parent.is_dir():
+                return  # no index in the read's tree or the main tree: nothing is written, no folder made
         line = {"ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds"), **record}
         session = line.get("session") or None
         line["session"] = session
@@ -81,7 +90,7 @@ def append(record: dict, root=None) -> None:
         if os.environ.get(ENV):
             path.parent.mkdir(parents=True, exist_ok=True)
         else:
-            path.parent.mkdir(exist_ok=True)  # .gov-runtime in an existing tree; never a tree made up
+            path.parent.mkdir(exist_ok=True)  # the main tree's .gov-runtime, when the read's tree has an index
         with open(path, "a", encoding="utf-8") as handle:
             handle.write(text)
     except Exception:  # noqa: BLE001 - F2: the log never fails or changes a search or a brief
