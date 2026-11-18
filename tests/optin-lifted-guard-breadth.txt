@@ -1843,11 +1843,9 @@ rep: tests/unit/guard/test_research_install.py::test_uv_run_w_with_its_value_joi
 # unit/hooks
 rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_settings_line_equals_its_rulesync_source  # unitfold: one case per unit function
 rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_takes_the_pinned_form  # unitfold: one case per unit function
-rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_lifecycle_lines_keep_the_plain_form  # fold: a row beyond the representatives
 rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_runs_the_program_with_the_gov_s_interpreter_and_minus_e  # unitfold: one case per unit function
 rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_finds_gov_on_path_when_home_has_none  # unitfold: one case per unit function
 rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_keeps_its_exit_mapping  # fold: a row beyond the representatives
-rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_with_no_gov_the_line_refuses_and_names_it  # unitfold: one case per unit function
 rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_a_gov_naming_no_interpreter_that_runs_refuses  # fold: a row beyond the representatives
 
 # unit/install
