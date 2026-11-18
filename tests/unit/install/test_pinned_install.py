@@ -444,6 +444,21 @@ def test_each_hook_line_runs_the_pin_s_interpreter_before_the_home_gov(name, lin
         "pinpy", "-E", str(box["project"] / "governance/kernel/hooks" / program)]
 
 
+@pytest.mark.parametrize("name,line", _hook_lines(), ids=[name for name, _ in _hook_lines()])
+def test_each_hook_line_reads_the_interpreter_of_a_long_path_console_script(name, line, tmp_path):
+    """pip writes a console script whose interpreter path is longer than a shebang allows as distlib's /bin/sh
+    trampoline: the interpreter is on its second line."""
+    box = _box(tmp_path)
+    interpreter = _interpreter(tmp_path, "pinpy")
+    script = box["project"] / ".git/gov/bin/gov"
+    script.parent.mkdir(parents=True)
+    script.write_text(f"#!/bin/sh\n'''exec' {interpreter} \"$0\" \"$@\"\n' '''\nimport sys\n", encoding="utf-8")
+    script.chmod(0o755)
+    done = _run_line(line, box)
+    assert done.returncode == 0, f"{name}: {done.stderr!r}"
+    assert (tmp_path / "ran").read_text().split()[:2] == ["pinpy", "-E"], done.stderr
+
+
 def test_a_hook_line_in_a_linked_worktree_finds_the_pin_through_the_common_dir(tmp_path):
     box = _box(tmp_path)
     _gov_script(box["project"] / ".git/gov/bin/gov", _interpreter(tmp_path, "pinpy"))
