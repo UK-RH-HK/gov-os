@@ -17,6 +17,8 @@ import yaml
 from gov.cli.errors import GovError
 from gov.launch import launcher, role as roles
 
+from .test_w2_195_preload import install_judging_skill
+
 OPUS, SONNET, HAIKU = "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"
 VERSION = "- **Version:** 1.0.0"
 
@@ -94,6 +96,8 @@ class Project:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"# {role}\n\n{VERSION}\n- **Launch default:** {default}\n" + (f"{line}\n" if line else ""),
                         encoding="utf-8")
+        if role in roles.JUDGING_ROLES:  # a judging role launches with the judging-work skill (W2-195, DEC-1204 (5))
+            install_judging_skill(self.root)
 
     def criticality(self, text=None):
         path = self.root / "governance/project/criticality.yaml"

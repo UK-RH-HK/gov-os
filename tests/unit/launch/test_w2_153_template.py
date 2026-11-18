@@ -18,6 +18,9 @@ import yaml
 
 from gov.cli.errors import GovError
 from gov.launch import launcher
+from gov.launch.role import JUDGING_ROLES, SKILLS_REL
+
+from .test_w2_195_preload import install_judging_skill
 
 REPO = Path(__file__).resolve().parents[3]
 LAUNCH_NOW = REPO / "governance/project/orchestration/tools/dispatch/launch_now.sh"
@@ -61,11 +64,13 @@ def _plant_role_files(root: Path) -> None:
         path = root / ROLES_REL / f"{role}.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(_role_text(role), encoding="utf-8")
+    install_judging_skill(root)  # a judging role launches with the judging-work skill (W2-195, DEC-1204 (5))
 
 
 def _assert_one_appended_role_file(project, role: str, argv: list[str]) -> None:
     """A worker's one appended file: ``role-<role>.md`` in the session's temp folder, by absolute path, last on the
-    line; it starts with the role file's bytes and ends with the role template's bytes (only blank between)."""
+    line; it starts with the role file's bytes and ends with the role template's bytes; between them only blank, but
+    for a judging role the judging-work skill's preloaded copy, the one skill its role file names (W2-195)."""
     root = Path(os.path.realpath(project[0]))
     [seen] = appended
     assert argv.count("--append-system-prompt-file") == 1, argv
@@ -78,7 +83,8 @@ def _assert_one_appended_role_file(project, role: str, argv: list[str]) -> None:
     template_bytes = (root / launcher.TEMPLATES_REL / f"{STEMS[role]}.md").read_bytes()
     assert data.startswith(role_bytes), f"{role}: the appended file does not start with the role file: {data!r}"
     assert data.endswith(template_bytes), f"{role}: the appended file does not end with the template: {data!r}"
-    assert data[len(role_bytes):len(data) - len(template_bytes)].strip() == b"", data
+    skill = (root / SKILLS_REL / "judging-work/SKILL.md").read_bytes() if role in JUDGING_ROLES else b""
+    assert data[len(role_bytes):len(data) - len(template_bytes)].strip() == skill.strip(), data
 
 
 def _ticket(root: Path, role: str, allowed: list[str]) -> str:

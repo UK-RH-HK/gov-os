@@ -23,8 +23,9 @@ TEMPLATES = "template/governance/kernel/templates"
 SCHEMAS = "template/governance/kernel/schemas"
 # Four since run 8b (item 21); nine since S29 (DEC-1189 (1)): every rel the resolver is asked for, template/ ones too;
 # eleven since W2-174: the two ticket schemas its Verify pass reads (through its own lookup, DEC-1189 (1)).
+# Twelve since W2-195 (DEC-1204 (5)): the judging-work skill folder, which A9 installs as it does the other two.
 THE_SHIPPED = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, "template/.gitleaks.toml",
-               f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{TEMPLATES}/brief.md", f"{TEMPLATES}/role-cto.md",
+               f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{SKILLS}/judging-work", f"{TEMPLATES}/brief.md", f"{TEMPLATES}/role-cto.md",
                f"{SCHEMAS}/ticket.schema.json", f"{SCHEMAS}/common.schema.json",
                f"{SKILLS}/spec-writing/check_spec.py")  # W2-36: gov discover's spec check (a fix, EMERGENCY-2 4.2)
 
@@ -63,7 +64,7 @@ def test_the_walls_and_briefs_are_whole_in_the_copy():
     assert sorted(_files(PACKAGE, memory_sets.BRIEFS)) == [f"{memory_sets.BRIEFS}/{name}" for name in
                                                           ("auditor.md", "checker.md", "writer.md")]
     assert f"{memory_sets.WALLS}/README.md" in _files(PACKAGE, memory_sets.WALLS)
-    for name in ("retrieval", "discovery"):  # S29: the kernel skill folders A9 copies, whole
+    for name in ("retrieval", "discovery", "judging-work"):  # S29: the kernel skill folders A9 copies, whole
         assert sorted(_files(PACKAGE, f"{SKILLS}/{name}")) == sorted(_files(REPO, f"{SKILLS}/{name}"))
 
 

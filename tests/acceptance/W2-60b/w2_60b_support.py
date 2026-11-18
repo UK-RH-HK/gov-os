@@ -572,13 +572,23 @@ QA_SKILL_TEXT = ("---\nname: qa-review\nversion: \"1.0.0\"\ndescription: The W2-
                  "# qa-review\n\nThe fixture method text.\n")
 
 
+# The judging-work skill (W2-195, DEC-1204 (5)) a judging role's launch needs installed: the kernel file and the
+# preloaded copy, the bytes this repository holds (the kernel's qa-engineer.md lists it among its skills).
+JUDGING_SKILL_SRC = REPO_ROOT / "template/governance/kernel/skills/judging-work/SKILL.md"
+JUDGING_SKILL_RELS = ("template/governance/kernel/skills/judging-work/SKILL.md",
+                      ".claude/skills/judging-work/SKILL.md")
+
+
 def plant_roles(project, roles=(SIXTH,)):
     """The sixth worker role's file (planted form) and the kernel's own ``qa-engineer.md`` (its bytes as they stand
-    in this repository), with their templates and the ``qa-review`` skill the latter names."""
+    in this repository), with their templates and the skills the latter names (``qa-review`` as a fixture, and the
+    installed ``judging-work``, which a judging role's launch is refused without)."""
     for role in roles:
         if role == QA:
             b.write(b.role_path(project, QA), (KERNEL_ROLES / "qa-engineer.md").read_text(encoding="utf-8"))
             b.write(Path(project) / QA_SKILL, QA_SKILL_TEXT)
+            for rel in JUDGING_SKILL_RELS:
+                b.write(Path(project) / rel, JUDGING_SKILL_SRC.read_text(encoding="utf-8"))
         else:
             b.write(b.role_path(project, role), worker_role_text(role))
         for rel, text in template_files(role).items():

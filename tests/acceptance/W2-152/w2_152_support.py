@@ -33,6 +33,10 @@ PLANTED = HERE / "fixtures/planted"
 GOLDEN = HERE / "fixtures/golden"
 SPY = HERE / "w2_152_spy.py"
 
+JUDGING_SKILL = REPO / "template/governance/kernel/skills/judging-work/SKILL.md"
+JUDGING_SKILL_RELS = ("template/governance/kernel/skills/judging-work/SKILL.md",
+                      ".claude/skills/judging-work/SKILL.md")
+
 TEMPLATES_REL = "template/governance/kernel/templates"
 FALLBACK_TEMPLATES_REL = "governance/kernel/templates"
 FACTS_REL = "governance/project/facts.yaml"
@@ -203,6 +207,16 @@ class Repo:
             shutil.copyfile(TEMPLATES / "keys.yaml", self.templates_dir / "keys.yaml")
             self.write_facts(facts if facts is not None else planted_facts())
         self.ticket(ready_front())
+        if templates_rel == TEMPLATES_REL:  # the fallback case holds no template/ folder, and no judging brief
+            self.install_judging_skill()
+
+    def install_judging_skill(self) -> None:
+        """The project's installed judging-work skill (W2-195): the kernel file and the preloaded copy of the same
+        version, as an adopted project holds them; a judging brief is refused without it."""
+        for rel in JUDGING_SKILL_RELS:
+            path = self.root / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(JUDGING_SKILL, path)
 
     # inputs
     def write_facts(self, data: dict) -> None:
@@ -419,6 +433,28 @@ def normal(text: str) -> str:
     from each line, and leading and trailing blank lines dropped."""
     text = strip_front_matter(text)
     return "\n".join(line.rstrip() for line in text.split("\n")).strip("\n")
+
+
+JUDGING_HEADER = "Judging work: the judging-work skill, version "
+
+
+def split_judging(out: str) -> tuple[str, str | None]:
+    """A judging brief (independent-auditor, qa-engineer, the lead's ``--run review``) as ``(rest, block)``: the
+    block ``gov brief`` appends from the installed judging-work skill (W2-195), from its header line to its end,
+    and what stood before it; ``(out, None)`` when the brief carries none."""
+    index = out.find("\n" + JUDGING_HEADER)
+    if index < 0:
+        return out, None
+    return out[:index], out[index + 1:]
+
+
+def judging_sections() -> str:
+    """Sections 1 to 3 of the installed judging-work skill, as the brief carries them (from the ``## 1.`` heading up
+    to the next ``## `` heading, white space at the ends dropped)."""
+    text = JUDGING_SKILL.read_text(encoding="utf-8")
+    start = text.index("## 1. ")
+    stop = text.index("\n## 4", start) if "\n## 4" in text[start:] else len(text)
+    return text[start:stop].strip()
 
 
 def golden(name: str) -> str:

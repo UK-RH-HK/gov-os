@@ -25,7 +25,7 @@ from .test_w2_88_fabric import SHIPPED, git, planted, run_a9, stand_ins  # noqa:
 REPO = Path(__file__).resolve().parents[3]
 SKILLS = "template/governance/kernel/skills"
 KIT = ("template/governance/kernel/templates/brief.md", "template/governance/kernel/templates/role-cto.md",
-       f"{SKILLS}/retrieval", f"{SKILLS}/discovery")
+       f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{SKILLS}/judging-work")
 SHIPPED_FILES = (*KIT, "template/.gitleaks.toml", fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS,
                  memory_sets.CRON)  # step 6's cron script, found by ``fabric.shipped`` only (run 8b, item 22)
 MARK = "\nSHIPPED-MARK\n"
@@ -190,6 +190,7 @@ def test_a9_copies_reads_the_pool_the_walls_and_the_briefs_from_the_shipped_byte
     assert result["ok"] is True
     for source, target in ((f"{SKILLS}/retrieval/SKILL.md", ".claude/skills/retrieval/SKILL.md"),
                            (f"{SKILLS}/discovery/SKILL.md", ".claude/skills/discovery/SKILL.md"),
+                           (f"{SKILLS}/judging-work/SKILL.md", ".claude/skills/judging-work/SKILL.md"),
                            ("template/governance/kernel/templates/brief.md", "governance/kernel/templates/brief.md"),
                            ("template/governance/kernel/templates/role-cto.md", "governance/kernel/templates/role-cto.md")):
         assert (root / target).read_bytes() == (tree / source).read_bytes(), target
@@ -214,7 +215,7 @@ def test_the_pool_is_the_shipped_files_not_one_written_in_code(tmp_path, monkeyp
 
 def test_a9_refuses_a_missing_shipped_file_by_name_and_writes_nothing(tmp_path, monkeypatch, stand_ins):
     for missing in (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, f"{SKILLS}/discovery",
-                    "template/governance/kernel/templates/role-cto.md"):
+                    f"{SKILLS}/judging-work", "template/governance/kernel/templates/role-cto.md"):
         tmp = tmp_path / missing.replace("/", "_")
         tmp.mkdir()
         tree = fake_tree(tmp, leave_out=(missing,))

@@ -47,9 +47,15 @@ def fixture(tmp_path, **tickets):
 
 
 def adopted(tmp_path):
-    """The two tickets, the kernel templates and a filled facts file: what ``gov brief`` reads."""
+    """The two tickets, the kernel templates, the judging-work skill and a filled facts file: what ``gov brief`` reads
+    (the auditor's brief carries the skill, W2-195: the kernel file and the session's preloaded copy of one version)."""
     root = fixture(tmp_path)
     shutil.copytree(REPO / "template/governance/kernel/templates", root / "template/governance/kernel/templates")
+    for source, target in (("template/governance/kernel/skills/judging-work/SKILL.md",
+                            "template/governance/kernel/skills/judging-work/SKILL.md"),
+                           (".claude/skills/judging-work/SKILL.md", ".claude/skills/judging-work/SKILL.md")):
+        (root / target).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(REPO / source, root / target)
     (root / "governance/project").mkdir(parents=True)
     shutil.copyfile(REPO / "governance/project/facts.yaml", root / "governance/project/facts.yaml")
     return root

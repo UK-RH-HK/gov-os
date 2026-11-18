@@ -15,7 +15,16 @@ import w2_152_support as s
 def test_s1_golden_brief_per_worker_role(repo, role):
     """The planted T-0 filled for each worker role equals its committed golden file (README, "Golden files")."""
     out = s.ok(repo.run(role, s.TICKET_ID))
-    assert s.normal(out) == s.golden(f"brief-{role}.txt"), \
+    rest, block = s.split_judging(out)
+    if role == "independent-auditor":
+        # a judging brief ends with the installed judging-work skill's sections 1 to 3 and its version (W2-195);
+        # the rest of it is the golden file
+        assert block is not None, f"the independent-auditor brief carries no judging-work block:\n{out}"
+        assert "version 1.1.0" in block.split("\n", 1)[0], f"the block does not name the skill's version:\n{block}"
+        assert s.judging_sections() in block, f"the block lacks the skill's sections 1 to 3 verbatim:\n{block}"
+    else:
+        assert block is None, f"a {role} brief carries the judging-work block:\n{out}"
+    assert s.normal(rest) == s.golden(f"brief-{role}.txt"), \
         f"gov brief {role} differs from fixtures/golden/brief-{role}.txt:\n{out}"
 
 

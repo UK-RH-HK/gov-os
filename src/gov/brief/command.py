@@ -11,7 +11,9 @@ stderr, each ``gov brief: <CODE> <detail>``; with ``--json``, gov's envelope wit
 not READY, a placeholder left over, a KPI line without a verify or an "until <ticket>" line whose ticket is closed is
 refused: ``GovError("BRIEF_NOT_READY")`` with ``details.findings`` (each ``{code, detail}``), nothing on stdout but
 ``--json``'s envelope. It writes one file only: the retrieval's line in the memory-use log (``gov.memory_use``, S8),
-which never changes what is printed (F2).
+which never changes what is printed (F2). A brief that judges work (independent-auditor, qa-engineer, the lead's
+``review`` run) carries sections 1 to 3 of the installed judging-work skill and names its version, or is refused
+``BRIEF_JUDGING_RULE_MISSING`` (W2-195, ``gov.brief.judging``).
 """
 
 from __future__ import annotations
@@ -25,7 +27,8 @@ CHILD_EXIT_CODE = True  # stdout is the brief itself, never gov's default render
 
 def add_arguments(parser) -> None:
     parser.add_argument("brief_role", metavar="<role>", choices=tuple(ROLE_TEMPLATES),
-                        help="engineer, independent-test-designer, independent-auditor, product-spec, research or lead")
+                        help="engineer, independent-test-designer, independent-auditor, qa-engineer, product-spec, "
+                             "research or lead")
     parser.add_argument("ticket", metavar="<ticket>", help="a tk id (DAEO-...) or a W2 id, resolved in <root>/.tickets/")
     parser.add_argument("--run", metavar="<kind>", choices=RUN_KINDS, help="the lead's run: " + "|".join(RUN_KINDS))
     parser.add_argument("--part", metavar="<file>", help="what the lead knows: fills {LEAD_NOTE}")

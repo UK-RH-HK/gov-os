@@ -42,9 +42,11 @@ DECISION = re.compile(r"DEC-[0-9]+(?::[a-z_]+)?")
 SETTINGS = ("reranker", "reranker_service", "pool", "bundle_tokens", "widen")
 RETRIEVAL = "governance/project/retrieval.yaml"
 # The kernel files A9 copies, byte for byte, as Gov OS ships them (S15, S10; B-1.1, B-1.3): (Gov OS folder or file,
-# the adopted repository's). Nothing is re-worded per repository.
+# the adopted repository's). Nothing is re-worded per repository. The judging-work skill (DEC-1204 (5), W2-195): the
+# one rule every role that judges work preloads, shipped through every release.
 KERNEL_FOLDERS = (("template/governance/kernel/skills/retrieval", ".claude/skills/retrieval"),
-                  ("template/governance/kernel/skills/discovery", ".claude/skills/discovery"))
+                  ("template/governance/kernel/skills/discovery", ".claude/skills/discovery"),
+                  ("template/governance/kernel/skills/judging-work", ".claude/skills/judging-work"))
 KERNEL_FILES = (("template/governance/kernel/templates/brief.md", "governance/kernel/templates/brief.md"),
                 ("template/governance/kernel/templates/role-cto.md", "governance/kernel/templates/role-cto.md"))
 
@@ -229,7 +231,7 @@ def read_standard(root: Path, decisions: list[str]) -> dict:
 # ---- the copy step (S15, S10; B-1.1, B-1.3)
 
 def _sources(root: Path | None) -> list[tuple[str, str]]:
-    """``(from, to)`` for every kernel file A9 installs: the files of the two skill folders (same relative names) and
+    """``(from, to)`` for every kernel file A9 installs: the files of the three skill folders (same relative names) and
     the two templates, ``from`` being the file's path in the Gov OS repository (read through ``shipped``). A source
     Gov OS ships nowhere is a refusal (``SHIPPED_FILE_MISSING``), never a skipped file."""
     found = []
@@ -271,10 +273,10 @@ def _blob_ids(root: Path, paths: list[str]) -> dict[str, str]:
 
 def install(run, head: str) -> dict:
     """Write, byte for byte, the kernel files Gov OS ships into the adopted repository and stage them (the stage's one
-    commit takes them with its record): the retrieval and discovery skills to ``.claude/skills/``, T-0 and T-8 to
-    ``governance/kernel/templates/``, and Gov OS's ``retrieval.yaml`` only where the repository tracks none (its own is
-    kept, and judged). ``{installed: [{path, sha256, from}], kept: [{path, sha256}], written, sums, dirs, staged,
-    replaced}``: what A9 wrote (each path named before its write) and the sha256 of its bytes, the folders it made, the
+    commit takes them with its record): the retrieval, discovery and judging-work skills to ``.claude/skills/``, T-0
+    and T-8 to ``governance/kernel/templates/``, and Gov OS's ``retrieval.yaml`` only where the repository tracks none
+    (its own is kept, and judged). ``{installed: [{path, sha256, from}], kept: [{path, sha256}], written, sums, dirs,
+    staged, replaced}``: what A9 wrote (each path named before its write) and the sha256 of its bytes, the folders it made, the
     index entry ``(mode, blob)`` it stages per path (the blob hashed before the ``git add``, so a stop at any point after
     the add has begun finds it named) and the blob of each path the start commit tracked: what ``undo`` judges by.
     ``commit`` adds A9's record to the same lists. The copies join ``run.tracked`` (the stores judge them like any

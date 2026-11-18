@@ -30,6 +30,9 @@ FACTS = REPO / "governance/project/facts.yaml"
 FACTS_SCHEMA = REPO / "template/governance/kernel/schemas/facts.schema.json"
 FACTS_REL = "governance/project/facts.yaml"
 TEMPLATES_REL = "template/governance/kernel/templates"
+JUDGING_SKILL = REPO / "template/governance/kernel/skills/judging-work/SKILL.md"
+JUDGING_SKILL_RELS = ("template/governance/kernel/skills/judging-work/SKILL.md",
+                      ".claude/skills/judging-work/SKILL.md")
 
 BASE_COMMIT = "f2b1d38af"  # the base this ticket first branched from (F2): commits since it are searched by trailer
 TICKET_ID = "DAEO-zmo4"  # the trailer ``Task: <id>`` of this ticket's own commits (F2)
@@ -169,6 +172,14 @@ class Repo:
         for path in sorted(TEMPLATES.iterdir()):
             if path.is_file():
                 shutil.copyfile(path, folder / path.name)
+
+    def judging_skill(self) -> None:
+        """The installed judging-work skill, as an adopted project holds it (W2-195): the kernel file and the
+        preloaded copy of the same version; ``gov brief`` for a judging role is refused without it."""
+        for rel in JUDGING_SKILL_RELS:
+            path = self.root / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(JUDGING_SKILL, path)
 
     def filled_facts(self) -> None:
         """This tree's own facts file with every command filled and ``ready.new_since`` set to the fixtures' date

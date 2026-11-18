@@ -341,7 +341,8 @@ def test_a_file_the_graph_does_not_read_is_refused_unsupported_language_never_in
 # ---- B-1.1 / B-1.3: the copy step
 
 KERNEL = (("template/governance/kernel/skills/retrieval", ".claude/skills/retrieval"),
-          ("template/governance/kernel/skills/discovery", ".claude/skills/discovery"))
+          ("template/governance/kernel/skills/discovery", ".claude/skills/discovery"),
+          ("template/governance/kernel/skills/judging-work", ".claude/skills/judging-work"))
 TEMPLATES = (("template/governance/kernel/templates/brief.md", "governance/kernel/templates/brief.md"),
              ("template/governance/kernel/templates/role-cto.md", "governance/kernel/templates/role-cto.md"))
 

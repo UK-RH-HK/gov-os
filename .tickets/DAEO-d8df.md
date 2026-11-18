@@ -38,6 +38,36 @@ allowed_paths:
 - tests/unit/launch/test_w2_195*
 - tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py
 - docs/changes/W2-195-CIT-P.md
+- .rulesync/skills/judging-work/SKILL.md  # Gov OS's own copies, so its own judging briefs build after the land (EMERGENCY-2 2.10: copies by ordinary commits)
+- .claude/skills/judging-work/SKILL.md
+- .rulesync/subagents/independent-auditor.md
+- .rulesync/subagents/orchestrator.md
+- .rulesync/subagents/qa-engineer.md
+- .rulesync/subagents/ticket-lead.md
+- .claude/agents/independent-auditor.md
+- .claude/agents/orchestrator.md
+- .claude/agents/qa-engineer.md
+- .claude/agents/ticket-lead.md
+- .claude/templates/role-reviewer.md  # Gov OS's byte copy of the kernel reviewer template (EMERGENCY-2 2.10)
+- tests/unit/adopt/test_w2_174_fields.py  # unit fixtures that plant a judging brief or count A9's kernel skills (the lead's P3)
+- tests/unit/adopt/test_w2_88_ignored.py
+- tests/unit/adopt/test_w2_88_p1.py
+- tests/unit/adopt/test_w2_88_run4.py
+- tests/acceptance/W2-152/w2_152_support.py  # other tickets' acceptance support, revised by the test designer (P3, P4)
+- tests/acceptance/W2-174/test_w2_174_fields.py
+- tests/acceptance/W2-153/w2_153_support.py
+- tests/acceptance/W2-152/test_w2_152_fill.py
+- tests/acceptance/W2-175/test_w2_175_templates.py
+- tests/acceptance/W2-60b/w2_60b_support.py
+- tests/acceptance/W2-174/w2_174_support.py
+- tests/acceptance/W2-197/w2_197_support.py  # W2-197 (merged in d904d0236) plants an auditor brief without the skill
+- tests/acceptance/W2-88/w2_88_support.py
+- tests/unit/launch/test_w2_184_launch.py  # their planted independent-auditor role files gain the skill (S3's launch check; the lead's path case)
+- tests/unit/launch/test_w2_184_r_fixes.py
+- tests/unit/launch/test_session_record_launch.py
+- tests/unit/launch/test_w2_153_template.py
+- src/gov/adapters/portability.py  # ROLE_SKILLS names judging-work for the judging roles: gov check green on a fresh kit (the lead's P1)
+- tests/unit/adapters/test_w2_153_portability.py
 reads:
 - governance/project/orchestration/packages/P-GOLDEN-RULE-1.md
 - governance/project/orchestration/packages/judging-work.SKILL.md
@@ -58,7 +88,7 @@ kpis:
     verify: "tests/unit/launch/test_w2_195_preload.py: each named role file's Skills line and role-reviewer.md's skills list hold judging-work; gov.launch.role.read_role for independent-auditor and qa-engineer returns judging-work among the skills the launch record carries (P-W2-195-1 (a): --plan prints one line, DEC-1167 (2))"
   - line: "S2 Briefed automatically: gov brief for the independent-auditor, reviewer and QA roles, and a lead brief's reviewer and probe steps, include sections 1 to 3 of the installed judging-work skill file (never a hand copy) and name the skill's version [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S2]"
     verify: "tests/unit/brief/test_w2_195_inject.py: a fixture project with the skill installed; each judging brief holds the skill's sections 1 to 3 byte for byte and its version; a non-judging brief (engineer) does not"
-  - line: "S3 Checked: gov brief refuses BRIEF_JUDGING_RULE_MISSING and gov launch refuses LAUNCH_JUDGING_RULE_MISSING for a judging role (independent-auditor, reviewer, probe, QA engineer) whose brief or role lacks the skill or names a different version [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S3]"
+  - line: "S3 Checked: gov brief refuses BRIEF_JUDGING_RULE_MISSING and gov launch refuses LAUNCH_JUDGING_RULE_MISSING for a judging role (independent-auditor, reviewer, probe, QA engineer) whose brief or role lacks the skill or names a different version; the launch check applies in a project that holds the kernel judging-work file, and a project without it launches unchecked (EMERGENCY-2 2.1: catch, do not prevent; the lead, P2 (a)) [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S3]"
     verify: "tests/unit/brief/test_w2_195_check.py and tests/unit/launch/test_w2_195_check.py: one case per judging role with the skill removed and one with a different version, each refused with its named code; the same roles with the skill pass; one acceptance case under tests/acceptance/W2-195/"
   - line: "S4 Shipped: gov init (the kit) and a wheel of HEAD both deliver the skill (.claude/skills/judging-work/ after gov adapters generate); the shipped-folder lists include it exactly [DEC-1204 (5), P-GOLDEN-RULE-1 section 3 S4]"
     verify: "tests/unit/adopt/test_w2_88_shipped.py THE_SHIPPED and fabric.PACKAGED / KERNEL_FOLDERS name the skill; a copier copy of the template and a wheel built from HEAD each hold the skill's bytes"

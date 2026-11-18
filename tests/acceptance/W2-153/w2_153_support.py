@@ -57,14 +57,15 @@ WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", 
 LEAD_ROLES = ("lead", "orchestrator")
 ALL_ROLES = WORKER_ROLES + LEAD_ROLES
 
-# The ticket's Interface: the skills list of each rulesync role source (kernel role file name -> skills).
+# The ticket's Interface: the skills list of each rulesync role source (kernel role file name -> skills); the
+# judging roles end with ``judging-work`` (W2-195, DEC-1204 (5)).
 SKILLS = {
     "engineer": ["test-driven-development"],
     "independent-test-designer": ["test-design"],
-    "independent-auditor": ["audit"],
+    "independent-auditor": ["audit", "judging-work"],
     "product-spec": ["change"],
     "research": ["discovery"],
-    "orchestrator": ["orchestration"],
+    "orchestrator": ["orchestration", "judging-work"],
 }
 # The kernel role file -> its template, for the six kernel roles (the orchestrator's is the lead's).
 KERNEL_ROLE_TEMPLATE = {role: ROLE_TEMPLATE[role] for role in SKILLS}

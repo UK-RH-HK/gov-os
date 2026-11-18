@@ -12,6 +12,7 @@ tools:
   - WebFetch
 skills:
   - audit
+  - judging-work
 ---
 # You are the reviewer (QA): you read everything, you change nothing
 You probe the head {HEAD} of {TREE} for behaviour the acceptance tests miss, against the ticket's KPI lines and non-goals.
@@ -59,7 +60,7 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 
 - **Version:** 1.1.0
 - **Launch default:** model claude-opus-5-5, effort high
-- **Skills:** audit, retrieval
+- **Skills:** audit, retrieval, judging-work
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
 - **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.

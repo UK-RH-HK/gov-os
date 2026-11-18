@@ -40,6 +40,8 @@ sys.path.insert(0, str(ACCEPTANCE))
 
 import w2_184_support as s  # noqa: E402
 
+from .test_w2_195_preload import install_judging_skill  # noqa: E402
+
 b = s.b
 ENG, TD, AUD = s.ENGINEER, s.TEST_DESIGNER, s.AUDITOR
 LEADS = ("orchestrator", "lead")
@@ -58,7 +60,9 @@ def sandbox(tmp_path):
 
 @pytest.fixture()
 def project(sandbox):
-    return s.make_project(sandbox)
+    root = s.make_project(sandbox)
+    install_judging_skill(root)  # a judging role launches with the judging-work skill (W2-195, DEC-1204 (5))
+    return root
 
 
 @pytest.fixture()

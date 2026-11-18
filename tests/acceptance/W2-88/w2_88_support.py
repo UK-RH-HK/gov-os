@@ -61,11 +61,12 @@ KERNEL_REL = "template/governance/kernel"
 
 def copy_plan() -> list:
     """B-1.1 + B-1.3: ``(path in the adopted repository, path in Gov OS)`` for each file A9's copy step installs byte for
-    byte: every file of the kernel's retrieval and discovery skills (same relative names, under ``.claude/skills/<skill>/``)
+    byte: every file of the kernel's retrieval, discovery and judging-work skills (same relative names, under
+    ``.claude/skills/<skill>/``; judging-work since W2-195)
     and T-0 and T-8 (``governance/kernel/templates/brief.md`` and ``role-cto.md``). ``retrieval.yaml`` is the copy's other
     file, installed only where the repository tracks none (``RETRIEVAL_REL``)."""
     pairs = []
-    for skill in ("retrieval", "discovery"):
+    for skill in ("retrieval", "discovery", "judging-work"):
         base = REPO_ROOT / KERNEL_REL / "skills" / skill
         for path in sorted(p for p in base.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
             rel = path.relative_to(base).as_posix()
