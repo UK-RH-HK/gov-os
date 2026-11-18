@@ -1,6 +1,6 @@
 # CTO handover (the CTO session 10cfb730 → the fresh CTO on Fable, 2026-11-18 ~23:20)
 
-Read `docs/emergency-2/EMERGENCY-2.md` first, then this page, then DEC-1211 to DEC-1215 in `docs/DECISION_REGISTER.md`
+Read `docs/emergency-2/EMERGENCY-2.md` first, then this page, then DEC-1211 to DEC-1216 in `docs/DECISION_REGISTER.md`
 and the owner's page `docs/emergency-2/audits/OWNER-DECISIONS-2026-11-18.md`. **The owner is asleep until about 08:00.**
 Nothing waits for him except the 99 % push; bring everything else in the morning brief.
 
@@ -17,6 +17,9 @@ Nothing waits for him except the 99 % push; bring everything else in the morning
 - **The machine:** keep the load inside the gate (20). Every test run through
   `.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh` (it waits until the 1-minute load is under 12; SLOTS=2,
   WORKERS=4). Watch `lead-mem.jsonl` and `uptime`.
+- **The night's priority order, his sleep and the reporting rule are DEC-1216** (added by the fresh CTO, 23:5x): the
+  six priorities in his words; only the 99 % push wakes him; every report ends with the status block from
+  `.gov-runtime/scratch/orchestrator/tools/status_block.py`, run each time; the morning brief's contents.
 - **Leads end into your inbox:** `PYTHONPATH=src python3 -m gov.cli.main msg read cto` (start_lead.sh sends a wake).
 
 ## 1. Running at the handover (nothing is to be stopped)
