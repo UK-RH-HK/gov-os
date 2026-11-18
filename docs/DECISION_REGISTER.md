@@ -9631,7 +9631,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 266. The owner's rule of 2026-10-20 on the countdown's first line (register v0.266, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-878 — Every countdown starts with one progress line: the tickets by state out of the total, and the keystones done, in progress and ahead
-- **Status:** ACCEPTED (owner, standing, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-787, DEC-823, DEC-847, DEC-851, DEC-861 · **Adds to:** the countdown rule (prompt §8, §13, §15; WBS §6); nothing is superseded.
+- **Status:** ACCEPTED (owner, standing, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-787, DEC-823, DEC-847, DEC-851, DEC-861 · **Adds to:** the countdown rule (prompt §8, §13, §15; WBS §6); nothing is superseded. · **Class:** retired
 - **Decision:** from now on, each countdown starts with one progress line, in this order:
   1. **Tickets:** closed / merged, not closed / built and held / in flight / not started, out of the total.
   2. **Keystones:** done / in progress / ahead, out of nine.
@@ -12575,7 +12575,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-1003 — Every practice the CTO adopts in its own tools is mapped into the product's tickets the same day (standing)
-- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-982 (the smart way of working is the product's), DEC-983 (SMART-WORK-1), DEC-979 item 2 (the tools lane) · **Changes:** DEC-982's "a practice built only in your tools is a gap to name" becomes a same-day mapping · **Changed by:** DEC-1052, DEC-1057 (scoped, O-11)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-982 (the smart way of working is the product's), DEC-983 (SMART-WORK-1), DEC-979 item 2 (the tools lane) · **Changes:** DEC-982's "a practice built only in your tools is a gap to name" becomes a same-day mapping · **Changed by:** DEC-1052, DEC-1057 (scoped, O-11) · **Class:** retired
 - **Decision:** (1) Today's four queue changes (DEC-1001 (a) to (d)) reach the Gov OS: each mapped, as SMART-WORK-1 did, to the product ticket that should carry it (W2-115, W2-117, W2-20 or W2-76 as fits), with its KPI change, as proposals for the owner (`packages/SMART-WORK-2.md`). (2) **Standing:** every new practice the CTO adopts in its own tools is mapped into the product's tickets the same day, as a KPI change proposal, so the smart way of working never lives only in the CTO's tools; the daily document lists each with its proposal.
 - **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; the lighter lane's rule (DEC-979 item 2).
 
