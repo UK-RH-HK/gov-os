@@ -11,6 +11,7 @@ from __future__ import annotations
 import stat
 
 import w2_107_support as support
+from gov import secrets
 
 pytestmark = support.needs_tools
 
@@ -33,8 +34,15 @@ def passes(project, engine, env, count=2):
     return out
 
 
-def test_with_no_cache_named_outside_pytest_the_cache_is_made_in_the_home_folder(tmp_path, project, engine, per_text):
+def full_cost(project, engine):
+    """What one pass costs with no cache: the files' batch and the name, each by its own run."""
+    rels = list(FILES)
+    return support.cost(engine, lambda: (secrets.indexable(project, rels), secrets.path_holds_secret(project, NAME)))
+
+
+def test_with_no_cache_named_outside_pytest_the_cache_is_made_in_the_home_folder(tmp_path, project, engine):
     support.put(project, FILES)
+    full = full_cost(project, engine)
     home = tmp_path / "child-home"
     home.mkdir()
     before = support.files_under(project)
@@ -43,30 +51,32 @@ def test_with_no_cache_named_outside_pytest_the_cache_is_made_in_the_home_folder
     made = home / ".cache" / "gov-os" / support.CACHE_NAME
     assert made.is_file(), "the cache is made at <HOME>/.cache/gov-os/secrets-scan.sqlite"
     assert stat.S_IMODE(made.parent.stat().st_mode) & 0o077 == 0, "its folder is the owner's only"
-    assert calls == [3 * per_text, 0], "the second process is answered from the cache in the home folder"
+    assert calls == [full, 0], "the second process is answered from the cache in the home folder"
     assert support.files_under(project) == before, "nothing is written in the repository"
 
 
-def test_an_empty_cache_setting_uses_no_cache_at_all(tmp_path, project, engine, per_text):
+def test_an_empty_cache_setting_uses_no_cache_at_all(tmp_path, project, engine):
     """A guard: the base code uses no cache either."""
     support.put(project, FILES)
+    full = full_cost(project, engine)
     home, temp = tmp_path / "child-home", tmp_path / "child-tmp"
     home.mkdir()
     temp.mkdir()
     before = support.files_under(project)
     env = support.child_env(engine, "", home=home, extra={"TMPDIR": str(temp)},
                             drop=("PYTEST_CURRENT_TEST", "XDG_CACHE_HOME", "GOV_SECRETS_FULL_SCAN"))
-    assert passes(project, engine, env) == [3 * per_text, 3 * per_text], "every call scans every text"
+    assert passes(project, engine, env) == [full, full], "every call scans every text"
     assert support.files_under(home) == [] and support.files_under(temp) == [], "no cache file is made anywhere"
     assert support.files_under(project) == before, "nor in the repository"
 
 
-def test_under_pytest_with_no_cache_named_no_cache_is_used(tmp_path, project, engine, per_text):
+def test_under_pytest_with_no_cache_named_no_cache_is_used(tmp_path, project, engine):
     """A guard: while a test runs (``PYTEST_CURRENT_TEST``) and names no cache, every scan happens as before."""
     support.put(project, FILES)
+    full = full_cost(project, engine)
     home = tmp_path / "child-home"
     home.mkdir()
     env = support.child_env(engine, None, home=home, extra={"PYTEST_CURRENT_TEST": "test_w2_107_example (call)"},
                             drop=("GOV_SECRETS_CACHE", "XDG_CACHE_HOME", "GOV_SECRETS_FULL_SCAN"))
-    assert passes(project, engine, env) == [3 * per_text, 3 * per_text], "every call scans every text"
+    assert passes(project, engine, env) == [full, full], "every call scans every text"
     assert support.files_under(home) == [], "no cache is made in the home folder"

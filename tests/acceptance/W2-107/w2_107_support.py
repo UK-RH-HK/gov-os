@@ -2,9 +2,16 @@
 
 The interfaces under test are public only: ``gov.secrets.indexable(root, paths)``, ``gov.secrets.path_holds_secret(root,
 path)``, ``gov.secrets.scan_counts()``, the variables ``GOV_SECRETS_CACHE`` and ``GOV_SECRETS_FULL_SCAN``, and the cache
-file as a file. gitleaks is a stand-in first on ``PATH`` that counts its scan calls (``gitleaks stdin``) in a log of its
-own and hands every call, unchanged, to the real gitleaks (found before any test changes ``PATH``). The log holds one line
-a call: the sub-command and the sha256 of the rule set it was given; never content.
+file as a file. gitleaks is a stand-in first on ``PATH`` that counts its scan calls in a log of its own and hands every
+call, unchanged, to the real gitleaks (found before any test changes ``PATH``). A scan call is one gitleaks process given
+texts to judge: ``gitleaks stdin`` (one text; a path's names) or ``gitleaks dir`` (folder mode, DEC-1183 (2): a whole
+batch of texts, each a numbered file of a private folder, one process per rule set). The log holds one line a call: the
+sub-command and the sha256 of the rule set it was given; never content.
+
+What a call costs, so what a case may expect: a text judged by ``indexable`` costs one ``dir`` call per rule set for its
+whole batch (up to nineteen texts with two rule sets are one batch), a path judged by ``path_holds_secret`` one ``stdin``
+call per rule set each. A case never hard-codes a number: it takes the cost of the same work with no cache (``uncached``)
+as the base, and expects that, or nothing when every text is remembered.
 
 The code under test is the ``gov`` the run's ``PYTHONPATH`` gives (DEC-732): in-process cases import it, and every child
 process gets the folder that ``gov`` was imported from, so a child runs the same code.
@@ -92,6 +99,9 @@ def put(root, files):
 # The stand-in gitleaks
 # --------------------------------------------------------------------------
 
+SCAN_COMMANDS = ("stdin", "dir")  # the sub-commands that are given texts to judge
+
+
 @dataclass(frozen=True)
 class Engine:
     """A stand-in gitleaks: ``folder`` holds it (put first on PATH), ``log`` counts its scan calls."""
@@ -104,10 +114,15 @@ class Engine:
         return self.folder / "gitleaks"
 
     def calls(self):
-        """How many scan calls (``gitleaks stdin``) this stand-in has had."""
+        """How many scan calls (``gitleaks stdin`` and ``gitleaks dir``: a process given texts to judge) this stand-in
+        has had."""
+        return sum(self.count(command) for command in SCAN_COMMANDS)
+
+    def count(self, command):
+        """How many calls of one sub-command (``stdin`` or ``dir``) this stand-in has had."""
         if not self.log.exists():
             return 0
-        return sum(1 for line in self.log.read_text(encoding="utf-8").splitlines() if line.startswith("stdin "))
+        return sum(1 for line in self.log.read_text(encoding="utf-8").splitlines() if line.startswith(f"{command} "))
 
     def path(self):
         """A PATH with this stand-in first, then the runner's own."""
@@ -120,17 +135,18 @@ REAL = {real!r}
 LOG = {log!r}
 FAIL = {fail!r}
 args = sys.argv[1:]
-if args[:1] == ["stdin"]:
+if args[:1] in (["stdin"], ["dir"]):
     rules = os.environ.get("GITLEAKS_CONFIG_TOML", "").encode("utf-8", "replace")
     handle = os.open(LOG, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
     try:
-        os.write(handle, ("stdin " + hashlib.sha256(rules).hexdigest() + "\\n").encode())
+        os.write(handle, (args[0] + " " + hashlib.sha256(rules).hexdigest() + "\\n").encode())
     finally:
         os.close(handle)
     if os.path.exists(FAIL):
         mode = open(FAIL, encoding="utf-8").read().strip()
         if mode == "all" or os.path.exists(FAIL + ".first"):
-            sys.stdin.buffer.read()
+            if args[0] == "stdin":
+                sys.stdin.buffer.read()
             print("W2-107 stand-in: this gitleaks cannot decide", file=sys.stderr)
             sys.exit(1)
         open(FAIL + ".first", "w").close()
@@ -141,7 +157,7 @@ os.execv(REAL, [REAL] + args)
 def make_engine(folder, tag="a"):
     """A stand-in gitleaks in ``folder``; ``tag`` makes its bytes its own (another tag, another engine).
 
-    While ``engine.fail`` exists, its scan calls exit 1 (gitleaks could not decide): every one when the file says
+    While ``engine.fail`` exists, its scan calls (``stdin`` and ``dir``) exit 1 (gitleaks could not decide): every one when the file says
     ``all``; every one after the first when it says ``after-first``.
     """
     folder = Path(folder)
@@ -184,6 +200,22 @@ def uncached(engine, work):
     """``work()`` with no cache: its result and its scan calls (what a scan of the same texts costs in full)."""
     with cache_off():
         return counted(engine, work)
+
+
+def cost(engine, work):
+    """What ``work()`` costs in scan calls with no cache: the base a case expects when it scans every text it is given
+    (one ``dir`` call per rule set for a batch of files, one ``stdin`` call per rule set for each path name)."""
+    return uncached(engine, work)[1]
+
+
+def texts_judged(work):
+    """``work()``'s result and how many file contents it gave to gitleaks (``scanned``) and answered from the record
+    (``remembered``), by the public ``scan_counts()``. One ``dir`` call judges a whole batch, so the calls say how many
+    processes ran; this says how many texts they judged."""
+    before = gov_secrets.scan_counts()["content"]
+    result = work()
+    after = gov_secrets.scan_counts()["content"]
+    return result, {key: after[key] - before[key] for key in ("scanned", "remembered")}
 
 
 def cache_files(cache):

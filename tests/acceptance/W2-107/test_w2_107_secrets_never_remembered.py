@@ -20,10 +20,13 @@ def test_a_file_holding_the_secret_is_dropped_and_scanned_on_every_call(project,
     clean = support.put(project, {"docs/neighbour.md": "W2-107: an ordinary neighbour.\n"})
     kept, alone = support.uncached(engine, lambda: secrets.indexable(project, secret))
     assert kept == [] and alone >= 1, "premise: gitleaks finds the planted secret"
+    both = support.cost(engine, lambda: secrets.indexable(project, secret + clean))  # one batch, one run a rule set
     for number in range(CALLS):
-        kept, calls = support.counted(engine, lambda: secrets.indexable(project, secret + clean))
+        (kept, calls), texts = support.texts_judged(
+            lambda: support.counted(engine, lambda: secrets.indexable(project, secret + clean)))
         assert kept == clean, f"call {number + 1}: the file holding the secret is dropped"
-        assert calls == alone + (per_text if number == 0 else 0), \
+        assert calls == (both if number == 0 else alone), f"call {number + 1}: the processes the scan takes"
+        assert texts == ({"scanned": 2, "remembered": 0} if number == 0 else {"scanned": 1, "remembered": 1}), \
             f"call {number + 1}: the secret is scanned in full again, the clean neighbour only the first time"
 
 
@@ -53,8 +56,12 @@ def test_a_commit_of_the_repository_after_the_rules_keyword_is_let_through_and_s
     assert kept == [] and dropped >= 1, "premise: the rule finds a 40-hex string after its keyword, not a commit"
     kept, alone = support.uncached(engine, lambda: secrets.indexable(root, exempt))
     assert kept == exempt and alone >= 1, "premise: a commit of the repository there is exempt and let through"
+    findings = support.cost(engine, lambda: secrets.indexable(root, exempt + other))  # the texts that are never remembered
+    every = support.cost(engine, lambda: secrets.indexable(root, exempt + other + clean))
     for number in range(CALLS):
-        kept, calls = support.counted(engine, lambda: secrets.indexable(root, exempt + other + clean))
+        (kept, calls), texts = support.texts_judged(
+            lambda: support.counted(engine, lambda: secrets.indexable(root, exempt + other + clean)))
         assert kept == exempt + clean, f"call {number + 1}: the commit is let through, the other string dropped"
-        assert calls == alone + dropped + (per_text if number == 0 else 0), \
+        assert texts == ({"scanned": 3, "remembered": 0} if number == 0 else {"scanned": 2, "remembered": 1}), \
             f"call {number + 1}: the exempt match and the finding are scanned again, the clean neighbour only once"
+        assert calls == (every if number == 0 else findings), f"call {number + 1}: the processes the scan takes"

@@ -32,16 +32,28 @@ gitleaks or git is not on `PATH`.
 ## The fixtures
 
 - **The stand-in gitleaks** (`w2_107_support.make_engine`) is first on `PATH`. It is a small Python script that logs one
-  line for each scan call (`gitleaks stdin`): the sub-command and the sha256 of the rule set it was given, never content.
-  It then hands the call, unchanged, to the real gitleaks (found with `shutil.which` before any case changes `PATH`).
+  line for each scan call: the sub-command and the sha256 of the rule set it was given (the `GITLEAKS_CONFIG_TOML` of
+  the call), never content. It then hands the call, unchanged, to the real gitleaks (found with `shutil.which` before any
+  case changes `PATH`).
+  - **What it counts** (`Engine.calls()`): a *scan call* is one gitleaks process given texts to judge, that is
+    `gitleaks stdin` (a path's names, one text) plus `gitleaks dir` (folder mode, DEC-1183 (2), `_FORM` 7: one process
+    per rule set for a whole batch of file texts, each a numbered file of a private folder). `Engine.count("dir")` or
+    `count("stdin")` gives one sub-command's share. Other calls (`gitleaks version`) are not scan calls.
+  - So a call costs: `indexable` over up to nineteen texts (two rule sets) is one `dir` call per rule set for the whole
+    batch, however many texts; `path_holds_secret` is one `stdin` call per rule set for each name. A case never counts
+    "calls per text" for files: it takes the cost of the same work with no cache as the base (`support.cost`) and
+    expects that, or 0 when every text is remembered. Where a case must tell how many *texts* were judged (a finding
+    beside a clean neighbour in one batch), it reads `scan_counts()` (`support.texts_judged`, or the child's counts).
   - Another engine is another stand-in with other bytes, first on `PATH`.
   - In `test_a_gitleaks_whose_bytes_change_in_place_rescans_everything`, the stand-in's own bytes are rewritten in
     place between two processes.
-  - While its `fail` file exists, the stand-in "cannot decide" (exit 1): on every call (`all`), or on every call after
-    the first (`after-first`).
-- **`per_text`** is what one clean text costs with no cache (`GOV_SECRETS_CACHE=""`): one call per rule set in force,
-  2 with the kernel's `.gitleaks.toml`. Expectations are built from it and from the measured cost of the findings, not
-  from a hard-coded number.
+  - While its `fail` file exists, the stand-in "cannot decide" (exit 1) on a `stdin` and on a `dir` call alike: on every
+    call (`all`), or on every call after the first (`after-first`).
+  - Without gitleaks on `PATH` the folder form raises `RuntimeError` ("gitleaks is not on PATH: nothing can be
+    decided") and the one-text form the `OSError` of the missing program; the case accepts either: it must raise.
+- **`per_text`** is what one clean text alone costs with no cache (`GOV_SECRETS_CACHE=""`): one call per rule set in
+  force, 2 with the kernel's `.gitleaks.toml`. It is the base only for one text; expectations over several texts are
+  the measured cost of the same work, and of the findings, never a hard-coded number.
 - **The cache.** Every case sets `GOV_SECRETS_CACHE` to a file in its own `tmp_path`, in a folder that exists, and sets
   `HOME` to a folder of its own. No case can reach the real `~/.cache/gov-os/`, even under a filter that ignored
   `GOV_SECRETS_CACHE`. The default-place cases run in child processes with `HOME` set to a temporary folder.
@@ -89,6 +101,10 @@ The test files are all `test_w2_107_<name>.py`; the tables give `<name>::<case>`
 | 11. The verdicts, their order and the dropping are unchanged | `remembered::test_the_verdicts_and_their_order_are_those_of_a_scan_without_a_cache` |
 
 ## Red on the base code, and the guards
+
+*Historical: the table below was seen on the base code of round 1, when the filter judged one text a `gitleaks stdin`
+call. The stand-in then followed the folder form (E2 reds fix, EMERGENCY-2 section 4.2: `Rewrite-Reason` in the commit);
+the red reasons name what each case checks, which the folder form does not change.*
 
 **Run on the base code: 33 cases; 27 fail, 6 pass. The 6 that pass are the guards.**
 
