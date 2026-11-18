@@ -100,8 +100,8 @@ Every item is a test function (a parametrised one covers all its rows). "Red on 
 | S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_admit_exit_0_when_used_plus_need_stays_within_the_budget` | exit 2, not 0 (no `gov dispatch limits`) |
 | S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_wait_exit_3_with_the_reason_when_used_plus_need_exceeds_the_budget` | exit 2, not 3 (no `gov dispatch limits`) |
 | S9 (RT-3b) | `test_w2_121c_rt3_limits.py::test_rt3b_with_no_gpu_the_answer_is_refuse_saying_memory_is_unavailable` | exit 2, not 3 (no `gov dispatch limits`) |
-| S10 (RT-8) | `test_w2_121c_rt8_launch_line.py::test_rt8_the_launch_line_names_model_effort_their_sources_the_class_and_the_rubric_file` | no stderr line naming the rubric |
-| S10 (RT-8) | `test_w2_121c_rt8_launch_line.py::test_rt8_without_criticality_yaml_the_line_says_no_rubric_and_the_record_holds_null` | no stderr line naming the rubric |
+| S10 (RT-8) | `test_w2_121c_rt8_launch_line.py::test_rt8_with_a_rubric_the_record_names_model_effort_both_sources_the_class_and_the_rubric_file` | the launch record has no `rubric` key |
+| S10 (RT-8) | `test_w2_121c_rt8_launch_line.py::test_rt8_without_criticality_yaml_the_sources_are_role_default_and_rubric_is_null` | the launch record has no `rubric` key |
 | S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_by_day_a_61_minute_silence_gives_one_item_and_one_push_three_more_passes_none` | 0 stall items, not one (the tick has no stall check) |
 | S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_a_newer_entry_then_a_new_61_minute_silence_gives_one_more_of_each` | 0 stall items and 0 pushes at the first stall |
 | S11 (interim stall check) | `test_w2_121c_s11_dispatcher_stall.py::test_s11_in_the_quiet_hours_61_minutes_give_the_item_and_no_push_121_minutes_the_push` | 0 stall items, not one |
@@ -164,10 +164,10 @@ exist, or the launcher sends and prints nothing); no harness error.
 - **RT-2a's environment**: `GOV_MSG_ADDRESS` is read from the stand-in process's own environment. The registry entry's
   `notify` and `address` are read from the entry while the session runs (the launcher removes it at the end).
 - **RT-2a's "within 5 s of the stub's end"**: polled for 5 s from `gov launch`'s return (which follows the stub's end).
-- **RT-8's "one line"**: exactly one stderr line names the rubric file or says "no rubric"; with the file it names the
-  model, the effort, `by criticality` (both sources), `C2` and `governance/project/criticality.yaml`; the record's
-  `rubric` ends with that path. Without the file the line holds "no rubric: the role's default" and the record's
-  `rubric` is null. "Before the session starts" is not observable from the stand-in and is not asserted.
+- **RT-8** (amended at `486467ec5`, round 3: no stderr line): the launch record's `rubric` ends with
+  `governance/project/criticality.yaml` (relative or absolute), or is null with the key present; the record's
+  `model`, `effort`, `model_source`, `effort_source` (and `criticality` C2 with the rubric) are the table's or the
+  role default's; a successful launch's stdout and stderr are both empty (W2-60a's stand-in prints nothing).
 - **RT-7b's log**: at least one `pass` event per pass, every line `{"at", "event", ...}`.
 - **RT-7b's "writes nothing"** under a held lock: state.json and log.jsonl byte for byte, the `runtime` inbox's mark,
   and no message sent for a watch that would be due.
