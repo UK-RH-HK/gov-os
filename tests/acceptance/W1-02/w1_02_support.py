@@ -65,7 +65,6 @@ PRODUCT_SPEC = "product-spec"
 TEST_DESIGNER = "independent-test-designer"
 AUDITOR = "independent-auditor"
 KNOWN_ROLES = (ORCHESTRATOR, PRODUCT_SPEC, TEST_DESIGNER, ENGINEER, AUDITOR)
-UNKNOWN_ROLES = ("developer", "implementer", "admin", "owner", "engineer,orchestrator", "*")
 
 HOOK_TIMEOUT_S = 20.0
 SESSION_ID = "w1-02-acceptance-session"
@@ -138,11 +137,6 @@ def _argv(entry):
     raise HookMissing(
         f"{entry.name} is not executable and is neither a .py nor a .sh file; cannot tell how to run it"
     )
-
-
-def installed_hook_rel():
-    """Repository-relative path of the hook entry point inside a fixture project."""
-    return f"{PRODUCT_HOOK_DIR_REL}/{hook_entry().name}"
 
 
 # --------------------------------------------------------------------------
@@ -301,15 +295,6 @@ def findings(project):
     return [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def real_ticket_text(wbs_id="W1-02", root=REPO_ROOT):
-    """(ticket id, text) of this repository's ticket for ``wbs_id``, set in progress."""
-    for path in sorted((Path(root) / ".tickets").glob("*.md")):
-        text = path.read_text(encoding="utf-8")
-        if re.search(rf"(?m)^wbs_id:\s*{re.escape(wbs_id)}\s*$", text):
-            return path.stem, re.sub(r"(?m)^status:.*$", "status: in_progress", text, count=1)
-    raise AssertionError(f"no ticket with wbs_id {wbs_id} in .tickets/")
-
-
 # --------------------------------------------------------------------------
 # One hook call
 # --------------------------------------------------------------------------
@@ -458,38 +443,6 @@ def run_hook(project, tool_name, tool_input, sandbox, role=None, ticket=None, su
     return run_hook_raw(project, stdin, sandbox, role, ticket, extra_env)
 
 
-def run_hook_with_open_stdin(project, sandbox, limit_s, role=None, ticket=None):
-    """Run the installed hook with a stdin that never ends; wait at most ``limit_s``."""
-    project = Path(project)
-    started = time.perf_counter()
-    proc = subprocess.Popen(
-        _argv(_installed_entry(project)),
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        cwd=str(project),
-        env=hook_environment(project, sandbox, role, ticket),
-    )
-    try:
-        proc.wait(timeout=limit_s)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        proc.wait()
-        proc.stdin.close()
-        proc.stdout.close()
-        proc.stderr.close()
-        return HookResult("timeout", None, "", "", time.perf_counter() - started)
-    seconds = time.perf_counter() - started
-    stdout, stderr = proc.stdout.read(), proc.stderr.read()
-    for stream in (proc.stdin, proc.stdout, proc.stderr):
-        try:
-            stream.close()
-        except OSError:
-            pass
-    return HookResult(classify(proc.returncode, stdout), proc.returncode, stdout, stderr, seconds)
-
-
 # --------------------------------------------------------------------------
 # Tool inputs
 # --------------------------------------------------------------------------
@@ -508,10 +461,6 @@ def edit_tool_input(tool_name, path):
 
 def bash_tool_input(command):
     return {"command": command, "description": "W1-02 acceptance attempt"}
-
-
-def assert_denied(result, what):
-    assert result.decision == "deny", f"{what} was not denied: {result.describe()}"
 
 
 def assert_allowed(result, what):
