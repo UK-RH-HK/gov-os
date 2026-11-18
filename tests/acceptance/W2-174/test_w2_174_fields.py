@@ -101,8 +101,10 @@ def _check_inserted(old: str, new: str, answered: dict) -> None:
 
 def _coordination_and_review(repo) -> dict:
     """The adopted repository's two tickets (L16): a coordination ticket and an A5 review ticket, each with the common
-    keys and none of the six fields; the kernel templates, a filled facts file and a file the review waits on."""
+    keys and none of the six fields; the kernel templates, the installed judging-work skill (the auditor's brief
+    needs it), a filled facts file and a file the review waits on."""
     repo.kernel_templates()
+    repo.judging_skill()
     repo.filled_facts()
     repo.file("docs/notes/a5-scope.md", "The scope of the A5 review.\n")
     repo.bare("exa-dt1z", "W2-27")

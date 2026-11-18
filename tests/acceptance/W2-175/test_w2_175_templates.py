@@ -104,6 +104,9 @@ def test_f1_a_stop_sentence_changed_by_one_letter_fails_the_s4_check(tmp_path):
 
 # --- Success 5: version 1.0.1, every other front matter key the base's ----------------------------------------------
 
+JUDGING_STEMS = ("role-reviewer",)  # the template of the independent auditor, a judging role
+
+
 @pytest.mark.parametrize("stem", t.SEVEN)
 def test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s(stem):
     base, _ = s.split(t.base_text(stem))
@@ -112,5 +115,11 @@ def test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s(stem):
     assert now.get("version") == "1.0.1", \
         f"{stem}.md: version is {now.get('version')!r}, not 1.0.1 (DEC-1121's step for a template delta)"
     others = {key for key in set(base) | set(now) if key != "version"}
+    if stem in JUDGING_STEMS:
+        # W2-195 (DEC-1204 (5)): a template of a judging role appends ``judging-work`` to its base's skills list
+        # and changes nothing else
+        assert now.get("skills") == list(base.get("skills") or []) + ["judging-work"], \
+            f"{stem}.md: skills is {now.get('skills')!r}, not the base's {base.get('skills')!r} plus judging-work"
+        others.discard("skills")
     changed = {key: (base.get(key), now.get(key)) for key in sorted(others) if base.get(key) != now.get(key)}
     assert not changed, f"{stem}.md: front matter keys other than version differ from the base {t.BASE[stem]}: {changed}"
