@@ -9,6 +9,7 @@ import types
 from pathlib import Path
 
 SKILL_REL = "governance/kernel/skills/spec-writing/check_spec.py"
+SHIPPED_REL = "template/governance/kernel/skills/spec-writing/check_spec.py"  # its copy in the wheel (fabric.shipped)
 COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 BULLET = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 _loaded: dict[str, types.ModuleType] = {}
@@ -23,7 +24,7 @@ def skill(root: Path) -> types.ModuleType:
         if place.is_file():
             break
     else:
-        place = shipped("template/" + SKILL_REL, root)
+        place = shipped(SHIPPED_REL, root)
     if str(place) not in _loaded:
         module = types.ModuleType("check_spec")
         module.__file__ = str(place)

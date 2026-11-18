@@ -20,7 +20,7 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("session-watch",)
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("wait",)  # wait (W2-160, DEC-1079): a bounded wait on a job's exit file
 # install, update (W2-18, W2-17: the pinned install and gov update) and msg (DAEO-5rgj, the run-time tool's inbox),
 # EMERGENCY-2 6.1, 6.3
-RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("install", "msg", "update")
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("install", "msg", "update", "discover")  # discover: W2-36
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)  # impact (W2-37, DEC-812 item 6, P-7 (a)): the impact query
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("skilleval",)  # skilleval (W2-104, DEC-747, DEC-1020): the skill evaluation harness
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
