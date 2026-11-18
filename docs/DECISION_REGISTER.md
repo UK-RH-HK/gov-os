@@ -815,7 +815,7 @@ The owner's answers to the S1-A round-1 decision packages DP-1…DP-8 (`~/gov-os
 round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
 
 ### DEC-088 — MR-4: what triggers an independent audit
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-1 (owner's own option) · **Implements:** MR-4, DEC-070
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-1 (owner's own option) · **Implements:** MR-4, DEC-070 · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:** A fresh, independent audit runs when a spine specification closes, when a STANDARD or FULL feature
   specification closes, when an accepted CIT-E changes a closed spine specification, and at every wave and release
   exit. LITE feature specifications are audited at the wave exit. Contested and owner-level findings reach the owner in
@@ -865,7 +865,7 @@ round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
 | 0.14 | 2026-10-01 | S1-A round 1: DEC-088 (audit triggers), DEC-089 (gap tickets in W1), DEC-090 (A0–A11), DEC-091 (parent-child retrieval W1), DEC-092 (covers lists), DEC-093 (five-package cap, P1 bypass), DEC-094 (test execution, integration roles W2), DEC-095 (DEC-040: ACCEPTED as amended by DEC-083). |
 
 ### DEC-096 — Loop policy: iterate to convergence; escalate after three consecutive non-converging iterations
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Amends:** DEC-044, DEC-070, DEC-082 · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-1010
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Amends:** DEC-044, DEC-070, DEC-082 · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-1010 · **Class:** superseded by EMERGENCY-2 §3.3 (DEC-1211)
 - **Decision:** Any iterative loop that runs until convergence (review→repair, audit→repair, test→fix, verification)
   continues until it converges, or until three consecutive iterations fail to converge. The third consecutive failure
   produces an escalation package for the owner: each iteration's outcome, why it is not converging, and the options
@@ -945,7 +945,7 @@ as it is.
   orchestrator does not change the Contract or any ticket now.
 
 ### DEC-104 — UX before build, with visual testing
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package) · **Class:** superseded by EMERGENCY-2 §6.2 (DEC-1211)
 - **Decision:** For a feature with a user interface, the UX readiness dimension closes only with scenario-derived
   wireframes or mockups the owner has approved. Its acceptance tests include visual checks against those designs
   (screenshot comparison and scenario walk-throughs). The UX role (Wave 2) owns this; visual-testing tools are
@@ -1249,7 +1249,7 @@ Contract nor any ticket for them now.
 - To be carried into Contract v4 by the post-bootstrap spec change.
 
 ### DEC-137 — Independent post-green probe for FULL tickets
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:** For a FULL-profile ticket, the adversarial probe after the acceptance tests go green is done by a fresh
   reviewer subagent, not by the engineer who wrote the code. The orchestrator commissions and judges the probe; the
   reviewer writes nothing to the repository.
@@ -1341,7 +1341,7 @@ W1-03 repair (commit `95df6c5`): the answer to W1-BUILD decision package DP-6, o
   outside the repository, whatever the command form.
 
 ### DEC-148 — How a ticket is reopened for a repair
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Refines:** DEC-133
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Refines:** DEC-133 · **Class:** superseded by EMERGENCY-2 §4.2 (DEC-1211)
 - **Decision:** Repairs follow W1-03's pattern: reopening sets the status to `in_progress` and claims the ticket, and
   closing sets it back to `closed`. W1-04's repair kept its status unchanged in history; no fix is needed, and the
   pattern holds from here on.
@@ -4410,7 +4410,7 @@ fourth round.
     `PAUSE_NOT_SET` and `PAUSE_NOT_LIFTED`, and the flag's mode 0600.
 
 ### DEC-413 — Review rounds: at most two per FULL ticket; what is fixed after that; W1-50 keeps its seventh round
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220 · **Changed by:** DEC-880 makes one exception, for W2-58 only: a third review limited to its narrow extra round · **Changed by:** DEC-909 (for W2-69 only): the owner allows a third review, the last. · **Changed by:** DEC-912 item 3 (for W2-66 only): the owner allows a third review, the last. · **Changed by:** DEC-916 (standing): a ticket run in rounds declared in its plan gets up to two reviews per declared round.
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220 · **Changed by:** DEC-880 makes one exception, for W2-58 only: a third review limited to its narrow extra round · **Changed by:** DEC-909 (for W2-69 only): the owner allows a third review, the last. · **Changed by:** DEC-912 item 3 (for W2-66 only): the owner allows a third review, the last. · **Changed by:** DEC-916 (standing): a ticket run in rounds declared in its plan gets up to two reviews per declared round. · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:**
   - A FULL ticket has at most two review rounds.
   - After the second, only two kinds of finding are fixed: fail-open holes, and silent changes to tests or ticket
@@ -4915,7 +4915,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
     minimum; the record is renewed at the Wave 1 exit.
 
 ### DEC-449 — Every KPI clause is read against the tests and the code before a close is accepted
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator's practice since DEC-439 · **Under:** DEC-439
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator's practice since DEC-439 · **Under:** DEC-439 · **Class:** superseded by EMERGENCY-2 §4.3 (DEC-1211)
 - **Decision:**
   - The orchestrator's practice of reading every KPI clause against the tests and the code before accepting a
     close is confirmed and kept for every ticket.
@@ -5464,7 +5464,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 131. Owner answers: W1-30's last review and the order of the probe for FULL tickets (register v0.131, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-498 — W1-30's second review is its last; what it may still change; a FULL ticket is probed before its merge
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-415, DEC-137 · **Refines:** DEC-496
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-415, DEC-137 · **Refines:** DEC-496 · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:**
   - **W1-30.** The review of the fixed `gov close` (after the DEC-487 follow-up) is the ticket's second and last independent review under DEC-415. After it, only two kinds of finding are fixed: a fail-open hole, and a silent close in a shape that ordinary work produces. Every other finding becomes a residual. A fail-open that one fix does not close comes to the owner as a decision package, not as another round. Then W1-30 closes.
   - **Process, for every FULL ticket from now on.** The fresh reviewer probes the ticket's final code before the orchestrator merges it (DEC-137), not after a later tool asks for the record.
@@ -6261,7 +6261,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - This repository's hook entries carry `"timeout": 60` since the operator's commit `0894faab` (all five entries: PreToolUse, PostToolUse, PostToolUseFailure, PreCompact, SessionStart; nothing else changed). It takes effect in sessions started after it. If containment flags `0894faab` or `27ec3482` (the orchestrator prompt's section 11), each is a record of an owner action (DEC-254).
 
 ### DEC-581 — P-30: the probe gate refuses only for later commits that change the ticket's code or its acceptance tests
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-30 option (a) · **Refines:** DEC-505 · **Under:** DEC-498, DEC-137
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-30 option (a) · **Refines:** DEC-505 · **Under:** DEC-498, DEC-137 · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:** The probe gate refuses only for commits after the probed one that change files inside the ticket's `allowed_paths` or its acceptance tests. It is built in the running follow-up after W1-41.
 
 ### DEC-582 — P-31: how a register entry is known to be the owner's stays as built for Wave 1
@@ -7756,7 +7756,7 @@ The orchestrator reported revision 2 of `docs/plan/WAVE_2_WBS.md` with one open 
   7. **Until W2-50 closes, W2-26 clones into its session's scratch folder under `/tmp`.** Its results are committed to `docs/research/EXP-003/examin/`, so only the throwaway clone is volatile.
 
 ### DEC-729 — The Wave 2 plan is approved; the main session records under a coordination ticket, W2-00 (P-W2-6 (a))
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718 (F-m7), DEC-720 to DEC-728 · **Basis:** the main session has recorded under DAEO-6cc2, the closed W1-45 ticket (F-m7).
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718 (F-m7), DEC-720 to DEC-728 · **Basis:** the main session has recorded under DAEO-6cc2, the closed W1-45 ticket (F-m7). · **Class:** superseded by EMERGENCY-2 §6.2 (DEC-1211)
 - **Decision:**
   1. **The plan is approved:** `docs/plan/WAVE_2_WBS.md` revision 2, with W2-50 added (DEC-728), and `docs/plan/WAVE_2_TRIAGE.md`. Both are ACCEPTED when the owner commits them.
   2. **P-W2-6 (a):** straight after that commit, the orchestrator creates the coordination ticket W2-00 with `tk`, before any other ticket, and gives the owner its `tk` id. The owner sets `GOV_TICKET` to it in `.claude/settings.local.json` (owner act O-3).
@@ -7814,7 +7814,7 @@ The first leads of Wave 2, W2-01 (DAEO-g0ip) and W2-26 (DAEO-2ds6), started in t
   5. **A Wave 2 row, W2-H054 (high), triaged into W2-21:** "a ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree". Added to `docs/plan/WAVE_2_LIST.md` §3.1 and `docs/plan/WAVE_2_TRIAGE.md` with this entry. It goes into W2-21's `list_rows` in a commit of its own (`Task: DAEO-1ahb`) once this entry is committed.
 
 ### DEC-733 — The lead commits the probe record under `docs/probes/<ticket id>/`
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-137, DEC-498, DEC-236 · **Basis:** `gov close`'s probe gate reads `docs/probes/<ticket id>/*.md`, committed with `Role: orchestrator`; the orchestrator's lead brief said the lead writes nothing under `docs/`.
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-137, DEC-498, DEC-236 · **Basis:** `gov close`'s probe gate reads `docs/probes/<ticket id>/*.md`, committed with `Role: orchestrator`; the orchestrator's lead brief said the lead writes nothing under `docs/`. · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:** a FULL ticket's lead commits the reviewer's probe record under `docs/probes/<ticket id>/`, with `Task: <ticket id>`, `Implements:` and `Role: orchestrator`. It is the one path under `docs/` a lead writes; every other file under `docs/`, `src/`, `template/` and `tests/` stays a worker's.
 
 ### DEC-734 — The form of an accepted-history entry (W2-01)
@@ -10813,7 +10813,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - Next free id: DEC-916.
 
 ### DEC-916 — A ticket run in rounds gets up to two reviews per round declared in its plan (standing, under the rule about rules)
-- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-413, DEC-851, DEC-904 item 5, DEC-909, DEC-912 · **Basis:** package P-W2-67-R23 (`governance/project/orchestration/packages/P-W2-67-R23.md`): W2-67 runs in three rounds declared in its ticket's plan; round 1 used both of DEC-413's reviews. · **Changed by:** DEC-1010, DEC-987
+- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-413, DEC-851, DEC-904 item 5, DEC-909, DEC-912 · **Basis:** package P-W2-67-R23 (`governance/project/orchestration/packages/P-W2-67-R23.md`): W2-67 runs in three rounds declared in its ticket's plan; round 1 used both of DEC-413's reviews. · **Changed by:** DEC-1010, DEC-987 · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:**
   1. **A ticket run in rounds gets up to two reviews per round,** only for rounds declared in its ticket's plan before the round starts.
   2. **A third review in any round is the owner's exception,** as before (DEC-909, DEC-912).
@@ -11633,7 +11633,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - **Where it goes (DEC-851):** this register; `LEAD-w2-common.md` (Return); the prompt §1 (item 5, `gov context` once the trigger is met) and §7 (the daily document's lines), v3.40; `brief-gaps.md`; W2-79's ticket; RESUME HERE.
 
 ### DEC-944 — The Gov OS as a software company: the mapping; a Definition of Ready checked at claim and a playbook per stream join EXAMIN's minimum (standing)
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; an addendum to the re-plan, DEC-941; items 2 and 3 standing) · **Under:** DEC-941, DEC-940, DEC-930, CAP-33 · **Changes:** K9's entry criteria for EXAMIN's copy (DEC-941 items 3, 6 and 7), which gain items 2 and 3
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; an addendum to the re-plan, DEC-941; items 2 and 3 standing) · **Under:** DEC-941, DEC-940, DEC-930, CAP-33 · **Changes:** K9's entry criteria for EXAMIN's copy (DEC-941 items 3, 6 and 7), which gain items 2 and 3 · **Class:** superseded by EMERGENCY-2 §6.2 (DEC-1211)
 - **Decision:**
   1. **The mapping.** The Gov OS was designed to work the way a software company does. The orchestrator gives a short mapping, one row per company function, to its Gov OS artefact, its state, the gap and the ticket that closes it. It covers at least:
      - the engineering handbook (the Contract, the register, ADRs, the standing practices);
@@ -12222,7 +12222,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 ### DEC-974 — The memory-chain line back in every status block; a new ticket in the WBS is a P1; a lighter lane for the CTO's own tools, to be proposed (standing)
 - **Superseded by DEC-1214 (2026-11-18, K2 (c): planning first).**
-- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; items 1 and 2 standing; item 3 a proposal to come) · **Under:** DEC-952 item 4, DEC-948, DEC-949, DEC-818, DEC-954 · **Changes:** the CTO's filing of tickets under delegation (DEC-220, DEC-936 item 2.5: no longer a P2 or P3 for a WBS ticket) · **Changed by:** DEC-979 (item 3), DEC-1157 (12)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; items 1 and 2 standing; item 3 a proposal to come) · **Under:** DEC-952 item 4, DEC-948, DEC-949, DEC-818, DEC-954 · **Changes:** the CTO's filing of tickets under delegation (DEC-220, DEC-936 item 2.5: no longer a P2 or P3 for a WBS ticket) · **Changed by:** DEC-979 (item 3), DEC-1157 (12) · **Class:** superseded by DEC-1214 (K2 (c): planning first)
 - **Decision:**
   1. **The memory-chain line (DEC-952 item 4, reaffirmed):** every status block carries it again. It had dropped out of the CTO's blocks on 2026-10-31 (the CTO's slip). The 20:00 CAPACITY-1 brief gives memory's state: what has merged, what is running, what has not started, and when the next measure is due.
   2. **A new ticket in the WBS is a P1 (standing):** adding a ticket changes the WBS and the plan, so it goes to the owner as a P1 package (six parts, DEC-818) with the CTO's recommendation, before it is filed. This covers follow-ups, splits (an "a/b" ticket) and tickets for a red found by a close or the nightly; a red fixed on the spot inside an existing ticket's scope needs no new ticket. A lead never files one: it names the need in its return. The 20:00 brief lists every ticket added since the plan's approval (DEC-954), each with the decision that added it and who decided it (the owner, or the CTO under delegation).
@@ -12482,7 +12482,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.376 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-994 (the dead-man's switch by push only, tested first; the quiet-hours hook in with onFailure block; the approvals discipline into W2-11, W2-33 and W2-113). Next free id: DEC-995. |
 
 ### DEC-995 — A role is what it may read and write; a skill never widens it; mixed tickets are split before they start; P-W2-11-9 (c) (standing)
-- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-957 (the work order), DEC-954 Q6/Q13, DEC-959 item 4, DEC-974, DEC-944 item 2 · **Changes:** P-W2-11-9's option (b) is refused, not parked
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-957 (the work order), DEC-954 Q6/Q13, DEC-959 item 4, DEC-974, DEC-944 item 2 · **Changes:** P-W2-11-9's option (b) is refused, not parked · **Class:** superseded by EMERGENCY-2 §1.2 (DEC-1211)
 - **Decision:**
   1. **P-W2-11-9 (c):** a child engineer ticket (W2-120) holds W2-11's validator failure line ("the skill validator refuses a brief without the twelve-field rule") and row W2-L097, on `src/gov/check/skill_validator.py` and its unit tests, after W2-11; W2-11 closes on its other lines. **(b) is dropped: the launcher must not accept a second role on a ticket.**
   2. **The rule:** a role is defined by what it may read and write; a skill only changes how a role works and never widens what it may touch. Work that needs different permissions is a different role: spec writing is the product-spec role (with the spec-writing skill), never an engineer loading a spec-writing skill. Work that shares the engineer's permissions (backend, frontend, API, data, security, DevOps) is a skill of the engineer role.
@@ -14837,7 +14837,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** the owner's message of 2026-11-12 ~19:40, after the CTO's two lines each.
 
 ### DEC-1154 — A change decided after a ticket's review gets a narrow independent check of that change, without asking the owner; the ticket lands on it (standing)
-- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~20:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1152 (3), DEC-1010, DEC-802, DEC-989
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~20:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1152 (3), DEC-1010, DEC-802, DEC-989 · **Class:** superseded by EMERGENCY-2 §3.6 (DEC-1211)
 - **Decision:**
   - (1) **Standing:** any change the owner decided that is added to a ticket after its review (a widening, a default, a fix riding a resume, DEC-802) gets a narrow independent check of that change only, launched by the CTO without asking; the ticket then lands on that check's passing record. Not a design review and not a full round.
   - (2) **W2-121b now:** the narrow check of the template default (DEC-1149 (2)) that rode after its review; if it passes, it lands tonight.
