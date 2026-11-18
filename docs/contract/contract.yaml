@@ -200,10 +200,11 @@ master_rules:
 - id: MR-4
   title: Audit, discovery and impact are distinct functions
   text_source: architecture v0.3 §1A (Charter v6 §4)
-  acceptance: Each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or skill and record; closing a spine,
-    STANDARD or FULL feature specification, an accepted CIT-E that changes a closed spine, and every wave or release exit
-    each create an audit ticket for a fresh auditor that authored none of the audited files; its report names the milestone,
-    and contested or owner-level findings appear in chat as decision packages.
+  acceptance: 'The functions stay distinct: each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or
+    skill and record. A fresh auditor that authored none of the audited files runs at the release acceptance and at adoption
+    stages A5, AS, A7 and A10; otherwise a review happens only for a red test, a failed landing or merge, or a feature that
+    does not work as intended, batched when several come together; the audit report names its milestone, and contested or
+    owner-level findings appear in chat as decision packages.'
   provider:
   - W1-27
   - W1-13
@@ -222,7 +223,8 @@ master_rules:
   - DEC-065
   - DEC-066
   - DEC-070
-  - DEC-088
+  - DEC-1204
+  - DEC-1214
 - id: MR-5
   title: The Gov OS works as a software company
   text_source: architecture v0.3 §1A (Charter v6 §4)
@@ -1342,7 +1344,8 @@ capabilities:
       no in-process L0–L5 machinery.
   covers:
   - id: CAP-21.a
-    item: Approval facts only from the owner's git account
+    item: Approval facts only from the owner's git account; kernel and instruction text needs the CTO's approval, not the
+      owner's (EMERGENCY-2 §3.5); decisions still need the owner's
     source: Contract v3 E1 (LITE); Framework v4.1.2 §23
     wave: W1
     provider:
@@ -1454,8 +1457,8 @@ capabilities:
 - id: CAP-24
   title: Skill lifecycle and versioning
   outcome: An agent can tell which version of each skill produced a piece of work.
-  acceptance: Every skill file carries a version in frontmatter, and the `gov close` record of a ticket lists the skill ids
-    and versions used.
+  acceptance: Every skill file carries a version in frontmatter, and the land record of a ticket lists the skill ids and versions
+    used.
   wave: W1
   provider:
   - W1-35
@@ -1491,8 +1494,9 @@ capabilities:
     - W1-35
     - W1-36
   - id: CAP-24.c
-    item: Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
-    source: Framework v4.1.2 §5, §27
+    item: Kernel and instruction text (role files, brief and role templates, skills, CLAUDE.md and AGENTS.md) changes only
+      by the CTO's decision, approval and own commit; the landing checks kernel bytes against the CTO-approved list
+    source: Framework v4.1.2 §5, §27; EMERGENCY-2 §3.5 (DEC-1211)
     wave: W1
     provider:
     - W1-35
@@ -2001,9 +2005,9 @@ capabilities:
     source: Contract v3 W6
     wave: W3
   - id: CAP-33.d
-    item: Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned
-      promotion
-    source: Framework v4.1.2 §5
+    item: Changes to the Gov OS's own Charter and Contract pass evidence → a CIT-P with three costed options (DEC-105) → the
+      owner's approval → a versioned promotion; kernel and instruction text follows CAP-24.c
+    source: Framework v4.1.2 §5; EMERGENCY-2 §3.5 (DEC-1211)
     wave: W1
     provider:
     - W1-35
@@ -2359,12 +2363,10 @@ capabilities:
     provider:
     - W1-35
   - id: CAP-38.f
-    item: For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the
-      orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
-    source: DEC-137
-    wave: W1
-    provider:
-    - W1-30
+    item: 'Non-goal: a fresh reviewer''s adversarial probe after green for a FULL ticket, with the close needing the probe
+      record: work that went through green gets no review'
+    source: EMERGENCY-2 §3.4, §3.6 (DEC-1211); DEC-1214 G6
+    wave: NONE
 - id: CAP-39
   title: Governance health tiers and the landing's checks (G1-G5)
   outcome: Governance checks run at the right tier automatically, and a stale required index fails the landing.
@@ -2878,8 +2880,8 @@ capabilities:
     contains no builder chat.
   wave: W3
   wave_note: Independent Test Designer and Independent Auditor roles in W1 (W1-33), including the A5 path-map review (DEC-090);
-    the lite A7 and A10 gates W2 by that Independent Auditor role (CAP-44.f, DEC-722); full independent adoption/audit roles
-    and the full A7, A10 and A11 gates W3
+    the lite A7 and A10 gates and the AS spec audit W2 by that Independent Auditor role (CAP-44.f, DEC-722); full independent
+    adoption/audit roles and the full A7, A10 and A11 gates W3
   provider:
   - W1-33
   - 'W3: independent adoption/audit roles'
@@ -2895,6 +2897,7 @@ capabilities:
   - DEC-070
   - DEC-088
   - DEC-090
+  - DEC-1214 G6
   scenarios:
     dev:
     - AUDIT-X-01
@@ -2918,8 +2921,9 @@ capabilities:
     source: Contract v3 T3; Adoption Protocol v3.0 §5
     wave: W3
   - id: CAP-47.d
-    item: 'Audit triggers: spine, STANDARD/FULL feature closure, CIT-E on a closed spine, wave and release exits'
-    source: MR-4; DEC-088
+    item: 'Audit triggers: the release acceptance and adoption stages A5, AS, A7 and A10; otherwise only a red test, a failed
+      landing or merge, or a feature that does not work as intended'
+    source: MR-4; DEC-1214 G6 (a); EMERGENCY-2 §3.4, §3.6 (DEC-1211)
     wave: W1
     provider:
     - W1-13

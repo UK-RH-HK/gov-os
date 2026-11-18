@@ -110,11 +110,12 @@ These rules apply to every session in every Gov OS, including the Gov OS's own d
   independently compares the project's actual state with its specification and contract. `gov doctor` checks only
   the installation's own health. None of these substitutes for another.
   - Audit is performed by a fresh, read-only Independent Auditor who did not author what it audits.
-  - It runs at every specification milestone and at every wave or release exit, including on the Gov OS's own
-    Charter and Contract.
+  - A fresh auditor runs at the release acceptance and at adoption stages A5, AS, A7 and A10. Otherwise a review
+    happens only for a red test, a failed landing or merge, or a feature that does not work as intended, batched when
+    several come together (EMERGENCY-2 §3.4, §3.6; DEC-1214 G6).
   - The auditor's yardstick is the governing sources **plus** the owner's accepted decisions: a deliberate, recorded
     drop is not a defect.
-  - Its findings go to the owner as decision packages, within the loop budget.
+  - Its contested and owner-level findings go to the owner as decision packages, within the loop budget.
 - **MR-5 The Gov OS works as a software company.** Work is done by role agents: orchestrator, product/specification,
   research, architecture, UX, frontend, backend, database/data, integration/API, AI/ML, DevOps/SRE, security,
   performance, data author, independent test designer, test execution, integration, change controller,
@@ -140,7 +141,7 @@ ceremony scales with impact radius.
 |---|---|---|---|---|---|
 | LITE | R0–R1 | the 10 mandatory rows (§37 rows 1, 2, 4, 5, 6, 9, 16, 23, 24, 25) | independent acceptance tests (MR-3) | code + tests, 1 follow-up round | none beyond MR-6 |
 | STANDARD | R2 | mandatory rows + the rows the capability-type table in `readiness-dimensions.yaml` marks | MR-3 | + decisions, graph; ~3 rounds; single-pass synthesis | on contradictions |
-| FULL | R3+ | all 26 rows | MR-3 + a fresh independent verifier with a bounded whole-system pack (DEC-042 as amended) | all facets; ~8 rounds, then escalate; hierarchical synthesis | customer gate before CIT-E |
+| FULL | R3+ | all 26 rows | MR-3; no verifier for green work (EMERGENCY-2 §3.4) | all facets; ~8 rounds, then escalate; hierarchical synthesis | customer gate before CIT-E |
 
 - A row a profile does not require may stay MISSING without blocking.
 - There is no defaulted N/A. Every N/A is N/A_WITH_REASON, written by an agent with a non-empty reason.
@@ -197,14 +198,13 @@ from kernel role files plus the project roster. It carries:
 - discovery: the discovery skill plus `gov readiness`;
 - impact (CIT-P): an OpenSpec proposal, plus `gov impact` from Wave 2;
 - execution (CIT-E): OpenSpec apply/archive plus `gov close`;
-- audit: a fresh, read-only Independent Auditor. It runs (DEC-088):
-  - when a spine specification closes;
-  - when a STANDARD or FULL feature specification closes;
-  - when an accepted CIT-E changes a closed spine specification;
-  - at every wave and release exit.
+- audit: a fresh, read-only Independent Auditor. It runs (DEC-1214 G6):
+  - at the release acceptance;
+  - at adoption stages A5, AS, A7 and A10.
 
-  LITE feature specifications are audited at the wave exit. Contested and owner-level findings come to the owner as
-  decision packages, and agreed fixes become tickets.
+  Otherwise a review happens only for a red test, a failed landing or merge, or a feature that does not work as
+  intended. Contested and owner-level findings come to the owner as decision packages; a fix is recorded in the
+  owning ticket, never a ticket of its own.
 
 Readiness gaps generate linked tickets from Wave 1 (DEC-089).
 

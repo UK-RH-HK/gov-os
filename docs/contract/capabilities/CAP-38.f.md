@@ -3,14 +3,14 @@ id: CAP-38.f
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
+title: 'Non-goal: a fresh reviewer''s adversarial probe after green for a FULL ticket, with the close needing the probe record: work that went through green gets no review'
 depends_on:
 - CAP-38
 ---
 
-# CAP-38.f: For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
+# CAP-38.f: Non-goal: a fresh reviewer's adversarial probe after green for a FULL ticket, with the close needing the probe record: work that went through green gets no review
 
 A covers item of CAP-38 (Verification test families (product and governance)). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
-- **Wave:** W1
+- **Item:** Non-goal: a fresh reviewer's adversarial probe after green for a FULL ticket, with the close needing the probe record: work that went through green gets no review
+- **Wave:** NONE
