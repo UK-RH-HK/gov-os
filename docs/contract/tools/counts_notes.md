@@ -1,0 +1,1 @@
+DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1. Version 4.1 adds CAP-61 and CAP-62 to Wave 1 (DEC-152, DEC-153).
