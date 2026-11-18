@@ -10,6 +10,8 @@ metadata:
 
 A method for gathering evidence with `gov retrieve`. The guard and the role file decide what the caller may read and write (CAP-24.b); this skill is the method only.
 
+**Memory first:** `gov retrieve "<question>"` before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
+
 ## How retrieval works
 
 1. **Invoke `gov retrieve`.** Pass the query, the ticket id (`--ticket`), any record or symbol ids to close over (`--id`), and the impact radius (`--radius 0..4`). The radius scales the follow-up rounds (DEC-035, CAP-16).
@@ -25,7 +27,7 @@ A method for gathering evidence with `gov retrieve`. The guard and the role file
 
 6. **Handle continuation.** If the bundle carries a continuation token and the stopping reason is not `CLOSURE_COMPLETE` or `SATURATED`, pass the token back with `--continue` to gather more evidence within the spend budget.
 
-7. **Search again once (DEC-1092 (1)).** If the bundle does not answer the question, or you can tell your answer may be incomplete, run `gov retrieve` once more in your own, different words (the ids, names and paths the first bundle showed, or the repository's own term). Then answer from both bundles and the files you read, citing path and lines, or say "not found" and what is missing. The bundle does not answer when no item states the fact asked (only its neighbourhood), when an item names the thing but not the part asked, when the question asks for all of something and the bundle cannot show it holds all, or when your draft needs "probably" or "may be incomplete". A continuation (step 6) is the same search, not the second; `FACET_UNAVAILABLE` is a fault to report, not a miss. Two searches in all by default; a third only when your brief asks. Never answer beyond what the bundles and the files you read show.
+7. **Search again once (DEC-1092 (1)).** First read every item of the bundle, never head or cut it, and cite the ids you use. If the bundle does not answer the question, or you can tell your answer may be incomplete, run `gov retrieve` once more in your own, different words (the ids, names and paths the first bundle showed, or the repository's own term). Then answer from both bundles and the files you read, citing path and lines, or say "not found" and what is missing. The bundle does not answer when no item states the fact asked (only its neighbourhood), when an item names the thing but not the part asked, when the question asks for all of something and the bundle cannot show it holds all, or when your draft needs "probably" or "may be incomplete". A continuation (step 6) is the same search, not the second; `FACET_UNAVAILABLE` is a fault to report, not a miss. Two searches in all by default; a third only when your brief asks. Never answer beyond what the bundles and the files you read show.
 
 ## Key constraints
 

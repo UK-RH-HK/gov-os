@@ -27,7 +27,9 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-6 in the 
 | CTO tools | {TOOLS} |
 
 ## Your first calls (every run)
-0. {CMD:identity} (expect orchestrator, {ID}) and {CMD:where} (expect {TREE}, w2/{W2}); `test -f {CHECKPOINT_FILE} && echo resume`; read {TICKET_FILE}; read the 3 to 5 paths, or ask the one memory question, that the part names. Then start your run's first step. Ask memory, not the register: {CMD:retrieve} "<question>".
+0. {CMD:identity} (expect orchestrator, {ID}) and {CMD:where} (expect {TREE}, w2/{W2}); `test -f {CHECKPOINT_FILE} && echo resume`; read {TICKET_FILE}; read the 3 to 5 paths, or ask the one memory question, that the part names. Then start your run's first step.
+
+**Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
 
 ## Every run
 - Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
