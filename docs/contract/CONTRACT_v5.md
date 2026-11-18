@@ -125,14 +125,14 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 
 ### CAP-05 — Emergency controls (pause/freeze/cancel/rollback)
 
-- **Outcome:** The owner can freeze all agent writes with one command and resume them, and roll back by `git revert`.
-- **Acceptance:** After `gov pause`, the next Edit/Write/Bash write by any role is denied by the guard, and `git status --porcelain` is unchanged; `gov pause --off` restores writes.
-- **Wave:** W1
-- **Provider:** W1-28, W1-02
+- **Outcome:** The owner can stop the work with one command and resume it, and roll back by `git revert`.
+- **Acceptance:** After `gov pause`, `gov launch` and the dispatcher start no session, the landing lands nothing, and every running session gets a stop message in its inbox; `gov pause --off` restores all three and `git status --porcelain` is unchanged.
+- **Wave:** W1 (the freeze flag and `gov pause` are W1; its readers (launch, dispatch, landing) are a fix recorded in W1-28)
+- **Provider:** W1-28, the flag's readers in `gov launch`, the dispatcher and the landing: a fix to W1-28's feature (EMERGENCY-2 §4.2; audit 7 C-1)
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate A5; Framework v4.1.2 §74; DEC-025
+- **Sources:** Contract v3 Gate A5; Framework v4.1.2 §74; DEC-025; EMERGENCY-2 §9.2 (DEC-1211); DEC-409
 - **Covers:**
-  - `CAP-05.a` [W1] PAUSE and FREEZE_WRITES (gov pause) — Contract v3 A5; Framework v4.1.2 §74 · delivered by W1-28
+  - `CAP-05.a` [W1] PAUSE and FREEZE (`gov pause`): the freeze flag stops launches, dispatcher ticks and landings and sends a stop message to every running session; `--off` lifts all three, and only the owner in person lifts (DEC-409) — Contract v3 A5; Framework v4.1.2 §74; EMERGENCY-2 §9.2 (DEC-1211) · delivered by W1-28
   - `CAP-05.b` [W1] CANCEL_AGENTS: stop running subagents and release their claims — Contract v3 A5; Framework v4.1.2 §74 · delivered by W1-28
   - `CAP-05.c` [W1] ROLLBACK_TRANSACTION: git revert of the ticket's commits, recorded — Contract v3 A5; Framework v4.1.2 §74 · delivered by W1-28
   - `CAP-05.d` [W1] Emergency commands deterministic and owner-gated; recovery auditable (recorded in the ticket) — Contract v3 A5 · delivered by W1-28

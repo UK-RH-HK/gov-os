@@ -496,17 +496,20 @@ capabilities:
     wave: W2
 - id: CAP-05
   title: Emergency controls (pause/freeze/cancel/rollback)
-  outcome: The owner can freeze all agent writes with one command and resume them, and roll back by `git revert`.
-  acceptance: After `gov pause`, the next Edit/Write/Bash write by any role is denied by the guard, and `git status --porcelain`
-    is unchanged; `gov pause --off` restores writes.
+  outcome: The owner can stop the work with one command and resume it, and roll back by `git revert`.
+  acceptance: After `gov pause`, `gov launch` and the dispatcher start no session, the landing lands nothing, and every running
+    session gets a stop message in its inbox; `gov pause --off` restores all three and `git status --porcelain` is unchanged.
   wave: W1
   provider:
   - W1-28
-  - W1-02
+  - 'the flag''s readers in `gov launch`, the dispatcher and the landing: a fix to W1-28''s feature (EMERGENCY-2 §4.2; audit
+    7 C-1)'
   sources:
   - Contract v3 Gate A5
   - Framework v4.1.2 §74
   - DEC-025
+  - EMERGENCY-2 §9.2 (DEC-1211)
+  - DEC-409
   scenarios:
     dev:
     - CHAOS-A-10
@@ -517,8 +520,9 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-05.a
-    item: PAUSE and FREEZE_WRITES (gov pause)
-    source: Contract v3 A5; Framework v4.1.2 §74
+    item: 'PAUSE and FREEZE (`gov pause`): the freeze flag stops launches, dispatcher ticks and landings and sends a stop
+      message to every running session; `--off` lifts all three, and only the owner in person lifts (DEC-409)'
+    source: Contract v3 A5; Framework v4.1.2 §74; EMERGENCY-2 §9.2 (DEC-1211)
     wave: W1
     provider:
     - W1-28
@@ -540,6 +544,7 @@ capabilities:
     wave: W1
     provider:
     - W1-28
+  wave_note: the freeze flag and `gov pause` are W1; its readers (launch, dispatch, landing) are a fix recorded in W1-28
 - id: CAP-06
   title: Repository contract and path map
   outcome: An agent can find where every kind of artefact lives from the committed path map, and nothing material is unclassified.
