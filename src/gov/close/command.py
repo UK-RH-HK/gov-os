@@ -1508,7 +1508,9 @@ def _write_close_record(root: Path, ticket: str, record: dict,
 # scoped close (DEC-953 item 1, DEC-983) runs only the scoped selection (``gov.close.select.scoped``) in the warm
 # clone (``gov.close.attribution``), refuses only on a red its change caused (S4), opens a repair ticket for every
 # other red (S5), computes READY from the reviewer's verdict block (S11) and writes its close record (S7). It
-# reads and writes no accepted-reds or load-sensitive list and runs none of the lifted gates.
+# runs none of the lifted gates and reads no load-sensitive list; of the path map's lists it reads only the counted
+# ``accepted_reds`` entries (DEC-757's owner-entry rule), which accept a red that is red at the base (W2-194 S3,
+# DEC-1206 (1), ``_accept_base_reds``); it writes none.
 
 CLOSE_MODE_REL = "governance/project/close.yaml"
 SCOPED, STRICT = "scoped", "strict"
@@ -1583,10 +1585,96 @@ def _inside(entry: str, targets: list[str]) -> bool:
     return False
 
 
+_CONFTEST_BY_NAME = r"^[ \t]*(?:from[ \t]+conftest[ \t]+import\b|import[ \t]+conftest\b)"
+_NOT_SCANNED = {".git", ".gov-runtime", "__pycache__", "node_modules", ".venv", "venv", ".tox", ".mypy_cache"}
+
+
+def _unit_of(tree: Path, target: str) -> tuple[str, list[Path]]:
+    """The folder a selected target is grouped by (W2-193 S1) and the Python files it holds: a folder target its
+    own folder, every file below it; a file or node target its file's folder, the files of that folder."""
+    rel = target.partition("::")[0].rstrip("/")
+    path = Path(tree) / rel
+    if path.is_dir():
+        files = [f for f in sorted(path.rglob("*.py"))
+                 if not any(part in _NOT_SCANNED for part in f.relative_to(path).parts[:-1])]
+        return rel, files
+    folder = path.parent
+    return folder.relative_to(tree).as_posix() if folder != Path(tree) else ".", \
+        sorted(folder.glob("*.py")) if folder.is_dir() else []
+
+
+def _unit_traits(files: list[Path]) -> dict:
+    """What a group of files brings to a pytest process (S1): the names of its modules that live outside a package
+    (``conftest`` not among them: pytest imports each conftest.py afresh), whether it holds a conftest.py, and
+    whether one of its modules imports ``conftest`` by name."""
+    import re
+
+    names, conftest, by_name = set(), False, False
+    for f in files:
+        if f.name == "conftest.py":
+            conftest = True
+        elif f.name != "__init__.py" and not (f.parent / "__init__.py").exists():
+            names.add(f.stem)
+        if not by_name:
+            try:
+                by_name = re.search(_CONFTEST_BY_NAME, f.read_text(encoding="utf-8", errors="replace"),
+                                    re.M) is not None
+            except OSError:
+                pass
+    return {"names": names, "conftest": conftest, "by_name": by_name}
+
+
+def _collide(one: dict, other: dict) -> bool:
+    return bool(one["names"] & other["names"]) or (one["by_name"] and other["conftest"]) \
+        or (other["by_name"] and one["conftest"])
+
+
+def _process_groups(tree: Path, targets: list[str]) -> list[list[str]]:
+    """The parallel phase's targets split into pytest processes (W2-193 S1, DEC-1203 (3), F-028): two selected
+    folders (a file grouped by its folder) collide when they hold a module of the same name outside a package, or
+    when a module of one imports ``conftest`` by name and the other holds a conftest.py; colliding folders never
+    share a process, the rest share as few as they can (the first that takes them, in the selection's order). A
+    selection without a collision is one process, as before."""
+    units: dict[str, list[str]] = {}
+    traits: dict[str, dict] = {}
+    for target in targets:
+        unit, files = _unit_of(tree, target)
+        if unit not in units:
+            units[unit] = []
+            traits[unit] = _unit_traits(files)
+        units[unit].append(target)
+    groups: list[list[str]] = []
+    for unit in units:
+        home = next((g for g in groups if not any(_collide(traits[unit], traits[u]) for u in g)), None)
+        if home is None:
+            groups.append([unit])
+        else:
+            home.append(unit)
+    return [[t for u in g for t in units[u]] for g in groups]
+
+
+def _merge_junit(parts: list[Path], into: Path) -> None:
+    """The JUnit files of the parallel phase's processes as one (``<testsuites>`` holding each one's suites)."""
+    import xml.etree.ElementTree as ET
+
+    merged = ET.Element("testsuites")
+    for part in parts:
+        try:
+            root = ET.parse(part).getroot()
+        except (OSError, ET.ParseError):
+            continue
+        merged.extend(list(root) if root.tag == "testsuites" else [root])
+    into.parent.mkdir(parents=True, exist_ok=True)
+    ET.ElementTree(merged).write(into, encoding="utf-8", xml_declaration=True)
+
+
 def _phases(tree: Path, chosen: dict, folder: Path, timeout: float, workers) -> dict:
     """The parallel phase, then the serial phase (W2-57's, ``gov.close.serial.phase``) restricted to the entries
     inside the selection, in ``tree``: ``{"runs", "failing", "complete", "incomplete", "parallel_xml",
-    "serial_xml"}``. A run is complete when pytest ended 0 or 1 and its JUnit file was written."""
+    "serial_xml", "parallel_processes"}``. A run is complete when pytest ended 0 or 1 and its JUnit file was
+    written. The parallel phase runs its targets in one pytest process, or, where selected suites collide, in one
+    process for each group of them that does not (W2-193 S1, ``_process_groups``); their results are read as one
+    run (``runs``: one ``parallel`` entry, ``parallel_xml`` their merged JUnit file)."""
     import importlib.util
 
     from gov.close import attribution as _attribution, serial as _serial
@@ -1598,6 +1686,7 @@ def _phases(tree: Path, chosen: dict, folder: Path, timeout: float, workers) -> 
         routed = _serial.nightly(tree)
     except UnicodeDecodeError as e:
         return {"runs": [], "failing": [], "complete": False, "parallel_xml": None, "serial_xml": None,
+                "parallel_processes": [],
                 "incomplete": [f"the serial-only list {serial_only.LIST_REL} is not UTF-8 text ({e})"]}
     inside = [e for e in listed if _inside(e, suites)]
     serial_entries = [e for e in _serial.phase(tree, inside) if e in inside]
@@ -1606,32 +1695,54 @@ def _phases(tree: Path, chosen: dict, folder: Path, timeout: float, workers) -> 
     parallel_options = options + [f"--deselect={e}" for e in left_out]
     if importlib.util.find_spec("xdist") is not None and workers not in (1, None):
         parallel_options += ["-n", str(workers)]
-    plans = [("parallel", parallel_targets, parallel_options), ("serial", serial_entries, options + (
+    groups = _process_groups(tree, parallel_targets) if parallel_targets else []
+    plans = [("parallel", groups or [[]], parallel_options), ("serial", [serial_entries], options + (
         ["-p", "no:xdist"] if importlib.util.find_spec("xdist") is not None else []))]
     out = {"runs": [], "failing": [], "complete": True, "incomplete": [], "routed_to_nightly": sorted(
-        set(inside) & routed)}
-    for name, targets, opts in plans:
+        set(inside) & routed), "parallel_processes": groups}
+    for name, parts, opts in plans:
         xml, log = folder / f"{name}.xml", folder / f"{name}.txt"
         out[f"{name}_xml"] = str(xml)
-        if not targets:
+        if not parts[0]:
             _empty_junit(xml)
             out["runs"].append({"name": name, "passed": 0, "failed": 0, "errors": 0, "skipped": 0})
             continue
-        done = _attribution.run_pytest(tree, targets, opts, xml, log, timeout,
-                                       workers=workers if isinstance(workers, int) else None)
-        results = _attribution.read_results(xml, tree)
-        if done["exit"] not in (0, 1) or results is None:
-            out["complete"] = False
-            out["incomplete"].append(f"the {name} run did not complete (pytest exit {done['exit']}"
-                                     f"{', timed out' if done['timed_out'] else ''}"
-                                     f"{', no JUnit file' if results is None else ''}; slot: {done['slot']})")
-            if results is None:
-                continue
-        out["runs"].append({"name": name, **{k: results[k] for k in ("passed", "failed", "errors", "skipped")}})
-        out["failing"] += [{**f, "run": name} for f in results["failures"]]
-        if done["exit"] == 1 and not results["failures"]:
-            out["complete"] = False
-            out["incomplete"].append(f"the {name} run ended 1 and its JUnit file names no failing test")
+        many = len(parts) > 1
+        counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}
+        read_any, written, empty = False, [], 0
+        for n, targets in enumerate(parts, 1):
+            what = f"the {name} run" + (f" (process {n} of {len(parts)}: {', '.join(targets)})" if many else "")
+            p_xml, p_log = (folder / f"{name}-{n}.xml", folder / f"{name}-{n}.txt") if many else (xml, log)
+            done = _attribution.run_pytest(tree, targets, opts, p_xml, p_log, timeout,
+                                           workers=workers if isinstance(workers, int) else None)
+            results = _attribution.read_results(p_xml, tree)
+            # a process of several that collects nothing is part of a run that may (pytest's exit 5); a run all
+            # of whose processes collect nothing did not complete, as the one process before it
+            nothing = many and done["exit"] == 5 and results is not None
+            empty += nothing
+            if (done["exit"] not in (0, 1) and not nothing) or results is None:
+                out["complete"] = False
+                out["incomplete"].append(f"{what} did not complete (pytest exit {done['exit']}"
+                                         f"{', timed out' if done['timed_out'] else ''}"
+                                         f"{', no JUnit file' if results is None else ''}; slot: {done['slot']})")
+                if results is None:
+                    continue
+            read_any = True
+            written.append(p_xml)
+            for key in counts:
+                counts[key] += results[key]
+            out["failing"] += [{**f, "run": name} for f in results["failures"]]
+            if done["exit"] == 1 and not results["failures"]:
+                out["complete"] = False
+                out["incomplete"].append(f"{what} ended 1 and its JUnit file names no failing test")
+        if many:
+            if empty == len(parts):
+                out["complete"] = False
+                out["incomplete"].append(f"the {name} run did not complete (pytest exit 5 in each of its "
+                                         f"{len(parts)} processes)")
+            _merge_junit(written, xml)
+        if read_any:
+            out["runs"].append({"name": name, **counts})
     return out
 
 
@@ -1791,6 +1902,73 @@ def review_verdict(root: Path, ticket: str, front: dict) -> dict:
 
 # --- the scoped close -------------------------------------------------------
 
+BASE_RUN_KEYS = ("ran", "commit", "passed", "failed", "errors", "skipped", "complete")
+
+
+def _base_run(root: Path, tree: Path, commit: str, base: str, chosen: dict, folder: Path, timeout: float,
+              workers) -> dict:
+    """The selection run at the base (W2-193 S4, W2-194 S1): the clone reset to ``base``, the selection's targets
+    the base holds run by ``_phases`` (the close's own process layout), the clone reset to ``commit`` after.
+    ``{ran, commit, passed, failed, errors, skipped, complete, usable, outcomes, why}``; ``usable`` only where the
+    run completed and collected a test."""
+    from gov.close import attribution as _attribution
+
+    out = {"ran": False, "commit": base, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "complete": False,
+           "usable": False, "outcomes": {}, "why": None}
+    try:
+        _attribution.checkout(tree, base)
+        held = [s for s in chosen["suites"] if _attribution._git(
+            tree, "cat-file", "-e", f"{base}:{s.split('::')[0].rstrip('/') or '.'}").returncode == 0]
+        if not held:
+            out["why"] = "the base holds none of the selection's targets"
+            return out
+        phases = _phases(tree, {**chosen, "suites": held}, folder, timeout, workers)
+    except _attribution.CloneError as e:
+        out["why"] = f"the clone could not be brought to the base: {e}"
+        return out
+    finally:
+        _attribution.checkout(tree, commit)
+    out["ran"], out["complete"] = True, bool(phases["complete"])
+    for run in phases["runs"]:
+        for key in ("passed", "failed", "errors", "skipped"):
+            out[key] += run[key]
+    for name in ("parallel_xml", "serial_xml"):
+        read = _attribution.read_results(Path(phases[name]), tree) if phases.get(name) else None
+        for node, result in (read or {}).get("outcomes", {}).items():
+            out["outcomes"].setdefault(node, result)
+    collected = sum(out[key] for key in ("passed", "failed", "errors", "skipped"))
+    if not out["complete"]:
+        out["why"] = "it did not complete: " + "; ".join(phases["incomplete"])
+    elif collected == 0:
+        out["why"] = "it collected no test"
+    else:
+        out["usable"] = True
+    return out
+
+
+def _accept_base_reds(root: Path, reds: list[dict]) -> tuple[list[dict], list[dict]]:
+    """The path map's ``accepted_reds`` applied to the scoped close's reds (W2-194 S3, DEC-1206 (1); DEC-757's
+    owner-entry rule unchanged, ``gov.close.ratchet.counted_entries``): ``(accepted, findings)``. A red that a
+    counted entry lists by its exact id and that is red at the base (its alone run there or the base run, any
+    failure type) is accepted: not caused, its decision named, no repair ticket. A listed red green or not collected
+    at the base is never accepted. An entry that does not count covers nothing and is a finding."""
+    if not reds:
+        return [], []
+    counted, findings = _ratchet.counted_entries(root, _ratchet.ACCEPTED_REDS)
+    listed = {entry["test"]: entry for entry in counted}
+    accepted = []
+    for red in reds:
+        red["accepted"] = None
+        entry = listed.get(red["test"])
+        if entry is None or not red.get("red_at_base"):
+            continue
+        red.update(caused=False, accepted=entry["decision"], reason=red["reason"] + (
+            f"; red at the base and listed by the counted accepted_reds entry of {entry['decision']}: accepted"))
+        red.pop("baseline_missing", None)
+        accepted.append({**{f: entry[f] for f in _ratchet.FIELDS[_ratchet.ACCEPTED_REDS]}, "result": _ratchet.FAILED})
+    return accepted, findings
+
+
 def _run_scoped(root: Path, args, config: dict):
     """The scoped close (S1 to S7, S10, S11): its result, or a ``GovError`` naming its refusal."""
     from datetime import datetime, timezone
@@ -1828,11 +2006,17 @@ def _run_scoped(root: Path, args, config: dict):
     if review["verdict"] != READY:
         raise GovError(review["verdict"], "; ".join(review["reasons"]),
                        {"ticket": ticket, "review": review}, exit_code=EXIT_CHECK_FAILED)
-    base = getattr(args, "base", None) or chosen["base"]
+    # the head without the change (W2-193 S3): --base, else the newest green record on HEAD's line, else the first
+    # parent of the ticket's oldest own commit; --base resolved as git rev-parse resolves it (W2-194 S2)
+    given = getattr(args, "base", None)
+    base, base_from = (given, "given") if given else (chosen["base"], chosen.get("base_from"))
     if base is not None:
-        resolved = _select.full_id(root, base)
+        resolved, refused = _select.resolve_base(root, base)
         if resolved is None:
-            raise GovError("BASE_UNKNOWN", f"--base {base} names no commit", {"ticket": ticket})
+            what = "names more than one object; give more of its digits" if refused == "BASE_AMBIGUOUS" \
+                else "names no commit"
+            raise GovError(refused, f"{'--base' if given else 'the base'} {base} {what}",
+                           {"ticket": ticket, "base": base})
         base = resolved
 
     try:
@@ -1847,24 +2031,40 @@ def _run_scoped(root: Path, args, config: dict):
         raise GovError("RUN_INCOMPLETE", "the selection's run did not complete, so nothing is judged: "
                        + "; ".join(phases["incomplete"]), {"ticket": ticket, "runs": phases["runs"]},
                        exit_code=EXIT_CHECK_FAILED)
+    base_run: dict = {}
+
+    def run_at_base() -> dict:
+        base_run.update(_base_run(root, tree, commit, base, chosen, folder / "base", timeout, workers))
+        return base_run
+
     if phases["failing"]:
         try:
             reds, night = _attribution.attribute(root, tree, commit, base, phases["failing"],
-                                                 chosen["pytest_options"], folder / "alone", timeout)
+                                                 chosen["pytest_options"], folder / "alone", timeout,
+                                                 base_run=run_at_base)
         except _attribution.CloneError as e:
             raise GovError("CLOSE_CLONE_FAILED", f"the clone could not be brought back to {commit[:12]}: {e}",
                            {"ticket": ticket})
     else:
         reading = _attribution.nightly_reading(root)
         reds, night = [], {"read": reading["read"], "record": reading["record"]}
+    stated_base_run = {k: base_run[k] for k in BASE_RUN_KEYS} if base_run else None
+    accepted, accepted_findings = _accept_base_reds(root, reds)
+    details = {"ticket": ticket, "reds": reds, "runs": phases["runs"], "selection": chosen["suites"], "base": base,
+               "base_from": base_from, "base_run": stated_base_run, "accepted_red_findings": accepted_findings}
+    missing = [r for r in reds if r.get("baseline_missing")]
+    if missing:
+        raise GovError("BASELINE_MISSING", f"the base run at {base[:12]} ({base}) cannot judge {len(missing)} red(s) "
+                       f"of {ticket} whose alone runs could not ({base_run.get('why')}): "
+                       + "; ".join(f"{r['test']} ({r['failure_type']})" for r in missing)
+                       + "; give --base a commit where the selection runs", details, exit_code=EXIT_CHECK_FAILED)
     caused = [r for r in reds if r["caused"]]
     if caused:
         raise GovError("RED_CAUSED", f"{len(caused)} red(s) caused by the change of {ticket}: "
                        + "; ".join(f"{r['test']} ({r['failure_type']}): {r['reason']}" for r in caused),
-                       {"ticket": ticket, "reds": reds, "runs": phases["runs"], "selection": chosen["suites"]},
-                       exit_code=EXIT_CHECK_FAILED)
+                       details, exit_code=EXIT_CHECK_FAILED)
     for red in reds:
-        red["repair_ticket"] = _tool.open_red_repair(root, ticket, red)
+        red["repair_ticket"] = None if red.get("accepted") else _tool.open_red_repair(root, ticket, red)
     record = {
         "close": SCOPED,
         "commit": commit,
@@ -1872,11 +2072,16 @@ def _run_scoped(root: Path, args, config: dict):
         "runs": phases["runs"],
         "review": {"verdict": review["verdict"], "record": review["record"]},
         "reds": [{"test": r["test"], "failure_type": r["failure_type"], "caused": r["caused"], "reason": r["reason"],
-                  "repair_ticket": r["repair_ticket"]} for r in reds],
+                  "repair_ticket": r["repair_ticket"], "accepted": r.get("accepted")} for r in reds],
         "culprits": [],
         "clone": {"path": clone["path"], "reused": clone["reused"], "replaced": clone["replaced"]},
         "nightly": {"read": night["read"], "record": night["record"]},
         "base": base,
+        "base_from": base_from,
+        "base_run": stated_base_run,
+        "parallel_processes": phases.get("parallel_processes", []),
+        _ratchet.ACCEPTED_REDS: accepted,
+        "accepted_red_findings": accepted_findings,
         "changed": chosen["changed"],
     }
     commit_files = list(chosen.get("own", chosen["changed"]))

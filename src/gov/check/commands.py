@@ -18,6 +18,11 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
 # ``gov`` imports); check() accepts that folder or a folder of the command's own name, as it is.
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("session-watch",)
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("wait",)  # wait (W2-160, DEC-1079): a bounded wait on a job's exit file
+# install, update (W2-18, W2-17: the pinned install and gov update) and msg (DAEO-5rgj, the run-time tool's inbox),
+# EMERGENCY-2 6.1, 6.3
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("install", "msg", "update", "discover")  # discover: W2-36
+# memory-use (W2-197), queue (W2-115b), backup (W2-198)
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("memory-use", "queue", "backup", "decisions", "memaudit")
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)  # impact (W2-37, DEC-812 item 6, P-7 (a)): the impact query
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("skilleval",)  # skilleval (W2-104, DEC-747, DEC-1020): the skill evaluation harness
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("spend",)  # spend (W2-156, DEC-1091 (2)): the runaway brake

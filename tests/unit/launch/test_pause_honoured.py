@@ -68,3 +68,15 @@ def test_a_worker_launch_is_refused_while_paused(repo, monkeypatch):
     with pytest.raises(GovError) as refused:
         launcher.launch(main, "engineer", "DAEO-x", [])
     assert "paused" in refused.value.message and not started
+
+
+# Emergency 2 (2.3): the launcher passes the no-prompt mode unless the caller names a mode
+@pytest.mark.parametrize("args, expected", [
+    ([], ["--permission-mode", "bypassPermissions"]),
+    (["-p", "x"], ["--permission-mode", "bypassPermissions"]),
+    (["--permission-mode", "acceptEdits"], []),
+    (["--permission-mode=plan"], []),
+    (["--dangerously-skip-permissions"], []),
+])
+def test_the_no_prompt_mode_is_the_default(args, expected):
+    assert launcher._mode_args(args) == expected

@@ -137,6 +137,23 @@ def state_block(project_root: str) -> bytes:
     return BEGIN + b"\ngenerated: " + stamp + b" " + digest(stamp, rest) + b"\n" + rest
 
 
+def _gov_os_source_tree(project_root: str) -> bool:
+    """The Gov OS source tree itself (copier.yml, template/ and src/gov/ at its root): the one project whose src/ a
+    hook puts on the import path (W2-18); a product's own package named gov is never imported."""
+    return (os.path.isfile(os.path.join(project_root, "copier.yml"))
+            and os.path.isdir(os.path.join(project_root, "template"))
+            and os.path.isdir(os.path.join(project_root, "src", "gov")))
+
+
+def _no_gov(exc: BaseException, what: str) -> bool:
+    """For an import of gov that failed: one line on stderr naming what was looked for, and True (W2-18)."""
+    if not isinstance(exc, ImportError) or not (getattr(exc, "name", None) or "").split(".")[0] == "gov":
+        return False
+    sys.stderr.write(f"gov hook: no gov importable by {sys.executable} (looked on its import path for "
+                     f"{exc.name}); {what}\n")
+    return True
+
+
 def put(f, offset: int, data: bytes) -> None:
     """Writes data at offset and ends the file there."""
     f.seek(offset)
@@ -153,11 +170,12 @@ def main() -> None:
     if ticket:
         try:
             src_dir = os.path.join(project_root, "src")
-            if os.path.isdir(src_dir) and src_dir not in sys.path:
+            if _gov_os_source_tree(project_root) and src_dir not in sys.path:
                 sys.path.insert(0, src_dir)
             from gov.checkpoint.record import write as _rec_write
             _rec_write(Path(project_root), ticket, "compaction", "Resume after compaction", [], dest="automatic")
         except Exception as exc:
+            _no_gov(exc, "the checkpoint record was not written")
             messages.append(f"checkpoint not written ({exc})")
     line = read_first(project_root, ticket)  # after the write: it names the record just written
 

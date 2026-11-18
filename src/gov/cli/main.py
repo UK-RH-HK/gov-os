@@ -220,6 +220,9 @@ def _version() -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if argv is None:  # started as a program: a repository with a pin runs its pinned gov (W2-18)
+        from gov.install.dispatch import run as dispatch
+        dispatch(sys.argv[1:])
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv == ["--version"]:  # no command, no project and no configuration
         print(_version())

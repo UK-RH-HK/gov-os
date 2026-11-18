@@ -16,6 +16,12 @@ its settings as the adapter check applies it (DEC-635); then:
   template copies under ``.claude/templates/`` are written byte for byte from it: an absent copy written, a differing
   one replaced, an equal one left alone (``templates``; W2-153 S-ADOPTED, DEC-1192 (2)). In Gov OS's own repository
   an ACT writes them (DEC-315) and generate does not.
+
+``gov update`` regenerates through ``forget_generated`` first (W2-17): a generated file whose bytes are still what the
+old release's ``.rulesync/`` generates is removed, so the regeneration writes the new release's (a file the project
+changed is kept and named); ``.claude/settings.json`` loses what the old generation merged into it
+(``unmerge_value``), so the new release's hooks replace the old ones instead of standing beside them. ``generate``
+itself is unchanged for every other caller.
 """
 
 from __future__ import annotations
@@ -86,6 +92,53 @@ def merge_value(own, generated):
     if isinstance(own, list) and isinstance(generated, list):
         return own + [item for item in generated if item not in own]
     return own
+
+
+def unmerge_value(own, generated):
+    """The programme's value without what the generated value put in (W2-17): an equal value dropped, a map key by key,
+    a list entry by entry, a map or list emptied by it dropped; what the programme changed stays."""
+    if isinstance(own, dict) and isinstance(generated, dict):
+        rest = {}
+        for key, value in own.items():
+            if key not in generated:
+                rest[key] = value
+            elif value == generated[key]:
+                continue
+            elif isinstance(value, (dict, list)) and type(value) is type(generated[key]):
+                left = unmerge_value(value, generated[key])
+                if left:
+                    rest[key] = left
+            else:
+                rest[key] = value
+        return rest
+    if isinstance(own, list) and isinstance(generated, list):
+        return [item for item in own if item not in generated]
+    return own
+
+
+def forget_generated(root: Path, previous: dict[str, bytes], write, delete) -> list[str]:
+    """Before ``gov update`` regenerates (W2-17): ``previous`` is what the old ``.rulesync/`` generates (path ->
+    bytes). A project file still equal to it is deleted (``delete(rel)``); ``.claude/settings.json`` is written without
+    the old generation's entries (``write(rel, bytes)``); ``CLAUDE.md`` and ``AGENTS.md`` are left to their block.
+    Returns the generated files the project changed, which are kept."""
+    kept = []
+    for rel, data in sorted(previous.items()):
+        path = Path(root) / rel
+        if rel in TEXTS or path.is_symlink() or not path.is_file():
+            continue
+        if rel == SETTINGS:
+            try:
+                own, generated = json.loads(path.read_text(encoding="utf-8")), json.loads(data.decode("utf-8"))
+            except (OSError, UnicodeDecodeError, ValueError):
+                continue
+            if isinstance(own, dict) and isinstance(generated, dict):
+                write(rel, (json.dumps(unmerge_value(own, generated), indent=2, ensure_ascii=False) + "\n").encode())
+            continue
+        if path.read_bytes() == data:
+            delete(rel)
+        else:
+            kept.append(rel)
+    return kept
 
 
 def merge_settings(own: dict | None, generated: dict) -> dict:

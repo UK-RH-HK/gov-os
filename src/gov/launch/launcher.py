@@ -112,6 +112,7 @@ REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
 # The no-prompt mode, accepted since Emergency 2 (0.1.2; DEC-313 superseded by EMERGENCY-2 2.2, 2.9).
 BYPASS_MODE = "bypassPermissions"
+WORKER_CACHE_TTL = "5m"  # a launched worker's prompt-cache lifetime (audit 09; the CTO's own session keeps 1 h)
 # Names kept for the readers that import them (suites, fixtures); since Emergency 2 no launch decides by them.
 GUARD_HOOK = "hooks/pretooluse.py"
 GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
@@ -183,7 +184,9 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
     """The ``--settings`` value of a worker session: its env (``GOV_ROLE``, ``GOV_TICKET``, ``GOV_STORE``) and an empty
     deny list, to which ``_worker_plan`` adds the user's deny rules. Emergency 2 (2.2, 2.4): no sandbox block and no
     deny rule of the launcher's own. ``root`` is a real path."""
-    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, **_store_env(root)}
+    # the owner's audit 09 item (2026-11-18): workers write the 5-minute prompt cache (their calls come fast; checked:
+    # CLAUDE_CODE_PROMPT_CACHE_TTL=5m sends the writes to the 5-minute tier); measured in the spend log
+    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, "CLAUDE_CODE_PROMPT_CACHE_TTL": WORKER_CACHE_TTL, **_store_env(root)}
     return {"env": env, "permissions": {"deny": []}}
 
 
@@ -266,6 +269,15 @@ def _check_repository_settings(root: Path, worker: bool = True) -> None:
             raise _refuse(f"{rel} is not a JSON object")
         if worker:
             _check_role_settings(data, rel)
+
+
+def _mode_args(cli_args: list[str]) -> list[str]:
+    """Emergency 2 (2.3): a session starts in the no-prompt mode unless the caller names a permission mode itself
+    (``--permission-mode``, ``--dangerously-skip-permissions``). The CLI does not take ``defaultMode: bypassPermissions``
+    from a project's settings for a launched session (seen in EXAMIN's smoke launch, 2026-11-17), so the launcher
+    passes it."""
+    named = any(a == "--permission-mode" or a.startswith("--permission-mode=") or a in BYPASS_FLAGS for a in cli_args)
+    return [] if named else ["--permission-mode", BYPASS_MODE]
 
 
 def _check_not_paused(root: Path) -> None:
@@ -682,6 +694,7 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
                       f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
     return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
             "tier": model.split("-")[1], "criticality": ticket_class,
+            "rubric": crit.REL if crit.exists(root) else None,  # W2-121c RT-8: the file the choice came from
             "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
             "review_round": review_round}
 
@@ -741,6 +754,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "effort": effort, "effort_source": chosen["effort_source"], "criticality": chosen["criticality"],
         "trial": chosen["trial"], "promotion": chosen["promotion"], "effort_reason": chosen["effort_reason"],
         "owner_named": chosen["owner_named"], "review_round": chosen["review_round"],
+        "rubric": chosen.get("rubric"),  # W2-121c RT-8: the rubric file the choice came from, or null
         "subagent_model": model, "compaction_threshold": "none",
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
@@ -748,10 +762,37 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
     if plan.get("projection_usd") is not None:  # W2-156: the runaway brake's projection; absent, the key is absent
         data["projection_usd"] = plan["projection_usd"]
     written = record.write(plan["records"], data)
-    head =[*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
+    head = [*OWN_SWITCHES, *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
+
+
+def _end_message(entry: dict | None, code) -> None:
+    """W2-121c RT-2: the session's end as one wake message to whoever launched it, with the id the watch pass gives
+    the same end. Best effort: a failed send is said on stderr and never changes the exit code or the launch."""
+    if entry is None:
+        return
+    try:
+        from gov.dispatch import inbox, runtime
+        role, ticket = entry.get("role"), entry.get("ticket")
+        inbox.send(entry["notify"], "wake", f"session {role} {ticket} ended with exit code {code}",
+                   sender=entry["address"], message_id=runtime.end_id(entry),
+                   data={"role": role, "ticket": ticket, "pid": entry.get("pid"), "exit_code": code,
+                         "repository": entry.get("repository")})
+    except Exception as error:  # noqa: BLE001 - nothing here may end the launch
+        _say(f"gov launch: the end message to {entry.get('notify')} could not be sent: "
+             f"{' '.join(str(getattr(error, 'message', error)).split())}\n")
+
+
+def _notify_address() -> str:
+    """Whoever launched: the launching process's ``$GOV_MSG_ADDRESS`` when it is an address, else ``cto``."""
+    from gov.dispatch import inbox
+    given = os.environ.get("GOV_MSG_ADDRESS")
+    try:
+        return inbox.check(given) if given else "cto"
+    except inbox.InboxError:
+        return "cto"
 
 
 def check_lead(root: Path, ticket_id: str):
@@ -933,7 +974,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
             _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-            return _run(root, cli, settings, [*cli_args, *template], entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
+            return _run(root, cli, settings, [*_mode_args(cli_args), *cli_args, *template],
+                        entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
     _check_worker_role(role)
@@ -957,6 +999,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     settings = build_settings(root, role, ticket_id)
     # W2-60a: the role read once; W2-184: the session's model and effort are RUBRIC-2's for its role and criticality.
     plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd)
+    plan["mode"] = _mode_args(cli_args)
     lock = StartLock()
     try:
         # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start
@@ -994,7 +1037,8 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
     just before the session starts, and the record is removed when it cannot be started."""
     from gov.resources import registry
 
-    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None}
+    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None, "code": None,
+             "entry": None}
     keeper = None  # W2-60b: the session record's two calls, for a worker session with its launch record
     relay = None  # W2-60b S2: the session's stdout relayed, for its result line, when it runs --output-format json
 
@@ -1025,6 +1069,9 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
         env = environ.session_env(os.environ, own_env)
+        address = f"{entry[1]}:{entry[0]}" if entry is not None else None
+        if address is not None:  # W2-121c RT-2: the session's own inbox address, in its process's environment
+            env["GOV_MSG_ADDRESS"] = address
         if not state["ended"]:  # a signal that came first: no session is started
             head, tail, written = [], [], None
             if worker is not None:  # W2-60a: the record before the session starts; the appended file last (W2-153)
@@ -1049,7 +1096,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:
-                    registry.register(pid, root, *entry)
+                    state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address)
                     state["registered"] = pid
                 except (OSError, GovError) as error:
                     raise _refuse(f"the session cannot be entered in the machine-wide registry "
@@ -1085,6 +1132,8 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 keeper.result = relay.result
         if keeper is not None:  # W2-60b S1, S5: replaced whole by every ending; it never changes the exit code
             keeper.end(state["code"] if state["code"] is not None else getattr(session, "returncode", None))
+        _end_message(state["entry"], state["code"] if state["code"] is not None else getattr(session, "returncode",
+                                                                                            None))
         if terminal is not None:
             _take_terminal(terminal)
         if state["registered"] is not None:

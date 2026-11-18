@@ -632,6 +632,11 @@ def _check_framework_lock(root: Path) -> dict:
     return section
 
 
+def _check_install(root: Path) -> dict:
+    from gov.doctor.install import check  # W2-18: the gov a product runs is its pin
+    return check(root)
+
+
 def _failed_parts(sections: dict) -> str:
     """The parts that failed or drifted, each with its reason where it gives one: what plain ``gov doctor`` prints."""
     failed = []
@@ -882,6 +887,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
             "index_freshness": _part("index_freshness", _check_index_freshness, root),
             "canaries": _part("canaries", _check_canaries, root),
             "framework_lock": _part("framework_lock", _check_framework_lock, root),
+            "install": _part("install", _check_install, root),
             "isolation": _part("isolation", _check_isolation, root),
             "claude_code": _part("claude_code", _check_claude_code, root),
             "held_out": _part("held_out", _check_held_out, root),

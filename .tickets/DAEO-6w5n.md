@@ -1,14 +1,14 @@
 ---
 id: DAEO-6w5n
-status: deferred
+status: moved
 deps: [DAEO-cb2b]
-links: [DAEO-cb2b]
+links: [DAEO-cb2b, DAEO-5rgj]
 created: 2026-11-12T01:50:00Z
 type: task
 priority: 1
 assignee: engineer
 external-ref: W2-121d
-tags: [dispatch, full, wave-3, deferred]
+tags: [dispatch, full, folded]
 wbs_id: W2-121d
 title: "gov dispatch, part d: watch and launch lead: gov watch wakes on key results, merges from integration never wake, gov launch lead builds the invocation"
 class: implementation
@@ -47,3 +47,5 @@ Parked in docs/plan/WAVE_3_PARKING.md as W3-P34: filed or split by the CTO witho
 **Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-121d leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
 
 **Paths cleared on its deferral (DEC-1201), 2026-11-16 16:1x, by the CTO (as W2-19's, DND 273):** a scratch-only placeholder stands in (the schema needs one path); the list was `src/gov/watch/**`, `src/gov/launch/**`, `tests/unit/watch/test_w2_121d*`, `tests/unit/launch/test_w2_121d*`; `src/gov/launch/**` held W2-195 (DEC-1204, top priority) in gov plan on `src/gov/launch/role.py` though this ticket is deferred to Wave 3. Restored when Wave 3 plans it.
+
+**Folded into W2-121c (DAEO-5rgj), the run-time tool, 2026-11-17 (the CTO, EMERGENCY-2 §6.1 "W2-121c, W2-121d ... build, as the run-time tool"; audit 3 Table 1 row 4).** Not built here: its watch lines become the per-session inbox, `gov msg wait` and the watch pass (RT-2, RT-6, RT-7 of DAEO-5rgj); its `gov launch lead` line becomes RT-8 there and slice 2 (dispatch through `gov launch`). No work happens under this ticket.

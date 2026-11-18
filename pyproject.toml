@@ -24,6 +24,7 @@ where = ["src"]
 "gov" = ["_shipped/template/.gitleaks.toml",
          "_shipped/template/governance/kernel/skills/retrieval/SKILL.md",
          "_shipped/template/governance/kernel/skills/discovery/SKILL.md",
+         "_shipped/template/governance/kernel/skills/spec-writing/check_spec.py",  # W2-36, gov discover
          "_shipped/template/governance/kernel/templates/brief.md",
          "_shipped/template/governance/kernel/templates/role-cto.md",
          # the ticket schema the Verify pass validates against (gov.adopt.verify_pass._validator; W2-174, DEC-1189 (1))

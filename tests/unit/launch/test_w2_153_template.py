@@ -176,12 +176,14 @@ def test_the_launch_is_otherwise_what_it_was(project, role):
     # two switches that keep user-level context out; nothing else is added. A lead's line is as it was.
     between = _options(argv[3:-2 - len(args)])
     if role in launcher.WORKER_ROLES:
+        # Emergency 2 (2.3): the launcher's own no-prompt mode, the caller naming none
+        assert between.pop("--permission-mode", None) == "bypassPermissions", argv
         assert set(between) == {"--model", "--effort", "--session-id", "--strict-mcp-config", "--setting-sources"}, argv
         assert (between["--model"], between["--effort"]) == (ROLE_MODEL, "high"), argv
         assert between["--strict-mcp-config"] is None and between["--setting-sources"] == "project,local", argv
         assert re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", between["--session-id"])
     else:
-        assert between == {}, argv
+        assert between == {"--permission-mode": "bypassPermissions"}, argv  # Emergency 2 (2.3): a lead's too
 
 
 def _options(items: list[str]) -> dict:
@@ -290,11 +292,11 @@ def test_the_dispatchers_lead_form_is_otherwise_the_same_command():
     command = [line for line in lines[start:start + 7]
                if "--append-system-prompt-file" not in line and not line.startswith("  --add-dir ")]
     assert command[:4] == [
-        "exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json "
+        "exec /home/usain/.local/bin/claude -p --model claude-sonnet-5-5 --effort high --output-format json "
         f"--permission-mode {mode} \\",
         '  --allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob" \\',
         '  --settings "{\\"env\\":{\\"GOV_ROLE\\":\\"orchestrator\\",\\"GOV_TICKET\\":\\"$ID\\",'
-        '\\"CLAUDE_CODE_SUBAGENT_MODEL\\":\\"claude-opus-5-5\\"}}" \\',
+        '\\"CLAUDE_CODE_SUBAGENT_MODEL\\":\\"claude-sonnet-5-5\\"}}" \\',
         '  < "$ORCH/briefs/$BRIEF" > "$ORCH/log/$LOGF"',
     ]
 

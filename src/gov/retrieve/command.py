@@ -35,6 +35,12 @@ built, the chunks of the stale paths left out whole, and nothing is rebuilt. A s
 unreadable or built with other index-time methods than ``rebuild.yaml``'s is still ``FACET_UNAVAILABLE``, and the
 stated gap below is decided against the same store, at a moved head too. The folder is resolved once, whichever form named it (``--root <link>``,
 ``GOV_STORE``, a call's ``root``), and every facet of the search reads it, even when the link is switched meanwhile.
+
+The memory-use log (W2-197 S8, F2): every call, a refused one with its code included (``STORE_MISSING``,
+``STORE_UNREADABLE``, ``CONTINUATION_INVALID``, ``UNRESOLVED_IDS``, or any other), appends one line to
+``gov.memory_use``'s log, in the main worktree of the call's root (``--root``, else the working folder) unless
+``GOV_MEMORY_LOG`` names it. The role is ``--role``, else ``GOV_ROLE``; the ticket ``--ticket``, else ``GOV_TICKET``;
+the session ``--session``, else ``GOV_SESSION``. A log that cannot be written changes nothing printed or exited.
 """
 
 from __future__ import annotations
@@ -123,7 +129,52 @@ def _store_root(root: Path, args) -> Path:
     return resolved(root) if chosen is None else chosen
 
 
+def _logged(root, args, started: float, result: dict | None, refusal: str | None) -> None:
+    """The call's memory-use line (W2-197 S8); never raises."""
+    try:
+        import os
+        import time
+
+        from gov import memory_use
+
+        evidence = (result or {}).get("evidence") or []
+        stop = (result or {}).get("stopping_reason")
+        if refusal is None and stop == "UNRESOLVED_IDS" and not evidence:
+            refusal = "UNRESOLVED_IDS"  # the stated gap: nothing offered in place of the ids
+        memory_use.append({
+            "command": "retrieve",
+            "role": getattr(args, "role", None) or os.environ.get("GOV_ROLE") or None,
+            "ticket": getattr(args, "ticket", None) or os.environ.get("GOV_TICKET") or None,
+            "session": getattr(args, "session", None) or os.environ.get("GOV_SESSION") or None,
+            "query_sha256": memory_use.query_hash(getattr(args, "query", "")),
+            "stop_reason": stop,
+            "items": len(evidence),
+            "characters": sum(len(str(item.get("text", ""))) for item in evidence),
+            "latency_ms": int((time.monotonic() - started) * 1000),
+            "refusal": refusal,
+            "store_commit": ((result or {}).get("store") or {}).get("commit"),
+            "reranked": bool(((result or {}).get("merge") or {}).get("reranked", False)),
+        }, root)
+    except Exception:  # noqa: BLE001 - F2: the log never changes a search
+        return
+
+
 def run(root: Path, args, config: dict) -> dict:
+    import time
+
+    from gov.cli.errors import GovError
+
+    started = time.monotonic()
+    try:
+        result = _search(root, args)
+    except GovError as error:
+        _logged(root, args, started, None, error.code)
+        raise
+    _logged(root, args, started, result, None)
+    return result
+
+
+def _search(root: Path, args) -> dict:
     import sqlite3
 
     from gov.cli.errors import GovError

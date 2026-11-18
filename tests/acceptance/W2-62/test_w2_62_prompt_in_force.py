@@ -65,8 +65,8 @@ def test_in_a_worktree_the_lead_is_sent_to_appendix_a5_of_the_rosters_prompt(tmp
     support.assert_well_formed(run)
     injection = run.injection
     lowered = injection.lower()
-    assert f"ticket lead for {LEAD_TICKET}".lower() in lowered and "appendix a5" in lowered, (
-        f"the injection does not say `ticket lead for {LEAD_TICKET}` and `appendix A5`: {injection[:400]!r}")
+    assert f"ticket lead for {LEAD_TICKET}".lower() in lowered, (  # Emergency 2: no appendix A5; the prompt is named below
+        f"the injection does not say `ticket lead for {LEAD_TICKET}`: {injection[:400]!r}")
     assert prompt in injection and support.W1_PROMPT not in injection, (
         f"the lead is not sent to appendix A5 of the roster's prompt {prompt}: {injection[:400]!r}")
     support.assert_instruction(injection, cp, LEAD)

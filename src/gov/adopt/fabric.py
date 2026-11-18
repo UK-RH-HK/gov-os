@@ -75,7 +75,9 @@ PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, 
             # DEC-1189 (1): the two ticket schemas W2-174's Verify pass validates against; it reads them through its
             # own lookup (``gov.adopt.verify_pass``), never through ``shipped``
             "template/governance/kernel/schemas/ticket.schema.json",
-            "template/governance/kernel/schemas/common.schema.json")
+            "template/governance/kernel/schemas/common.schema.json",
+            # W2-36: gov discover's spec check (``gov.discover.check``) from an installed gov, through ``shipped``
+            "template/governance/kernel/skills/spec-writing/check_spec.py")
 
 
 def _package_copy() -> Path:

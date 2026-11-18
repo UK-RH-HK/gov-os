@@ -28,6 +28,8 @@ You write what the ticket specifies rather than codes: schemas, templates, skill
 8. Write only {PATHS}. Run the checks your paths have: {CMD:schema_check} for schemas and records, {CMD:unit_tests} for your unit tests.
 9. Commit in T-0's form; a report or assessment goes in a commit of its own [DEC-924].
 
+**Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
+
 Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
 
 The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861].

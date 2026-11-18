@@ -43,7 +43,12 @@ SEMVER = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
 
 
 class ReleaseError(Exception):
-    """A release is refused: not built, not verified, or not installed."""
+    """A release is refused: not built, not verified, or not installed. ``reason`` names the check that refused, where
+    a caller tells them apart (``verify_at``: ``no_release``, ``manifest``, ``files``)."""
+
+    def __init__(self, message: str, reason: str | None = None):
+        super().__init__(message)
+        self.reason = reason
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -122,8 +127,10 @@ def _hash(path: Path) -> str | None:
     return hashlib.sha256(data).hexdigest()
 
 
-def _wheel(repo: Path, commit: str) -> dict:
-    """Build the gov wheel from ``commit`` in a temporary folder; its name and sha256."""
+def _wheel(repo: Path, commit: str, keep: Path | None = None) -> dict:
+    """Build the gov wheel from ``commit`` in a temporary folder; its name and sha256. With ``keep`` (a folder), the
+    built file is kept there too and its ``path`` given: the one route for ``gov release``, ``gov install`` and
+    ``gov update``, so a wheel built for an install reproduces the manifest's sha256."""
     archive = subprocess.run(["git", "-C", str(repo), "archive", "--format=tar", commit, "pyproject.toml", "src"],
                              capture_output=True)
     if archive.returncode:
@@ -139,7 +146,12 @@ def _wheel(repo: Path, commit: str) -> dict:
         wheels = sorted(out.glob("*.whl")) if out.is_dir() else []
         if built.returncode or len(wheels) != 1:
             raise ReleaseError(f"the wheel could not be built: {built.stderr.strip()[-2000:]}")
-        return {"name": wheels[0].name, "sha256": _hash(wheels[0])}
+        result = {"name": wheels[0].name, "sha256": _hash(wheels[0])}
+        if keep is not None:
+            kept = Path(keep) / wheels[0].name
+            shutil.copyfile(wheels[0], kept)
+            result["path"] = str(kept)
+        return result
 
 
 def _previous(releases: Path) -> str | None:
@@ -246,6 +258,57 @@ def verify(source: Path, version: str) -> tuple[bytes, str]:
         raise ReleaseError(f"release {version}: shipped files do not match their sha256 in {MANIFEST_NAME}: "
                            f"{', '.join(wrong[:20])}")
     return data, digest
+
+
+def verify_at(source: Path, version: str, files: bool = True) -> tuple[bytes, str, dict]:
+    """Check release ``version`` of the Gov OS repository at ``source`` from git objects at its tag ``v<version>``,
+    never the work tree's bytes (W2-18, W2-17): the record's manifest against its ``manifest.sha256`` and, with
+    ``files``, every file under ``template/`` at the tag against the manifest's ``files``.
+
+    Returns the manifest's bytes, its sha256 and the manifest. Refused (``ReleaseError`` with ``reason``): no tag
+    (``no_release``); a record that cannot be read, does not hash to its sha256 or is not that version's
+    (``manifest``); a template file added, removed or changed (``files``)."""
+    source, tag = Path(source), f"v{version}"
+    found = subprocess.run(["git", "-C", str(source), "rev-parse", "--verify", "--quiet", f"refs/tags/{tag}^{{commit}}"],
+                           capture_output=True, text=True)
+    if found.returncode or not found.stdout.strip():
+        raise ReleaseError(f"no release v{version} in {source}: it has no tag {tag}", "no_release")
+    commit = found.stdout.strip()
+    folder = f"{RELEASES_REL}/{version}"
+    try:
+        record = _blobs(source, commit, folder)
+    except ReleaseError:
+        record = {}
+    data, stated = record.get(f"{folder}/{MANIFEST_NAME}"), record.get(f"{folder}/{HASH_NAME}")
+    if data is None or stated is None:
+        raise ReleaseError(f"release {version}: {folder}/{MANIFEST_NAME} or {HASH_NAME} cannot be read at {tag}",
+                           "manifest")
+    digest = hashlib.sha256(data).hexdigest()
+    stated_digest = (stated.decode("utf-8", "replace").split() or [""])[0]
+    if stated_digest != digest:
+        raise ReleaseError(f"release {version}: {MANIFEST_NAME} at {tag} does not match the sha256 in {HASH_NAME} "
+                           f"({HASH_NAME} states {stated_digest}, {MANIFEST_NAME} hashes to {digest})", "manifest")
+    try:
+        manifest = json.loads(data)
+    except ValueError:
+        manifest = None
+    listed = manifest.get("files") if isinstance(manifest, dict) else None
+    if not isinstance(manifest, dict) or manifest.get("version") != version or not isinstance(listed, dict) \
+            or not listed or not isinstance(manifest.get("wheel"), dict):
+        raise ReleaseError(f"release {version}: {MANIFEST_NAME} at {tag} is not the manifest of release {version}",
+                           "manifest")
+    if files:
+        shipped = {rel[len(TEMPLATE_REL) + 1:]: hashlib.sha256(blob).hexdigest()
+                   for rel, blob in _blobs(source, commit, TEMPLATE_REL).items()}
+        added = sorted(set(shipped) - set(listed))
+        removed = sorted(set(listed) - set(shipped))
+        changed = sorted(rel for rel in set(listed) & set(shipped) if listed[rel] != shipped[rel])
+        if added or removed or changed:
+            named = "; ".join(f"{what}: {', '.join(rels[:20])}" for what, rels in
+                              (("added", added), ("removed", removed), ("changed", changed)) if rels)
+            raise ReleaseError(f"release {version}: files of {TEMPLATE_REL}/ at {tag} do not match their sha256 in "
+                               f"{MANIFEST_NAME} ({named})", "files")
+    return data, digest, manifest
 
 
 def _held(project: Path) -> str | None:

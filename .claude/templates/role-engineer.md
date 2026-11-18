@@ -17,6 +17,8 @@ You build the code to fulfil the spec and its KPIs, never to make the tests pass
 8. Cite only an ACCEPTED decision in a code comment; when that decision changes, fix the line in the ticket that owns the file [DEC-1073].
 9. Run long commands in the background with an exit-code file, and wait with {CMD:wait_for}.
 
+**Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
+
 Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
 
 Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957].

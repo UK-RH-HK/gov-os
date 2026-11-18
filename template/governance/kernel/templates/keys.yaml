@@ -37,12 +37,12 @@ keys:
 - PART
 - ROWS
 - COMMANDS_TABLE
+- MEMORY_BLOCK
 - HARNESS_ALLOWED
 - DATE
 # the forms a command is filled with
 - SUBJECT
 - COMMIT_PATHS
-- QUESTION
 - FOLDER
 - COMMAND
 - BRIEF_FILE

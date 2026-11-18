@@ -271,7 +271,7 @@ def test_in_a_worktree_the_injection_tells_the_session_it_is_the_ticket_lead(run
     assert f"ticket lead for {LEAD_TICKET}".lower() in injection.lower(), (
         f"the injection does not say `you are the ticket lead for {LEAD_TICKET}`: {injection[:400]!r}"
     )
-    assert "appendix a5" in injection.lower(), f"the injection does not send the lead to appendix A5: {injection[:400]!r}"
+    # Emergency 2: the lead is sent to the roster prompt's §4 (EMERGENCY-2.md has no appendix A5); the prompt named below
     support.assert_reads_both_now(injection, support.PROMPT_REL, LEAD)
     _assert_whole_section(injection, body)
     assert "ZQ-71" not in injection and ORCH not in injection, (
@@ -290,7 +290,7 @@ def test_in_a_worktree_without_gov_ticket_the_injection_says_the_ticket_is_not_s
     assert "ticket lead" in injection.lower() and "GOV_TICKET" in injection, (
         f"without GOV_TICKET the injection does not say it is a ticket lead whose GOV_TICKET is not set: {injection[:400]!r}"
     )
-    assert "appendix a5" in injection.lower(), f"the injection does not send the lead to appendix A5: {injection[:400]!r}"
+    # Emergency 2: the lead is sent to the roster prompt's §4 (EMERGENCY-2.md has no appendix A5); the prompt named below
     support.assert_reads_both_now(injection, support.PROMPT_REL, LEAD)
     _assert_whole_section(injection, body)
     support.assert_within_cap(result)

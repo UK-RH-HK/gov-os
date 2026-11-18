@@ -82,6 +82,8 @@ def test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag(bed):
     for i, arg in enumerate(argv[:-1]):
         if arg == "--permission-mode" and argv[i + 1] == "bypassPermissions":
             argv[i + 1] = "acceptEdits"
+    # the owner's audit 09 decision 3 (2026-11-18): every lead runs Sonnet, its helpers too; integrate's line had Opus
+    argv = [a.replace("claude-sonnet-5-5", "claude-opus-5-5") for a in argv]
     mine = support.without_flag(argv)
     assert mine == theirs["argv"], f"the lead line changed beyond the one flag\nthis tree: {mine}\nintegrate: {theirs['argv']}"
 
