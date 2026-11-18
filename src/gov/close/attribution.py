@@ -22,8 +22,8 @@ DEC-1003, INVESTIGATION-1 Q-1).
   only where needed, once per close. A base run that collected nothing or did not complete judges nothing: those
   reds are named (``baseline_missing``), never excused.
 
-No accepted-reds or load-sensitive list is read or written here (S5; ``gov.close.ratchet`` stays the strict
-close's).
+No accepted-reds or load-sensitive list is read or written here (S5); the scoped close applies the counted
+``accepted_reds`` entries to the reds judged here (``gov.close.command``, W2-194 S3, by ``gov.close.ratchet``).
 """
 
 from __future__ import annotations
@@ -311,6 +311,12 @@ def judge_by_base_run(kind: str, there: str | None) -> tuple[bool, str]:
     return True, f"red with {kind} and {seen} in the base run: the change's"
 
 
+def red_at_base(without: list[str | None], there: str | None) -> bool:
+    """Whether a red is red at the base (W2-194 S3): its alone run there failed (any failure type, a timeout
+    among them; not ``absent`` or ``unknown``, which are no result), or its node failed in the base run."""
+    return any(t is not None and t not in UNJUDGEABLE for t in without) or there not in (None, NOT_COLLECTED, SKIPPED)
+
+
 def load_sensitive(clone: Path, test: str) -> bool:
     """Whether the test is load-sensitive: an entry of the serial phase's own list
     (``gov.close.pytest_plugin.gov_close_serial_only.LIST_REL``) names it and that entry's comment's kind is
@@ -386,7 +392,7 @@ def _same_commit(clone: Path, a: str | None, b: str | None) -> bool:
 def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: list[dict], options: list[str],
               folder: Path, timeout: float, base_run=None) -> tuple[list[dict], dict]:
     """Each failing test of a run judged (S4): ``(reds, nightly)``. ``reds``: ``{test, failure_type, caused,
-    reason, rounds}``, with ``baseline_missing`` on a red the base run had to judge and could not;
+    reason, rounds, red_at_base}``, with ``baseline_missing`` on a red the base run had to judge and could not;
     ``nightly``: ``{read, record}``. The clone is left at ``commit``.
 
     ``base_run`` (W2-193 S4, W2-194 S1): called at most once, only where a red's alone runs cannot judge it
@@ -451,7 +457,8 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
                 reason += f"; the base run at {base[:12]} cannot judge it ({at_base['why']})"
         if kind == UNKNOWN:
             kind = in_run
-        red = {"test": t, "failure_type": kind, "caused": caused, "reason": reason, "rounds": rounds[t]}
+        red = {"test": t, "failure_type": kind, "caused": caused, "reason": reason, "rounds": rounds[t],
+               "red_at_base": red_at_base(without.get(t, []), there)}
         if missing:
             red["baseline_missing"] = True
         reds.append(red)

@@ -1508,7 +1508,9 @@ def _write_close_record(root: Path, ticket: str, record: dict,
 # scoped close (DEC-953 item 1, DEC-983) runs only the scoped selection (``gov.close.select.scoped``) in the warm
 # clone (``gov.close.attribution``), refuses only on a red its change caused (S4), opens a repair ticket for every
 # other red (S5), computes READY from the reviewer's verdict block (S11) and writes its close record (S7). It
-# reads and writes no accepted-reds or load-sensitive list and runs none of the lifted gates.
+# runs none of the lifted gates and reads no load-sensitive list; of the path map's lists it reads only the counted
+# ``accepted_reds`` entries (DEC-757's owner-entry rule), which accept a red that is red at the base (W2-194 S3,
+# DEC-1206 (1), ``_accept_base_reds``); it writes none.
 
 CLOSE_MODE_REL = "governance/project/close.yaml"
 SCOPED, STRICT = "scoped", "strict"
@@ -1944,6 +1946,29 @@ def _base_run(root: Path, tree: Path, commit: str, base: str, chosen: dict, fold
     return out
 
 
+def _accept_base_reds(root: Path, reds: list[dict]) -> tuple[list[dict], list[dict]]:
+    """The path map's ``accepted_reds`` applied to the scoped close's reds (W2-194 S3, DEC-1206 (1); DEC-757's
+    owner-entry rule unchanged, ``gov.close.ratchet.counted_entries``): ``(accepted, findings)``. A red that a
+    counted entry lists by its exact id and that is red at the base (its alone run there or the base run, any
+    failure type) is accepted: not caused, its decision named, no repair ticket. A listed red green or not collected
+    at the base is never accepted. An entry that does not count covers nothing and is a finding."""
+    if not reds:
+        return [], []
+    counted, findings = _ratchet.counted_entries(root, _ratchet.ACCEPTED_REDS)
+    listed = {entry["test"]: entry for entry in counted}
+    accepted = []
+    for red in reds:
+        red["accepted"] = None
+        entry = listed.get(red["test"])
+        if entry is None or not red.get("red_at_base"):
+            continue
+        red.update(caused=False, accepted=entry["decision"], reason=red["reason"] + (
+            f"; red at the base and listed by the counted accepted_reds entry of {entry['decision']}: accepted"))
+        red.pop("baseline_missing", None)
+        accepted.append({**{f: entry[f] for f in _ratchet.FIELDS[_ratchet.ACCEPTED_REDS]}, "result": _ratchet.FAILED})
+    return accepted, findings
+
+
 def _run_scoped(root: Path, args, config: dict):
     """The scoped close (S1 to S7, S10, S11): its result, or a ``GovError`` naming its refusal."""
     from datetime import datetime, timezone
@@ -1982,13 +2007,15 @@ def _run_scoped(root: Path, args, config: dict):
         raise GovError(review["verdict"], "; ".join(review["reasons"]),
                        {"ticket": ticket, "review": review}, exit_code=EXIT_CHECK_FAILED)
     # the head without the change (W2-193 S3): --base, else the newest green record on HEAD's line, else the first
-    # parent of the ticket's oldest own commit
+    # parent of the ticket's oldest own commit; --base resolved as git rev-parse resolves it (W2-194 S2)
     given = getattr(args, "base", None)
     base, base_from = (given, "given") if given else (chosen["base"], chosen.get("base_from"))
     if base is not None:
-        resolved = _select.full_id(root, base)
+        resolved, refused = _select.resolve_base(root, base)
         if resolved is None:
-            raise GovError("BASE_UNKNOWN", f"{'--base' if given else 'the base'} {base} names no commit",
+            what = "names more than one object; give more of its digits" if refused == "BASE_AMBIGUOUS" \
+                else "names no commit"
+            raise GovError(refused, f"{'--base' if given else 'the base'} {base} {what}",
                            {"ticket": ticket, "base": base})
         base = resolved
 
@@ -2022,8 +2049,9 @@ def _run_scoped(root: Path, args, config: dict):
         reading = _attribution.nightly_reading(root)
         reds, night = [], {"read": reading["read"], "record": reading["record"]}
     stated_base_run = {k: base_run[k] for k in BASE_RUN_KEYS} if base_run else None
+    accepted, accepted_findings = _accept_base_reds(root, reds)
     details = {"ticket": ticket, "reds": reds, "runs": phases["runs"], "selection": chosen["suites"], "base": base,
-               "base_from": base_from, "base_run": stated_base_run}
+               "base_from": base_from, "base_run": stated_base_run, "accepted_red_findings": accepted_findings}
     missing = [r for r in reds if r.get("baseline_missing")]
     if missing:
         raise GovError("BASELINE_MISSING", f"the base run at {base[:12]} ({base}) cannot judge {len(missing)} red(s) "
@@ -2036,7 +2064,7 @@ def _run_scoped(root: Path, args, config: dict):
                        + "; ".join(f"{r['test']} ({r['failure_type']}): {r['reason']}" for r in caused),
                        details, exit_code=EXIT_CHECK_FAILED)
     for red in reds:
-        red["repair_ticket"] = _tool.open_red_repair(root, ticket, red)
+        red["repair_ticket"] = None if red.get("accepted") else _tool.open_red_repair(root, ticket, red)
     record = {
         "close": SCOPED,
         "commit": commit,
@@ -2044,7 +2072,7 @@ def _run_scoped(root: Path, args, config: dict):
         "runs": phases["runs"],
         "review": {"verdict": review["verdict"], "record": review["record"]},
         "reds": [{"test": r["test"], "failure_type": r["failure_type"], "caused": r["caused"], "reason": r["reason"],
-                  "repair_ticket": r["repair_ticket"]} for r in reds],
+                  "repair_ticket": r["repair_ticket"], "accepted": r.get("accepted")} for r in reds],
         "culprits": [],
         "clone": {"path": clone["path"], "reused": clone["reused"], "replaced": clone["replaced"]},
         "nightly": {"read": night["read"], "record": night["record"]},
@@ -2052,6 +2080,8 @@ def _run_scoped(root: Path, args, config: dict):
         "base_from": base_from,
         "base_run": stated_base_run,
         "parallel_processes": phases.get("parallel_processes", []),
+        _ratchet.ACCEPTED_REDS: accepted,
+        "accepted_red_findings": accepted_findings,
         "changed": chosen["changed"],
     }
     commit_files = list(chosen.get("own", chosen["changed"]))

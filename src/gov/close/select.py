@@ -551,6 +551,28 @@ def head_without_change(root: Path, green: str | None, parent: str | None = None
     return None, None
 
 
+def resolve_base(root: Path, given: str) -> tuple[str | None, str | None]:
+    """``--base`` resolved as ``git rev-parse --verify <given>^{commit}`` resolves it (W2-194 S2): ``(full id,
+    None)``; ``(None, "BASE_AMBIGUOUS")`` for a prefix that names more than one object; ``(None, "BASE_UNKNOWN")``
+    for one that names no commit (an option-like text among them: never passed to git as one)."""
+    import subprocess
+
+    from gov.util.gitenv import git_env
+
+    given = (given or "").strip()
+    if not given or given.startswith("-"):
+        return None, "BASE_UNKNOWN"
+    done = subprocess.run(["git", "-C", str(root), "--no-replace-objects", "rev-parse", "--verify",
+                           given + "^{commit}"], capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                          env={**git_env(Path(root), pinned=True), "LC_ALL": "C", "LANGUAGE": "C"})  # git's words
+    found = done.stdout.strip()
+    if done.returncode == 0 and re.fullmatch(r"[0-9a-f]{40}", found):
+        return found, None
+    if "ambiguous" in done.stderr:
+        return None, "BASE_AMBIGUOUS"
+    return None, "BASE_UNKNOWN"
+
+
 def _module_of(rel: str) -> str | None:
     """The dotted module a Python file is: under ``src/`` relative to it, else relative to the project."""
     if not rel.endswith(".py"):
