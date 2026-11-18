@@ -139,16 +139,31 @@ def search_path() -> str:
     return os.pathsep.join(dict.fromkeys(folder for folder in folders if folder))
 
 
+NO_STORE = "no-store"  # under the scratch folder, never made: the store gov brief retrieves from (W2-197)
+MEMORY_LOG_DIR = "memory-log"  # under the scratch folder: the memory-use log's own folder (W2-197)
+
+
+def memory_log(scratch: Path) -> Path:
+    return scratch / MEMORY_LOG_DIR / "memory-use.jsonl"
+
+
 def child_env(scratch: Path, extra: dict | None = None) -> dict:
-    """This tree's ``src`` first, an empty ``HOME``, no bytecode written, dead proxies, no ``GOV_``/``PYTEST_`` variable."""
+    """This tree's ``src`` first, an empty ``HOME``, no bytecode written, dead proxies, no ``GOV_``/``PYTEST_`` variable.
+
+    Revised for W2-197: ``gov brief`` retrieves the ticket's memory from a store (``GOV_STORE`` when no ``--store`` is
+    given) and appends a line to the memory-use log (``GOV_MEMORY_LOG``). Both are set to the scratch folder, outside
+    the fixture repository: ``GOV_STORE`` a folder that does not exist (no store is read, nothing reaches a model),
+    ``GOV_MEMORY_LOG`` a file in a folder of its own, so no case reads the real store or writes a real log."""
     home = scratch / "empty-home"
     home.mkdir(parents=True, exist_ok=True)
+    memory_log(scratch).parent.mkdir(parents=True, exist_ok=True)
     env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "GOV_"))}
     env.setdefault("PYTHONUSERBASE", site.getuserbase())
     dead = "http://127.0.0.1:9"
     env.update({"PYTHONPATH": str(SRC), "HOME": str(home), "PYTHONDONTWRITEBYTECODE": "1", "PATH": search_path(),
                 "http_proxy": dead, "https_proxy": dead, "HTTP_PROXY": dead, "HTTPS_PROXY": dead,
-                "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"})
+                "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+                "GOV_STORE": str(scratch / NO_STORE), "GOV_MEMORY_LOG": str(memory_log(scratch))})
     if extra:
         env.update(extra)
     return env
