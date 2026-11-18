@@ -113,9 +113,6 @@ RUNTIME, SCRATCH = ".gov-runtime", "scratch"
 # The no-prompt mode, accepted since Emergency 2 (0.1.2; DEC-313 superseded by EMERGENCY-2 2.2, 2.9).
 BYPASS_MODE = "bypassPermissions"
 # Names kept for the readers that import them (suites, fixtures); since Emergency 2 no launch decides by them.
-GUARD_HOOK = "hooks/pretooluse.py"
-GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
-PROTECTED_TREES = (".tickets", ".claude")
 EXPERIMENTS_ROOT = "experiments"
 KERNEL_ALLOWLIST_REL = "template/governance/kernel/launch/research-allowlist.yaml"
 PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
