@@ -1424,7 +1424,7 @@ in `docs/changes/S2-CIT-E.md`.
   providers in Contract v4 are updated to match.
 
 ### DEC-155 — The plan validator after S1
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief · **Class:** retired
 - **Decision:** `docs/plan/tools/validate_s1.py` scopes its "writes only under docs/ and .tickets/" check to the S1
   branch, or retires it, and is extended to check everything the S2 change adds. It stays runnable from the
   repository root.
@@ -1555,7 +1555,7 @@ on W1-47.
   The lesson loop itself stays in Wave 3.
 
 ### DEC-169 — The plan validator: the fingerprint fallback and the S2 write-scope check
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, repair instruction on S2-A finding S2A-F-08 · **Extends:** DEC-155 · **Under:** DEC-101
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, repair instruction on S2-A finding S2A-F-08 · **Extends:** DEC-155 · **Under:** DEC-101 · **Class:** retired
 - **Decision:** The S1-A fingerprint check accepts a renamed file for `PROMPT.md` only (`PROMPT.retired.md`, same
   hash, DEC-101). Every other listed file must exist under its own name. The S2 write-scope check excludes
   `docs/SOURCES.md`, as the S1 check did.
@@ -10122,7 +10122,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 280. The owner's rule of 2026-10-22 on placeholders (register v0.280, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-893 — No placeholder reaches the owner or a commit: a scan in the record checks
-- **Status:** ACCEPTED (owner, standing, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-868, DEC-862 (a), DEC-861, DEC-851 · **Basis:** the owner's `Role: owner` commit of DEC-892's W1-38 entry (`49c24ac9`, 2026-10-22). The entry's reason carries an unfilled placeholder, "2026-10-22 00:2x", which the orchestrator had prepared. <!-- placeholder-examples --> · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-1045
+- **Status:** ACCEPTED (owner, standing, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-868, DEC-862 (a), DEC-861, DEC-851 · **Basis:** the owner's `Role: owner` commit of DEC-892's W1-38 entry (`49c24ac9`, 2026-10-22). The entry's reason carries an unfilled placeholder, "2026-10-22 00:2x", which the orchestrator had prepared. <!-- placeholder-examples --> · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-1045 · **Class:** retired
 - **Decision:**
   1. **The committed entry is not corrected now.** The real time goes into the owner's next ratchet commit, or into W2-57's removal of the entry. The alone run fell between 00:12 and 00:16 on 2026-10-22: after W2-63's refused close ended at 00:11, and before the DEC-891 commit at 00:16.
   2. **The rule (standing):** the orchestrator's record checks include a scan that refuses placeholders in any prepared entry, patch or record before it reaches the owner or a commit:
@@ -11749,7 +11749,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-948 — Every report to the owner ends with the same five-line block (standing)
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-787, DEC-788, DEC-878, DEC-930, DEC-946 · **Changes:** DEC-787/788's ending (the `OWNER_ACTION:` line becomes the block's last line)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-787, DEC-788, DEC-878, DEC-930, DEC-946 · **Changes:** DEC-787/788's ending (the `OWNER_ACTION:` line becomes the block's last line) · **Class:** retired
 - **Decision:** every report to the owner, however short, ends with the same block, so the owner can follow from a phone:
   - **Progress:** closed / merged-not-closed / built-and-held / in flight / not started, of the total;
   - **Leads:** running (which), queued next (which), and what the gate is waiting on;
