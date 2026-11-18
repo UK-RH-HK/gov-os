@@ -1,5 +1,5 @@
-"""Builder tests for W2-56 (DAEO-wnnz): the launcher's cleaned environment, refused arguments, the sandbox module's
-own block and placeholders (no longer used by the launch since Emergency 2), process group and temp-folder removal.
+"""Builder tests for W2-56 (DAEO-wnnz): the launcher's cleaned environment, refused arguments, process group and
+temp-folder removal. The sandbox module's own block and placeholders were retired with it (EMERGENCY-2 6.1).
 
 Regression evidence only (DEC-136). Every place is a temporary folder under a stand-in HOME; the CLI is a stand-in
 script; no reranker, model or real sandbox is started.
@@ -23,7 +23,7 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
 from gov.cli.errors import GovError  # noqa: E402
-from gov.launch import environ, launcher, sandbox  # noqa: E402
+from gov.launch import environ, launcher  # noqa: E402
 from gov.util.gitenv import git_env  # noqa: E402
 
 
@@ -106,127 +106,6 @@ def test_a_prompt_that_names_a_guard_argument_among_other_words_starts(flag):
 def test_the_refusals_of_today_still_refuse(args):
     with pytest.raises(GovError):
         launcher._check_cli_args(args)
-
-
-# --- S8, S9, S11: the sandbox block -----------------------------------------------------------------------------------
-
-def test_the_socket_and_the_log_are_the_services_own_under_home(tmp_path):
-    assert sandbox.socket_path(tmp_path) == str(tmp_path / ".cache/gov-os/rerank.sock")
-    assert sandbox.network([], tmp_path) == {"strictAllowlist": True, "allowedDomains": [],
-                                             "allowUnixSockets": [str(tmp_path / ".cache/gov-os/rerank.sock")]}
-
-
-def test_the_log_is_made_a_regular_file_of_the_users_own_and_put_on_the_write_list(tmp_path):
-    block = sandbox.filesystem("/tmp/gov-launch-ab", "/home/x/gov-os-runs/W2-1", tmp_path)
-    log = tmp_path / ".cache/gov-os/rerank.log"
-    assert block == {"allowWrite": ["//tmp/gov-launch-ab", "//home/x/gov-os-runs/W2-1", f"/{log}"]}
-    assert stat.S_ISREG(log.lstat().st_mode) and stat.S_IMODE(log.lstat().st_mode) == 0o600
-    assert stat.S_IMODE((tmp_path / ".cache/gov-os").stat().st_mode) == 0o700
-
-
-def test_a_log_that_is_a_link_is_left_off_and_its_target_untouched(tmp_path):
-    (tmp_path / ".cache/gov-os").mkdir(parents=True)
-    target = tmp_path / "target.txt"
-    target.write_text("keep\n", encoding="utf-8")
-    (tmp_path / ".cache/gov-os/rerank.log").symlink_to(target)
-    assert sandbox.filesystem("/t", None, tmp_path) == {"allowWrite": ["//t"]}
-    assert target.read_text(encoding="utf-8") == "keep\n"
-
-
-def test_a_log_that_is_a_folder_is_left_off(tmp_path):
-    (tmp_path / ".cache/gov-os/rerank.log").mkdir(parents=True)
-    assert sandbox.filesystem("/t", None, tmp_path) == {"allowWrite": ["//t"]}
-
-
-def test_a_socket_that_is_a_link_is_not_allowed(tmp_path):
-    (tmp_path / ".cache/gov-os").mkdir(parents=True)
-    (tmp_path / ".cache/gov-os/rerank.sock").symlink_to(tmp_path / "other.sock")
-    assert sandbox.reranker_socket(tmp_path) == []
-
-
-def test_a_cache_folder_that_is_a_link_allows_neither(tmp_path):
-    (tmp_path / "elsewhere").mkdir()
-    (tmp_path / ".cache").mkdir()
-    (tmp_path / ".cache/gov-os").symlink_to(tmp_path / "elsewhere", target_is_directory=True)
-    assert sandbox.reranker_socket(tmp_path) == [] and sandbox.reranker_log(tmp_path) == []
-    assert list((tmp_path / "elsewhere").iterdir()) == []
-
-
-def _built(home: Path) -> dict:
-    return {"sandbox": {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
-                        "network": sandbox.network([], home), "filesystem": sandbox.filesystem("/t", None, home)}}
-
-
-def test_the_built_block_has_no_fault(tmp_path):
-    assert sandbox.faults(_built(tmp_path), tmp_path) == []
-
-
-def test_the_socket_written_with_two_slashes_is_the_same(tmp_path):
-    settings = _built(tmp_path)
-    settings["sandbox"]["network"]["allowUnixSockets"] = ["/" + sandbox.socket_path(tmp_path)]
-    assert sandbox.faults(settings, tmp_path) == []
-
-
-@pytest.mark.parametrize("change", (
-    lambda b, s: b.update(enabled=False),
-    lambda b, s: b.update(failIfUnavailable=False),
-    lambda b, s: b.update(allowUnsandboxedCommands=True),
-    lambda b, s: b["network"].update(strictAllowlist=False),
-    lambda b, s: b.update(excludedCommands=["git"]),
-    lambda b, s: b.update(enableWeakerNestedSandbox=True),
-    lambda b, s: b["network"].update(allowAllUnixSockets=True),
-    lambda b, s: b["network"].update(allowLocalBinding=True),
-    lambda b, s: b["network"].update(httpProxyPort=8080),
-    lambda b, s: b["network"].update(socksProxyPort=1080),
-    lambda b, s: b["network"]["allowUnixSockets"].append("/run/other.sock"),
-    lambda b, s: b["network"].update(allowUnixSockets=["/run/other.sock"]),
-    lambda b, s: b["network"].update(allowUnixSockets=[s.replace("rerank.sock", "*.sock")]),
-    lambda b, s: b["network"].update(allowUnixSockets=[os.path.dirname(s)]),
-    lambda b, s: b["filesystem"].update(allowRead=["/"]),
-), ids=("enabled", "fail-if-unavailable", "unsandboxed", "strict", "excluded", "weaker-nested", "all-sockets",
-        "local-binding", "http-port", "socks-port", "second-socket", "other-socket", "socket-pattern",
-        "socket-folder", "filesystem-key"))
-def test_each_widening_is_a_fault(tmp_path, change):
-    settings = _built(tmp_path)
-    change(settings["sandbox"], sandbox.socket_path(tmp_path))
-    assert sandbox.faults(settings, tmp_path)
-
-
-# --- S4: the placeholders ---------------------------------------------------------------------------------------------
-
-def _git(root: Path, *args: str) -> str:
-    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, check=True,
-                          env=git_env(root)).stdout
-
-
-def _repository(tmp_path: Path) -> tuple[Path, Path]:
-    main = tmp_path / "main"
-    main.mkdir()
-    _git(main, "init", "-q")
-    _git(main, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "first")
-    worktree = tmp_path / "wt"
-    _git(main, "worktree", "add", "-q", str(worktree))
-    (worktree / ".gov-runtime/scratch").mkdir(parents=True)
-    (worktree / ".gov-runtime/records").mkdir()
-    return main, worktree
-
-
-def test_a_folder_at_a_placeholder_name_is_still_added(tmp_path):
-    _, worktree = _repository(tmp_path)
-    root = Path(os.path.realpath(worktree))
-    sandbox.exclude_placeholders(root, [])
-    (root / ".claude/commands").mkdir(parents=True)
-    (root / ".claude/commands/a.md").write_text("x\n", encoding="utf-8")
-    (root / ".idea").mkdir()
-    (root / ".idea/b.xml").write_text("x\n", encoding="utf-8")
-    _git(root, "add", "-A")
-    assert sorted(_git(root, "diff", "--cached", "--name-only").split()) == [".claude/commands/a.md", ".idea/b.xml"]
-
-
-def test_a_root_outside_any_repository_writes_nothing(tmp_path, monkeypatch):
-    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path))
-    sandbox.exclude_placeholders(tmp_path, [])
-    assert list(tmp_path.iterdir()) == []
 
 
 # --- S15: the temp folder goes whole ----------------------------------------------------------------------------------

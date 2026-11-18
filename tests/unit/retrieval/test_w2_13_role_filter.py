@@ -269,7 +269,7 @@ def test_a_packet_built_from_another_tickets_session_judges_the_packets_own_tick
 
 def test_a_leads_own_packet_is_unchanged_by_the_packets_ticket(project):
     """GOV_TICKET is the packet's own ticket: the same filter and the same words as before S5-F1."""
-    from gov.guard import role_paths
+    from gov.util import role_paths
     from gov.retrieval import supplementary
     before = role_paths.caller(project, "engineer")
     after = role_paths.caller(project, "engineer", also=("TK-1",))

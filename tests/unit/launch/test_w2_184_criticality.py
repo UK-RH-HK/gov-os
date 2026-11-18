@@ -158,7 +158,7 @@ def test_a_file_with_no_rules_is_well_formed(tmp_path):
 
 
 def test_the_project_s_own_file_is_well_formed_and_places_this_ticket_at_c2():
-    from gov.guard.decide import _load_ticket
+    from gov.util.tickets import _load_ticket
     assert criticality.opus_model(REPO).startswith("claude-opus")
     ticket = _load_ticket(str(REPO), "DAEO-6f0s")
     if ticket is None:  # the ticket lives in the main checkout's .tickets

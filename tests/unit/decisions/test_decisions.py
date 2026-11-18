@@ -28,7 +28,7 @@ sys.path.insert(0, str(REPO / "src"))
 from gov import decisions  # noqa: E402
 from gov.cli.errors import GovError  # noqa: E402
 from gov.decisions import checker  # noqa: E402
-from gov.guard.containment_merge import MergeReadError  # noqa: E402
+from gov.containment.merge import MergeReadError  # noqa: E402
 
 ADR = "docs/adr/ADR-0001.md"
 _ENV = {"PATH": "/usr/bin:/bin", "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t.invalid",

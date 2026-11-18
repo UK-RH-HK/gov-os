@@ -21,7 +21,7 @@ except ImportError:
     sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "src")))
 
 from gov.adapters import portability
-from gov.guard import heldout
+from gov.util import heldout
 
 ROLE = "- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n- **Network:** none.\n"
 ROLE_SOURCE = "---\nname: engineer\nclaudecode:\n  tools: [{tools}]\n---\n\n" + ROLE

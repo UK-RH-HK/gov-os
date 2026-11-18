@@ -27,7 +27,7 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
 from gov.cli.errors import GovError  # noqa: E402
-from gov.guard.decide import freeze_state  # noqa: E402
+from gov.util.freeze import freeze_state  # noqa: E402
 from gov.pause import command  # noqa: E402
 
 TICKET = "TST-a001"
@@ -103,7 +103,7 @@ def test_an_empty_gov_role_is_refused_and_sets_nothing(project, monkeypatch, opt
 
 
 def test_a_flag_the_guard_does_not_read_as_a_freeze_ends_in_an_error_not_paused(project, monkeypatch):
-    monkeypatch.setattr("gov.guard.decide.freeze_state", lambda root: "unmarked")
+    monkeypatch.setattr("gov.util.freeze.freeze_state", lambda root: "unmarked")
     with pytest.raises(GovError) as refusal:
         _pause(project)
     assert refusal.value.code == "PAUSE_NOT_SET" and ".gov-runtime/freeze" in refusal.value.message
@@ -248,7 +248,7 @@ def test_a_rollback_that_aborts_after_its_reverts_removed_the_flag_ends_frozen(p
 
 def test_a_rollback_whose_flag_is_no_freeze_at_its_end_ends_in_an_error_not_paused(project, monkeypatch):
     states = iter(("frozen", "unmarked"))  # the read-back before the reverts, then the one after them
-    monkeypatch.setattr("gov.guard.decide.freeze_state", lambda root: next(states))
+    monkeypatch.setattr("gov.util.freeze.freeze_state", lambda root: next(states))
     _commit(project, "a.txt", "a\n")
     with pytest.raises(GovError) as refusal:
         _pause(project, rollback=TICKET)

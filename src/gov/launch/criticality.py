@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
-from gov.guard.heldout import load_yaml_unique
+from gov.util.parts import load_yaml_unique
 
 REL = "governance/project/criticality.yaml"
 CLASSES = ("C0", "C1", "C2", "C3")  # lowest first: the position is the rank

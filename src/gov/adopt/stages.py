@@ -21,7 +21,7 @@ import yaml
 from gov.adopt import lite_gates, project, safety
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
-from gov.guard import install
+from gov.adopt import coordination
 from gov.retrieval.semantic import EMBEDDED
 from gov.tasks import tickets
 
@@ -108,7 +108,7 @@ def _coordination(root: Path) -> tuple[dict, dict]:
     and the record's new entries. The roster's key that names a ticket is kept; a roster without the key gets one
     line, the rest as it was; no ``tk`` or a roster that cannot take the key creates and writes nothing, and the
     record says so (the guard stays closed). Nothing is written here: the ticket's file is read back and committed."""
-    key, rel = install.COORDINATION_KEY, install.ROSTER
+    key, rel = coordination.COORDINATION_KEY, coordination.ROSTER
     path, text, roster = root / rel, None, {}
     if os.path.lexists(path):
         try:
@@ -121,7 +121,7 @@ def _coordination(root: Path) -> tuple[dict, dict]:
         return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {rel} is not "
                                                "a readable mapping; it is left as it is"}
     if key in roster:
-        found, why = install.coordination_ticket(root)
+        found, why = coordination.coordination_ticket(root)
         if found is None:
             return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {why}; "
                                                    f"the key is left as it is"}
@@ -162,7 +162,7 @@ def a0(run: Run) -> dict:
     try:
         return run.finish({"baseline_commit": head, "backup_ref": ref, "tree": "clean", "set_up": sorted(setup),
                            **entries}, {**setup, **coordination}, backup_ref=ref, set_up=sorted(setup),
-                          coordination_ticket=entries[install.COORDINATION_KEY], roster=entries["roster"])
+                          coordination_ticket=entries[coordination.COORDINATION_KEY], roster=entries["roster"])
     except (OSError, GovError):
         if existed is None:
             git(run.root, "update-ref", "-d", ref)

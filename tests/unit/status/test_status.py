@@ -20,7 +20,7 @@ sys.path.insert(0, str(REPO / "src"))
 
 from gov import store  # noqa: E402
 from gov.cli.errors import GovError  # noqa: E402
-from gov.guard.decide import FREEZE_FLAG  # noqa: E402
+from gov.util.freeze import FREEZE_FLAG  # noqa: E402
 from gov.status import command  # noqa: E402
 
 ARGS = argparse.Namespace(json=True)
@@ -112,7 +112,7 @@ def test_a_flag_that_cannot_be_read_is_paused_and_who_paused_is_not_read(project
 
 
 def test_a_device_at_the_flags_path_is_a_flag_not_read_and_only_the_mirror_can_say_paused(project):
-    from gov.guard.decide import _mirror_path
+    from gov.util.freeze import _mirror_path
 
     flag = project / FREEZE_FLAG
     flag.parent.mkdir(exist_ok=True)

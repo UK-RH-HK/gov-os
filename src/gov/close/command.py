@@ -429,7 +429,7 @@ def _work_of(front: dict, ticket: str, wbs: str):
     The patterns are read as the guard reads a ticket's ``allowed_paths``; this command has no pattern
     grammar of its own.
     """
-    from gov.guard.decide import _match_pattern
+    from gov.util.patterns import _match_pattern
     from gov.tasks.tickets import TICKETS_REL
 
     patterns = front.get("allowed_paths") or []
@@ -613,7 +613,7 @@ def _check_unmeasured(ticket: str, others: list[dict], own, tickets: frozenset[s
 def _check_containment(root: Path, commits: list[dict]) -> None:
     """W1-50's judgement of the ticket's commits (DEC-453): every finding
     refuses, as returned. This command has no rule of its own."""
-    from gov.guard.containment import ContainmentError, judge_commits
+    from gov.containment import ContainmentError, judge_commits
 
     if not commits:  # nothing to judge: the finding "no commits" says of containment that it was not measured
         return

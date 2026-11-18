@@ -23,7 +23,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
-from gov.guard.heldout import load_yaml_unique
+from gov.util.parts import load_yaml_unique
 
 ROLES_REL = "template/governance/kernel/roles"
 ADOPTED_ROLES_REL = "governance/kernel/roles"  # P-W2-60a-4 (a): an adopted repository's kernel, read when no template/

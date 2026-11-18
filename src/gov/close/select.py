@@ -38,8 +38,8 @@ FULL_TARGET = "tests"
 
 
 def match(path: str, pattern: str) -> bool:
-    """``allowed_paths``' grammar, as the close reads it (``gov.guard.decide``)."""
-    from gov.guard.decide import _match_pattern
+    """``allowed_paths``' grammar, as the close reads it (``gov.util.patterns``)."""
+    from gov.util.patterns import _match_pattern
     return _match_pattern(path, pattern)
 
 

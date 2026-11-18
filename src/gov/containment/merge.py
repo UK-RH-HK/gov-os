@@ -1,7 +1,7 @@
 """The one place that reads a merge commit (W1-50; DEC-394, DEC-398,
 DEC-403, DEC-410).
 
-The containment check uses ``read_merge`` for a merge commit's own
+The close's commit check uses ``read_merge`` for a merge commit's own
 change, and the approval check reads merges the same way.  What cannot
 be read raises ``MergeReadError``.
 """
@@ -12,7 +12,7 @@ import re
 from itertools import combinations
 from typing import NamedTuple
 
-from gov.guard.containment import ACCEPTANCE, _GitError, _NotARepo, _git
+from gov.containment.commits import ACCEPTANCE, _GitError, _NotARepo, _git
 
 _COMMIT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 

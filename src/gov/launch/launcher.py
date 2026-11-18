@@ -65,13 +65,14 @@ from subprocess import SubprocessError
 import yaml
 
 from gov.cli.errors import GovError
-from gov.guard.decide import _load_ticket, freeze_state
-from gov.guard.heldout import load_yaml_unique
-from gov.guard import runs
 from gov.launch import criticality as crit, environ, record, role as roles, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
+from gov.util import runs
+from gov.util.freeze import freeze_state
 from gov.util.gitenv import git_binary, git_env
+from gov.util.parts import load_yaml_unique
+from gov.util.tickets import _load_ticket
 
 # W2-60b S7, S8 (DEC-946 (W3-P09), DEC-826 Q1): the launchable roles and their own-ticket rule are read from the
 # kernel's role files (``_role_kind``), so a new role is a file, not a code change. A role file is a worker's unless it

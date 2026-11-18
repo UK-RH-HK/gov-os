@@ -16,7 +16,7 @@ import secrets
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.guard import runs
+from gov.util import runs
 
 RUNTIME, LAUNCHES = ".gov-runtime", "launches"
 FORMAT = 1

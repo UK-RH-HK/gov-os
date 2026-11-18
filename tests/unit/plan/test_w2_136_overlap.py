@@ -7,7 +7,7 @@ import random
 
 import pytest
 
-from gov.guard.decide import _match_pattern
+from gov.util.patterns import _match_pattern
 from gov.plan import overlap
 from gov.plan.overlap import Tracked, patterns_overlap
 

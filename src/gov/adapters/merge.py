@@ -47,7 +47,7 @@ def _refuse(code: str, message: str, **details) -> GovError:
 def generate_into(root: Path, folder: Path) -> dict[str, bytes]:
     """What ``rulesync generate`` writes from the project's ``.rulesync/`` into ``folder``: path -> bytes."""
     from gov.adapters import portability
-    from gov.guard import heldout
+    from gov.util import heldout
 
     binary = portability._find_rulesync()
     if binary is None:

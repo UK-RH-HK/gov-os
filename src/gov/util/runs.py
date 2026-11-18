@@ -1,6 +1,7 @@
 """The durable scratch root ``~/gov-os-runs`` and a session's own folder in it (W2-50, DEC-728, DEC-743).
 
-One place names both, for the guard and for the launcher alike. The own folder is
+One place names both, for the launcher and the close's commit check. Moved from ``gov.guard.runs``
+unchanged when the guard was retired (EMERGENCY-2 6.1). The own folder is
 the ticket's ``external-ref`` as written, or its ``tk`` id when it has none (R1),
 resolved from ``GOV_TICKET`` (R3). Whatever cannot be resolved gives no folder.
 """
@@ -12,7 +13,7 @@ import re
 import stat
 from pathlib import Path
 
-from gov.util.runs_root import ROOT_NAME, root  # noqa: F401 - moved there by W2-150; both stay names of this module
+from gov.util.runs_root import ROOT_NAME, root  # noqa: F401 - both stay names of this module (W2-150)
 
 # DEC-751 1: the file in an own folder naming the git common directory of the repository whose launch made it.
 MARKER = ".gov-os-repository"
@@ -32,7 +33,7 @@ def _name(ticket: dict) -> str:
 def _named_once(project_root: str, name: str) -> bool:
     """Whether exactly one ticket of the project gives ``name`` (the review: one folder, one ticket). A ticket file
     that cannot be read may give it too, so it gives ``False``."""
-    from gov.guard.decide import _parse_frontmatter
+    from gov.util.tickets import _parse_frontmatter
     count = 0
     try:
         for path in Path(project_root, ".tickets").glob("*.md"):
@@ -127,7 +128,7 @@ def folder(project_root: str, ticket_id: str | None, role: str | None) -> str | 
     real = os.path.realpath(project_root)
     if real == base or real.startswith(base + os.sep):
         return None
-    from gov.guard.decide import _load_ticket
+    from gov.util.tickets import _load_ticket
     ticket = _load_ticket(project_root, ticket_id)
     if not ticket or ticket.get("status") != "in_progress":
         return None
