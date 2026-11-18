@@ -314,14 +314,23 @@ class TestBriefTemplates:
     def test_the_brief_has_a_placeholder_for_each_thing_it_is_filled_in_with(self, kind):
         """Revised for W2-128 TPL-1 S4 (DEC-1050, DEC-1052): a retired brief is read as its replacement template
         and the envelope; there the decisions may come as the sources placeholder sent to the decision register
-        (R3-TEMPLATES.md's T-0: "Sources: {SOURCES} (read each in .../DECISION_REGISTER.md, by id ...)")."""
+        (R3-TEMPLATES.md's T-0: "Sources: {SOURCES} (read each in .../DECISION_REGISTER.md, by id ...)").
+
+        Revised again for W2-197 (commit 48bfec0e4, DAEO-3d3o, EMERGENCY-2 section 5, memory by construction): the
+        brief no longer asks the reader for decisions through a question placeholder ("which decision governs X");
+        decisions reach it through its sources ("Sources: {SOURCES}. Read each by id in {REGISTER}, or ask memory")
+        and the memory block `gov brief` fills with the ticket's retrieval. So, whether the brief is read as its
+        replacement template and the envelope or stands in full, the `decisions` kind is met when one statement
+        names decisions, the register or memory AND carries a sources, register or memory-block placeholder. A
+        brief with neither still fails; the other four kinds are as strict as before."""
         texts = support.brief_texts(kind)
         found = [inner for text in texts.values() for inner in support.placeholders(text)]
         missing = [what for what, pattern in support.PLACEHOLDER_KINDS.items()
                    if not any(re.search(pattern, inner, re.IGNORECASE) for inner in found)]
-        if "decisions" in missing and support.is_retired(support.BRIEFS[kind]):
-            if any(re.search(r"decision", statement, re.IGNORECASE)
-                   and any(re.search(r"source", inner, re.IGNORECASE) for inner in support.placeholders(statement))
+        if "decisions" in missing:
+            names, carries = r"decision|register|memory", r"source|register|memory"
+            if any(re.search(names, statement, re.IGNORECASE)
+                   and any(re.search(carries, inner, re.IGNORECASE) for inner in support.placeholders(statement))
                    for text in texts.values() for _section, statement in support.statements(text)):
                 missing.remove("decisions")
         assert not missing, (

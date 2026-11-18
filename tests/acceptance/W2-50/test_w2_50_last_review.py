@@ -110,9 +110,11 @@ def _entries_at_or_under_the_root(result, box):
 
 
 def _assert_temp_folder_kept(result, box):
+    """The session still gets a temp folder of its own (its TMPDIR), not the launcher's. Emergency 2 (release 0.1.2,
+    EMERGENCY-2 6.1, commits e7777f434 / 85710e6e6): the sandbox is retired, so there is no write list to hold it on."""
     folder = result.variable("TMPDIR")
-    assert folder and any(support.covers(real, os.path.join(folder, "f.txt")) for _, real in _real_entries(result, box)), (
-        f"the sandbox may not write the session's temp folder {folder}: {result.allow_write()}")
+    assert folder and os.path.realpath(folder) != os.path.realpath(box.tmpdir), (
+        f"the session got no temp folder of its own: TMPDIR is {folder!r}")
 
 
 def _work(folder, text):
