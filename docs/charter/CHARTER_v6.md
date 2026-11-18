@@ -21,15 +21,16 @@ owner (DEC-039). It stops drift and makes the owner's agents work, and record th
 does: not a security battle, not a rule battle. It needs four things: memory; help with the spec and the KPIs; roles
 that keep conflicting work apart; and governance of the WBS and of tickets' launching and closing, governing the
 traffic, not a city (EMERGENCY-2 §1.1). What matters is tests and code that match the KPIs and the spec and pass green;
-everything else must justify itself (DEC-1047). It extends the agents' context and memory. The authoritative memory is the repository: git-tracked
-records plus derived indexes that can be rebuilt from git on any machine. It never lives in an agent session or a
-vendor account (DEC-057).
+everything else must justify itself (DEC-1047). It extends the agents' context and memory. The authoritative memory
+is the repository: git-tracked records plus derived indexes that can be rebuilt from git on any machine. It never
+lives in an agent session or a vendor account (DEC-057).
 
 **Scope.**
 - One Gov OS serves every project type, language and agent harness. Projects differ only in their committed overlay
   configuration (DEC-060).
-- Every Contract v3 capability that survives ADR-0001 is in scope. That includes the full 26-dimension readiness
-  contract (DEC-064).
+- Every Contract v3 capability that survives ADR-0001 is in scope, built in this order: the lean release first, the
+  rest only from friction (DEC-064 as superseded by EMERGENCY-2 §8.1). That includes the full 26-dimension readiness
+  contract.
 - The Gov OS is built in two waves, Wave 1 Integrate and Wave 2 Strengthen, and then released lean (EMERGENCY-2 §8).
   The release is accepted by §8.2 of EMERGENCY-2: the Contract's checks pass, the proving run on the synthetic
   repositories passes, EXAMIN's copy is adopted with memory at 95 % or more end to end on a fresh 80, and one EXAMIN
