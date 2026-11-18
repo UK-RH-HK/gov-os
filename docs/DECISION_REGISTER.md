@@ -55,7 +55,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Rationale:** The contract's properties are sound; its implied implementation scope is enterprise/multi-tenant.
 
 ### DEC-003 — Governance is code, not prose
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Class:** kept (items changed: (compiled context packet) superseded §5.5)
 - **Decision:** No agent reads the framework, protocols or contract during normal work. They compile into deterministic checks (hooks, `gov check`, CI). Agents see only: a short AGENTS.md (target ≤ ~1.5k tokens), a compiled context packet, and terse `gov` output.
 - **Rationale:** Framework (~62KB) + contract (~42KB) ≈ 25k tokens per session if read; multiplied across fresh independent sessions this dominates spend.
 - **Gates:** A1, G1, M1 (T0 routing), U (tokens/completed task)
@@ -94,7 +94,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Revisit trigger:** telemetry shows sustained limit hits → Max 20x.
 
 ### DEC-011 — Specification & change control: OpenSpec
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** kept
 - **Decision:** OpenSpec owns spec truth (`openspec/specs/`) and change proposals (`openspec/changes/`). Proposal ≈ CIT-P; archive ≈ CIT-E. Accept OpenSpec's directory convention; the project path map describes it (do not force into `spec/`).
 - **Pin:** ≥ v1.12.0 (findings-only validation reports; code-grounded planning). [E-OSPEC-REL]
 - **Extension point:** custom schemas in `openspec/schemas/` (version-controlled) — use to add readiness and impact artefacts to the change workflow. [E-OSPEC-CUST]
@@ -103,7 +103,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Alternatives considered:** GitHub Spec Kit (heavier, greenfield-oriented); BMAD (REJECTED, DEC-021).
 
 ### DEC-012 — Decisions: ADR markdown with frontmatter in git
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (ADR practice) + SUGGESTION (schema)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (ADR practice) + SUGGESTION (schema) · **Class:** kept
 - **Decision:** Decisions are ADR files in git with YAML frontmatter: `id`, `type`, `status` (ACTIVE/PROVISIONAL/SUPERSEDED/…), `supersedes`, `superseded_by`, `depends_on`, `implements`, `constrains`, `content_hash` (computed). The decision/spec graph is **derived deterministically** from frontmatter into SQLite — no LLM extraction.
 - **Explicitly not used:** codebase-memory-mcp's `manage_adr` feature — an open issue (July 2026) reports ADR content silently destroyed on incremental reindex. [E-CBM-ADR]
 - **Gates:** B3, C1, C2, C6, W1–W3, W10
@@ -195,7 +195,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **BMAD:** many personas → more tokens per cycle and handoff failures as a debugging surface. [E-BMAD]
 
 ### DEC-022 — Provider adapters: rulesync
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** kept
 - **Decision:** Single source in `.rulesync/` generating CLAUDE.md, AGENTS.md, `.claude/`, Codex and other targets; `rulesync import` used during legacy-rule retirement (R1). [E-RULESYNC]
 - **CI:** generated files must match source (drift = G2 failure). Generated adapters are never hand-edited.
 
@@ -207,7 +207,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates:** S1, S2 (partial), S3, S5, S6
 
 ### DEC-024 — Method skills: Superpowers, selectively
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074 (Q5)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074 (Q5) · **Class:** kept (items changed: two-stage review in subagent-driven dev superseded §3.6)
 - **Decision:** Adopt selected Superpowers skills (test-driven development, systematic debugging, verification-before-completion, subagent-driven development with two-stage review). OpenSpec (DEC-011) remains owner of planning/spec artefacts — do not run Superpowers' brainstorm/plan workflow in parallel with OpenSpec proposals.
 - **Evidence:** 14 SKILL.md files plus a session-start bootstrap reportedly under ~2k tokens; multi-host; listed in Anthropic's official plugin marketplace. [E-SUPERPOWERS][E-SP-MKT]
 - **Gates:** F1, O3 (two-stage independent review)
@@ -443,7 +443,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Consequence:** DEC-001's ~3k-line revisit trigger becomes a per-wave review (glue ≈ 4.5k LOC across three waves).
 
 ### DEC-065 — Master rules (constitutional, every session, every Gov OS)
-- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER, grounded in Framework v4.1.2 §23–25, §36–39, §52–54 and Contract v3 H, I, K, L, O3
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER, grounded in Framework v4.1.2 §23–25, §36–39, §52–54 and Contract v3 H, I, K, L, O3 · **Class:** kept (items changed: MR-1..MR-6)
 - MR-1 Specification first: discovery Q&A between agent sessions and the human customer closes a spine or feature specification (26-dimension readiness; silent N/A invalid).
 - MR-2 Closed specifications generate the WBS: tasks, dependencies, order, roles; readiness gaps generate tasks; no production task is READY before its specification's required cells are satisfied.
 - MR-3 Every task carries KPIs; an independent, freshly spawned test designer writes the acceptance tests from them before implementation; the implementer's allowed paths exclude the acceptance tests; builder tests are regression evidence only.
@@ -453,7 +453,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - These rules go verbatim into Charter v5 and apply to the Gov OS's own development from S1.
 
 ### DEC-066 — Organisation layer and the five distinct functions
-- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER + SUGGESTION (mechanism) · **Changed by:** DEC-094 (Wave 2 roster)
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Basis:** OWNER + SUGGESTION (mechanism) · **Changed by:** DEC-094 (Wave 2 roster) · **Class:** kept (items changed: guard-enforced allowed paths superseded §2.2)
 - **Decision:** Roles are subagent definitions generated by rulesync from kernel role files plus a project roster; each carries purpose, allowed-path pattern, tools, model tier, authority level and handoff format. Wave 1: orchestrator, product/specification, independent test designer, engineer, independent auditor. Wave 2: architecture, frontend, backend, database/data, integration/API, DevOps/SRE, security, performance, UX, typed handoffs. Wave 3: research, AI/ML, data author, change controller, memory/knowledge, tooling, release, claims/concurrency. `gov doctor` (installation health), discovery skill + `gov readiness`, `gov impact` (CIT-P), OpenSpec apply/archive + `gov close` (CIT-E), and the audit skill with an Independent Auditor role are separate.
 
 ### DEC-067 — Two layers of testing; Gate V returns as qualification
@@ -847,7 +847,7 @@ round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
   dropped by the compression.
 
 ### DEC-093 — Decision packages: at most five at a time; P1 may bypass the cap
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-6 option (a) with an addition · **Changed by:** DEC-220 (which packages reach the owner)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-6 option (a) with an addition · **Changed by:** DEC-220 (which packages reach the owner) · **Class:** kept
 - **Decision:** Decision packages are ranked P1–P3 and asked at most five at a time. A P1 package may bypass the cap.
 
 ### DEC-094 — Test execution and integration are distinct roles, added in Wave 2
@@ -928,7 +928,7 @@ as it is.
   states it.
 
 ### DEC-102 — Experiments are part of discovery
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package) · **Class:** kept
 - **Decision:** Research and experiment tasks (spikes, and tool compatibility and performance trials like S0a and
   S0b2) are a normal part of discovery and can run at any point in development. They run in sandboxes outside
   production paths and produce an evidence record: what was tested, how, the results and a verdict. Their code is never
@@ -1159,7 +1159,7 @@ W1-03's `allowed_paths` change under DEC-126 only.
   `Implements: DEC-126`.
 
 ### DEC-127 — Where the tool-registry schema and the registry live
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-4 option (a) · **Amends:** DEC-121 (its fallback)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-4 option (a) · **Amends:** DEC-121 (its fallback) · **Class:** kept
 - **Decision:** The registry schema stays in the kernel template at the path W1-04's ticket names
   (`template/governance/kernel/schemas/tool-registry*`). The registry itself is per-repository project data at
   `governance/project/tool-registry.yaml`. W1-04 ships no registry file; W1-06 creates it at the first install.
@@ -1725,7 +1725,7 @@ KPI disputes (KD-1…KD-3), the orchestrator's DP-5, and two items the orchestra
   deleted. A fresh, correctly identified test designer starts from the ticket and these decisions alone.
 
 ### DEC-185 — KD-1: every `gov` command loads the `governance/project/` files it knows; an invalid one is `CONFIG_INVALID`
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package KD-1 option (a), without a new `overlay.yaml`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package KD-1 option (a), without a new `overlay.yaml` · **Class:** kept
 - **Decision:**
   - Every `gov` command loads the `governance/project/` files it knows: `path-map.yaml` now, the other overlay
     files as their tickets add them. There is no new `overlay.yaml`.
@@ -1847,7 +1847,7 @@ Owner answers of 2026-10-03 to the test designer's package DP-5 on W1-06 (`DAEO-
 orchestrator reported about the registry.
 
 ### DEC-199 — W1-06 DP-5: the sha256 of a vendored folder is a digest of its committed files
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-5 option (a) · **Extends:** DEC-196
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-5 option (a) · **Extends:** DEC-196 · **Class:** kept
 - **Decision:**
   - The Superpowers entry's `sha256` is a digest of the committed vendor folder: the sha256 of the sorted lines
     `<sha256 of the file>  <relative path>` over every file under `template/governance/kernel/vendor/superpowers/`.
@@ -2134,7 +2134,7 @@ drafts the answers first (DEC-222).
   upper-case spelling names the same three values; the Contract text is not changed.
 
 ### DEC-227 — W1-08 DP-6: one shared definitions file holds every id grammar
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-6 option (a); test designer's confidence medium-high
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-6 option (a); test designer's confidence medium-high · **Class:** kept
 - **Decision:** One shared definitions file under `template/governance/kernel/schemas/` holds every id grammar under
   a fixed name (`ticket_id`, `wbs_id`, `decision_id`, `lesson_id`, `record_id`), and no other schema writes an id
   `pattern` of its own; the record schemas refer to it.
@@ -2578,7 +2578,7 @@ version question of W1-37), on W1-49's DP-3, and on the gap the orchestrator rep
     recorded in `governance/project/bootstrap.md`. The ADR is not changed.
 
 ### DEC-262 — The owner's reading of CAP-24 for vendored skills
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the W1-37 question left open by DEC-245, option (a) · **Under:** CAP-24, DEC-245, DEC-246
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the W1-37 question left open by DEC-245, option (a) · **Under:** CAP-24, DEC-245, DEC-246 · **Class:** kept
 - **Decision:**
   - For a vendored skill, the version recorded beside it (`vendored.yaml`) satisfies CAP-24. The copies stay
     byte-identical to upstream.
@@ -2708,7 +2708,7 @@ ticket has built on it yet. The suite and the implementation on the branch alrea
 changes nothing in this ticket.
 
 ### DEC-274 — W1-10 DP-1: what a record is, and what an invalid one does to a load
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-1 option (a); confidence medium · **Under:** DEC-239, CAP-13.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-1 option (a); confidence medium · **Under:** DEC-239, CAP-13.a · **Class:** kept
 - **Decision:**
   - A record is any tracked Markdown file whose frontmatter has an `id`. It needs `id`, `type` and `status`
     (DEC-239). An unreadable or incomplete one is listed in the load's `invalid` by path, and the load continues.
@@ -3034,7 +3034,7 @@ to the owner, and W1-12 is not merged before the answer.
   it is read before W1-12 closes is asked of the owner, and an answer may put a file in that folder.
 
 ### DEC-305 — W1-12 DP-4: the readiness record is YAML
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-12 package DP-4 option (a); confidence medium · **Under:** CAP-30.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-12 package DP-4 option (a); confidence medium · **Under:** CAP-30.a · **Class:** kept
 - **Decision:** The readiness record is `readiness.yaml`, artifact id `readiness`: one entry per row with `n`, `key`,
   `state`, `evidence`, `reason` and `gap_ticket`. A fresh record has all 26 rows `MISSING`: empty is invalid, N/A is
   never a default, and the other states need content.
@@ -3238,7 +3238,7 @@ returned. The designer's, the lead's and the orchestrator's recommendations agre
 choice is reversible until W1-11 reads the state.
 
 ### DEC-328 — W1-34 DP-1: a gate record holds its state in `status` alone
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-34 package DP-1 option (a); confidence medium · **Under:** CAP-34.d, DEC-308
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-34 package DP-1 option (a); confidence medium · **Under:** CAP-34.d, DEC-308 · **Class:** kept
 - **Decision:**
   - A decision package holds its gate state in `status` alone, with no second key: `PROPOSED` is open, `ACCEPTED` is
     answered, `DECLINED` is declined, `REVOKED` is revoked and `STALE` is stale. The template states the mapping.
@@ -3257,7 +3257,7 @@ both are reversible. DP-2 (the owner approval fact) and DP-3 (how a gate is cite
 who reads the archived sources under DEC-222; DP-2 goes to the owner afterwards.
 
 ### DEC-329 — W1-11 DP-1: the decision checker reads frontmatter and git, never prose
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-11 package DP-1 option (a); confidence medium · **Under:** CAP-51.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-11 package DP-1 option (a); confidence medium · **Under:** CAP-51.a · **Class:** kept
 - **Decision:**
   - The checker is deterministic: it reads frontmatter and git only. It does not read a decision's body for
     statements such as "superseded by DEC-003".
@@ -4901,7 +4901,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
     other check gains this answer, and the answer is never green.
 
 ### DEC-448 — `gov doctor`: registered tool locations, historical records, one rebuild, and the Claude Code drift
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** `gov doctor` on this repository: Node 18 found against 22 pinned, `openspec` and `ccusage` not found, 180 references to moved paths, a stale index, Claude Code drift · **Under:** DEC-202, DEC-210, DEC-440 · **Changed by:** its one-off limit superseded by DEC-477 (its other parts stand) (shown by DEC-825, 2026-10-19) · **Changed by:** DEC-456 (the set of historical records)
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** `gov doctor` on this repository: Node 18 found against 22 pinned, `openspec` and `ccusage` not found, 180 references to moved paths, a stale index, Claude Code drift · **Under:** DEC-202, DEC-210, DEC-440 · **Changed by:** its one-off limit superseded by DEC-477 (its other parts stand) (shown by DEC-825, 2026-10-19) · **Changed by:** DEC-456 (the set of historical records) · **Class:** kept (items changed: (one-off limit) history, superseded by DEC-477)
 - **Decision:**
   - Each tool is checked at its registered location (the PATH prefix of DEC-202 and the registry's paths),
     not only on PATH, so Node 22, `openspec` and `ccusage` are found where they are installed. The machine's
@@ -4944,7 +4944,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 112. Three delegated decisions: where `gov doctor` looks for a tool, and what `gov close` must measure (register v0.112, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-452 — Doctor looks under every registered PATH prefix before PATH, and a tool it cannot verify fails
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07) · **Basis:** the orchestrator's reading of W1-27's code and of `gov doctor` run on this repository after DEC-448 was built: `openspec` and `ccusage` are found under the prefix their registry entries carry, Node is not (its entry's install command is the `nvm install` line and carries no prefix; the place is only in a free-text note), `socat` passes with no version read and no hash match, and one case asserted a key name · **Under:** DEC-202, DEC-425, DEC-440, DEC-448
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07) · **Basis:** the orchestrator's reading of W1-27's code and of `gov doctor` run on this repository after DEC-448 was built: `openspec` and `ccusage` are found under the prefix their registry entries carry, Node is not (its entry's install command is the `nvm install` line and carries no prefix; the place is only in a free-text note), `socat` passes with no version read and no hash match, and one case asserted a key name · **Under:** DEC-202, DEC-425, DEC-440, DEC-448 · **Class:** kept
 - **Decision:**
   - Doctor looks for a tool first under its own registry entry's PATH prefix, then under every PATH prefix that
     any entry of the registry carries, in the registry's order, and only then on PATH. This is the reading of
@@ -5082,12 +5082,12 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   summary.
 
 ### DEC-462 — A designer's brief states behaviour and sources only
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: the orchestrator's designer briefs for W1-27 and W1-30 named private identifiers of the implementation · **Under:** MR-3, DEC-069
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: the orchestrator's designer briefs for W1-27 and W1-30 named private identifiers of the implementation · **Under:** MR-3, DEC-069 · **Class:** kept
 - **Decision:** Confirmed stopped. A brief for a test designer states behaviour and sources, never the names of
   the implementation's private parts.
 
 ### DEC-463 — Decisions recorded late are accepted; from now on the record comes first, and `gov check` flags a commit citing an unrecorded decision
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: DEC-391, DEC-417, DEC-437, DEC-440, DEC-450, DEC-452 and DEC-455 were recorded after the work they authorise
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: DEC-391, DEC-417, DEC-437, DEC-440, DEC-450, DEC-452 and DEC-455 were recorded after the work they authorise · **Class:** kept (items changed: (1) history)
 - **Decision:**
   - Those seven are accepted as recorded late.
   - From now on a decision is recorded before the change it authorises.
@@ -5143,14 +5143,14 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 117. Two delegated decisions on W1-38: the OpenSpec skills are registered sources too; who refreshes the registered OpenSpec sources (register v0.117, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-468 — The six skills OpenSpec writes beside its commands are registered rulesync sources, like its commands
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-38's test designer measured with rulesync 24.0.0 that `generate --delete` removes every file under `.claude/commands/` and `.claude/skills/` that is not a registered source, and that `openspec init --tools claude` (OpenSpec 1.13.2) writes six commands and six `openspec-*` skills. The ticket's failure line reads "generate --delete removes OpenSpec or vendored skills"; DEC-074 (question 7) makes rulesync the holder of what OpenSpec writes. Registering the commands alone would let `--delete` remove the six skills.
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-38's test designer measured with rulesync 24.0.0 that `generate --delete` removes every file under `.claude/commands/` and `.claude/skills/` that is not a registered source, and that `openspec init --tools claude` (OpenSpec 1.13.2) writes six commands and six `openspec-*` skills. The ticket's failure line reads "generate --delete removes OpenSpec or vendored skills"; DEC-074 (question 7) makes rulesync the holder of what OpenSpec writes. Registering the commands alone would let `--delete` remove the six skills. · **Class:** kept
 - **Decision:**
   - The registered rulesync sources hold what the registered OpenSpec version ships, unchanged: its six commands and its six skills. A text written for the ticket in their place is not a source.
   - The acceptance cases compare the generated files with what the installed, registered OpenSpec writes; an OpenSpec that is absent or of another version fails those cases with that reason.
   - Recorded before the change (DEC-463): the designer's cases for the six skills and the engineer's sources follow this entry.
 
 ### DEC-469 — The change that moves the registered OpenSpec or rulesync version refreshes the registered sources in the same change
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the cases of DEC-468 turn red when the tool registry names a new OpenSpec version and the sources still hold the old texts; no source named who refreshes them.
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the cases of DEC-468 turn red when the tool registry names a new OpenSpec version and the sources still hold the old texts; no source named who refreshes them. · **Class:** kept
 - **Decision:**
   - The ticket that changes the `openspec` or `rulesync` entry of the tool registry refreshes the registered sources from that version in the same change, in a temporary folder outside the repository (nobody runs a writing rulesync command in the repository), and copies the result in.
   - Where a project keeps its check declarations once adopted (`template/governance/kernel/checks/` today, `governance/kernel/` after adoption) is not decided here: W1-39 settles it.
@@ -5196,7 +5196,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - Added: the baseline must be empty at W1-42's exit run, cleared by W1-39 and by W1-41's adoption. Any item still in it then comes to the owner as a decision package. This is added to W1-42's KPI lines.
 
 ### DEC-473 — The decision-citations check knows both register forms (W1-26, package P-1)
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** DEC-463; the test designer's package P-1 on W1-26's follow-up.
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** DEC-463; the test designer's package P-1 on W1-26's follow-up. · **Class:** kept
 - **Decision:**
   - A decision is recorded either as a decision file, or as an entry of a register file that the project names in one line of configuration under `governance/project/`. With no register file named, decision files alone count. No path of this repository goes into the kernel.
   - Heading grammar of a register file: a level-3 heading `### DEC-<digits>` at the start of a line, followed by a space, a colon or a dash and the title. A heading inside a fenced code block does not count.
@@ -5242,7 +5242,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 121. One delegated decision on W1-26: where a project records its register file and its base commit (register v0.121, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-479 — The register file and the base commit of the decision-citations check are two optional keys of the project's path map
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-473 and DEC-474 order "one line of configuration under `governance/project/`" without naming the file. W1-26's test designer (commit `ac952490`) found no source that names it and settled on the path map: DEC-185 refuses a new overlay file and has commands load the `governance/project/` files they know, the path map first; DEC-224 and DEC-230 already put project data there under top-level keys.
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-473 and DEC-474 order "one line of configuration under `governance/project/`" without naming the file. W1-26's test designer (commit `ac952490`) found no source that names it and settled on the path map: DEC-185 refuses a new overlay file and has commands load the `governance/project/` files they know, the path map first; DEC-224 and DEC-230 already put project data there under top-level keys. · **Class:** kept
 - **Decision:**
   - `governance/project/path-map.yaml` holds two optional top-level keys: `decision_register` (the register file's path from the project root) and `decision_citations_base` (a commit id, full or abbreviated).
   - The configuration read is the project's present one, not each judged commit's: a base can only be recorded after it exists.
@@ -8939,7 +8939,7 @@ The owner committed DEC-782 to DEC-812 (`9d44601d`) and answered the four open p
 The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synthesis, then lenses F and G; the reports are in `docs/assessment/2026-10/`). The synthesis brought nine packages, P-S1 to P-S9 (`docs/assessment/2026-10/SYNTHESIS.md` §7). The owner answered them, set two standing policies, and kept Wave 2 paused until the owner approves the revised plan (DEC-829). Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
 
 ### DEC-818 — The P1 decision package format, and the daily P2 digest (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** MR-6, DEC-220, DEC-787, DEC-809 · **Basis:** OWNER, 2026-10-19: the owner and the owner's adviser must be able to decide a package without other context.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** MR-6, DEC-220, DEC-787, DEC-809 · **Basis:** OWNER, 2026-10-19: the owner and the owner's adviser must be able to decide a package without other context. · **Class:** kept (items changed: (1) retired as ceremony; (3) history)
 - **Decision:**
   1. Every P1 package stands alone, in six parts: (1) the context in plain words, with its history and links; (2) what happened, with the evidence; (3) why it matters to the Gov OS's purpose; (4) the options, each with its consequence, cost and risk, and what it changes in the Contract, the specifications, the skills or the briefs; (5) the recommendation and its confidence, with the threat-model classification of any findings (DEC-809); (6) what it blocks, and what waiting costs.
   2. P2 items go to the owner in one daily digest, not one by one.
@@ -9092,7 +9092,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. The new ticket W2-62 (DEC-837) is added; W2-33 stays in Wave 2, cut down (DEC-832). Wave 2 then holds 55 tickets plus W2-00.
 
 ### DEC-832 — The Charter's eight unplanned roles: four as skill packs the engineer loads, four to Wave 3 (plan §11 item 6; item 1a)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** Charter v5 §6, DEC-105 (defer, for four), DEC-829 items 4 (iii) and (iv), CAP-24.b, CAP-33 · **Basis:** OWNER, 2026-10-19: the plan's alternative, as skill packs rather than new governance roles · **Replaces:** the plan's recommendation to defer all eight. · **Changed by:** DEC-957 (the skill packs come in Wave 2)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** Charter v5 §6, DEC-105 (defer, for four), DEC-829 items 4 (iii) and (iv), CAP-24.b, CAP-33 · **Basis:** OWNER, 2026-10-19: the plan's alternative, as skill packs rather than new governance roles · **Replaces:** the plan's recommendation to defer all eight. · **Changed by:** DEC-957 (the skill packs come in Wave 2) · **Class:** kept (items changed: (2) history)
 - **Decision:**
   1. **Backend, database and data, integration and API, and security become skill packs,** not governance roles: method text that the engineer role loads at launch, through W2-60. They add no role, no guard entry, no permission and no path; a skill grants nothing on its own authority (CAP-24.b).
   2. **W2-33 stays in Wave 2, cut down to these four packs:** about 1.5 days of product-spec work, no new machinery. It is a kernel skill change, so it goes through CIT-P (CAP-33). It starts after W2-60 (which loads them) and W2-11 (one versioned source per skill), and it is admitted by this decision under DEC-829 (iii).
@@ -9237,7 +9237,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   3. **The orchestrator counts these refusals** (its own, and those its leads return) in the daily digest.
 
 ### DEC-850 — How questions reach the owner (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19, in two follow-ups; item 1 as the second one restated it; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 1's end-of-turn question line replaced by DEC-855's `owner-ping` (2026-10-19) · **Under:** DEC-818, DEC-787, MR-6 · **Basis:** OWNER, 2026-10-19. The notification test of 2026-10-19: an AskUserQuestion box did not reach the owner's phone (the owner answered "No"); a box pauses the turn mid-way, so the app sends nothing, while a permission request or a finished turn does notify.
+- **Status:** ACCEPTED (owner, 2026-10-19, in two follow-ups; item 1 as the second one restated it; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 1's end-of-turn question line replaced by DEC-855's `owner-ping` (2026-10-19) · **Under:** DEC-818, DEC-787, MR-6 · **Basis:** OWNER, 2026-10-19. The notification test of 2026-10-19: an AskUserQuestion box did not reach the owner's phone (the owner answered "No"); a box pauses the turn mid-way, so the app sends nothing, while a permission request or a finished turn does notify. · **Class:** kept (items changed: (1) end-of-turn question line history DEC-855)
 - **Decision:**
   1. **A question that blocks all further work** (nothing else the orchestrator or any lead can do until the owner answers): the orchestrator writes the full six-part package (DEC-818) as its message, saves the same text under `governance/project/orchestration/packages/<package id>.md`, and **ends its turn with it**, finishing with one line `QUESTION FOR THE OWNER: <package id> - choose (a), (b), (c) or Discuss first; my recommendation is (x)`, then the OWNER_ACTION line. **The AskUserQuestion box is not used.** Background work (leads, workers, runs) keeps going while it waits. If the owner answers "Discuss first", the orchestrator goes on with anything that does not depend on it, and waits for the owner's written answer. If a finished turn does not reach the owner's phone either, a Notification hook is added (the owner's change).
   2. **A question that blocks only part of the work:** no question box. It goes in the report and the daily digest with the same six parts; the orchestrator keeps working on everything it does not block, and uses a question box only once it becomes blocking.
@@ -9373,7 +9373,7 @@ The owner committed DEC-856 to DEC-858 (`ccf28d5c`), with the path-map edit, and
 The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule that replaces DEC-724's "the owner commits owner entries" and the owner's earlier patch-file idea. From this section on, the orchestrator commits the records of the owner's decisions itself, signed as below.
 
 ### DEC-861 — The orchestrator commits the records of the owner's decisions; the owner's push is the acceptance (standing)
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-724, DEC-788, DEC-851, ADR-0001 · **Basis:** OWNER, 2026-10-20: "Nothing is ever left staged in the main tree, so no merge, close or lead ever waits on me." · **Changes:** DEC-724 (owner entries were committed by the owner with `Role: owner`) and DEC-788 (the daily owner batch). · **Changed by:** DEC-1057
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-724, DEC-788, DEC-851, ADR-0001 · **Basis:** OWNER, 2026-10-20: "Nothing is ever left staged in the main tree, so no merge, close or lead ever waits on me." · **Changes:** DEC-724 (owner entries were committed by the owner with `Role: owner`) and DEC-788 (the daily owner batch). · **Changed by:** DEC-1057 · **Class:** kept (items changed: (1)(2) amended by DEC-1057; (5) history)
 - **Decision:**
   1. **What the orchestrator commits:** the records of the owner's decisions (the register, the plan files, the prompt, the briefs, the path map and the ratchet lists), as soon as they are written. Nothing is left staged in the main tree.
   2. **How it signs:** never as the owner. Its commits carry `Role: orchestrator`, never `Role: owner`, plus `Task: decision-record` and `Decided-by: owner (chat, <date>)` naming whose decision it records. The owner's own commits keep `Role: owner`.
@@ -9440,7 +9440,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
   3. **DEC-636 is marked superseded by DEC-838** (its status line and a "Changed by" note), with the other entries that held the 300k rule (DEC-866 item 5).
 
 ### DEC-866 — Supersession propagates (standing)
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-825, DEC-851, DEC-791 (W2-55), DEC-105 · **Basis:** OWNER, 2026-10-20: W1-49's two cases (DEC-636 against DEC-838) and W2-59's three earlier cases (DEC-605's premise against DEC-822 and DEC-835) still enforced replaced decisions, and DEC-838 never named the entries it superseded.
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-825, DEC-851, DEC-791 (W2-55), DEC-105 · **Basis:** OWNER, 2026-10-20: W1-49's two cases (DEC-636 against DEC-838) and W2-59's three earlier cases (DEC-605's premise against DEC-822 and DEC-835) still enforced replaced decisions, and DEC-838 never named the entries it superseded. · **Class:** kept
 - **Decision:** whenever a decision supersedes, cancels or changes another:
   1. **The old entry is marked at once:** its status line names the new entry (`SUPERSEDED by DEC-n`, or a "Changed by" note for a part), and agents are no longer served the old one as in force.
   2. **The orchestrator sweeps for everything that cites or enforces the old decision,** by its id and by its value (tests, code, skills, briefs, ticket KPIs, the prompt, the path map), and lists it in the package or the digest.
@@ -11611,7 +11611,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-943 — Brief gaps in every lead's return, fixed the same week; the orchestrator's own drift measured (standing)
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-824, DEC-793, DEC-836, DEC-930, DEC-938, DEC-941, CAP-33 · **Changed by:** DEC-1052 (item 1)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-824, DEC-793, DEC-836, DEC-930, DEC-938, DEC-941, CAP-33 · **Changed by:** DEC-1052 (item 1) · **Class:** kept (items changed: (1) kept; (2) superseded §5.5)
 - **Decision:**
   1. **Brief gaps.** Every lead's return gains a "brief gaps" section: what it had to discover, look up or ask that its brief, ticket or skills did not tell it, with the time it cost.
      - The orchestrator collects them and fixes the common brief, the brief builder or the kernel skills the same week.
@@ -13026,7 +13026,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.434 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1051. Next free id: DEC-1052. |
 
 ### DEC-1052 — P1-LIFT-1 and P1-PLAN decided: the basis, the rows, the templates with READY and DONE by code, the test suite cut to about 5,000, the homes, the updated plan, tonight's restart
-- **Status:** ACCEPTED (owner, 2026-11-02 ~23:58, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-1047, DEC-1050, DEC-1051, DEC-1010, DEC-1039 · **Changes:** DEC-1003 (a practice enters the product only after it has proven itself in use), DEC-851 item 1 and DEC-943 item 1 (the templates' four recommendations), DEC-957's review effort kept, DEC-1039 steps 2, 3, 3b and the order of the plan · **Changed by:** DEC-1055, DEC-1157 (3), DEC-1164 (2) (the plan bullet and "Tonight" spent; D-11 its own line)
+- **Status:** ACCEPTED (owner, 2026-11-02 ~23:58, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-1047, DEC-1050, DEC-1051, DEC-1010, DEC-1039 · **Changes:** DEC-1003 (a practice enters the product only after it has proven itself in use), DEC-851 item 1 and DEC-943 item 1 (the templates' four recommendations), DEC-957's review effort kept, DEC-1039 steps 2, 3, 3b and the order of the plan · **Changed by:** DEC-1055, DEC-1157 (3), DEC-1164 (2) (the plan bullet and "Tonight" spent; D-11 its own line) · **Class:** kept (items changed: (templates/READY and DONE by code, basis, path-map roles) kept; suite cut, homes, plan, restart history; ACT rule superseded §2.10)
 - **The basis (standing):** everything is judged on one question: does it help deliver tests and code that match the KPIs and the spec, with less drift? In order: (1) does it serve memory, spec-and-KPI development, role separation, or the traffic of tickets; (2) without it, would ordinary work fail open or lose work (DEC-1010); (3) does it run only where the risk is (the change, or the full suite), not everywhere every time; (4) does it make agents deliver more with less drift, or only add records, approvals and pings; (5) a practice enters the product only after it has proven itself in use, never the same day.
 - **The rows** (`packages/INVESTIGATION-1-COMBINED.md`): **approved:** T-2, T-3 (first), T-6 to T-11, T-13; Q-2 to Q-14; G-4 to G-9, G-13; M-2, M-3, M-5, M-6; R-6, R-7, R-9, R-10, R-12, R-13; O-5, O-8, O-9, O-11, O-12, O-13; K-1 to K-4; W-1 to W-10. **R-1 to R-5, O-1, O-2, O-4:** no cuts; the templates replace them. **O-3 refused:** a fresh CTO session every day; orchestrators keep long contexts. **O-6:** ACTs are for machine changes (installs, services, crontab) and only where they help; restarts of the repository's own servers from committed configs are approved by class; no ACTs for records. **G-12 refused:** review effort stays as it is. **G-3:** the hidden half of the memory measure moves outside every worktree, so no guard rule is needed for it. **G-14:** role separation is enforced deterministically from the path map: each role's reads and writes are its paths; the engineer never reads the acceptance tests; the test designer never reads the engineer's new code (it may read the integrated code, DEC-963); simple path checks, no shell guessing; repeated QA findings mean the spec is missing something and go back to product-spec. **M-1:** W2-04 accepted as built; no more runs on it. **M-4:** memory embeds the WBS, the specs and KPIs, the tickets, the code and the decisions; tests and the close, checkpoint and probe records are not embedded (they stay in keyword search, and tickets link to their tests); W2-61's measure before and after. **E1 and R1-21:** yes, inside the refactoring, E1 before the guard ACT. **Option A:** the product switches are re-scoped tickets after the resume.
 - **The templates:** the four recommendations approved (TPL-1 to TPL-8 as one package, the three scripts first; lines waiting on decisions become switches in the facts file; DEC-851 and DEC-943 narrowed for templates: a line only where it changes what is done, one owner, product-spec writes and the CTO approves, gaps closed by a tool or a measured line; the six measures report only). **READY and DONE are computed by code from the filled templates** (the required fields: non-goals, how each KPI line is verified, the definition of done), as `verdict.py` computes READY from a review; not warnings.
@@ -14199,7 +14199,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   (the lift's date protected if the week's allowance runs short).
 
 ### DEC-1116 — W2-128's kernel templates approved at 1bf23a0b3e77 and promoted as version 1.0.0; ACT-CLAUDE-COPIES-2: yes
-- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** CAP-33, DEC-1050, DEC-1052, DEC-1081 (2), DEC-1115 · **Source:** the owner's messages (chat, 2026-11-10): "yes ACT-CLAUDE-COPIES-2 36ab6b62" and "Templates approved at 1bf23a0b3e77"
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** CAP-33, DEC-1050, DEC-1052, DEC-1081 (2), DEC-1115 · **Source:** the owner's messages (chat, 2026-11-10): "yes ACT-CLAUDE-COPIES-2 36ab6b62" and "Templates approved at 1bf23a0b3e77" · **Class:** kept (items changed: (1) kernel templates 1.0.0 kept as the baseline; ACT-CLAUDE-COPIES-2 superseded §2.10)
 - **Decision:**
   - (1) **The templates approved** as the bytes in TEMPLATES-APPROVAL-1's table at integrate `1bf23a0b3e77` (the
     brief envelope, the ticket, the seven role templates, the key list and the kernel skills and role of rounds 1, 2a
