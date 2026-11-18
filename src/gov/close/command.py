@@ -2057,7 +2057,7 @@ def _run_scoped(root: Path, args, config: dict):
         raise GovError("BASELINE_MISSING", f"the base run at {base[:12]} ({base}) cannot judge {len(missing)} red(s) "
                        f"of {ticket} whose alone runs could not ({base_run.get('why')}): "
                        + "; ".join(f"{r['test']} ({r['failure_type']})" for r in missing)
-                       + f"; give --base a commit where the selection runs", details, exit_code=EXIT_CHECK_FAILED)
+                       + "; give --base a commit where the selection runs", details, exit_code=EXIT_CHECK_FAILED)
     caused = [r for r in reds if r["caused"]]
     if caused:
         raise GovError("RED_CAUSED", f"{len(caused)} red(s) caused by the change of {ticket}: "
