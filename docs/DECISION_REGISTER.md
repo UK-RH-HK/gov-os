@@ -7695,7 +7695,7 @@ The orchestrator's planning report of 2026-10-16 put five packages (P-W2-1 to P-
   4. The queued package for an owner signing key (Q-5) is dropped.
 
 ### DEC-723 — The EXAMIN profile runs early and read-only on a copy the owner makes; agents never write, list, glob or search in `~/gov-os-workbench` (P-W2-4 (a))
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-525 · **Basis:** EXAMIN's size, languages and test runner decide whether Track B waits for the language-agnostic test commands and the check runner's scale work; measuring them early sizes that work before it is built. In the planning session, a listing of the workbench folder printed a protected folder's name (nothing in it was read). · **Changed by:** DEC-953 (item 2) · **Changed by:** DEC-820
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-525 · **Basis:** EXAMIN's size, languages and test runner decide whether Track B waits for the language-agnostic test commands and the check runner's scale work; measuring them early sizes that work before it is built. In the planning session, a listing of the workbench folder printed a protected folder's name (nothing in it was read). · **Changed by:** DEC-953 (item 2) · **Changed by:** DEC-820 · **Class:** history (settled by DEC-820)
 - **Decision:**
   1. W2-26 (the EXAMIN profile, EXP-003's EXAMIN leg) runs early, beside Track A, read-only.
   2. **The owner makes the copy** at `~/gov-os-workbench/examin/` in a plain terminal and gives the orchestrator its exact path.
@@ -7836,7 +7836,7 @@ The first leads of Wave 2, W2-01 (DAEO-g0ip) and W2-26 (DAEO-2ds6), started in t
 W2-26's lead (run 2) returned its research round with two packages: P-1, where the indexing measure comes from, and P-2, `gov rebuild` reporting ok when no index is built. The orchestrator decided both under the delegation and the finish line, and the owner accepted both on 2026-10-16.
 
 ### DEC-735 — EXAMIN's per-index time and peak RSS are measured in W2-27 after adoption; `gov rebuild`'s ok without an index is a Wave 3 row (W2-M357)
-- **Status:** ACCEPTED (orchestrator, delegated under MR-6 and the w2 prompt §7; the owner accepted it on 2026-10-16) · **Under:** DEC-078, DEC-723, DEC-727, DEC-728 · **Basis:**
+- **Status:** ACCEPTED (orchestrator, delegated under MR-6 and the w2 prompt §7; the owner accepted it on 2026-10-16) · **Under:** DEC-078, DEC-723, DEC-727, DEC-728 · **Basis:** · **Class:** history
   - W2-26's record (`docs/research/EXP-003/examin/`, branch `w2/W2-26` at `62c4e477`) measured the clone of the owner's copy at `a7cf346`: 1,442 tracked files, 382,795 lines, 24.7 MB tracked, 392 commits.
   - On an unadopted clone `gov rebuild` builds no index. The lexical index needs the path map; every index goes through the secrets filter, which needs `.gitleaks.toml`. EXAMIN tracks neither. Measuring there would mean writing adoption's files into the clone, which is a configuration adoption has not chosen, and a way round.
   - DEC-078's own probe of the real repository found 24,665 nodes and 81,356 edges, about 30 % of the envelope. So the risk that W2-45 must join W2-27 (DEC-727) is low.
@@ -15246,7 +15246,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** package `packages/P-W2-81-FULLRUN.md` (ef8a2a32b); DEC-1178 (3)(c), (3)(e); DEC-1183 (1); DEC-1188 (1).
 
 ### DEC-1190 — The W2-81 adopter brief approved (65438a2e); EXAMIN's copy's settings reshaped to Gov OS's standard (the owner as EXAMIN's owner, F-015); the product fix stays flag-not-drop
-- **Status:** ACCEPTED (owner, 2026-11-15 ~22:30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-15)`) · **Under:** DEC-1189 (2), DEC-1184 (4), DEC-313, DEC-315, DEC-158, DEC-1178 (3)
+- **Status:** ACCEPTED (owner, 2026-11-15 ~22:30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-15)`) · **Under:** DEC-1189 (2), DEC-1184 (4), DEC-313, DEC-315, DEC-158, DEC-1178 (3) · **Class:** history
 - **Decision:**
   - (1) **`yes W2-81-adopter-brief 65438a2e`:** the brief `drafts/w2-81-fullrun/W2-81-adopter-brief.md` (sha256 65438a2e2da1…) starts the six W2-81 adopting sessions; the operator's set-up script `operator_setup.py` (sha256 c40a0099…) runs first.
   - (2) **EXAMIN's settings (F-015):** the owner, as EXAMIN's owner, reshapes the copy's whole settings to Gov OS's standard (package `packages/P-W2-27-SETTINGS.md`): the allow list keeps `Bash(gov launch:*)` only; the dead Windows `additionalDirectories` entry is dropped; `.claude/settings.local.json` is removed and its tools are given to each session at its start (`--allowedTools`, as Gov OS's launcher does); every deny rule and hook stays, EXAMIN's own guard and compaction hooks included. An owner commit by the operator (`operator_settings.py`, sha256 1f76e8ea…); then the EXAMIN CTO re-runs its precondition probes on the new settings before A5. The same reshape applies to EXAMIN's real repository at W2-29, judged again on its files.
@@ -15350,7 +15350,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** packages `P-EXAMIN-LEAD-1.md`, `EXAMIN-CTO-wave0-brief.approved-0d96110c.md`, `P-ADOPT-SPEC-AUDIT-1.md`; DEC-1199 (1).
 
 ### DEC-1201 — Wave 2 keeps only Gov OS's own work: ten deferred or parked tickets to Wave 3's list, W2-27 to W2-30 to EXAMIN's Wave 0; F-028 (a) with the base-red condition; every report ends with the status block; EXAMIN has no customer data; the merge back
-- **Status:** ACCEPTED (owner, 2026-11-16 ~15:05, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1199, DEC-1200, DEC-974, DEC-1142 (8) · **Changes:** DEC-954 Q8 (c) and its 19 deferrals (their tickets leave Wave 2's list)
+- **Status:** ACCEPTED (owner, 2026-11-16 ~15:05, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1199, DEC-1200, DEC-974, DEC-1142 (8) · **Changes:** DEC-954 Q8 (c) and its 19 deferrals (their tickets leave Wave 2's list) · **Class:** history
 - **Decision:**
   - (1) **F-028 (a), on one condition:** EXAMIN's exa-g6db close may accept the harness reds only if each already fails at the ticket's base commit, listed by name in the close record; a red that is new with the change is not accepted.
   - (2) **Every report** to the owner ends with the status block (counts, leads, closes, reopened, new tickets, waiting on the owner); an idle-check line does not replace it.
