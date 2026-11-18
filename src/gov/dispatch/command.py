@@ -4,9 +4,9 @@ convention is in ``gov.cli.main``).
 - ``tick``: one pass of the dispatcher (``gov.dispatch.run``), run every minute by the host outside any agent session.
 - ``status``: prints the last pass's status (the text, or the JSON under ``--json``), and says when it is older than
   three minutes.
-- ``watch`` (W2-121c, RT-2, RT-7): one machine-wide watch pass (``gov.dispatch.runtime``); ``--root`` is not read and no
-  ``dispatch.yaml`` is needed. Exit 0, or 4 when another pass holds the runtime folder's lock.
-- ``limits [--gpu-need-mib <n>]`` (W2-121c, RT-3): the machine detected now and each limit with its rule
+- ``watch`` (the run-time tool, RT-2, RT-7): one machine-wide watch pass (``gov.dispatch.runtime``); ``--root`` is not
+  read and no ``dispatch.yaml`` is needed. Exit 0, or 4 when another pass holds the runtime folder's lock.
+- ``limits [--gpu-need-mib <n>]`` (the run-time tool, RT-3): the machine detected now and each limit with its rule
   (``gov.dispatch.limits``); with a GPU need, ``admit`` (exit 0), ``wait`` or ``refuse`` (exit 3). No project is read.
 
 Exit codes: 0 a pass done or nothing to do (``status``: always 0), 3 the gate, the disk or the forecast refused a start

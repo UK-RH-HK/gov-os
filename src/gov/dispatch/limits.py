@@ -1,4 +1,5 @@
-"""The run-time limits from the machine detected at the pass (W2-121c, RT-3; audit 3 D1; DEC-1037 (4)).
+"""The run-time limits from the machine detected at the pass (the run-time tool, slice 1: RT-3; audit 3 D1;
+DEC-1037 (4)).
 
 Ratios only: no CPU count, byte or MiB figure of any machine is here or in a configuration. Sources, each plantable:
 the CPUs ``gov.resources.machine.nproc`` (``GOV_RESOURCES_NPROC``); the RAM the ``MemTotal:`` line of

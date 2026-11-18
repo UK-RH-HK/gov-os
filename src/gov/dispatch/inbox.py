@@ -1,4 +1,4 @@
-"""Per-session inbox files with a read mark, machine-wide (W2-121c, RT-6, RT-7; audit 3 D6, D7).
+"""Per-session inbox files with a read mark, machine-wide (the run-time tool, slice 1: RT-6, RT-7; audit 3 D6, D7).
 
 ``$HOME/.gov-os/inbox/<address>/`` holds ``messages.jsonl`` (one JSON object a line) and ``mark`` (the decimal byte
 offset of the first unread byte; absent or empty means 0). The inbox never depends on a project root, so two sessions

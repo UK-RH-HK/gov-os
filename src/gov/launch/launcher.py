@@ -673,7 +673,8 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         raise _refuse(f"the review of session {repeated['session_id']} ran on model {model}, effort {effort}, "
                       f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
     return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
-            "tier": model.split("-")[1], "criticality": ticket_class, "rubric": crit.REL if crit.exists(root) else None,
+            "tier": model.split("-")[1], "criticality": ticket_class,
+            "rubric": crit.REL if crit.exists(root) else None,  # W2-121c RT-8: the file the choice came from
             "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
             "review_round": review_round}
 
@@ -1040,13 +1041,13 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         if temp_prefix is not None:  # DEC-159: a temp directory of the session's own, for the CLI and its commands
             tmpdir = tempfile.mkdtemp(prefix=temp_prefix)
             own_env.update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-        address = f"{entry[1]}:{entry[0]}" if entry is not None else None
-        if address is not None:  # W2-121c RT-2: the session's own inbox address
-            own_env["GOV_MSG_ADDRESS"] = address
         # W2-56 S5: the cleaned environment for the CLI process (gov.launch.environ), and in a worker's --settings (a
         # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
         env = environ.session_env(os.environ, own_env)
+        address = f"{entry[1]}:{entry[0]}" if entry is not None else None
+        if address is not None:  # W2-121c RT-2: the session's own inbox address, in its process's environment
+            env["GOV_MSG_ADDRESS"] = address
         if not state["ended"]:  # a signal that came first: no session is started
             head, tail, written = [], [], None
             if worker is not None:  # W2-60a: the record before the session starts; the appended file last (W2-153)

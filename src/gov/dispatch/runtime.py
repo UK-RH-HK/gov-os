@@ -1,5 +1,5 @@
-"""The watch pass: one machine-wide pass, one state file, every end and stall messaged once (W2-121c, RT-2, RT-3, RT-7;
-F1, F2; audit 3 D1, D4).
+"""The watch pass: one machine-wide pass, one state file, every end and stall messaged once (the run-time tool,
+slice 1: RT-2, RT-3, RT-7; F1, F2; audit 3 D1, D4).
 
 ``gov dispatch watch`` runs one pass; no project and no ``dispatch.yaml`` is read. The pass holds an exclusive,
 non-blocking ``flock`` on the folder ``~/.gov-os/runtime/`` itself (held: exit 4, nothing written), so the folder holds
