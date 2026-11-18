@@ -55,34 +55,14 @@ tests/acceptance/W2-50/test_w2_50_owner_answers.py::test_the_check_follows_a_lin
 # W1-47
 
 # W1-50
-tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_freeze_mirror_restore.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_judge_commits.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_merge_commit_file_that_equals_one_parent_s_version.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_mirror_tripwire.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_read_merge_brought.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_read_merge_helper.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py  # post-command containment (G-5; DEC-1061 (3a))
 
 # W2-72
-tests/acceptance/W2-72/test_w2_72_clean_merge_across_a_rename.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W2-72/test_w2_72_drop_behind_a_rename_or_a_directory.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W2-72/test_w2_72_file_that_differs_from_git_s_merge.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W2-72/test_w2_72_nothing_else_changes.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/acceptance/W2-72/test_w2_72_the_two_merge_backs.py  # post-command containment (G-5; DEC-1061 (3a))
 
 # W2-106
 
 # unit/guard
 
 # unit/containment
-tests/unit/containment/test_dec_572_lift.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/unit/containment/test_judge_commits.py  # post-command containment (G-5; DEC-1061 (3a))
-tests/unit/containment/test_w1_50_commit_trailers.py  # post-command containment (G-5; DEC-1061 (3a))
 
 # ---- Decision 3a: the Stop hook's line (R-7) ----
 
