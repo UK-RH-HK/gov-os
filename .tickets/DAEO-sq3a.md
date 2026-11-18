@@ -7,7 +7,7 @@ type: task
 class: implementation
 role: engineer
 profile: FULL
-status: in_progress
+status: closed
 state_class: AUTHORITATIVE
 priority: 2
 created: 2026-11-13
@@ -59,3 +59,6 @@ did not widen it), while a bare host entry opens every loopback port, Ollama's A
 starts. The owner amends DEC-158 (workers' empty network allowlist) and DEC-1114 S9 for this one entry. W2-56's S8-S10
 and F4, and W2-112's and W2-145's cases, are revised by a test designer under this ticket. Re-check the proxy's matching
 at each CLI re-pin.
+
+
+**Retired on its record 2026-11-18 by the CTO (EMERGENCY-2 6.1; the owner's audit 09 items):** the guard and the sandbox this ticket served are switched off and being retired (EMERGENCY-2 2.2, 6.1); nothing further is built under it, and any open reopen or follow-up of it is void.
