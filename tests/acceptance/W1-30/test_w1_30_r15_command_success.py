@@ -11,8 +11,12 @@ judged as today." What "today" is was measured with this suite's stand-in comman
 
 - the success form with another exit code: RED;
 - the refusal form (``"ok": false``), exit code 0 or not: RED, the object its one finding;
-- another JSON object with exit code 0 (``unmeasured``, a finding written as an object, ``"ok": true`` without a
-  ``result``): RED, the object its one finding.
+- another JSON object with exit code 0 (a finding written as an object, ``"ok": true`` without a ``result``): RED,
+  the object its one finding; ``"unmeasured": true`` is the exception, see below.
+
+Revised for W2-45 (commit 3ed6f5311, DAEO-neam, DEC-729): an object with exit code 0 and ``"unmeasured": true`` is not
+the finding itself any more; the runner turns it into one ``CHECK_UNMEASURED`` finding that names the check and carries
+the object's ``reason``. The status stays RED.
 
 A ``findings`` list, a list of findings and the forms ``not_applicable`` and ``unmeasured`` (exit code 1) have
 their cases in W1-26's and W1-15's suites and are not repeated.
@@ -75,14 +79,26 @@ NOT_THE_SUCCESS_FORM = {
 }
 
 
+UNMEASURED_FINDING = {"code": "CHECK_UNMEASURED", "message": "answers did not measure", "reason": "nothing was measured"}
+
+
+# Rewrite-Reason: W2-45 (commit 3ed6f5311, DAEO-neam, DEC-729): an unmeasured object with exit code 0 is answered as one
+# CHECK_UNMEASURED finding carrying the reason (the runner's form), no longer as the object itself.
+def _expected_findings(what, document):
+    """What a not-the-success-form object with exit code 0 is judged as: the object itself, except the unmeasured
+    mapping, which the runner turns into one CHECK_UNMEASURED finding for the check ``answers`` with its reason."""
+    return [UNMEASURED_FINDING] if what == "unmeasured, exit code 0" else [document]
+
+
 @pytest.mark.parametrize("what", sorted(NOT_THE_SUCCESS_FORM))
 def test_another_object_with_exit_code_0_is_still_a_finding(what, scratch, sandbox, tmp_path):
-    """Pins what holds today (passes before the round): only the success form of a ``gov`` command (``"ok": true``
-    and a ``result``) stops being a finding."""
+    """Only the success form of a ``gov`` command (``"ok": true`` and a ``result``) stops being a finding; another
+    object is RED with the object as its one finding. The unmeasured object is RED with one CHECK_UNMEASURED finding
+    that carries its reason (W2-45, DEC-729)."""
     document = NOT_THE_SUCCESS_FORM[what]
     entry, run = _entry(scratch, sandbox, tmp_path, document, 0)
-    assert entry["status"] == r15.RED and entry["findings"] == [document], \
-        f"{what}: not judged as before the round ({entry['status']}, {entry['findings']})\n{run.describe()}"
+    assert entry["status"] == r15.RED and entry["findings"] == _expected_findings(what, document), \
+        f"{what}: not judged as expected ({entry['status']}, {entry['findings']})\n{run.describe()}"
 
 
 def test_the_fresh_agent_reconstruction_check_is_green_where_the_resume_brief_can_be_built(scratch, sandbox):
