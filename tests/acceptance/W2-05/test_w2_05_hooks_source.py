@@ -300,24 +300,19 @@ def _only_the_order_of_the_hooks(repository):
     return repository, template
 
 
-def _only_the_wrapper(repository):
-    """Each of the repository's hooks, with the template's command around it (``python3``) and the repository's
-    path: the template's commands, path for path, in the repository's events, order and matchers."""
-    wrapped = _template_with_the_matcher()["hooks"]
-    template = copy.deepcopy(repository)
-    wrapped_differently = 0
-    for event, entries in template["hooks"].items():
-        for number, entry in enumerate(entries):
-            # By program, not by place: the template's postToolUse holds the guard's entry beside the repository's own
-            # context watch entry (DEC-1167 (4)); the case wraps each repository entry with the template's line for it.
-            theirs = [other for other in wrapped.get(event, []) if _program(other["command"]) == _program(entry["command"])]
-            assert len(theirs) == 1, (
-                f"the template has {len(theirs)} hooks of {event} running {_program(entry['command'])}; one is expected")
-            entry["command"] = theirs[0]["command"].replace(TEMPLATE_HOOKS_PATH, REPO_HOOKS_PATH)
-            wrapped_differently += entry["command"] != repository["hooks"][event][number]["command"]
-    # The context watch's line is the same in both sources (the pinned form, the path apart), so it differs in no
-    # wrapper; the others' lines do, and the case needs another wrapper somewhere.
-    assert wrapped_differently, "the template's commands are the repository's; the case needs another wrapper"
+# Rewrite-Reason: 8ebf27b9d brought the root's hook commands to the template's form (EMERGENCY-2 3.5), so the live
+# sources no longer differ in their wrapper. The two sources are built here from ``BASE_HOOKS``: the repository's with
+# the pinned interpreter around each hook, the template's with ``python3``, both with the repository's path, so the
+# wrapper is the only difference. The expectation is unchanged.
+def _only_the_wrapper(_repository_source):
+    """The base pair's events, matchers and order, in the repository's path in both; only the command wrapper differs
+    (the pinned interpreter in the repository's, ``python3`` in the template's)."""
+    repository = _from_base(_repository_command)
+    template = _from_base(lambda hook: _template_command(hook).replace(TEMPLATE_HOOKS_PATH, REPO_HOOKS_PATH))
+    assert all(_program(a["command"]) == _program(b["command"]) and a["command"] != b["command"]
+               for event in repository["hooks"]
+               for a, b in zip(repository["hooks"][event], template["hooks"][event])), (
+        "the case's two sources must run the same hooks, each in another wrapper")
     return repository, template
 
 
