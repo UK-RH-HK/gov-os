@@ -15,6 +15,8 @@ class: implementation
 role: engineer
 profile: FULL
 state_class: AUTHORITATIVE
+closes:
+- CAP-44.m
 allowed_paths:
 - src/gov/adopt/command.py
 - src/gov/adopt/stages.py
@@ -80,3 +82,5 @@ the skill's text and the Contract's CAP-44 line by CIT-P. For the release after 
 **Path case 2026-11-16 15:3x (P-W2-192-P1 (a), P2 (a); the CTO, DEC-1156 (7); listed for the owner's reading):** the tests run returned DONE (30 cases, 5a9a6ca7a). Other tickets' adoption cases run A3 straight after A2, which stage AS now precedes: the ticket gains `src/gov/adopt/project.py` (the stage chain, the engineer's) and the shared support helpers of W1-41, W2-23, W2-88 and W2-190 (acceptance folders: an independent test designer's change, each case's assertion unchanged, AS run before A3). P2 (a): F1's owner route stays as the cases state (AS and A3 leave every gap's answer empty). The kernel CIT-P (the adopt skill, CAP-44's line) comes back once the code is green.
 
 **Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
+
+**Fix in the record, 2026-11-18 (the CTO; EMERGENCY-2 4.2):** CAP-44.m is in `closes:`; the owner approved W2-192 CIT-P (B) on 2026-11-18 (DEC-1213) and Contract 4.4 carries it (e2/cap44m).

@@ -125,7 +125,7 @@ The CIT-E matches the CIT-P, or lists the differences (CAP-33's acceptance).
 | `test_cit_e_names_its_proposal_and_source` | names `W2-49-CIT-P`; cites DEC-722 | DEC-722 |
 | `test_cit_e_records_each_change_the_cit_p_names[CAP-44.h, A7, A10, CAP-43.b, v4.2]` | each change named (confirmed or listed as a difference) | CAP-44.h, CAP-44.f, CAP-43.b |
 | `test_cit_e_states_its_differences_from_the_cit_p` | a statement of differences from the CIT-P/proposal (or that there are none) | CAP-33 |
-| `test_cit_e_records_every_covers_item_the_contract_changed` | every covers item whose fields changed, or that v4.2 added, against the base, is named | CAP-33 |
+| `test_cit_e_records_every_covers_item_the_contract_changed` | every covers item whose fields changed, or that v4.2 added, between the base and Contract 4.2 as applied (`V42_COMMIT`, not today's Contract), is named | CAP-33 |
 | `test_cit_e_records_every_moved_item_the_cit_p_names` | each of CAP-44.f, CAP-44.h, CAP-43.b named in the CIT-P is named in the CIT-E | CAP-33 |
 | `test_cit_e_records_the_owner_approval_before_the_change` | cites CAP-33; records the owner's approval | CAP-33 |
 

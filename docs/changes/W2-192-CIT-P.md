@@ -9,7 +9,8 @@ ticket: DAEO-mpq2 (W2-192)
 author: orchestrator (the ticket lead of W2-192)
 review: 'none yet: the ticket''s FULL independent review follows the owner''s approval of these bytes (the order of the build run)'
 decisions_carried: [DEC-1200, DEC-974, DEC-105, DEC-614]
-owner_approval: 'pending: "W2-192 CIT-P (A) approved" (the adopt skill) and/or "W2-192 CIT-P (B) approved" (CAP-44.m), section 6'
+owner_approval: 'Part B: approved by the owner in the chat, 2026-11-18: "W2-192 CIT-P (B) approved" (DEC-1213); Part A pending: "W2-192 CIT-P (A) approved" (the adopt skill), section 6'
+part_b: 'APPLIED 2026-11-18 on branch e2/cap44m (Contract v4 version 4.4, CAP-44.m, DEC-1213; the CTO records DEC-1213 in the register after release 0.1.3)'
 state_class: EVIDENCE
 ---
 

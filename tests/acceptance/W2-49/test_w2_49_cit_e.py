@@ -14,15 +14,18 @@ import pytest
 from w2_49_support import (
     CIT_E,
     CIT_P,
+    CONTRACT_YAML,
     MOVED_ITEMS,
+    V42_COMMIT,
     base_yaml_model,
     covers_ids,
-    current_model,
     gate,
     has,
+    read_at,
     read_doc,
     require_v42,
     together,
+    yaml_model,
 )
 
 
@@ -60,11 +63,13 @@ def test_cit_e_states_its_differences_from_the_cit_p():
 
 def test_cit_e_records_every_covers_item_the_contract_changed():
     """Every covers item whose wave or wording changed in v4.2, or that v4.2 added, is in the CIT-E."""
+    # Rewrite-Reason: the case read today's Contract, so a later approved change (Contract 4.4, CAP-44.m, DEC-1213)
+    # turned it red; it compares Contract 4.2 as W2-49 applied it (V42_COMMIT) with the base, v4.2's own change.
     cit_e = read_doc(CIT_E)
-    now = current_model("yaml")
-    require_v42(now)
+    v42 = yaml_model(read_at(V42_COMMIT, CONTRACT_YAML))
+    require_v42(v42)
     before = {c.id: c.raw for c in base_yaml_model().covers}
-    changed = {c.id for c in now.covers if before.get(c.id) != c.raw}
+    changed = {c.id for c in v42.covers if before.get(c.id) != c.raw}
     assert changed, "Contract v4.2 changed no covers item"
     missing = sorted(i for i in changed if not has(rf"{i.replace('.', r'[.]')}(?![\w])", cit_e))
     assert not missing, f"covers items changed in v4.2 but not recorded in the CIT-E: {missing}"
