@@ -9,6 +9,7 @@ Written by the CTO for the ticket leads of the build list (EMERGENCY-2 §6.1, §
 - **The machine rule.** Every test run goes through the machine-wide heavy slot (two slots today), one run at a time:
   `TMPDIR=$(mktemp -d) PYTHONPATH=<worktree>/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest <paths> -q -p no:cacheprovider`
   - No `-n`: the slot sets the workers. `PYTHONPATH` absolute (tests start `gov` in subprocesses). The slot waits while taken; never bypass it.
+  - The slot also waits until the machine's 1-minute load is under 12, so the load stays inside the resource gate of 20 (the owner, 2026-11-18). A wait is the rule working: let it wait. Never run pytest outside the slot, and never with your own `-n`.
   - The smallest set that proves your change; no full suites (the CTO runs those); no rebuild and no memory measure without asking the CTO.
   - Before starting a worker: `uptime` and `free -g`; over load 30 or under 3 GB available, wait.
 

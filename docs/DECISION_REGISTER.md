@@ -719,12 +719,6 @@ gov rebuild       # derived state
 
 ## 12. Change log
 
-### DEC-1213 — W2-192 CIT-P Part B approved: CAP-44.m (the adoption stage AS spec audit, lite, Wave 2) enters the Contract as version 4.4
-- **Status:** ACCEPTED (owner, 2026-11-18, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1211, DEC-1200 · **Changes:** Contract v4 4.3 → 4.4 (CAP-44 gains covers item CAP-44.m [W2]; CAP-44 stays W3)
-- **Decision:** Part B of `docs/changes/W2-192-CIT-P.md` is approved and applied as it gives it (`docs/contract/contract.yaml`, `CONTRACT_v4.md`, the generated `capabilities/CAP-44.md` and `CAP-44.m.md`); W2-192 closes CAP-44.m (a fix in its record). Part A (the adopt skill) is not decided by this entry. The re-baseline (G5) builds on 4.4.
-- **Basis:** the owner's message of 2026-11-18: "W2-192 CIT-P (B) approved"; the incident behind it: W2-49's `cit-p-lines-applied` red in every full suite of 2026-11-18 (five cases), which kept every night red and left `select.scoped` without a green base.
-- **Governing sources:** docs/changes/W2-192-CIT-P.md; docs/emergency-2/audits/DECISIONS-FOR-THE-OWNER.md (Q-CAP44); DEC-1200.
-
 | Version | Date | Change |
 |---|---|---|
 | 0.12 | 2026-09-30 | DEC-078 (scale probes, RAM correction, envelope), DEC-079 (GitHub remote), DEC-080 (retrieval completeness all in W1), DEC-081 (how S1 runs), DEC-082 (how S1-A runs); DEC-077 DONE. |
@@ -15487,6 +15481,12 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
   - (5) **Working assumptions until the owner's morning decisions** (2026-11-17): audit 1's thin `gov queue` on batch.isolate, select.scoped and the close, and DONE as the green landing itself; audit 3's stall check from the dispatcher's cron pass, a phone push only for a CTO stall, no CPU fallback.
 - **Basis:** the owner's messages of 2026-11-17 (the working assumptions) and 2026-11-18 ("Audit 09, my decisions: 1. ... 2. ... 3. ..."); the incident behind (2) and (3): audit 09, Opus took 95.4 % of the last two days' spend and the CTO's forks re-read 300k to 950k of context per call.
 - **Governing sources:** docs/emergency-2/audits/09-usage-last-two-days.md; 01-landing-templates-briefs.md; 03-run-time-tool.md; DEC-1120.
+
+### DEC-1213 — W2-192 CIT-P Part B approved: CAP-44.m (the adoption stage AS spec audit, lite, Wave 2) enters the Contract as version 4.4
+- **Status:** ACCEPTED (owner, 2026-11-18, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1211, DEC-1200 · **Changes:** Contract v4 4.3 → 4.4 (CAP-44 gains covers item CAP-44.m [W2]; CAP-44 stays W3)
+- **Decision:** Part B of `docs/changes/W2-192-CIT-P.md` is approved and applied as it gives it (`docs/contract/contract.yaml`, `CONTRACT_v4.md`, the generated `capabilities/CAP-44.md` and `CAP-44.m.md`); W2-192 closes CAP-44.m (a fix in its record). Part A (the adopt skill) is not decided by this entry. The re-baseline (G5) builds on 4.4.
+- **Basis:** the owner's message of 2026-11-18: "W2-192 CIT-P (B) approved"; the incident behind it: W2-49's `cit-p-lines-applied` red in every full suite of 2026-11-18 (five cases), which kept every night red and left `select.scoped` without a green base.
+- **Governing sources:** docs/changes/W2-192-CIT-P.md; docs/emergency-2/audits/DECISIONS-FOR-THE-OWNER.md (Q-CAP44); DEC-1200.
 
 | Version | Date | Change |
 |---|---|---|
