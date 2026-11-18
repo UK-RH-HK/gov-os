@@ -49,6 +49,8 @@ ITEMS = {
     "the-cto-role-template": "template/governance/kernel/templates/role-cto.md",
     # W2-174 (DAEO-zmo4; DEC-1189 (1), DEC-1156 (7)): the Verify pass reads the kernel's ticket and common schemas, so both ship, one item
     # per file (never the whole ``schemas/`` folder: a kernel schema the product does not read stays an extra).
+    # W2-36 (DAEO-w19l, 2026-11-18; a fix, EMERGENCY-2 4.2): gov discover's spec check, read through ``fabric.shipped``
+    "the-spec-check": "template/governance/kernel/skills/spec-writing/check_spec.py",
     "the-ticket-schema": "template/governance/kernel/schemas/ticket.schema.json",
     "the-common-schema": "template/governance/kernel/schemas/common.schema.json",
     # W2-195 (DAEO-d8df; DEC-1204 (5), S4): the judging-work kernel skill ships in the wheel.

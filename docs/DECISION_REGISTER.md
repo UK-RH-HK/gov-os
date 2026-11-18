@@ -15465,6 +15465,23 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's message of 2026-11-16 17:36: "P-FRESH-80-1 (a) with A13 (b): record the amendments now and reopen W2-187 and W2-188 only when the emergency lifts; queue the first fresh 80 as a measurement job and tell me its id."
 - **Governing sources:** packages/P-FRESH-80-1.md; DEC-1207 (3); DEC-1179; DEC-1097; DEC-1098; DEC-1186 (4); DEC-1209.
 
+### DEC-1211 — EMERGENCY-2.md v3 approved and in force: the strategy that supersedes what contradicts it, the Contract included (A-11)
+- **Status:** ACCEPTED (owner, 2026-11-17, launching the fresh CTO with it; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat, 2026-11-17)`; standing) · **Under:** DEC-1209 · **Changes:** DEC-1205, DEC-1207 (2), DEC-1203 (1), DEC-820, DEC-313, DEC-314, DEC-1082, DEC-1128 (EMERGENCY-2 2.9; audit 8's classes, `docs/emergency-2/audits/08-register.md`, await the owner's approval by group)
+- **Decision:** `docs/emergency-2/EMERGENCY-2.md` v3 (committed a246f72b2) is the strategy in force, with B-1 to B-4 answered and A-1 to A-14 approved (its §12); it supersedes anything that contradicts it until the Contract is re-baselined (§11.2). DEC-1209 lifts for §6.1's build list (A-10).
+- **Basis:** the owner's message of 2026-11-17 starting the fresh CTO ("EMERGENCY-2.md (the strategy, in force; it supersedes anything that contradicts it, the Contract included)"); the incident behind it: DEC-1209's emergency of 2026-11-16 (retro P1 to P5: product 4 % of a month's spend, the owner a relay in 134 of 544 messages).
+- **Governing sources:** docs/emergency-2/EMERGENCY-2.md; docs/emergency-2/HANDOVER.md; docs/audit/emergency-2026-11/.
+
+### DEC-1212 — Audit 09's decisions: the CTO's context, models by the rubric enforced by code, Sonnet for the operator, leads, helpers and proving runs; the working assumptions for gov queue and the run-time tool
+- **Status:** ACCEPTED (owner, 2026-11-17 and 2026-11-18, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1211, DEC-1120 · **Changes:** DEC-1120's table (item (3) below); DEC-1183 (4)
+- **Decision:**
+  - (1) **The CTO's context:** no cap, the full window, always; a fresh CTO session each morning, handed over through its checkpoint and EMERGENCY-2.md, with no lead or worker stopped.
+  - (2) **Models and effort by the rubric, by code:** every session, helpers and leads included, runs the model and effort the rubric gives its role; none chooses its own. The launcher picks them for launched roles; helpers come from fixed roles with their model set, the user settings' default is Sonnet, and any other model is refused (`.claude/hooks/agent_model.py`, exceptions in `governance/project/model-exceptions.yaml`). An exception goes to the owner as one line.
+  - (3) **The rubric changes now, Opus to Sonnet,** for the owner's operator session; every lead, all profiles; every helper the CTO spawns; the proving runs, acceptance included; C2 engineers and test designers. The CTO stays on Opus. Running it is the trial; a role whose quality drops goes back by code on the owner's word. Until audit 04's table is decided, the rubric is DEC-1120's table with these changes.
+  - (4) **The CTO's items of audit 09, as recommended:** off the retired machinery (W2-111, W2-186, W2-56 closed on their records); no inbox waiter and no idle-check wake-ups (files and one daily digest); no fork for helper work, a fresh helper from a written brief; review only red work, two rounds at most; the 5-minute cache checked before it is applied to workers; no register entry for what the landing records; one plan reading an hour, a daily budget, points reserved first for the two fresh-80 measures and the proving run.
+  - (5) **Working assumptions until the owner's morning decisions** (2026-11-17): audit 1's thin `gov queue` on batch.isolate, select.scoped and the close, and DONE as the green landing itself; audit 3's stall check from the dispatcher's cron pass, a phone push only for a CTO stall, no CPU fallback.
+- **Basis:** the owner's messages of 2026-11-17 (the working assumptions) and 2026-11-18 ("Audit 09, my decisions: 1. ... 2. ... 3. ..."); the incident behind (2) and (3): audit 09, Opus took 95.4 % of the last two days' spend and the CTO's forks re-read 300k to 950k of context per call.
+- **Governing sources:** docs/emergency-2/audits/09-usage-last-two-days.md; 01-landing-templates-briefs.md; 03-run-time-tool.md; DEC-1120.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |

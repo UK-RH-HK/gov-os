@@ -376,9 +376,12 @@ def test_s5_the_runners_and_w2_81s_files_are_untouched_but_the_two_paths_of_dec_
     `test_w2_81_runner.py`."""
     import subprocess
 
-    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "diff", "--name-only", s.BASE_COMMIT, "--",
-                           "tests/acceptance/W2-81"], capture_output=True, text=True)
-    assert done.returncode == 0, "git diff failed"
+    # W2-93's own commits only (Task: DAEO-6y0x): W2-81's later commits of its own files (DEC-1197 (2)) are not W2-93's
+    # (a fix in W2-93's record, EMERGENCY-2 4.2)
+    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "log", "--no-merges", "--format=", "--name-only",
+                           "--grep=^Task: DAEO-6y0x$", f"{s.BASE_COMMIT}..HEAD", "--", "tests/acceptance/W2-81"],
+                          capture_output=True, text=True)
+    assert done.returncode == 0, "git log failed"
     allowed = {"tests/acceptance/W2-81/w2_81_run.py", "tests/acceptance/W2-81/test_w2_81_runner.py"}
     changed = set(done.stdout.split())
     assert changed <= allowed, f"W2-81 files changed beyond DEC-1144 (6)'s two: {sorted(changed - allowed)}"

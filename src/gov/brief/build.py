@@ -1,9 +1,12 @@
 """The builder behind ``gov brief`` (W2-152; W2-128 TPL-2 S3, TPL-3, TPL-5 S3; DEC-1050, DEC-1052, DEC-1083, DEC-1088).
 
-It reads only the ticket files under ``<root>/.tickets/``, ``<root>/governance/project/facts.yaml``, the kernel
-templates with ``keys.yaml``, and the ``--part``/``--repair`` files; it writes nothing and uses no clock, so the same
-inputs give the same bytes. ``build`` returns the brief, the ready check's warnings, the refusal findings (each
-``{code, detail}``) and the prose size against facts.yaml's ``budgets.brief``; the command decides what to print.
+It reads the ticket files under ``<root>/.tickets/``, ``<root>/governance/project/facts.yaml``, the kernel
+templates with ``keys.yaml``, the ``--part``/``--repair`` files and, for a ticket that is READY, the store the ticket's
+retrieval answers from (``gov.brief.memory``, W2-197: T-0's ``{MEMORY_BLOCK}``); it writes nothing and uses no clock,
+so the same inputs and the same store commit give the same bytes. ``build`` returns the brief, the ready check's
+warnings (with ``MEMORY_UNAVAILABLE`` when memory was not reached or not reranked), the refusal findings (each
+``{code, detail}``), the prose size against facts.yaml's ``budgets.brief`` and the retrieval (``memory``, None when
+the ticket is refused before it); the command decides what to print and logs the retrieval.
 """
 
 from __future__ import annotations
@@ -12,7 +15,7 @@ import datetime
 import re
 from pathlib import Path
 
-from gov.brief import ROLE_TEMPLATES, judging
+from gov.brief import ROLE_TEMPLATES, judging, memory
 from gov.cli.errors import GovError
 from gov.util.frontmatter import FrontmatterError, ids, parse, with_body
 
@@ -315,8 +318,10 @@ def _flag_file(path: str | None, flag: str) -> str | None:
 
 
 def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: str | None = None,
-          repair: str | None = None) -> dict:
-    """``{brief, warnings, findings, size, budget, ticket}``; findings non-empty means BRIEF_NOT_READY."""
+          repair: str | None = None, store: str | None = None, spent: dict | None = None) -> dict:
+    """``{brief, warnings, findings, size, budget, ticket, memory}``; findings non-empty means BRIEF_NOT_READY.
+    ``spent``, a dict given, gets the retrieval's ``latency_ms``, kept out of the result so that it stays the same for
+    the same inputs."""
     if (role == "lead") != (run is not None):
         raise GovError("BRIEF_RUN_MISSING", "--run <kind> goes with the lead role, and only with it",
                        {"role": role, "run": run})
@@ -332,7 +337,8 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
     budgets = facts.get("budgets") if isinstance(facts.get("budgets"), dict) else {}
     if ticket_path in tickets.unreadable:  # F6: refused by its own name, not as the fields it seems to miss
         return {"brief": "", "warnings": [], "size": 0, "budget": budgets.get("brief"), "ticket": ticket_ref,
-                "findings": [_finding("TICKET_UNREADABLE", f"{ticket_ref}: {tickets.unreadable[ticket_path]}")]}
+                "findings": [_finding("TICKET_UNREADABLE", f"{ticket_ref}: {tickets.unreadable[ticket_path]}")],
+                "memory": None}
     folder = _templates(root)
     keys = _yaml(folder / "keys.yaml").get("keys")
     keys = {str(key) for key in keys} if isinstance(keys, list) else set()
@@ -359,6 +365,15 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
     literal, values = _values(front, body, facts, role, role_front, run, part_text, repair_text, root)
     filler = Filler(literal, values, facts, keys)
     literal["COMMANDS_TABLE"] = _commands_table(role_body, filler)
+    found = None
+    if not refuse:  # W2-197 S1: the ticket's retrieval, for a ticket that is READY; never a refusal (F1)
+        found = _memory(root, front, body, role, store, filler, values)
+        latency = found.pop("latency_ms", 0)
+        if spent is not None:
+            spent["latency_ms"] = latency
+        literal["MEMORY_BLOCK"] = memory.block(found, literal["ID"])
+        if (warned := memory.warning(found)) is not None:
+            warnings.append(warned)
     brief = filler.lines(t0).rstrip("\n") + "\n"
     if lead_lines:
         brief += "\n" + filler.lines("\n".join(lead_lines)) + "\n"
@@ -366,7 +381,15 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
         brief += "\n" + judging_block
     findings = refuse + [_finding("PLACEHOLDER_LEFT", key) for key in filler.left]
     return {"brief": brief, "warnings": warnings, "findings": findings, "size": prose_size(brief),
-            "budget": budgets.get("brief"), "ticket": str(front.get("id", ticket_ref))}
+            "budget": budgets.get("brief"), "ticket": str(front.get("id", ticket_ref)), "memory": found}
+
+
+def _memory(root: Path, front: dict, body: str, role: str, store: str | None, filler: Filler, values: dict) -> dict:
+    """The ticket's retrieval for the brief's role (``gov.brief.memory``)."""
+    ticket_id = str(front.get("id", ""))
+    store_tree = filler.text("{STORE_TREE}") if "STORE_TREE" in values else None
+    return memory.gather(memory.store_root(root, store, store_tree), memory.query_of(front, body, ticket_id),
+                         ticket_id, role)
 
 
 def _values(front, body, facts, role, role_front, run, part_text, repair_text, root) -> tuple[dict, dict]:

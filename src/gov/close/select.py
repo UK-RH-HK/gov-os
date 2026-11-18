@@ -539,14 +539,34 @@ def ticket_change(root: Path, ticket: str) -> tuple[list[str], str | None]:
     return paths, base_commit
 
 
-def head_without_change(root: Path, green: str | None) -> str | None:
-    """The head a red is judged against (DEC-988 item 3, DEC-989): the green base the change is counted from when
-    it is an ancestor of ``HEAD``, so every commit counted in the change (an untrailered one too) is outside it;
-    else None, never the parent of the ticket's oldest own commit: with no green base on HEAD's line every red
-    counts as the change's (fails closed)."""
+def head_without_change(root: Path, green: str | None, parent: str | None = None) -> tuple[str | None, str | None]:
+    """The head a red is judged against without ``--base`` (W2-193 S3, EMERGENCY-2 6.1, superseding DEC-1150 (2)'s
+    no-fallback rule): ``(base, base_from)``. The green base the change is counted from when it is an ancestor of
+    ``HEAD`` (``green_record``); else ``parent``, the first parent of the ticket's oldest own non-merge commit, the
+    head without the change as git has it (``ticket``); ``(None, None)`` when there is neither."""
     if green and is_ancestor(Path(root), green):
-        return green
-    return None
+        return green, "green_record"
+    if parent:
+        return parent, "ticket"
+    return None, None
+
+
+def resolve_base(root: Path, given: str) -> tuple[str | None, str | None]:
+    """``--base`` resolved as ``git rev-parse --verify <given>^{commit}`` resolves it (W2-194 S2): ``(full id,
+    None)``; ``(None, "BASE_AMBIGUOUS")`` for a prefix git cannot resolve because it names more than one object
+    (``git rev-parse --disambiguate``); ``(None, "BASE_UNKNOWN")`` for one that names no commit (an option-like
+    text among them: never passed to git as one)."""
+    given = (given or "").strip()
+    if not given or given.startswith("-"):
+        return None, "BASE_UNKNOWN"
+    found = _git(root, "rev-parse", "--verify", "--quiet", given + "^{commit}", ok=(0, 1, 128)).strip()
+    if re.fullmatch(r"[0-9a-f]{40}", found):
+        return found, None
+    if re.fullmatch(r"[0-9a-fA-F]{4,39}", given):
+        named = _git(root, "rev-parse", f"--disambiguate={given.lower()}", ok=(0, 1, 128)).split()
+        if len(named) > 1:
+            return None, "BASE_AMBIGUOUS"
+    return None, "BASE_UNKNOWN"
 
 
 def _module_of(rel: str) -> str | None:
@@ -660,9 +680,11 @@ def _bookkeeping(root: Path, ticket: str, paths: list[str]) -> bool:
     return all(p == f"{TICKETS_REL}/{ticket}.md" or p.startswith(own) or p in green for p in paths)
 
 
-def scoped(root: Path, ticket: str) -> dict:
+def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
-    "head"}``; ``SelectionRefused`` with its reason where it cannot be made."""
+    "base_from", "head"}`` (``base``: the head without the change, ``head_without_change``); ``SelectionRefused``
+    with its reason where it cannot be made. ``change``: paths counted in the change beside the ticket's own commits
+    (``gov queue``: a work branch's changed paths, untrailered commits among them)."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter
 
     root = Path(root)
@@ -673,11 +695,13 @@ def scoped(root: Path, ticket: str) -> dict:
     test_map, why_not = load_map(root)
     if test_map is None:
         raise SelectionRefused(f"the test map {MAP_REL} cannot be read ({why_not}): no selection is made blind")
-    own_paths, _ = ticket_change(root, ticket)
+    own_paths, parent = ticket_change(root, ticket)
     # the change is what the head holds that no green record has tested: everything since the newest green record
     # (the strict close's base), with the ticket's own commits; a ticket's own commits alone without a green record
     green = base(root)
     paths = sorted(set(own_paths) | set(changed(root, green))) if green else own_paths
+    if change:
+        paths = sorted(set(paths) | set(change))
     tickets = _tickets(root)
     couplings = test_map.get("couplings") or []
     why: dict[str, list[str]] = {}
@@ -755,9 +779,10 @@ def scoped(root: Path, ticket: str) -> dict:
         raise SelectionRefused("the head does not hold a selected target: "
                                + ", ".join(f"{t} ({d})" for t, d in gone))
     suites = sorted(t for t in why if not any(_within(t, o) for o in why if o != t))
+    judged_at, judged_from = head_without_change(root, green, parent)
     return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
-            "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only, "why": {t: why[t] for t in suites},
-            "base": head_without_change(root, green),
+            "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only,
+            "why": {t: why[t] for t in suites}, "base": judged_at, "base_from": judged_from,
             "head": _git(root, "rev-parse", "HEAD").strip()}
 
 

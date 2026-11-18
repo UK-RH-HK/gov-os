@@ -44,7 +44,7 @@ kpis:
     verify: <the case that shows it refused>
 non_goals:
 - <what this ticket deliberately does not do>
-done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]   # the facts file's dod, by id
+done_when: [DOD-1, DOD-2, DOD-3]   # the facts file's dod, by id
 sources: [DEC-n, CAP-n]
 acceptance_tests: {path: tests/acceptance/W2-00/}
 ```

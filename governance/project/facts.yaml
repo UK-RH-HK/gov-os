@@ -2,8 +2,8 @@
 # template/governance/kernel/schemas/facts.schema.json). The templates name a path by its key ({TREE} is paths.tree,
 # a `paths` name upper-cased) and a command by {CMD:name}; a conditional line is {STEP:name}. Each command's `check`
 # exits 0 in a temporary repository with no model, network or GPU (--help, a dry run or a no-op), so a tool change
-# that breaks a form shows in a unit test, not in a session. Until `gov brief` lands (W2-128 round 2), `lead_brief`
-# maps to today's build_lead_brief.py and a worker brief is built with `context`; the templates do not change when it lands.
+# that breaks a form shows in a unit test, not in a session. A worker's brief is built with `brief` (gov brief);
+# `lead_brief` still maps to build_lead_brief.py.
 paths:
   main: '/home/usain/Dynamic-Agentic-Engineering-OS'
   worktrees: '/home/usain/gov-os-worktrees'
@@ -38,7 +38,7 @@ commands:
     run: 'git -C {WRITE_TREE} rev-parse --show-toplevel --abbrev-ref HEAD'
     check: 'git rev-parse --show-toplevel'
   retrieve:
-    run: 'gov retrieve --root {STORE_TREE} "{QUESTION}"'
+    run: 'gov retrieve --root {STORE_TREE} "<question>"'
     check: 'gov retrieve --help'
   context:
     run: 'gov context {ID} --role {WORKER_ROLE}'
@@ -117,17 +117,11 @@ commands:
 # The Definition of Done, quoted by id in the ticket (T-1) and lead (T-7) templates (R3-6).
 dod:
 - id: DOD-1
-  line: 'Every KPI line''s verify holds: the acceptance suite passes through {CMD:accept}, read as pass or fail per line.'
+  line: 'Acceptance green: every KPI line''s verify holds through {CMD:accept}, read as pass or fail per line.'
 - id: DOD-2
-  line: 'The scoped verification is green ({CMD:lead_verify}); a red is named only from {KNOWN_REDS}.'
+  line: 'The landing''s checks are green: `gov queue {ID}` lands the work (its impact-selected run on the merged result green, every acceptance-test commit by the test designer or the owner; a path outside allowed_paths is a notice).'
 - id: DOD-3
-  line: 'Every commit carries Task: {ID}, Role: and Implements: with ACCEPTED ids from sources:; {CMD:links} reports no new finding.'
-- id: DOD-4
-  line: 'FULL: the reviewer''s verdict block gives READY (no finding in scope, ordinary work yes, fails open or loses work).'
-- id: DOD-5
-  line: 'The tree is clean and its head is the verified (and, FULL, the reviewed) head.'
-- id: DOD-6
-  line: 'The return carries the twelve fields, the template receipt, brief_gaps and guard_refusals.'
+  line: 'The close is written at the land: the ticket''s close record names the landed merge and the ticket is closed.'
 
 # Conditional lines (R3 §B′, R2-5): on while an ACCEPTED rule in force keeps the step; off where the owner lifted it
 # (DEC-1052's R-6 and R-12 by DEC-1057, DEC-868 by DEC-953 item 1). A switch turned off removes its one line and

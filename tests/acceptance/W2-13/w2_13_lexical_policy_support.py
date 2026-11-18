@@ -99,9 +99,10 @@ MEASURE_AUDIT = "docs/research/memory-measure-audit/"
 # search): only these namespaces say ``not indexed``, and every tracked file they keep out lies under these patterns.
 # Written as the decisions word them, not read from the path map. fixtures/memory-quality/** is in evaluation-fixtures
 # by the CTO's map and holds no tracked file (the review's F3, open).
-NOT_INDEXED_NAMESPACES = {"evaluation-sources", "evaluation-fixtures"}
+# EMERGENCY-2 11.1, 11.3 (DEC-1211): the archived start-up documents leave both indexes (path map ``history-archive``)
+NOT_INDEXED_NAMESPACES = {"evaluation-sources", "evaluation-fixtures", "history-archive"}
 KEPT_OUT_BY_DECISION = (LENS_B_REPORT, W2_15A_RAW + "**", MEASURE_AUDIT + "**", EVALUATION_FIXTURES + "**",
-                        "fixtures/memory-quality/**")
+                        "fixtures/memory-quality/**", "docs/emergency-2/archive/**")
 
 
 # --------------------------------------------------------------------------

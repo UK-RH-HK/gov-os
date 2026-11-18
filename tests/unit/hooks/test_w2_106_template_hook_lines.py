@@ -3,19 +3,27 @@
 Builder regression evidence (DEC-966 item 2, DEC-822, W2-59's form). Each guard line of
 ``template/governance/kernel/settings.json`` and of its rulesync source ``template/.rulesync/hooks.jsonc``:
 
-- finds the installed ``gov`` (``$HOME/.local/bin/gov``, else ``gov`` on ``PATH``), reads the interpreter its first
-  line names, and runs the product's hook program with that interpreter and ``-E``;
+- finds the pinned ``gov`` (``<common>/gov/bin/gov`` of the project's git common dir, else ``$HOME/.local/bin/gov``,
+  else ``gov`` on ``PATH``), reads the interpreter its first line names, and runs the product's hook program with that
+  interpreter and ``-E``;
 - keeps its exit mapping: 0 and 2 pass through, any other exit ends in a refusal (exit 2);
-- fails closed: no gov found, or a first line naming no interpreter that runs, refuses (exit 2) with a message naming
-  what is missing, and never falls back to a bare ``python3``;
+- with no gov found, says so on one line beginning ``gov hook: no gov`` and exits 0, without running the program
+  (the call is not blocked); a gov whose first line names no interpreter that runs still refuses (exit 2); neither
+  falls back to a bare ``python3``;
 - is not moved by a session's ``PYTHONPATH``: an edited gov planted there does not let a refused write through.
 
-The four lifecycle lines keep DEC-608's plain form (DEC-917): they are held unchanged here.
+The four lifecycle lines take the same form: they find the pinned gov first, in the same order, and run their program
+with its interpreter and ``-E``.
 
 Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The source's ``postToolUse`` holds a second entry beside the
 guard's, the context watch (``context_watch.py``, matcher ``Bash``, timeout 10). A line is found by the program it runs
 (never by its place in the list); the guard's ``postToolUse`` line is the one that runs ``posttooluse.py``, still the
 only one the kernel settings register and still equal to it. The context watch's line is held here too.
+
+Rewrite-Reason: EMERGENCY-2 §2 (the guard retired, §2.2 and §6.1) and DAEO-057v (W2-18) S3, S4. The kernel hooks run
+the pinned gov, never a product's own package named gov (S3), so the lifecycle lines leave DEC-608's plain form and
+find the pin first; with no gov installed every line says so and does not block the call (S4), so the no-gov case
+exits 0 with one ``gov hook: no gov`` line instead of refusing.
 """
 
 from __future__ import annotations
@@ -128,10 +136,17 @@ def test_the_line_takes_the_pinned_form(key):
 
 
 @pytest.mark.parametrize("key", list(LIFECYCLE))
-def test_the_lifecycle_lines_keep_the_plain_form(key):
+def test_the_lifecycle_lines_find_the_pin_first(key):
     line = source_line(key)
-    assert line == f'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/{LIFECYCLE[key]}"', (
-        f"{key}'s lifecycle line left DEC-608's plain form (DEC-917): {line!r}")
+    assert not re.search(r"(^|[;&|\s])python3?\s", line), f"{key} runs a bare python3: {line!r}"
+    assert f'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/{LIFECYCLE[key]}"' in line, (
+        f"{key} does not run the product's own program {LIFECYCLE[key]}: {line!r}")
+    pin = line.find('g="$c/gov/bin/gov"')
+    home = line.find('g="$HOME/.local/bin/gov"')
+    path = line.find("command -v gov")
+    assert "rev-parse --path-format=absolute --git-common-dir" in line, f"{key} does not look up the git common dir"
+    assert 0 <= pin < home < path, f"{key} does not look for the pin, then $HOME/.local/bin/gov, then PATH: {line!r}"
+    assert '"$p" -E "$h"' in line, f"{key} does not run its program with the gov's interpreter and -E: {line!r}"
 
 
 # --------------------------------------------------------------------------
@@ -239,15 +254,17 @@ def test_the_line_keeps_its_exit_mapping(key, program_exit, line_exit, tmp_path)
 
 
 @pytest.mark.parametrize("key", LINE_IDS)
-def test_with_no_gov_the_line_refuses_and_names_it(key, tmp_path):
+def test_with_no_gov_the_line_says_so_in_one_line_and_exits_zero(key, tmp_path):
     event, program = GUARD[key]
     box = Box(tmp_path)
     box.stub(program)
     env = box.env()
     assert not _gov_on_path_exists(env["PATH"], box.home), "a gov is on the case's PATH"
     done = box.run(settings_line(event), env)
-    assert done.returncode == 2, f"{event}: with no gov the line ended {done.returncode}; {done.stderr!r}"
-    assert "no pinned gov" in done.stderr, f"{event}: the message does not name what is missing: {done.stderr!r}"
+    lines = [text for text in done.stderr.splitlines() if text.strip()]
+    assert done.returncode == 0, f"{event}: with no gov the line ended {done.returncode}; {done.stderr!r}"
+    assert len(lines) == 1 and lines[0].startswith("gov hook: no gov"), (
+        f"{event}: not one line naming the missing gov: {done.stderr!r}")
     assert box.stub_record() is None, f"{event}: the program ran with no gov"
     assert not box.decoy_ran(), f"{event}: fell back to the python3 first on PATH"
 

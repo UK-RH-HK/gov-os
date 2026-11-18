@@ -145,13 +145,21 @@ def test_f2_the_built_arguments_are_integrate_s_but_for_the_one_flag(bed, baseli
     _started(theirs)
     assert theirs["result"]["module"].startswith(str(baseline_src)), theirs["result"]
     assert ours["result"]["module"].startswith(str(support.SRC)), ours["result"]
-    mine = support.without_flag(bed.normalised(ours["calls"][0]))
+    mine = _without_mode(support.without_flag(bed.normalised(ours["calls"][0])))
     base = bed.normalised(theirs["calls"][0])
     if role in WORKER_ROLES:  # the settings compared as values: the JSON text is rebuilt once W2-60a's are taken out
         mine = _without_w2_60a(mine, role)
         mine, base = [mine[0], _rules_sorted(json.loads(mine[1])), *mine[2:]], [
             base[0], _rules_sorted(_without_emergency_2(json.loads(base[1]))), *base[2:]]
     assert mine == base,f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
+
+
+def _without_mode(argv: list) -> list:
+    """Emergency 2 (2.3): the launcher's own no-prompt pair, added when the caller names no mode, taken out."""
+    for i in range(len(argv) - 1):
+        if argv[i] == "--permission-mode" and argv[i + 1] == "bypassPermissions":
+            return argv[:i] + argv[i + 2:]
+    return argv
 
 
 W2_60A_SWITCHES = {"--setting-sources": "project,local", "--strict-mcp-config": None, "--effort": "high",

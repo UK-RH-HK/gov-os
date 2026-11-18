@@ -154,8 +154,9 @@ def test_refusals_name_each_finding(tmp_path):
 def test_advisory_items_only_warn(tmp_path):
     out = build(plant(tmp_path, dict(GOOD, non_goals=[], est_loc=401)), "engineer", "W2-900")
     assert out["findings"] == []
-    assert out["warnings"] == [{"code": "NON_GOALS_MISSING", "detail": "DAEO-aaaa"},
-                               {"code": "EST_LOC_OVER", "detail": "401"}]
+    assert out["warnings"][:2] == [{"code": "NON_GOALS_MISSING", "detail": "DAEO-aaaa"},
+                                   {"code": "EST_LOC_OVER", "detail": "401"}]
+    assert [w["code"] for w in out["warnings"][2:]] == ["MEMORY_UNAVAILABLE"]  # W2-197 F1: no store planted
 
 
 def test_dependency_fields_from_the_date_on(tmp_path):
@@ -169,7 +170,9 @@ def test_dependency_fields_from_the_date_on(tmp_path):
         ("WAITS_ON_UNKNOWN", "docs/r.md"), ("WAITS_ON_UNKNOWN", "DAEO-gone")]
 
 
-def test_command_output_and_refusal(tmp_path, capsys):
+def test_command_output_and_refusal(tmp_path, capsys, monkeypatch):
+    log = tmp_path.parent / f"{tmp_path.name}-memory-use.jsonl"  # W2-197 S8: the one file it writes, kept apart
+    monkeypatch.setenv("GOV_MEMORY_LOG", str(log))
     root = plant(tmp_path)
     before = sorted((p, p.stat().st_mtime_ns) for p in tmp_path.rglob("*"))
     assert main(["brief", "engineer", "W2-900", "--root", str(root)]) == 0
@@ -178,8 +181,9 @@ def test_command_output_and_refusal(tmp_path, capsys):
     assert "gov brief: SIZE " in err and "of 4000" in err
     assert main(["brief", "engineer", "W2-900", "--root", str(root), "--json"]) == 0
     envelope = json.loads(capsys.readouterr().out)
-    assert envelope["ok"] and set(envelope["result"]) == {"brief", "warnings", "size", "budget"}
-    assert sorted((p, p.stat().st_mtime_ns) for p in tmp_path.rglob("*")) == before  # it writes nothing
+    assert envelope["ok"] and set(envelope["result"]) == {"brief", "warnings", "size", "budget", "memory"}
+    assert sorted((p, p.stat().st_mtime_ns) for p in tmp_path.rglob("*")) == before  # it writes nothing but the log
+    assert len(log.read_text(encoding="utf-8").splitlines()) == 2
     (root / ".tickets/DAEO-aaaa.md").write_text(ticket_text(dict(GOOD, allowed_paths=[])), encoding="utf-8")
     assert main(["brief", "engineer", "W2-900", "--root", str(root), "--json"]) == 1
     error = json.loads(capsys.readouterr().out)["error"]

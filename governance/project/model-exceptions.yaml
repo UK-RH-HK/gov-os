@@ -1,0 +1,1 @@
+exceptions: []  # the owner's exceptions to the helper model rule (audit 09 decision 2); each: {subagent_type, model, decided}
