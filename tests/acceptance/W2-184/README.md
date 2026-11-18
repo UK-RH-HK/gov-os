@@ -1,5 +1,7 @@
 # W2-184 acceptance tests: RUBRIC-2 at launch
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** `_load_ticket` is read from `gov.util.tickets`.
+
 Ticket `DAEO-6f0s` (W2-184, FULL). Written by the independent test designer (MR-3) from the ticket's KPI lines (S1-S5,
 F1), the interface the CTO adopted at claim (W2-60a run 4d's proposal, with the lead's settled points: sections 1-9),
 and the launcher as it stands on the base `b624fa3c1`. The engineer's branch and tree were not read (DEC-820).

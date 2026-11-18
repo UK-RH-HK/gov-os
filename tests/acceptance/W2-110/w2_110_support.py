@@ -46,8 +46,6 @@ import w1_04_support as w104  # noqa: E402  (the ticket form, the freeze flag)
 
 ROSTER_REL = "governance/project/roster.yaml"
 KEY = "coordination_ticket"
-KERNEL_HOOK_REL = "governance/kernel/hooks/pretooluse.py"
-TEMPLATE_HOOK_REL = "template/governance/kernel/hooks/pretooluse.py"
 EXPERIMENT_REL = "experiments/exp-1"
 
 ORCHESTRATOR = "orchestrator"
@@ -60,7 +58,6 @@ TICKET_LEAD = "ticket-lead"
 OTHER_ROLES = (ENGINEER, TEST_DESIGNER, PRODUCT_SPEC, AUDITOR, RESEARCH, TICKET_LEAD)
 
 PERMISSION_MODES = w104.PERMISSION_MODES
-PROMPT_SKIPPING_MODES = ("auto", "dontAsk", "bypassPermissions")
 
 
 @dataclass(frozen=True)
@@ -83,8 +80,6 @@ THIS_REPOSITORYS_ID = Ticket("DAEO-w200", "W2-00", ORCHESTRATOR, ("governance/pr
 TICKETS = (COORDINATION, OTHER_ORCHESTRATION, ENGINEERING, SPECIFICATION, AUDIT, EXPERIMENT, THIS_REPOSITORYS_ID)
 MISSING_TICKET_ID = "DAEO-gone"   # no such ticket in the product
 MISSING_WBS_ID = "P-99"
-OWN_TICKET = {ENGINEER: ENGINEERING, TEST_DESIGNER: ENGINEERING, PRODUCT_SPEC: SPECIFICATION, AUDITOR: AUDIT,
-              RESEARCH: EXPERIMENT, TICKET_LEAD: ENGINEERING}
 
 PRODUCT_FILES = {
     "src/app/main.py": "VALUE = 1\n",
@@ -106,9 +101,6 @@ INSTALLS = (
 INSTALL = INSTALLS[0]
 SUDO = ("sudo apt-get install -y jq", "sudo ls /root", "cd /tmp && sudo make install")
 ORDINARY = ("ls -la", "git status --porcelain", "python3 -m pytest tests/unit -q")
-# The owner's prompt for an install as it is today (DEC-083): the approval names that a tool-registry record is
-# required, and the command.
-OWNER_PROMPT = "install command requires owner approval (tool registry record required): {command}"
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -315,19 +307,7 @@ def says_how_to_set_the_key(reason: str) -> bool:
     return ROSTER_REL in reason and KEY in reason
 
 
-def owner_prompt(command: str) -> str:
-    return OWNER_PROMPT.format(command=command)
-
-
 # ---------------------------------------------------------------------------------------------------------------
 # The code the hook runs (DEC-732)
 # ---------------------------------------------------------------------------------------------------------------
 
-def gov_the_hook_imports(sandbox) -> str:
-    """The ``gov`` package the pinned hook line's interpreter imports for the stand-in home, with ``-E``."""
-    home_gov = Path(sandbox.home) / ".local" / "bin" / "gov"
-    interpreter = home_gov.read_text(encoding="utf-8").splitlines()[0][2:].strip()
-    env = live.command_environment(REPO_ROOT, sandbox)
-    done = subprocess.run([interpreter, "-E", "-c", "import gov; print(gov.__file__)"], capture_output=True,
-                          text=True, env=env, timeout=60)
-    return (done.stdout.strip() or done.stderr.strip())

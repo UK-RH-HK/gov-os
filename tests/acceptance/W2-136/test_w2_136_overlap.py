@@ -1,4 +1,4 @@
-"""S3: overlap is decided by the guard's own pattern matcher (``gov.guard.decide._match_pattern``, decide.py:96-102:
+"""S3: overlap is decided by the guard's own pattern matcher (``gov.util.patterns._match_pattern`` (moved from the guard, EMERGENCY-2 6.1):
 ``*`` within a folder, ``**`` across), on the tracked files and pattern to pattern for paths not yet created, erring
 toward overlap; two patterns the guard would let two writers both touch are never planned in parallel
 (DEC-1088 (1)).
@@ -13,7 +13,7 @@ import pytest
 import w2_136_support as support
 from w2_136_support import T
 
-from gov.guard.decide import _match_pattern
+from gov.util.patterns import _match_pattern
 
 TRACKED = ("src/p/mod.py", "src/p/deep/x/y.py", "src/a/x.py", "src/a/y.py", "src/b/z.py", "docs/a.md")
 

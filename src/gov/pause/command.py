@@ -89,7 +89,7 @@ def _freeze(root: Path, flag: Path, caller: str) -> None:
     """Write the marked flag (DEC-402, DEC-404): a temporary file renamed over the flag's path, never through a link
     there, then read back with the guard's own reader."""
     from gov.cli.errors import GovError
-    from gov.guard.decide import FREEZE_FLAG, FREEZE_MARKER, freeze_state
+    from gov.util.freeze import FREEZE_FLAG, FREEZE_MARKER, freeze_state
 
     line, tmp = f"{FREEZE_MARKER.decode()} {caller} {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n", None
     try:
@@ -238,7 +238,7 @@ def _lift_test(root: Path, ancestry: list[dict] | None = None, terminal: tuple[i
     system's random source and goes to the terminal only; one line is read, once.
     """
     from gov.cli.errors import GovError
-    from gov.guard.decide import FREEZE_FLAG
+    from gov.util.freeze import FREEZE_FLAG
 
     def refused(reason: str, message: str) -> GovError:
         return GovError("PAUSE_REFUSED", message, {"reason": reason})
@@ -299,7 +299,7 @@ def _linked(flag: Path):
 
 def run(root: Path, args, config: dict) -> dict:
     from gov.cli.errors import GovError
-    from gov.guard.decide import FREEZE_FLAG
+    from gov.util.freeze import FREEZE_FLAG
 
     role = os.environ.get("GOV_ROLE")  # DEC-365: the caller; unset, the owner
     if role is not None and (role != ORCHESTRATOR or args.off):

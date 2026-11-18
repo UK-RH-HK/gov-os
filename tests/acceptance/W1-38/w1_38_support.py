@@ -91,11 +91,9 @@ ROLE_NAMES = (
     "research",
 )
 
-HOOK_SCRIPTS = (   # the seven kernel hooks: context_watch.py added (DEC-1167 (4), DEC-1156 (7))
+HOOK_SCRIPTS = (   # the five kernel hooks left (EMERGENCY-2 6.1: pretooluse.py and posttooluse.py retired)
     "context_watch.py",
-    "posttooluse.py",
     "precompact.py",
-    "pretooluse.py",
     "sessionstart.py",
     "stop.py",
     "subagentstop.py",
@@ -682,7 +680,8 @@ def _find_commands_recursive(obj: object) -> list[str]:
 def extract_hook_script_paths(settings: dict) -> list[str]:
     """Extract script file paths from hook commands in settings.
 
-    Returns relative paths (e.g. ``governance/kernel/hooks/pretooluse.py``).
+    Returns relative paths (e.g. ``governance/kernel/hooks/sessionstart.py``). A script named inside a shell
+    assignment (``h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py"; ...``, the pinned form of the lines) is read too.
     """
     hooks = settings.get("hooks", {})
     commands = _find_commands_recursive(hooks)
@@ -694,6 +693,9 @@ def extract_hook_script_paths(settings: dict) -> list[str]:
             token = token.strip("'\"")
             if token.endswith(".py") and "/" in token and not token.startswith("-"):
                 paths.append(token.lstrip("./"))
+        for found in re.findall(r'\$\{?CLAUDE_PROJECT_DIR\}?"?/([^\s"\';]+\.py)', cmd):
+            if found not in paths:
+                paths.append(found)
     return paths
 
 

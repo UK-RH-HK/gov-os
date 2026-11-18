@@ -1,5 +1,7 @@
 # W2-136 acceptance tests: gov plan, the launch batches, and gov launch's check against them
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** `_match_pattern` is read from `gov.util.patterns`.
+
 Ticket DAEO-p3ln (W2-136), profile STANDARD (DEC-1088; `governance/project/orchestration/packages/LIFT-1/DEPENDENCY-MAP-1.md`).
 Written by the independent test designer (MR-3) from the ticket's KPI lines S1 to S10, before any implementation,
 reading only the integrated code (`w2/integrate` at `24e0e8b0f55d`, with the ticket's claim on top: this branch's

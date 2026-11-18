@@ -1,7 +1,7 @@
 """Unit tests for gov.util.role_paths and gov.util.register, moved whole by W2-150 (DEC-136; S5).
 
-Each is the same module object as its old name (``gov.guard.role_paths``, ``gov.decisions.register``), whose own
-builder cases stay in tests/unit/guard and tests/unit/decisions. Planted trees only; no git history is read.
+``gov.util.register`` is the same module object as its old name ``gov.decisions.register``, whose own builder cases
+stay in tests/unit/decisions (``gov.guard.role_paths``, the other old name, was retired with the guard). Planted trees only; no git history is read.
 """
 
 from __future__ import annotations
@@ -23,9 +23,8 @@ def _tree(at, section=SECTION):
 
 def test_the_old_names_are_the_same_modules():
     import gov.decisions.register as old_register
-    from gov.guard import role_paths as old_role_paths
 
-    assert old_role_paths is role_paths and old_register is register
+    assert old_register is register
 
 
 def test_the_role_filter_withholds_the_engineer_s_own_tests_and_counts_them(tmp_path, monkeypatch):
@@ -38,13 +37,6 @@ def test_the_role_filter_withholds_the_engineer_s_own_tests_and_counts_them(tmp_
     assert f.keep([{"path": "tests/acceptance/W2-99/a.py", "chunk_id": "c1"}, {"path": "src/a.py", "chunk_id": "c2"}]) \
         == [{"path": "src/a.py", "chunk_id": "c2"}]
     assert f.summary()["withheld"] == {"paths": 1, "chunks": 1}
-
-
-def test_a_name_set_on_the_old_module_reaches_the_moved_code(tmp_path, monkeypatch):
-    from gov.guard import role_paths as old_role_paths
-
-    monkeypatch.setattr(old_role_paths, "WORKTREES", str(tmp_path / "set-on-the-old-name"))
-    assert role_paths.WORKTREES == str(tmp_path / "set-on-the-old-name")
 
 
 def test_a_ticket_the_role_filter_cannot_read_fails_closed(tmp_path, monkeypatch):

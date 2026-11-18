@@ -29,12 +29,3 @@ def test_s2_retrieve_command_closure_reaches_no_decisions_checker():
     """Edge 2: ``retrieve/command.py`` no longer pulls ``gov.decisions.checker``."""
     _closure_free("gov.retrieve.command", lambda m: m == "gov.decisions.checker", "gov.decisions.checker")
 
-
-def test_s2_secrets_closure_reaches_no_guard():
-    """Edge 3: ``secrets/__init__.py`` no longer pulls ``gov.guard`` (``guard.runs`` and on to ``guard.decide``)."""
-    _closure_free("gov.secrets", lambda m: in_package(m, "gov.guard"), "gov.guard")
-
-
-def test_s2_retrieval_measure_closure_reaches_no_guard():
-    """Edge 4: ``retrieval/measure.py`` no longer pulls ``gov.guard`` (``guard.reads``)."""
-    _closure_free("gov.retrieval.measure", lambda m: in_package(m, "gov.guard"), "gov.guard")

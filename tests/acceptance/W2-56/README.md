@@ -1,5 +1,7 @@
 # W2-56 acceptance tests: `gov launch` usable for every worker
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The cases of the sandboxed session (`test_w2_56_guard_scope.py`, `test_w2_56_session_daemon.py`, `test_w2_56_session_reranker.py`) and the template's guard hook case are deleted; the launcher, the cleaned environment, the endings, the sweep and the template's allow rule stay.
+
 Ticket DAEO-wnnz (W2-56), profile FULL. Written by the independent test designer (MR-3) from the ticket's KPI lines,
 before any implementation, reading only the integrated code (DEC-963).
 
@@ -127,12 +129,12 @@ the length guard is green.
 | S1 | `test_w2_56_suite_daemon.py::test_s1_each_test_session_uses_one_daemon_folder_of_its_own` | red | here: no build reaches the tool (`Read-only file system: '/tmp/gov-cbm-1000/…'`); outside a sandbox: both sessions' folders lie in the shared `/tmp/gov-cbm-<uid>` |
 | S1 | `test_w2_56_suite_daemon.py::test_s1_no_daemon_folder_is_left_after_the_test_session_ends` | red | here as above; outside a sandbox the folders stay (nothing removes them) |
 | S1 | `test_w2_56_suite_daemon.py::test_s1_guard_each_daemon_folder_is_short_enough_for_the_tools_socket` | red here, green outside a sandbox | guard (DEC-338): here no build reaches the tool; today's folder is 34 bytes |
-| S1 | `test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder` | red (5 roles) | `daemon_dir` gives `/tmp/gov-cbm-1000/<16 hex>` for the session's commands and a suite inside, not under the session's temp folder |
-| S1 | `test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket` | green (guard, 5 roles) | today's folder is 34 bytes; a folder under the session's temp folder that is too long for the socket (D-12) fails it |
-| S2 | `test_w2_56_guard_scope.py::test_s2_premise_a_write_inside_the_roles_scope_is_allowed` | green (premise, 5 roles) | a guard that refuses everything fails it |
-| S2 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_file_tool_write_outside_the_tickets_paths` | green (guard, 10) | Write and Edit, five roles: the guard refuses today (DEC-820 (4)) |
-| S2 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_bash_write_it_names_outside_the_tickets_paths` | green (guard, 11) | seven forms for the engineer, a redirect for the other four roles |
-| S3 | `test_w2_56_guard_scope.py::test_s3_a_name_pattern_is_held_by_the_guards_match` | green (guard, 7) | `_match_pattern`: one `*` within a folder |
+| S1 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red (5 roles) | `daemon_dir` gives `/tmp/gov-cbm-1000/<16 hex>` for the session's commands and a suite inside, not under the session's temp folder |
+| S1 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 5 roles) | today's folder is 34 bytes; a folder under the session's temp folder that is too long for the socket (D-12) fails it |
+| S2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (premise, 5 roles) | a guard that refuses everything fails it |
+| S2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 10) | Write and Edit, five roles: the guard refuses today (DEC-820 (4)) |
+| S2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 11) | seven forms for the engineer, a redirect for the other four roles |
+| S3 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 7) | `_match_pattern`: one `*` within a folder |
 | S5 | `test_w2_56_environment.py::test_s5_no_parent_claude_gov_or_pythonpath_value_reaches_the_session` | red (5 roles) | every planted CLAUDE*, GOV* and PYTHONPATH value reaches the process environment (`env = {**os.environ, …}`) |
 | S5 | `test_w2_56_environment.py::test_s5_each_parent_variable_set_alone_is_kept_from_the_session` | red (22), green (3) | each alone reaches the session; CLAUDE_CODE_TMPDIR, GOV_ROLE and GOV_TICKET are already replaced by the launcher's own |
 | S5 | `test_w2_56_environment.py::test_s5_an_unrelated_parent_variable_is_not_passed` | red | an unrelated parent variable passes (S5 read as the list of what passes; see D-3) |
@@ -145,19 +147,19 @@ the length guard is green.
 | S6 | — | auditor | the CIT-E's weighing of an accepted-arguments list (lens E R6) is a document, the auditor's |
 | S7 | `test_w2_56_start_together.py::test_s7_three_launches_at_once_in_worktrees_sharing_one_git_all_start_run_together_and_commit` | green (guard) | no lock today: all three start, run at once and commit; a lock held for a whole session fails it |
 | S7 | `test_w2_56_start_together.py::test_s7_a_launch_after_three_at_once_still_starts` | green (guard) | a lock left behind fails it |
-| S8, F5 | `test_w2_56_session_reranker.py::test_s8_a_search_in_the_launched_session_reaches_the_planted_service_and_is_ranked` | skipped here | this sandbox refuses Unix sockets; outside it expected green (guard: the session's environment keeps what the search needs) |
+| S8, F5 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | skipped here | this sandbox refuses Unix sockets; outside it expected green (guard: the session's environment keeps what the search needs) |
 | S10 | — | the CTO | measured outside the sandbox, against the live service (`docs/changes/W2-127-evidence.md`) |
-| S11, F5 | `test_w2_56_session_reranker.py::test_s11_an_unranked_search_in_the_launched_session_is_counted_where_gov_status_counts` | green (guard) | without the OS's sandbox the line lands in the log; a session environment that sends it elsewhere fails it |
+| S11, F5 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | without the OS's sandbox the line lands in the log; a session environment that sends it elsewhere fails it |
 | S12 | `test_w2_56_endings.py::test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group` | red (3) | SIGTERM, SIGINT, SIGHUP: the launcher signals the CLI's pid alone; its grandchild runs on |
 | S12 | `test_w2_56_endings.py::test_s12_a_process_of_the_group_that_ignores_the_ending_signal_is_killed_after_the_wait` | red | the grandchild that ignores SIGTERM still runs 13 s later |
 | S12 | `test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled` | green (guard, 3) | the folder goes on each ending signal today |
 | S12, S15 | `test_w2_56_endings.py::test_s15_a_temp_folder_holding_folders_the_owner_may_not_write_is_removed` | red (2) | exit 0 and SIGTERM: `shutil.rmtree` cannot empty a 0500 folder, the folder stays with one line on stderr |
 | S14 | `test_w2_56_template.py::test_s14_the_template_carries_one_allow_rule_bash_gov_launch` | red | the template has no `permissions.allow` |
-| S14 | `test_w2_56_template.py::test_s14_guard_the_template_keeps_its_hooks` | green (guard) | the PreToolUse hook stays |
+| S14 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | the PreToolUse hook stays |
 | S15 | `test_w2_56_endings.py::test_s15_the_temp_folder_is_removed_whatever_the_sessions_exit` | green (guard, 3) | exit 0, exit 3, killed by SIGKILL: removed today |
 | S15 | `test_w2_56_endings.py::test_s15_a_cli_that_cannot_be_started_leaves_no_temp_folder` | green (guard) | removed today |
-| F1 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_file_tool_write_outside_the_tickets_paths` | green (guard, 10) | as S2 |
-| F1 | `test_w2_56_guard_scope.py::test_s2_the_guard_refuses_a_bash_write_it_names_outside_the_tickets_paths` | green (guard, 11) | as S2 |
+| F1 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 10) | as S2 |
+| F1 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 11) | as S2 |
 | F2 | `test_w2_56_refused_arguments.py::test_f2_todays_refused_argument_still_refuses` | green (guard, 11) | DEC-313's and the other CLI arguments refused today |
 | F2 | `test_w2_56_todays_refusals.py::test_f2_todays_refusal_still_refuses` | green (guard, 18) | tickets, roles, repository settings, held-out list, evaluation sets, store, research allowlist and folder |
 | F2 | `test_w2_56_todays_refusals.py::test_f2_a_missing_cli_still_refuses` | green (guard) |  |
@@ -171,8 +173,8 @@ the length guard is green.
 
 | Line (part) held back by the first half | This round |
 |---|---|
-| S1: inside a launched, sandboxed worker, the daemon folder under its own temp folder and the suite run there | settings level: `test_w2_56_session_daemon.py` (place and length, five roles); the OS's part: `test_s13_real_sandbox_…` (the suite inside a real session); D-12 on the length budget |
-| S2 (changed) | today's write list and literal deny rules from `--settings`; the guard refuses file-tool and named Bash writes outside the ticket's paths, per role (`test_w2_56_guard_scope.py`); the OS's refusal of a script's write into another worktree or a denied name: `test_s2_real_sandbox_…`; the script write inside the worktree is the CIT-E's named gap (the auditor's) |
+| S1: inside a launched, sandboxed worker, the daemon folder under its own temp folder and the suite run there | settings level: ; the OS's part: `test_s13_real_sandbox_…` (the suite inside a real session); D-12 on the length budget |
+| S2 (changed) | today's write list and literal deny rules from `--settings`; the guard refuses file-tool and named Bash writes outside the ticket's paths, per role (); the OS's refusal of a script's write into another worktree or a denied name: `test_s2_real_sandbox_…`; the script write inside the worktree is the CIT-E's named gap (the auditor's) |
 | S3 (changed) | the guard's match holds `test_batch*` (seven cases); no sandbox entry from any allowed path |
 | S7: the failure on a missing `.git/*.lock` source path | `test_s7_real_sandbox_…` (three real sessions at once) |
 | S8 | the one socket from the service's setting (settings level, two HOMEs); a search in the session reaches a planted stand-in service; the link edge; D-13 and D-14 |

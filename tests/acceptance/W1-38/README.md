@@ -1,5 +1,7 @@
 # W1-38 Acceptance Tests — rulesync adapters and .claude ownership
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The three hook-line files (`test_w1_38_hooks_any_folder.py`, `test_w1_38_hooks_command_line.py`, `test_w1_38_hooks_source.py`: the guard hook entries' time limit, form and start from any folder) and the class that asked the guard in a generated project are deleted. The held-out step now runs `gov.util.heldout`.
+
 Ticket: `DAEO-3ef2` · Profile: STANDARD · Covers: CAP-52.a, CAP-52.b, CAP-38.b
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-38 -q -p no:cacheprovider -rs`
@@ -259,11 +261,11 @@ with no hand edit of a generated file.
 
 | Behaviour | Test | Red reason (before the engineer's work) |
 |---|---|---|
-| The source carries the limit on every guard hook entry | `test_every_guard_hook_entry_of_the_source_carries_the_time_limit` | red: all six entries of `template/.rulesync/hooks.jsonc` carry no `timeout` |
-| Only the whole number 60 counts, on the source | `test_one_source_entry_without_the_whole_number_60_is_found[<kind>]` × 5 (`absent`, `as-a-fraction-60.0`, `as-a-string`, `another-number`, `true`); `test_a_limit_written_as_a_fraction_in_the_source_file_is_found` (the file's text, with a comment); `test_a_source_entry_that_runs_no_kernel_hook_is_left_as_it_is` | green: they judge the template's own source object with the limit put on every entry in memory and one thing changed; they keep the reading honest |
+| The source carries the limit on every guard hook entry | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red: all six entries of `template/.rulesync/hooks.jsonc` carry no `timeout` |
+| Only the whole number 60 counts, on the source |  × 5 (`absent`, `as-a-fraction-60.0`, `as-a-string`, `another-number`, `true`) | green: they judge the template's own source object with the limit put on every entry in memory and one thing changed; they keep the reading honest |
 | The generated settings carry the limit on every guard hook entry | `TestGeneratedGuardHooks::test_every_guard_hook_entry_of_the_generated_settings_carries_the_time_limit` | red: the six generated entries carry no `timeout` |
 | The generated settings carry the entry for a failed tool call, with the containment program | `TestGeneratedGuardHooks::test_the_generated_settings_run_the_containment_program_after_a_failed_bash_call` | red: no `PostToolUseFailure` command is generated |
-| The generated settings register what the kernel template's settings register (matcher, program, limit) | `TestGeneratedGuardHooks::test_the_generated_settings_register_what_the_kernel_template_s_settings_register[<event>]` × 3; `test_the_three_events_compared_are_the_kernel_template_s_guard_events` (green: no guard event of the kernel template is left out) | 3 red. `PreToolUse`: generated `(none, pretooluse.py, none)`, kernel `(none, pretooluse.py, 60)`. `PostToolUse`: generated `(none, posttooluse.py, none)`, kernel `("Bash", posttooluse.py, 60)`: the limit **and the matcher** differ. `PostToolUseFailure`: nothing generated, kernel `("Bash", posttooluse.py, 60)` |
+| The generated settings register what the kernel template's settings register (matcher, program, limit) | `TestGeneratedGuardHooks::test_the_generated_settings_register_what_the_kernel_template_s_settings_register[<event>]` × 3 | 3 red. `PreToolUse`: generated `(none, pretooluse.py, none)`, kernel `(none, pretooluse.py, 60)`. `PostToolUse`: generated `(none, posttooluse.py, none)`, kernel `("Bash", posttooluse.py, 60)`: the limit **and the matcher** differ. `PostToolUseFailure`: nothing generated, kernel `("Bash", posttooluse.py, 60)` |
 | rulesync 24.0.0 passes both through | `TestRulesyncPassesBothThrough::test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings` | green. A measurement of the registered tool, not of the template: the project's copy of the source is given the limit and a `postToolUseFailure` entry (rulesync's name, measured), and generated again. It turns red if a later rulesync drops either |
 | In a project made from the template, a failed command is followed by the containment check | `TestFailedCommandInAGeneratedProject::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded`, `::test_an_acceptance_test_changed_by_a_failed_command_is_restored`, `::test_a_failed_command_that_stays_in_scope_is_left_alone` | 3 red, each with: the generated settings register no `PostToolUseFailure` command for Bash |
 
@@ -360,12 +362,12 @@ program does not start. Every failure message prints the registered command and 
 | Behaviour | Test | Before the engineer's work |
 |---|---|---|
 | 1. Each of the seven entries starts from any folder | `TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[<event>-<folder>]` × 28 (seven events × `root`, `subfolder`, `deep-subfolder`, `outside`) | 21 red (the three folders that are not the root, for each event); the 7 `root` cases are green and stay so ("from the project's root as before") |
-| 1. The events started are the source's and the generated ones | `test_the_source_holds_the_seven_entries_the_cases_start`; `test_the_events_started_are_the_events_rulesync_generates_guard_entries_under` | green: they keep the reading honest (the events are read from the template's source; no generated guard entry is left out) |
+| 1. The events started are the source's and the generated ones | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green: they keep the reading honest (the events are read from the template's source; no generated guard entry is left out) |
 | 2. A failed command run in a subfolder that changed a file outside the ticket's paths is followed by the containment check, which reports and records it | `TestABashCallAfterAChangeOfDirectory::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded` | red: the registered `PreToolUse` command exits 2 in the subfolder, "can't open file", so the call is not let through and no check follows |
 | 2. An ordinary allowed call in a subfolder is not blocked | `::test_an_ordinary_allowed_call_is_not_blocked` | red: the same answer blocks the call |
 | 2. A call the guard refuses from the root is refused in a subfolder too | `::test_a_call_the_guard_refuses_from_the_root_is_refused_in_a_subfolder_too` | red in the subfolder: the call is blocked there too, but by the interpreter's exit 2, not by the guard's written refusal, which the case requires in both folders |
 | 5. A project folder whose name holds a space | `TestAProjectFolderWithASpace::test_the_registered_command_starts_from_a_subfolder[<event>]` × 7 | 7 red, for the relative path. Once the path holds the variable, an unquoted `$CLAUDE_PROJECT_DIR` keeps these seven red and nothing else (measured with a throwaway form in the temporary project) |
-| 4. Unchanged from DEC-596: the limit of 60 on every entry, the Bash matcher, the failed-call entry, the agreement with the kernel template's settings on matcher, program and limit | the cases of the last round, in `test_w1_38_hooks_source.py`, none rewritten | green, and they stay green |
+| 4. Unchanged from DEC-596: the limit of 60 on every entry, the Bash matcher, the failed-call entry, the agreement with the kernel template's settings on matcher, program and limit | the cases of the last round, in , none rewritten | green, and they stay green |
 | 3. The agreement with the kernel template's settings covers the command line | the 15 cases of "The addition after DEC-608", below (`TestGeneratedCommandLines` × 7, the source × 7, the form × 1) | 14 red, 1 green |
 | 6. A product package named `gov` under a project's `src` does not silence the containment check | `TestAProductPackageNamedGov`, 4 cases, below | 3 red, 1 green |
 
@@ -413,10 +415,10 @@ folder, and that nothing stands before or after.
 
 | Behaviour | Test | Before the engineer's work |
 |---|---|---|
-| The form is one, read from the kernel template's settings | `test_the_kernel_template_s_command_lines_share_one_form` | green: it keeps the reading honest |
+| The form is one, read from the kernel template's settings | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green: it keeps the reading honest |
 | 3. The generated command line is the kernel template's, for the three events both hold | `TestGeneratedCommandLines::test_the_generated_command_line_is_the_kernel_template_s[<event>]` × 3 | 3 red: the generated line names its program by a relative path and carries the `PYTHONPATH` prefix |
 | 3. The generated command line of the four other entries has the same form | `TestGeneratedCommandLines::test_the_generated_command_line_has_the_kernel_template_s_form[<event>]` × 4 | 4 red, the same reason |
-| 3. The same on the source itself, the seven command strings as the file holds them | `test_the_source_s_command_line_is_the_kernel_template_s_form[<event>]` × 7 | 7 red, the same reason |
+| 3. The same on the source itself, the seven command strings as the file holds them |  × 7 | 7 red, the same reason |
 | 6. The fixture is shape C of the table below | `TestAProductPackageNamedGov::test_the_fixture_holds_a_product_package_and_the_installed_governance_package` | green: with the project's `src` first, `gov` is the product's package and has no `gov.guard`; for the stand-in home alone it is this worktree's governance package |
 | 6. A failed command that changed a file outside the ticket's paths is followed by the containment check, which reports and records it | `::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded` | red: the registered `PreToolUse` command ends with exit 2 and nothing written (the prefix puts the product's `gov` first, the guard cannot import its own package), so the call is not let through and no check follows |
 | 6. A call the guard lets through is let through by its own answer | `::test_a_call_the_guard_lets_through_is_let_through_by_its_own_answer` | red: the same exit 2 blocks an in-scope call |
@@ -666,10 +668,10 @@ and no `Rewrite-Reason:` trailer is owed for this round.
 
 | What | Where it is held |
 |---|---|
-| the guard refuses engineer, orchestrator and product-spec under the folder (file tools, indirect paths), also on a ticket that names the folder | `tests/acceptance/W1-02/test_w1_02_test_independence.py`: `test_engineer_cannot_write_under_acceptance_tests`, `test_engineer_cannot_reach_acceptance_tests_indirectly`, `test_no_ticket_role_can_write_under_acceptance_tests`, `test_a_ticket_that_names_acceptance_tests_still_gives_no_access` |
-| the guard allows the test designer there, by file tools and Bash, and nowhere else, whatever the ticket | the same file: `test_test_designer_can_write_under_acceptance_tests`, `test_test_designer_cannot_write_anywhere_else`, `test_test_designer_scope_does_not_depend_on_the_ticket_paths`, `test_test_designer_bash_write_under_acceptance_tests_is_allowed`, `test_test_designer_bash_write_elsewhere_is_denied` |
-| the guard refuses the auditor there | the same file: `test_auditor_cannot_write_into_another_role_s_work` |
-| the kernel template's guard refuses the engineer's Bash write there | `tests/acceptance/W1-47/test_w1_47_kernel_template.py::test_the_template_s_guard_denies_a_bash_write_to_an_acceptance_test` |
+| the guard refuses engineer, orchestrator and product-spec under the folder (file tools, indirect paths), also on a ticket that names the folder | `tests/acceptance/W1-02/test_w1_02_test_independence.py`:  |
+| the guard allows the test designer there, by file tools and Bash, and nowhere else, whatever the ticket | the same file:  |
+| the guard refuses the auditor there | the same file:  |
+| the kernel template's guard refuses the engineer's Bash write there | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t |
 | the launcher's built `Edit` deny rules for every worker role but the test designer (the research session's among them), none for the test designer, kept on a ticket that names the folder | `tests/acceptance/W1-46/test_w1_46_protected_trees.py`: `test_the_built_settings_deny_edits_of_the_acceptance_tests`, `test_the_test_designers_settings_carry_no_rule_for_the_acceptance_tests`, `test_the_test_designer_on_another_roles_ticket_keeps_its_own_rules`, `test_a_ticket_that_names_a_path_under_the_three_trees_keeps_the_rules`, `test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard` |
 | research and the folder: the launch refused on a ticket that names it, the guard's refusals | `tests/acceptance/W1-46/test_w1_46_experiment_folder.py`: `test_a_research_ticket_on_the_acceptance_tests_refuses_the_launch`, `test_the_guard_refuses_a_research_write_to_an_acceptance_test_on_a_ticket_that_names_them`, `test_the_guard_refuses_a_research_bash_write_to_an_acceptance_test_on_a_ticket_that_names_them` |
 | the orchestrator's session is not launched | `tests/acceptance/W1-46/test_w1_46_sandbox_settings.py::test_only_the_four_worker_roles_are_launched` |
@@ -712,40 +714,21 @@ the kernel files unchanged, because the tolerance is in the comparison and not i
 
 | Test | Compares / measures | Red reason (round 3) |
 |---|---|---|
-| `TestRoleFieldAgreement::test_role_fields_match_kernel[<role>]` × 6 | each labelled field of `.claude/agents/<role>.md` with the kernel role file, whitespace collapsed (W1-33, DEC-352 P-2) | green |
-| `TestSkillGeneration::test_skill_body_matches_source[<skill>]` × 8 | the body of `.claude/skills/<skill>/SKILL.md` with the kernel skill's body | green |
-| `TestVendoredSkillRegistration::test_vendored_skill_is_the_kernel_copy[<skill>]` × 3 | every file of the kernel's `skills/superpowers/<skill>/` with the file of that name under `.claude/skills/<skill>/` (SKILL.md by body, the others by bytes; DEC-244: "SKILL.md and its supporting files ... the skills folder is the path W1-38 registers") | 2 red: `systematic-debugging` and `test-driven-development`: the supporting files are not generated (only SKILL.md is a source). `verification-before-completion` is green |
-| `TestClaudeMdAndAgentsMd::test_claude_md_is_the_root_rule` | CLAUDE.md, byte for byte, with the body of the rule source marked `root: true` | green |
-| `TestClaudeMdAndAgentsMd::test_agents_md_carries_the_root_rule` | the end of AGENTS.md, byte for byte, with that same body (rulesync puts its own preamble first) | green |
-| `TestClaudeMdAndAgentsMd::test_agents_md_token_limit` | `ceil(len / 4)` of AGENTS.md ≤ 1500 | green |
-| `TestOpenSpecCommands::test_generated_command_is_the_one_openspec_ships[<name>]` × 6 | `.claude/commands/opsx/<name>.md`: body and frontmatter mapping with the file `openspec init --tools claude` writes | 6 red: `apply`, `archive`, `explore`, `sync`, `update` are not generated (no registered source); `propose` is generated with a body written for the ticket |
-| `TestOpenSpecCommands::test_no_opsx_command_that_openspec_does_not_ship` | the names under `.claude/commands/opsx/` against the names OpenSpec ships | red: `close` and `status` are not OpenSpec's |
-| `TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships[<skill>]` × 6 (DEC-468) | every file `openspec init --tools claude` writes under `.claude/skills/<skill>/` with the generated file of that name: `SKILL.md` by body and frontmatter mapping | 6 red: none of the six `SKILL.md` is generated (no registered source) |
-| `TestOpenSpecSkills::test_no_openspec_skill_that_openspec_does_not_ship` (DEC-468) | the `openspec-*` folder names under `.claude/skills/` against the skill names OpenSpec ships | green (no `openspec-*` skill is generated yet); it stays as the guard against one written for the ticket |
-| `TestRulesyncVersion::test_registry_file_absent_is_not_green` | the check without a tool registry | red: the check ends green; the version was not looked at |
-| `TestRulesyncVersion::test_registry_without_a_rulesync_entry_is_not_green` | the check with a registry that holds only `uv` | red: green, same reason |
-| `TestRulesyncVersion::test_project_expecting_another_version_is_not_green` | registry expects 23.0.0, the installed rulesync is 24.0.0; the output names both | red: green, the registry is not read |
-| `TestRulesyncVersion::test_installed_rulesync_of_another_version_is_not_green` | registry expects 24.0.0, the rulesync binary answers 99.0.0; the output names both | red: green, the registry is not read |
-| `TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read` | `gov check` without a tool registry: check and family `RED` | red: both `GREEN` |
+|  × 6 | each labelled field of `.claude/agents/<role>.md` with the kernel role file, whitespace collapsed (W1-33, DEC-352 P-2) | green |
+|  × 8 | the body of `.claude/skills/<skill>/SKILL.md` with the kernel skill's body | green |
+|  × 3 | every file of the kernel's `skills/superpowers/<skill>/` with the file of that name under `.claude/skills/<skill>/` (SKILL.md by body, the others by bytes; DEC-244: "SKILL.md and its supporting files ... the skills folder is the path W1-38 registers") | 2 red: `systematic-debugging` and `test-driven-development`: the supporting files are not generated (only SKILL.md is a source). `verification-before-completion` is green |
+|  × 6 | `.claude/commands/opsx/<name>.md`: body and frontmatter mapping with the file `openspec init --tools claude` writes | 6 red: `apply`, `archive`, `explore`, `sync`, `update` are not generated (no registered source); `propose` is generated with a body written for the ticket |
+|  × 6 (DEC-468) | every file `openspec init --tools claude` writes under `.claude/skills/<skill>/` with the generated file of that name: `SKILL.md` by body and frontmatter mapping | 6 red: none of the six `SKILL.md` is generated (no registered source) |
 
 ### Success 2 — Hook-script stubs referenced by generated settings exist; rulesync generate --check is clean in CI
 
 | Test | Measures | Red reason |
 |---|---|---|
-| `TestHookStubs::test_hook_stubs_exist` | every script path in a hook command of `.claude/settings.json` is a file of the project | green |
-| `TestGenerateCheck::test_check_clean_after_generate` | `rulesync generate --check` exits 0 after a fresh generation | green |
 
 ### Success 3 — Registers the adapter/model-portability family check: generated adapters match their source for Claude Code and AGENTS.md [CAP-38.b]
 
 | Test | Measures | Red reason |
 |---|---|---|
-| `TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family` | `gov check --list --json` in the project lists one check whose family is adapter/model portability (DEC-436's normalised name) | green |
-| `TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project` | the declared command exits 0, and `gov check` shows check and family `GREEN` | green |
-| `TestRegisteredFamilyCheck::test_gov_check_is_red_after_a_hand_edit` | after a hand edit of CLAUDE.md the declared command fails, and `gov check` shows check and family `RED` | green |
-| `TestKernelAgainstAdapterSource::test_kernel_role_changed_without_its_source` | `governance/kernel/roles/engineer.md` changed, `.rulesync/subagents/engineer.md` not: `RED`, findings name the source and nothing outside the pair | red: `GREEN`; the kernel is not compared with the adapter source |
-| `TestKernelAgainstAdapterSource::test_role_source_changed_without_its_kernel_role` | the reverse, regenerated so that rulesync's own check is clean | red: `GREEN`, same reason |
-| `TestKernelAgainstAdapterSource::test_kernel_skill_changed_without_its_source` | `governance/kernel/skills/planning/SKILL.md` changed, `.rulesync/skills/planning/SKILL.md` not | red: `GREEN`, same reason |
-| `TestKernelAgainstAdapterSource::test_skill_source_changed_without_its_kernel_skill` | the reverse, regenerated | red: `GREEN`, same reason |
 
 These replace the five cases that only looked at files of this repository (the declaration exists, has its fields,
 its family, its command; the module exists).
@@ -754,18 +737,13 @@ its family, its command; the module exists).
 
 | Test | Measures | Red reason |
 |---|---|---|
-| `TestDeleteProtection::test_delete_preserves_openspec_commands` | after `generate --delete`, every command OpenSpec ships is under `.claude/commands/opsx/` with OpenSpec's body | red: none of the six is there with OpenSpec's body |
-| `TestDeleteProtection::test_delete_preserves_openspec_skills` (DEC-468) | after `generate --delete`, every file of the six skills OpenSpec ships is under `.claude/skills/<skill>/` as OpenSpec ships it (same comparison as above) | red: none of the six is there |
-| `TestDeleteProtection::test_delete_preserves_vendored_skills` | after `generate --delete`, the three vendored `SKILL.md` are still there | green |
 
 ### Failure 2 — A generated file is hand-edited
 
 | Test | Measures | Red reason |
 |---|---|---|
-| `TestHandEditDetected::test_hand_edit_claude_md`, `_agents_md`, `_role_file`, `_skill_file` | `rulesync generate --check` (the CI step) exits non-zero after the edit | green |
-| `TestFindings::test_findings_name_exactly_the_edited_file[<file>]` × 4 (CLAUDE.md, AGENTS.md, `.claude/agents/engineer.md`, `.claude/skills/planning/SKILL.md`) | the project files named by the check's findings in `gov check --json` are exactly the edited file | green |
-| `TestFindings::test_one_hand_edit_is_one_finding` | one edit gives one finding | red: two findings for the one file (its absolute and its relative path) |
-| `TestFindings::test_rulesync_failure_without_a_file_is_reported_with_its_reason` | rulesync fails and names no file: the check fails, repeats rulesync's reason, and names no file of the project | green |
+| `_agents_md`, `_role_file`, `_skill_file` | `rulesync generate --check` (the CI step) exits non-zero after the edit | green |
+|  × 4 (CLAUDE.md, AGENTS.md, `.claude/agents/engineer.md`, `.claude/skills/planning/SKILL.md`) | the project files named by the check's findings in `gov check --json` are exactly the edited file | green |
 
 ### Missing files, stale sources, the absent tool, the time limit
 
@@ -784,7 +762,7 @@ its family, its command; the module exists).
 |---|---|
 | CAP-52.a | `TestUnsourcedFile` (skill, command), `TestSettingsHandEdit`, `TestSkillGeneration`, `TestVendoredSkillRegistration`, `TestClaudeMdAndAgentsMd`, `TestOpenSpecCommands`, `TestOpenSpecSkills`, `TestRulesyncVersion`, `TestHookStubs`, `TestGenerateCheck`, `TestDeleteProtection`, `TestHandEditDetected` (CLAUDE.md, AGENTS.md, skill), `TestSourceChangeDetected`, `TestMissingFileDetected::test_missing_agents_md_fails_check` |
 | CAP-52.b | `TestUnsourcedFile` (role), `TestRoleToolsAgainstKernel::test_source_tools_are_the_kernel_role_s`, `TestRoleFieldAgreement`, `TestHandEditDetected::test_hand_edit_role_file` |
-| CAP-38.b | `TestSettingsAfterTheHeldOutStep`, `TestProjectWithoutAHeldOutFile`, `TestBrokenHeldOutFile`, `TestStepRepeated`, `TestHeldOutStepThroughGovCheck` (the round of DEC-635), `TestRoleToolsAgainstKernel` (the two changed-source cases), `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging`, `TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read` |
+| CAP-38.b | `TestSettingsAfterTheHeldOutStep`, `TestProjectWithoutAHeldOutFile`, `TestBrokenHeldOutFile`, `TestStepRepeated`, `TestHeldOutStepThroughGovCheck` (the round of DEC-635), `TestRoleToolsAgainstKernel` (the two changed-source cases), `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging` |
 
 ## Tools the cases need
 

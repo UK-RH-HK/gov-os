@@ -21,7 +21,7 @@ from pathlib import Path
 
 from gov.launch.gate import EXIT_GATE_SHUT
 
-HELP = "start a sandboxed worker session"
+HELP = "start a worker session"
 CLASS = "act"
 PASSTHROUGH = True       # what follows "--" goes to the CLI unchanged
 CHILD_EXIT_CODE = True   # the session's exit code is the command's

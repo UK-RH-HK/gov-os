@@ -1,6 +1,6 @@
 """Whether two path patterns can name one path, decided one way only (W2-136 S3, DEC-1088 (1)).
 
-The patterns are read as the guard reads a ticket's ``allowed_paths`` (``gov.guard.decide._match_pattern``): ``*``
+The patterns are read as the guard reads a ticket's ``allowed_paths`` (``gov.util.patterns._match_pattern``): ``*``
 stays inside one folder, ``**`` crosses folders. A path the guard would let two writers both touch is a path both
 patterns match, so:
 
@@ -19,7 +19,7 @@ import subprocess
 from functools import lru_cache
 from pathlib import Path
 
-from gov.guard import decide
+from gov.util import patterns
 
 _STAR, _DSTAR = object(), object()
 
@@ -89,9 +89,9 @@ def _one(a: str, b: str) -> bool:
     if _literal(a) and _literal(b):
         return a == b
     if _literal(a):
-        return decide._match_pattern(a, b)
+        return patterns._match_pattern(a, b)
     if _literal(b):
-        return decide._match_pattern(b, a)
+        return patterns._match_pattern(b, a)
     return _intersect(a, b)
 
 
@@ -122,7 +122,7 @@ class Tracked:
             if _literal(pattern):
                 return pattern
         for path in self.files:
-            if decide._match_pattern(path, a) and decide._match_pattern(path, b):
+            if patterns._match_pattern(path, a) and patterns._match_pattern(path, b):
                 return path
         return min((a, b), key=lambda p: (-len(_prefix(p)), p))
 

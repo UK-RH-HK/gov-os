@@ -2,13 +2,16 @@
 
 (i) a roster that already names an existing ticket: A0 keeps it and creates nothing;
 (ii) a roster without the key: A0 adds the key and changes nothing else;
-(iii) ``tk`` missing: A0 completes without creating the ticket or the key, and its record says so; the guard stays closed
-      (every install refused, the refusal naming ``GOV_TICKET`` and how to set the key) (PKG-3 (b), the owner, DEC-1157
-      (15); was: A0 refuses and writes nothing).
+(iii) ``tk`` missing: A0 completes without creating the ticket or the key, and its record says so (PKG-3 (b), the
+      owner, DEC-1157 (15); was: A0 refuses and writes nothing).
 
 In (iii) A0 ends as W2-23's success does (exit 0, an ``ok: true`` envelope). "Its record says so" is judged on the
 record's text, not on a field name (``w2_113_support.says_no_ticket_was_created_because_tk_is_missing``; README, "The
-record says so"). "The guard stays closed" is the kernel hook's decision, as the rest of the suite reads it.
+record says so").
+
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The cases that put an install through the
+guard's CTO-only rule are deleted with the guard (the "asked at once" case, the roster-names-the-CTO case, the guard-stays-closed
+case, and the files of the refusals and the refusal words); the cases of what A0 writes stay.
 """
 
 from __future__ import annotations
@@ -34,19 +37,6 @@ def test_a_roster_that_names_an_existing_ticket_is_kept_and_no_ticket_is_created
     assert support.roster_data(adopted.project) == yaml.safe_load(adopted.before.roster.decode("utf-8")), \
         "A0 changed the roster's content although it already named an existing ticket"
     assert w23.porcelain(adopted.project) == "", "A0 left the tree dirty"
-
-
-@pytest.mark.parametrize("name,named", [("names-by-id", support.OTHER.id), ("names-by-wbs", support.OTHER.wbs)])
-def test_the_ticket_a_roster_names_stays_the_ctos(adoption, name, named, sandbox):
-    """The kept key still decides: the orchestrator on the ticket the roster named is asked, a worker is refused."""
-    adopted = adoption(name)
-    support.assert_succeeded(adopted)
-    settings = w110.wiring.load_settings(adopted.project)
-    asked = w110.call(adopted.project, settings, sandbox, w110.cto(support.OTHER.id, "cto"), support.INSTALL)
-    assert asked.decision == "ask", f"the orchestrator on {support.OTHER.id} (named by the roster) was {asked.decision}: {asked.describe()}"
-    worker = w110.Session("engineer", w110.ENGINEER, support.ENGINEERING.id)
-    refused = w110.call(adopted.project, settings, sandbox, worker, support.INSTALL)
-    assert refused.decision == "deny", f"an engineer was {refused.decision}: {refused.describe()}"
 
 
 # --- (ii) a roster with other content and no key -----------------------------------------------------------------------
@@ -106,30 +96,3 @@ def test_a0_completes_without_a_ticket_or_a_key_and_its_record_says_so_when_tk_i
         f"A0's record {support.A0_RECORD} must say that no coordination ticket was created because tk is missing "
         f"(it must name tk and say a ticket was not made); the record reads:\n{text}")
 
-
-def test_the_guard_stays_closed_when_tk_is_missing(adoption, sandbox):
-    """No key was written, so the install rule cannot run: every session's install is refused (fail closed), and the
-    refusal names ``GOV_TICKET`` and says how to set the key, as KPI success 2 asks of every such refusal."""
-    adopted = adoption("no-tk")
-    support.assert_succeeded(adopted)
-    project = adopted.project
-    settings = w110.wiring.load_settings(project)
-    sessions = [w110.cto(support.OTHER.id, "orchestrator on an existing ticket"),
-                w110.cto(w110.COORDINATION.id, "orchestrator on a would-be coordination ticket"),
-                w110.Session("orchestrator with no ticket", w110.ORCHESTRATOR, None),
-                w110.Session("engineer", w110.ENGINEER, support.ENGINEERING.id)]
-    problems = []
-    for session in sessions:
-        for command in support.INSTALLS:
-            answer = w110.call(project, settings, sandbox, session, command)
-            if answer.decision != "deny":
-                problems.append(f"{session}: `{command}` was {answer.decision}, not refused: {answer.describe()}")
-                continue
-            if not support.names_the_variable(answer.reason):
-                problems.append(f"{session}: the refusal of `{command}` does not name {support.NAMES_THE_VARIABLE}: "
-                                f"{answer.reason!r}")
-            if not support.says_how_to_set_the_key(answer.reason):
-                problems.append(f"{session}: the refusal of `{command}` does not say how to set the key (name "
-                                f"{support.ROSTER_REL} and {support.KEY}): {answer.reason!r}")
-    assert not problems, "with tk missing the guard must stay closed:\n" + "\n".join(problems)
-    assert w23.porcelain(project) == "", f"A0 left the tree dirty:\n{w23.porcelain(project)}"

@@ -19,16 +19,13 @@ directory) is refused, and the refusal names it, whatever that index or the proj
 
 The list rows:
 
-- W2-M105, ``gov.guard.containment_merge``: a merge is read with ``GIT_TRACE*`` cleared, and with
+- W2-M105, ``gov.containment.merge``: a merge is read with ``GIT_TRACE*`` cleared, and with
   ``GIT_NO_LAZY_FETCH`` set: in a partial clone a missing object is never fetched (the read fails instead).
-- W2-M113, the containment check's git calls (W1-03's PostToolUse hook) run with a cleared environment and
-  pinned configuration: a planted decoy, planted trace variables and a trace setting in the person's git
-  configuration change nothing and write nothing.
 - W2-M161, every subprocess of ``gov close`` (its test run included: the test helper) runs with a sanitised
   environment and pinned configuration. Red until W2-53 merges (``src/gov/close/**``).
-- W2-L160, the guard hook resolves git by absolute path, and its freeze look-up has a limit of its own of 15 s
-  (DEC-783 item 2), below the hook's 20 s deadline (DEC-580: the guard answers refuse). W2-50 has merged; this
-  ticket's resume makes the change to ``src/gov/guard/decide.py``.
+
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The three cases that ran the post-command
+containment hook and the guard hook under a planted environment (W2-M113 and W2-L160) are deleted with the hooks.
 """
 
 from __future__ import annotations
@@ -44,14 +41,6 @@ import w2_05_support as support
 from w2_05_support import skip_without
 
 STAGED_SECRET_EXIT = "SECRET_STAGED"
-# The freeze look-up's own limit (DEC-783 item 2; reading P-2 as decided), and the window its refusal is held to, on
-# the test's clock from the start of the hook's process to its end: not before FREEZE_FROM_S (the look-up was waited
-# for up to its limit; 0.5 s for the clocks), and by FREEZE_BY_S (3 s for the hook's start and its answer after the
-# limit; 1 s before 19 s, the earliest the hook deadline's answer comes in W1-02's deadline cases, and 2 s before the
-# hook's 20 s deadline, DEC-580).
-FREEZE_LIMIT_S = 15.0
-FREEZE_FROM_S = 14.5
-FREEZE_BY_S = 18.0
 
 
 def assert_untouched(decoy, what):
@@ -279,12 +268,12 @@ def test_a_hooked_commit_in_a_linked_worktree_scans_the_index_git_gives_it(tmp_p
 
 
 # --------------------------------------------------------------------------
-# W2-M105: gov.guard.containment_merge reads a merge with trace variables cleared and no lazy fetch
+# W2-M105: gov.containment.merge reads a merge with trace variables cleared and no lazy fetch
 # --------------------------------------------------------------------------
 
 _READ_MERGE = (
     "import json, sys\n"
-    "from gov.guard.containment_merge import read_merge\n"
+    "from gov.containment.merge import read_merge\n"
     "try:\n"
     "    reading = read_merge(sys.argv[1], sys.argv[2])\n"
     "except Exception as error:\n"
@@ -372,35 +361,6 @@ def test_read_merge_in_a_partial_clone_fetches_nothing(tmp_path, box):
 # W2-M113: the containment check (W1-03's PostToolUse hook) with a cleared environment and pinned configuration
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
-                                   "a trace setting in the person's git configuration"))
-def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
-    import w1_03_support as w103
-    project = w103.make_project(tmp_path / "project")
-    sandbox = w103.make_sandbox(tmp_path / "sandbox")
-    traces = tmp_path / "traces"
-    call = w103.script_call(sandbox, "echo changed >> README.md")
-    guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
-    w103.assert_let_through(guard, call)
-    bash = w103.run_bash(project, call.command, sandbox)
-    if plant.startswith("a decoy"):
-        environment = support.planted(decoy[0])
-    elif plant == "trace variables":
-        environment = support.trace_plants(traces)
-    else:
-        traces.mkdir()
-        (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
-        xdg = tmp_path / "xdg"
-        support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
-        environment = {"XDG_CONFIG_HOME": str(xdg)}
-
-    result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
-                            environment=environment)
-
-    w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
-    assert_no_trace(traces, f"the containment check with {plant}")
-    assert_untouched(decoy, f"the containment check with {plant}")
-
 
 # --------------------------------------------------------------------------
 # W2-M161: every subprocess of gov close, its test run included (red until W2-53 merges)
@@ -451,66 +411,3 @@ def test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_e
     assert_no_trace(traces, "gov close with planted trace variables and a trace setting (W2-M161)")
     assert_untouched(decoy, "gov close under a planted GIT_DIR")
     w201.closed(run, interface)
-
-
-# --------------------------------------------------------------------------
-# W2-L160: the guard hook's git by absolute path, and the freeze look-up's own limit (red until W2-50 merges)
-# --------------------------------------------------------------------------
-
-def _guard_project(tmp_path):
-    import w1_02_support as w102
-    project = w102.make_project(tmp_path / "project")
-    return w102, project, w102.make_sandbox(tmp_path / "sandbox")
-
-
-def test_the_guard_hook_does_not_run_the_git_first_on_path(tmp_path):
-    """Red until W2-50 merges (``src/gov/guard/decide.py``)."""
-    w102, project, sandbox = _guard_project(tmp_path)
-    tool_input = w102.edit_tool_input("Write", project / "src/gov/guard/decide.py")
-    plain = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID)
-    assert plain.decision == "allow", f"the guard did not allow an in-scope write; the case needs it: {plain.describe()}"
-    fake = tmp_path / "fake-bin"
-    fake.mkdir()
-    mark = tmp_path / "fake-git-ran"
-    (fake / "git").write_text(f"#!/bin/sh\necho \"$*\" >> {support.sh_quote(mark)}\nexec {support.GIT} \"$@\"\n")
-    (fake / "git").chmod(0o755)
-
-    result = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID,
-                           extra_env={"PATH": f"{fake}:{os.environ.get('PATH', support.SYSTEM_PATH)}"})
-
-    ran = mark.read_text().splitlines() if mark.is_file() else []
-    assert not ran, f"the guard hook ran the git first on PATH, not git by absolute path (W2-L160): {ran[:3]}"
-    assert result.decision == plain.decision, f"the guard decided otherwise: {result.describe()}"
-
-
-# Rewritten (DEC-783 item 2: the freeze look-up's own limit is 15 seconds; was held to "an answer within 18 s",
-# reading P-2): the refusal is the look-up's own, at its 15 s limit, never the hook deadline's at 20 s.
-def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs(tmp_path, fifo_cleanup):
-    """The worktree's ``HEAD`` in its git directory is a fifo: every git that opens it waits. The guard's freeze
-    look-up gives up at its own limit of 15 s (DEC-783 item 2) and the guard refuses (DEC-580): the answer is
-    ``deny``, not before 14.5 s and by 18 s, so it is the look-up's own and not the hook deadline's (20 s)."""
-    w102, project, sandbox = _guard_project(tmp_path)
-    tree = tmp_path / "wt"
-    w102.git(project, "worktree", "add", "-q", str(tree), "-b", "w2-05/guard")
-    head = support.git_dir_of(tree) / "HEAD"
-    head.unlink()
-    os.mkfifo(head)
-    fifo_cleanup.append(head)
-
-    result = w102.run_hook(tree, "Write", w102.edit_tool_input("Write", tree / "src/gov/guard/decide.py"), sandbox,
-                           role=w102.ENGINEER, ticket=w102.TICKET_ID)
-
-    assert result.decision != "timeout", (
-        f"the guard hook did not answer within the hook's {w102.HOOK_TIMEOUT_S:.0f} s deadline while its freeze "
-        f"look-up waited (W2-L160: the look-up has no limit of its own of {FREEZE_LIMIT_S:.0f} s, DEC-783 item 2): "
-        f"{result.describe()}")
-    assert result.decision == "deny", (
-        f"the guard hook did not refuse when its freeze look-up hung (DEC-580): {result.describe()} "
-        f"after {result.seconds:.1f} s")
-    assert result.seconds >= FREEZE_FROM_S, (
-        f"the guard hook refused after {result.seconds:.1f} s: before the freeze look-up's own limit of "
-        f"{FREEZE_LIMIT_S:.0f} s (DEC-783 item 2; not before {FREEZE_FROM_S} s): {result.describe()}")
-    assert result.seconds <= FREEZE_BY_S, (
-        f"the guard hook refused after {result.seconds:.1f} s: not by the freeze look-up's own limit of "
-        f"{FREEZE_LIMIT_S:.0f} s (by {FREEZE_BY_S:.0f} s); a refusal this late is the hook deadline's "
-        f"({w102.HOOK_TIMEOUT_S:.0f} s, DEC-580), not the look-up's: {result.describe()}")

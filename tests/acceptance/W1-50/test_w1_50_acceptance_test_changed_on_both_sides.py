@@ -86,7 +86,7 @@ OUTSIDE = support.SOURCE              # outside tests/acceptance/** and .tickets
 
 @pytest.fixture()
 def helper(monkeypatch):
-    """``helper()`` -> the module ``gov.guard.containment_merge``, imported when it is first called."""
+    """``helper()`` -> the module ``gov.containment.merge``, imported when it is first called."""
     return own_change.helper_module(monkeypatch)
 
 
@@ -99,15 +99,6 @@ ONE_SIDE_WHOLE = {
 }
 
 
-def _call(project, call, shape):
-    """One call of the orchestrator makes the merge commit of ``shape``. Returns (result, state after, what)."""
-    before = check_support.git(project, "rev-parse", "HEAD").strip()
-    branch = check_support.git(project, "rev-parse", support.TICKET_BRANCH).strip()
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    own_change.assert_both_changed(project, shape, before, branch)
-    return result, left, f"{shape.what}, in the orchestrator's own call on {TICKET}"
-
-
 def _build(project, sandbox, shape):
     """Make the merge commit of ``shape`` with no hook around it. Returns the state a reading must leave."""
     before = check_support.git(project, "rev-parse", "HEAD").strip()
@@ -115,14 +106,6 @@ def _build(project, sandbox, shape):
     state = own_change.built(project, sandbox, shape.command)
     own_change.assert_both_changed(project, shape, before, branch)
     return state
-
-
-def _assert_the_test_is_named(project, shape, made):
-    """A finding names the test both sides changed; the path only the branch changed is not named."""
-    result, left, what = made
-    check_support.assert_caught(result, shape.path, what=what, action=check_support.FLAGGED)
-    check_support.assert_not_recorded(result, shape.also, what=what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 def _assert_own_not_brought(reading, shape):
@@ -142,15 +125,6 @@ def _assert_own_not_brought(reading, shape):
 # The merge commit holds one side's content of the test whole
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("case", sorted(ONE_SIDE_WHOLE), ids=sorted(ONE_SIDE_WHOLE))
-def test_a_merge_that_takes_one_side_s_content_of_a_test_both_sides_changed_is_flagged(project, sandbox, call,
-                                                                                      case):
-    """DEC-410, DP-24. "Taking one side whole is a resolution, and a resolution of an acceptance test is a
-    finding." The test is named whichever parent's content the merge commit holds and whichever parent comes
-    first; the source file only the branch changed is not named."""
-    holds, turned_round = ONE_SIDE_WHOLE[case]
-    shape = own_change.changed_on_both_sides(project, sandbox, TEST, AS_DESIGNER, holds, turned_round)
-    _assert_the_test_is_named(project, shape, _call(project, call, shape))
 
 
 @pytest.mark.parametrize("case", sorted(ONE_SIDE_WHOLE), ids=sorted(ONE_SIDE_WHOLE))
@@ -166,37 +140,10 @@ def test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_conte
     own_change.assert_left(project, state, shape.what)
 
 
-def test_the_same_merge_with_a_test_designer_s_trailers_on_the_merge_commit_is_flagged(project, sandbox, call):
-    """DEC-410, DP-24 with DP-27. The merge commit holds the merged side's content of the test and carries a
-    test designer's trailers on a ticket in progress: the path is its own change, and its own change of an
-    acceptance test is a finding whatever its trailers."""
-    shape = own_change.changed_on_both_sides(project, sandbox, TEST, AS_DESIGNER, SECOND, trailers=AS_DESIGNER)
-    made = _call(project, call, shape)
-    assert support.trailer_values(project, "HEAD", "Role") == [support.DESIGNER], (
-        "the fixture is wrong: the merge commit does not carry the test designer's Role trailer"
-    )
-    _assert_the_test_is_named(project, shape, made)
-
-
 # --------------------------------------------------------------------------
 # DP-26: git's own clean combination of two edits
 # --------------------------------------------------------------------------
 
-def test_a_clean_combination_of_two_sides_edits_of_one_test_is_silent(project, sandbox, call):
-    """Rewritten; Rewrite-Reason: DEC-918. Until then this case was
-    ``test_a_clean_combination_of_two_sides_edits_of_one_test_is_flagged`` and expected, by DEC-410 DP-26
-    ("stays flagged, as built"), that the orchestrator's merge in its own call is a finding that names the test.
-
-    DEC-918 item 1 changes DP-24 for acceptance tests: a path both parents changed is not the merge commit's own
-    change when the merge commit holds exactly git's own merge of it (``git merge-tree --write-tree``, no
-    conflict on that file). A test designer changed line 2 of an acceptance test on the branch and line 19 on
-    ``main``; ``git merge`` combines them without a conflict, and the merge commit holds that merge, content
-    neither parent holds. Now expected: the check is silent and moves nothing. ``read_merge``'s reading is
-    unchanged (the next case, DEC-918 item 4)."""
-    shape = own_change.changed_on_both_sides_in_different_parts(project, sandbox)
-    result, left, what = _call(project, call, shape)
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 def test_read_merge_puts_a_clean_combination_of_two_sides_edits_of_one_test_in_own(project, sandbox, helper):
@@ -249,20 +196,6 @@ OUTSIDE_ONE_SIDE_WHOLE = {
     "holds-the-first-parent-s-content": FIRST,
     "holds-the-second-parent-s-content": SECOND,
 }
-
-
-@pytest.mark.parametrize("case", sorted(OUTSIDE_ONE_SIDE_WHOLE), ids=sorted(OUTSIDE_ONE_SIDE_WHOLE))
-def test_a_merge_that_takes_one_side_s_content_of_a_source_file_both_sides_changed_stays_silent(project, sandbox,
-                                                                                               call, case):
-    """DP-24 names ``tests/acceptance/**``. Both sides changed a source file by an engineer's commit inside its
-    ticket's paths; the merge commit holds one side's content whole. That content is a parent's and differs
-    from the merge base: it is brought, as before, and the merge is silent. A fix that takes every path both
-    sides changed for the merge commit's own, and judges it, must still find nothing here; a fix that flags
-    the shape fails."""
-    shape = own_change.changed_on_both_sides(project, sandbox, OUTSIDE, AS_ENGINEER, OUTSIDE_ONE_SIDE_WHOLE[case])
-    result, left, what = _call(project, call, shape)
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 @pytest.mark.parametrize("case", sorted(OUTSIDE_ONE_SIDE_WHOLE), ids=sorted(OUTSIDE_ONE_SIDE_WHOLE))

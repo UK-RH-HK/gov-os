@@ -19,7 +19,7 @@ import subprocess
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.guard import decide as guard
+from gov.util import patterns
 from gov.readiness import checker
 from gov.tasks import tickets
 
@@ -39,8 +39,8 @@ def _lines(value, least: int = 0) -> bool:
 def _covers(pattern: str) -> bool:
     """Whether ``pattern``, read as the guard reads it, allows a path at or under ``tests/acceptance/``."""
     pattern = posixpath.normpath(pattern)
-    return guard._is_under_acceptance(pattern.rstrip("*/ ")) \
-        or any(guard._match_pattern(probe, pattern) for probe in PROBES)  # a folder covers what is under it
+    return patterns._is_under_acceptance(pattern.rstrip("*/ ")) \
+        or any(patterns._match_pattern(probe, pattern) for probe in PROBES)  # a folder covers what is under it
 
 
 def _tasks(text: str) -> list[tuple[str, str, dict]]:
@@ -78,7 +78,7 @@ def _fault(fields: dict) -> str | None:
     if not all(_lines(fields.get(key, [])) for key in ("depends_on", "inputs")):
         return "depends_on and inputs are lists of strings (a task number is written in quotes)"
     if fields["role"] != TEST_DESIGNER and any(_covers(pattern) for pattern in paths):
-        return f"allowed_paths covers {guard.ACCEPTANCE}/**, which only the {TEST_DESIGNER} may hold (MR-3)"
+        return f"allowed_paths covers {patterns.ACCEPTANCE}/**, which only the {TEST_DESIGNER} may hold (MR-3)"
     return None
 
 

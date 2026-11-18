@@ -11,9 +11,6 @@ What the words are taken to mean:
 - **A hook entry of the source** is one object of the list an event name holds
   under ``hooks`` (and under ``hooks`` of a block that overrides one tool, if
   the source has such a block): the object that holds ``command``.
-- **A guard hook entry**, **carries the limit**: the words of
-  ``tests/acceptance/W1-47/w1_47_hook_time_limit.py`` (DEC-592: every hook entry
-  that runs a program of the kernel's hooks folder; only the integer 60).
 - **The program of an entry** is the file of the kernel's hooks folder its
   command names. The command line around it (how Python is called, how the
   path is written) is not compared.
@@ -39,28 +36,13 @@ for _suite in ("W1-03", "W1-05", "W1-47"):
 
 import w1_03_support as check_support  # noqa: E402  (the fixture ticket, what a hook's result tells the agent)
 import w1_05_support as live_support   # noqa: E402  (which registered commands the harness runs, and their input)
-import w1_47_hook_time_limit as limit  # noqa: E402  (a guard hook entry, the limit)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE_REL = "template/.rulesync/hooks.jsonc"
-PROJECT_SOURCE_REL = ".rulesync/hooks.jsonc"
-KERNEL_SETTINGS_REL = "template/governance/kernel/settings.json"
 KERNEL_HOOKS_REL = "template/governance/kernel/hooks"
 GENERATED_REL = ".claude/settings.json"
 FAILED_CALL_EVENT = "PostToolUseFailure"       # the harness's event for a failed tool call
-# rulesync 24.0.0's name for that event in a hooks source (measured, see the README).
-RULESYNC_FAILED_CALL_KEY = "postToolUseFailure"
-RULESYNC_AFTER_CALL_KEY = "postToolUse"
 
-# Revised (Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2)). The template's ``postToolUse`` holds a second
-# entry beside the guard's: the context watch (``context_watch.py``, matcher ``Bash``, ``"timeout": 10``). It is a
-# handover aid, not a guard line: it carries its own limit, and the kernel template's settings register no such
-# entry. Every other guard entry keeps the limit of W1-47's module.
-WATCH_PROGRAM = "context_watch.py"
-WATCH_LIMIT_S = 10
-WATCH_MATCHER = "Bash"
-WATCH_MODEL = "claude-sonnet-5-5"      # a model whose window the program knows (1,000,000 tokens)
-WATCH_USED_TOKENS = 900_000            # 90 % of that window: past the 85 % at which the program speaks
 
 ENGINEER = check_support.ENGINEER
 TICKET_ID = check_support.TICKET_ID
@@ -125,75 +107,9 @@ def load_source(path=None, name=SOURCE_REL):
     return parse_source(path.read_text(encoding="utf-8"), name)
 
 
-def write_source(path, source):
-    Path(path).write_text(json.dumps(source, indent=2) + "\n", encoding="utf-8")
-
-
-def kernel_programs():
-    """The file names of the kernel template's hook programs."""
-    return limit.program_names(REPO_ROOT / KERNEL_HOOKS_REL)
-
-
-def kernel_settings():
-    return limit.load(REPO_ROOT / KERNEL_SETTINGS_REL, KERNEL_SETTINGS_REL)
-
-
 # --------------------------------------------------------------------------
 # The source's hook entries
 # --------------------------------------------------------------------------
-
-def source_entries(source):
-    """Every hook entry of a source object: ``(where, entry)``, and what is not of the stated shape."""
-    entries, misshapen = [], []
-    blocks = [("hooks", source.get("hooks"))]
-    blocks += [(f"{key}.hooks", value["hooks"]) for key, value in source.items()
-               if key != "hooks" and isinstance(value, dict) and "hooks" in value]
-    if not isinstance(source.get("hooks"), dict):
-        misshapen.append("the object holds no `hooks` map")
-    for label, block in blocks:
-        if not isinstance(block, dict):
-            continue
-        for event, listed in block.items():
-            if not isinstance(listed, list):
-                misshapen.append(f"{label}.{event}: not a list of hook entries")
-                continue
-            for index, entry in enumerate(listed):
-                if not isinstance(entry, dict):
-                    misshapen.append(f"{label}.{event}[{index}]: not an object")
-                    continue
-                entries.append((f"{label}.{event}[{index}]", entry))
-    return entries, misshapen
-
-
-def source_guard_entries(source, programs):
-    return [(where, entry) for where, entry in source_entries(source)[0] if limit.is_guard_entry(entry, programs)]
-
-
-def expected_limit(entry, programs):
-    """The whole number ``timeout`` an entry carries: the context watch's own (``WATCH_LIMIT_S``), else W1-47's."""
-    return WATCH_LIMIT_S if program_of(entry, programs) == WATCH_PROGRAM else limit.LIMIT_S
-
-
-def carries_its_limit(entry, programs):
-    """Only the whole number: ``60.0``, ``"60"``, ``True`` and an absent key are not a limit (DEC-592)."""
-    value = entry.get(limit.LIMIT_KEY)
-    return type(value) is int and value == expected_limit(entry, programs)
-
-
-def source_faults(source, programs):
-    """One sentence for each guard hook entry of the source that does not carry the limit, and for each misshapen part."""
-    entries, found = source_entries(source)
-    found = list(found)
-    for where, entry in entries:
-        if not limit.is_guard_entry(entry, programs) or carries_its_limit(entry, programs):
-            continue
-        wanted = expected_limit(entry, programs)
-        if limit.LIMIT_KEY not in entry:
-            state = f"carries no `{limit.LIMIT_KEY}`"
-        else:
-            state = f"carries `{limit.LIMIT_KEY}`: {entry[limit.LIMIT_KEY]!r}, which is not the whole number {wanted}"
-        found.append(f"{where}, command `{entry.get('command')}`, {state}")
-    return found
 
 
 # --------------------------------------------------------------------------
@@ -205,36 +121,6 @@ def program_of(entry, programs):
     command = entry.get("command")
     named = [name for name in programs if isinstance(command, str) and name in command]
     return named[0] if len(named) == 1 else None
-
-
-def registered(settings, programs, event):
-    """What a settings object registers under ``event`` for the kernel's hook programs:
-    the sorted list of ``(matcher or None, program, the value under timeout or None)``, one for each guard hook entry."""
-    found = []
-    for where, group, entry in limit.guard_entries(settings, programs):
-        if where.startswith(f"{event}["):
-            found.append((group.get("matcher"), program_of(entry, programs), entry.get(limit.LIMIT_KEY)))
-    return sorted(found, key=repr)
-
-
-def guard_events(settings, programs):
-    """The events under which a settings object registers a guard hook entry, in the file's order."""
-    events = []
-    for where, _group, _entry in limit.guard_entries(settings, programs):
-        event = where.split("[", 1)[0]
-        if event not in events:
-            events.append(event)
-    return events
-
-
-def containment_program(programs):
-    """The program the kernel template's settings register for a failed Bash call."""
-    found = {program for matcher, program, _limit in registered(kernel_settings(), programs, FAILED_CALL_EVENT)
-             if live_support.matcher_matches(matcher, "Bash")}
-    assert len(found) == 1 and None not in found, (
-        f"{KERNEL_SETTINGS_REL} registers {sorted(map(str, found))} for a failed Bash call; one program is expected"
-    )
-    return found.pop()
 
 
 # --------------------------------------------------------------------------
@@ -299,77 +185,6 @@ def make_session_sandbox(base):
     return box
 
 
-@dataclass(frozen=True)
-class FailedCall:
-    registered: tuple       # the commands the settings register for the failed call
-    results: tuple          # one live_support.CommandResult for each
-    report: str             # the text that reaches the agent
-    new_findings: tuple     # the lines added to the findings file since the call began
-    bash_exit: int
-
-    def describe(self):
-        return "; ".join(result.describe() for result in self.results) or "no command is registered"
-
-
-_CALLS = iter(range(1, 1_000_000))
-
-
-def failed_bash_call(project, settings, sandbox, command, changed=(), role=ENGINEER, ticket=TICKET_ID):
-    """One whole Bash call that fails, as a session makes it, through the commands ``settings`` register:
-    the PreToolUse commands for Bash, the command for real, then the commands for the failed-call event with
-    the input the harness gives after a failed tool call. The registered commands are run in the project's
-    root folder, as the suites' other live-hook cases run them (W1-05).
-    """
-    project = Path(project)
-    number = next(_CALLS)
-    tool_use_id = f"toolu_w1_38_{number:04d}"
-    directory = sandbox.home.parent / "calls"
-    directory.mkdir(exist_ok=True)
-    script = directory / f"call-{number:04d}.sh"
-    script.write_text(command + "\n", encoding="utf-8")
-    call = f"bash {script}"
-    tool_input = {"command": call, "description": "W1-38 acceptance call"}
-    seen = len(check_support.finding_lines(project))
-
-    def run(event, extra=None):
-        stdin = live_support.hook_input(project, sandbox, event, "Bash", tool_input, tool_use_id=tool_use_id)
-        stdin.update(extra or {})
-        commands = live_support.hook_commands(settings, event, "Bash")
-        results = []
-        for registered_command in commands:
-            try:
-                proc = subprocess.run(["sh", "-c", registered_command], input=json.dumps(stdin),
-                                      capture_output=True, text=True, cwd=str(project),
-                                      env=live_support.command_environment(project, sandbox, role, ticket),
-                                      timeout=COMMAND_TIMEOUT_S, check=False)
-                results.append(live_support.CommandResult(registered_command, proc.returncode, proc.stdout,
-                                                          proc.stderr))
-            except subprocess.TimeoutExpired:
-                results.append(live_support.CommandResult(registered_command, None, "", "timed out"))
-        return commands, results
-
-    _commands, before = run("PreToolUse")
-    assert before, f"{GENERATED_REL} registers no PreToolUse command for Bash"
-    refused = [result for result in before
-               if check_support._guard_decision(result.returncode, result.stdout) != "allow"]
-    assert not refused, (
-        f"the registered PreToolUse commands did not let the fixture call `{call}` through, so no Bash call "
-        f"would follow: " + "; ".join(result.describe() for result in refused)
-    )
-    bash = live_support.run_bash(project, call, sandbox)
-    assert bash.returncode != 0, f"the fixture command `{command}` did not fail: exit {bash.returncode}"
-    status = check_support.porcelain_all(project)
-    for rel in changed:
-        assert rel in status, f"the fixture command `{command}` did not change {rel}:\n{status}"
-    commands, after = run(FAILED_CALL_EVENT, {"error": f"Exit code {bash.returncode}\n{bash.stderr}".strip()})
-    report = "\n".join(
-        text for text in (check_support.agent_text(result.returncode, result.stdout, result.stderr)
-                          for result in after) if text
-    )
-    return FailedCall(tuple(commands), tuple(after), report,
-                      tuple(check_support.finding_lines(project)[seen:]), bash.returncode)
-
-
 # --------------------------------------------------------------------------
 # A registered command started from any folder (DEC-603, DEC-607)
 # --------------------------------------------------------------------------
@@ -380,38 +195,6 @@ def failed_bash_call(project, settings, sandbox, command, changed=(), role=ENGIN
 # same folder as ``cwd`` of the hook's input, and the project's folder in ``CLAUDE_PROJECT_DIR``.
 
 ORCHESTRATOR = check_support.ORCHESTRATOR
-OUT_OF_SCOPE_FILE = "docs/notes.md"          # a file of the product outside the ticket's paths
-SUBFOLDER_REL = "src/app"                    # a folder of the product, inside the ticket's paths
-DEEP_SUBFOLDER_REL = "docs/one/two/three/four/five"
-NOT_STARTED = "can't open file"              # what the interpreter says when it does not find the program
-
-
-def source_events(source=None):
-    """The harness's names of the events under which the template's hooks source holds an entry: rulesync's
-    key with its first letter in upper case (measured; held by a case against what rulesync generates)."""
-    source = load_source() if source is None else source
-    block = source.get("hooks") if isinstance(source.get("hooks"), dict) else {}
-    return tuple(key[:1].upper() + key[1:] for key in block)
-
-
-def registered_commands(settings, programs, event):
-    """The commands of the guard hook entries a settings object registers under ``event``."""
-    return [entry.get("command") for where, _group, entry in limit.guard_entries(settings, programs)
-            if where.startswith(f"{event}[")]
-
-
-def folder_of(project, kind, outside=None):
-    """The working directory of one kind: the project's root, a subfolder, a deep subfolder, a folder outside."""
-    project = Path(project)
-    folder = {"root": project, "subfolder": project / SUBFOLDER_REL, "deep-subfolder": project / DEEP_SUBFOLDER_REL,
-              "outside": outside}[kind]
-    assert folder is not None, "no folder outside the project was given"
-    folder = Path(folder)
-    folder.mkdir(parents=True, exist_ok=True)      # an empty folder is no change of the working tree
-    return folder
-
-
-FOLDER_KINDS = ("root", "subfolder", "deep-subfolder", "outside")
 
 
 def run_registered(command, stdin, project, sandbox, folder, role=None, ticket=None):
@@ -426,42 +209,6 @@ def run_registered(command, stdin, project, sandbox, folder, role=None, ticket=N
     return live_support.CommandResult(command, proc.returncode, proc.stdout, proc.stderr)
 
 
-def _json(text):
-    """The object a program's standard output holds: the whole text, else its last line that is an object (the
-    PreCompact program writes its read-first line, as text, before its JSON message: W2-176)."""
-    for candidate in [text.strip() or "null"] + [line for line in reversed(text.strip().splitlines()) if line.strip()]:
-        try:
-            data = json.loads(candidate)
-        except ValueError:
-            continue
-        if isinstance(data, dict):
-            return data
-    return {}
-
-
-def _specific(result):
-    specific = _json(result.stdout).get("hookSpecificOutput")
-    return specific if isinstance(specific, dict) else {}
-
-
-def refused_by_the_program(result):
-    """The guard's program itself answered "refuse": it ended with 0 and wrote the refusal. An exit 2 is not
-    that: the interpreter ends with 2 too when it does not find the program."""
-    return result.returncode == 0 and _specific(result).get("permissionDecision") == "deny"
-
-
-def _runtime_files(project):
-    runtime = Path(project) / ".gov-runtime"
-    return {str(path.relative_to(project)) for path in runtime.rglob("*") if path.is_file()} if runtime.is_dir() \
-        else set()
-
-
-def refused_call(project):
-    """A Bash call the guard refuses for the engineer whatever the current folder: it writes a file outside the
-    ticket's paths, named by its whole path."""
-    return {"command": f"echo changed >> {Path(project) / OUT_OF_SCOPE_FILE}", "description": "W1-38 acceptance call"}
-
-
 @dataclass(frozen=True)
 class Started:
     event: str
@@ -473,160 +220,9 @@ class Started:
         return f"expected {self.expected}; got {self.result.describe()}"
 
 
-def start_entry(event, command, project, sandbox, folder, settings):
-    """Start one registered command in ``folder`` and look for an answer only its program gives.
-
-    The exit code is never taken as that answer: the interpreter that does not find the program ends with 2,
-    as the guard does on an internal failure and as the return-contract program does on an incomplete return.
-
-    - ``PreToolUse``: a call the guard refuses; the program's written refusal (exit 0, ``permissionDecision``).
-    - ``PostToolUse`` for the context watch (``WATCH_PROGRAM``): a transcript at 90 % of the model's window; the
-      reminder the program writes under its own event name.
-    - ``PostToolUse``, ``PostToolUseFailure``: one whole call whose pre-call part ran from the project's root
-      (where every form of the command starts); the command changed a file outside the ticket's paths; the
-      check's report names that file.
-    - ``SessionStart``: the orchestrator's session; the context the program writes under its own event name.
-    - ``PreCompact``: the orchestrator's session without a checkpoint; the program's own message.
-    - ``Stop``: the engineer's session on its ticket; the checkpoint the program writes for the ticket.
-    - ``SubagentStop``: an incomplete return; the program's written refusal under its own event name.
-    """
-    project = Path(project)
-    number = next(_CALLS)
-    base = {"session_id": f"w1-38-any-folder-{number:04d}", "hook_event_name": event,
-            "transcript_path": str(sandbox.home / ".claude" / "projects" / "product" / "session.jsonl"),
-            "permission_mode": "default"}
-    if event == "PreToolUse":
-        stdin = live_support.hook_input(project, sandbox, event, "Bash", refused_call(project),
-                                        tool_use_id=f"toolu_w1_38_any_{number:04d}")
-        result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
-        return Started(event, result, "refused" if refused_by_the_program(result) else "",
-                       "the guard's written refusal of a write outside the ticket's paths (exit 0)")
-    if event == "PostToolUse" and own_programs(command, (WATCH_PROGRAM,)):
-        # The context watch (DEC-1167 (4)): a session at 90 % of its model's window is reminded to write its handover.
-        transcript = Path(base["transcript_path"])
-        transcript.parent.mkdir(parents=True, exist_ok=True)
-        transcript.write_text(json.dumps({"type": "assistant", "message": {
-            "model": WATCH_MODEL, "usage": {"input_tokens": WATCH_USED_TOKENS}}}) + "\n", encoding="utf-8")
-        stdin = live_support.hook_input(project, sandbox, event, "Bash",
-                                        {"command": "bash tools/step.sh", "description": "W1-38 acceptance call"},
-                                        tool_use_id=f"toolu_w1_38_any_{number:04d}")
-        stdin.update(session_id=base["session_id"], transcript_path=str(transcript))
-        result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
-        reply = _specific(result)
-        added = reply.get("additionalContext")
-        seen = (result.returncode == 0 and reply.get("hookEventName") == event
-                and isinstance(added, str) and "Context watch" in added)
-        return Started(event, result, added if seen else "",
-                       "the context watch's reminder for a session at 90 % of its window, under its event name (exit 0)")
-    if event in ("PostToolUse", FAILED_CALL_EVENT):
-        tool_use_id = f"toolu_w1_38_any_{number:04d}"
-        tool_input = {"command": "bash tools/step.sh", "description": "W1-38 acceptance call"}
-        before = [run_registered(registered, live_support.hook_input(project, sandbox, "PreToolUse", "Bash",
-                                                                     tool_input, tool_use_id=tool_use_id),
-                                 project, sandbox, project, ENGINEER, TICKET_ID)
-                  for registered in live_support.hook_commands(settings, "PreToolUse", "Bash")]
-        assert before and all(check_support._guard_decision(r.returncode, r.stdout) == "allow" for r in before), (
-            f"from the project's root the registered PreToolUse commands did not let the fixture call through: "
-            + ("; ".join(r.describe() for r in before) or "none is registered")
-        )
-        with (project / OUT_OF_SCOPE_FILE).open("a", encoding="utf-8") as handle:
-            handle.write("changed by the call\n")
-        stdin = live_support.hook_input(project, sandbox, event, "Bash", tool_input, tool_use_id=tool_use_id)
-        result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
-        report = check_support.agent_text(result.returncode, result.stdout, result.stderr)
-        seen = result.returncode == 0 and OUT_OF_SCOPE_FILE in report
-        return Started(event, result, report if seen else "",
-                       f"the containment check's report naming {OUT_OF_SCOPE_FILE} (exit 0)")
-    if event == "SessionStart":
-        result = run_registered(command, dict(base, source="startup"), project, sandbox, folder, ORCHESTRATOR)
-        seen = result.returncode == 0 and _specific(result).get("hookEventName") == event
-        return Started(event, result, "context" if seen else "",
-                       "the context the program writes for the orchestrator under its event name (exit 0)")
-    if event == "PreCompact":
-        result = run_registered(command, dict(base, trigger="manual"), project, sandbox, folder, ORCHESTRATOR)
-        message = _json(result.stdout).get("systemMessage")
-        seen = result.returncode == 0 and isinstance(message, str) and "PreCompact" in message
-        return Started(event, result, message if seen else "",
-                       "the program's message that no state block was appended, there being no checkpoint (exit 0)")
-    if event == "Stop":
-        had = _runtime_files(project)
-        result = run_registered(command, base, project, sandbox, folder, ENGINEER, TICKET_ID)
-        written = sorted(rel for rel in _runtime_files(project) - had if TICKET_ID in rel)
-        seen = result.returncode == 0 and bool(written)
-        return Started(event, result, ", ".join(written) if seen else "",
-                       f"a checkpoint written for {TICKET_ID} under the project's runtime folder (exit 0)")
-    if event == "SubagentStop":
-        result = run_registered(command, dict(base, last_assistant_message="done"), project, sandbox, folder,
-                                ENGINEER, TICKET_ID)
-        seen = _specific(result).get("hookEventName") == event and NOT_STARTED not in result.stderr
-        return Started(event, result, "incomplete return refused" if seen else "",
-                       "the program's written refusal of an incomplete return under its event name")
-    raise AssertionError(f"no case knows what the program registered under {event} answers")
-
-
 # --------------------------------------------------------------------------
 # One whole Bash call made in a folder the session changed to
 # --------------------------------------------------------------------------
-
-@dataclass(frozen=True)
-class FolderCall:
-    before: tuple           # one CommandResult for each registered PreToolUse command
-    decision: str           # allow | deny | ask | error | timeout, as the harness reads the pre-call results
-    bash_exit: object       # the command's exit code; None when the call was not let through
-    event: str              # the event raised after the command; empty when the call was not let through
-    after: tuple            # one CommandResult for each command registered for that event
-    report: str             # the text that reaches the agent after the command
-    new_findings: tuple     # the lines added to the findings file since the call began
-
-    def describe(self):
-        return ("before: " + ("; ".join(r.describe() for r in self.before) or "no command is registered")
-                + " | after: " + ("; ".join(r.describe() for r in self.after) or "no command ran"))
-
-
-def bash_call_in(project, settings, sandbox, folder, command, literal=False, role=ENGINEER, ticket=TICKET_ID):
-    """One whole Bash call of a session whose current folder is ``folder``, through the commands ``settings``
-    register: the PreToolUse commands for Bash; if they let it through, the command for real in ``folder``; then
-    the commands registered for the event that follows (the failed-call event when the command failed), every
-    registered command started in ``folder``. ``literal``: the guard is shown the command itself, not a script.
-    """
-    project, folder = Path(project), Path(folder)
-    number = next(_CALLS)
-    tool_use_id = f"toolu_w1_38_{number:04d}"
-    call = command
-    if not literal:
-        directory = sandbox.home.parent / "calls"
-        directory.mkdir(exist_ok=True)
-        script = directory / f"call-{number:04d}.sh"
-        script.write_text(command + "\n", encoding="utf-8")
-        call = f"bash {script}"
-    tool_input = {"command": call, "description": "W1-38 acceptance call"}
-    seen = len(check_support.finding_lines(project))
-
-    def run(event, extra=None):
-        stdin = live_support.hook_input(project, sandbox, event, "Bash", tool_input, tool_use_id=tool_use_id)
-        stdin.update(extra or {})
-        return tuple(run_registered(registered, stdin, project, sandbox, folder, role, ticket)
-                     for registered in live_support.hook_commands(settings, event, "Bash"))
-
-    before = run("PreToolUse")
-    assert before, f"{GENERATED_REL} registers no PreToolUse command for Bash"
-    decisions = [check_support._guard_decision(result.returncode, result.stdout) for result in before]
-    decision = next((d for d in decisions if d != "allow"), "allow")
-    if decision != "allow":
-        return FolderCall(before, decision, None, "", (), "", tuple(check_support.finding_lines(project)[seen:]))
-    env = live_support.command_environment(project, sandbox)
-    env.update({"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull})
-    bash = subprocess.run(["bash", "-c", call], cwd=str(folder), env=env, capture_output=True, text=True,
-                          timeout=COMMAND_TIMEOUT_S, check=False)
-    if bash.returncode != 0:
-        event, extra = FAILED_CALL_EVENT, {"error": f"Exit code {bash.returncode}\n{bash.stderr}".strip()}
-    else:
-        event, extra = "PostToolUse", None
-    after = run(event, extra)
-    report = "\n".join(text for text in (check_support.agent_text(r.returncode, r.stdout, r.stderr) for r in after)
-                       if text)
-    return FolderCall(before, decision, bash.returncode, event, after, report,
-                      tuple(check_support.finding_lines(project)[seen:]))
 
 
 # --------------------------------------------------------------------------
@@ -657,132 +253,7 @@ PLAIN_FORM_AS_WORDED = 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<pr
 PLAIN_FORM = PLAIN_FORM_AS_WORDED.replace("<program>", PROGRAM_PLACE)
 
 
-def own_programs(command, programs):
-    """The kernel hook programs a command line names by their whole file name (``stop.py`` is not named by a
-    command line that names ``subagentstop.py``)."""
-    if not isinstance(command, str):
-        return []
-    def of_a_name(char):
-        return bool(char) and (char.isalnum() or char in "._-")
-
-    found = []
-    for name in programs:
-        start = command.find(name)
-        while start >= 0:
-            end = start + len(name)
-            if not of_a_name(command[start - 1:start]) and not of_a_name(command[end:end + 1]):
-                found.append(name)
-            start = command.find(name, end)
-    return found
-
-
-def own_program(command, programs, where):
-    """The one program a command line names; a failure when it names none or more than one."""
-    found = own_programs(command, programs)
-    assert len(found) == 1, f"{where}: the command line `{command}` names {found or 'no kernel hook program'}; one is expected"
-    return found[0]
-
-
-def kernel_command_line(event, programs):
-    """The one command line the kernel template's settings register under ``event``, as that file holds it."""
-    commands = registered_commands(kernel_settings(), programs, event)
-    assert len(commands) == 1 and isinstance(commands[0], str), (
-        f"{KERNEL_SETTINGS_REL} registers {len(commands)} guard hook entries under {event}; one is expected: {commands}"
-    )
-    return commands[0]
-
-
-def kernel_forms(programs):
-    """``{event: form}`` for each event under which the kernel template's settings register a guard hook entry:
-    its command line with the file name of its program exchanged for ``PROGRAM_PLACE``."""
-    forms = {}
-    for event in guard_events(kernel_settings(), programs):
-        command = kernel_command_line(event, programs)
-        program = own_program(command, programs, f"{KERNEL_SETTINGS_REL}, {event}")
-        assert command.count(program) == 1 and PROGRAM_PLACE not in command, (
-            f"{KERNEL_SETTINGS_REL}, {event}: `{command}` holds `{program}` more than once"
-        )
-        forms[event] = command.replace(program, PROGRAM_PLACE)
-    return forms
-
-
-def kernel_form(programs):
-    """The one form the kernel template's three guard command lines share: its exit-mapping form (DEC-880 item 3,
-    DEC-913 item 1). A failure when they do not share one. Revised after implementation (Rewrite-Reason:
-    DEC-917): the lifecycle lines are no longer put into this form; it is held for the three guard lines only."""
-    forms = kernel_forms(programs)
-    distinct = sorted(set(forms.values()))
-    assert len(distinct) == 1, (
-        f"the command lines of {KERNEL_SETTINGS_REL} do not share one form once the program's file name is taken "
-        f"out: {forms}"
-    )
-    return distinct[0]
-
-
-def expected_command_line(event, command, programs, where):
-    """What DEC-917 makes the command line of the entry under ``event``, whose present command line is ``command``.
-
-    Under a guard event (``GUARD_EVENTS``): the kernel template's command line for that event, the same string
-    (its exit-mapping form). Under a lifecycle event (``LIFECYCLE_EVENTS``): DEC-608's plain form with the
-    entry's own program in the place of the program's file name; the entry's own program is the one its present
-    command line names by its whole file name. Under any other event: a failure.
-
-    Revised after implementation (Rewrite-Reason: DEC-917): the lifecycle lines were put into the kernel
-    template's one form (DEC-608), which is now the guard lines' exit-mapping form.
-    """
-    if event in GUARD_EVENTS:
-        return kernel_command_line(event, programs)
-    assert event in LIFECYCLE_EVENTS, (
-        f"{where}: {event} is neither a guard event {GUARD_EVENTS} nor a lifecycle event {LIFECYCLE_EVENTS}; "
-        f"DEC-917 names no form for its command line"
-    )
-    return PLAIN_FORM.replace(PROGRAM_PLACE, own_program(command, programs, where))
-
-
-def source_command_lines(source=None):
-    """``{event: [command, ...]}`` of a hooks source, as written, under the harness's names of the events."""
-    source = load_source() if source is None else source
-    block = source.get("hooks") if isinstance(source.get("hooks"), dict) else {}
-    return {key[:1].upper() + key[1:]: [entry.get("command") for entry in listed if isinstance(entry, dict)]
-            for key, listed in block.items() if isinstance(listed, list)}
-
-
 # --------------------------------------------------------------------------
 # A product's own package named ``gov`` under the project's ``src`` (DEC-608; shape C of the README)
 # --------------------------------------------------------------------------
 
-PRODUCT_GOV_FILES = {
-    "src/gov/__init__.py": '"""The product\'s own package: a speed governor for a pump. Not the governance package."""\n'
-                           "\nMAX_RPM = 3000\n",
-    "src/gov/limits.py": "from gov import MAX_RPM\n\n\ndef within(rpm):\n    return 0 <= rpm <= MAX_RPM\n",
-}
-GOVERNANCE_MODULE = "gov.guard"      # a module the kernel's hook programs import and a product's package lacks
-
-
-def add_product_package_named_gov(project):
-    """Give the project, under its own ``src``, a product package named ``gov``, and commit it."""
-    project = Path(project)
-    for rel, text in PRODUCT_GOV_FILES.items():
-        path = project / rel
-        assert not path.exists(), f"{rel} is already in the project"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-    check_support.git(project, "add", "-A")
-    check_support.git(project, "commit", "-q", "-m", "the product's own package named gov")
-    return project
-
-
-def gov_as_imported(project, sandbox, first=None):
-    """What ``import gov`` gives a program started as a hook is, outside the project, with ``first`` (a folder)
-    ahead of the installed packages when given: ``(the package's folder, whether it holds the guard)``."""
-    code = ("import importlib.util, json, os, gov\n"
-            f"print(json.dumps([os.path.dirname(os.path.abspath(gov.__file__)), "
-            f"importlib.util.find_spec({GOVERNANCE_MODULE!r}) is not None]))")
-    env = live_support.command_environment(project, sandbox)
-    if first is not None:
-        env["PYTHONPATH"] = str(first)
-    proc = subprocess.run(["python3", "-c", code], capture_output=True, text=True, cwd=str(sandbox.tmpdir), env=env,
-                          timeout=COMMAND_TIMEOUT_S, check=False)
-    assert proc.returncode == 0, f"`import gov` failed in the stand-in session: {proc.stderr.strip()[:300]}"
-    folder, has_guard = json.loads(proc.stdout)
-    return Path(folder), has_guard

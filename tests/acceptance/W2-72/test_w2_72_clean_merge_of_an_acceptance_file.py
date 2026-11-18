@@ -43,24 +43,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import w2_72_support as support  # noqa: E402
-from w2_72_support import call, guard_hook, hook, judge, project, sandbox  # noqa: E402,F401  fixtures
+from w2_72_support import judge, project, sandbox  # noqa: E402,F401  fixtures
 
 check_support = support.check_support
 
 ORCHESTRATOR = support.ORCHESTRATOR
 TICKET = support.TICKET
-
-
-def _in_the_call(project, sandbox, call, build):
-    """The orchestrator's own call makes the merge commit of ``build``. Returns (shape, result, state, merge id)."""
-    shape = build(project, sandbox)
-    before = support.full_id(project, "HEAD")
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    merge_id = support.full_id(project, "HEAD")
-    support.assert_shape(project, shape, before, merge_id)
-    assert support.trailer_values(project, merge_id, "Role") == [ORCHESTRATOR] and support.trailer_values(
-        project, merge_id, "Task") == [TICKET], "the fixture is wrong: the merge commit's trailers"
-    return shape, result, left, merge_id
 
 
 def _with_no_hook(project, sandbox, build):
@@ -71,17 +59,6 @@ def _with_no_hook(project, sandbox, build):
     merge_id = support.full_id(project, "HEAD")
     support.assert_shape(project, shape, before, merge_id)
     return shape, merge_id
-
-
-@pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
-def test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge(
-        project, sandbox, call, case):
-    """DEC-918 item 1, through the live hook: the call is silent (no report to the agent, no finding, exit 0) and
-    the check moves nothing (HEAD, index, working tree as the call left them)."""
-    shape, result, left, _ = _in_the_call(project, sandbox, call, support.SUCCESS[case])
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
@@ -101,27 +78,6 @@ def test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_
 # Not (a2): the merged side's edit of the test is an engineer's commit
 # --------------------------------------------------------------------------
 
-def test_the_live_check_names_the_engineer_s_commit_and_not_the_merge_commit(project, sandbox, call):
-    """The clean combination, where the merged side's edit of the acceptance test is an engineer's commit. The
-    merge commit holds git's own merge of the test: no finding is the merge commit's. The engineer's commit is
-    new in the move and judged by its own trailers, as before: a finding for it names the test."""
-    shape, result, left, merge_id = _in_the_call(project, sandbox, call, support.brought_by_an_engineer)
-    engineer = support.support.commit_of(project, support.MERGED_TEST, support.BRANCH)
-    assert support.trailer_values(project, engineer, "Role") == [support.support.ENGINEER], (
-        "the fixture is wrong: the merged side's commit of the test is not an engineer's"
-    )
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    for_the_engineer = support.findings_for(result, engineer, what)
-    assert any(support.MERGED_TEST in check_support.finding_paths(result, f) for f in for_the_engineer), (
-        f"{what}: no finding for the engineer's commit {engineer[:12]} names {support.MERGED_TEST}; findings: "
-        f"{[f['reason'] for f in check_support.new_findings(result, what)]}"
-    )
-    for_the_merge = support.findings_for(result, merge_id, what)
-    assert for_the_merge == [], (
-        f"{what}: the merge commit {merge_id[:12]} holds git's own merge of {support.MERGED_TEST} and has the "
-        f"findings {[(f['paths'], f['reason']) for f in for_the_merge]} (DEC-918 items 1 and 2)"
-    )
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 def test_judge_commits_finds_nothing_in_the_merge_commit_and_still_judges_the_engineer_s_commit(project, sandbox,

@@ -12,7 +12,7 @@ the merge commit differs from any parent (and, by DP-24, an acceptance test
 both sides changed in the same way, which differs from none and is in
 ``own``); ``brought`` is sorted, holds no path twice and no path of ``own``.
 
-Through the helper only (``from gov.guard.containment_merge import read_merge``,
+Through the helper only (``from gov.containment.merge import read_merge``,
 DEC-398), imported inside the test when the history is built, as in the other
 helper cases.
 
@@ -58,7 +58,7 @@ TESTS = symmetric.TESTS
 
 @pytest.fixture()
 def helper(monkeypatch):
-    """``helper()`` -> the module ``gov.guard.containment_merge``, imported when it is first called."""
+    """``helper()`` -> the module ``gov.containment.merge``, imported when it is first called."""
     return own_change.helper_module(monkeypatch)
 
 

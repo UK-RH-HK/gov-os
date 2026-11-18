@@ -24,7 +24,7 @@ sys.path.insert(0, str(REPO / "tests" / "unit" / "telemetry"))
 sys.path.insert(0, str(REPO / "tests" / "unit" / "launch"))  # test_w2_195_preload, also when imported as a top module
 
 from gov.cli.errors import GovError  # noqa: E402
-from gov.guard import decide  # noqa: E402
+from gov.containment import scope as decide  # noqa: E402
 from gov.launch import launcher, session_record as sr  # noqa: E402
 from test_sessionlog_w2_60b import SECRET, Log  # noqa: E402
 from test_w2_195_preload import install_judging_skill  # noqa: E402

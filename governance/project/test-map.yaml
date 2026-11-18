@@ -8,7 +8,7 @@ version: 1
 # P-IS-1 (a), DEC-892 c: a change here runs everything.
 shared_core:
   - "src/gov/close/**"
-  - "src/gov/guard/**"
+  - "src/gov/containment/**"
   - "src/gov/check/**"
   - "src/gov/records/**"
   # the retrieval core, its eight wide modules (I3 §4.1 item 1)
@@ -159,7 +159,7 @@ couplings:
   - paths: ["src/gov/context/**", "src/gov/checkpoint/**"]
     suites: ["tests/acceptance/W1-31/"]
     why: "gov telemetry builds the ticket's context (I2 §4.1)"
-  - paths: ["src/gov/secrets/**", "src/gov/guard/runs.py"]
+  - paths: ["src/gov/secrets/**", "src/gov/util/runs_root.py"]
     suites: ["tests/acceptance/W1-40/"]
     why: "the hooks run the staged-secrets scan (I2 §4.1)"
   - paths: ["src/gov/retrieval/validate.py", "src/gov/retrieval/canary.py"]
@@ -181,9 +181,7 @@ couplings:
     why: "loaded by file path: test_w2_67_copies.py loads these suites' conftests with spec_from_file_location (W1-27's own reaches it through its suite folder)"
   # P-SELECT-FIXES-1 (i), DEC-1100 (1): the couplings for the miss kinds the P-SELECT-GRAPH trial saw
   - paths: [".claude/settings.json", ".rulesync/hooks.jsonc", ".rulesync/permissions.jsonc"]
-    suites: ["tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
-             "tests/acceptance/W1-46/test_w1_46_research_installs.py",
-             "tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py"]
+    suites: ["tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py"]
     why: "settings and hook wiring: these suites copy or read the live settings and the hook lines (P-SELECT-FIXES-1 (i), K2)"
   - paths: ["template/governance/kernel/checks/**"]
     suites: ["tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened"]

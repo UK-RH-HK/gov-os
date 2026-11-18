@@ -17,6 +17,10 @@ latency cases kept serial with their reasons; and no entry that names no case.
 
 The cases read the list and the test files as text and ask the test runner only to collect (W1-16); no declared
 case is run here.
+
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The entries of the list that named a guard, hook,
+sandbox or launched-session case of a deleted file are taken out of the tables, with the case that held the report's two
+guard-timing figures (the file's entries went with the list's).
 """
 
 import re
@@ -34,20 +38,9 @@ SERIAL, NIGHTLY = "serial", "nightly"
 KINDS = {"latency": SERIAL, "daemon": SERIAL, "race": SERIAL, "real-model": NIGHTLY, "live-session": NIGHTLY}
 REASON_WORDS = 3   # a reason in words: more than a kind or a ticket number
 
-# The report's table of the suites it timed: the node id, how many parameter sets it has, and its route.
-NAMED_IN_THE_TIMED_SUITES = {
-    f"{ACCEPTANCE}/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms": (5, SERIAL),
-    f"{ACCEPTANCE}/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook": (9, SERIAL),
-    f"{ACCEPTANCE}/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays":
-        (1, NIGHTLY),
-    f"{ACCEPTANCE}/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path":
-        (1, NIGHTLY),
-}
-
 # The other cases the list declares, with their route. A file alone means every case of the file.
 DECLARED_WITH_THEIR_ROUTE = {
     f"{ACCEPTANCE}/W1-25/test_w1_25_live_session.py": NIGHTLY,
-    f"{ACCEPTANCE}/W1-46/test_w1_46_live_sessions.py": NIGHTLY,
     f"{ACCEPTANCE}/W1-49/test_w1_49_live_session.py": NIGHTLY,
     f"{ACCEPTANCE}/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95": NIGHTLY,
     f"{ACCEPTANCE}/W1-19/test_w1_19_real_models.py": NIGHTLY,
@@ -67,7 +60,6 @@ DECLARED_WITH_THEIR_ROUTE = {
     "test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild": SERIAL,
     f"{ACCEPTANCE}/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::"
     "test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store": SERIAL,
-    f"{ACCEPTANCE}/W2-57/test_w2_57_designer_read_p95.py": SERIAL,
     # W1-09's two races stay serial in this run; they move to the parallel phase after one green nightly there.
     f"{ACCEPTANCE}/W1-09/test_w1_09_review.py::"
     "test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim": SERIAL,
@@ -78,20 +70,12 @@ DECLARED_WITH_THEIR_ROUTE = {
 # DEC-889 item 5 (P-IS-6, I1 F-2, I3 F6): the live and real-model files and cases that leave the close for the
 # nightly. Every case of each, as the test runner collects it, is declared on the nightly route.
 LIVE_AND_REAL_MODEL = (
-    f"{ACCEPTANCE}/W1-46/test_w1_46_live_sessions.py",
-    f"{ACCEPTANCE}/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays",
-    f"{ACCEPTANCE}/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path",
     f"{ACCEPTANCE}/W1-19/test_w1_19_real_models.py",
     f"{ACCEPTANCE}/W1-21/test_w1_21_dev_tier.py",
     f"{ACCEPTANCE}/W1-21/test_w1_21_family_check.py::test_the_check_is_green_when_the_dev_tiers_meet_the_baselines",
     f"{ACCEPTANCE}/W1-49/test_w1_49_live_session.py",
     f"{ACCEPTANCE}/W1-25/test_w1_25_live_session.py",
-    f"{ACCEPTANCE}/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_collects_its_own_acceptance_tests",
-    f"{ACCEPTANCE}/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_runs_its_tests_and_sees_their_results",
-    f"{ACCEPTANCE}/W2-58/test_w2_58_launched_sessions.py::test_a_launched_test_designer_imports_the_branch_s_changed_code",
-    f"{ACCEPTANCE}/W2-58/test_w2_58_launched_sessions.py::test_a_launched_session_shows_no_phantom_deletion",
     f"{ACCEPTANCE}/W2-62/test_w2_62_live_resume.py",
-    f"{ACCEPTANCE}/W2-54/test_w2_54_sandboxed_worker.py",
     f"{ACCEPTANCE}/W2-54/test_w2_54_query_vector.py::"
     "test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before",
 )
@@ -104,14 +88,10 @@ NOT_DECLARED = (
     f"{ACCEPTANCE}/W1-10/test_w1_10_dev_tier.py::test_a_dev_tier_loads_to_the_same_digest_twice",
     f"{ACCEPTANCE}/W1-05/test_w1_05_switch_over_record.py::test_the_operator_diff_check_is_recorded_as_retired",
     f"{ACCEPTANCE}/W1-09/test_w1_09_claims.py::test_a_released_ticket_can_be_claimed_again",
-    f"{ACCEPTANCE}/W1-02/test_w1_02_guard_hook.py",
     f"{ACCEPTANCE}/W1-30/test_w1_30_close.py",
     # I1 §4.2: its bound is 10 s and it took at most 1.2 s alone and 0.8 s in parallel at peak loads of 77.
     f"{ACCEPTANCE}/W1-50/test_w1_50_review_of_the_symmetric_rule.py::"
     "test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought",
-    # The W2-58 cases that start nothing: they read the settings gov launch writes.
-    f"{ACCEPTANCE}/W2-58/test_w2_58_launched_sessions.py::test_the_launch_denies_no_tracked_file_of_the_project_by_a_read_rule",
-    f"{ACCEPTANCE}/W2-58/test_w2_58_launched_sessions.py::test_the_held_out_rules_stay_in_every_launched_role_s_settings",
 )
 
 W1_16 = f"{ACCEPTANCE}/W1-16"
@@ -186,15 +166,6 @@ def _collected(*args):
                           stdin=subprocess.DEVNULL)
     assert done.returncode in (0, 5), f"the test runner did not collect {args}:\n{done.stdout}\n{done.stderr}"
     return [line.strip() for line in done.stdout.splitlines() if "::" in line]
-
-
-@pytest.mark.parametrize("node", sorted(NAMED_IN_THE_TIMED_SUITES))
-def test_every_case_the_report_names_in_the_suites_it_timed_is_declared_with_its_route(node):
-    count, route = NAMED_IN_THE_TIMED_SUITES[node]
-    assert _route(node) == route, f"{node} is not declared on the {route} route: {_route(node)!r}"
-    collected = [found for found in _collected(node) if found.split("[")[0] == node]
-    assert len(collected) == count, f"{node} has {len(collected)} parameter sets, the report names {count}"
-    assert all(_route(found) == route for found in collected), f"a parameter set of {node} is not declared {route}"
 
 
 @pytest.mark.parametrize("node", sorted(DECLARED_WITH_THEIR_ROUTE))

@@ -24,6 +24,10 @@ Rewrite-Reason: DEC-966 item 1 (W2-105, DEC-866). The template's ``npm install*`
 are taken out of its permission source, so an adopted product's CTO session reaches the guard's install rule
 (DEC-172). The cases of behaviour 2 pinned them among the other rules; they now pin the ticket-folder edit rule and
 the sudo rule, and nothing else. The two cases keep their ids ("four other") from DEC-664's round.
+
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The class that asked the guard, through the
+PreToolUse commands the generated settings register, about writes under the folder is deleted with the guard, with the
+helpers only it used.
 """
 
 from __future__ import annotations
@@ -98,7 +102,6 @@ OWN_TICKET_PATHS = {
     AUDITOR: ("docs/audit/**",),
     ORCHESTRATOR: ("docs/**",),
 }
-NOT_THE_TEST_DESIGNER = (ENGINEER, PRODUCT_SPEC, RESEARCH, AUDITOR, ORCHESTRATOR)
 # ``gov launch`` starts worker sessions; the orchestrator's is not one (W1-46 holds that refusal). A research
 # session is not launched here: the launcher reads a research allowlist the suite's stand-in project does not
 # carry, and none is written for the test. W1-46 holds the research session's built rules (README).
@@ -172,54 +175,9 @@ def product(generated_project):
     return project
 
 
-@pytest.fixture()
-def session_sandbox(tmp_path):
-    """A stand-in home with the ``gov`` package installed, and a temporary folder, outside the project."""
-    return hooks.make_session_sandbox(tmp_path / "session")
-
-
 # ---------------------------------------------------------------------------
 # The guard, asked through the commands the generated settings register
 # ---------------------------------------------------------------------------
-
-def _write_input(tool, path):
-    if tool == "Write":
-        return {"file_path": str(path), "content": "VALUE = 2\n"}
-    if tool == "Edit":
-        return {"file_path": str(path), "old_string": "VALUE = 1", "new_string": "VALUE = 2"}
-    return {"command": f"echo changed >> {path}", "description": "W1-38 acceptance call"}
-
-
-def _calls(project, rels=(EXISTING_TEST, NEW_TEST)):
-    """``(what, tool, tool input)``: a Write and an Edit on each path by its whole name, and a Bash redirect
-    into the new file by its name relative to the project."""
-    calls = [(f"{tool} on {rel}", tool, _write_input(tool, Path(project) / rel))
-             for rel in rels for tool in ("Write", "Edit")]
-    calls.append((f"Bash `echo changed >> {rels[-1]}`", "Bash", _write_input("Bash", rels[-1])))
-    return calls
-
-
-_NUMBERS = iter(range(1, 1_000_000))
-
-
-def _ask(project, sandbox, tool, tool_input, role):
-    """The answers of the PreToolUse commands the generated settings register for ``tool``, run through the
-    shell as registered in the project's root, as a session of ``role`` on its ticket. No call is made."""
-    settings = support.load_settings(project)
-    commands = live_support.hook_commands(settings, "PreToolUse", tool)
-    assert commands, f"{GENERATED_REL}, generated from the template's sources, registers no PreToolUse command for {tool}"
-    stdin = live_support.hook_input(project, sandbox, "PreToolUse", tool, tool_input,
-                                    tool_use_id=f"toolu_w1_38_folder_{next(_NUMBERS):04d}")
-    return [hooks.run_registered(command, stdin, project, sandbox, project, role, TICKET_OF[role])
-            for command in commands]
-
-
-def _decisions(results):
-    return [check_support._guard_decision(result.returncode, result.stdout) for result in results]
-
-
-def _describe(results):
-    return "; ".join(result.describe() for result in results)
 
 
 # ---------------------------------------------------------------------------
@@ -358,63 +316,6 @@ class TestEveryOtherRuleStays:
         open_ = [rel for rel in (".tickets/DAEO-zz90.md", ".tickets/new/DAEO-zz99.md")
                  if not launch_support.covers(specs, rel, generated_project, tmp_path / "home")]
         assert not open_, f"no Edit deny rule of {GENERATED_REL} covers {open_}; rules: {specs}"
-
-
-# ===================================================================
-# 3. The guard's decision in a project made from the template
-# ===================================================================
-
-class TestTheGuardInAProjectMadeFromTheTemplate:
-    """MR-3, DEC-069, DEC-664: taking the line out opens the folder to nobody but the independent test
-    designer. Green before implementation (the guard decides so already); it must stay green."""
-
-    @needs_rulesync
-    def test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder(self, product, session_sandbox):
-        for what, tool, tool_input in _calls(product):
-            results = _ask(product, session_sandbox, tool, tool_input, TEST_DESIGNER)
-            assert set(_decisions(results)) == {"allow"}, (
-                f"{what} by the independent test designer on {TICKET_OF[TEST_DESIGNER]}, in a project made from "
-                f"the template: the guard did not allow it (MR-3: the acceptance tests are the test designer's "
-                f"to write): {_describe(results)}"
-            )
-
-    @needs_rulesync
-    def test_the_test_designer_is_still_refused_outside_the_folder(self, product, session_sandbox):
-        """The allowance above is the guard's decision for this role, not a guard that lets everything through:
-        the ticket's own paths, a file beside the folder, the ticket file."""
-        rels = (hooks.IN_SCOPE_FILE, "tests/unit/test_main.py", f".tickets/{TICKET_OF[TEST_DESIGNER]}.md")
-        for rel in rels:
-            for tool in ("Write", "Edit"):
-                results = _ask(product, session_sandbox, tool, _write_input(tool, product / rel), TEST_DESIGNER)
-                assert any(hooks.refused_by_the_program(result) for result in results), (
-                    f"{tool} on {rel} by the independent test designer: the guard's program did not answer with "
-                    f"its refusal: {_describe(results)}"
-                )
-
-    @needs_rulesync
-    @pytest.mark.parametrize("role", NOT_THE_TEST_DESIGNER)
-    def test_every_other_role_is_refused_a_write_under_the_folder(self, product, session_sandbox, role):
-        """The refusal is the guard's own: its program ended with 0 and wrote the refusal. An exit 2 would stop
-        the call too, but it is also what an interpreter gives that did not find the program."""
-        before = check_support.read(product, EXISTING_TEST)
-        for what, tool, tool_input in _calls(product):
-            results = _ask(product, session_sandbox, tool, tool_input, role)
-            assert any(hooks.refused_by_the_program(result) for result in results), (
-                f"{what} by {role} on its ticket {TICKET_OF[role]}, in a project made from the template: the "
-                f"guard's program did not answer with its refusal. With the template's deny rule taken out "
-                f"(DEC-664) nothing else stops this write: {_describe(results)}"
-            )
-        assert check_support.read(product, EXISTING_TEST) == before and not (product / NEW_TEST).exists()
-
-    @needs_rulesync
-    def test_the_engineer_is_let_through_inside_its_ticket(self, product, session_sandbox):
-        """The refusals above are decisions about the folder, not a guard that refuses every write there is."""
-        for tool in ("Write", "Edit"):
-            results = _ask(product, session_sandbox, tool, _write_input(tool, product / hooks.IN_SCOPE_FILE),
-                           ENGINEER)
-            assert set(_decisions(results)) == {"allow"}, (
-                f"{tool} on {hooks.IN_SCOPE_FILE} by the engineer, inside its ticket's paths: {_describe(results)}"
-            )
 
 
 # ===================================================================

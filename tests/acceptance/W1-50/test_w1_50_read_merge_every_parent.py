@@ -4,7 +4,7 @@ Added after implementation; reason: delegated decision, DEC-403 (packages DP-20
 option (a) and DP-19 option (a), and the review's F3).
 
 DEC-403, through the helper's public name
-(``from gov.guard.containment_merge import read_merge``, DEC-398):
+(``from gov.containment.merge import read_merge``, DEC-398):
 
 - **DP-20.** ``read_merge`` reads every parent the way it reads the first. A
   path where the merge commit's content differs from any parent's is in
@@ -21,7 +21,7 @@ DEC-403, through the helper's public name
   refused, never passed to git as an option.
 
 **What these cases require of the error**, and no more: the exception
-``read_merge`` raises is an instance of a class that ``gov.guard.containment_merge``
+``read_merge`` raises is an instance of a class that ``gov.containment.merge``
 holds under a name without a leading underscore, and that class is neither
 ``Exception`` nor ``BaseException``. The class's name is the engineer's to
 choose. "Documented" is read as: that name stands in the docstring of
@@ -59,13 +59,13 @@ check_support = support.check_support
 AS_ORCHESTRATOR = support.AS_ORCHESTRATOR
 TESTS = symmetric.TESTS
 
-MODULE = "gov.guard.containment_merge"
+MODULE = "gov.containment.merge"
 SOURCES = check_support.REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL
 
 
 @pytest.fixture()
 def helper(monkeypatch):
-    """``helper()`` -> the module ``gov.guard.containment_merge``, imported from this repository's ``src`` when
+    """``helper()`` -> the module ``gov.containment.merge``, imported from this repository's ``src`` when
     it is first called, in a process that says nothing of a caller."""
     for name in (check_support.ROLE_ENV, check_support.TICKET_ENV, "CLAUDE_PROJECT_DIR"):
         monkeypatch.delenv(name, raising=False)

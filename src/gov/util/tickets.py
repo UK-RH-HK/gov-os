@@ -1,13 +1,15 @@
-"""Where the ticket files live and the guard's line reader of their front matter (W2-150).
+"""Where the ticket files live, the line reader of their front matter and the ticket loader (W2-150).
 
 ``TICKETS_REL`` moved from ``gov.tasks.tickets`` and ``_parse_frontmatter`` from ``gov.guard.decide``, both
-unchanged (DEC-1039 (2), DEC-1109 (2)); the old modules import them from here. The standard library only: the guard's
-hook imports this module on every call.
+unchanged (DEC-1039 (2), DEC-1109 (2)); ``_load_ticket`` moved from ``gov.guard.decide`` unchanged when the guard was
+retired (EMERGENCY-2 6.1). The standard library only.
 """
 
 from __future__ import annotations
 
+import os
 import re
+from pathlib import Path
 
 TICKETS_REL = ".tickets"
 
@@ -41,3 +43,32 @@ def _parse_frontmatter(text: str) -> dict | None:
             in_paths = False
     result["allowed_paths"] = paths
     return result
+
+
+def _load_ticket(root: str, tid: str) -> dict | None:
+    """The front matter of the ticket ``tid`` names, by its file name (the ``tk`` id) or else by its ``wbs_id``;
+    ``None`` when no ticket file gives it or it cannot be read."""
+    if not tid or "/" in tid or os.sep in tid:
+        return None
+    d = Path(root) / TICKETS_REL
+    if not d.is_dir():
+        return None
+    p = d / f"{tid}.md"
+    if p.is_file():
+        try:
+            return _parse_frontmatter(p.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            return None
+    try:
+        for p in sorted(d.glob("*.md")):
+            if not p.is_file():
+                continue
+            try:
+                fm = _parse_frontmatter(p.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError):
+                continue
+            if fm and fm.get("wbs_id") == tid:
+                return fm
+    except OSError:
+        pass
+    return None

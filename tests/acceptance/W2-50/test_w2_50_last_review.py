@@ -76,35 +76,6 @@ def _at(box, location):
     return _ProjectAt(**fields, location=Path(location))
 
 
-def _refused(result, what, box, *paths):
-    names = []
-    for path in paths:
-        names += support.why_words(path, box)
-    support.assert_refused(result, what, *names)
-
-
-def _ask(box, project, tool_name, target, ticket, role=ENGINEER):
-    return support.ask_guard(box, tool_name, support.tool_input(tool_name, target), role, ticket, project)
-
-
-def _writes_refused(box, project, folder, what, ticket):
-    """Write and Edit on a file in ``folder``, a Bash redirect into it, ``mkdir -p`` in it and ``rm -rf`` of it."""
-    target = folder / "work" / "README.md"
-    for tool_name in ("Write", "Edit"):
-        _refused(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}", box, target)
-    for command in (f"echo written > {q(target)}", f"mkdir -p {q(folder / 'clone')}", f"rm -rf {q(folder)}"):
-        _refused(_ask(box, project, "Bash", command, ticket), f"Bash `{command}` {what}", box, folder)
-
-
-def _writes_allowed(box, project, folder, what, ticket):
-    """Write and Edit on a file in ``folder``, a Bash redirect, ``mkdir -p`` and ``rm -rf`` of a sub-folder."""
-    target = folder / "work" / "README.md"
-    for tool_name in ("Write", "Edit"):
-        support.assert_allowed(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}")
-    for command in (f"echo written > {q(target)}", f"mkdir -p {q(folder / 'clone')}", f"rm -rf {q(folder / 'old')}"):
-        support.assert_allowed(_ask(box, project, "Bash", command, ticket), f"Bash `{command}` {what}")
-
-
 def _state(folder):
     """What ``folder`` holds: each entry's kind, and a file's size and modification time. No file is read."""
     result = {}
@@ -167,42 +138,6 @@ def first(sandbox, project, cli):
     return project
 
 
-def test_the_launching_repositorys_session_keeps_its_folder(first, sandbox):
-    """The control: the session of the repository whose launch made the folder writes there."""
-    _writes_allowed(sandbox, first, sandbox.own(MAIN), f"by the engineer on {MAIN.tk} in the first project", MAIN.tk)
-
-
-def test_a_later_launch_in_the_same_repository_keeps_the_folder_its_content_and_its_entry(first, sandbox, cli):
-    own = sandbox.own(MAIN)
-    support.set_plan(cli, listing=(own,))
-    result = _launched(sandbox, cli, MAIN)
-    assert "work" in (result.session()["listed"][str(own)] or []), "the later session did not find the folder's content"
-    assert (own / "work" / "README.md").read_text(encoding="utf-8") == f"{MAIN.folder}'s work, by the first project\n"
-    under = [real for _, real in _real_entries(result, sandbox)
-             if real is not None and real.startswith(os.path.realpath(sandbox.root) + "/")]
-    assert under == [os.path.realpath(own)], (
-        f"after a later launch the sandbox's entries under the root are {under}, not [{own}]: {result.allow_write()}")
-    support.assert_allowed(_ask(sandbox, first, "Write", own / "work" / "README.md", MAIN.tk),
-                           "Write in the own folder after a later launch")
-
-
-def _second_worktree(sandbox, project):
-    location = sandbox.home / support.WORKTREES / f"{MAIN.folder}-second"
-    support.git(project, "worktree", "add", "-q", "-b", "second", str(location))
-    return _at(sandbox, location), location
-
-
-def test_a_second_worktree_of_the_same_repository_gets_the_same_folder(first, sandbox, cli):
-    """Every worktree of one repository is the same repository: its session and its launch get the folder."""
-    box, second = _second_worktree(sandbox, first)
-    own = sandbox.own(MAIN)
-    _writes_allowed(box, second, own, f"by the engineer on {MAIN.tk} in a second worktree {second}", MAIN.tk)
-    result = _launched(box, cli, MAIN)
-    assert any(support.covers(real, own / "f.txt") for _, real in _real_entries(result, box)), (
-        f"a launch in the second worktree {second} may not write the folder {own}: {result.allow_write()}")
-    assert (own / "work" / "README.md").is_file(), "a launch in the second worktree lost the folder's content"
-
-
 # Another Gov OS project on the same HOME (how it is made, and where), by the folder its ticket's name shares.
 ANOTHER_REPOSITORY = {
     "a-project-built-apart-outside-the-root": "W2-91",
@@ -227,19 +162,6 @@ def _another_repository(sandbox, first, form):
 
 
 @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
-def test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made(first, sandbox, form):
-    box, other, ticket = _another_repository(sandbox, first, form)
-    folder = sandbox.own(ticket)
-    assert ticket.folder == ANOTHER_REPOSITORY[form] and folder.is_dir()
-    assert (other / ".tickets" / f"{ticket.tk}.md").is_file(), f"premise: {other} has no ticket {ticket.tk}"
-    _writes_refused(box, other, folder, f"by the engineer on {ticket.tk} of another repository {other} ({form})",
-                    ticket.tk)
-    # The success control: the first project's session on the same ticket keeps the folder.
-    support.assert_allowed(_ask(sandbox, first, "Write", folder / "work" / "README.md", ticket.tk),
-                           f"Write in {folder} by the first project's session on {ticket.tk}, after the other's calls")
-
-
-@pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
 def test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder(first, sandbox, cli, form):
     box, other, ticket = _another_repository(sandbox, first, form)
     folder = sandbox.own(ticket)
@@ -252,56 +174,6 @@ def test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder(firs
     assert _state(folder) == before, (
         f"a launch in another repository {other} ({form}) changed what {folder} holds")
     _assert_temp_folder_kept(result, box)
-
-
-NO_RECORD = ("before-any-launch", "beside-a-launched-folder")
-
-
-def _no_record_layout(sandbox, cli, layout):
-    """Before the case: nothing launched, or OTHER's folder launched beside (the root then exists)."""
-    if layout == "beside-a-launched-folder":
-        _launched(sandbox, cli, OTHER)
-        assert sandbox.own(OTHER).is_dir()
-
-
-@pytest.mark.parametrize("layout", NO_RECORD)
-def test_a_folder_made_by_hand_gives_no_session_anything(project, sandbox, cli, layout):
-    """A folder under the root that no launch made: the guard refuses MAIN's session there, with its reason."""
-    _no_record_layout(sandbox, cli, layout)
-    _work(sandbox.own(MAIN), "made by hand\n")
-    _writes_refused(sandbox, project, sandbox.own(MAIN), f"(a folder made by hand, {layout})", MAIN.tk)
-
-
-@pytest.mark.parametrize("layout", NO_RECORD)
-def test_a_folder_that_does_not_exist_yet_gives_no_session_anything(project, sandbox, cli, layout):
-    _no_record_layout(sandbox, cli, layout)
-    own = sandbox.own(MAIN)
-    assert not os.path.lexists(own)
-    what = f"(the own folder does not exist yet, {layout})"
-    for tool_name in ("Write", "Edit"):
-        _refused(_ask(sandbox, project, tool_name, own / "notes.txt", MAIN.tk), f"{tool_name} on {own} {what}",
-                 sandbox, own / "notes.txt")
-    for command in (f"echo written > {q(own / 'notes.txt')}", f"mkdir -p {q(own / 'clone')}"):
-        _refused(_ask(sandbox, project, "Bash", command, MAIN.tk), f"Bash `{command}` {what}", sandbox, own)
-
-
-@pytest.mark.parametrize("content", ("empty", "holding-a-file"))
-def test_a_launch_neither_adds_nor_records_a_folder_that_exists_without_a_record(project, sandbox, cli, content):
-    """The folder was there before any launch: the launch leaves it as it is and gives the session nothing there."""
-    own = sandbox.own(MAIN)
-    own.mkdir(parents=True)
-    if content == "holding-a-file":
-        _work(own, "there before any launch\n")
-    before = _state(own)
-    result = _launched(sandbox, cli, MAIN)
-    holding = _entries_at_or_under_the_root(result, sandbox)
-    assert holding == [], (
-        f"the launch added a folder that no launch made ({content}) through {holding}: allowWrite is "
-        f"{result.allow_write()}")
-    assert _state(own) == before, f"the launch changed what {own} holds ({content}): it wrote into a folder it did not make"
-    _assert_temp_folder_kept(result, sandbox)
-    _refused(_ask(sandbox, project, "Write", own / "notes.txt", MAIN.tk),
-             f"Write in {own} after a launch that found it there ({content})", sandbox, own / "notes.txt")
 
 
 # --------------------------------------------------------------------------

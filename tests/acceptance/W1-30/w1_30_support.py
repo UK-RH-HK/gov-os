@@ -578,7 +578,7 @@ def ticket_commits(root, ticket):
 
 _JUDGE = (
     "import json, sys\n"
-    "from gov.guard.containment import judge_commits\n"
+    "from gov.containment.commits import judge_commits\n"
     "found = judge_commits(sys.argv[1], sys.argv[2:])\n"
     "print(json.dumps([{'commit': f.commit, 'paths': list(f.paths), 'reason': f.reason} for f in found]))\n"
 )

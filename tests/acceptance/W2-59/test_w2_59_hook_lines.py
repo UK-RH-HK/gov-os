@@ -10,7 +10,9 @@ with that ``.local/bin`` folder first on ``PATH`` and ``HOME`` a temporary folde
 the two the line uses. A decoy ``python3`` comes next on ``PATH``. Each line is run through ``sh -c`` in a temporary
 project that holds the kernel's hook programs, with ``CLAUDE_PROJECT_DIR`` set to it.
 
-Never fail open: with no pin to be found, the preToolUse line must block the call (Claude Code blocks on exit 2 or
+(Retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t: the never-fail-open cases, for the preToolUse line and the
+after-call lines of the containment check, and the editable-install rollback case of the preToolUse line.)
+Never fail open, as it was: with no pin to be found, the preToolUse line must block the call (Claude Code blocks on exit 2 or
 a deny decision; any other non-zero exit lets the call proceed), and the after-call lines must not end silently.
 
 Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). Since ACT 1 this repository's source holds five lines, its
@@ -93,40 +95,6 @@ def imports_only_the_standard_library(command):
     return all(root in sys.stdlib_module_names or (folder / f"{root}.py").is_file() for root in roots)
 
 
-@pytest.fixture(scope="module")
-def kernel_entries(tmp_path_factory):
-    """(event, index, entry) for every command entry of a generated project's rulesync hooks source (W2-90)."""
-    try:
-        project = kernel_wiring.generate_project(tmp_path_factory.mktemp("w2-90-w2-59-kernel"))
-    except kernel_wiring.GenerationFailed as exc:
-        pytest.fail(str(exc), pytrace=False)
-    source = support.load_jsonc(project / kernel_wiring.HOOK_SOURCE_REL)
-    return [(event, index, entry) for event, entries in (source.get("hooks") or {}).items()
-            for index, entry in enumerate(entries or []) if isinstance(entry, dict) and entry.get("type") == "command"]
-
-
-def test_the_source_holds_the_seven_governance_hook_lines(kernel_entries):
-    """The cases below cover every command line of the source; each starts a kernel hook program.
-
-    The source is the generated project's (W2-90): the lines of the kernel's seven hook programs. The guard's program
-    runs after a call and after a failed call, and the context watch is the second entry of the after-call event, so
-    the programs are seven and the lines eight."""
-    ENTRIES = kernel_entries
-    for event, index, entry in ENTRIES:
-        assert "governance/kernel/hooks/" in entry["command"], (
-            f"{event}[{index}] starts no kernel hook program: {entry['command']!r}")
-    started = sorted({_program_of(entry["command"]) for _event, _index, entry in ENTRIES})
-    kernel = sorted(kernel_wiring.kernel_hook_copies().values(), key=lambda path: path.name)
-    assert len(kernel) == 7, f"the template's kernel hooks folder holds {len(kernel)} programs; seven are expected"
-    assert started == [path.name for path in kernel], (
-        f"{support.HOOK_SOURCE_REL} starts the programs {started}; the kernel's seven are {[p.name for p in kernel]}")
-    assert len(ENTRIES) == 8, f"{support.HOOK_SOURCE_REL} holds {len(ENTRIES)} command entries; eight are expected"
-    assert sorted(index for event, index, _ in ENTRIES if event == "postToolUse") == [0, 1], (
-        f"the after-call event must hold the guard's entry and the context watch's")
-    assert sorted(_program_of(entry["command"]) for event, _i, entry in ENTRIES if event == "postToolUse") == [
-        "context_watch.py", "posttooluse.py"]
-
-
 @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
 def test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path(event, index, entry):
     command = entry["command"]
@@ -174,75 +142,3 @@ def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
         f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
         f"{done.describe()}")
 
-
-def _without_pin(tmp_path, entry):
-    box = support.make_box(tmp_path / "box", None)
-    path = f"{box.local_bin}:{box.decoy_bin}:{support.SYSTEM_PATH}"
-    check = subprocess.run(["sh", "-c", "command -v gov"], env={"PATH": path, "HOME": str(box.home)},
-                           capture_output=True, text=True)
-    assert check.returncode != 0, f"a gov is on the case's PATH although no pin is installed: {check.stdout}"
-    project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers, with_src=True)
-    return box, project, path
-
-
-@pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] == "preToolUse"],
-                         ids=[i for i, e in zip(IDS, ENTRIES) if e[0] == "preToolUse"])
-def test_without_a_pin_the_pretooluse_line_blocks_the_call(event, index, entry, tmp_path):
-    """No ``gov`` link and no ``gov`` on ``PATH``: the call is blocked (exit 2 or a deny decision), and neither the
-    project's ``src`` nor the ``python3`` first on ``PATH`` stands in for the pin."""
-    box, project, path = _without_pin(tmp_path, entry)
-    done = support.run_hook_line(entry["command"], event, project, box, path=path)
-    assert support.denies(done), (
-        f"with no pin to be found, {event}[{index}] lets the call through (exit {done.returncode}; only exit 2 or "
-        f"a deny decision blocks)\n{done.describe()}")
-    assert not box.marks("tree-gov-"), (
-        f"with no pin, {event}[{index}] fell back to the project's own src/gov\n{done.describe()}")
-    assert not box.marks("path-python3-"), (
-        f"with no pin, {event}[{index}] fell back to the python3 first on PATH\n{done.describe()}")
-
-
-@pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in ("postToolUse", "postToolUseFailure")],
-                         ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in ("postToolUse", "postToolUseFailure")])
-def test_without_a_pin_the_after_call_lines_do_not_end_silently(event, index, entry, tmp_path):
-    """The containment check cannot run without the pin: the line ends with an error (non-zero), never as a
-    silent success, and no other install stands in for the pin."""
-    box, project, path = _without_pin(tmp_path, entry)
-    done = support.run_hook_line(entry["command"], event, project, box, path=path)
-    assert done.returncode not in (0, None), (
-        f"with no pin to be found, {event}[{index}] ends as a silent success\n{done.describe()}")
-    assert not box.marks("tree-gov-"), (
-        f"with no pin, {event}[{index}] fell back to the project's own src/gov\n{done.describe()}")
-    assert not box.marks("path-python3-"), (
-        f"with no pin, {event}[{index}] fell back to the python3 first on PATH\n{done.describe()}")
-
-
-@pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] == "preToolUse"],
-                         ids=[i for i, e in zip(IDS, ENTRIES) if e[0] == "preToolUse"])
-def test_the_line_follows_the_owner_s_rollback_to_an_editable_install(event, index, entry, tmp_path):
-    """The owner's documented rollback replaces the link by an editable install's own ``gov`` script (DEC-605:
-    ``pip install --user -e``: a script at ``~/.local/bin/gov`` whose first line names the system interpreter, the
-    package found through the user site folder). The line then starts that install's interpreter, not the
-    ``python3`` first on ``PATH``, and not with the project's ``src``."""
-    box = support.make_box(tmp_path / "box", None)
-    rollback = box.local_bin / "gov"
-    rollback.write_text(f"#!{support.REAL_PYTHON}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
-                        encoding="utf-8")
-    rollback.chmod(0o755)
-    env = support.base_env(box.home, support.SYSTEM_PATH)
-    site = subprocess.run([support.REAL_PYTHON, "-c", "import site; print(site.getusersitepackages())"],
-                          env=env, capture_output=True, text=True, check=True).stdout.strip()
-    assert site.startswith(str(box.home) + os.sep), f"the user site folder {site} is not under the case's home"
-    os.makedirs(site, exist_ok=True)
-    with open(os.path.join(site, "w259_rollback.pth"), "w", encoding="utf-8") as pth:
-        pth.write(f"{support.SRC}\n")
-        pth.write(f"import os; open(os.path.join({str(box.markers)!r}, 'rollback-python-%d' % os.getpid()), "
-                  f"'w').close()\n")
-    project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers, with_src=True)
-    done = support.run_hook_line(entry["command"], event, project, box)
-    assert not box.marks("path-python3-"), (
-        f"after the rollback, {event}[{index}] started the python3 first on PATH\n{done.describe()}")
-    assert not box.marks("tree-gov-"), (
-        f"after the rollback, {event}[{index}] imported the project's own src/gov\n{done.describe()}")
-    assert box.marks("rollback-python-"), (
-        f"after the rollback, {event}[{index}] did not start the editable install's interpreter "
-        f"({support.REAL_PYTHON}, named by {rollback})\n{done.describe()}")

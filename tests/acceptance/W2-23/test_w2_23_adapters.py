@@ -98,9 +98,6 @@ def test_s2_settings_keep_the_programmes_keys_and_entries_in_order_with_generate
         f"the programme's hook events are not kept first, in their order: {list(own['hooks'])} -> {list(hooks)}"
     for event, entries in own["hooks"].items():
         _prefix(hooks.get(event), entries, f"hooks.{event}")
-    generated = json.dumps(hooks.get("PreToolUse", [])[len(own["hooks"]["PreToolUse"]):])
-    assert support.GENERATED_HOOK_MARK in generated, \
-        f"no generated PreToolUse hook entry follows the programme's: {hooks.get('PreToolUse')}"
     env = merged.get("env")
     assert isinstance(env, dict), f"the merged settings hold no env block: {merged}"
     assert list(env)[:1] == ["HARBOUR_PROGRAMME_FLAG"] and env["HARBOUR_PROGRAMME_FLAG"] == "1", \

@@ -50,7 +50,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.guard.containment_merge import read_merge
+from gov.containment.merge import read_merge
 from gov.store.loader import TRAILER_RULE_DATE, _frontmatter, _ids
 from gov.tasks.tickets import TICKETS_REL
 from gov.util.gitenv import git_env

@@ -21,6 +21,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+_COMPAT = str(Path(__file__).resolve().parents[1] / "W2-131")
+if _COMPAT not in sys.path:
+    sys.path.insert(0, _COMPAT)
+
+from w2_131_old_guard_names import old_guard_names  # noqa: E402  (the retired gov.guard, for the historical blobs)
+
 REPO = Path(__file__).resolve().parents[3]
 SRC = REPO / "src"
 if str(SRC) not in sys.path:
@@ -120,7 +126,8 @@ def today():
                             capture_output=True).stdout.decode("utf-8")
     spec = importlib.util.spec_from_loader("w2_131_today_retrieve", loader=None)
     module = importlib.util.module_from_spec(spec)
-    exec(compile(source, f"retrieve.py@{TODAY_COMMIT}", "exec"), module.__dict__)  # noqa: S102 - our own blob
+    with old_guard_names():
+        exec(compile(source, f"retrieve.py@{TODAY_COMMIT}", "exec"), module.__dict__)  # noqa: S102 - our own blob
     return module
 
 

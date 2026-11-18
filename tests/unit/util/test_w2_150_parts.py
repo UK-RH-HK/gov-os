@@ -1,7 +1,7 @@
 """Unit tests for gov.util.parts, the guard's parts, ticket names and evaluation sets moved by W2-150 (DEC-136; S5).
 
 Planted trees and path maps only; no evaluation set of this repository is read. The old names
-(``gov.guard.reads.evaluation_sets`` and the rest) keep their cases in tests/unit/guard.
+(``gov.guard.reads.evaluation_sets`` and the rest) were retired with the guard (EMERGENCY-2 6.1).
 """
 
 from __future__ import annotations
@@ -127,11 +127,3 @@ def test_a_ticket_file_that_cannot_be_read_for_its_wbs_id_fails_closed(tmp_path)
     with pytest.raises(parts.PolicyError):
         parts._ticket(str(tmp_path), "DAEO-none")
 
-
-def test_the_old_module_names_the_same_objects():
-    from gov.guard import reads
-
-    for name in ("evaluation_sets", "set_fault", "PolicyError", "PATH_MAP_REL", "SETS_KEY", "_Part", "_ticket",
-                 "_read_text", "_related", "_walk", "HIDDEN_REFUSAL"):
-        assert getattr(reads, name) is getattr(parts, name), name
-    assert issubclass(reads._Runs, parts._Part)

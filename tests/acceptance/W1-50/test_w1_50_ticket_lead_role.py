@@ -72,17 +72,6 @@ def sandbox(tmp_path):
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _guard(project, sandbox, tool_name, rel, role=TICKET_LEAD, ticket=TICKET):
-    """Run the guard hook with the given tool and relative path."""
-    tool_input = guard_support.edit_tool_input(tool_name, Path(project) / rel)
-    return guard_support.run_hook(project, tool_name, tool_input, sandbox, role=role, ticket=ticket)
-
-
-def _guard_bash(project, sandbox, command, role=TICKET_LEAD, ticket=TICKET):
-    return guard_support.run_hook(
-        project, "Bash", guard_support.bash_tool_input(command),
-        sandbox, role=role, ticket=ticket,
-    )
 
 
 def _assert_allowed(result, what):
@@ -103,109 +92,30 @@ def _assert_denied(result, what, *, reason_fragment=None):
 # Tests — ticket-lead must be in KNOWN_ROLES
 # ---------------------------------------------------------------------------
 
-def test_ticket_lead_in_known_roles(project, sandbox):
-    """``ticket-lead`` must be in ``KNOWN_ROLES`` so the guard does not deny it
-    outright.  Currently it is NOT present, so this test is red.
-    """
-    result = _guard(project, sandbox, "Write", SCRATCH_REL)
-    not_known = "not a known role" in result.stdout.lower()
-    assert not not_known, (
-        f"the guard denies ticket-lead as 'not a known role' — "
-        f"ticket-lead must be added to KNOWN_ROLES (DEC-434)"
-    )
 
 
 # ---------------------------------------------------------------------------
 # Tests — scratch writes allowed
 # ---------------------------------------------------------------------------
 
-def test_ticket_lead_may_write_scratch(project, sandbox):
-    """Scratch is allowed for every known role (``_is_in_scratch`` check).
-
-    Red because ticket-lead is not yet in KNOWN_ROLES.
-    """
-    result = _guard(project, sandbox, "Write", SCRATCH_REL)
-    _assert_allowed(result, "ticket-lead writing scratch")
-
-
-def test_ticket_lead_may_write_scratch_via_bash(project, sandbox):
-    """Bash writes to scratch are allowed."""
-    command = f"echo x > {Path(project) / SCRATCH_REL}"
-    result = _guard_bash(project, sandbox, command)
-    _assert_allowed(result, "ticket-lead bash write to scratch")
 
 
 # ---------------------------------------------------------------------------
 # Tests — checkpoint writes allowed
 # ---------------------------------------------------------------------------
 
-def test_ticket_lead_may_write_checkpoint(project, sandbox):
-    """The lead's checkpoint is under scratch (DP-L2, DEC-434): no
-    ``_get_allowed_paths`` patterns, the ``_is_in_scratch`` rule covers it.
-
-    Red because ticket-lead is not yet in KNOWN_ROLES.
-    """
-    result = _guard(project, sandbox, "Write", CHECKPOINT_REL)
-    _assert_allowed(result, "ticket-lead writing checkpoint")
 
 
 # ---------------------------------------------------------------------------
 # Tests — reads are allowed (GREEN: reads pass before role check)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("tool", ["Read", "Grep", "Glob"])
-def test_ticket_lead_may_read(project, sandbox, tool):
-    """Read-only tools are allowed for any role (guard allows READ_TOOLS
-    before checking the role).  These tests should be GREEN already.
-    """
-    if tool == "Glob":
-        tool_input = {"pattern": "src/**/*.py", "path": str(project)}
-    elif tool == "Grep":
-        tool_input = {"pattern": "def ", "path": str(project / "src")}
-    else:
-        tool_input = {"file_path": str(project / SRC_REL)}
-    result = guard_support.run_hook(project, tool, tool_input, sandbox,
-                                    role=TICKET_LEAD, ticket=TICKET)
-    _assert_allowed(result, f"ticket-lead {tool}")
-
-
-def test_ticket_lead_may_run_read_only_bash(project, sandbox):
-    """A Bash command with no write targets is allowed.
-
-    GREEN: the guard extracts no write target → no path check → allow.
-    """
-    result = _guard_bash(project, sandbox, "git log --oneline -5")
-    _assert_allowed(result, "ticket-lead read-only bash")
 
 
 # ---------------------------------------------------------------------------
 # Tests — writes outside scratch/checkpoint/merge-back are denied
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("rel,label", [
-    (SRC_REL, "source"),
-    (TESTS_REL, "tests"),
-    (TICKET_REL, "ticket file"),
-    (DOCS_REL, "docs"),
-    (GOVERNANCE_REL, "governance"),
-    (TEMPLATE_REL, "template"),
-])
-def test_ticket_lead_denied_write_to(project, sandbox, rel, label):
-    """The ticket lead may not write source, tests, tickets, docs, governance
-    or template files (DEC-434, DEC-435).
-
-    Before ``ticket-lead`` is in KNOWN_ROLES the denial reason is "not a
-    known role".  After, it must be a path-based denial.
-    """
-    result = _guard(project, sandbox, "Write", rel)
-    _assert_denied(result, f"ticket-lead write to {label}")
-
-
-def test_ticket_lead_denied_bash_write_to_source(project, sandbox):
-    """A Bash command that writes to source is denied."""
-    command = f"echo x > {Path(project) / SRC_REL}"
-    result = _guard_bash(project, sandbox, command)
-    _assert_denied(result, "ticket-lead bash write to source")
 
 
 # ---------------------------------------------------------------------------
@@ -252,13 +162,3 @@ def test_ticket_lead_cannot_set_freeze(project, sandbox):
 # Tests — the ticket lead is stricter than the orchestrator
 # ---------------------------------------------------------------------------
 
-def test_ticket_lead_stricter_than_orchestrator(project, sandbox):
-    """The orchestrator may write source files within its ticket's paths;
-    the ticket lead may not.  This verifies the scope is narrower (DEC-435).
-    """
-    orch_result = _guard(project, sandbox, "Write", SRC_REL,
-                         role=guard_support.ORCHESTRATOR,
-                         ticket=guard_support.ORCHESTRATOR_TICKET_ID)
-    lead_result = _guard(project, sandbox, "Write", SRC_REL,
-                         role=TICKET_LEAD, ticket=TICKET)
-    _assert_denied(lead_result, "ticket-lead write to source (vs orchestrator)")
