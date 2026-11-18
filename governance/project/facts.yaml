@@ -2,8 +2,8 @@
 # template/governance/kernel/schemas/facts.schema.json). The templates name a path by its key ({TREE} is paths.tree,
 # a `paths` name upper-cased) and a command by {CMD:name}; a conditional line is {STEP:name}. Each command's `check`
 # exits 0 in a temporary repository with no model, network or GPU (--help, a dry run or a no-op), so a tool change
-# that breaks a form shows in a unit test, not in a session. Until `gov brief` lands (W2-128 round 2), `lead_brief`
-# maps to today's build_lead_brief.py and a worker brief is built with `context`; the templates do not change when it lands.
+# that breaks a form shows in a unit test, not in a session. A worker's brief is built with `brief` (gov brief);
+# `lead_brief` still maps to build_lead_brief.py.
 paths:
   main: '/home/usain/Dynamic-Agentic-Engineering-OS'
   worktrees: '/home/usain/gov-os-worktrees'
@@ -38,7 +38,7 @@ commands:
     run: 'git -C {WRITE_TREE} rev-parse --show-toplevel --abbrev-ref HEAD'
     check: 'git rev-parse --show-toplevel'
   retrieve:
-    run: 'gov retrieve --root {STORE_TREE} "{QUESTION}"'
+    run: 'gov retrieve --root {STORE_TREE} "<question>"'
     check: 'gov retrieve --help'
   context:
     run: 'gov context {ID} --role {WORKER_ROLE}'

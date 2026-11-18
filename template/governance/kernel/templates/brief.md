@@ -1,6 +1,6 @@
 ---
 name: brief
-version: 1.0.0
+version: 1.1.0
 role: any
 ---
 # Your assignment
@@ -26,11 +26,13 @@ Done when: the DoD lines {DOD_REFS} hold for your part.
 - What the lead knows of the ground: {LEAD_NOTE}
 {REPAIR: the failing output, verbatim, and nothing else of earlier rounds}
 
+## What memory holds for this ticket
+{MEMORY_BLOCK: the ticket's retrieval, filled by gov brief}
+
 ## Commands (copy them as they are)
 {COMMANDS_TABLE: | name | command | for this role, from facts.yaml}
-Ask memory first: outside the sandbox {CMD:retrieve} "<which decision governs X | where is Y implemented>"; inside it, the Read and Grep tools [DEC-1065]; grep the register only by id.
+Ask memory first: {CMD:retrieve}; read every item of the bundle, never head or cut it, and cite the ids you use; grep the register only by id.
 Search again once: if the bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all; never answer beyond what you read.
-No `gov retrieve` in the sandbox, and no `gov context`: a launched worker searches with the Read and Grep tools, and searches again once the same way [DEC-1065].
 Every whole-folder pytest run adds `-m "not local_only" -k "not real and not green_here and not time_limit"` and an empty `HOME`: run it as {CMD:pytest_folder} [DEC-1065].
 Wait for anything long with {CMD:wait_for}, one call per 9.5 min; never a hand-written sleep loop.
 No merge inside the sandbox: the CTO or your lead merges into your branch outside it; a restore or conflict resolution in `tests/acceptance/` is a test designer's [DEC-1052].
