@@ -52,7 +52,7 @@ SECOND_TICKET_FILE = symmetric.CLOSED_FILE     # .tickets/DAEO-zz96.md
 
 @pytest.fixture()
 def helper(monkeypatch):
-    """``helper()`` -> the module ``gov.guard.containment_merge``, imported when it is first called."""
+    """``helper()`` -> the module ``gov.containment.merge``, imported when it is first called."""
     return own_change.helper_module(monkeypatch)
 
 
@@ -60,15 +60,6 @@ ONE_SIDE_WHOLE = {
     "holds-the-first-parent-s-content": FIRST,
     "holds-the-second-parent-s-content": SECOND,
 }
-
-
-def _call(project, call, shape):
-    """One call of the orchestrator makes the merge commit of ``shape``. Returns (result, state after, what)."""
-    before = check_support.git(project, "rev-parse", "HEAD").strip()
-    branch = check_support.git(project, "rev-parse", support.TICKET_BRANCH).strip()
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    own_change.assert_both_changed(project, shape, before, branch)
-    return result, left, f"{shape.what}, in the orchestrator's own call on {TICKET}"
 
 
 def _build(project, sandbox, shape):
@@ -84,17 +75,6 @@ def _build(project, sandbox, shape):
 # Through the check (the hook): both sides changed the same ticket file
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("case", sorted(ONE_SIDE_WHOLE), ids=sorted(ONE_SIDE_WHOLE))
-def test_a_merge_that_takes_one_side_s_content_of_a_ticket_file_both_sides_changed_is_silent(project, sandbox, call,
-                                                                                             case):
-    """DEC-572 (rewritten; until then DEC-421 made it a finding). Both sides changed the ticket file by an
-    orchestrator's commit that passes, and the merge commit holds one parent's version whole: the file is not
-    the merge commit's own change. Silent."""
-    holds = ONE_SIDE_WHOLE[case]
-    shape = own_change.changed_on_both_sides(project, sandbox, TICKET_FILE, AS_ORCHESTRATOR, holds)
-    result, left, what = _call(project, call, shape)
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 # --------------------------------------------------------------------------
@@ -168,23 +148,3 @@ def test_read_merge_puts_a_ticket_file_both_sides_changed_in_the_same_way_in_own
 # The other side: each side changed a different ticket file
 # --------------------------------------------------------------------------
 
-def test_a_merge_where_each_side_changed_a_different_ticket_file_is_silent(project, sandbox, call):
-    """DEC-421 speaks of one path that more than one parent changed. An orchestrator's commit changed one
-    ticket file on the branch and another orchestrator's commit changed a different ticket file on ``main``
-    since the fork; the merge commit holds both. ``own`` is empty and the merge is silent."""
-    support.ticket_branch_of(project, sandbox,
-                             support.commit(TICKET_FILE, AS_ORCHESTRATOR,
-                                            subject="the branch's ticket-file change"),
-                             main_moves_on=False)
-    support.run(project, sandbox, support.commit(SECOND_TICKET_FILE, support.ORCHESTRATOR_ON_MAIN,
-                                                 subject="main's ticket-file change"))
-    command = support.merge(trailers=AS_ORCHESTRATOR)
-    shape = symmetric.TakingMerge(command, (TICKET_FILE, SECOND_TICKET_FILE),
-                                  what=f"an ordinary --no-ff merge of {support.TICKET_BRANCH} (an orchestrator's "
-                                       f"change of {TICKET_FILE}) into main, which got an orchestrator's change of "
-                                       f"{SECOND_TICKET_FILE} since the fork")
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    symmetric.assert_taking(project, shape)
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)

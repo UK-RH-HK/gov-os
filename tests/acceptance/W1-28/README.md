@@ -1,5 +1,7 @@
 # W1-28 acceptance tests: `gov pause`, the fixtures' copies, the launcher
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The guard cases are deleted: `test_the_next_write_by_each_role_is_denied_until_pause_is_lifted`, `test_a_bash_write_is_denied_while_paused`, `test_reads_stay_open_while_paused`, `test_git_status_is_unchanged_by_the_denied_writes` and `test_the_guard_decides_by_the_identity_the_launcher_gave`; the cases that kept a guard assertion beside the flag assertion keep the flag assertion only. The guard half of the support module and the `hook` gate fixture are gone. A KPI line whose every case went (success-1's "the next write is denied", failure-1) is retired with the guard.
+
 Ticket `DAEO-9279`, profile STANDARD (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
 149 cases in 9 files, in three parts:
 
@@ -54,13 +56,13 @@ Cases: 103 in the full run, 52 in `breadth`, 0 in `lifted`.
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: gov pause sets the freeze flag and the next write by any role is denied; gov pause --off clears it [CAP-05.a] | `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` (2 of 5), `test_w1_28_freeze.py::test_pause_sets_the_flag_in_the_runtime_directory` | part A's row, by its words |
+| S1: gov pause sets the freeze flag and the next write by any role is denied; gov pause --off clears it [CAP-05.a] | `test_w1_28_freeze.py::test_pause_sets_the_flag_in_the_runtime_directory` | part A's row, by its words |
 | S2: gov pause --cancel-agents releases every claim and records the cancelled sessions; gov pause --rollback <ticket> reverts the ticket's commits w... | `test_w1_28_cancel.py::test_the_cancel_is_recorded_by_one_commit_per_released_ticket`, `test_w1_28_cancel.py::test_each_cancelled_session_is_recorded_in_its_ticket`, `test_w1_28_rollback.py::test_rollback_reverts_the_commits_of_the_ticket_and_no_other`, `test_w1_28_rollback.py::test_rollback_makes_one_revert_commit_per_commit_newest_first`, `test_w1_28_command.py::test_rollback_without_a_ticket_is_a_usage_error`, `test_w1_28_command.py::test_gov_pause_is_no_longer_answered_as_not_implemented` | part A's row, by its words |
 | S3: Pause, cancel and rollback run only on the owner's or the orchestrator's invocation and give the same result on repeat; cancel and rollback eac... | `test_w1_28_roles.py::test_the_orchestrator_can_pause`, `test_w1_28_roles.py::test_the_orchestrator_cannot_lift_a_pause`, `test_w1_28_repeat.py::test_pause_on_a_paused_project_succeeds_and_stays_paused` | part A's row, by its words |
 | S4: Every test fixture that copies the repository leaves governance/project/held-out.yaml out, so it is never copied into a temporary project (DEC-... | `test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out` (1 of 12) | part A's row, by its words |
 | S5: gov launch removes its per-session temp folder when the session ends (DEC-386) | `test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends` (1 of 5), `test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends_with_an_error` (1 of 2) | part A's row, by its words |
 | S6: gov launch starts a product-spec worker sandboxed, with an empty network allowlist (DEC-386) | `test_w1_28_launch_product_spec.py::test_the_product_spec_session_has_an_empty_network_allowlist`, `test_w1_28_launch_product_spec.py::test_the_launcher_starts_one_product_spec_session` | part A's row, by its words |
-| F1: A write succeeds while paused | `test_w1_28_freeze.py::test_a_bash_write_is_denied_while_paused` (2 of 2), `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` (2 of 5) | part A's row, by its words |
+| F1: A write succeeds while paused | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | part A's row, by its words |
 | F2: The flag lives outside the repository runtime directory | `test_w1_28_freeze.py::test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` | part A's row, by its words |
 
 ## KPI lines and covers ids
@@ -70,7 +72,7 @@ Red reason, for every row but the second: the `built` fixture stops the case wit
 
 | KPI line | File | Cases | Decisions |
 |---|---|---|---|
-| **Success 1.** `gov pause` sets the freeze flag and the next write by any role is denied; `gov pause --off` clears it **[CAP-05.a]** | `test_w1_28_freeze.py` | `test_pause_sets_the_flag_in_the_runtime_directory` · `test_the_next_write_by_each_role_is_denied_until_pause_is_lifted[5]` · `test_a_bash_write_is_denied_while_paused[2]` · `test_reads_stay_open_while_paused` · `test_git_status_is_unchanged_by_the_denied_writes` | DEC-109, DEC-365 (the owner's call) |
+| **Success 1.** `gov pause` sets the freeze flag and the next write by any role is denied; `gov pause --off` clears it **[CAP-05.a]** | `test_w1_28_freeze.py` | `test_pause_sets_the_flag_in_the_runtime_directory` | DEC-109, DEC-365 (the owner's call) |
 | | `test_w1_28_command.py` | `test_gov_pause_is_no_longer_answered_as_not_implemented` · `test_help_names_each_option[3]` · `test_rollback_without_a_ticket_is_a_usage_error` | DEC-317. **Red reason:** the command answers `NOT_IMPLEMENTED`; `--help` names no option; exit code 1, not 2 |
 | | `test_w1_28_cancel.py`, `test_w1_28_rollback.py` | `test_cancel_agents_sets_the_freeze_flag` · `test_rollback_sets_the_freeze_flag` · `test_rollback_runs_on_a_paused_project` | DEC-368 |
 | **Success 2a.** `gov pause --cancel-agents` releases every claim and records the cancelled sessions (CANCEL_AGENTS) **[CAP-05.b]** | `test_w1_28_cancel.py` | `test_cancel_agents_releases_every_claim` · `test_a_released_ticket_can_be_claimed_again` · `test_the_result_names_each_cancelled_session` · `test_each_cancelled_session_is_recorded_in_its_ticket` · `test_cancel_agents_with_no_claim_succeeds_and_releases_nothing` | DEC-357 (locks only; the status line is unchanged), DEC-292 |
@@ -83,7 +85,7 @@ Red reason, for every row but the second: the `built` fixture stops the case wit
 | | `test_w1_28_rollback.py` | `test_rollback_of_a_ticket_with_no_commit_succeeds_with_an_empty_list` · `test_rollback_of_a_ticket_whose_only_commit_is_a_merge_reverts_nothing_and_writes_no_record` (no record commit when nothing is reverted) | DEC-375 |
 | **Success 3, the freeze after a rollback that fails** **[CAP-05.d]** | `test_w1_28_rollback.py`, `test_w1_28_roles.py` | `test_a_conflicting_revert_aborts_everything_with_an_error` · `test_rollback_of_an_unknown_ticket_is_an_error` · `test_rollback_on_a_dirty_tree_is_refused` · `test_a_failed_rollback_keeps_a_freeze_that_was_already_set` · `test_a_workers_rollback_of_an_unknown_ticket_is_refused_as_a_workers_and_sets_nothing` | DEC-378: set once the caller is allowed; a caller who is not sets nothing |
 | **Success 3, "a plain pause writes no record"** **[CAP-05.d]** | `test_w1_28_freeze.py` | `test_a_plain_pause_writes_no_record` · `test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` | DEC-367 |
-| **Failure 1.** A write succeeds while paused | `test_w1_28_freeze.py` | `test_the_next_write_by_each_role_is_denied_until_pause_is_lifted[5]` · `test_a_bash_write_is_denied_while_paused[2]` | DEC-109 |
+| **Failure 1.** A write succeeds while paused | `test_w1_28_freeze.py` | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | DEC-109 |
 | | other files | `test_pause_on_a_paused_project_succeeds_and_stays_paused` · `test_the_orchestrator_can_pause` · `test_the_orchestrator_cannot_lift_a_pause` · `test_cancel_agents_sets_the_freeze_flag` · `test_rollback_sets_the_freeze_flag` (each asks the guard after the call) | DEC-365, DEC-368 |
 | **Failure 2.** The flag lives outside the repository runtime directory | `test_w1_28_freeze.py` | `test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` · `test_the_flag_is_not_seen_by_git` · `test_pause_sets_the_flag_in_the_runtime_directory` | DEC-109 |
 

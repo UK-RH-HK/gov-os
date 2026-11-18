@@ -1,5 +1,7 @@
 # W2-185 (DAEO-qyt2): adopted projects get the context watch; portability's lift is per hook; W1-38's fixture holds seven hooks
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The template's `posttooluse.py` entry is no longer asked for, and the kernel's hook scripts are five.
+
 Profile STANDARD, class C2. Decisions: DEC-1167 (4), DEC-1163 (6) E (a), DEC-971 item 3, DEC-805, DEC-1156 (7).
 Written from the ticket's KPI lines and the code as it stands on the base `31eab2103` (never from the engineer's branch).
 

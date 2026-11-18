@@ -1,5 +1,7 @@
 # W2-149 acceptance tests: the independent sessions' launch script
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** `test_w2_149_guard_line.py` (the CTO's documented lines pass the guard) is deleted; the walls launch script's cases stay.
+
 Ticket DAEO-52ku (W2-149), profile FULL (DEC-1101 (2)-(3) step 2, DEC-1109 (2)). Written by the independent test
 designer (MR-3) from the ticket's KPI lines S1-S21, its ten failure lines, its "Readings settled by the CTO" and
 LAUNCH-SPEC §1-§5, before any implementation, reading only `w2/integrate` (`bc72066fa`): the template
@@ -544,9 +546,9 @@ Every red fails on "governance/project/orchestration/tools/indep_launch.py does 
 | S17 | `test_w2_149_results.py::test_s17_a_finished_wall_is_one_file` | red | no script |
 | S18 | `test_w2_149_results.py::test_s18_a_launch_past_the_8000_file_budget_refuses_15` | red | no script |
 | S18 | `test_w2_149_results.py::test_s18_a_launch_inside_the_budget_builds` | red | no script |
-| S19 | `test_w2_149_guard_line.py::test_s19_each_documented_line_is_allowed_to_the_orchestrator` | green (guard, 6) | the hook allows each documented line today |
-| S19 | `test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused` | green (guard, 3) | the hook refuses `indep-walls/` after the root today |
-| S19 | `test_w2_149_guard_line.py::test_s19_the_script_refuses_an_argument_naming_a_folder_under_the_sets_root_17` | red (2) | no script |
+| S19 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 6) | the hook allows each documented line today |
+| S19 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard, 3) | the hook refuses `indep-walls/` after the root today |
+| S19 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red (2) | no script |
 | S20 | `test_w2_149_seed_content.py::test_s20_the_overlap_is_the_declaration_s_rule_with_the_wall_s_seed` | revised (DEC-1112 (3)) | the set-up A table below |
 | S20 | `test_w2_149_seed_content.py::test_s20_round_1_stages_half_json_and_nothing_of_the_actions` | revised (DEC-1112 (3)) | the set-up A table below |
 | S21 | `test_w2_149_canary_session.py::test_s21_the_script_holds_no_name_matched_wait_or_stop` | red | no script |

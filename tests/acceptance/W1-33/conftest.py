@@ -1,6 +1,6 @@
 """Fixtures for the W1-33 acceptance tests.
 
-The temporary project, the guard and ``gov launch`` are W1-46's: the same
+The temporary project and ``gov launch`` are W1-46's: the same
 fixtures as ``tests/acceptance/W1-46/conftest.py``, built on its support code.
 """
 
@@ -35,17 +35,6 @@ def project(base, tmp_path):
     target = tmp_path / "repo"
     shutil.copytree(base, target, symlinks=True)
     return target
-
-
-@pytest.fixture()
-def guard(project, sandbox):
-    """``guard(tool_name, tool_input, role, ticket)``: the committed settings' decision on one call. No call is made."""
-
-    def _guard(tool_name, tool_input, role, ticket=None, cwd=None):
-        return launch_support.ask_guard(project, sandbox, tool_name, tool_input, role,
-                                        ticket or support.w47.TICKET_OF[role], cwd=cwd)
-
-    return _guard
 
 
 @pytest.fixture()

@@ -134,26 +134,12 @@ def install_gov_for(home):
     return home
 
 
-def gov_the_pinned_line_imports(home, project):
-    """The ``gov.__file__`` the interpreter a pinned hook line starts would import, with ``HOME=home``: the line's
-    own look-up (``$HOME/.local/bin/gov``, else ``gov`` on ``PATH``, its first line), then that interpreter with
-    ``-E``. Used to show a harness home runs this worktree's code (DEC-732)."""
-    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C.UTF-8",
-           "CLAUDE_PROJECT_DIR": str(project)}
-    line = ('g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || exit 3; read -r p < "$g"; '
-            'p="${p#\'#!\'}"; "$p" -E -c "import gov; print(gov.__file__)"')
-    done = subprocess.run(["sh", "-c", line], capture_output=True, text=True, env=env, cwd=str(project), check=False)
-    return done.stdout.strip()
-
-
 # --------------------------------------------------------------------------
 # The template's hook lines, read where the kernel keeps them (W2-90b, DEC-965 item 4)
 # --------------------------------------------------------------------------
 
 KERNEL_GUARD_EVENTS = ("preToolUse", "postToolUse", "postToolUseFailure")   # the three pinned lines (W2-106)
 TEMPLATE_HOOKS_REL = "template/governance/kernel/hooks"                      # the programs, as the template has them
-_SETTINGS_EVENTS = {"PreToolUse": "preToolUse", "PostToolUse": "postToolUse",
-                    "PostToolUseFailure": "postToolUseFailure"}
 
 
 def _read_jsonc(path):
@@ -171,22 +157,6 @@ def template_hook_entries(events=KERNEL_GUARD_EVENTS):
     source = _read_jsonc(REPO_ROOT / TEMPLATE_HOOK_SOURCE_REL)
     return [(event, index, entry) for event, entries in (source.get("hooks") or {}).items() if event in events
             for index, entry in enumerate(entries or []) if isinstance(entry, dict) and entry.get("type") == "command"]
-
-
-def template_settings_commands(events=KERNEL_GUARD_EVENTS):
-    """``(event, index, command)`` for every hook command of ``template/governance/kernel/settings.json`` on
-    ``events`` (the event named as the rulesync source names it): the kernel's shipped settings."""
-    settings = json.loads((REPO_ROOT / TEMPLATE_SETTINGS_REL).read_text(encoding="utf-8"))
-    found = []
-    for name, entries in (settings.get("hooks") or {}).items():
-        event = _SETTINGS_EVENTS.get(name)
-        if event not in events:
-            continue
-        commands = [hook["command"] for entry in entries or [] if isinstance(entry, dict)
-                    for hook in entry.get("hooks") or [] if isinstance(hook, dict)
-                    and hook.get("type") == "command" and isinstance(hook.get("command"), str)]
-        found.extend((event, index, command) for index, command in enumerate(commands))
-    return found
 
 
 def runs_a_kernel_program(command):
@@ -219,103 +189,12 @@ def w2_59_hook_project(entry, base, markers, *, with_src):
     return support.make_repository(base, files, kernel_hook_copies())
 
 
-def w2_59_worker_project(entry, base, markers, *, src_in_project):
-    """W2-59's ``worker_project`` for one line, in the layout the line looks in (as ``w2_59_hook_project``)."""
-    support = _w2_59_support()
-    if not runs_a_kernel_program(entry["command"]):
-        return support.worker_project(base, markers, src_in_project=src_in_project)
-    base = Path(base)
-    files = {"README.md": "w259 worker project\n"}
-    if src_in_project:
-        files.update(support.worker_import_path_files(markers))
-        project = support.make_repository(base / "project", files, kernel_hook_copies())
-        return project, project / "src"
-    project = support.make_repository(base / "project", files, kernel_hook_copies())
-    elsewhere = base / "inherited"
-    for rel, text in support.worker_import_path_files(markers).items():
-        path = elsewhere / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-    return project, elsewhere / "src"
-
-
 # --------------------------------------------------------------------------
 # W1-05's project: the switch-over's fixture ticket and the files its cases name
 # --------------------------------------------------------------------------
-
-W1_05_ACCEPTANCE_FILE = "tests/acceptance/W1-02/README.md"
-W1_05_FILES = {
-    "README.md": "# A product of the Gov OS kernel\n",
-    live_support.FIXTURE_SOURCE: "VALUE = 1\n",
-    W1_05_ACCEPTANCE_FILE: "# W1-02 acceptance tests\n",
-    f".tickets/{live_support.FIXTURE_TICKET_ID}.md": live_support.fixture_ticket_text(),
-}
-
-
-def w1_05_project(base):
-    """A generated project with W1-05's fixture ticket (``DAEO-zz90``, an engineer ticket in progress) and the
-    files W1-05's cases write to or read: ``README.md``, ``src/gov/guard/decide.py`` (inside the ticket's paths) and
-    ``tests/acceptance/W1-02/README.md`` (an acceptance test)."""
-    return plant(generate_project(base), W1_05_FILES, "W1-05's fixture ticket and files")
 
 
 # --------------------------------------------------------------------------
 # W1-46's project: the launcher's fixture project, wired by the kernel's generated settings
 # --------------------------------------------------------------------------
 
-def w1_46_project(base):
-    """W1-46's launch fixture project, built on a generated project.
-
-    It holds what W1-46's ``make_project`` puts in its project (this worktree's ``src/gov``, the kernel template,
-    ``pyproject.toml``, the roster, the tool registry, the research allowlist, the fixture tickets and files, the
-    runtime files), file by file from git's listing, except this repository's ``.claude/settings.json`` and
-    ``.claude/agents/``: those are the generated project's, made by rulesync from the template's sources. The guard
-    and the containment check run as those settings register them, from ``governance/kernel/hooks/``.
-    """
-    if str(_TESTS / "W1-46") not in sys.path:
-        sys.path.insert(0, str(_TESTS / "W1-46"))
-    import w1_46_support as w46   # noqa: E402
-
-    project = generate_project(base, "repo")
-    kept = [spec for spec in w46.PROJECT_PATHSPECS if spec not in (w46.SETTINGS_REL, ".claude/agents")]
-    listing = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", *kept],
-        capture_output=True, text=True, check=True,
-    ).stdout
-    for rel in sorted(set(item for item in listing.split("\0") if item)):
-        source = REPO_ROOT / rel
-        if source.is_file() and not source.is_symlink():
-            target = project / rel
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, target)
-    files = dict(w46.PROJECT_FILES)
-    tickets = w46.check_support.default_tickets()
-    tickets[f"{w46.RESEARCH_TICKET}.md"] = w46.check_support.ticket_text(
-        ticket_id=w46.RESEARCH_TICKET, wbs_id="W1-97", role=w46.RESEARCH, allowed_paths=(f"{w46.EXPERIMENT_REL}/**",))
-    for name, text in tickets.items():
-        files[f".tickets/{name}"] = text
-    plant(project, files, "W1-46's launch fixture project, on a generated project")
-    for rel, text in w46.RUNTIME_FILES.items():
-        path = project / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-    return project
-
-
-def w1_28_project(base):
-    """W1-28's launch fixture project (W1-46's, with the roster entry DEC-386 asks for), on a generated project.
-
-    The roster entry is written as W1-28's ``make_project`` writes it.
-    """
-    if str(_TESTS / "W1-28") not in sys.path:
-        sys.path.insert(0, str(_TESTS / "W1-28"))
-    import w1_28_launch_support as w28   # noqa: E402
-    import yaml   # noqa: E402
-
-    project = w1_46_project(base)
-    path = project / w28.ROSTER_REL
-    roster = yaml.safe_load(path.read_text(encoding="utf-8"))
-    roster["roles"][w28.PRODUCT_SPEC].update({"session": w28.ROSTER_SESSION, "network_profile": w28.ROSTER_PROFILE})
-    path.write_text(yaml.safe_dump(roster, sort_keys=False), encoding="utf-8")
-    copier_support.commit_all(project, "roster: product-spec is launched (DEC-386)")
-    return project

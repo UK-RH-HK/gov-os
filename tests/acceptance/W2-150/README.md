@@ -1,5 +1,7 @@
 # W2-150 acceptance tests: memory's import closure free of the gates (E-2's four edges)
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The old names of `gov.guard.*` and the cases that ran their behaviour, the guard's import-closure case and the two "reaches no guard" cases are deleted; the closure free of `gov.close` and the old names of the other modules stay.
+
 Ticket DAEO-ijf5 (W2-150), profile STANDARD; D-6 part 2's code item (P1-PLAN §A P1-6 item 1, §D; DEC-1039 (2),
 DEC-1040 (1), DEC-1109 (2)); source INVESTIGATION-1 part E, row E-2. Written by the independent test designer (MR-3)
 from the ticket's KPI lines S1 to S5 and its three failure lines, before any implementation, reading only
@@ -46,16 +48,16 @@ module is printed with the shortest import path that reaches it, every edge with
 | S1 | `test_w2_150_closure.py::test_s1_the_walk_follows_every_import_statement_form` | green (guard) | the instrument, on a planted tree: function-, method- and `if`-level imports, relative imports, `from pkg import submodule`, a parent package's `__init__`, the printed path form, no false edge for a non-module name |
 | S2 | `test_w2_150_edges.py::test_s2_store_loader_imports_no_close_and_no_tickets` | red | `store/loader.py:546` (and `:599`) `from gov.close.fingerprint import of_commit` |
 | S2 | `test_w2_150_edges.py::test_s2_retrieve_command_closure_reaches_no_decisions_checker` | red | `gov.retrieve.command -> gov.decisions [src/gov/retrieve/command.py:123] -> gov.decisions.checker [src/gov/decisions/__init__.py:3]` |
-| S2 | `test_w2_150_edges.py::test_s2_secrets_closure_reaches_no_guard` | red | `gov.secrets -> gov.guard.runs [src/gov/secrets/__init__.py:48] -> gov.guard.decide [src/gov/guard/runs.py:42] -> …` (6 guard modules) |
-| S2 | `test_w2_150_edges.py::test_s2_retrieval_measure_closure_reaches_no_guard` | red | `gov.retrieval.measure -> gov.guard.reads [src/gov/retrieval/measure.py:74] -> gov.guard.decide [src/gov/guard/reads.py:27] -> …` (6 guard modules) |
+| S2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | `gov.secrets -> gov.guard.runs [src/gov/secrets/__init__.py:48] -> gov.guard.decide [src/gov/guard/runs.py:42] -> …` (6 guard modules) |
+| S2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | `gov.retrieval.measure -> gov.guard.reads [src/gov/retrieval/measure.py:74] -> gov.guard.decide [src/gov/guard/reads.py:27] -> …` (6 guard modules) |
 | S3 | `test_w2_150_old_names.py::test_s3_old_name_importable_from_its_old_module` | green (guard) | 12 items, each `from <old module> import <name>` in a fresh process: `of_commit`, `_match_pattern`, `TICKETS_REL`, `runs.root`, `leave_out`, and from `gov.guard.reads` `evaluation_sets`, `PolicyError`, `PATH_MAP_REL`, `SETS_KEY`, `set_fault`, plus `_Part` and `_ticket` (the other names `measure.py:74` imports, "the names measure.py used") |
-| S3 | `test_w2_150_old_names.py::test_s3_constants_keep_their_values` | green (guard) | `.tickets`, `governance/project/path-map.yaml`, `evaluation_sets`; `PolicyError` an `Exception` |
-| S3 | `test_w2_150_old_names.py::test_s3_match_pattern_behaves_as_today` | green (guard) | nine path/pattern pairs (`**`, `*`, an escaped `.`, a trailing `/**` not matching the bare folder) |
-| S3 | `test_w2_150_old_names.py::test_s3_runs_root_behaves_as_today` | green (guard) | `<realpath of HOME>/gov-os-runs`; `None` for a relative HOME |
+| S3 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | `.tickets`, `governance/project/path-map.yaml`, `evaluation_sets`; `PolicyError` an `Exception` |
+| S3 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | nine path/pattern pairs (`**`, `*`, an escaped `.`, a trailing `/**` not matching the bare folder) |
+| S3 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | `<realpath of HOME>/gov-os-runs`; `None` for a relative HOME |
 | S3 | `test_w2_150_old_names.py::test_s3_leave_out_passes_evidence_without_lines_through` | green (guard) | evidence with no `start_line` comes back unchanged with `None` |
-| S3 | `test_w2_150_old_names.py::test_s3_evaluation_sets_and_set_fault_behave_as_today` | green (guard) | no path map `{}`; the block alone parsed; a list block `PolicyError`; `set_fault`'s four messages and `None` |
+| S3 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | no path map `{}`; the block alone parsed; a list block `PolicyError`; `set_fault`'s four messages and `None` |
 | S3 | `test_w2_150_old_names.py::test_s3_of_commit_classifies_paths_as_today` | green (guard) | a temporary git folder: no test map `None`; with one, the code and records fingerprints recomputed from `git ls-tree` (`record_only` matches out of code, the test map always code); an unreadable commit `None` |
-| S4 | `test_w2_150_guard_imports.py::test_s4_import_of_guard_decide_loads_only_guard_util_and_stdlib` | green (guard) | `sys.modules` before and after `import gov.guard.decide` in a fresh process: only `gov`, `gov.guard.*`, `gov.util.*` and the standard library (`sys.stdlib_module_names`) |
+| S4 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | `sys.modules` before and after `import gov.guard.decide` in a fresh process: only `gov`, `gov.guard.*`, `gov.util.*` and the standard library (`sys.stdlib_module_names`) |
 
 The failure lines, by the cases that would catch each:
 
@@ -64,12 +66,12 @@ The failure lines, by the cases that would catch each:
 | F1 | `test_w2_150_closure.py::test_s1_memory_closure_reaches_no_gate` | red | a gate still reached from memory's closure |
 | F1 | `test_w2_150_edges.py::test_s2_store_loader_imports_no_close_and_no_tickets` | red | as above, edge 1 |
 | F1 | `test_w2_150_edges.py::test_s2_retrieve_command_closure_reaches_no_decisions_checker` | red | as above, edge 2 |
-| F1 | `test_w2_150_edges.py::test_s2_secrets_closure_reaches_no_guard` | red | as above, edge 3 |
-| F1 | `test_w2_150_edges.py::test_s2_retrieval_measure_closure_reaches_no_guard` | red | as above, edge 4 |
+| F1 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | as above, edge 3 |
+| F1 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | as above, edge 4 |
 | F2 | `test_w2_150_old_names.py::test_s3_old_name_importable_from_its_old_module` | green (guard) | a moved name no longer importable from its old module |
 | F2 | `test_w2_150_old_names.py::test_s3_of_commit_classifies_paths_as_today` | green (guard) | a change in the close fingerprint's path classification |
-| F2 | `test_w2_150_old_names.py::test_s3_match_pattern_behaves_as_today` | green (guard) | a change in the guard's and the close selection's pattern grammar |
-| F2 | `test_w2_150_guard_imports.py::test_s4_import_of_guard_decide_loads_only_guard_util_and_stdlib` | green (guard) | the guard's hot path pulling a new module |
+| F2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | a change in the guard's and the close selection's pattern grammar |
+| F2 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | the guard's hot path pulling a new module |
 
 ## The follow-up: S6, one source each (DEC-1109 (2))
 
@@ -81,12 +83,12 @@ defined twice. On `66fdb8750` the 26 cases above are all green, S1 included.
 
 | KPI line | Test (node id) | On `66fdb8750` | Why |
 |---|---|---|---|
-| S6 | `test_w2_150_one_source.py::test_s6_glob_defined_once_not_in_guard_protected` | red | the scan finds `_Glob` defined twice: `src/gov/guard/protected.py:87`, `src/gov/util/parts.py:58` |
-| S6 | `test_w2_150_one_source.py::test_s6_load_yaml_unique_defined_once_not_in_guard_heldout` | red | defined twice: `src/gov/guard/heldout.py:29`, `src/gov/util/parts.py:42` |
+| S6 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | the scan finds `_Glob` defined twice: `src/gov/guard/protected.py:87`, `src/gov/util/parts.py:58` |
+| S6 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | defined twice: `src/gov/guard/heldout.py:29`, `src/gov/util/parts.py:42` |
 | S6 | `test_w2_150_one_source.py::test_s6_git_runner_defined_once_not_in_close_repo` | red | `gov.close.repo` defines its own `git` (line 28); two git runners: `close/repo.py:28` and `store/loader.py:599` (`_commit_git`); the one in `gov.close` is not in a new home |
-| S6 | `test_w2_150_one_source.py::test_s6_old_names_are_the_new_homes_objects` | red | fresh process: `gov.guard.protected._Glob is gov.util.parts._Glob` false (from `gov.guard.protected`), the same for `gov.guard.heldout.load_yaml_unique`; `gov.close.repo.git.__module__` is `gov.close.repo`, and no name of `gov.store.loader` is bound to it |
+| S6 | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | red | fresh process: `gov.guard.protected._Glob is gov.util.parts._Glob` false (from `gov.guard.protected`), the same for `gov.guard.heldout.load_yaml_unique`; `gov.close.repo.git.__module__` is `gov.close.repo`, and no name of `gov.store.loader` is bound to it |
 | S6 (S1) | `test_w2_150_one_source.py::test_s6_guard_new_homes_reach_no_gate` | green (guard) | each helper's definitions outside the gates (today `gov.util.parts`; `gov.store.loader` for the runner) and their static closure reach no gate: the new homes must not import back from the gates |
-| S6 (S3) | `test_w2_150_one_source.py::test_s6_guard_old_names_importable_and_behave_as_today` | green (guard) | fresh process: `from gov.guard.protected import _Glob`, `from gov.guard.heldout import load_yaml_unique`, `from gov.close.repo import git`; five glob matches, a twice-written key refused (`ConstructorError`), `git`'s whole call kept (`root, *args, ok, code, given, pinned`) on a temporary repository: output, `given` as stdin, `ok`/`code`, `GIT_FAILURE` |
+| S6 (S3) | retired with the guard, EMERGENCY-2 6.1, DAEO-gr7t | green (guard) | fresh process: `from gov.guard.protected import _Glob`, `from gov.guard.heldout import load_yaml_unique`, `from gov.close.repo import git`; five glob matches, a twice-written key refused (`ConstructorError`), `git`'s whole call kept (`root, *args, ok, code, given, pinned`) on a temporary repository: output, `given` as stdin, `ok`/`code`, `GIT_FAILURE` |
 | S6 (S1) | `test_w2_150_closure.py::test_s1_memory_closure_reaches_no_gate` | green (guard) | S1 still holds after the change (the same case as above, unchanged) |
 
 ## Notes and limits

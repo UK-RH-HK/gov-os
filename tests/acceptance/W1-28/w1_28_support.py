@@ -40,7 +40,7 @@ for _suite in ("W1-07", "W1-02"):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-import w1_02_support as guard_support  # noqa: E402  the guard hook as a process, and the fixture project
+import w1_02_support as guard_support  # noqa: E402  the fixture project (the guard half of the module is retired)
 import w1_07_support as cli_support  # noqa: E402  the ``gov`` console script, without an install
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -51,7 +51,7 @@ MODULE_INVALID = "COMMAND_MODULE_INVALID"
 # ``LAUNCH_REFUSED``, ``src/gov/launch/launcher.py:55``.
 PAUSE_REFUSED = "PAUSE_REFUSED"
 
-FREEZE_FLAG_REL = ".gov-runtime/freeze"   # DEC-109; ``FREEZE_FLAG`` of ``src/gov/guard/decide.py``
+FREEZE_FLAG_REL = ".gov-runtime/freeze"   # DEC-109; ``FREEZE_FLAG`` of ``src/gov/util/freeze.py``
 RUNTIME_REL = ".gov-runtime"
 TICKETS_REL = ".tickets"
 CLAIMS_REL = ".tickets/.claims"           # DEC-292
@@ -63,21 +63,11 @@ ORCHESTRATOR = guard_support.ORCHESTRATOR
 ENGINEER = guard_support.ENGINEER
 WORKER_ROLES = (guard_support.ENGINEER, guard_support.PRODUCT_SPEC, guard_support.TEST_DESIGNER,
                 guard_support.AUDITOR, "research")
-GUARD_ROLES = guard_support.KNOWN_ROLES
 
 # The tickets of W1-02's fixture project, all in progress.
 TICKET = guard_support.TICKET_ID            # an engineer ticket
 OTHER_TICKET = guard_support.DOCS_TICKET_ID  # a second engineer ticket
 UNKNOWN_TICKET = "DAEO-zz00"                # no such ticket file, and no commit names it
-
-# A write each role may make when nothing is frozen: (ticket, repository-relative path). As in W1-02's freeze tests.
-NORMAL_WRITE = {
-    guard_support.ENGINEER: (TICKET, "src/gov/guard/decide.py"),
-    guard_support.ORCHESTRATOR: (guard_support.ORCHESTRATOR_TICKET_ID, ".claude/settings.json"),
-    guard_support.PRODUCT_SPEC: (guard_support.PRODUCT_SPEC_TICKET_ID, "docs/spec/feature.md"),
-    guard_support.TEST_DESIGNER: (TICKET, f"tests/acceptance/{guard_support.TICKET_WBS_ID}/test_fixture.py"),
-    guard_support.AUDITOR: (TICKET, f"{guard_support.SCRATCH_REL}/audit-note.txt"),
-}
 
 HOLDER = "engineer:w1-28-session-a"                      # DEC-292: by convention ``<role>:<session>``
 OTHER_HOLDER = "independent-test-designer:w1-28-session-b"
@@ -453,23 +443,3 @@ def locks(project):
     folder = Path(project) / CLAIMS_REL
     return sorted(path.name for path in folder.iterdir()) if folder.is_dir() else []
 
-
-# --------------------------------------------------------------------------
-# The guard (W1-02)
-# --------------------------------------------------------------------------
-
-def guard_write(project, sandbox, role, tool_name="Write"):
-    """The guard's decision on the write ``role`` may make when nothing is frozen."""
-    ticket, rel = NORMAL_WRITE[role]
-    tool_input = guard_support.edit_tool_input(tool_name, Path(project) / rel)
-    return guard_support.run_hook(project, tool_name, tool_input, sandbox, role=role, ticket=ticket)
-
-
-def guard_bash(project, sandbox, role, command):
-    ticket, _ = NORMAL_WRITE[role]
-    return guard_support.run_hook(project, "Bash", guard_support.bash_tool_input(command), sandbox, role=role,
-                                  ticket=ticket)
-
-
-assert_allowed = guard_support.assert_allowed
-assert_denied = guard_support.assert_denied

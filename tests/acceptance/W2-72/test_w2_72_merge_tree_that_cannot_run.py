@@ -49,7 +49,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import w2_72_support as support  # noqa: E402
-from w2_72_support import call, guard_hook, hook, project, sandbox  # noqa: E402,F401  fixtures
+from w2_72_support import project, sandbox  # noqa: E402,F401  fixtures
 
 check_support = support.check_support
 
@@ -78,36 +78,6 @@ def _assert_met(seam, who, what, missing=None, installed=None):
         met = all(a.exit_code == seam.exit_code and a.stderr == support.USAGE for a in answered)
         expected = f"{seam.exit_code} and the usage line"
     assert met, f"{what}: {who}'s `git merge-tree --write-tree` was not answered with {expected}:\n{seen}"
-
-
-@pytest.mark.parametrize("case", sorted(support.CANNOT_RUN), ids=sorted(support.CANNOT_RUN))
-def test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run(project, sandbox, call, tmp_path, case):
-    """Rewrite-Reason: DEC-802 (P-B1-2): containment takes git by absolute path, so a ``git`` first on the hook's
-    ``PATH`` no longer reaches merge-tree. The hook process's ``GIT_DIRS`` names the case's ``git`` now; for
-    ``a-fatal-error`` the real git fails, on the merge base's missing blob. Expected as before: the failing
-    merge-tree was met, the test is flagged in a finding for the merge commit, and nothing moved."""
-    shape = support.clean_combination(project, sandbox)
-    seam = support.git_seam(tmp_path / "the-check-s-git", case)
-    before = support.full_id(project, "HEAD")
-    missing = []
-
-    def before_the_check():
-        merge_id = support.full_id(project, "HEAD")
-        support.assert_shape(project, shape, before, merge_id)   # git's own merge, read while it still runs
-        if case == "a-fatal-error":
-            missing.append(support.remove_the_merge_base_s_blob(project, merge_id, shape.path))
-
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET,
-                        check_environment=seam.hook_environment(), before_the_check=before_the_check)
-    merge_id = support.full_id(project, "HEAD")
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}, `git merge-tree` failing ({case})"
-    _assert_met(seam, "the live check", what, missing=missing[0] if missing else None, installed=seam.installed())
-    check_support.assert_caught(result, shape.path, what=what, action=check_support.FLAGGED)
-    for_the_merge = support.findings_for(result, merge_id, what)
-    assert any(shape.path in check_support.finding_paths(result, f) for f in for_the_merge), (
-        f"{what}: no finding for the merge commit {merge_id[:12]} names {shape.path}"
-    )
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 @pytest.mark.parametrize("case", sorted(support.CANNOT_RUN), ids=sorted(support.CANNOT_RUN))

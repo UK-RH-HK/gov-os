@@ -41,16 +41,6 @@ def project(sandbox):
 
 
 @pytest.fixture()
-def guard(sandbox, project):
-    """``guard(tool, target_or_command, role=engineer, ticket=MAIN's tk id)``: the guard's decision on one call."""
-
-    def _guard(tool_name, target, role=support.ENGINEER, ticket=support.MAIN.tk):
-        return support.ask_guard(sandbox, tool_name, support.tool_input(tool_name, target), role, ticket, project)
-
-    return _guard
-
-
-@pytest.fixture()
 def cli(sandbox):
     """The stand-in CLI at ``<HOME>/.local/bin/claude``: it starts no session and never a model."""
     return support.install_stand_in_cli(sandbox)

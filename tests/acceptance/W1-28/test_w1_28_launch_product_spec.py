@@ -14,8 +14,7 @@ worker role". DEC-386 makes product-spec a launched role. Nothing of the
 launcher is weakened for it: the session is what an engineer's is, under the
 role's own name.
 
-- **Identity**: ``GOV_ROLE=product-spec`` and ``GOV_TICKET``, which the guard
-  then decides by.
+- **Identity**: ``GOV_ROLE=product-spec`` and ``GOV_TICKET``.
 - **A temp folder of its own**, removed when the session ends (KPI success 5).
 - **Its own ticket only.** DEC-242 refuses "a ticket of another role"; DEC-271
   lifts that for the two independent roles and for no other. The role file
@@ -30,26 +29,17 @@ role's own name.
   role. The committed entry of product-spec must name them too. The ticket
   lead changes ``governance/project/roster.yaml``; the engineer cannot.
 
-Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The case that asked this repository's live guard about the
-launched session's identity now asks the kernel's: the ``kernel_launch*`` fixtures below are the same launch project
-built on a project generated from the template, whose ``.claude/settings.json`` rulesync generates from the
-template's sources; the guard is the PreToolUse line those settings register, run from ``governance/kernel/hooks/``
-(``tests/acceptance/W2-90/README.md``).
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The case that asked the guard about the
+launched session's identity is deleted with the guard, with the fixtures only it used (the generated project and its
+guard line); the launcher's cases stay.
 """
 
 from __future__ import annotations
 
-import shutil
-import sys
-from pathlib import Path
 
 import pytest
 
 import w1_28_launch_support as support
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
-
-import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 w46, w47 = support.w46, support.w47
 
@@ -98,52 +88,6 @@ def test_the_product_spec_session_knows_its_role_and_ticket(launch):
         f"the identity is not in the settings' env block, where the session's own environment cannot replace it "
         f"(DEC-183): {sorted(block)}"
     )
-
-
-@pytest.fixture(scope="module")
-def kernel_launch_base(tmp_path_factory):
-    """The launcher's project (DEC-386) on a project generated from the template, built once (W2-90)."""
-    try:
-        return kernel_wiring.w1_28_project(tmp_path_factory.mktemp("w2-90-w1-28-kernel"))
-    except kernel_wiring.GenerationFailed as exc:
-        pytest.fail(str(exc), pytrace=False)
-
-
-@pytest.fixture()
-def kernel_launch_project(kernel_launch_base, tmp_path, sandbox):
-    """This test's own copy of it, with a ``held-out.yaml`` made up here, and this worktree's ``gov`` package
-    importable for the sandbox's home as an install makes it (the kernel's line starts ``python3``)."""
-    target = tmp_path / "launch-repo"
-    shutil.copytree(kernel_launch_base, target, symlinks=True)
-    stand_in = w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in")
-    w47.configure_stand_in(target, stand_in)
-    kernel_wiring.install_gov_for(sandbox.home)
-    return target
-
-
-@pytest.fixture()
-def kernel_launch(kernel_launch_project, sandbox, cli):
-    """``launch(role, ticket=None, *cli_args)`` in the project on a generated project."""
-
-    def _launch(role, ticket=None, *cli_args):
-        return w46.launch(kernel_launch_project, sandbox, cli, role,
-                          ticket or support.TICKET_OF.get(role, support.ENGINEER_TICKET), *cli_args)
-
-    return _launch
-
-
-@pytest.mark.parametrize("tool", ("Write", "Edit"))
-def test_the_guard_decides_by_the_identity_the_launcher_gave(kernel_launch, kernel_launch_project, sandbox, tool):
-    """The role and the ticket of the session, handed to the guard: its own path is allowed, another is denied."""
-    launch, launch_project = kernel_launch, kernel_launch_project
-    result = _started(launch)
-    role, ticket = result.variable("GOV_ROLE"), result.variable("GOV_TICKET")
-    own = w46.ask_guard(launch_project, sandbox, tool,
-                        w47.write_input(tool, launch_project / support.PRODUCT_SPEC_OWN_PATH), role, ticket)
-    w47.assert_allowed(own, f"{tool} to {support.PRODUCT_SPEC_OWN_PATH} by the launched {PRODUCT_SPEC} session")
-    other = w46.ask_guard(launch_project, sandbox, tool,
-                          w47.write_input(tool, launch_project / support.PRODUCT_SPEC_OTHER_PATH), role, ticket)
-    w47.assert_denied_by_rule(other, f"{tool} to {support.PRODUCT_SPEC_OTHER_PATH}, outside the ticket's paths")
 
 
 def test_the_product_spec_session_has_a_temp_folder_of_its_own_and_may_write_there(launch, cli):

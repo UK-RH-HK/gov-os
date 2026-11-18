@@ -1,5 +1,7 @@
 # W2-72 acceptance tests: containment's merge rule matches DEC-912
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** Every case that drove the live post-command check (the hooks around a Bash call) is deleted, with the fixtures only they used; the `judge_commits` and `read_merge` cases stay, on `gov.containment`.
+
 Ticket `DAEO-ye2a` (W2-72, FULL), from DEC-918 (P-W2-L437-B (a1)). Written by the independent test designer
 (MR-3) from the ticket's KPI lines and its sources (DEC-918, DEC-912, DEC-410, DEC-421, DEC-572, DEC-453,
 DEC-266), before the implementation. No part of an implementation was read to learn what a test should expect;
@@ -48,7 +50,6 @@ PYTHONPATH=/home/usain/gov-os-worktrees/W2-72/src python3 -m pytest tests/accept
 | `test_w2_72_merge_tree_that_cannot_run.py` | KPI 2, fail closed |
 | `test_w2_72_nothing_else_changes.py` | KPI 3 |
 | `test_w2_72_the_two_merge_backs.py` | KPI 4 |
-| `test_w2_72_merge_over_two_calls.py` | review 1, F1: KPI 1 and KPI 2 over two Bash calls |
 | `test_w2_72_drop_behind_a_rename_or_a_directory.py` | review 1, F2 and F3: KPI 2 |
 | `test_w2_72_clean_merge_across_a_rename.py` | review 1, F4: KPI 1 |
 
@@ -105,9 +106,7 @@ The first batch: 53 tests, of which 14 were red before the implementation and 39
 
 | Test | Cases | Expected | Red now because |
 |---|---|---|---|
-| `test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge` | `a-clean-combination-of-two-sides-edits`, `the-same-edit-on-both-sides`, `a-conflict-on-another-file-resolved-by-hand` | silent (exit 0, no text for the agent, no finding), and HEAD, the index and the tree as the call left them | the check flags the test: "a merge commit's own change to a ticket file or an acceptance test" (DEC-410 DP-24) |
 | `test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge` | the same three | `judge_commits([merge])` is `[]` | it returns that finding |
-| `test_the_live_check_names_the_engineer_s_commit_and_not_the_merge_commit` | the merged side's edit of the test is an engineer's commit | the engineer's commit has a finding naming the test, as before; no finding is the merge commit's | the merge commit has the DP-24 finding too |
 | `test_judge_commits_finds_nothing_in_the_merge_commit_and_still_judges_the_engineer_s_commit` | the same | `judge_commits([engineer])` names the test (passes now); `judge_commits([merge])` is `[]` | the second half: the DP-24 finding |
 
 The three cases:
@@ -129,7 +128,6 @@ bringing commit is still judged by its own trailers wherever it is judged.
 
 | Test | Expected |
 |---|---|
-| `test_the_live_check_still_flags_an_acceptance_file_that_differs_from_git_s_own_merge` | reported and recorded as `flagged`, in a finding for the merge commit (its `reason` begins `commit <12 digits>`) that names the test; nothing moved |
 | `test_judge_commits_still_finds_an_acceptance_file_that_differs_from_git_s_own_merge` | `judge_commits([merge])` is one finding, for the merge commit, naming the test |
 
 Each runs these nine cases:
@@ -185,7 +183,6 @@ The history is the clean combination of KPI 1, which with git's own merge there 
 
 | Test | Expected |
 |---|---|
-| `test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run` | the log holds at least one `merge-tree --write-tree` call, each answered as the case fails it; the test is flagged in a finding for the merge commit, and nothing moved |
 | `test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run` | first the control (new): through a recording `git` with nothing failing, `judge_commits` asks git's own merge (answered 0) and returns no finding (KPI 1). Then, with merge-tree failing: the log holds at least one `merge-tree --write-tree` call, each answered as the case fails it; the process exits 0; one finding, for the merge commit, names the test |
 
 **How each case shows that the check met the failing merge-tree, and nothing else.** The case's `git` logs only the
@@ -211,7 +208,6 @@ raised instead fails the case: the KPI line says the path stays the merge commit
 
 | Test | Cases | Expected |
 |---|---|---|
-| `test_the_live_check_still_flags_a_clean_merge_of_a_path_outside_the_acceptance_tests` | `a-clean-combination-of-two-sides-edits-of-a-ticket-file` (DEC-421: orchestrator's commits changed `.tickets/DAEO-zz94.md` on both sides and git combined them cleanly); `a-clean-combination-of-another-path-under-an-engineer-s-trailers` (read_merge's rule with DEC-269: git combined two sides' orchestrator edits of `README.md`; the merge commit carries an engineer's trailers whose ticket does not allow it) | flagged, in a finding for the merge commit, naming the path; the brought `pyproject.toml` not named |
 | `test_judge_commits_still_finds_a_clean_merge_of_a_path_outside_the_acceptance_tests` | the same two | one finding for the merge commit naming the path |
 | `test_read_merge_reads_every_merge_of_this_suite_as_it_does_today` | every merge of this suite (15) | `read_merge`'s `(own, brought)` exactly as DEC-410 and DEC-403 give them today. The cleanly merged acceptance test is still in `own`. With no merge base, every path of the tree is in `own` (DP-23) |
 
@@ -250,8 +246,6 @@ through the check, are revised to DEC-918's rule. No other expectation is lowere
 
 | Case | Before | Now |
 |---|---|---|
-| `test_w1_50_acceptance_test_changed_on_both_sides.py::test_a_clean_combination_of_two_sides_edits_of_one_test_is_silent` (was `..._is_flagged`) | DEC-410 DP-26, "stays flagged, as built": the orchestrator's merge in its own call is a finding that names the test | silent, nothing moved: the merge commit holds git's own clean combination of the two edits |
-| `test_w1_50_merge_that_takes_each_side_s_change.py::test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent` (was `..._is_flagged`; before DEC-410 it was `..._is_silent`) | DEC-410 DP-24 by its words: the test is named | silent, nothing moved: the merge commit holds git's own merge, which is both parents' content |
 
 Each revised case's docstring states what it expected before, what it expects now, and "Rewrite-Reason: DEC-918".
 Both are red now, because the check flags the test, and turn green with the implementation.
@@ -304,10 +298,6 @@ A failure message shows every call's agent-facing text and finding records.
 
 | Test | Cases | Expected | Now |
 |---|---|---|---|
-| `test_a_merge_back_over_two_calls_keeps_git_s_own_merge_of_the_acceptance_tests` | `a-conflict-on-the-source-file-resolved-in-the-second-call` (as `03f470a5`). Call 1, `git merge --no-ff --no-commit w1/W1-90`, stops on a conflict in `src/gov/guard/decide.py`, which both sides' engineers changed, while git combines `test_merged.py` (both sides' test designers changed it) and brings `test_new.py` (only the merged side added it). Call 2 resolves the source file, stages it and commits. `no-conflict-and-the-commit-in-the-second-call`: call 1 is the same merge with no conflict; call 2 is `git commit` with the trailers | neither call's check restores, flags or reports (silent, and nothing moved). The merge commit holds git's own merge of both tests: the combined test as `git merge-tree --write-tree` writes it, and the new test present. The tree and the index equal the merge commit. `judge_commits([merge])` is `[]` | **red**: after call 1 the check reports "Acceptance test restored from HEAD" for both tests (recorded `reverted`). The combined test is set back to the first parent's version and the new one is deleted, in the tree and in the index. Call 2's merge commit holds the first parent's versions: it is flagged ("a merge commit's own change to a ticket file or an acceptance test"), and `judge_commits` returns that finding |
-| `test_a_hand_write_of_an_acceptance_test_in_a_merge_over_two_calls_stays_caught` | the history of the no-conflict case, with line 10 of `test_merged.py` changed by hand: `in-the-first-call-after-the-merge` (call 1 merges, then writes); `in-a-call-of-its-own-between` (three calls); `in-the-commit-s-call-before-the-commit` | KPI 2: the check of the call that makes the hand write reports it and records a finding that names the test (restored or flagged). When the committed merge's test differs from git's own merge (it holds the hand write, or a restore that is not git's merge), the commit's check has a finding for the merge commit that names the test, and so has `judge_commits` | passes; must keep passing |
-| `test_a_conflict_in_an_acceptance_test_over_two_calls_stays_caught` | both sides changed line 2 of `test_merged.py`, and git reports the test as conflicted (call 1 exits 1). Call 2 stages the first parent's version whole, the merged side's version whole, or the blob git's own merge writes with its markers, then commits | KPI 2: call 1's check catches the conflicted test. The commit's check and `judge_commits` each have a finding for the merge commit that names it | passes; must keep passing |
-| `test_the_same_merge_over_two_calls_in_an_engineer_s_session_keeps_today_s_behaviour` | the no-conflict case in an engineer's session (`GOV_ROLE=engineer` on `DAEO-zz90`), committed with the engineer's trailers | DEC-266, today's behaviour. Call 1's check reports both tests and records them as `reverted`, and both are as `HEAD` holds them in the tree and the index. Call 2's merge is flagged with nothing reverted (W1-03's default for a merge that is not a fast-forward) | passes; must keep passing |
 
 ### F2 and F3: a drop hidden behind a rename or a file replaced by a directory (KPI 2)
 
@@ -315,7 +305,6 @@ A failure message shows every call's agent-facing text and finding records.
 
 | Test | Expected |
 |---|---|
-| `test_the_live_check_flags_a_drop_behind_a_rename_or_a_directory` | reported, and recorded as `flagged` in a finding for the merge commit that names a path of the test (its old or new name, the directory's file, or a moved-aside name `<path>~<commit>`). Nothing moved |
 | `test_judge_commits_finds_a_drop_behind_a_rename_or_a_directory` | `judge_commits([merge])` returns one finding, for the merge commit, that names such a path |
 
 Each test runs four cases:
@@ -347,9 +336,7 @@ parent.
 
 | Test | Expected | Red now because |
 |---|---|---|
-| `test_the_live_check_is_silent_on_git_s_own_merge_across_a_rename` | one call: silent, and nothing moved | `test_renamed.py` is flagged: "a merge commit's own change to a ticket file or an acceptance test" |
 | `test_judge_commits_returns_no_finding_for_git_s_own_merge_across_a_rename` | `judge_commits([merge])` is `[]` | it returns that finding |
-| `test_git_s_own_merge_across_a_rename_over_two_calls_is_kept` | F1 (b)'s form, over two calls: as F1's first test expects | after call 1 the check restores both names from `HEAD`, and call 2's merge is flagged |
 
 ### Earlier cases that assert the opposite of F1
 
@@ -399,7 +386,6 @@ The folder list and its use are as W2-05's lead states them: `gov.util.gitenv.GI
 
 | Case | At `d1533bf30a10`, before (seen) | After (seen, same head) |
 |---|---|---|
-| `test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run[a-fatal-error]` | **red:** the log of refused calls is empty | **green:** one call logged, `128`, `fatal: unable to read blob object <id>` (the removed blob); flagged |
 | `...[a-git-without-write-tree]` | **red:** the same | **green:** one call logged, `129`, the usage line; flagged |
 | `test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run[a-fatal-error]` | **red:** the same | **green:** control `0` and `[]`; one call logged, `128`, naming the blob; one finding naming the test |
 | `...[a-git-without-write-tree]` | **red:** the same | **green:** control `0` and `[]`; one call logged, `129`; one finding naming the test |

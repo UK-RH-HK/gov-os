@@ -3,7 +3,7 @@
 A project's settings hold one ``Read`` deny rule per held-out path (DEC-162).
 No rulesync source names a held-out path: the rules are written into the
 settings after generation, by the existing generator
-``python3 -m gov.guard.heldout`` run in the project, from the project's
+``python3 -m gov.util.heldout`` run in the project, from the project's
 held-out file (DEC-218). The owner's apply procedure is therefore "rulesync
 generate, then the generator", and the adapter/model-portability check holds
 the project's settings to exactly that: inside its temporary generation it
@@ -43,7 +43,7 @@ import w1_38_support as support
 
 needs_rulesync = pytest.mark.needs_rulesync
 
-GENERATOR = ("python3", "-m", "gov.guard.heldout")   # the owner's apply procedure, second step
+GENERATOR = ("python3", "-m", "gov.util.heldout")   # the owner's apply procedure, second step
 SRC = support.REPO_ROOT / "src"
 HELD_OUT_STEP_FAILED = "HELD_OUT_STEP_FAILED"   # the check's finding: the held-out step could not be applied
 
@@ -58,7 +58,7 @@ def _names() -> dict:
     the key in it, and the settings file it writes. Read in a fresh interpreter
     with this worktree's ``src`` first, so no other tree's code answers."""
     code = (
-        "import json, gov, gov.guard.heldout as h\n"
+        "import json, gov, gov.util.heldout as h\n"
         "print(json.dumps({'config': h.CONFIG_REL, 'key': h.CONFIG_KEY, "
         "'settings': h.SETTINGS_REL, 'code': gov.__file__}))"
     )
@@ -107,7 +107,7 @@ def _environment(project: Path) -> dict[str, str]:
 
 
 def _run_step(project: Path) -> subprocess.CompletedProcess:
-    """``python3 -m gov.guard.heldout`` in the stand-in project, with this
+    """``python3 -m gov.util.heldout`` in the stand-in project, with this
     worktree's code: the second step of the owner's apply procedure."""
     _assert_stand_in(project)
     done = subprocess.run(

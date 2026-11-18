@@ -41,11 +41,8 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SCRIPT_REL = "fixtures/evaluation/examin/check_gold.py"
 SCRIPT = Path(os.environ.get("W2_94_CHECK_GOLD") or REPO_ROOT / SCRIPT_REL)
-PATH_MAP = REPO_ROOT / "governance/project/path-map.yaml"
 CLOSE_RECORD = Path(os.environ.get("W2_94_CLOSE_RECORD")
                     or REPO_ROOT / "governance/project/orchestration/closes/W2-61-DAEO-iw1f.md")
-# The path map copied into the planted guarded repository (F1): this tree's own, unless a planted-break run names another.
-GUARD_PATH_MAP = Path(os.environ.get("W2_94_GUARD_PATH_MAP") or REPO_ROOT / "governance/project/path-map.yaml")
 TIMEOUT_S = 120.0
 
 SET = "examin"
@@ -428,62 +425,3 @@ def question_failures(run):
 # The guard (F1): the live hook, driven as W2-149's tests drive it
 # --------------------------------------------------------------------------
 
-HOOK = REPO_ROOT / ".claude/hooks/pretooluse.py"
-HIDDEN_QUESTION_REL = f"{SET_REL}/hidden/q01.yaml"
-HIDDEN_WORD = "zqxw94hiddentext"
-
-
-def real_set_entry():
-    """This tree's path map's ``evaluation_sets.examin`` entry (the declaration the guard enforces)."""
-    document = yaml.safe_load(PATH_MAP.read_text(encoding="utf-8"))
-    return document["evaluation_sets"][SET]
-
-
-def plant_guarded_repo(base):
-    """A temporary repository with this tree's path map, one committed stand-in hidden file at
-    ``fixtures/evaluation/examin/hidden/q01.yaml`` and one released stand-in at ``visible/q01.yaml``; and a planted
-    sets root under a planted HOME (``~/gov-os-eval``, the path map's ``sets_root_hidden`` root) with the same two."""
-    base = Path(base).resolve()
-    repo, home = base / "guarded", base / "guard-home"
-    for folder in (repo, home):
-        folder.mkdir(parents=True, exist_ok=True)
-    hidden_text = f"question: {HIDDEN_WORD} one?\ngold_answer: {HIDDEN_WORD} answer\n"
-    (repo / "governance/project").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(GUARD_PATH_MAP, repo / "governance/project/path-map.yaml")
-    write(repo / HIDDEN_QUESTION_REL, hidden_text)
-    write(repo / f"{SET_REL}/hidden/visible/q02.yaml", hidden_text)
-    write(repo / f"{SET_REL}/visible/q02.yaml", "question: a released stand-in?\n")
-    write(repo / "README.md", "# a planted project\n")
-    git(repo, "init", "-q", "-b", "main")
-    git(repo, "add", "-A")
-    git(repo, "commit", "-q", "-m", "the planted project")
-    sets_root = home / "gov-os-eval"
-    write(sets_root / HIDDEN_QUESTION_REL, hidden_text)
-    write(sets_root / f"{SET_REL}/hidden/visible/q02.yaml", hidden_text)
-    write(sets_root / f"{SET_REL}/visible/q02.yaml", "question: a released stand-in?\n")
-    return repo, home, sets_root
-
-
-def ask_guard(repo, home, tool, tool_input, role, ticket="W2-00"):
-    """The hook's decision on one call of a session of ``role``: ``deny`` (exit 2 or a deny decision), ``ask`` or
-    ``allow``, and its reason."""
-    import json
-
-    event = {"tool_name": tool, "tool_input": tool_input, "cwd": str(repo), "session_id": "w2-94-acceptance",
-             "agent_type": None}
-    env = {"HOME": str(home), "PATH": os.environ.get("PATH", "/usr/bin:/bin"), "LANG": "C.UTF-8", "GOV_ROLE": role,
-           "GOV_TICKET": ticket, "CLAUDE_PROJECT_DIR": str(repo), "PYTHONPATH": str(REPO_ROOT / "src"),
-           "GOV_GUARD_CALLS_DIR": str(Path(home) / "guard-calls"), "PYTHONDONTWRITEBYTECODE": "1"}
-    for key in ("PYTHONUSERBASE",):
-        if key in os.environ:
-            env[key] = os.environ[key]
-    done = subprocess.run([sys.executable, str(HOOK)], input=json.dumps(event), capture_output=True, text=True,
-                          env=env, cwd=str(repo), timeout=TIMEOUT_S)
-    if done.returncode == 2:
-        return "deny", done.stderr.strip()
-    if done.returncode != 0:
-        return "error", done.stderr.strip()
-    if done.stdout.strip():
-        out = json.loads(done.stdout)["hookSpecificOutput"]
-        return out["permissionDecision"], out.get("permissionDecisionReason", "")
-    return "allow", ""

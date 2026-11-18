@@ -105,8 +105,8 @@ def test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir(tmp_pa
     events = support.kernel_hook_events()
     scripts = {path.name for path in support.KERNEL_HOOKS.glob("*.py")}
     reached = {name for name in scripts if any(name in command for _, command in events)}
-    assert reached == scripts and len(scripts) == 7, \
-        f"the settings' hook command lines do not reach the seven kernel hooks: {sorted(scripts - reached)}"
+    assert reached == scripts and len(scripts) == 5, \
+        f"the settings' hook command lines do not reach the five kernel hooks: {sorted(scripts - reached)}"   # five since EMERGENCY-2 6.1, DAEO-gr7t
     runs = {f"the {event} hook": tuple(support.run_hook(root, box, command, event) for root, box in pair)
             for event, command in events}
     problems = _compare(runs, pair[0][0])

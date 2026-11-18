@@ -42,76 +42,9 @@ needs_gitleaks = pytest.mark.skipif(shutil.which("gitleaks") is None,
                                     reason="gitleaks is not on PATH: the secret filter and the check cannot run")
 
 
-def _refused(result, what, sandbox, *paths):
-    names = []
-    for path in paths:
-        names += support.why_words(path, sandbox)
-    support.assert_refused(result, what, *names)
-
-
-def _populate(sandbox):
-    """The root with MAIN's and OTHER's folders and a file in each, as the refusal cases build it.
-
-    Rewritten under DEC-751: both folders are made by ``gov launch`` of the
-    fixture project, never by hand (``support.open_own_folder``).
-    """
-    own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
-    support.write(own / "mine.txt", "mine\n")
-    support.write(other / "theirs.txt", "theirs\n")
-    return own, other
-
-
-def _writes_refused(guard, sandbox, folder, what, role, ticket_id):
-    """Write, Edit and two judged Bash forms (a redirect, and ``mkdir -p`` of a new folder) in ``folder``."""
-    target = folder / "notes.txt"
-    support.write(target, "a\n")
-    for tool_name in ("Write", "Edit"):
-        _refused(guard(tool_name, target, role, ticket_id), f"{tool_name} on {target} {what}", sandbox, target)
-    for command in (f"echo written > {q(target)}", f"mkdir -p {q(folder / 'clone')}"):
-        _refused(guard("Bash", command, role, ticket_id), f"Bash `{command}` {what}", sandbox, folder)
-
-
 # --------------------------------------------------------------------------
 # 1. R7 is scoped to the root
 # --------------------------------------------------------------------------
-
-# The spellings of the root the suite's removal cases use, but the plain one (held by
-# test_w2_50_guard_refusals.py::test_removing_or_moving_the_root_is_refused[rmdir]).
-ROOT_RMDIRS = {
-    "trailing-slash": "rmdir {root}/",
-    "dot": "rmdir {root}/.",
-    "through-the-own-folder": "rmdir {root}/W2-90/..",
-}
-
-
-@pytest.mark.parametrize("spelling", sorted(ROOT_RMDIRS))
-def test_rmdir_of_the_root_is_refused_in_each_spelling(guard, sandbox, spelling):
-    """DEC-743 1: ``rmdir`` is judged for ``~/gov-os-runs`` itself, however the root is spelled."""
-    _populate(sandbox)
-    command = ROOT_RMDIRS[spelling].format(root=q(sandbox.root))
-    _refused(guard("Bash", command), f"Bash `{command}`", sandbox, sandbox.root)
-
-
-def test_rmdir_of_an_empty_folder_in_the_repository_outside_the_paths_stays_as_today(guard, sandbox, project):
-    """DEC-743 1: ``rmdir`` is not judged everywhere. Inside the repository it stays as today's guard decides it.
-
-    Measured on ``w2/W2-50`` at ``a5ef3c69``, before the change: the guard allows
-    ``rmdir`` of an empty folder under ``docs/``, outside the engineer's
-    ``src/app/**``, because it does not judge ``rmdir``. The case holds that
-    decision; judging ``rmdir`` as a write target everywhere would refuse it.
-    """
-    empty = project / "docs" / "empty"
-    empty.mkdir()
-    command = f"rmdir {q(empty)}"
-    support.assert_allowed(guard("Bash", command), f"Bash `{command}` (an empty folder outside the ticket's paths)")
-
-
-def test_rmdir_of_an_empty_folder_inside_the_own_folder_stays_allowed(guard, sandbox):
-    """DEC-743 1: once the own folder is open, ``rmdir`` of its empty sub-folder is allowed."""
-    own, _ = _populate(sandbox)
-    (own / "empty").mkdir()
-    command = f"rmdir {q(own / 'empty')}"
-    support.assert_allowed(guard("Bash", command), f"Bash `{command}` (an empty folder in the own folder)")
 
 
 # --------------------------------------------------------------------------
@@ -217,66 +150,8 @@ def test_the_check_follows_a_link_to_a_folder_whose_name_only_starts_with_the_ro
 # 4. §6.4: the own folder is open only while the ticket is in_progress
 # --------------------------------------------------------------------------
 
-STATUS_TICKET = support.Ticket("DAEO-zz95", ENGINEER, "W2-95", ("src/app/**",))
-
-
-def _add_ticket(project, ticket, status):
-    """Write ``ticket`` into the fixture project with ``status``, from the suite's own ticket text, and commit it."""
-    original = support.ticket_text(ticket)
-    text = original.replace("status: in_progress", f"status: {status}", 1)
-    assert status == "in_progress" or text != original, "the fixture ticket's text has no status line to change"
-    support.write(project / ".tickets" / f"{ticket.tk}.md", text)
-    support.git(project, "add", "-A")
-    support.git(project, "commit", "-q", "-m", f"fixture ticket {ticket.tk} ({status})")
-
-
-def test_the_same_ticket_in_progress_opens_its_folder(guard, sandbox, project):
-    """The control of the two refusals below: the ticket written the same way, ``in_progress``, opens its folder.
-
-    Rewritten under DEC-751: the folder is made by ``gov launch`` of the ticket.
-    """
-    _add_ticket(project, STATUS_TICKET, "in_progress")
-    target = support.open_own_folder(sandbox, STATUS_TICKET) / "notes.txt"
-    support.write(target, "a\n")
-    for tool_name in ("Write", "Edit"):
-        support.assert_allowed(guard(tool_name, target, ENGINEER, STATUS_TICKET.tk),
-                               f"{tool_name} on {target} by the engineer on {STATUS_TICKET.tk} (in_progress)")
-    command = f"echo written > {q(target)}"
-    support.assert_allowed(guard("Bash", command, ENGINEER, STATUS_TICKET.tk), f"Bash `{command}` (in_progress)")
-
-
-@pytest.mark.parametrize("status", ("open", "closed"))
-def test_the_folder_of_a_ticket_that_is_not_in_progress_is_closed(guard, sandbox, project, status):
-    """DEC-743 6: a session whose GOV_TICKET names a ticket in another status may not write in its folder.
-
-    Rewritten under DEC-751 (the expectation unchanged): the folder is made by a
-    launch while the ticket is ``in_progress``, then the ticket's status changes;
-    the refusal is then the status's, not that of a folder no launch made.
-    """
-    _add_ticket(project, STATUS_TICKET, "in_progress")
-    support.open_own_folder(sandbox, STATUS_TICKET)
-    _add_ticket(project, STATUS_TICKET, status)
-    _writes_refused(guard, sandbox, sandbox.own(STATUS_TICKET), f"by the engineer on {STATUS_TICKET.tk} ({status})",
-                    ENGINEER, STATUS_TICKET.tk)
-
 
 # --------------------------------------------------------------------------
 # 5. §6.5: ticket-lead is not among "any role"
 # --------------------------------------------------------------------------
 
-def test_a_ticket_lead_may_not_write_in_its_tickets_folder(guard, sandbox):
-    """DEC-743 7: a ``ticket-lead`` session on MAIN (``in_progress``) may not write in ``~/gov-os-runs/W2-90``.
-
-    Rewritten under DEC-751 (the expectation unchanged): the folder is made by a
-    launch of MAIN first, so it is open to MAIN's engineer and the refusal is the role's.
-    """
-    support.open_own_folder(sandbox, MAIN)
-    _writes_refused(guard, sandbox, sandbox.own(MAIN), f"by {TICKET_LEAD} on {MAIN.tk}", TICKET_LEAD, MAIN.tk)
-
-
-def test_a_ticket_lead_keeps_its_scratch_in_the_repository(guard, sandbox, project):
-    """The control: DEC-434's own list is unchanged, so the refusal above is not one of an unknown role."""
-    target = project / ".gov-runtime" / "scratch" / "lead" / "CHECKPOINT.md"
-    support.assert_allowed(guard("Write", target, TICKET_LEAD, MAIN.tk), f"Write on {target} by {TICKET_LEAD}")
-    command = f"echo written > {q(project / '.gov-runtime' / 'scratch' / 'lead' / 'notes.md')}"
-    support.assert_allowed(guard("Bash", command, TICKET_LEAD, MAIN.tk), f"Bash `{command}` by {TICKET_LEAD}")
