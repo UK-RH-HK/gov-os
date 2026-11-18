@@ -3139,7 +3139,8 @@ capabilities:
   title: Decisions register (structured, versioned, authoritative)
   outcome: An agent can rely on one structured, versioned register of decisions with supersession.
   acceptance: Superseding a decision updates both records' status and links, and the checker flags an ACTIVE record that is
-    superseded, a duplicate id or a cycle.
+    superseded, a duplicate id or a cycle. The checker also runs on the register that replaces the archived one, and an id
+    cited from the archive is a finding that points to it.
   wave: W1
   provider:
   - MADR + check-jsonschema 0.38.2
@@ -3152,6 +3153,7 @@ capabilities:
   - DEC-030 (authority/current/superseded filtering)
   - DEC-012
   - DEC-074
+  - EMERGENCY-2 §11.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-B-08

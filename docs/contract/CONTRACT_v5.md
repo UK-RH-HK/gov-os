@@ -802,11 +802,11 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 ### CAP-51 — Decisions register (structured, versioned, authoritative)
 
 - **Outcome:** An agent can rely on one structured, versioned register of decisions with supersession.
-- **Acceptance:** Superseding a decision updates both records' status and links, and the checker flags an ACTIVE record that is superseded, a duplicate id or a cycle.
+- **Acceptance:** Superseding a decision updates both records' status and links, and the checker flags an ACTIVE record that is superseded, a duplicate id or a cycle. The checker also runs on the register that replaces the archived one, and an id cited from the archive is a finding that points to it.
 - **Wave:** W1
 - **Provider:** MADR + check-jsonschema 0.38.2, W1-11, W1-21
 - **Disposition:** KEPT
-- **Sources:** Framework v4.1.2 §2, §68; Contract v3 Gate C1 (decisions); Contract v3 Gate L1 (contradiction resolution); DEC-030 (authority/current/superseded filtering); DEC-012; DEC-074
+- **Sources:** Framework v4.1.2 §2, §68; Contract v3 Gate C1 (decisions); Contract v3 Gate L1 (contradiction resolution); DEC-030 (authority/current/superseded filtering); DEC-012; DEC-074; EMERGENCY-2 §11.3 (DEC-1211)
 - **Covers:**
   - `CAP-51.a` [W1] Structured, versioned decisions with supersession; contradiction resolution — Framework v4.1.2 §2, §68; Contract v3 C1, L1 · delivered by W1-11
   - `CAP-51.b` [W1] Authority/current/superseded filtering in retrieval — DEC-030 · delivered by W1-21
