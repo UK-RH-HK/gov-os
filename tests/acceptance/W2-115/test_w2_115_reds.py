@@ -4,8 +4,8 @@ S4: every failing test is run again alone; a red is judged against the head with
 it is not the change's only if the head without it has it red with the same failure type; the nightly's recorded
 result is read first; no nightly-baseline clone is built; only the load-sensitive cases get 3 rounds; an unknown
 failure (a timeout, no record) never matches.
-S5: a red the change did not cause is named in the close record and opened as a repair ticket for the orchestrator;
-no accepted-reds or load-sensitive list is read or written.
+S5: a red the change did not cause is named in the close record, with no repair ticket (EMERGENCY-2 4.2, W2-193 S6;
+it was opened as one for the orchestrator before); no accepted-reds or load-sensitive list is read or written.
 F1: an unowned red does not refuse the scoped close; a caused red does not close.
 F2 (the lists half): the lists in the path map are neither changed nor written (bytes and file time unchanged).
 
@@ -38,25 +38,22 @@ def test_an_unowned_red_does_not_refuse_the_scoped_close(unowned):
     assert unowned.project.ticket_status() == "closed", f"the ticket did not close\n{unowned.run.describe()}"
 
 
-def test_an_unowned_red_is_named_in_the_record_and_opened_as_a_repair_ticket_for_the_orchestrator(unowned):
-    """S5: the close record names the unowned red (not caused, its reason) and the repair ticket it opened in
-    ``.tickets/``: assigned to the orchestrator, naming the red's node id and failure type."""
+def test_an_unowned_red_is_named_in_the_record_and_opens_no_repair_ticket(unowned):
+    """S5: the close record names the unowned red (not caused, its failure type, a reason that says it was red at the
+    base) with ``repair_ticket: null``, and the close creates no file in ``.tickets/``.
+
+    Rewrite-Reason: EMERGENCY-2 4.2 (a known bug is a fix recorded in its owning ticket's record, not a ticket),
+    W2-193 S6. Was ``test_an_unowned_red_is_named_in_the_record_and_opened_as_a_repair_ticket_for_the_orchestrator``
+    (S5: a repair ticket in ``.tickets/``, assigned to the orchestrator, naming the red's node id and failure type)."""
     support.passed(unowned.run)
     front = unowned.project.record()
     entry = support.red_entry(front, unowned.known)
     assert entry.get("caused") is False, f"the unowned red is recorded as caused: {entry}"
-    assert str(entry.get("reason") or "").strip(), f"the unowned red has no reason: {entry}"
+    assert "base" in str(entry.get("reason") or "").lower(), f"the reason does not say it was red at the base: {entry}"
     assert entry.get("failure_type") == "AssertionError", f"the red's failure type is not recorded: {entry}"
-    repair = entry.get("repair_ticket")
-    assert repair, f"the unowned red names no repair ticket: {entry}"
-    new = [p for p in (unowned.project.root / ".tickets").glob("*.md") if p.stem not in unowned.known_tickets]
-    found = [p for p in new if support.close_support.frontmatter_of(p).get("id") == repair or p.stem == repair]
-    assert len(found) == 1, f"no ticket {repair} was opened in .tickets/: {[p.name for p in new]}"
-    text = found[0].read_text(encoding="utf-8")
-    assert support.close_support.frontmatter_of(found[0]).get("assignee") == "orchestrator", \
-        f"the repair ticket is not for the orchestrator:\n{text}"
-    assert unowned.known in text and "AssertionError" in text, \
-        f"the repair ticket does not name the red's node id and failure type:\n{text}"
+    assert "repair_ticket" in entry and entry["repair_ticket"] is None, f"the unowned red names a repair ticket: {entry}"
+    new = [p.name for p in (unowned.project.root / ".tickets").glob("*.md") if p.stem not in unowned.known_tickets]
+    assert not new, f"the close opened tickets in .tickets/: {new}"
 
 
 def test_every_failing_test_is_run_again_alone_and_once_on_the_head_without_the_change(unowned):
@@ -334,8 +331,11 @@ def _parent_of_oldest_own(project):
 
 def _assert_judged_at_the_ticket_s_parent(project, before, run, node):
     """W2-193 S3: the close passed and the ticket closed; the record names ``base`` the parent of the ticket's oldest
-    own commit and ``base_from: ticket``, and ``node`` not caused with a repair ticket that names it; ``node`` ran
-    on the head without the change (that parent), where it failed."""
+    own commit and ``base_from: ticket``, and ``node`` not caused, with a reason that says it was red at the base and
+    no repair ticket (``repair_ticket`` null; no new file in ``.tickets/``); ``node`` ran on the head without the
+    change (that parent), where it failed.
+
+    Rewrite-Reason: EMERGENCY-2 4.2, W2-193 S6: a base red opens no repair ticket (it asserted one that names ``node``)."""
     support.passed(run)
     assert project.ticket_status() == "closed", f"the ticket did not close\n{run.describe()}"
     front = project.record()
@@ -344,10 +344,10 @@ def _assert_judged_at_the_ticket_s_parent(project, before, run, node):
     assert front.get("base_from") == "ticket", f"base_from is not 'ticket': {front.get('base_from')!r}"
     entry = support.red_entry(front, node)
     assert entry.get("caused") is False, f"a red already red at the ticket's parent is the change's: {entry}"
-    assert entry.get("repair_ticket"), f"the red names no repair ticket: {entry}"
-    repairs = [p.name for p in (project.root / ".tickets").glob("*.md")
-               if p.stem not in before and node in p.read_text(encoding="utf-8")]
-    assert repairs, "no repair ticket names the red"
+    assert "base" in str(entry.get("reason") or "").lower(), f"the reason does not say it was red at the base: {entry}"
+    assert "repair_ticket" in entry and entry["repair_ticket"] is None, f"the red names a repair ticket: {entry}"
+    new = [p.name for p in (project.root / ".tickets").glob("*.md") if p.stem not in before]
+    assert not new, f"the close opened tickets in .tickets/: {new}"
     base = support.base_side(project.told_runs(node.split("::")[1]))
     assert base and not any(r["ok"] for r in base), f"the red was not run at the ticket's parent: {base}"
 
@@ -358,9 +358,10 @@ def test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_not_th
     there is no green base on HEAD's line: the head without the change is the first parent of the ticket's oldest
     own commit. W2-bb's known red is already red there, with the same failure type (AssertionError): it is not the
     change's. The close passes, the record names that parent under ``base`` with ``base_from: ticket``, marks the red
-    not caused and opens a repair ticket naming it; the red ran on that parent.
+    not caused and opens no repair ticket; the red ran on that parent.
 
-    Rewrite-Reason: W2-193 S3 (EMERGENCY-2 6.1, close against the base by default; supersedes DEC-1150 (2)). Was
+    Rewrite-Reason: W2-193 S3 (EMERGENCY-2 6.1, close against the base by default; supersedes DEC-1150 (2)) and
+    W2-193 S6 (EMERGENCY-2 4.2: no repair ticket for a base red). Was
     ``test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_still_the_change_s`` (DEC-1150 (2):
     refused with RED_CAUSED, every red the change's, nothing asserted about a run on the parent)."""
     told = tmp_path / "project-told"
@@ -400,10 +401,11 @@ def test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_judged
     trailer (an honest slip) and breaks W2-bb's widget test; the ticket's trailered work follows. The head without
     the change is the first parent of the oldest trailered commit: the slip, where the test is already red with the
     same failure type. The red is judged there and is not the change's; it is not lost: the close passes, the
-    record names the slip under ``base`` with ``base_from: ticket``, marks the red not caused, and a repair ticket
-    names it; the red ran on the slip.
+    record names the slip under ``base`` with ``base_from: ticket``, marks the red not caused, and opens no repair
+    ticket; the red ran on the slip.
 
-    Rewrite-Reason: W2-193 S3 (EMERGENCY-2 6.1, close against the base by default; supersedes DEC-1150 (2)). Was
+    Rewrite-Reason: W2-193 S3 (EMERGENCY-2 6.1, close against the base by default; supersedes DEC-1150 (2)) and
+    W2-193 S6 (EMERGENCY-2 4.2: no repair ticket for a base red). Was
     ``test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_the_change_s`` (DEC-1150 (2): with no
     green base every red is the change's, refused with RED_CAUSED)."""
     told = tmp_path / "project-told"

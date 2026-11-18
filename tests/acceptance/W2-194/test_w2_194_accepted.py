@@ -83,8 +83,11 @@ def test_the_same_entry_added_without_role_owner_covers_nothing(tmp_path, sandbo
 def test_an_entry_whose_decision_is_not_accepted_is_named_in_the_record_and_covers_nothing(tmp_path, sandbox):
     """S3: an entry whose decision is ``PROPOSED`` (not an ACCEPTED owner entry) for a red that is red at the base
     with the same failure type: the close passes (the red is a base red), the record's ``accepted_red_findings``
-    names the entry's test, and the red is not accepted (``accepted`` null) and gets a repair ticket as any other
-    base red."""
+    names the entry's test, and the red is not accepted (``accepted`` null) and is listed as any other base red,
+    with no repair ticket (``repair_ticket`` null, no new file in ``.tickets/``).
+
+    Rewrite-Reason: EMERGENCY-2 4.2, W2-193 S6: a base red opens no repair ticket (it asserted a repair ticket
+    for the red)."""
     made, before, run = _project(tmp_path, sandbox, KNOWN, support.KNOWN_RED, decision=PROPOSED, status="PROPOSED")
 
     support.assert_closed(made, run)
@@ -99,7 +102,8 @@ def test_an_entry_whose_decision_is_not_accepted_is_named_in_the_record_and_cove
     entry = support.red_entry(front, KNOWN)
     assert entry.get("caused") is False and entry.get("accepted") is None, \
         f"the base red's entry is not a plain base red: {entry}"
-    assert entry.get("repair_ticket"), f"the base red names no repair ticket: {entry}"
+    assert entry.get("repair_ticket") is None, f"the base red names a repair ticket: {entry}"
+    assert support.tickets(made) == before, f"the close created tickets: {support.tickets(made) - before}"
 
 
 def test_a_listed_red_green_at_the_base_refuses(tmp_path, sandbox):
