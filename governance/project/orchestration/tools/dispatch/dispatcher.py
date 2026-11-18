@@ -1362,6 +1362,9 @@ def inbox_item(name, body):
 LIVE_ORCH = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator")
 LIVE_PROJECTS = Path.home() / ".claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS"
 STALL_S, QUIET_PUSH_S = 3600, 7200  # the item at any hour; the push by day, and in the quiet hours (02:00-07:30)
+# a named session silent this long is a stale name (a CTO handed over, the file not yet rewritten; 2026-11-18 00:38):
+# one inbox note, never a push
+STALE_NAME_S = 12 * 3600
 
 
 def _live():
@@ -1399,6 +1402,10 @@ def watch_stall(dry):
     what = f"waiting on a tool ({tool}) since {last_a:%H:%M}" if pending else f"idle since {last_a:%H:%M}"
     line = f"STALL WAKE | the CTO session is {what}, {int(age // 60)} min"
     push_due = age >= (QUIET_PUSH_S if deadman.quiet(datetime.fromtimestamp(now())) else STALL_S)
+    if age >= STALE_NAME_S:  # a stale name, not a stall: tell the CTO's inbox once, push nothing
+        line = (f"STALL CHECK | {path.name} has been silent {int(age // 3600)} h: the watched session looks stale; "
+                f"write the live CTO's session id to {LOG / 'cto-session.txt'}")
+        push_due = False
     todo = [k for k in ("item", "push") if not st.get(k) and (k == "item" or push_due)]
     if not todo or dry:
         for k in todo:

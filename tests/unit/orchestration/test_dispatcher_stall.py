@@ -110,3 +110,12 @@ def test_a_failing_step_is_named_and_the_pass_goes_on(s):
     done = tick(s, DISPATCH_NOW=DAY)
     assert done.returncode == 0
     assert "stall" in json.dumps(json.loads((s.d / "status.json").read_text()))
+
+
+def test_a_named_session_silent_past_twelve_hours_is_a_stale_name_never_a_push(s):
+    """2026-11-18 00:38: a handed-over CTO's session still named gave a false push; now one note, no push."""
+    transcript(s, DAY - 25 * 3600)
+    for _ in range(3):
+        assert tick(s, DISPATCH_NOW=DAY).returncode == 0
+    assert len(items(s)) == 1 and pushes(s) == []
+    assert "stale" in (s.d / "inbox" / items(s)[0]).read_text()
