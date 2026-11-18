@@ -2,12 +2,15 @@
 each such search writes one FALLBACK line naming the failure and "unranked" (DEC-374, DEC-1033, DEC-979 item 4).
 
 - **The bounds**, timed over S1's planted kinds (``w2_145_support.KINDS``), by the search's own call time in its
-  session: within ``CONNECT_S`` plus 1 s when nothing answers the socket (no connection within ``CONNECT_S``) or the
-  socket is refused (EPERM); within ``CONNECT_S`` plus 1 s *of the refused start's end* when no service listens and
-  its start is refused (the start itself is the shared service's: one that waits for a GPU slot, as S3 keeps, takes
-  its own wait, which the planted interpreter records; what may not follow it is a second wait, a private's); within
-  the request's time limit (``GOV_RERANK_TIMEOUT_S``, 3 s in every box) plus 1 s when the service does not answer or
-  answers wrongly. Never the 20 s slot wait.
+  session, with the time the session's thread waited on a run queue for a CPU taken out (``queued``, the kernel's
+  account in ``/proc/thread-self/schedstat``; a loaded machine's queue is not the search's time). The bounds are as
+  they were, lowered by nothing, and a search that sleeps or waits past one has no queue wait to take out and still
+  fails (rewrite 2026-11-18, DEC-979 item 1 D2, DEC-983): within ``CONNECT_S`` plus 1 s when nothing answers the
+  socket (no connection within ``CONNECT_S``) or the socket is refused (EPERM); within ``CONNECT_S`` plus 1 s *of the
+  refused start's end* when no service listens and its start is refused (the start itself is the shared service's: one
+  that waits for a GPU slot, as S3 keeps, takes its own wait, which the planted interpreter records; what may not
+  follow it is a second wait, a private's); within the request's time limit (``GOV_RERANK_TIMEOUT_S``, 3 s in every
+  box) plus 1 s when the service does not answer or answers wrongly. Never the 20 s slot wait.
 - **The log line:** exactly one line of ``~/.cache/gov-os/rerank.log`` of kind ``FALLBACK`` per such search (the
   second tab field, as ``gov status`` counts it), whose detail names the service's failure and says "unranked", and
   never "private".
@@ -41,13 +44,17 @@ def test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallba
         planted.premise()
         bound = support.bound_of(kind)
         if kind.bound == "start":
-            late = report["ended"] - planted.service_end()
+            # Rewrite: the run-queue wait of the session's thread is taken out of the time after the start's end too,
+            # and the two wall-clock stamps (the session's end, the recorder's `date` of the service's end) are never
+            # taken to be later than the whole call on the monotonic clock: a step of the wall clock is no lateness.
+            late = min(report["ended"] - planted.service_end(), report["wall"]) - report["queued"]
             assert late <= bound, \
-                (f"{who} came back {late:.1f} s after the service's refused start ended (in all "
-                 f"{report['seconds']:.1f} s): within CONNECT_S + 1 s = {bound:g} s, never waiting for anything else")
+                (f"{who} came back {late:.1f} s after the service's refused start ended, less {report['queued']:.1f} s "
+                 f"waiting for a CPU (in all {support.spent(report)}): within CONNECT_S + 1 s = {bound:g} s, never "
+                 f"waiting for anything else")
         else:
             assert report["seconds"] <= bound, \
-                f"{who} took {report['seconds']:.1f} s: within {bound:g} s ({kind.bound} bound + 1 s)"
+                f"{who} took {support.spent(report)}: within {bound:g} s ({kind.bound} bound + 1 s)"
         lines = [detail for logged, detail in box.log_lines() if logged == "FALLBACK"]
         assert len(lines) == 1, f"{who} wrote {len(lines)} FALLBACK lines to rerank.log, one is expected: {lines}"
         detail = lines[0]
@@ -79,7 +86,7 @@ def test_s4_a_search_that_cannot_write_the_log_still_searches(boxes, name):
         outcome = report.get("outcome") or {}
         assert outcome.get("by") == "unavailable", f"{who}: last_outcome() is {outcome}"
         support.check_reason(outcome.get("reason"), kind, who)
-        assert report["seconds"] <= support.bound_of(kind), f"{who} took {report['seconds']:.1f} s"
+        assert report["seconds"] <= support.bound_of(kind), f"{who} took {support.spent(report)}"
         support.check_no_private(box, report, who)
     finally:
         planted.close()

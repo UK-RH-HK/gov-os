@@ -40,7 +40,7 @@ test here. In the same round, the W2-112 and W2-32 acceptance cases that assumed
 | `gov.retrieval.rerank` | has no `_started`; every process start in `rerank.py` names the service (`rerank_service` or a name bound to it); no process start anywhere in `src/gov/` names `rerank_worker` (an AST search of `subprocess.*`, `os.exec*`/`spawn*`/`posix_spawn*`/`system`/`popen`, `asyncio.create_subprocess_*`) | S2 |
 | `GOV_RERANK_ALLOW_CPU=1` | opens no CPU path: a search with it and no usable GPU is unranked, named, nothing loaded | S2 |
 | The service's slots | the GPU slot lock files `gov-os-rerank-gpu-<i>.lock` (`GOV_RERANK_GPU_SLOTS`, `GOV_RERANK_GPU_LOCK_DIR`), held by `flock` by the service's own process (its pid in `/proc/locks`): the first one as today (`take_slot`, `GOV_RERANK_GPU_WAIT_S`, never the CPU), then every other free one, and one another process frees within 3 s of its release (the ticket's 2 s, a second of slack); all free once it ends (SIGTERM, SIGKILL, idle) | S3 |
-| The bounds | the search's own call time: `CONNECT_S` (the product's constant, at most 2 s) + 1 s when the socket is refused or nothing takes the connection; `CONNECT_S` + 1 s after the refused service's end (the planted interpreter records it) when no service listens and its start is refused; the request's time limit (`GOV_RERANK_TIMEOUT_S`, 3 s in every box) + 1 s when the service does not answer or answers wrongly | S4 |
+| The bounds | the search's own call time (the monotonic clock, less the session thread's run-queue wait, see "How the load case was shown"): `CONNECT_S` (the product's constant, at most 2 s) + 1 s when the socket is refused or nothing takes the connection; `CONNECT_S` + 1 s after the refused service's end (the planted interpreter records it) when no service listens and its start is refused; the request's time limit (`GOV_RERANK_TIMEOUT_S`, 3 s in every box) + 1 s when the service does not answer or answers wrongly | S4 |
 | `rerank.log` | `~/.cache/gov-os/rerank.log`, tab-separated `time`, `kind`, `detail…`: exactly one `FALLBACK` line per unanswered search, its detail saying `unranked` (a word), naming the failure (as above), never `private`. A search that cannot write the log (it is a folder) still searches | S4 |
 | `gov status` | `gov status --json`: `result.reranker.fallbacks` counts every `FALLBACK` line (old ones too), `result.reranker.service_refusals` every `REFUSED` line | S4 (`status()` unchanged) |
 | The evidence file | `docs/changes/W2-145-evidence.md` (see S5's cases) | S5 |
@@ -145,6 +145,48 @@ ticket).
   cases naming it.
 - **N-5. S6 and failure lines 4 and 5 read git history** after the filing commit `f916c5766f7f`; a clone without it
   fails them naming it.
+
+## How the load case was shown (rewrite of 2026-11-18, Class Q, Task emergency-2)
+
+`test_s4_an_unanswered_search_comes_back_within_its_bound...[no-connection-within-connect-s]` passed alone and failed
+in the full suite under load (`-n 8`): 5.4 s against its bound of 3 s. The bounds are KPI lines and are unchanged. What
+changed is what the number measures: the search's own time, not the machine's. The session (`w2_145_session.py`) now
+stamps the call alone on `time.monotonic()` (`t0`, `t1`) and records `queued`, the second field of
+`/proc/thread-self/schedstat` (nanoseconds this thread waited on a run queue) before and after the call. `Session.wait`
+(`w2_145_support.py`) reports `seconds` = (`t1` - `t0`) - `queued`, and keeps `wall` and `queued` for the message; the
+"start" branch of the case takes `queued` out of its lateness too. A search that sleeps or waits past its bound has no
+run-queue wait to take out, and still fails.
+
+Two causes were found, and both are taken out:
+
+1. **This machine's wall clock steps.** `time.time()` jumps by seconds against `time.monotonic()` on this WSL2 host (a
+   100 s watch saw a 2.9 s step and 8.5 s of drift). The session's call was timed as `time.time()` after minus before, so a
+   step inside the call read as search time: pytest's own clock said the case took 2.2 s while the report said 4.8 s.
+   The stamps `started`/`ended` stay wall-clock (the planted interpreter's `date` stamps the service's end in the same
+   clock); `seconds` comes from the monotonic pair.
+2. **A process waiting for a CPU.** `queued` is the kernel's account of it.
+
+Shown (a scratch run, nothing kept in the tree; every burner pinned and ended by `timeout 120`):
+
+- *The measure sees starvation.* Inside the heavy slot, on the slot's first CPU (`${GOV_HEAVY_CPUS%%[-,]*}`): six
+  `taskset -c <cpu> timeout 120 python3 -c "while True: pass"` burners at nice 0, and the case's session (`taskset -c
+  <cpu> nice -n 19`, set from a `.pth` of a scratch venv that runs only in a process whose script is
+  `w2_145_session.py`, so pytest itself is not starved). The case's report then read `wall 2.07 s, queued 1.06 s,
+  seconds 1.01 s` (16 burners: `wall 2.10 s, queued 1.96 s`), and the case was green. A plain loop pinned the same way
+  under nice 19 waited 13.9 s of 14.8 s on the queue, and the same loop alone 0.0 s.
+- *Starvation alone did not lengthen this case's wall time* (the connection wait ends on a timer that runs while the
+  thread queues), so the old measure was red under load by a step of the wall clock. The step was shown by planting one:
+  the same hook adds 2.8 s to the session's `time.time()` one second into the process (inside the call). Before the
+  change: `took 4.8 s: within 3 s`, red. After: green (`seconds` 2.0 s). The first red of the work was a real step of
+  that size (pytest `in 2.19s`, report 4.8 s).
+- *The bound still bites.* A scratch copy of `src/` (the case run with `PYTHONPATH` at it) with a 3 s `time.sleep`
+  added where `_connect` raises `no connection ... within CONNECT_S`: quiet, red with `took 5.0 s (wall 5.0 s less 0.0 s
+  waiting for a CPU): within 3 s`; starved as above, red with `took 4.1 s (wall 5.1 s less 1.0 s waiting for a CPU)`.
+
+Limit: where the file cannot be read (a `/proc` without schedstat) `queued` is 0.0 and the case judges the monotonic
+wall time alone. The queue wait is taken out whole, including any part that overlapped a wait the code was making
+anyway (16 burners took 1.96 s of a 2.1 s call), so the measure can read lower than the search's true time by that
+part; a single long sleep has no queue wait and is never credited.
 
 ## Files
 
