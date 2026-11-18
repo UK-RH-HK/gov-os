@@ -200,7 +200,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **CI:** generated files must match source (drift = G2 failure). Generated adapters are never hand-edited.
 
 ### DEC-023 — Distribution: Copier (`gov init` / `gov update`)
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** kept
 - **Decision:** `gov-os` repo is a Copier template; kernel files are template-owned; overlay files listed in `_skip_if_exists`; tags = releases. Update uses Copier's three-way merge. [E-COPIER][E-COPIER-SKIP]
 - **Rule:** never hand-edit `.copier-answers.yml` (breaks the update diff). [E-COPIER-DOCS]
 - **Lock:** `framework.lock` = `.copier-answers.yml` reference + file hash manifest generated at install.
@@ -422,7 +422,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Decision:** The `S1_STABILISE_PROMPT` is not run. The carried `govbridge` code may be replaced by tools chosen in S0; fixing its tests first would be wasted work. The carried code is evaluated in S0 as an in-house candidate.
 
 ### DEC-060 — One agnostic Gov OS; projects differ only by overlay configuration
-- **Status:** ACCEPTED (owner, 2026-09-29)
+- **Status:** ACCEPTED (owner, 2026-09-29) · **Class:** kept
 - **Decision:** There is one Gov OS release line for every project type. Projects differ only in their committed overlay configuration (path map, enabled capabilities such as code-intelligence languages or a research corpus, policy strengths). The choice of which product adopts first is a sequencing decision for dogfooding, not a variant. OQ-04 is deferred to the adoption stage.
 
 ### DEC-061 — One workbench folder for out-of-repo sessions
@@ -5335,7 +5335,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 125. One delegated decision on W1-39: the lock comparison, the update procedure, the adapter generation step (register v0.125, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-488 — W1-39: one comparison of a project with its lock, owned by W1-39; the update procedure is in the template's messages and the lock's header; adapter generation is a documented step after `copier copy`
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-39 lead's packages P-1 (in part), P-3 and P-4 (`log/W1-39-lead-run1.json`), each with the lead's recommendation. The parts of its packages that change a ticket's allowed paths (P-1's call site in `gov doctor`, P-2, P-5) are the owner's and are not decided here.
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-39 lead's packages P-1 (in part), P-3 and P-4 (`log/W1-39-lead-run1.json`), each with the lead's recommendation. The parts of its packages that change a ticket's allowed paths (P-1's call site in `gov doctor`, P-2, P-5) are the owner's and are not decided here. · **Class:** kept
 - **Decision:**
   - **The comparison of a project with its lock is built once, by W1-39, as a public function of its own code:** given a project, it answers match or drift, the drifted files, and the reason where it could not compare. It never answers match without having hashed: an absent or empty manifest is not a match; a kernel file that the manifest does not list is drift, named; the lock's template tag and commit are compared with the answers file. `gov doctor` is to call it (where and under which ticket: with the owner).
   - **Only `__pycache__/` folders are left out of "a kernel file the manifest does not list".** Git-ignored files in general are not left out: an ignore rule is the project's to write, and a file hidden by one would escape the comparison.
@@ -8446,7 +8446,7 @@ W2-53 was merged into `w2/integrate` at `c9537e39` (`Task: DAEO-7rr2`; its tree 
   2. **The condition:** W2-18 refuses to pin a product repository to a lock that shows `release: null`. Until then, R3-F3 (a lock laundered to `release: null`) is a residual of W2-16's close.
 
 ### DEC-772 — `gov release` is the owner's alone, from a plain terminal; the guard refuses a prefix in front of any `gov` command (P-W2-23)
-- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-761, DEC-409, DEC-722 · **Basis:** P-W2-23; W2-16's run-2 review, finding R3-NAMED: from an auditor's session, `GOV_ROLE=orchestrator gov release` and `env -u GOV_ROLE gov release` wrote a release and a lock.
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-761, DEC-409, DEC-722 · **Basis:** P-W2-23; W2-16's run-2 review, finding R3-NAMED: from an auditor's session, `GOV_ROLE=orchestrator gov release` and `env -u GOV_ROLE gov release` wrote a release and a lock. · **Class:** kept (items changed: (1) kept §2.5; (2) guard prefix refusal superseded §2.2; (3) history)
 - **Decision:**
   1. **`gov release` is owner-only, from a plain terminal,** like `gov approve` and the freeze lift: it refuses with a Claude Code process among its ancestors, with `GOV_ROLE` or `GOV_TICKET` set, or without a terminal, and asks for a typed one-time code. **This replaces DEC-761 item 1's line "`gov release` refuses unless the role is orchestrator, or the owner in a plain terminal".** It is W2-16's next round, and that round does only this (tests first, one review of that change); W2-16's allowed paths do not change.
   2. **And (b): the guard refuses a leading `NAME=value` assignment or an `env` prefix in front of any `gov` command:** a high row, W2-H060, triaged to W2-42 (the guard-holes ticket), not W2-16's.
