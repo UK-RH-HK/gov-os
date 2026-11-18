@@ -313,7 +313,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Rationale:** The tool-install surface produced HIGH findings in every Phase-2 review round; "reading argv" cannot determine what executes.
 
 ### DEC-041 — Path guards are default-deny allow-lists; checks are derived, not enumerated
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (Phase-1 ledger L-0074 root cause)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (Phase-1 ledger L-0074 root cause) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The PreToolUse write guard permits only the current task's declared paths (plus a small kernel-defined scratch set); everything else is denied. CI checks derive their scope from the repository (e.g. all records under `spec/`), never from a hand-maintained deny-list.
 - **Rationale:** L-0074: a universal negative implemented as a positive enumeration fails silently as soon as the product grows a path the author did not list, and tests derived from the same list cannot notice.
 
@@ -919,7 +919,7 @@ owner decisions touches only `docs/DECISION_REGISTER.md` and `governance/project
 as it is.
 
 ### DEC-101 — Secret-file deny rules in the session-folder settings; `s1` and `s1a` retired
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-1 option (b) · **Refines:** DEC-098
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-1 option (b) · **Refines:** DEC-098 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The owner has added Read and Edit deny rules for `.env*`, `*.pem`, `*.key` and `config/secrets*` to the
   `w1-build` and `w1-tests` session settings, and has retired the `s1` and `s1a` session folders. The install forms
   those two files did not name are closed by the retirement.
@@ -984,7 +984,7 @@ defaults for the edge cases that README lists as left open (KD-8). They settle h
 ticket's KPI text is unchanged. The acceptance tests at `43fdf41` cover KD-1…KD-5 and take no side on KD-6…KD-8.
 
 ### DEC-107 — W1-02 KD-1: how a session declares its role and ticket; the stricter of session and subagent applies
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-1 · **Implements:** CAP-58.a, CAP-58.c · **Changed by:** DEC-117
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-1 · **Implements:** CAP-58.a, CAP-58.c · **Changed by:** DEC-117 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A session declares its role and its active ticket through the environment variables `GOV_ROLE` and
   `GOV_TICKET`, set at session start. Inside a subagent, the hook input's `agent_type` identifies the subagent's role,
   and the guard applies the stricter of the session's role and the subagent's. A missing or unknown role means
@@ -1003,22 +1003,22 @@ ticket's KPI text is unchanged. The acceptance tests at `43fdf41` cover KD-1…K
 - **Decision:** Until `gov pause` exists, the freeze flag is the file `.gov-runtime/freeze`.
 
 ### DEC-110 — W1-02 KD-4: the guard fails closed
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-4 · **Refines:** DEC-025
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-4 · **Refines:** DEC-025 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The guard catches every internal error, exits with code 2 and appends one line to
   `.gov-runtime/findings.jsonl`.
 - **Why exit code 2:** exit code 1 and timeouts don't block in Claude Code. W1-03 covers the timeout case.
 
 ### DEC-111 — W1-02 KD-5: which Bash forms the guard judges
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-5
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-5 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The guard judges plain Bash forms. All other forms stay with W1-03.
 
 ### DEC-112 — W1-02 KD-6: the auditor's one write path
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-6
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-6 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The auditor is read-only everywhere except the report path its own ticket allows (for example
   `docs/audit/wave-1/**`).
 
 ### DEC-113 — W1-02 KD-7: a subagent whose type is not a defined role is read-only
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-7 · **Implements:** CAP-58.c
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-7 · **Implements:** CAP-58.c · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A subagent whose `agent_type` is not a defined role is read-only.
 - **Consequence for W1-05:** the role definitions (W1-33) land after the switch-over, so W1-05 must ensure the Wave 1
   roles (orchestrator, engineer, product-spec, independent test designer, independent auditor) exist as subagent types
@@ -1026,7 +1026,7 @@ ticket's KPI text is unchanged. The acceptance tests at `43fdf41` cover KD-1…K
   package before implementing W1-05.
 
 ### DEC-114 — W1-02 KD-8: owner defaults for the open edge cases
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, defaults for the cases `tests/acceptance/W1-02/README.md` leaves open
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, defaults for the cases `tests/acceptance/W1-02/README.md` leaves open · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - `GOV_TICKET` accepts both the ticket id and the W1 id.
   - Writes require the ticket to be claimed.
@@ -1046,27 +1046,27 @@ switch-over. W1-02 (`DAEO-emkd`) is reopened as a repair for DEC-115 and DEC-117
 first. The KPI text of W1-02 is unchanged. W1-05's ticket changes under DEC-119 only.
 
 ### DEC-115 — The guard resolves a Bash write target before judging it
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limit reported at the W1-02 diff check · **Refines:** DEC-111
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limit reported at the W1-02 diff check · **Refines:** DEC-111 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** Before judging a Bash write target, the guard expands `~`, `~user` and environment variables from the
   hook's own environment. Any target it still can't resolve (command substitution, an unset or unknown variable, a glob
   it can't expand) is denied. W1-03 stays the second line.
 
 ### DEC-116 — Three readings of DEC-114 confirmed
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings reported at the W1-02 diff check · **Refines:** DEC-114
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings reported at the W1-02 diff check · **Refines:** DEC-114 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - "Claimed" means `status: in_progress`.
   - A test designer without a claimed ticket has no write, scratch included.
   - `/dev/null` is the only device target that isn't a write, for any session, also when frozen.
 
 ### DEC-117 — Amendment of DEC-107: inside a role subagent, the subagent's role governs
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (owner correction) · **Amends:** DEC-107
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (owner correction) · **Amends:** DEC-107 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** Inside a subagent with a defined role, that subagent's role governs its tool calls. The session's role
   governs the main thread only. There is no "stricter of the two". A subagent whose type isn't a defined role stays
   read-only (DEC-113).
 - The rest of DEC-107 stands. Its text above stays as written; this entry is the amendment.
 
 ### DEC-118 — Project root: from the switch-over, every Gov OS session starts in the repository root
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the W1-05 points reported at the W1-02 diff check
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the W1-05 points reported at the W1-02 diff check · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** From the switch-over, every Gov OS session starts in the repository root, so `CLAUDE_PROJECT_DIR` is
   the repository. A write target outside the project directory is denied unless it's in the scratch set. The `w1-build`
   and `w1-tests` folders end with the bootstrap.
@@ -1100,7 +1100,7 @@ The owner's answers of 2026-10-01 to KPI disputes raised by the Independent Test
 The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change under DEC-120 only.
 
 ### DEC-120 — W1-04 KD-1: the install rule reaches the harness through the PreToolUse guard
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-04 KPI dispute KD-1 · **Implements:** DEC-083 · **Changed by:** its settings "second line" withdrawn by DEC-172 (shown by DEC-825, 2026-10-19)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-04 KPI dispute KD-1 · **Implements:** DEC-083 · **Changed by:** its settings "second line" withdrawn by DEC-172 (shown by DEC-825, 2026-10-19) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The install rule reaches the harness through the PreToolUse guard. For a Bash call it classifies as an
   install, the guard returns the permission decision `ask` when the acting role is orchestrator, and `deny` for every
   other role, and for no role. The classifier only ever escalates: a match never allows something the harness would
@@ -1118,7 +1118,7 @@ The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change u
 - Which of the two applies is shown by W1-04's acceptance tests; the build session cannot read the package.
 
 ### DEC-122 — W1-03 KD-1: the containment finding record
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-1 · **Extends:** DEC-110
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-1 · **Extends:** DEC-110 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A containment finding is one JSON line in `.gov-runtime/findings.jsonl`, the same file as guard
   failures, with: `time`, `session_id`, `agent_type`, `role`, `ticket`, `tool`, `command`, `paths`, `action`
   (`reverted` or `flagged`) and `reason`.
@@ -1131,13 +1131,13 @@ The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change u
 - **Record:** `governance/project/bootstrap.md`, section "Accepted residual".
 
 ### DEC-124 — W1-03 KD-3: containment acts only on changes made by the current call
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-3
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-3 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** Containment acts only on changes made by the current call. It snapshots the changed-path set before the
   call (PreToolUse) and compares it after (PostToolUse). Paths already changed before the call are never touched. When
   attribution is uncertain, it flags and doesn't revert.
 
 ### DEC-125 — W1-02 KD-9: a role subagent's role applies only in a session with a declared role
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-9 and W1-BUILD DP-2 option (a) · **Refines:** DEC-117
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-9 and W1-BUILD DP-2 option (a) · **Refines:** DEC-117 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A role subagent's own role applies only when the session itself has a declared role. In a session with
   no role, everything, subagents included, is read-only.
 
@@ -1182,23 +1182,23 @@ The owner's answers on a call that moves `HEAD`, to the Independent Test Designe
 KPI text of W1-03 is unchanged.
 
 ### DEC-129 — W1-03 KD-4: containment also snapshots `HEAD`
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-4 · **Extends:** DEC-124
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-4 · **Extends:** DEC-124 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** Containment also snapshots `HEAD` before the call. A forward move on the same branch has its new
   commits' paths checked against the allowed paths, with anything outside flagged. Any other `HEAD` move (reset,
   checkout of another branch, rebase, amend) is flagged and never reverted.
 
 ### DEC-130 — The test designer's readings of DEC-124 confirmed
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-124
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-124 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** No before-snapshot or overlapping calls means flag and never revert. A path changed before the call is
   never restored. Uncommitted work discarded by `git reset --hard` is reported.
 
 ### DEC-131 — The test designer's readings of KD-4 confirmed
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-129
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-129 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** Any other `HEAD` move is flagged whoever makes it, even when it only undoes the caller's own in-scope
   commit. A `git commit -a` that sweeps up another role's uncommitted work is flagged for those paths.
 
 ### DEC-132 — Owner defaults for the open `HEAD` cases
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, defaults for the cases `tests/acceptance/W1-03/README.md` leaves open · **Refines:** DEC-129
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, defaults for the cases `tests/acceptance/W1-03/README.md` leaves open · **Refines:** DEC-129 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - Checking out a branch that points at the same commit isn't a `HEAD` move.
   - Creating a new branch and committing on it in one call is flagged.
@@ -1224,7 +1224,7 @@ Contract nor any ticket for them now.
   implementation before its acceptance tests exist (enforced from W1-09).
 
 ### DEC-134 — W1-03's four known limits are accepted residuals
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limits reported at the W1-03 diff check
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limits reported at the W1-03 diff check · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** These are accepted residuals of the containment check:
   - an unseen change during a Bash call is attributed to that call;
   - a `HEAD` move with no snapshot is checked only against the last `HEAD` seen;
@@ -1233,7 +1233,7 @@ Contract nor any ticket for them now.
 - **Record:** `governance/project/bootstrap.md`, section "Accepted residual".
 
 ### DEC-135 — Proportion rule for enforcement code
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (Charter principle 9)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (Charter principle 9) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** In guard and containment work, fix every probe finding that could lose work or let an implementer
   change acceptance tests. Record every other edge case as a residual in `governance/project/bootstrap.md` instead of
   adding code. Report the ticket's actual LOC against its estimate when closing it.
@@ -1280,7 +1280,7 @@ on W1-03 (`DAEO-8qvp`); their package is with the test designer and is not reada
 text changes.
 
 ### DEC-139 — While frozen, an install is denied to every role
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the reading reported at the W1-04 diff check · **Refines:** DEC-109, DEC-120
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the reading reported at the W1-04 diff check · **Refines:** DEC-109, DEC-120 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `pip install` is denied while frozen. While frozen, an install by any role, the orchestrator included,
   is denied. Only the owner acts while frozen.
 
@@ -1296,13 +1296,13 @@ text changes.
 - The orchestrator does not start the spike.
 
 ### DEC-142 — W1-03 KD-5: a snapshot of a call that is known to be over no longer blocks restoration
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-5 (fix it; proportion rule, DEC-135) · **Refines:** DEC-124, DEC-130
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-5 (fix it; proportion rule, DEC-135) · **Refines:** DEC-124, DEC-130 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A snapshot of another actor's call that never ended (for example, a declined prompt) no longer blocks
   restoration once that call is known to be over: its session has issued a later tool call, or the hook timeout has
   passed. Restoration still requires certain attribution; otherwise flag.
 
 ### DEC-143 — W1-03 KD-6: an acceptance test changed in a call that also moves `HEAD` is restored from the pre-call `HEAD`
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-6 (fix it; proportion rule, DEC-135) · **Refines:** DEC-129
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-6 (fix it; proportion rule, DEC-135) · **Refines:** DEC-129 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** When a non-designer changes an acceptance test in the same call as a non-forward `HEAD` move, the test
   is restored from the pre-call `HEAD` recorded in the snapshot, when attribution is certain. The `HEAD` move itself
   is still flagged and never reverted.
@@ -1318,19 +1318,19 @@ W1-03 repair (commit `95df6c5`): the answer to W1-BUILD decision package DP-6, o
 (`DAEO-8qvp`, KD-7), a reading of DEC-142, and two working rules. No KPI text changes.
 
 ### DEC-144 — When another actor's unfinished call is known to be over
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-6 option (a) · **Refines:** DEC-142
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-6 option (a) · **Refines:** DEC-142 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** In DEC-142, "call known to be over" means either the same actor's session has issued a later tool
   call, or ten minutes have passed.
 - **Accepted residual:** background commands keep running after their call returns, so their later writes may be
   attributed to whichever call is active then. Recorded in `governance/project/bootstrap.md`.
 
 ### DEC-145 — W1-03 KD-7: the ten minutes is a named, overridable constant
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-7 · **Refines:** DEC-144
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-7 · **Refines:** DEC-144 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The ten minutes is a named constant, `PENDING_SNAPSHOT_TIMEOUT_S = 600`, in the containment module,
   overridable by the environment variable `GOV_PENDING_SNAPSHOT_TIMEOUT_S`.
 
 ### DEC-146 — "Its session" in DEC-142 means the same actor
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the test designer's reading in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-142
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the test designer's reading in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-142 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** "Its session" means the same actor (session and agent id). Another actor's later call doesn't clear a
   snapshot.
 
@@ -1356,7 +1356,7 @@ The owner's answer to the Independent Test Designer's KPI dispute KD-1 on W1-05 
 acceptance tests of W1-05 (commit `2b2944a`, recorded in `tests/acceptance/W1-05/README.md`). No KPI text changes.
 
 ### DEC-149 — W1-05 KD-1: what the 100 ms hook budget covers
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-05 KPI dispute KD-1 · **Refines:** DEC-134 (the snapshot's cost)
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-05 KPI dispute KD-1 · **Refines:** DEC-134 (the snapshot's cost) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The 100 ms p95 hook budget covers the guard's decision, for every tool. For Bash, the total wait
   including W1-03's before-snapshot (observed 115–119 ms p95) is measured and reported in W1-05's record, and isn't a
   failure.
@@ -1372,7 +1372,7 @@ packages P-1…P-5, to DP-7 and to the open point on the oracle (DEC-156…DEC-1
 in `docs/changes/S2-CIT-E.md`.
 
 ### DEC-150 — DP-7: the orchestrator's standing rights, option (b) extended
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on DP-7 option (b) extended · **Amended by:** DEC-156
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on DP-7 option (b) extended · **Amended by:** DEC-156 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision as given in the brief:** whatever its active ticket, the orchestrator role may write `.tickets/**`,
   `docs/DECISION_REGISTER.md`, `governance/project/bootstrap.md` and `.gov-runtime/scratch/**`. A commit made by the
   orchestrator is judged against these standing paths plus the active ticket's `allowed_paths`. DEC-156 replaces both
@@ -1392,7 +1392,7 @@ in `docs/changes/S2-CIT-E.md`.
   second line of DEC-120. W1-01's interim acceptance tests skipping after the switch-over is by design.
 
 ### DEC-152 — EXP-001 is accepted as ADOPT-PARTIAL
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on `spike-sandbox/EVIDENCE.md` · **Outcome of:** DEC-138, DEC-147 · **Scoped by:** DEC-161
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on `spike-sandbox/EVIDENCE.md` · **Outcome of:** DEC-138, DEC-147 · **Scoped by:** DEC-161 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The OS sandbox is the outer wall for everything a Bash command does: writes outside the repository, installs,
     network, and reads of hidden paths. Its configuration comes from the launcher through `--settings`, never from the
@@ -1430,19 +1430,19 @@ in `docs/changes/S2-CIT-E.md`.
   repository root.
 
 ### DEC-156 — DP-7 corrected: the orchestrator may write anywhere except `tests/acceptance/**`
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to S2 · **Amends:** DEC-150 (replaces its standing paths and commit rule) · **Changed by:** DEC-165 (one path outside the repository), DEC-176, DEC-434 (as far as a ticket lead is concerned)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to S2 · **Amends:** DEC-150 (replaces its standing paths and commit rule) · **Changed by:** DEC-165 (one path outside the repository), DEC-176, DEC-434 (as far as a ticket lead is concerned) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The orchestrator role may write anywhere in the repository except `tests/acceptance/**` (MR-3). The
   guard enforces only that exclusion for the orchestrator. Containment still records its changes. Its checkpoint goes
   to `.gov-runtime/scratch/orchestrator/` until W1-25. The orchestrator's interactive session (VS Code or terminal)
   is not sandboxed.
 
 ### DEC-157 — P-1: installs stay as DEC-083 decided
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-1, option (d), the owner's own · **Confirms:** DEC-083 · **Changed by:** DEC-209
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-1, option (d), the owner's own · **Confirms:** DEC-083 · **Changed by:** DEC-209 · **Class:** superseded by EMERGENCY-2 §2.3 (DEC-1211)
 - **Decision:** The orchestrator installs tools under DEC-083 as decided: the guard asks, and the owner approves in
   chat. Worker roles never install system-wide.
 
 ### DEC-158 — P-2: network profiles per role
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-2 (the owner's own answer) · **Changed by DEC-1168 (1):** workers' network allowlist holds one loopback `127.0.0.1:<port>` entry for the shared reranker (W2-186), never a bare host
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-2 (the owner's own answer) · **Changed by DEC-1168 (1):** workers' network allowlist holds one loopback `127.0.0.1:<port>` entry for the shared reranker (W2-186), never a bare host · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The orchestrator is unrestricted, being unsandboxed.
   - Research and experiment work (discovery spikes, bake-offs, and product-spec when it runs experiments) gets a
@@ -1463,7 +1463,7 @@ in `docs/changes/S2-CIT-E.md`.
   `bypassPermissions` mode are tested by a Wave 2 experiment. Until then they are residuals.
 
 ### DEC-161 — P-5: the sandbox applies to launched worker sessions only
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-5 (the owner's own answer) · **Scopes:** DEC-152, DEC-153
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-5 (the owner's own answer) · **Scopes:** DEC-152, DEC-153 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The launcher applies the sandbox to worker sessions only: engineer, independent test designer,
   independent auditor, and research or experiment work, each with its network profile from DEC-158. Work that needs
   the sandbox runs as a worker session the orchestrator launches. In-session subagents remain for read-only work,
@@ -1475,7 +1475,7 @@ in `docs/changes/S2-CIT-E.md`.
   - that its `GOV_ROLE` and `GOV_TICKET` reach the guard.
 
 ### DEC-162 — The qualification oracle is hidden from every session started in the repository root
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to the S2 open point on DEC-161 · **Refines:** DEC-152 (oracle hiding), DEC-161
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to the S2 open point on DEC-161 · **Refines:** DEC-152 (oracle hiding), DEC-161 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The qualification oracle is hidden from every session started in the repository root, the unsandboxed
   orchestrator included, by two layers:
   - a `Read` deny rule with the oracle's absolute path in the repository's committed `.claude/settings.json`;
@@ -1575,7 +1575,7 @@ confirmed DEC-169 as the owner's decision; its entry is unchanged.
   Whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures.
 
 ### DEC-171 — An orchestrator change outside its ticket's paths is a record, not a containment finding
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-01 · **Confirms:** DEC-156
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-01 · **Confirms:** DEC-156 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A change the orchestrator makes outside its ticket's paths is a record, not a containment finding
   (DEC-156).
 
@@ -1589,7 +1589,7 @@ Owner answers of 2026-10-03 to the two decision packages of the S2-A round-2 aud
 is recorded in `docs/changes/S2-CIT-E.md` §7.
 
 ### DEC-172 — DP-3: the settings ask rules for installs and downloads are removed; the guard's install rule stands alone
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-3 option (b), unconditionally · **Withdraws:** the settings "second line" of DEC-120 and DEC-151 · **Under:** DEC-083, DEC-163
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-3 option (b), unconditionally · **Withdraws:** the settings "second line" of DEC-120 and DEC-151 · **Under:** DEC-083, DEC-163 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The install and download ask rules are removed from the committed `.claude/settings.json`. The guard's install
     rule is relied on alone.
@@ -1600,7 +1600,7 @@ is recorded in `docs/changes/S2-CIT-E.md` §7.
     KPI and `governance/project/bootstrap.md` are updated to match.
 
 ### DEC-173 — DP-4: Charter §6's install sentence names the research exception
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-4 option (a) · **Extends:** DEC-163 · **Amends:** Charter v5 §6 (install sentence)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-4 option (a) · **Extends:** DEC-163 · **Amends:** Charter v5 §6 (install sentence) · **Class:** superseded by EMERGENCY-2 §2.3 (DEC-1211)
 - **Decision:** Charter §6's install sentence gains "except the research role, inside its experiment folder
   (DEC-163)". The plan validator's Charter line count and `docs/changes/S2-CIT-E.md` §6.3 are updated to match.
 
@@ -1614,7 +1614,7 @@ Owner decision of 2026-10-03, given with the round-3 closure check (ACCEPT_WITH_
 further audit round). The fixes are recorded in `docs/changes/S2-CIT-E.md` §8.
 
 ### DEC-174 — The guard's install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-17 · **Extends:** DEC-172 · **Under:** DEC-083, DEC-163
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-17 · **Extends:** DEC-172 · **Under:** DEC-083, DEC-163 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - W1-47 extends the guard's install rule to recognise `uv add`, `uv sync`, `uv run --with` and `uvx` as installs,
     so they keep their `ask` for the orchestrator (DEC-083).
@@ -1640,7 +1640,7 @@ its verification and from the reviewer's probe (DEC-137).
     change is its own commit, with the trailer `Task: DAEO-6cc2`.
 
 ### DEC-176 — DP-2: `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-2 option (a) · **Amends:** DEC-156 · **Changed by:** DEC-365, DEC-402
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-2 option (a) · **Amends:** DEC-156 · **Changed by:** DEC-365, DEC-402 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - Everything under `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator: the freeze flag, the
     snapshots, the findings and the records.
@@ -1648,13 +1648,13 @@ its verification and from the reviewer's probe (DEC-137).
   - The W1-02 freeze test stays as it is.
 
 ### DEC-177 — DP-3: the record of DEC-171 is one JSON line per call in `.gov-runtime/records.jsonl`
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-3 option (a) · **Extends:** DEC-171 · **Under:** DEC-122
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-3 option (a) · **Extends:** DEC-171 · **Under:** DEC-122 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** An orchestrator change outside its ticket's paths writes one JSON line per call to
   `.gov-runtime/records.jsonl`, with DEC-122's fields and `action: "recorded"`. `findings.jsonl` and its action list
   are unchanged.
 
 ### DEC-178 — DP-4: the orchestrator's wide scope holds only when the session's own role is orchestrator
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-4 option (a) · **Extends:** DEC-156 · **Under:** DEC-117
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-4 option (a) · **Extends:** DEC-156 · **Under:** DEC-117 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The wide scope of DEC-156 holds only when the session's own role is orchestrator. An `orchestrator`
   subagent in another role's session keeps the ticket-paths rule.
 
@@ -1668,7 +1668,7 @@ Owner decisions of 2026-10-03, given when the owner closed W1-45 (`DAEO-6cc2`), 
 reviewer's probe left (DEC-137) and on commit trailers.
 
 ### DEC-179 — A guard function that fails open is a defect: W1-47 makes the session-role default fail closed
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-178, DEC-135
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-178, DEC-135 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The guard function that gives the orchestrator's wide scope when its session-role argument is missing
     (`_get_allowed_paths` in `src/gov/guard/decide.py`) is a defect, not a residual.
@@ -1677,7 +1677,7 @@ reviewer's probe left (DEC-137) and on commit trailers.
   - In general, a finding that makes the guard fail open is a defect, not a residual.
 
 ### DEC-180 — `.gov-runtime/` is protected in worker sessions by an `Edit` deny rule the launcher sets
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Extends:** DEC-176 · **Under:** DEC-152, DEC-161, EXP-001 · **Changed by:** DEC-311
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Extends:** DEC-176 · **Under:** DEC-152, DEC-161, EXP-001 · **Changed by:** DEC-311 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The settings the launcher builds for every worker role carry an `Edit` deny rule for `.gov-runtime/**` except
     `.gov-runtime/scratch/**`.
@@ -1686,7 +1686,7 @@ reviewer's probe left (DEC-137) and on commit trailers.
   - W1-46 gains a matching KPI line, in its own commit with the trailer `Task: DAEO-jdqr`.
 
 ### DEC-181 — In the orchestrator's own session, opaque Bash writes and `ln` into `.gov-runtime/` stay a residual
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-156, DEC-176
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-156, DEC-176 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The orchestrator's own session is not sandboxed (DEC-156). An opaque Bash write or an `ln` into
   `.gov-runtime/` in that session is seen by neither the guard nor the containment check, and stays an accepted
   residual, recorded in `governance/project/bootstrap.md`.
@@ -2012,7 +2012,7 @@ Owner answers of 2026-10-04 to the test designer's packages DP-1…DP-6 on W1-47
     `Task: DAEO-xw3k`.
 
 ### DEC-215 — W1-47 DP-1: what "names the held-out path" covers
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-1 option 3 · **Under:** DEC-162
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-1 option 3 · **Under:** DEC-162 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The guard denies a tool call whose input contains the held-out path literally anywhere, or reaches it through a
     relative path, `..`, `~`, `$HOME` or a symbolic link.
@@ -2022,17 +2022,17 @@ Owner answers of 2026-10-04 to the test designer's packages DP-1…DP-6 on W1-47
     accepted residual.
 
 ### DEC-216 — W1-47 DP-3: the install rule knows `uv`'s value options
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-3 option 2 · **Extends:** DEC-174
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-3 option 2 · **Extends:** DEC-174 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The install rule knows `uv`'s value options `--directory`, `--project`, `--cache-dir` and
   `--config-file`, plus `uv run -w`, and skips their value when looking for the subcommand.
 
 ### DEC-217 — W1-47 DP-4: the kernel template carries `settings.json`
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-4 option 1
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-4 option 1 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The kernel template carries `template/governance/kernel/settings.json`, with PreToolUse for every
   tool and both post-command events, commands through `$CLAUDE_PROJECT_DIR`, and a behavioural test.
 
 ### DEC-218 — W1-47 DP-5: the owner wrote `held-out.yaml`; its key is `held_out_paths`
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-5 (the owner fixed the key and wrote the file) · **Under:** DEC-162, DEC-179
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-5 (the owner fixed the key and wrote the file) · **Under:** DEC-162, DEC-179 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - `governance/project/held-out.yaml` was committed by the owner in
     `f66bd1b35dd4f5d0a88e63eec77485b7d7ca9685`. Its key is `held_out_paths`, a list of absolute paths. The guard and
@@ -2088,7 +2088,7 @@ points on W1-47 (`DAEO-o4fg`) and W1-08 (`DAEO-uudf`).
     confidence, as a decision package, which then follows DEC-220.
 
 ### DEC-223 — W1-47: DP-7, DP-8, a missing `held-out.yaml`, and reading the two holder files
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 packages DP-7 option 1 and DP-8 option 1, and on the orchestrator's report · **Under:** DEC-162, DEC-218
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 packages DP-7 option 1 and DP-8 option 1, and on the orchestrator's report · **Under:** DEC-162, DEC-218 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-7: the two static checks that compare the committed list with the implementation files and with the suite
     stay.
@@ -2219,7 +2219,7 @@ confidence is low. They go to the owner.
   - They are not put behind an opt-in variable, so that the ticket cannot close on skipped tests.
 
 ### DEC-233 — W1-46 DP-3: a sandbox block in the repository's settings makes `gov launch` refuse
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-3 option (a); it fails closed · **Under:** CAP-61.a, DEC-161
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-3 option (a); it fails closed · **Under:** CAP-61.a, DEC-161 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `gov launch` refuses to start, with a non-zero exit and a named reason, when the repository's
   `.claude/settings.json` or `.claude/settings.local.json` carries a `sandbox` key, because the CLI may merge
   repository settings into the ones the launcher builds.
@@ -2296,7 +2296,7 @@ to DEC-242 answer the five open packages on W1-08 (`DAEO-uudf`) and W1-46 (`DAEO
     by gov", in its own commit with the trailer `Task: DAEO-uudf`.
 
 ### DEC-240 — W1-46 DP-4: when a research install is inside its experiment folder
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-4 option (a) · **Under:** DEC-163, DEC-174, CAP-25.e
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-4 option (a) · **Under:** DEC-163, DEC-174, CAP-25.e · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - A research install is inside its experiment folder when the session's working directory is the folder or below
     it, or the command first changes into it with `cd`.
@@ -2304,7 +2304,7 @@ to DEC-242 answer the five open packages on W1-08 (`DAEO-uudf`) and W1-46 (`DAEO
     behaviour (DEC-136).
 
 ### DEC-241 — W1-46 DP-5: the research allowlist file and its starting hosts
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-5 option (a) · **Under:** DEC-158, DEC-163, CAP-61.c · **Changed by:** DEC-316
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-5 option (a) · **Under:** DEC-158, DEC-163, CAP-61.c · **Changed by:** DEC-316 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - `governance/project/research-allowlist.yaml` extends the kernel default. The owner extends the list. That path
     is added to W1-46's `allowed_paths`, in its own commit with the trailer `Task: DAEO-jdqr`.
@@ -2636,31 +2636,31 @@ trailers) are not decided here: they set how strong containment is, and on DP-4 
 the owner.
 
 ### DEC-266 — W1-50 DP-1: only a merge in the orchestrator's own call is judged commit by commit
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-1 option (a); confidence high · **Under:** DEC-255, CAP-58.h
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-1 option (a); confidence high · **Under:** DEC-255, CAP-58.h · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A non-fast-forward merge is judged commit by commit only when it is made in an orchestrator
   session's own call (the main orchestrator's integration merge, or a lead taking `w1/integrate` into its ticket
   branch). A merge in any other caller's call stays flagged, as W1-03 tests it.
 
 ### DEC-267 — W1-50 DP-2: own-trailer judging needs both trailers in the final block
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-2 option (a); confidence medium-high · **Under:** DEC-255, DEC-182
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-2 option (a); confidence medium-high · **Under:** DEC-255, DEC-182 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A commit is judged by its own trailers only when its final trailer block carries both `Role` and
   `Task`. A commit with one of the two, or with `Role:` and `Task:` lines only in the message body, is judged
   against the caller, as today.
 
 ### DEC-268 — W1-50 DP-3: trailers that name nothing valid allow nothing
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-3 option (a), the fail-closed reading; confidence medium · **Under:** DEC-255
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-3 option (a), the fail-closed reading; confidence medium · **Under:** DEC-255 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** When a commit's trailers name an unknown role, an unknown ticket, a role that is not the ticket's,
   or several different `Role` or `Task` values, the commit has no allowed paths and every path it changes is a
   finding. A ticket is found by its `id` or its `wbs_id`, as the guard does.
 
 ### DEC-269 — W1-50 DP-6: a path the merge commit itself changes is judged by the merge commit's trailers
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-6 option (a); confidence medium-high · **Under:** DEC-255, DEC-156, DEC-253 · **Changed by:** DEC-394 (refines "content a parent holds")
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-6 option (a); confidence medium-high · **Under:** DEC-255, DEC-156, DEC-253 · **Changed by:** DEC-394 (refines "content a parent holds") · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A path a merge commit changes beyond what its parents hold (a conflict resolution, a hand edit) is
   judged by the merge commit's own trailers, or against the caller when it has none. An orchestrator's conflict
   resolution under `tests/acceptance/**` is therefore a finding, and elsewhere it is not.
 
 ### DEC-270 — W1-50 DP-7: the finding record keeps the caller's role and ticket
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-7 option (a); confidence medium · **Under:** DEC-122, DEC-255
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-7 option (a); confidence medium · **Under:** DEC-122, DEC-255 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** In a finding for a commit judged by its trailers, `role` and `ticket` hold the caller's values, as
   today; the commit id and its trailers are named in `reason`.
 
@@ -2677,19 +2677,19 @@ grant. The other six go to the owner: DP-10, DP-11, DP-12, DP-14 and DP-16 are P
 the guard are; DP-15 changes the owner's list of research hosts.
 
 ### DEC-271 — W1-46 DP-8: which tickets each role may be launched on
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-8 option (a); confidence medium · **Under:** DEC-242, DEC-161
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-8 option (a); confidence medium · **Under:** DEC-242, DEC-161 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `gov launch` starts an engineer or a research session only on a ticket of its own role. An
   independent test designer and an independent auditor are launched on any ticket that is `in_progress`: their work
   is always on another role's ticket. This is how "a ticket of another role" in DEC-242 is read.
 
 ### DEC-272 — W1-46 DP-9: the key of `research-allowlist.yaml`, and a project without the file
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-9 option (a); confidence medium · **Under:** DEC-241
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-9 option (a); confidence medium · **Under:** DEC-241 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The list is under the key `hosts`. A project without `governance/project/research-allowlist.yaml`
   launches a research session on the kernel default alone: no file means no extension. One test covers the missing
   file.
 
 ### DEC-273 — W1-46 DP-13: an experiment folder lies under a root the project names
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-13 option (a); confidence medium · **Under:** DEC-242, DEC-163
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-13 option (a); confidence medium · **Under:** DEC-242, DEC-163 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The one folder of a research ticket must lie under a root the project names, `experiments/` by
   default. `gov launch` refuses a research ticket whose folder is anywhere else, so a research ticket on `.claude/`,
   `.tickets/`, `governance/project/`, `src/` or `.git/` does not launch.
@@ -2856,13 +2856,13 @@ the guard or containment. The suite on the branch already follows them.
   suite's support module.
 
 ### DEC-287 — W1-15 DP-3: the filter runs the gitleaks binary
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-3 option (a); confidence medium-high · **Under:** CAP-03, DEC-195
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-3 option (a); confidence medium-high · **Under:** CAP-03, DEC-195 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:** The filter runs gitleaks 8.30.1 (in the tool registry) with the rules of `.gitleaks.toml`, so there
   is one source of rules. The filter and check cases therefore need the binary where they run. Putting gitleaks on
   CI is an install for the owner, raised with W1-40; until then those cases run on this machine.
 
 ### DEC-288 — W1-15 DP-4: what each gitleaks file holds
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-4 option (a); confidence medium
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-4 option (a); confidence medium · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:** `template/.gitleaks.toml` holds the defaults plus the token and canary rules, with no path
   allowlist. The root `.gitleaks.toml` holds the same rules plus this repository's own allowlist. A product that
   adopts the template inherits no allowlist.
@@ -2874,7 +2874,7 @@ the guard or containment. The suite on the branch already follows them.
   policy (W1-17 or W1-24). `bootstrap.md` is corrected at W1-15's close.
 
 ### DEC-290 — W1-15 DP-6: allowlists, and secrets inside a store
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-6, the lead's three recommendations; confidence medium · **Under:** CAP-03.a, CAP-38.b · **Changed by:** DEC-1045
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-6, the lead's three recommendations; confidence medium · **Under:** CAP-03.a, CAP-38.b · **Changed by:** DEC-1045 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:**
   - The root `.gitleaks.toml` allowlists, by path, the tracked documents that only name the canary identifier (the
     ticket file, plan documents, this suite's README), after the engineer runs gitleaks over the tree and reports
@@ -2955,7 +2955,7 @@ lead returned as needing a decision. The lead's recommendation and the orchestra
 medium, the choice is reversible, and it makes the filter stricter.
 
 ### DEC-298 — W1-15 F9: the pre-index filter ignores every allowlist of the project's gitleaks file
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 reviewer finding F9 and the lead's recommendation; confidence medium · **Extends:** DEC-290 · **Under:** CAP-03.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 reviewer finding F9 and the lead's recommendation; confidence medium · **Extends:** DEC-290 · **Under:** CAP-03.a · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:** DEC-290 made the filter ignore path allowlists. It also ignores the other ways a project's
   `.gitleaks.toml` can shelter a secret: allowlist `regexes` and `stopwords`, per-rule allowlists, and disabled
   rules. A file that holds a secret by the rules never reaches an index, whatever the project's file allows. The
@@ -3086,7 +3086,7 @@ now also delegates stricter-only decisions.
   what the kernel `templates/openspec/` folder holds, under the delegation rule.
 
 ### DEC-311 — W1-46 DP-14: literal deny rules for the names that exist at launch, and `ln` judged by the guard
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-14 option (b) · **Amends:** DEC-180 · **Under:** DEC-176, CAP-58
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-14 option (b) · **Amends:** DEC-180 · **Under:** DEC-176, CAP-58 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The launcher's settings carry a literal `Edit` deny rule for every name that exists under `.gov-runtime/`
     outside `scratch/` at launch, plus the freeze flag.
@@ -3104,26 +3104,26 @@ now also delegates stricter-only decisions.
   HEAD move at the next call in that worktree, it is a record of an owner action (DEC-254), not a defect.
 
 ### DEC-313 — W1-46 DP-10: `gov launch` refuses permission bypass and added directories
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-10 option (a) · **Under:** CAP-61, DEC-161
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-10 option (a) · **Under:** CAP-61, DEC-161 · **Class:** superseded by EMERGENCY-2 §2.9 (DEC-1211)
 - **Decision:** `gov launch` refuses `--dangerously-skip-permissions`, `--permission-mode bypassPermissions` and
   `--add-dir`, in any position, and the matching settings keys (`permissions.defaultMode: bypassPermissions`,
   `permissions.additionalDirectories`). `--allow-dangerously-skip-permissions`, which the package also named, is
   refused with them: that only makes the launcher stricter.
 
 ### DEC-314 — W1-46 DP-11: no launch when the project's settings don't register the guard
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-11 option (a), as built · **Under:** CAP-61, CAP-58
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-11 option (a), as built · **Under:** CAP-61, CAP-58 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `gov launch` refuses when the project's settings do not register the guard. The launcher does not
   register the hooks itself. As built, the refusal covers a missing or unwired `.claude/settings.json`,
   `disableAllHooks`, `--bare`, and `--setting-sources` with any value.
 
 ### DEC-315 — W1-46 DP-12: `Edit` deny rules for acceptance tests, tickets and `.claude` in worker sessions
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-12 option (a) · **Under:** MR-3, CAP-58, CAP-61
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-12 option (a) · **Under:** MR-3, CAP-58, CAP-61 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The settings the launcher builds carry `Edit` deny rules for `tests/acceptance/**` (every role but
   the independent test designer), `.tickets/**` and `.claude/**`. W1-46 gets a new KPI line for them, in its own
   commit (`Task: DAEO-jdqr`).
 
 ### DEC-316 — W1-46 DP-15: `cdn-lfs.huggingface.co` leaves the research allowlist
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-15 option (a) · **Amends:** DEC-241
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-46 package DP-15 option (a) · **Amends:** DEC-241 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `cdn-lfs.huggingface.co`, which does not resolve, is dropped from the starting hosts. The owner
   extends the list later if research needs it.
 
@@ -3135,13 +3135,13 @@ now also delegates stricter-only decisions.
   tickets no longer need `main.py`. W1-25's engineer starts once this change is merged.
 
 ### DEC-318 — W1-50 DP-4: a commit that names a closed ticket, or one never started
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-50 package DP-4 · **Under:** DEC-255, CAP-58.h · **Changed by:** DEC-359
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-50 package DP-4 · **Under:** DEC-255, CAP-58.h · **Changed by:** DEC-359 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A commit whose trailers name a closed ticket is judged by that ticket's role and `allowed_paths`
   only if it is an ancestor of the ticket's close commit; otherwise it is a finding. A commit that names a ticket
   that was never started is a finding.
 
 ### DEC-319 — W1-50 DP-5: in a worker's call, another role's trailer is a finding
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-50 package DP-5 option (b) · **Under:** DEC-255, MR-3, CAP-58.h
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-50 package DP-5 option (b) · **Under:** DEC-255, MR-3, CAP-58.h · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** In a worker's call, a commit whose `Role` trailer differs from the caller's role is a finding.
   Own-trailer judging applies only in an orchestrator session's own call. W1-50's implementation follows W1-46's
   merge, as planned (DEC-256).
@@ -3163,7 +3163,7 @@ now also delegates stricter-only decisions.
   their own stores in temporary directories. Revisit when `gov rebuild` is wired (W1-27).
 
 ### DEC-323 — Confirmed: the seven canaries, the root allowlist, the compaction warning and DEC-299
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER · **Confirms:** DEC-286, DEC-290, DEC-283, DEC-299
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER · **Confirms:** DEC-286, DEC-290, DEC-283, DEC-299 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:** The owner confirms the seven dev canaries (DEC-286), the root allowlist of DEC-290, and DEC-283's
   warning after every compaction, which W1-29 may refine. That a project can remove or rewrite a template rule
   (DEC-299) stays a residual.
@@ -3175,7 +3175,7 @@ now also delegates stricter-only decisions.
   chooses.
 
 ### DEC-325 — The token rule fix: its form, and W1-16 carries it
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** DEC-324; the W1-15 reviewer's suggested repair; confidence medium · **Under:** DEC-287, DEC-298, CAP-03.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** DEC-324; the W1-15 reviewer's suggested repair; confidence medium · **Under:** DEC-287, DEC-298, CAP-03.a · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:**
   - The `gov-token` rule flags a prefixed string (`sk`, `pk`, `rk`, `tok`, then `_` or `-`) only when the body
     after the prefix holds at least one digit, or both an upper-case and a lower-case letter. The length floor of
@@ -3324,7 +3324,7 @@ orchestrator prompt v4.1, section 6).
   another root waits for a project that needs one.
 
 ### DEC-334 — W1-46 DP-19 and DP-20: the guard refuses a hard link to a file the role may not write, and `mv --target-directory` and `install` into protected places
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-04) · **Basis:** W1-46 packages DP-19 option (a) and DP-20 option (a); confidence medium-high and medium · **Under:** DEC-311, MR-3
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-04) · **Basis:** W1-46 packages DP-19 option (a) and DP-20 option (a); confidence medium-high and medium · **Under:** DEC-311, MR-3 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The guard refuses `ln` without `-s` (and `link`, `cp -l`) when the source is a file the role may not write:
     otherwise a later call writes through the hard link and changes an acceptance test.
@@ -3393,7 +3393,7 @@ the owner.
   - Whether the daemon may serve its loopback UI at every call is the owner's to decide and is not settled here.
 
 ### DEC-339 — W1-16 R-1 and R-3: a token body that begins with `_` or `-` is flagged, and `gov.secrets` gets a public name check
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-16 packages R-1 and R-3; confidence medium · **Under:** DEC-324, DEC-325, DEC-298
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-16 packages R-1 and R-3; confidence medium · **Under:** DEC-324, DEC-325, DEC-298 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:**
   - R-1: the token rule also flags a body that begins with `_` or `-` when the rest meets DEC-325 (a digit, or
     mixed case; 16 characters). It only makes the rule flag more.
@@ -3474,7 +3474,7 @@ its second run. Each is reversible, the recommendations agree and the confidence
 secret filter and only makes it refuse more (stricter-only).
 
 ### DEC-346 — W1-16 DP-5 and DP-6: the 16-character floor counts the rest alone, and the daemon directory is a residual with one test
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-16 packages DP-5 option (a) and DP-6 options (a) and (c); confidence medium · **Under:** DEC-325, DEC-338, DEC-339
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-16 packages DP-5 option (a) and DP-6 options (a) and (c); confidence medium · **Under:** DEC-325, DEC-338, DEC-339 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:**
   - A leading `_` or `-` of a token body (DEC-339) does not count toward the 16-character floor: the rest alone
     needs 16 characters, as built.
@@ -3483,7 +3483,7 @@ secret filter and only makes it refuse more (stricter-only).
     secret stands in that directory after an index run.
 
 ### DEC-347 — The secret filter also scans with the project's rules alone, so gitleaks' built-in global allowlist cannot shelter a finding
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-04) · **Basis:** W1-16 package R-2, fix option 1, the engineer's and the lead's recommendation; confidence medium · **Under:** DEC-298, DEC-324, DEC-286
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-04) · **Basis:** W1-16 package R-2, fix option 1, the engineer's and the lead's recommendation; confidence medium · **Under:** DEC-298, DEC-324, DEC-286 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Context:** gitleaks' built-in defaults carry a global allowlist, and `[extend] useDefault = true` merges it over
   every rule, the project's included. DEC-298's stripping removes only the allowlists written in the project's
   file. So a canary or token that contains `abcdefghijklmnopqrstuvwxyz` in any case, contains `false`, begins with
@@ -3597,7 +3597,7 @@ agree; confidence medium-high.
     in the checker, so a governed taxonomy change (CAP-30.e) changes the checker with the schema and the Contract.
 
 ### DEC-354 — W1-16: `stores_with_secrets` also runs the second scan
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** the W1-16 lead's third return · **Under:** DEC-347, DEC-287
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** the W1-16 lead's third return · **Under:** DEC-347, DEC-287 · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:** The secrets-indexing check's `stores_with_secrets` shares the filter's helper and therefore also
   scans with the project's rules alone, which DEC-347 did not name. It is accepted: it only makes the check find
   more. Where a project's rules have no expression of their own (they only modify a built-in rule), one scan stays;
@@ -3675,7 +3675,7 @@ them are separate commits with the trailer `Task: <ticket id>`.
   `closed`. When no such commit is found for a ticket whose status is `closed`, that is a finding.
 
 ### DEC-359 — W1-50 DP-9: an orchestrator commit naming a closed, never-started or unknown ticket is allowed outside the acceptance tests
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-50 package DP-9 option (a) · **Amends:** DEC-318 · **Under:** DEC-255, CAP-58.h
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-50 package DP-9 option (a) · **Amends:** DEC-318 · **Under:** DEC-255, CAP-58.h · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A commit with `Role: orchestrator` whose `Task:` trailer names a closed ticket, a ticket never
   started, or a name that is no ticket (such as `Task: decision-record`) is allowed for every path outside
   `tests/acceptance/**`. Inside `tests/acceptance/**` it stays a finding (MR-3).
@@ -3742,11 +3742,11 @@ them are separate commits with the trailer `Task: <ticket id>`.
   - KPI success 4 of W1-28 is reworded to match, in its own commit.
 
 ### DEC-368 — W1-28 DP-8: cancel and rollback both set the freeze flag
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-8 option (a) · **Under:** CAP-05.a, CAP-05.b, CAP-05.c
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-8 option (a) · **Under:** CAP-05.a, CAP-05.b, CAP-05.c · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `gov pause --cancel-agents` and `gov pause --rollback <ticket>` both also set the freeze flag.
 
 ### DEC-369 — The pre-commit hook runs the second gitleaks scan
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the W1-16 residual · **Extends:** DEC-347 · **Under:** CAP-03.a, CAP-39.a
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the W1-16 residual · **Extends:** DEC-347 · **Under:** CAP-03.a, CAP-39.a · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:** The pre-commit hook also runs the second gitleaks scan, with the project's rules alone (DEC-347).
   W1-40 gets the KPI line, in its own commit.
 
@@ -3756,7 +3756,7 @@ them are separate commits with the trailer `Task: <ticket id>`.
   file path only, and never anything under `s0b2/probe/`.
 
 ### DEC-371 — Leads start their workers with `gov launch`
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER; orchestrator prompt v4.2, section 4 · **Supersedes:** DEC-183 for the roles the launcher starts · **Under:** DEC-231, DEC-311 · **Changed by:** DEC-386
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER; orchestrator prompt v4.2, section 4 · **Supersedes:** DEC-183 for the roles the launcher starts · **Under:** DEC-231, DEC-311 · **Changed by:** DEC-386 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - W1-46 is closed, so from now on a ticket lead starts its workers with `gov launch <role> <ticket>`, sandboxed.
   - The W1-46 residuals stand as `governance/project/bootstrap.md` records them at its close.
@@ -3882,7 +3882,7 @@ W1-28 DP-10, W1-19's packages and installs, and the launcher. DEC-372 stays as r
 - **Decision:** The test designer's read of G-17's row is accepted, and DEC-370 extends to G-17.
 
 ### DEC-383 — The S0b2 files a worker may read, by exact path only
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-198, DEC-310, DEC-370
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-198, DEC-310, DEC-370 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** Workers may read these S0b2 files by exact path only:
   `~/gov-os-workbench/s0b2/out/RESULTS.md`, `~/gov-os-workbench/s0b2/out/GLUE_REQUIREMENTS.md`,
   `~/gov-os-workbench/s0b2/out/TOOL_REGISTRY.yaml` and `~/gov-os-workbench/s0b2/sandbox/_reports/codeintel.md`.
@@ -3907,7 +3907,7 @@ W1-28 DP-10, W1-19's packages and installs, and the launcher. DEC-372 stays as r
     own commit.
 
 ### DEC-386 — The launcher removes its temp folder and starts product-spec workers sandboxed
-- **Status:** ACCEPTED (owner, 2026-10-05; stricter-only, the ticket is the orchestrator's choice) · **Basis:** OWNER · **Amends:** DEC-371 · **Under:** DEC-159, DEC-311, CAP-58 · **Changed by:** DEC-392
+- **Status:** ACCEPTED (owner, 2026-10-05; stricter-only, the ticket is the orchestrator's choice) · **Basis:** OWNER · **Amends:** DEC-371 · **Under:** DEC-159, DEC-311, CAP-58 · **Changed by:** DEC-392 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - `gov launch` removes its per-session temp folder when the session ends.
   - The launcher gets a `product-spec` role with an empty network allowlist, so product-spec workers are sandboxed
@@ -3993,7 +3993,7 @@ DP-11 and DP-12 touch owner decisions (DEC-360, DEC-366, DEC-367): they are kept
 stricter reading, and were told to the owner, who may choose otherwise.
 
 ### DEC-390 — W1-50 DP-11 to DP-16: the stricter reading in each case
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-11 (a), DP-12 (a), DP-13 (a), DP-14 (c), DP-15 (a), DP-16 (a finding); confidence medium-low to medium-high · **Under:** CAP-58, DEC-254, DEC-269, DEC-358, DEC-359, DEC-360 · **Changed by:** DEC-394 (replaces its DP-15 rule)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-11 (a), DP-12 (a), DP-13 (a), DP-14 (c), DP-15 (a), DP-16 (a finding); confidence medium-low to medium-high · **Under:** CAP-58, DEC-254, DEC-269, DEC-358, DEC-359, DEC-360 · **Changed by:** DEC-394 (replaces its DP-15 rule) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-15: when a merge commit has a parent that is not among the commits new in the move, every path it changes
     against its first parent is judged by the merge commit's own trailers, or against the caller without them. An
@@ -4102,7 +4102,7 @@ makes the check report more; it is reversible, and the lead's and the orchestrat
 medium-high confidence. The owner was told on 2026-10-05.
 
 ### DEC-394 — W1-50 DP-18 and DP-17: a merge commit's own change by the three-way rule; a ticket-file commit in a worker's call
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-18 option (a) and DP-17 option (a), confidence medium-high; the third reviewer's findings F1 and F2 · **Amends:** DEC-390 (replaces its DP-15 rule), DEC-269 (refines "content a parent holds") · **Under:** CAP-58, DEC-254, DEC-359 · **Changed by:** DEC-398, DEC-403
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-18 option (a) and DP-17 option (a), confidence medium-high; the third reviewer's findings F1 and F2 · **Amends:** DEC-390 (replaces its DP-15 rule), DEC-269 (refines "content a parent holds") · **Under:** CAP-58, DEC-254, DEC-359 · **Changed by:** DEC-398, DEC-403 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-18: a path a merge commit changes against its first parent is brought by another parent only when that
     parent's content of the path differs from the merge base of the parents; with several merge bases, it must differ
@@ -4191,7 +4191,7 @@ orchestrator. Where an answer leaves the ticket to the orchestrator, the choice 
   - DEC-372 stands as recorded: an owner decision, its handling delegated.
 
 ### DEC-402 — The freeze flag carries a marker; an empty placeholder is no freeze (high priority)
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-176, DEC-365, DEC-378 · **Under:** CAP-58, DEC-159, DEC-180
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-176, DEC-365, DEC-378 · **Under:** CAP-58, DEC-159, DEC-180 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Context:** launched sessions were refused with "frozen: all writes denied" although no freeze was set. Likely
   cause: the launcher denies `.gov-runtime/freeze` also when it does not exist, so the sandbox creates an empty
   placeholder at that path on the real filesystem while a worker's command runs, and the guard, outside the sandbox,
@@ -4221,7 +4221,7 @@ check report more, are reversible before W1-11 uses the helper, and the lead's a
 agree at medium confidence or higher. The owner was told on 2026-10-05.
 
 ### DEC-403 — W1-50 DP-20 and DP-19: the merge helper reads every parent; an octopus with a crossing parent fails closed
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-20 option (a), confidence medium-high, and DP-19 option (a), confidence medium; the fourth reviewer's finding F1 (seven merge shapes that undo acceptance tests silently) · **Amends:** DEC-394, DEC-398 ("against its first parent") · **Under:** CAP-58, DEC-269, DEC-401 · **Changed by:** DEC-410 (the octopus sentence; what `brought` holds)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-20 option (a), confidence medium-high, and DP-19 option (a), confidence medium; the fourth reviewer's finding F1 (seven merge shapes that undo acceptance tests silently) · **Amends:** DEC-394, DEC-398 ("against its first parent") · **Under:** CAP-58, DEC-269, DEC-401 · **Changed by:** DEC-410 (the octopus sentence; what `brought` holds) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-20: the one helper that reads a merge (`gov.guard.containment_merge.read_merge`) reads every parent the way
     it reads the first. A path where the merge commit's content differs from any parent's is the merge commit's own
@@ -4298,7 +4298,7 @@ DEC-400's drafts.
   - Tuning on the dev set alone (option (c), a larger top-k) is not accepted as the fix.
 
 ### DEC-407 — W1-50 DP-F2: accepted for the merge; before W1-50 closes, the flag is compared around every Bash call and owner identity follows process ancestry
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-50 freeze branch package DP-F2 option (a) now, option (b) and a new rule before the close · **Amends:** DEC-365 ("unset `GOV_ROLE` is the owner") · **Under:** DEC-402, DEC-404, DEC-311 · **Changed by:** DEC-409 (its ancestry rule is replaced)
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-50 freeze branch package DP-F2 option (a) now, option (b) and a new rule before the close · **Amends:** DEC-365 ("unset `GOV_ROLE` is the owner") · **Under:** DEC-402, DEC-404, DEC-311 · **Changed by:** DEC-409 (its ancestry rule is replaced) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - Now, so the freeze branch can merge: W1-46's one live assertion is revised as a rewrite after implementation,
     reason "owner decision: freeze marker".
@@ -4312,7 +4312,7 @@ DEC-400's drafts.
   - The KPI lines are added to W1-50 in their own commit.
 
 ### DEC-408 — DEC-403 stands; three orchestrator choices are confirmed
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner answer · **Under:** DEC-403, DEC-402, DEC-398, DEC-397
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner answer · **Under:** DEC-403, DEC-402, DEC-398, DEC-397 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DEC-403 (the symmetric merge rule; an octopus merge with a crossing parent fails closed): no objection.
   - Confirmed: the freeze work is carried by W1-50 and not by W1-32; the fail-closed reading of criss-cross merges
@@ -4363,7 +4363,7 @@ built or makes the check report more; none makes it report less. The findings of
 The owner was told on 2026-10-05.
 
 ### DEC-410 — W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a path both sides changed is the merge commit's own; 24 parents at most
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401 · **Changed by:** DEC-918: under `tests/acceptance/`, a path both parents changed is not the merge commit's own change when the merge holds exactly git's own merge of that file · **Changed by:** DEC-421 (DP-24)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401 · **Changed by:** DEC-918: under `tests/acceptance/`, a path both parents changed is not the merge commit's own change when the merge holds exactly git's own merge of that file · **Changed by:** DEC-421 (DP-24) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-21: a change to a file under `.tickets/**` that a merge commit itself makes (its own change, by the helper)
     is a finding whatever the merge commit's trailers, also with orchestrator trailers or none.
@@ -4463,7 +4463,7 @@ of 189 real merges flags two, neither by mistake: W1-20's merge-back `5922e24e` 
 passed, `tests/unit` 760 passed, every other suite passed). The owner was told on 2026-10-06.
 
 ### DEC-417 — W1-50 DP-29, DP-30 and the bound on a move: as built
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-06) · **Basis:** W1-50 packages DP-29 and DP-30, the stricter option of each, as the lead built them; the sixth reviewer's finding F3 · **Under:** DEC-410, DEC-413, DEC-401 · **Changed by:** DEC-421 (its residual)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-06) · **Basis:** W1-50 packages DP-29 and DP-30, the stricter option of each, as the lead built them; the sixth reviewer's finding F3 · **Under:** DEC-410, DEC-413, DEC-401 · **Changed by:** DEC-421 (its residual) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-29: under `tests/acceptance/**`, a path two parents both changed against their one merge base in the same
     way is the merge commit's own change too, although it differs from no parent.
@@ -4545,7 +4545,7 @@ again; no model or settings change was made. A one-line headless probe answered 
     others, each from its branch's last commit.
 
 ### DEC-421 — W1-50: the both-sides rule is extended to ticket files
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the residual of W1-50's seventh round (the sixth reviewer's finding F1) · **Amends:** DEC-410 (DP-24), DEC-417 (its residual) · **Under:** DEC-413 · **Changed by:** DEC-572
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the residual of W1-50's seventh round (the sixth reviewer's finding F1) · **Amends:** DEC-410 (DP-24), DEC-417 (its residual) · **Under:** DEC-413 · **Changed by:** DEC-572 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - Under `.tickets/**` too, a path that more than one parent changed against the merge base is the merge commit's
     own, whichever side's content it holds. Stricter-only.
@@ -4634,7 +4634,7 @@ wrote source (DEC-427). Ticket edits are in their own commits.
   - W1-50 no longer waits for it: W1-50 closes when DEC-429 is built, green and reviewed.
 
 ### DEC-429 — W1-50: the freeze is also written to a mirror outside the repository (MWA-01)
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the last freeze review's findings F2, F3 and F8 and the mid-wave audit's MWA-01; options (a) and (b) combined · **Extends:** DEC-404, DEC-407, DEC-409 · **Under:** DEC-413, DEC-415, CAP-05
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the last freeze review's findings F2, F3 and F8 and the mid-wave audit's MWA-01; options (a) and (b) combined · **Extends:** DEC-404, DEC-407, DEC-409 · **Under:** DEC-413, DEC-415, CAP-05 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - `gov pause` writes the freeze to `.gov-runtime/freeze` and to a mirror outside the repository, under
     `~/.local/state/gov-os/`, keyed by the repository.
@@ -4680,7 +4680,7 @@ wrote source (DEC-427). Ticket edits are in their own commits.
   to W1-30 is delegated to the orchestrator.
 
 ### DEC-434 — Ticket leads get their own role
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on DEC-427 · **Amends:** DEC-156 (as far as a ticket lead is concerned) · **Under:** DEC-371, MR-3
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on DEC-427 · **Amends:** DEC-156 (as far as a ticket lead is concerned) · **Under:** DEC-371, MR-3 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - Leads run as `GOV_ROLE=orchestrator`, which has wide write rights (DEC-156); that is why the guard did not
     stop W1-24's lead from writing source.
@@ -4748,7 +4748,7 @@ Decided by the orchestrator on 2026-10-06.
 Decided by the orchestrator on 2026-10-06. The owner was told the same day that DP-M2 to DP-M4 touch the guard and may be overturned.
 
 ### DEC-437 — W1-50 follow-up DP-M1 to DP-M4, DP-L1, DP-L2; W1-24 DP-2 to DP-5
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-434 and DEC-416, and as the strictest reading of DEC-429, 2026-10-06) · **Basis:** the test designers' packages, each with a recommendation · **Under:** DEC-429, DEC-409, DEC-402, DEC-425
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-434 and DEC-416, and as the strictest reading of DEC-429, 2026-10-06) · **Basis:** the test designers' packages, each with a recommendation · **Under:** DEC-429, DEC-409, DEC-402, DEC-425 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - DP-M1: the mirror entry is named by the SHA-256, in hex, of the real path of the repository's git common
     directory. The main tree and every worktree share one entry; two clones differ; a moved repository has a new
@@ -5418,7 +5418,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - `template/.gitignore`, ignoring `.gov-runtime/` and `__pycache__/`.
 
 ### DEC-494 — The CI workflow installs gitleaks and the `gov` package only, each verified against its archive's checksum; steps that need the dev tiers report "unmeasured"
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-8 (the W1-40 lead's P-4): the hosted runner has none of the tools the job needs.
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-8 (the W1-40 lead's P-4): the hosted runner has none of the tools the job needs. · **Class:** superseded by EMERGENCY-2 §2.11 (DEC-1211)
 - **Decision:**
   - The CI workflow installs only gitleaks and the `gov` package now; rulesync when the adapter comparison step is added.
   - Each at its registered version, in its own step, and each download verified against the checksum of its archive: a new field of `governance/project/tool-registry.yaml`, which the orchestrator adds and fills.
@@ -5570,7 +5570,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** Per session: the session role's file under `.claude/agents/`, plus `CLAUDE.md` and `AGENTS.md` where they exist. MCP counts 0, because the Governance OS defines no MCP server.
 
 ### DEC-508 — The held-out file: the brief rule is confirmed, and the guard refuses any agent tool call whose targets include it
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on the incident in W1-31's second run (a test designer's search with a glob over the folder that holds the held-out file) · **Under:** DEC-108 · **Changed by:** DEC-820
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on the incident in W1-31's second run (a test designer's search with a glob over the folder that holds the held-out file) · **Under:** DEC-108 · **Changed by:** DEC-820 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The orchestrator's brief rule is confirmed: no worker runs a glob, a search or a listing over `governance/project/`; files there are named one by one.
   - Delegated to the orchestrator, stricter-only: the guard refuses any agent tool call whose expanded file targets (globs included, DEC-108) include the project's held-out file under `governance/project/` (the owner's answer names its path). The orchestrator chooses the ticket.
@@ -5739,7 +5739,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** DEC-512 and DEC-516 stand as written. The measuring agent of DEC-514 as an independent auditor on W1-31 is accepted.
 
 ### DEC-525 — The guard refuses any agent tool call that reads the Claude Code settings file or the held-out file, for every role
-- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on the incident in W1-31's fourth run (a lead loaded `.claude/settings.json` in a script to list hook events) · **Extends:** DEC-508 · **Under:** DEC-108
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on the incident in W1-31's fourth run (a lead loaded `.claude/settings.json` in a script to list hook events) · **Extends:** DEC-508 · **Under:** DEC-108 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - Delegated to the orchestrator, stricter-only: the guard refuses any agent tool call that reads `.claude/settings.json` or the project's held-out file under `governance/project/` (the owner's answer names its path), for every role, the orchestrator included.
   - For hook listings, a small helper prints only the hook events, with the deny lines redacted.
@@ -5940,7 +5940,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 150. Delegated, stricter-only: four packages of the guard follow-up on W1-02 (register v0.150, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-548 — The guard's rule against reads of the settings file and the held-out file: redaction in the helper, second names, copies outside the project, and the refusals beyond the order
-- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; stricter-only: each point refuses more and blocks none of the owner's own actions; the lead's recommendation and the orchestrator's agree; reversible) · **Basis:** the lead's return at `c95bb271` (`log/W1-02-lead-run1.json`: 447 new cases green, every suite green) · **Under:** DEC-108, DEC-508, DEC-525
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; stricter-only: each point refuses more and blocks none of the owner's own actions; the lead's recommendation and the orchestrator's agree; reversible) · **Basis:** the lead's return at `c95bb271` (`log/W1-02-lead-run1.json`: 447 new cases green, every suite green) · **Under:** DEC-108, DEC-508, DEC-525 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - **DP-2.** The hook-listing helper redacts a whole deny value, as built, and also an absolute path that a deny rule carries wherever a hook command holds it bare.
   - **DP-3.** A command that gives either file a second name is refused as a read, for every role: a move or rename of the file, a hard or symbolic link to it, a linking copy, and an in-place edit that leaves a backup copy. A plain write to the file by a role that may write it today stays as it is.
@@ -6007,7 +6007,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 154. Delegated, stricter-only: three packages of the guard follow-up's second run on W1-02 (register v0.154, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-553 — The read rule for the two protected files: a wildcard-only glob from a copy's folder, a deny path spelled from the home folder, a move of the holding folder
-- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each refuses or redacts more; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `750d57fb` (`log/W1-02-lead-run2.json`: DEC-548's four points built, 331 new cases, every suite green; a comparison over 420,000 random calls found none that was refused before and is allowed now) · **Under:** DEC-508, DEC-525, DEC-548
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each refuses or redacts more; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `750d57fb` (`log/W1-02-lead-run2.json`: DEC-548's four points built, 331 new cases, every suite green; a comparison over 420,000 random calls found none that was refused before and is allowed now) · **Under:** DEC-508, DEC-525, DEC-548 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - **DP-6: (b).** A glob made of wildcards alone from the folder a copy lies under is refused as the same glob from the session's own root is: the two no longer differ. A glob or search from above that folder whose pattern names the file's own name or path is answered together with DP-1, which is with the owner (P-23); until then it is a residual.
   - **DP-7: (b).** The helper also redacts a deny path that is spelled from the home folder, as written and with the home folder in its place. A project-relative spelling is not redacted (it would blank ordinary relative paths) and stays a residual.
@@ -6056,7 +6056,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** Showing open `gate` records in `gov status` is an item of the Wave 2 list. For Wave 1, DEC-543 stands as decided.
 
 ### DEC-557 — P-23: the guard refuses a search from the project root that gives no path or glob, for every role
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-508, DEC-525, DEC-548, DEC-553
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-508, DEC-525, DEC-548, DEC-553 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** A search from the project root that gives no path or glob is refused by the guard, for every role. W1-02's current probe and merge are not held for it. It is built as one short round on W1-02 after that merge: the test designer first, who also rewrites the 14 cases in W1-02, W1-05, W1-47 and W1-50 that hold such a search as allowed (recorded as rewrites, reason "owner decision P-23"), then the engineer, then that round's own reviewer probe before its merge.
 
 ### DEC-558 — P-24: three test-designer commits without `Implements:` are named exceptions; the pre-merge check is confirmed
@@ -6200,15 +6200,15 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - The existing rules stay as they are: a merge commit's own change under `tests/acceptance/**` or `.tickets/**` remains a finding, and so do both sides changing the same acceptance test (DEC-410).
 
 ### DEC-573 — P-27: a root search is refused only where a protected file, or a copy of one, lies under the search start
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-27 option (b), as built · **Refines:** DEC-557
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-27 option (b), as built · **Refines:** DEC-557 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The guard refuses a root search only where a protected file, or a copy of one, lies under the search start. A project that holds neither refuses none.
 
 ### DEC-574 — P-28: the held-out check skips path resolution for a string longer than the system path limit
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-28 option (a) (`log/W1-02-lead-run4.json`: a megabyte of path-like text in a field that is not a path takes 40 seconds and more to decide) · **Under:** DEC-570
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-28 option (a) (`log/W1-02-lead-run4.json`: a megabyte of path-like text in a field that is not a path takes 40 seconds and more to decide) · **Under:** DEC-570 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The held-out check skips path resolution for any string longer than the system path limit, and keeps the literal substring check.
 
 ### DEC-575 — A type filter with no path stays refused
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-557, DEC-570
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-557, DEC-570 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** `rg -t <type>` from the root with no path stays refused, as built; the refusal names `-g` as the way round.
 
 ### DEC-576 — DEC-569, DEC-570 and DEC-571 are accepted
@@ -6216,7 +6216,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** The orchestrator's delegated decisions DEC-569 (the follow-up after W1-41 on W1-30's ticket), DEC-570 (the probe of W1-02's root-search round, one fix round) and DEC-571 (the fix round merges without a second probe) are accepted.
 
 ### DEC-577 — Guard scope for the rest of Wave 1
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-498, DEC-557
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-498, DEC-557 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** After the current W1-02 round merges, there are no further guard rounds in Wave 1, except for a hole that ordinary work produces. Holes that need a deliberate shape become residuals on the Wave 2 list.
 
 ### DEC-578 — Delegated experiment: what the harness does with a PreToolUse hook that passes its time limit; an explicit time limit for this repository's guard hooks
@@ -6253,7 +6253,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 166. Owner answers to P-29, P-30 and P-31, on DEC-579, and the Wave 1 finish line (register v0.166, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-580 — P-29: the guard's hook program keeps its own deadline of 20 seconds; the hook entries carry a time limit of 60 seconds, here and in the kernel template
-- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-29 option (a); the evidence record `docs/research/EXP-hook-time-limit.md` (a hook that passes its time limit lets the call through) · **Under:** DEC-578, DEC-577, DEC-254
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-29 option (a); the evidence record `docs/research/EXP-hook-time-limit.md` (a hook that passes its time limit lets the call through) · **Under:** DEC-578, DEC-577, DEC-254 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The guard's hook program keeps its own deadline of 20 seconds and answers "refuse" when it reaches it. It is built in the current W1-02 round, test designer first.
   - The kernel template's settings carry `"timeout": 60` on every guard hook entry, so that every adopted project gets it. That is added to the follow-up after W1-41, with the template settings path added to its ticket.
@@ -6393,7 +6393,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Decision:** One fix round on W1-15, test designer first: the secrets-indexing scan runs its files in parallel, as the module already does for the indexer, and a check's declaration may state its own time limit. No rule is loosened; every file is still scanned. One run plus its probe. Afterwards it is measured on this repository's real store and on one adopted dev-tier clone. Scanning only changed files (result caching) goes on the Wave 2 list.
 
 ### DEC-596 — P-34: the template's rulesync hooks source carries the time limit and the entry for a failed tool call
-- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-34 option (a), widened · **Under:** DEC-580, DEC-584 b
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-34 option (a), widened · **Under:** DEC-580, DEC-584 b · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** The template's rulesync hooks source (`template/.rulesync/hooks.jsonc`) gets `"timeout": 60` on every guard hook entry, and the missing PostToolUseFailure entry for the containment check. Without it an adopted project runs no containment after a failed command, which ordinary work meets. It is verified that rulesync 24.0.0 passes both through to the generated settings, and that an adopted dev-tier clone's sessions run the containment check after a failed command. It is built in the same round as DEC-595 if the paths allow, otherwise as its own short round, test designer first, with a probe.
 
 ### DEC-597 — P-35: another ticket's later commit inside a ticket's paths is a named residual
@@ -6781,7 +6781,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 190. Owner answers on P-44 and the checklist (register v0.190, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-635 — P-44, deny rules: option (d): the held-out Read deny rule is added after generation by the existing generator; every other deny rule goes into this repository's permissions source
-- **Status:** ACCEPTED (owner, 2026-10-11) · **Basis:** OWNER, on package P-44; none of (a) to (c) · **Under:** DEC-218, DEC-631, DEC-634
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Basis:** OWNER, on package P-44; none of (a) to (c) · **Under:** DEC-218, DEC-631, DEC-634 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - The held-out Read deny rule is never written into any rulesync source. After rulesync generation, it is added to the generated settings from the held-out file by the existing generator (W1-47, DEC-218), as a post-generation step. That step is part of the owner's apply procedure, and adapter-portability runs the same step inside its temporary generation, so the comparison stays exact.
   - Every other deny rule (the secret-file Edit rules, the sudo rule, the `docs/source` rules) goes into this repository's `.rulesync/permissions.jsonc`, written by a small script the orchestrator writes and the operator runs, printing counts only. None of those rules names a held-out or oracle path.
@@ -6916,7 +6916,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 197. Owner actions: lead launch permission, ESCALATION_BLOCKED ratification (register v0.197, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-650 — Lead launch permission: Claude Code 2.1.292's auto mode classifier blocks launching claude CLI sessions; the owner adds permission rules
-- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-649
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-649 · **Class:** superseded by EMERGENCY-2 §2.3 (DEC-1211)
 - **Decision:**
   - Claude Code 2.1.292's auto mode classifier denied launching a `claude` CLI session in the background as "Create Unsafe Agents". This blocks the standard way to start a ticket lead (a headless `claude` session with `--settings` for identity, `--permission-mode acceptEdits` and `--output-format json`, inside a worktree). The denial is new with 2.1.292.
   - **The owner added two permission rules** to `.claude/settings.local.json` (gitignored): `Bash(~/.local/bin/claude:*)` and `Bash(cd /home/usain/gov-os-worktrees/:*)`. The env block (`GOV_DEV_TIERS`, `GOV_ROLE`, `GOV_TICKET`) is unchanged. Git status remains clean. The lead launch is retried.
@@ -7242,7 +7242,7 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
   - Anything else stops for the owner, as DEC-651 says.
 
 ### DEC-685 — The guard refuses a tool it does not know; `MultiEdit` is judged like `Edit`; one short W1-02 round
-- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-584 (section 11), MR-3, CAP-58 · **Basis:** the W1-38 round's probe (`log/W1-38-probeM.json`, residual 2): the guard answers allow for `MultiEdit`, for every role
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-584 (section 11), MR-3, CAP-58 · **Basis:** the W1-38 round's probe (`log/W1-38-probeM.json`, residual 2): the guard answers allow for `MultiEdit`, for every role · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - `MultiEdit` is not a deliberate shape. It is an ordinary Claude Code tool that writes files, and the guard answering allow for a tool it does not know breaks its default-deny design (W1-02). Under section 11 it is a fail-open hole in ordinary work.
   - One short W1-02 round, test designer first, with a probe.
@@ -8426,7 +8426,7 @@ W2-53 was merged into `w2/integrate` at `c9537e39` (`Task: DAEO-7rr2`; its tree 
   5. **W2-M367 (W2-53's residual):** a refused close's envelope does not carry the ratchet's report (the accepted reds it let through and the load-sensitive re-runs); only a passing close's record states them.
 
 ### DEC-769 — Leads run sandboxed, in W2-21; the test designer writes only its own acceptance folder (P-W2-27 (a))
-- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-715, DEC-315, DEC-728, DEC-759 · **Basis:** P-W2-27. A launched worker's Bash already runs in the operating-system sandbox, writing only its own worktree and session folder (and its own folder under `~/gov-os-runs` once W2-50 lands), with `tests/acceptance/**`, the tickets, `.claude` and `.gov-runtime` (but its scratch) read-only for every role but the test designer; W1-46's live cases show such writes fail. Leads and the orchestrator run with no sandbox, so for them the guard's reading of shell text is the only layer. · **Changed by:** DEC-953 (item 2); DEC-1128 (4): leads are not sandboxed and no sandbox work follows for them (the title's "Leads run sandboxed" is withdrawn); the workers' launcher sandbox stays
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-715, DEC-315, DEC-728, DEC-759 · **Basis:** P-W2-27. A launched worker's Bash already runs in the operating-system sandbox, writing only its own worktree and session folder (and its own folder under `~/gov-os-runs` once W2-50 lands), with `tests/acceptance/**`, the tickets, `.claude` and `.gov-runtime` (but its scratch) read-only for every role but the test designer; W1-46's live cases show such writes fail. Leads and the orchestrator run with no sandbox, so for them the guard's reading of shell text is the only layer. · **Changed by:** DEC-953 (item 2); DEC-1128 (4): leads are not sandboxed and no sandbox work follows for them (the title's "Leads run sandboxed" is withdrawn); the workers' launcher sandbox stays · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **Folded into W2-21 (the stable lead launch).** It starts with a feasibility test of one to two hours: can a sandboxed lead start a sandboxed worker on this machine? Its result is recorded and brought to the owner if it fails.
   2. **Then leads run sandboxed:** the lead's worktree writable; `tests/acceptance/**`, every other worktree and every other ticket's folder read-only.
@@ -8523,7 +8523,7 @@ W2-54's first round (lead return of 2026-10-18, head `71a3a592`, not reviewed, n
 W2-50's run-6 engineer found that `src/gov/guard/protected.py`, outside W2-50's paths, still reads `mv` and `cp -l` with the old option reader. That is the one P-W2-25 (DEC-765) replaced for `cp` and `install`, which read a `t` inside an option's value as `-t` and ignored `--`. That file holds the guard's refusal to read protected material, the held-out material among it. Leads run with no sandbox, so a lead can reach the misreading (DEC-770 item 2). It was shown to the owner as P-I.
 
 ### DEC-778 — One option reader for every copy-like command, for writes and for reads (P-I)
-- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-765, DEC-770, DEC-774, DEC-413 · **Basis:** P-I; W2-50's run-6 return.
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-765, DEC-770, DEC-774, DEC-413 · **Basis:** P-I; W2-50's run-6 return. · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **Fixed in Wave 2, not deferred:** it protects the held-out material against reads by a lead.
   2. **One option reader:** `src/gov/guard/protected.py` stops using its old option reader for `mv` and `cp -l`. It uses the reader W2-50 built for `cp` and `install`, so the guard reads every copy-like command one way, for writes and for reads.
@@ -8741,7 +8741,7 @@ W2-54's run 3b found that the shared GPU Ollama gives a text a vector that depen
   5. **W2-54 is widened by `src/gov/retrieval/ollama.py`** (the CPU-only embedder: its start, its port and the query requests). **DEC-261 is amended:** `gov` starts two daemons on demand and stops neither, the shared one and the CPU-only one on its own port; the idle unload frees each one's memory.
 
 ### DEC-799 — W2-56 makes `gov launch` usable for every worker; sandboxed workers wherever the suites allow meanwhile (P-W2-38 (a))
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-789, DEC-779, DEC-794, DEC-786 · **Basis:** the `gov launch` trial: the sandbox refused a write outside the worktree (`OSError: [Errno 30] Read-only file system`), git's writes worked, and W2-54's engineers ran their suites inside it; W2-52's could not, because `/tmp/gov-cbm-<uid>` is read-only inside the sandbox (`DAEMON_BASE`, `src/gov/codeintel/__init__.py:35`). A worker's script can write anywhere in its worktree; the launcher's `.gov-runtime/` deny rules are patterns, which the Linux sandbox skips; placeholder files appear in a worktree while a sandboxed worker runs.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-789, DEC-779, DEC-794, DEC-786 · **Basis:** the `gov launch` trial: the sandbox refused a write outside the worktree (`OSError: [Errno 30] Read-only file system`), git's writes worked, and W2-54's engineers ran their suites inside it; W2-52's could not, because `/tmp/gov-cbm-<uid>` is read-only inside the sandbox (`DAEMON_BASE`, `src/gov/codeintel/__init__.py:35`). A worker's script can write anywhere in its worktree; the launcher's `.gov-runtime/` deny rules are patterns, which the Linux sandbox skips; placeholder files appear in a worktree while a sandboxed worker runs. · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **A new ticket, W2-56, with high priority:** it takes the first free slot after W2-50 and W2-05 close, ahead of Track C. Its scope:
      - the code-graph folder under the session's own temporary folder;
@@ -8970,7 +8970,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   6. **From now on the orchestrator commits its own working memory at every checkpoint:** it runs the script, runs gitleaks over the staged set, and commits the copy with `Task: <W2-00's id>` and `Role: orchestrator`. W2-00's `allowed_paths` gain `governance/project/orchestration/**` and `docs/assessment/**`.
 
 ### DEC-820 — Policy 2: reads open, writes closed (standing, under ADR-0001)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** ADR-0001 (accepted by DEC-824), MR-3, MR-4, CAP-38.c · **Replaces:** the listing refusals on `governance/` and `.claude/` (DEC-508), and every other read restriction beyond the four below (among them DEC-723's listing refusal on `~/gov-os-workbench`, and the briefs' "nobody reads anything under `~/.claude/`") · **Basis:** OWNER, 2026-10-19; lens E F5 (three texts give the test designer three rules); lens B F7. · **Changed by:** DEC-953 (item 2)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** ADR-0001 (accepted by DEC-824), MR-3, MR-4, CAP-38.c · **Replaces:** the listing refusals on `governance/` and `.claude/` (DEC-508), and every other read restriction beyond the four below (among them DEC-723's listing refusal on `~/gov-os-workbench`, and the briefs' "nobody reads anything under `~/.claude/`") · **Basis:** OWNER, 2026-10-19; lens E F5 (three texts give the test designer three rules); lens B F7. · **Changed by:** DEC-953 (item 2) · **Class:** superseded by EMERGENCY-2 §2.9 (DEC-1211)
 - **Decision:**
   1. **Agents read freely:** the whole repository, the committed context, git history, other worktrees, and what their own retrieval, search and context return.
   2. **Only four things are refused,** each because it protects what proves something real:
@@ -9230,7 +9230,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   3. DEC-830's "no push" means no pre-push gate yet, not no backups.
 
 ### DEC-849 — W2-58 goes first in keystone 3; until it lands, a read refusal is taken, never routed round, and counted (standing until W2-58 lands)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** item 1 (W2-58's place) by DEC-857: straight after W2-50 merges, ahead of anything else (2026-10-19) · **Under:** DEC-820 item 6, DEC-821, DEC-829 item 2 · **Basis:** OWNER, 2026-10-19: until W2-58 lands, the guard still refuses the reads Policy 2 opened (the orchestrator's repository-wide search met one on 2026-10-19), and that slows every agent. · **Changed by:** DEC-953 (item 2)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** item 1 (W2-58's place) by DEC-857: straight after W2-50 merges, ahead of anything else (2026-10-19) · **Under:** DEC-820 item 6, DEC-821, DEC-829 item 2 · **Basis:** OWNER, 2026-10-19: until W2-58 lands, the guard still refuses the reads Policy 2 opened (the orchestrator's repository-wide search met one on 2026-10-19), and that slows every agent. · **Changed by:** DEC-953 (item 2) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **W2-58 goes first in keystone 3,** or straight after keystone 1 if its paths allow. (On 2026-10-19 they do not yet: W2-50's unmerged branch changes `src/gov/guard/decide.py`, `src/gov/guard/protected.py` and `src/gov/launch/launcher.py`. W2-58 starts when W2-50 merges, or stacked on W2-50 once W2-50's resume probe has passed, DEC-786.)
   2. **Until W2-58 lands, every session keeps the refusal rule:** it takes the refusal, never looks for another form, and searches named folders instead.
@@ -9289,7 +9289,7 @@ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two package
 - **Decision:** W2-59 starts now on `w2/integrate`, although W2-05's unmerged branch changes two of its files (`src/gov/check/runner.py`'s `_run_command` environment and git calls; `src/gov/retrieval/retrieve_check.py`). W2-59's engineer is told W2-05's changes and keeps its own edit of those lines small and composable; W2-05's resume merges `w2/integrate` first and resolves the conflict keeping both sides (DEC-750, DEC-754). An exception to the prompt's §3 for this pair only.
 
 ### DEC-855 — How the owner is notified: `owner-ping`, a permission request (standing)
-- **Status:** ACCEPTED (night-time notification changed by DEC-938: the morning package and one 07:30 ping; changed by DEC-936 item 2.5: only P1s and ACTs ping; P2s delegated; owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line. · **Changed by:** DEC-972 (the ping: a non-blocking notification and the log line; the blocking owner-ping only as a daytime fallback; none at night)
+- **Status:** ACCEPTED (night-time notification changed by DEC-938: the morning package and one 07:30 ping; changed by DEC-936 item 2.5: only P1s and ACTs ping; P2s delegated; owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line. · **Changed by:** DEC-972 (the ping: a non-blocking notification and the log line; the blocking owner-ping only as a daytime fallback; none at night) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **Whenever anything needs the owner** (any decision that gates any ticket, even if other work continues; any COMMIT-NEEDED; any owner act, such as an install, a pin, a release or a go; any LAUNCH_BLOCKED, ESCALATION or AUTH_REQUIRED), the orchestrator:
      - (a) writes the full six-part package (DEC-818) in its message, and saves it under `governance/project/orchestration/packages/<id>.md`;
@@ -9541,7 +9541,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 261. The owner's answer of 2026-10-20 on P-W2-58-1: Policy 2's (c) and (d) by the guard, not by an OS-level Read rule (register v0.261, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-873 — P-W2-58-1 (a): DEC-821's sandbox clause for (c) and (d) re-baselined; the guard enforces them; the held-out rules stay in the sandbox
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-105 (re-baseline), DEC-820, DEC-821, DEC-801, ADR-0001, DEC-857, DEC-866 · **Basis:** P-W2-58-1 (`governance/project/orchestration/packages/P-W2-58-1.md`, W2-58 run 1): Claude Code 2.1.292 turns every Read deny rule that matches existing files into an OS-level read denial for the session's own commands; under each form tried (`<folder>/**`, `<file>*`, `W2-5[8]/**`) the engineer's pytest collected nothing, the test designer could not import the code it tests, and `git status` showed the test files as deleted (a `commit -a` would lose them) · **Changes:** DEC-821 items 1 and 2 (their sandbox clause). · **Changed by:** DEC-953 (item 2)
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-105 (re-baseline), DEC-820, DEC-821, DEC-801, ADR-0001, DEC-857, DEC-866 · **Basis:** P-W2-58-1 (`governance/project/orchestration/packages/P-W2-58-1.md`, W2-58 run 1): Claude Code 2.1.292 turns every Read deny rule that matches existing files into an OS-level read denial for the session's own commands; under each form tried (`<folder>/**`, `<file>*`, `W2-5[8]/**`) the engineer's pytest collected nothing, the test designer could not import the code it tests, and `git status` showed the test files as deleted (a `commit -a` would lose them) · **Changes:** DEC-821 items 1 and 2 (their sandbox clause). · **Changed by:** DEC-953 (item 2) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **The guard enforces Policy 2's (c) and (d)** on every tool and Bash route an honest agent takes.
   2. **The launcher adds no OS-level Read rule for (c) or (d),** because running a test means reading it. **The held-out material's rules (b) stay in the sandbox as well;** a launch under a malformed `evaluation_sets` block is still refused.
@@ -11790,7 +11790,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-950 — The owner's answers to P-W2-H063-1 and P-W2-20-SCOPE: W2-84 makes the hidden-set refusal cover every tree; W2-20 gets one more run aligned with DEC-942 and DEC-947
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`) · **Under:** DEC-820, DEC-845, DEC-873, DEC-942, DEC-946, DEC-947, DEC-817, DEC-949 · **Basis:** `packages/P-W2-H063-1.md`, `packages/P-W2-20-SCOPE.md` (sent 2026-10-29 21:52)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`) · **Under:** DEC-820, DEC-845, DEC-873, DEC-942, DEC-946, DEC-947, DEC-817, DEC-949 · **Basis:** `packages/P-W2-H063-1.md`, `packages/P-W2-20-SCOPE.md` (sent 2026-10-29 21:52) · **Class:** superseded by EMERGENCY-2 §2.7 (DEC-1211)
 - **Decision:**
   1. **P-W2-H063-1: (a).**
      - W2-84 (FULL, about 120 lines) makes the hidden-set refusal cover every tree: the main tree, all worktrees and the run clones.
@@ -11995,7 +11995,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.340 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-957 (the batch stopped before ACT 1; STORE_MISSING fixed by a rebuild; installs ask only in the CTO's session; ACT 1 (a) with W2-90 for the 235 tests; ROLES-SPEC-1 approved with the domain skill packs in Wave 2, a software company's work order, a roles research session, a fresh session daily for every orchestrator, the CTO's skills on demand, effort high for the CTO and Senior Engineers, and the P3/P2/P1/emergency rubric; memory's target 95 % with 85 % the floor, and all seven gaps closed before memory is ready). Next free id: DEC-958. |
 
 ### DEC-958 — The five-rule guard's false refusals: each recorded, counted in the daily document, and a package to fix the hook if they keep happening (standing)
-- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-953 item 2, DEC-954, DEC-957, DEC-849, ADR-0001 · **Basis:** the first false refusal after ACT 1 (2026-10-30 21:45 GMT: the hook's rule 1 refused the orchestrator's lead-brief build because the acceptance folder appeared as text in an argument; the write went to the briefs folder) · **Changed by:** DEC-1050 (the harvest)
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-953 item 2, DEC-954, DEC-957, DEC-849, ADR-0001 · **Basis:** the first false refusal after ACT 1 (2026-10-30 21:45 GMT: the hook's rule 1 refused the orchestrator's lead-brief build because the acceptance folder appeared as text in an argument; the write went to the briefs folder) · **Changed by:** DEC-1050 (the harvest) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **Watch:** every refusal by the five-rule hook (`.claude/hooks/pretooluse.py`, reasons ending "DEC-953 item 2"), in every session, is collected and judged: a true refusal, or a false positive (the hook refused something none of its five rules is meant to stop).
   2. **Record each false positive:** the time, the command's form (one line, at most 200 characters, never a secret or file contents), the rule that refused it, and what it cost (minutes and the workaround). The record is `.gov-runtime/scratch/orchestrator/log/guard-refusals.jsonl`, harvested from the session transcripts by `tools/guard_refusals.py` (checked by a background watcher) and backed by the leads' returns (`guard_refusals:` lines, their workers' included).
@@ -12108,7 +12108,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.348 | 2026-10-31 | Delegated (orchestrator, DEC-936 item 2.5): DEC-965 (W2-90 merged with 7 named reds; P2-C, P2-D, P2-E (a)). Next free id: DEC-966. |
 
 ### DEC-966 — The owner's decisions on P-W2-90-1 and on speed: the template's install block removed, its hook lines pinned; the designers' store refreshed twice a day; rebuild speed a priority (standing)
-- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-957, DEC-965, DEC-172, DEC-822, DEC-963, DEC-939 item 2 · **Changes:** DEC-963 (the store's refresh) · **Changed by:** DEC-1087 (3) (item 3: the store refreshed after every merge by W2-116's hook, not twice a day) · **Basis:** `packages/P-W2-90-1.md`; W2-76's measured rebuild stages (`log/W2-76-A5-run1.json`: secrets 274.8 of 307.4 s; run 2: 547.9 of 735.4 s) · **Changed by:** DEC-1045 (item 4)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-957, DEC-965, DEC-172, DEC-822, DEC-963, DEC-939 item 2 · **Changes:** DEC-963 (the store's refresh) · **Changed by:** DEC-1087 (3) (item 3: the store refreshed after every merge by W2-116's hook, not twice a day) · **Basis:** `packages/P-W2-90-1.md`; W2-76's measured rebuild stages (`log/W2-76-A5-run1.json`: secrets 274.8 of 307.4 s; run 2: 547.9 of 735.4 s) · **Changed by:** DEC-1045 (item 4) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **P1-A (a):** the template's install block is removed (`template/.rulesync/permissions.jsonc`'s `npm install*` and `pip install*` deny rules), so an adopted product's CTO session can ask the owner, as this repository does (DEC-172). A small ticket; then W2-90's next round moves its 3 cases.
   2. **P1-B (a):** the template's hook lines get the fixed-interpreter form this repository uses (DEC-822, W2-59): a fail-open must not ship in EXAMIN's copy. A ticket; then W2-90's next round moves its 4 cases.
@@ -12431,7 +12431,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.373 | 2026-11-01 | Orchestrator (delegated): DEC-990 (P-W2-97-PM-1 (a), the tools folder in the project overlay). Next free id: DEC-991. |
 
 ### DEC-991 — The CTO's approvals: know the allow list; by day ping, then run; in the quiet hours never run, queue for 09:00 (standing)
-- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-988 item 4 (the freeze), DEC-972, DEC-973, DEC-949 · **Changes:** the freeze fix proposed in the handover of 2026-11-01 (its items 1 and 2 are replaced by this rule; items 3 and 4 stand) · **Changed by:** DEC-1050, DEC-1057, DEC-1164 (17) (item 3: a call a lead waits on runs at any hour after a push, unless the owner has said they are asleep, DEC-1164 (23))
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-988 item 4 (the freeze), DEC-972, DEC-973, DEC-949 · **Changes:** the freeze fix proposed in the handover of 2026-11-01 (its items 1 and 2 are replaced by this rule; items 3 and 4 stand) · **Changed by:** DEC-1050, DEC-1057, DEC-1164 (17) (item 3: a call a lead waits on runs at any hour after a push, unless the owner has said they are asleep, DEC-1164 (23)) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Context:** the CTO's session froze from 01:46 to 10:37 on 2026-11-01 on one Bash call that needed a one-time approval (`rm -rf` of a `/tmp` folder, chained to a commit), and from 04:01 for 7 h 45 min on 2026-10-31 on an `owner-ping`. The old session's transcript holds 26 one-time approvals: 14 caused by `rm` in any form (the user settings' ask rules), 9 by `owner-ping` (ask rules), 3 by Claude Code's built-in safety check on `.claude/` paths (a `cp` reading from or writing to `.claude/`, even with `Bash(*)` allowed). Nothing else prompted.
 - **Decision (the owner's words, in order):**
   1. **Know your own allow list,** and before running a command, check whether it could need the owner's approval.
@@ -12470,7 +12470,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.375 | 2026-11-01 | Orchestrator (delegated): DEC-992 (W2-11's P-W2-11-1 to 8), DEC-993 (W2-81's round 2 for F1). Next free id: DEC-994. |
 
 ### DEC-994 — The owner's answers to ACT-DEADMAN-1, ACT-QUIET-DENY-1 and P1-ORCH-APPROVALS-1 (standing)
-- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-991, DEC-988 item 4, DEC-974, DEC-982 · **Changed by:** DEC-998 (item 1)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-991, DEC-988 item 4, DEC-974, DEC-982 · **Changed by:** DEC-998 (item 1) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   1. **ACT-DEADMAN-1: channel (b) only,** the push to the owner's phone through Remote Control (`--channel push`). Tested well before the crontab line goes in: (1) a forced test alert while the owner is away from the PC (the owner locks it for 20 minutes and says when); (2) a simulated stall, replaying a transcript, through the whole path to the push (in cron's bare environment), not just the alert call. The owner confirms on the phone whether each arrived; then the CTO brings the crontab line with `--channel push`. If (b) fails: why, and the options.
   2. **ACT-QUIET-DENY-1: yes, with `onFailure: block`;** the owner's operator added it (checked 12:57: the block is in `.claude/settings.local.json`; a session started in the main tree with the clock forced to 03:00 had a prompting `rm` refused at once and queued).
@@ -12896,7 +12896,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.419 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1037. Next free id: DEC-1038. |
 
 ### DEC-1038 — Machine changes outside the repository by ACT only; the CTO's checkpoint straight to scratch; the overload's standing targets, its incidents, and every heavy job through the gate
-- **Status:** ACCEPTED (owner, 2026-11-02 ~16:20; recorded by the orchestrator, DEC-861) · **Under:** DEC-1033, DEC-1032, DEC-1037, DEC-979, DEC-1011 · **Changed by:** DEC-1057 (1), DEC-1157 (5) (item 4's CPU band), DEC-1164 (9) (item 4's last sentence: slots from the machine, re-sized from the wait log)
+- **Status:** ACCEPTED (owner, 2026-11-02 ~16:20; recorded by the orchestrator, DEC-861) · **Under:** DEC-1033, DEC-1032, DEC-1037, DEC-979, DEC-1011 · **Changed by:** DEC-1057 (1), DEC-1157 (5) (item 4's CPU band), DEC-1164 (9) (item 4's last sentence: slots from the machine, re-sized from the wait log) · **Class:** superseded by EMERGENCY-2 §2.10 (DEC-1211)
 - **Decision:** (1) From now on, anything outside the repository that changes how the machine runs (files under `~/.local/bin`, `~/.config`, `~/.ollama`, the crontab, `.wslconfig`, services, environment files) comes to the owner as an ACT; the CTO and its agents do not place it themselves (the `~/.local/bin/ollama` wrapper of 15:50 was placed without one: accepted in DEC-1037 as an interim).
 (2) The CTO's checkpoint is written straight to scratch (`.gov-runtime/scratch/checkpoints/<ticket>/`), never under `docs/checkpoints/` and never moved by hand: `tools/cto_checkpoint.sh "<next action>" [inputs]` calls the checkpoint writer with its automatic destination (the Stop hook's) and fails if anything under `docs/checkpoints/` changed; the CTO no longer runs `gov checkpoint` in the main tree (two slips on 2026-11-02 came from moving that file by hand).
 (3) The WSL configuration: the owner's question answered by the CTO (below, "Recorded with it" (a)); no change before the RAM upgrade's planned restart.
@@ -13052,7 +13052,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.437 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1053. Next free id: DEC-1054. |
 
 ### DEC-1054 — G-14: the test designer's no-read list covers the ticket's own new unit-test files; shared test files stay readable
-- **Status:** ACCEPTED (owner, 2026-11-03 ~14:45, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 G-14, DEC-963, DEC-820 (c) · **Source:** the CTO's provisional recommendation (START-NEXT-SESSION §6; `.gov-runtime/scratch/orchestrator/briefs/EMG-g14-engineer.md`)
+- **Status:** ACCEPTED (owner, 2026-11-03 ~14:45, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 G-14, DEC-963, DEC-820 (c) · **Source:** the CTO's provisional recommendation (START-NEXT-SESSION §6; `.gov-runtime/scratch/orchestrator/briefs/EMG-g14-engineer.md`) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** in G-14's path-map role checks, what the independent test designer may not read (`{ticket_impl}`) covers the ticket's own new unit-test files (its `allowed_paths` under `tests/`, other than `tests/acceptance/**`), as well as its code outside `tests/`; shared test files stay readable (every `conftest.py` and the shared support modules the designer needs for fixtures); the integrated copies stay readable (DEC-963). Applied in ACT-G14 unless the replay's counts show a problem (honest designer work refused, or a gap in ordinary work); if they do, it comes back to the owner before the ACT.
 - **Basis:** question 1 (role separation: the designer writes from the spec and KPIs, not from the engineer's new tests) and question 2 (a designer shaping acceptance tests to the engineer's unit tests would let drift through).
 
@@ -13070,7 +13070,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.439 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1055. Next free id: DEC-1056. |
 
 ### DEC-1056 — G-14: engineers are refused their own ticket's acceptance tests, wherever they sit; other tickets' stay readable
-- **Status:** ACCEPTED (owner, 2026-11-03, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 G-14, DEC-1054, DEC-820 (c) · **Source:** the G-14 replay (variants (a) 567 refusals in 89 sessions, (b) 173 in 35; `.gov-runtime/scratch/orchestrator/drafts/g14/replay-counts.json`)
+- **Status:** ACCEPTED (owner, 2026-11-03, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 G-14, DEC-1054, DEC-820 (c) · **Source:** the G-14 replay (variants (a) 567 refusals in 89 sessions, (b) 173 in 35; `.gov-runtime/scratch/orchestrator/drafts/g14/replay-counts.json`) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:** in G-14's path-map role checks, an engineer is refused its own ticket's acceptance tests: every acceptance test that tests that ticket's KPIs, wherever it sits (its own folder, and any other ticket's cases revised for it, as W2-54's were for W2-126). Other tickets' acceptance tests stay readable, for regressions. The test designer's rule stays as DEC-1054. ACT-G14 comes to the owner once its review is READY, saying how the check finds a ticket's tests outside its own folder.
 - **Basis:** question 1 (role separation where the conflict of interest is: an engineer and its own ticket's tests) and question 4 (no refusal of honest regression work).
 
@@ -13088,7 +13088,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.441 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1057. Next free id: DEC-1058. |
 
 ### DEC-1058 — P-ACT-SPLIT: the operator's ACTs, the CTO's ACTs on a ping reply, and what the CTO never runs
-- **Status:** ACCEPTED (owner, 2026-11-03, in the chat, "approved as written"; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`; standing) · **Under:** DEC-1052 O-6, DEC-1038 (1), DEC-083, DEC-957 · **Source:** `governance/project/orchestration/packages/P-ACT-SPLIT.md` · **Changed by:** DEC-1164 (11) ((b)'s quiet hours: a (b) ACT a lead waits on, the yes recorded)
+- **Status:** ACCEPTED (owner, 2026-11-03, in the chat, "approved as written"; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`; standing) · **Under:** DEC-1052 O-6, DEC-1038 (1), DEC-083, DEC-957 · **Source:** `governance/project/orchestration/packages/P-ACT-SPLIT.md` · **Changed by:** DEC-1164 (11) ((b)'s quiet hours: a (b) ACT a lead waits on, the yes recorded) · **Class:** superseded by EMERGENCY-2 §2.10 (DEC-1211)
 - **Decision:** as written: (a) the operator's ACTs: the guard, its hooks, `.claude/` settings and generated files, the pinned gov, the sentinel and dead-man's switch, what the CTO's session runs on; (b) the CTO's ACTs on the owner's ping reply naming the ACT and its file's sha: machine changes with a rehearsed rollback (the crontab, the servers' settings beyond the restart classes, the CTO's watchers and samplers, `~/.config/gov-os*`, `~/.cache/gov-os`), the reply recorded verbatim in the ACT and in `log/act-approvals.jsonl`, the report in the next digest, a failed check rolled back at once and pinged; never the CTO's, whatever is approved: `sudo`, `git push`, installs, irreversible deletion (history prunes, anything outside the project and its scratch, anything without a rollback), secrets and paid services, its own permissions or the guard, paths a deny rule closes, and any (b) ACT in the quiet hours but an emergency's rollback. ACT-G14 stays with the operator, as (a).
 - **Basis:** question 4 (less of the owner's time) and question 2 (no change without its checks, rollback and rehearsal).
 
@@ -13441,7 +13441,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   memory work, not after it).
 
 ### DEC-1080 — P-PERMISSIONS-1 approved with read-only git through `git -C` only; the CTO's command rule (Read and Grep tools, one simple command per call, a line before any prompting command) standing, and in every agent's brief
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; standing) · **Under:** DEC-1058 (P-ACT-SPLIT), DEC-1057, DEC-1052 · **Source:** `governance/project/orchestration/packages/P-PERMISSIONS-1.md` · **Changed by:** DEC-1081 (1), DEC-1082 (0)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; standing) · **Under:** DEC-1058 (P-ACT-SPLIT), DEC-1057, DEC-1052 · **Source:** `governance/project/orchestration/packages/P-PERMISSIONS-1.md` · **Changed by:** DEC-1081 (1), DEC-1082 (0) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - **(1) The CTO's own rule, now and from here on:** reading with the Read and Grep tools; one simple command per
     call; no `cd … &&` chains; before any command that will prompt the owner, one line saying what it does and why.
@@ -13477,7 +13477,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   question 4 (scores computed once and combined offline cost the GPU once).
 
 ### DEC-1082 — The permissions' missed points accepted and ACT-PERMISSIONS-2 applied; the health check's decisions: the three stopped agents started again, the DEC-999 labels a priority fix, the guard refuses the hidden sets outside the repository to the measured roles, the spill reading investigated, the score-once window after its review
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1080, DEC-1081, DEC-1073, DEC-820 (d), DEC-1052 · **Changes:** DEC-1080 (P-PERMISSIONS-1's premise: the user-level settings allow all; the guard is the check)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1080, DEC-1081, DEC-1073, DEC-820 (d), DEC-1052 · **Changes:** DEC-1080 (P-PERMISSIONS-1's premise: the user-level settings allow all; the guard is the check) · **Class:** superseded by EMERGENCY-2 §2.9 (DEC-1211)
 - **Decision:**
   - **(0) Permissions.** P-PERMISSIONS-1 missed two points, accepted under our threat model: the owner's user-level
     settings allow every Bash command, Read, Edit, Write and web access, so the project's allow list adds nothing for
@@ -13960,7 +13960,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   standard carried to EXAMIN as the practice's first full run).
 
 ### DEC-1100 — P-SELECT-FIXES-1: the test-map couplings and W2-66's record-only case as ACT-SELECT-FIXES-1, pinned by W2-66c; a scoped selection after landings outside a ticket on settings, the registry or the test map, from one hook line, in the CTO's tools first
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (2), DEC-1062, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after P-SELECT-FIXES-1 §5
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (2), DEC-1062, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after P-SELECT-FIXES-1 §5 · **Class:** superseded by EMERGENCY-2 §2.10 (DEC-1211)
 - **Decision:**
   - (1) Proposals (i) the test-map couplings and (ii) W2-66's record-only case in the always-run set accepted as
     **ACT-SELECT-FIXES-1**, with **W2-66c**, tests first, to pin them.
@@ -14166,7 +14166,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the labels judged by every rule in force, and their disagreements settled independently).
 
 ### DEC-1114 — W2-56's S8 on Linux (DEC-105, against DEC-1035 (2)): (b), S8's reach and S10 deferred to Wave 3 as a ticket; the rest of W2-56 merged now; a re-estimate at today's measured pace
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1035 (2), DEC-1112 (1), DEC-1097 (8), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), on W2-56's D-13 (measured: on Linux a one-path `network.allowUnixSockets` leaves the connect refused; only `allowAllUnixSockets` connects, which S9 and F4 refuse)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1035 (2), DEC-1112 (1), DEC-1097 (8), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), on W2-56's D-13 (measured: on Linux a one-path `network.allowUnixSockets` leaves the connect refused; only `allowAllUnixSockets` connects, which S9 and F4 refuse) · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - (1) **(b).** S8's reach (a sandboxed session connecting to the shared reranker's one socket) and S10 (its
     measurement) are deferred to Wave 3, as a ticket to give sandboxed workers ranked search without opening every Unix
@@ -14402,7 +14402,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   fresh questions at a fixed rhythm).
 
 ### DEC-1128 — No switched-off control returns and no new guard rule goes live without set-up A's 100 % on the path map's actions; the lift does not wait for set-up A; set-up B dropped entirely; DEC-1010's one-rule principle investigated first; the switched-off list and the memory audit's landing to the owner
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC) · **Read by:** DEC-1133 (1): a fix to the guard's own faults is not a new rule; only a rule that adds or removes a deliberate refusal goes through the bar
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC) · **Read by:** DEC-1133 (1): a fix to the guard's own faults is not a new rule; only a rule that adds or removes a deliberate refusal goes through the bar · **Class:** superseded by EMERGENCY-2 §2.9 (DEC-1211)
 - **Decision:**
   - (1) **The switched-off controls:** the CTO brings one list of every guard rule, gate and check switched off during
     the emergency: why each was switched off, its home ticket, what must be true before it returns (for the guard,
@@ -14512,7 +14512,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   tickets ready by code).
 
 ### DEC-1133 — Set-up A's bar defined (V2, C, a fault fix is not a new rule, the as-run stratum); the error path and the listing rule fixed first; ACT A for the dispatcher's leads; the sample day after it, --remeasure writes the p95; FX6 one fix pass per round; MEMORY-PROTECTION-1 D1-D3, no window; the floor back to 3 GiB
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (1), (2) and (5) standing · **Under:** DEC-1128 (2), (3), DEC-1132 (5), DEC-1105, DEC-1131, DEC-947 (5), DEC-1038 (3), DEC-1073 (4), DEC-1057 (4) · **Source:** the owner's answers (chat, 2026-11-11 ~15:40 UTC) to SETUP-A-BAR, LOAD-BALANCER-1, the CIT-P review's FX6 and MEMORY-PROTECTION-1
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (1), (2) and (5) standing · **Under:** DEC-1128 (2), (3), DEC-1132 (5), DEC-1105, DEC-1131, DEC-947 (5), DEC-1038 (3), DEC-1073 (4), DEC-1057 (4) · **Source:** the owner's answers (chat, 2026-11-11 ~15:40 UTC) to SETUP-A-BAR, LOAD-BALANCER-1, the CIT-P review's FX6 and MEMORY-PROTECTION-1 · **Class:** superseded by EMERGENCY-2 §2.2 (DEC-1211)
 - **Decision:**
   - (1) **Set-up A's bar (SETUP-A-BAR):** scope V2; calls the guard cannot place scored by C; **a fix to the guard's own
     faults is not a new rule:** it goes by ACT as today, and only a rule that adds or removes a deliberate refusal goes
@@ -15272,7 +15272,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** package `packages/P-ADOPT-TEMPLATES.md` (0efec8ad7); W2-81's python-app F-009, rust-workspace F-004; DEC-1050; DEC-315.
 
 ### DEC-1193 — The sets-root file: the owner writes ~/.config/gov-os/sets-root once; an operator job that reads it reports only counts and ids to the CTO
-- **Status:** ACCEPTED (owner, 2026-11-16 ~00:45, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1191 (2), DEC-820 (d), DEC-1082 (3), DEC-1097 (2), DEC-953 item 2
+- **Status:** ACCEPTED (owner, 2026-11-16 ~00:45, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1191 (2), DEC-820 (d), DEC-1082 (3), DEC-1097 (2), DEC-953 item 2 · **Class:** superseded by EMERGENCY-2 §2.6 (DEC-1211)
 - **Decision:** the owner writes the evaluation sets' root once into `~/.config/gov-os/sets-root`. An operator job (DEC-1191 (2)) may read that file at run time, so its `job.sh`, written by the CTO, never names the sets root. Such a job is `report: summary-only`: its full output stays in the operator's log (`~/gov-os-operator/log/jobs/`, 0600), and only its `SUMMARY ` lines (counts and ids) reach the CTO in the job's result and inbox item. The CTO never reads the full log. Hidden-set steps (W2-81's read step and its summary, W2-15a's walled counts) can run this way on the owner's yes per job.
 - **Basis:** the owner's message of 2026-11-16 ~00:45: "sets-root: yes: I write ~/.config/gov-os/sets-root once. A job that reads it returns only counts and ids, its full output stays in the operator's log, and only its summary reaches you."
 - **Governing sources:** DEC-1191 (2); DEC-820 (d); DEC-1082 (3).
@@ -15296,7 +15296,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** packages `P-SESSIONS-1.md`, `P-JOBS-ROUTINE-1.md`; DEC-1191; DEC-1193.
 
 ### DEC-1196 — The accidental runner install undone; (O) ACTs by hand until act-O is built straight after the runner's install; P-JOBS-ROUTINE-1 (a) with R3 changed; when the owner's yes is needed; no rehearsal against a live path
-- **Status:** ACCEPTED (owner, 2026-11-16 ~01:21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1191 (2), DEC-1193, DEC-1104 (2) · **Changes:** DEC-1191 (2) (the (O) route: by hand until act-O, then the job runner's act-O kind on the owner's yes JOB line)
+- **Status:** ACCEPTED (owner, 2026-11-16 ~01:21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1191 (2), DEC-1193, DEC-1104 (2) · **Changes:** DEC-1191 (2) (the (O) route: by hand until act-O, then the job runner's act-O kind on the owner's yes JOB line) · **Class:** superseded by EMERGENCY-2 §2.10 (DEC-1211)
 - **Decision:**
   - (1) **The undo, yes:** the owner's operator runs `undo-accidental-install.sh` (sha256 8e64d460…) to remove the not-ready `job_run.py` (69640d46…) and its APPROVED line, which a review agent installed into the live operator folder at ~01:09.
   - (2) **`P-ACT-O (a)`:** (O) ACTs stay by hand until act-O is built. act-O is built straight after the job runner installs, as the job runner's kind `act-O`: the ACT's `apply.sh` runs in the same allowlist sandbox (HOME hidden, no network, no new privileges, writable only on its touched paths), on the owner's `yes JOB-<id> <sha8>`. Its touched paths never include `docs/releases/**` or the tag refs.
@@ -15398,7 +15398,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** DEC-039 (ADR-0001); DEC-801 to DEC-803; DEC-1010; DEC-1173; DEC-974; CAP-33; CAP-24.b; packages `P-GOLDEN-RULE-1.md` and `judging-work.SKILL.md`.
 
 ### DEC-1205 — P-PERMISSIONS-1 (a) with the push belt (P): full permission inside the box, the guard still deciding; the order ACT-GUARD-FIX-9, the box, the no-prompt start lines, today
-- **Status:** ACCEPTED (owner, 2026-11-16 16:28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1204, DEC-1203 (1), DEC-1199, DEC-953, DEC-313, DEC-1173, DEC-974
+- **Status:** ACCEPTED (owner, 2026-11-16 16:28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1204, DEC-1203 (1), DEC-1199, DEC-953, DEC-313, DEC-1173, DEC-974 · **Class:** superseded by EMERGENCY-2 §2.9 (DEC-1211)
 - **Decision:**
   - (1) **P-PERMISSIONS-1 (a):** the CTO, the leads, the product CTOs and the adopters run with full permission (`--permission-mode bypassPermissions`) **only inside the session box**, each confined to what the box mounts for it; every Gov OS hook still runs and its refusals hold; nothing switches on before the box.
   - (2) **The order, today:** (i) **ACT-GUARD-FIX-9** (class (b), reviewed under DEC-1204): the guard refuses every session's writes to `**/.claude/settings*.json`, `**/.claude/hooks/**`, `$CLAUDE_CONFIG_DIR/settings*.json` and `~/.claude/settings*.json`, and refuses the no-prompt mode outside the box (`permission_mode` bypassPermissions with `GOV_SESSION_SANDBOX` unset); (ii) the box (P-BOX-EXCEPTION-1, with fix 5: settings and hooks read-only inside the box) switched on after its narrow check and the owner's approval; (iii) **ACT-PERMISSIONS-4** (class (b)): the no-prompt flag in the box's start lines, rehearsed with planted forbidden actions in a boxed scratch session.
