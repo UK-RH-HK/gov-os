@@ -9,7 +9,6 @@ priority: 1
 assignee: orchestrator
 external-ref: E2-retire-guard
 tags: [retirement, standard, emergency-2]
-wbs_id: E2-retire-guard
 title: 'The guard and the sandbox retired in the product: no PreToolUse guard shipped or registered, src/gov/guard/ and the launch sandbox deleted, the helpers that stay moved to gov.util, gov.adopt and gov.containment'
 class: implementation
 state_class: AUTHORITATIVE
@@ -25,6 +24,7 @@ allowed_paths:
 - .claude/hooks/**
 - tests/unit/**
 - tests/optin-lifted*.txt
+- governance/project/test-map.yaml
 - .tickets/DAEO-gr7t.md
 kpis:
   success:
