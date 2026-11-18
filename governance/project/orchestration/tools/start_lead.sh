@@ -15,7 +15,7 @@ mkdir -p "$L"
 [ ! -e "$L/$name.json" ] || { echo "a lead named $name already ran ($L/$name.json): pick another name" >&2; exit 2; }
 cd "$REPO"
 setsid nohup bash -c '
-  env -u CLAUDECODE GOV_ROLE=orchestrator GOV_MSG_ADDRESS="lead:$1" CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-5-5 \
+  env -u CLAUDECODE GOV_ROLE=orchestrator GOV_MSG_ADDRESS="lead:$1" CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-5-5 CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 \
     "$HOME/.local/bin/claude" -p --model claude-sonnet-5-5 --effort high --permission-mode bypassPermissions \
     --output-format json < "$2" > "$3/$1.json" 2> "$3/$1.err"
   echo $? > "$3/$1.exit"

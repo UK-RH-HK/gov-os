@@ -111,6 +111,7 @@ REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
 # The no-prompt mode, accepted since Emergency 2 (0.1.2; DEC-313 superseded by EMERGENCY-2 2.2, 2.9).
 BYPASS_MODE = "bypassPermissions"
+WORKER_CACHE_TTL = "5m"  # a launched worker's prompt-cache lifetime (audit 09; the CTO's own session keeps 1 h)
 # Names kept for the readers that import them (suites, fixtures); since Emergency 2 no launch decides by them.
 GUARD_HOOK = "hooks/pretooluse.py"
 GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
@@ -182,7 +183,9 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
     """The ``--settings`` value of a worker session: its env (``GOV_ROLE``, ``GOV_TICKET``, ``GOV_STORE``) and an empty
     deny list, to which ``_worker_plan`` adds the user's deny rules. Emergency 2 (2.2, 2.4): no sandbox block and no
     deny rule of the launcher's own. ``root`` is a real path."""
-    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, **_store_env(root)}
+    # the owner's audit 09 item (2026-11-18): workers write the 5-minute prompt cache (their calls come fast; checked:
+    # CLAUDE_CODE_PROMPT_CACHE_TTL=5m sends the writes to the 5-minute tier); measured in the spend log
+    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, "CLAUDE_CODE_PROMPT_CACHE_TTL": WORKER_CACHE_TTL, **_store_env(root)}
     return {"env": env, "permissions": {"deny": []}}
 
 

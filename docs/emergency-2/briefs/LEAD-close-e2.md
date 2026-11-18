@@ -23,3 +23,8 @@ with its verify) and revises the W2-115 cases that assert a repair ticket or the
 line); an engineer (`subagent_type: engineer`, no `model`) builds until `gov accept W2-193` is green. Then run
 `tests/unit/close`, `tests/unit/queue` and `tests/acceptance/W2-115`, `W2-193`, `W2-194`, `W2-115b` through the slot.
 Return as LEAD-COMMON says, to the CTO's inbox (your end message is automatic).
+
+**Headless session:** you run as `claude -p`. Launch your test designer and engineer in the foreground (the Agent tool
+without `run_in_background`), one after the other, and wait for each; a background helper can be stopped when your
+turn ends. A first run of this brief (lead `close-e2`) stopped after starting the test designer: check your branch
+`e2/close-e2` for what it left (`git log w2/integrate..e2/close-e2`) and carry on from there.
