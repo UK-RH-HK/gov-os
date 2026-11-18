@@ -633,7 +633,7 @@ evaluation_sets:
 # source's family as a hit on that source only when the item's text holds the gold span's text (whitespace and
 # Markdown or YAML formatting normalised), never by its path alone.
 evaluation_families:
-  contract: ["docs/contract/CONTRACT_v4.md", "docs/contract/contract.yaml",
+  contract: ["docs/contract/CONTRACT_v5.md", "docs/contract/contract.yaml",
              "docs/contract/capabilities/*.md", "docs/contract/master-rules/*.md"]
   kernel: ["template/governance/kernel/**", ".claude/**", ".rulesync/**"]
   agents: ["AGENTS.md", "CLAUDE.md"]

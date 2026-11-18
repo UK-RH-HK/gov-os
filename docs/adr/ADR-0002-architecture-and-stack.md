@@ -7,7 +7,7 @@ date: 2026-09-30
 depends_on: [ADR-0001]
 decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-192, DEC-261, DEC-396, DEC-397, DEC-419, DEC-530, DEC-637, DEC-649, DEC-700, DEC-953, DEC-954, DEC-963, DEC-979, DEC-1010, DEC-1015, DEC-1029, DEC-1030, DEC-1031, DEC-1032, DEC-1033, DEC-1034, DEC-1035, DEC-1036, DEC-1037, DEC-1038, DEC-1039, DEC-1043, DEC-1045, DEC-1046, DEC-1047, DEC-1048, DEC-1049, DEC-1052, DEC-1055, DEC-1056, DEC-1057, DEC-1058, DEC-1059, DEC-1061, DEC-1064, DEC-1065, DEC-1066, DEC-1067, DEC-1068, DEC-1069, DEC-1070, DEC-1072, DEC-1073, DEC-1074, DEC-1075, DEC-1076, DEC-1077, DEC-1079, DEC-1081, DEC-1082, DEC-1084, DEC-1085, DEC-1086, DEC-1087, DEC-1088, DEC-1089, DEC-1090, DEC-1092, DEC-1093, DEC-1094, DEC-1095, DEC-1096, DEC-1097, DEC-1098]
 supersedes: []
-implements: [CHARTER-v5, CONTRACT-v4]
+implements: [CHARTER-v6, CONTRACT-v5]
 state_class: AUTHORITATIVE
 ---
 
@@ -281,7 +281,7 @@ lines added. On this repository DEC-953 / DEC-954 lifted the Gov OS features as 
     A research or experiment session runs as `GOV_ROLE=research`. The full research lifecycle (CAP-32) stays in
     Wave 3.
 
-  Wave 2 and Wave 3 roles follow Charter v5 §6, with test execution and integration as distinct Wave 2 roles
+  Wave 2 and Wave 3 roles follow Charter v6 §6, with test execution and integration as distinct Wave 2 roles
   (DEC-094).
 - **The owner** is the customer and L5. Decision packages come in chat, ranked P1–P3 and batched at most five at a
   time; a P1 package may bypass the cap (DEC-093). The template carries ten fields (Framework §52).
@@ -411,7 +411,7 @@ reviewer's structured verdict (DEC-1010 (1), kept by DEC-1047 (3)).
 
 ### Confirmation
 
-- The Wave 1 exit (WAVE_1_WBS §4) and the independent wave-exit audit against Contract v4.
+- The Wave 1 exit (WAVE_1_WBS §4) and the independent wave-exit audit against Contract v5.
 - `gov doctor` checks every pin in §2.
 - **Memory's verdict:** the fresh 80 (`memory-verdict-2`), used once, judges window 4's configuration (the pin, the
   pool on, the 6,000-token bundle, search again once) against K9's bar: right end to end at least 85 % with wrong

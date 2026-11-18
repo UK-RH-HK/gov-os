@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Governance health scheduler (G0-G6 tiers)
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-39: Governance health scheduler (G0-G6 tiers)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** Governance checks run at the right tier automatically, and a stale required index blocks close.
 - **Acceptance:** `gov close` fails when a required index is stale; the scheduler runs the configured tiers on schedule and records results.

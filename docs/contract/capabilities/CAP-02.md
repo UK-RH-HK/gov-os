@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: 'Release authenticity (lite: signed git tags)'
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-02: Release authenticity (lite: signed git tags)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can confirm that an installed kernel matches a released version.
 - **Acceptance:** `gov doctor` reports MATCH for the pinned `framework.lock` manifest, and DRIFT naming the edited file after a one-byte edit; at Release 1, `git tag -v` verifies the release tag (CAP-02.c, W3).

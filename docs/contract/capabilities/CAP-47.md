@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Independent adoption/audit roles and fresh-session independence
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-47: Independent adoption/audit roles and fresh-session independence
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner gets independent verification from fresh sessions that did not build what they check.
 - **Acceptance:** A fresh verifier session with only the bounded context pack runs held-out tests and reports; its transcript contains no builder chat.

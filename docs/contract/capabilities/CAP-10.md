@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Semantic memory (vector/embedding retrieval)
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-10: Semantic memory (vector/embedding retrieval)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can find a record from a paraphrased question.
 - **Acceptance:** On the dev query set, paraphrased questions reach the gold record in the top 5 at least as often as the S0b2 R1 baseline (mean hit@5 85).

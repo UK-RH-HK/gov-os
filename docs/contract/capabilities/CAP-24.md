@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Skill lifecycle and versioning
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-24: Skill lifecycle and versioning
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can tell which version of each skill produced a piece of work.
 - **Acceptance:** Every skill file carries a version in frontmatter, and the `gov close` record of a ticket lists the skill ids and versions used.

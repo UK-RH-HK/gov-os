@@ -7,7 +7,7 @@ date: 2026-09-30
 depends_on: []
 decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096, DEC-152, DEC-156, DEC-161, DEC-163]
 supersedes: []
-constrains: [CHARTER-v5, CONTRACT-v4, ADR-0002]
+constrains: [CHARTER-v6, CONTRACT-v5, ADR-0002]
 state_class: AUTHORITATIVE
 ---
 
@@ -25,7 +25,7 @@ What must the Gov OS defend against, and where is the hard boundary?
 
 ## Decision Drivers
 
-- Keep agents accurate, bounded and traceable at low token cost (Charter v5 §1, DEC-004).
+- Keep agents accurate, bounded and traceable at low token cost (Charter v6 §1, DEC-004).
 - One solo owner, one workstation, and a private GitHub repository without GitHub Pro (DEC-074 Q13).
 - Machinery against an adversary the design cannot stop produces endless review loops. Loops therefore escalate to the
   owner after three consecutive non-converging iterations (DEC-044 as amended by DEC-096).
@@ -77,7 +77,7 @@ Chosen: **option 1**, as DEC-039 states it and DEC-075 amends it.
   - A deliberate same-privilege actor can bypass the guardrails.
   - Until branch protection exists, the boundary rests partly on the owner's merge discipline.
   - Both costs are accepted.
-- **Non-goals this creates** (Charter v5 §7):
+- **Non-goals this creates** (Charter v6 §7):
   - CAP-26 plugin trust boundary;
   - CAP-60 below-floor recovery and break-glass;
   - full root of trust (CAP-02 is LITE: SSH-signed tags plus a hash manifest);

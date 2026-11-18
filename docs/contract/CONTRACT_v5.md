@@ -1,19 +1,19 @@
 ---
-id: CONTRACT-v4
+id: CONTRACT-v5
 status: ACCEPTED
-version: "4.4"
+version: "5.0"
 revised: 2026-11-18
-depends_on: [CHARTER-v5, ADR-0001, ADR-0002]
+depends_on: [CHARTER-v6, ADR-0001, ADR-0002]
 decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-722, DEC-1089, DEC-1090]
 type: specification
 state_class: AUTHORITATIVE
 ---
 
-# Governance OS — Capability Acceptance Contract v4 (version 4.4)
+# Governance OS — Capability Acceptance Contract v5 (version 5.0)
 
-Contract v4 states what the Gov OS must do, as outcomes with **one observable acceptance check each**. It replaces Contract v3 as the working text (DEC-058). `contract.yaml` holds the same content in machine-readable form; `readiness-dimensions.yaml` defines the 26 readiness rows that Wave 1's OpenSpec schema implements.
+Contract v5 states what the Gov OS must do, as outcomes with **one observable acceptance check each**. It replaces Contract v3 as the working text (DEC-058). `contract.yaml` holds the same content in machine-readable form; `readiness-dimensions.yaml` defines the 26 readiness rows that Wave 1's OpenSpec schema implements.
 
-**Version 4.4** (2026-11-18). The file names and the id `CONTRACT-v4` are unchanged.
+**Version 5.0** (2026-11-18). The re-baseline of EMERGENCY-2 (audit 7, DEC-1214 G5): the file is `CONTRACT_v5.md`, the id `CONTRACT-v5`; the text of version 4.4 is in git history.
 
 | Version | Date | Change |
 |---|---|---|
@@ -23,7 +23,7 @@ Contract v4 states what the Gov OS must do, as outcomes with **one observable ac
 | 4.3 | 2026-11-09 | W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093). Carries DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and CAP-45 with it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated source is the release's manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers items (W2 20 → 19, W3 38 → 39). |
 | 4.4 | 2026-11-18 | W2-192 specification change (docs/changes/W2-192-CIT-P.md), approved by the owner (DEC-1213). Carries DEC-1200 (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3. 62 capabilities; 215 covers items (W2 19 → 20). |
 
-**Precedence:** Charter v5 → Contract v4 → ADRs → everything else. The ADRs supersede the originals where they conflict.
+**Precedence:** Charter v6 → Contract v5 → ADRs → everything else. The ADRs supersede the originals where they conflict.
 
 **Fields:** `outcome` (what an agent or the owner can do) · `acceptance` (one observable check) · `wave` (W1/W2/W3; the wave in which the acceptance check must pass, with earlier partial delivery in `wave_note`) · `provider` (tool or W1 ticket; W2/W3 components are named) · `sources` (Contract v3 gates, Framework sections, owner records, decisions) · `covers` (every carried sub-requirement with its source and wave; each has an id; a Wave 1 item names the ticket whose KPI delivers it, and that KPI line carries the id in brackets; wave-exit audits check each item, DEC-092) · `scenarios` (dev and qual ids from `COVERAGE_MATRIX.md`; where the matrix truncates a list, the count of unlisted ids is given) · `disposition` (KEPT, LITE with its lite form, or DROP with its decision).
 
@@ -50,7 +50,7 @@ DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation valida
 
 ## 3. Master-rule clauses
 
-The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each clause below is a contract item with one acceptance check.
+The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each clause below is a contract item with one acceptance check.
 
 | Id | Rule | Acceptance | Provider | Dev scenarios | Decisions |
 |---|---|---|---|---|---|
@@ -444,11 +444,11 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Outcome:** The owner can ask in natural language and get a structured governance answer; a small command set covers the rest.
 - **Acceptance:** A status question in chat is answered from `gov status --json` (tickets, gates, readiness, share, pause state) rather than from free recall.
 - **Wave:** W1
-- **Provider:** Claude Code (harness), W1-07, W1-32, W1-42
+- **Provider:** Claude Code (harness), W1-07, W1-32, W1-35, W1-42
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate G1, G2; Framework v4.1.2 §33, §34; DEC-003
 - **Covers:**
-  - `CAP-28.a` [W1] Natural-language intent first; small explicit command set — Contract v3 G1, G2; Framework v4.1.2 §33, §34 · delivered by W1-32
+  - `CAP-28.a` [W1] Natural-language intent first; small explicit command set — Contract v3 G1, G2; Framework v4.1.2 §33, §34 · delivered by W1-32, W1-35
   - `CAP-28.b` [W1] Internal governance operations exposed as gov commands — Framework v4.1.2 §35 · delivered by W1-07, W1-42
 - **Scenarios:** dev MR-X-01 · qual MR-X-Q01
 
@@ -478,7 +478,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-30.b` [W1] Readiness gaps generate linked tickets (W1 planning skill + gov check) — Contract v3 H3; Framework v4.1.2 §38; DEC-089 · delivered by W1-13, W1-26, W1-35
   - `CAP-30.c` [W2] Automatic generation (gov readiness --generate) — Contract v3 H3; DEC-089
   - `CAP-30.d` [W3] Scenarios drive data and tests; data provenance recorded; data author independent where practical — Contract v3 H4; Framework v4.1.2 §39
-  - `CAP-30.e` [W1] Capability taxonomy for STANDARD rows; extended only through a governed change — Framework v4.1.2 §40 · delivered by W1-12
+  - `CAP-30.e` [W1] Capability taxonomy for STANDARD rows; extended only through a governed change — Framework v4.1.2 §40 · delivered by W1-12, W1-26
   - `CAP-30.f` [W1] Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code — DEC-103 · delivered by W1-35
   - `CAP-30.g` [W2] For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs); owned by the UX role — DEC-104
 - **Scenarios:** dev MR-A-02, MR-A-04, A-01 · qual MR-A-Q02, MR-A-Q04, CHAOS-A-Q07, A-Q01, A-Q02, A-Q05, AUDIT-A-Q32, AUDIT-A-Q35, AUDIT-A-Q37, AUDIT-A-Q43, AUDIT-A-Q44, AUDIT-A-Q47 (+9 not listed in the matrix row)

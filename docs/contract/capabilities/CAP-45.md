@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: gov update lifecycle
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-45: gov update lifecycle
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can update the Gov OS in a repository without losing overlay configuration.
 - **Acceptance:** `gov update --check` reports the version change and migrations; `copier update` applies them with the overlay files unchanged and `gov doctor` green.

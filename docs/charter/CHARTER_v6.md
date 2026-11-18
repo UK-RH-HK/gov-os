@@ -1,5 +1,5 @@
 ---
-id: CHARTER-v5
+id: CHARTER-v6
 status: ACCEPTED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
 decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173]
@@ -7,11 +7,11 @@ type: specification
 state_class: AUTHORITATIVE
 ---
 
-# Governance OS — Charter v5
+# Governance OS — Charter v6
 
-The Charter says what the Governance OS is for, the rules it never breaks, and how it is run. Contract v4 turns it
+The Charter says what the Governance OS is for, the rules it never breaks, and how it is run. Contract v5 turns it
 into capabilities with one observable acceptance check each. ADR-0001 and ADR-0002 hold the threat model and the
-architecture. Charter v5 and Contract v4 replace Framework v4.1.2, the two protocols and Contract v3 as the working
+architecture. Charter v6 and Contract v5 replace Framework v4.1.2, the two protocols and Contract v3 as the working
 texts. The originals are kept unchanged as provenance (DEC-058).
 
 ## 1. Purpose and scope
@@ -220,8 +220,8 @@ under its own guard (DEC-084).
 
 ## 8. Precedence
 
-1. **Charter v5** (this document);
-2. **Contract v4** (`docs/contract/CONTRACT_v4.md`; `contract.yaml` is the same content, machine-readable);
+1. **Charter v6** (this document);
+2. **Contract v5** (`docs/contract/CONTRACT_v5.md`; `contract.yaml` is the same content, machine-readable);
 3. **ADRs** (`docs/adr/`);
 4. everything else: specifications, tickets, skills, lessons.
 

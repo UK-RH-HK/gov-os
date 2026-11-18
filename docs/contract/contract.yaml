@@ -1,9 +1,10 @@
-# Contract v4 — machine-readable. Same content as CONTRACT_v4.md.
-id: CONTRACT-v4
+# Contract v5 — machine-readable. Same content as CONTRACT_v5.md.
+id: CONTRACT-v5
 status: ACCEPTED
-version: '4.4'
+version: '5.0'
 date: '2026-09-30'
 revised: '2026-11-18'
+charter: '6'
 change_log:
 - version: '4.0'
   date: '2026-09-30'
@@ -53,7 +54,7 @@ change_log:
     (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3. 62
     capabilities; 215 covers items (W2 19 → 20).'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
-precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
+precedence: Charter v6 → Contract v5 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
   W1: Integrate
   W2: Strengthen
