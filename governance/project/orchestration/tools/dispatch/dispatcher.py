@@ -1357,6 +1357,78 @@ def inbox_item(name, body):
             item = D / "inbox" / f"{fstamp()}-{name}-{n}.txt"
 
 
+# ---- the interim stall check (W2-121c's last success line; the owner's working assumptions T1 (c), T2 (b)) ----------
+
+LIVE_ORCH = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator")
+LIVE_PROJECTS = Path.home() / ".claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS"
+STALL_S, QUIET_PUSH_S = 3600, 7200  # the item at any hour; the push by day, and in the quiet hours (02:00-07:30)
+
+
+def _live():
+    return ORCH.resolve() == LIVE_ORCH.resolve() and D.resolve() == (LIVE_ORCH / "dispatch").resolve()
+
+
+def watch_stall(dry):
+    """The CTO session's last `assistant` entry (the dead-man's reading): 60 minutes old, one inbox item
+    `<stamp>-stall-wake.txt`; 60 minutes by day or 2 hours in the quiet hours, one push started detached; each once per
+    stall (stall-state.json, the key written before the act), never a reminder. DISPATCH_PROJECTS moves the projects
+    folder and DISPATCH_PUSH_COMMAND replaces the push; a state that is not the live one reads no live transcript and
+    starts no real push."""
+    import importlib.util
+    projects = E("DISPATCH_PROJECTS") or (str(LIVE_PROJECTS) if _live() else "")
+    if not projects:
+        return "no projects folder"
+    sid = (LOG / "cto-session.txt").read_text().strip() if (LOG / "cto-session.txt").is_file() else ""
+    path = Path(projects) / f"{sid}.jsonl"
+    if not (sid and path.is_file()):
+        files = sorted(Path(projects).glob("*.jsonl"), key=lambda f: f.stat().st_mtime)
+        if not files:
+            return "no transcript"
+        path = files[-1]
+    spec = importlib.util.spec_from_file_location("deadman", CODE.parent / "deadman.py")
+    deadman = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(deadman)
+    last_a, pending, tool = deadman.last_state(path)
+    if last_a is None:
+        return "no assistant entry"
+    age, stall = now() - last_a.timestamp(), f"{path.name}@{last_a.isoformat()}"
+    if age < STALL_S:
+        return "alive"
+    st = load_json("stall-state.json", {})
+    st = st if st.get("stall") == stall else {"stall": stall}
+    what = f"waiting on a tool ({tool}) since {last_a:%H:%M}" if pending else f"idle since {last_a:%H:%M}"
+    line = f"STALL WAKE | the CTO session is {what}, {int(age // 60)} min"
+    push_due = age >= (QUIET_PUSH_S if deadman.quiet(datetime.fromtimestamp(now())) else STALL_S)
+    todo = [k for k in ("item", "push") if not st.get(k) and (k == "item" or push_due)]
+    if not todo or dry:
+        for k in todo:
+            log(f"stall: would {'write the item' if k == 'item' else 'push'}: {line}")
+        return "stalled"
+    st.update({k: stamp() for k in todo})
+    tmp = D / "stall-state.json.tmp"
+    tmp.write_text(json.dumps(st))
+    os.replace(tmp, D / "stall-state.json")  # the key first: a key that cannot be written gives no item, no push
+    if "item" in todo:
+        inbox_item("stall-wake", f"{line}\ncheck the helpers and resume them\n")
+        log(f"stall: item written: {line}")
+    if "push" in todo:
+        cmd = E("DISPATCH_PUSH_COMMAND")
+        if cmd:
+            argv = shlex.split(cmd) + [line]
+        elif _live():  # the dead-man's push: a headless claude -p call to PushNotification
+            argv = [str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-haiku-5-5", "--output-format",
+                    "json", "Load the PushNotification tool (ToolSearch select:PushNotification if deferred) and call "
+                    "it once, status proactive, with exactly this message: " + line[:190]
+                    + " . Then reply with only the tool's result text."]
+        else:
+            log("stall: no push: not the live state and no DISPATCH_PUSH_COMMAND")
+            return "stalled"
+        with open(D / "stall-push.log", "a") as out, open(os.devnull) as nul:
+            subprocess.Popen(argv, stdin=nul, stdout=out, stderr=subprocess.STDOUT, cwd="/tmp", start_new_session=True)
+        log(f"stall: push started: {line}")
+    return "stalled"
+
+
 def collect_returns(t, dry=False):
     seen_f = LOG / "returns-seen.txt"
     seen = set(seen_f.read_text().split()) if seen_f.exists() else set()
@@ -3331,7 +3403,7 @@ def tick(dry):
         failures.append(f"returns: {exc!r}"[:200])
         log(f"returns failed: {exc!r}")
     for name, fn in (("interim", lambda: watch_interim(dry)), ("guard", lambda: watch_guard(dry)),
-                     ("nightly", lambda: watch_nightly(dry))):
+                     ("nightly", lambda: watch_nightly(dry)), ("stall", lambda: watch_stall(dry))):
         try:
             fn()
         except Exception as exc:
