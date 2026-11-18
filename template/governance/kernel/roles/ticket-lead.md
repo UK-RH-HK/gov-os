@@ -3,7 +3,7 @@
 Made from the section that the orchestrator role file held until then (DEC-236, DEC-954, DEC-957 Q2). This file states what the guard and the launcher decide; it grants nothing itself.
 
 - **Version:** 1.0.0
-- **Launch default:** model claude-sonnet-5-5, effort high (the owner, 2026-11-18: every lead on Sonnet, the trial of audit 09 decision 3)
+- **Launch default:** model claude-sonnet-5-5, effort high
 - **Skills:** orchestration, checkpoint, retrieval, judging-work
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
