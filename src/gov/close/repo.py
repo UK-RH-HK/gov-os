@@ -153,11 +153,14 @@ def store_is_of_head(root: Path) -> bool | None:
     head = git(root, "rev-parse", "HEAD").strip()
     history = git(root, "rev-list", "--count", "HEAD").strip()
     try:
-        connection = connect(root)
+        connection = connect(root)  # closes its own connection when the layout check fails
     except GovError as e:
         if e.code == "STORE_MISSING":
             return None
         raise
+    except sqlite3.Error as e:  # a file that is no database fails the layout check inside connect
+        raise GovError("STORE_UNREADABLE",
+                       f"the record store {STORE_REL} cannot be read ({e}); run gov rebuild", {"store": STORE_REL})
     try:
         held = connection.execute("SELECT COUNT(*) FROM commits").fetchone()[0]
         holds_head = connection.execute("SELECT COUNT(*) FROM commits WHERE id = ?", (head,)).fetchone()[0]
