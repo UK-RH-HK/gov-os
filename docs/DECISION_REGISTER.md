@@ -26,6 +26,8 @@ Each decision carries:
 
 Each entry's status line says who decided it and when: the owner, or the orchestrator for a delegated decision (MR-6). Only the owner sets an entry to ACCEPTED for the owner; agents never do. The status values of v0.1 to v0.12 were proposals from the design session; DEC-083 settled them. A "Changed by" note on a status line names a later entry that supersedes, settles, corrects, reverses or withdraws part of it (DEC-825).
 
+**The class field (audit 8, DEC-1214 G4).** Each entry DEC-001 to DEC-1210 carries `**Class:**` at the end of its status line, put there by `docs/emergency-2/audits/08-apply.py` from audit 8 (`docs/emergency-2/audits/08-register.md`), with the 48 doubtful rows settled in `08-doubtful-settled.md`: *kept* (in force, with the items that changed), *superseded by* (EMERGENCY-2 section or decision), *retired* (its subject is gone) or *history* (a one-off, done or settled). The status word itself (ACCEPTED, DONE ...) is untouched. This register is read-only history once EMERGENCY-2 §11.3 is carried out.
+
 Evidence was gathered on 2026-09-28 (v0.1 carried an incorrect date of 2026-09-26). Tool facts (versions, bugs, features) go stale quickly — re-verify at install time and record exact pinned versions in the Tool Capability Registry (Gate F2).
 
 ---
@@ -73,7 +75,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Decision:** A repo is governable from day one (hooks + `gov check` + task tracker) while A1–A11 path migration proceeds in background batches. Full A0–A11 remains the target for `ADOPTED_HEALTHY`.
 
 ### DEC-007 — Native harness features first; CI is the enforcement boundary
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED + SUGGESTION · **Changed by:** DEC-075
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED + SUGGESTION · **Changed by:** DEC-075 · **Class:** kept
 - **Decision:** Use harness-native hooks, subagents, skills and LSP where they exist. Treat hooks as guardrails, never as the security/enforcement boundary. Every hook check is re-run in git hooks (lefthook) and CI, which are authoritative for merge.
 - **Evidence:**
   - Claude Code hook docs note a stalled hook does not act as a gate — the call continues through the normal permission flow. [E-HOOK-CC]
@@ -211,7 +213,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Gates:** F1, O3 (two-stage independent review)
 
 ### DEC-025 — Enforcement stack
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** kept (items changed: PreToolUse guard superseded §2.2; SessionStart context superseded §5.5; gitleaks superseded §2.11; PreCompact/Stop checkpoint kept §6.1)
 - **Decision:**
   - Claude Code hooks: `SessionStart` (inject compact context + `br ready`), `PreToolUse` (path guard via exit 2 / `permissionDecision: deny`; the guard is a **default-deny allow-list** of the task's declared paths — see DEC-041), `PreCompact` + `Stop` (checkpoint; guard against loops with `stop_hook_active`), `SubagentStop` (worker return contract N4). [E-HOOK-CC][E-HOOK-EVENTS]
   - Codex hooks mirror where supported; Codex caps model-visible hook output at ~2,500 tokens → context packet delivered as file path + short summary, not inline. [E-HOOK-CX]
@@ -300,7 +302,7 @@ Evidence for this section is the owner's own repository records: spec records D-
 - **Revisit trigger:** the assembled Gov OS needs a component the Rust code already provides (e.g. SRR release signing at R2, a `gov` binary behind API-0002).
 
 ### DEC-039 — Threat model: the Gov OS guards against mistakes and drift, not a same-privilege adversary
-- **Status:** ACCEPTED (owner, 2026-09-29); to be written as ADR-0001 · **Basis:** ESTABLISHED (owner's own Phase-2 finding) + SUGGESTION · **Changed by:** DEC-075 · **Changed by:** DEC-1204 (merged into the golden rule, how work is judged)
+- **Status:** ACCEPTED (owner, 2026-09-29); to be written as ADR-0001 · **Basis:** ESTABLISHED (owner's own Phase-2 finding) + SUGGESTION · **Changed by:** DEC-075 · **Changed by:** DEC-1204 (merged into the golden rule, how work is judged) · **Class:** kept
 - **Decision:** The Gov OS's purpose is to keep agents accurate, bounded and traceable. It does **not** attempt to be a security boundary against a process running with the owner's OS privileges. The hard boundary is: git history, CI on a protected branch, and owner-signed approvals (signed commits/tags or PR approval by the owner's account). This is ADR-0001 of the new repository.
 - **Rationale:** Phase 2's eight-round loop was an attempt to make a same-privilege process secure against itself; the repository's own records identify this as the confused-deputy / ambient-authority problem and concede the seal is not proof-grade.
 - **Consequence:** No in-process trust classes beyond the simple rule inherited from D-0007 (DEC-046).
@@ -796,7 +798,7 @@ decision packages (round 1, asked 2026-09-30). They are the only changes to this
 - **ccusage** is installed and pinned by the orchestrator under DEC-083's install rule and is a Wave 1 prerequisite.
 
 ### DEC-087 — CI scope on the hosted runner
-- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P2-E option (a) · **Refines:** DEC-075
+- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P2-E option (a) · **Refines:** DEC-075 · **Class:** kept (items changed: gitleaks in CI superseded §2.11)
 - **Decision:** GitHub Actions (G4–G5, advisory) runs the deterministic checks only: schemas, `gov check` G0–G2,
   readiness, the decision checker, the ticket DAG, `openspec validate --strict`, gitleaks, rulesync drift, and tests that
   need no local models (lexical fallback; codebase-memory is a static binary). Tests that need local models run in the
@@ -4328,7 +4330,7 @@ this decision amends. DEC-367 (the record of a rollback or a cancel) says nothin
 changed here; the orchestrator told the owner so.
 
 ### DEC-409 — Lifting a freeze requires the owner in person: no Claude Code ancestor, an interactive terminal with a typed one-time code, and a guard rule on the lift form
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-365, DEC-407 (its ancestry rule is replaced), DEC-367 as the owner named it · **Under:** DEC-402, DEC-404, CAP-05.a · **Changed by:** DEC-428 (the one manual check before W1-50 closes)
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-365, DEC-407 (its ancestry rule is replaced), DEC-367 as the owner named it · **Under:** DEC-402, DEC-404, CAP-05.a · **Changed by:** DEC-428 (the one manual check before W1-50 closes) · **Class:** kept (items changed: (3) the guard rule on the lift form superseded §2.2)
 - **Decision:**
   1. `gov pause --off` refuses if any ancestor process is a Claude Code session, wherever that session was
      started. The operator console cannot lift either; only a plain terminal can.
@@ -9030,7 +9032,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   7. The ticket-file and KPI changes of items 1 to 3 land with the revised plan, before each ticket starts or resumes.
 
 ### DEC-826 — P-S5: what each role loads, reads and writes
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-820, MR-3, MR-4, MR-5, CAP-38.c, CAP-38.f, DEC-460 · **Basis:** P-S5 (lens E F2 to F7, F11, F13, F14, F19; R1 to R6, R10). · **Changed by:** DEC-953 (item 2)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-820, MR-3, MR-4, MR-5, CAP-38.c, CAP-38.f, DEC-460 · **Basis:** P-S5 (lens E F2 to F7, F11, F13, F14, F19; R1 to R6, R10). · **Changed by:** DEC-953 (item 2) · **Class:** kept (items changed: (1),(2),(3) kept; (4),(5) superseded §2.2; (6),(7) history)
 - **Decision:**
   1. **Q1 (a):** the role is loaded at launch: `gov launch` starts the session as its role's generated agent or appends the role file's text, and W2-21's launch record holds the text's hash and version.
   2. **Q2:** the test designer reads the specification, the KPIs and the existing code it must work with, never the ticket's own implementation (DEC-820 (c)). Its independence also comes from order: tests are written before the ticket's implementation exists, and the launch record shows it. The skill, the template and A1 state this one rule, and the skill cites CAP-38.c.
@@ -9221,7 +9223,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. Idle tickets waiting on the owner do not count against the ceiling; the resource gate still applies to every running lead.
 
 ### DEC-848 — Backups: the owner's own push of `w2/integrate` continues, at least daily (item 13)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-830, DEC-412 · **Basis:** OWNER, 2026-10-19 · **Corrects:** DEC-830 item 4.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-830, DEC-412 · **Basis:** OWNER, 2026-10-19 · **Corrects:** DEC-830 item 4. · **Class:** kept (items changed: (1) kept §2.4; (2) backup now §2.8 hourly bundle)
 - **Decision:**
   1. Agents never push.
   2. The owner's own backup push of `w2/integrate` continues, as an owner act, at least daily.
@@ -15161,7 +15163,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** CAP-33; DEC-1035 (2); DEC-1088 (6); DEC-1114 (1); DEC-1128 (4); DEC-1168 (1); DEC-1169 (2); DEC-1178 (5); DEC-1179; DEC-1180 (2), (4); `governance/project/orchestration/packages/SWITCHED-OFF-1.md` S2, S14, S18; W2-94's lead return (66dd6e77abbd).
 
 ### DEC-1182 — Secret scanning and pushes: no repository scan on Gov OS; EXAMIN one full gitleaks scan a week before its weekly push, in the memory audit's weekly cycle, never at a close or a refresh; the guard's per-command secret rule stays on; q02's variant version 2
-- **Status:** ACCEPTED (owner, 2026-11-14 ~16:00 and ~16:03, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-14)`; (1) to (4) standing) · **Under:** DEC-1045, DEC-1179, DEC-1180, DEC-1181, DEC-1101 (2) · **Changes:** DEC-1045 (1) (its "a full scan runs once a week only when the owner approves it": no repository scan on Gov OS at all); DEC-1180 (2) (q02's variant: version 2, 7aa6d88c, in place of 0703aebf) · **Changed by DEC-1184 (1), (2):** (3)'s and (4)'s open questions answered: Q-SCAN-1 (a), the guard's secret-path rule every day plus the weekly scan, no pre-commit scan; Q-REFRESH-1 (a), the seeded rebuild is the changes-only refresh
+- **Status:** ACCEPTED (owner, 2026-11-14 ~16:00 and ~16:03, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-14)`; (1) to (4) standing) · **Under:** DEC-1045, DEC-1179, DEC-1180, DEC-1181, DEC-1101 (2) · **Changes:** DEC-1045 (1) (its "a full scan runs once a week only when the owner approves it": no repository scan on Gov OS at all); DEC-1180 (2) (q02's variant: version 2, 7aa6d88c, in place of 0703aebf) · **Changed by DEC-1184 (1), (2):** (3)'s and (4)'s open questions answered: Q-SCAN-1 (a), the guard's secret-path rule every day plus the weekly scan, no pre-commit scan; Q-REFRESH-1 (a), the seeded rebuild is the changes-only refresh · **Class:** kept (items changed: (1) kept §2.11; (2) superseded §2.11; (3) superseded §2.2; (4) kept)
 - **Decision:**
   - (1) **Gov OS stays private: no repository scan**, at closes or anywhere else, weekly included. Its `secrets.yaml` stays `scan: off` (DEC-1045).
   - (2) **EXAMIN: one full gitleaks scan a week, before its weekly push to GitHub, in the memory audit's weekly cycle:** audit and measure, then the scan, then the push, only on a clean scan. No scan at a ticket's close or at a store refresh: EXAMIN's `secrets.yaml` holds `scan: off` (the one switch that governs the refresh, strict-close and nightly scans, `config/loader.py:427-431`), and the weekly cycle runs gitleaks itself. W2-187 takes the scan and push steps (S12, F7, the CTO within the owner's decision); A9's ACT package's cron line runs that cycle; the push step runs only once the repository declares its remote (EXAMIN's remote is removed at the operator's setup and comes back when it is hosted). The EXAMIN CTO's brief: `secrets.yaml` with `scan: off`, the weekly scan on (the owner's "its scan: on" read as the weekly scan), and no push by the EXAMIN CTO itself.
@@ -15371,7 +15373,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** DEC-1201; DEC-1197 (3); DND 257, 271, 272, 274.
 
 ### DEC-1203 — P-JOBS-USER-1 corrected to (B), live now as an exception until Wave 3; GF-7 alone first; W2-27's run closed with exa-g6db as a named exception and product tickets for F-028 and F-030; W2-81's re-run brief 31acaf29 approved; DEC-1010's moderated review for every review
-- **Status:** ACCEPTED (owner, 2026-11-16 before 16:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1010, DEC-1195, DEC-1196, DEC-1197, DEC-1201, DEC-1202, DEC-974 · **Changes:** DEC-1199 (3) (the box: (B) as an exception, not (A-full))
+- **Status:** ACCEPTED (owner, 2026-11-16 before 16:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`) · **Under:** DEC-1010, DEC-1195, DEC-1196, DEC-1197, DEC-1201, DEC-1202, DEC-974 · **Changes:** DEC-1199 (3) (the box: (B) as an exception, not (A-full)) · **Class:** kept (items changed: (1) superseded §2.9 (the box); (3) F-028/F-030 product tickets (W2-193) kept §6.1; (2),(4) history; (5) merged into DEC-1204)
 - **Decision:**
   - (1) **P-JOBS-USER-1 (B), corrected:** DEC-1199's (A-full) was a drafting error. The session box (B) goes live now as an exception until Wave 3, not after a fourth full round: an exception package of round 3's box plus the holes that are cheap to close (outside processes ignore git replace refs and never follow links in data folders; the held-out lists and the box's own scripts from a copy no box can write; anything else that takes hours, not days), each remaining hole named as a risk the owner accepts until Wave 3, a short narrow check of the fixes, and the date it goes live. (A-full), separate users or containers, stays the Wave 3 row with the agent-to-agent layer (DEC-1195).
   - (2) **ACT-GUARD-FIX-7 alone first:** its follow-ups that land before its apply are committed, then its yes line comes to the owner; ACT-GUARD-FIX-8 follows when its round 2 passes.
@@ -15419,7 +15421,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** DEC-1186 (3) (Q1 (a), Q2 (a), Q3 (a)); DEC-1171 (3); DEC-1203 (3); package P-W2-15A-CLOSE (`drafts/w2-15a-close/PACKAGE.md`); ~/gov-os-operator/queue/jobs/results/JOB-20261116-02.result.md; `docs/research/EXP-003/w2-15a-baseline.md` section 11; `.tickets/DAEO-kq8b.md`.
 
 ### DEC-1207 — yes ACT-GOLDEN-RULE-1 f9d67d5a; P-BOX-EXCEPTION-1 yes with F2 fixed, F1 and F3 Wave 3 rows; the memory measurement rule (standing): a fresh 80 for every measure, written and measured on one frozen state; today's order
-- **Status:** ACCEPTED (owner, 2026-11-16 16:51, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`; item (3) standing) · **Under:** DEC-1204, DEC-1205, DEC-1203 (1), DEC-1173, DEC-1171 (3), DEC-1178 (1), DEC-1101 (2), DEC-974 · **Changes:** DEC-1179 (1) (the standing set; and (3), (5), (6), O1, O2 by item (4)'s package)
+- **Status:** ACCEPTED (owner, 2026-11-16 16:51, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`; item (3) standing) · **Under:** DEC-1204, DEC-1205, DEC-1203 (1), DEC-1173, DEC-1171 (3), DEC-1178 (1), DEC-1101 (2), DEC-974 · **Changes:** DEC-1179 (1) (the standing set; and (3), (5), (6), O1, O2 by item (4)'s package) · **Class:** kept (items changed: (1) history; (2) superseded §2.9; (3) kept §5.3; (4)(5) history; (6) kept §2.6 (operator), rest superseded §2.2)
 - **Decision:**
   - (1) **`yes ACT-GOLDEN-RULE-1 f9d67d5a`:** the golden-rule section in CLAUDE.md, AGENTS.md and `.rulesync/rules/governance.md` (DEC-1204 (8); review READY, class (b)); queued for the operator agent at 16:52.
   - (2) **`P-BOX-EXCEPTION-1 yes, F2 fixed as stated, F1 and F3 Wave 3 rows`:** the session box (B) goes live as the exception of DEC-1203 (1) after: **F2 fixed** (in the box's trees the tracked `.claude/settings.json` and `.claude/hooks/` are writable so merges of w2/integrate succeed; `settings.local.json` and the box's settings copies stay read-only), rehearsed (a lead's merge after a hooks change; a boxed write of `settings.local.json` refused) and checked by the CTO, no third review round; **F1** (w2/integrate's read-only bind in a lead's box detaches after a land; the landing check remains the backstop) and **F3** (the CTO's settings bind after an outside apply; covered by ACT-GUARD-FIX-9) are Wave 3 rows; then the owner's two PC steps (pin_owner.sh, the held-out history count), rehearsed, and the switch (leads, the sentinel, the CTO last).
