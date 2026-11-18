@@ -1,6 +1,6 @@
 ---
 id: DAEO-5rgj
-status: in_progress
+status: closed
 deps: [DAEO-cb2b]
 links: [DAEO-cb2b, DAEO-6w5n]
 created: 2026-11-12T01:50:00Z
@@ -78,3 +78,5 @@ Message ids: a session's end `end:<boot>:<pid>:<start_ticks>` (from its registry
 **The launcher** (`src/gov/launch/launcher.py`): the registry entry gains `notify` (the launching process's `$GOV_MSG_ADDRESS`, else `cto`) and `address` (`<role>:<ticket>`); the session's environment gains `GOV_MSG_ADDRESS=<role>:<ticket>`; after the session ends the launcher sends the end message (best effort: a failed send never changes the exit code); the launch record gains `rubric` (RT-8); the launch prints nothing new.
 
 **The owner's working assumptions (the CTO's message, 2026-11-17 night), until the owner's decisions in the morning:** T1 (c) the stall check runs from the dispatcher's cron pass (an interim in the Gov OS dispatcher, writing to the CTO's inbox, the last success line; the run-time tool carries the same check, RT-2's stall line); T2 (b) a phone push only for a CTO stall, 60 minutes by day and 2 hours at night, one per stall; T3 (a) no CPU fallback: with no GPU, embedding and reranking jobs are refused and memory is said to be unavailable (RT-3's GPU line). The owner may amend them.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

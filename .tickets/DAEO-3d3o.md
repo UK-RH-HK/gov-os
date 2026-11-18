@@ -2,7 +2,7 @@
 id: DAEO-3d3o
 wbs_id: W2-197
 external-ref: W2-197
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-17T22:00:00Z
@@ -97,3 +97,5 @@ Filed 2026-11-17 by the ticket lead on the CTO's brief (EMERGENCY-2 §5.4, §5.6
 - `gov brief <role> <ticket> [--store <dir>] [--run ...] [--part ...] [--repair ...] [--json]`; T-0's `{MEMORY_BLOCK}` is filled by `gov.brief.memory` (the block of S1, or F1's not-reached line); stderr warning `gov brief: MEMORY_UNAVAILABLE <detail>`.
 - The memory-use log: `GOV_MEMORY_LOG`, else `<main worktree>/.gov-runtime/memory-use.jsonl`; written by `gov.memory_use.append(record, root)`, which never raises.
 - The reader: `gov.memory_use.read`, `gov.memory_use.per_role_day`, and `gov memory-use [--since <day>] [--json]`.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

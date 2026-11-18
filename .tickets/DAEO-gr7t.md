@@ -1,6 +1,6 @@
 ---
 id: DAEO-gr7t
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-057v, DAEO-sdhj]
 created: 2026-11-18T00:00:00Z
@@ -47,3 +47,5 @@ track: A
 # E2: the guard and the sandbox retired in the product
 
 EMERGENCY-2 §6.1 rows "The guard (PreToolUse hook, its rules and parser): switched off now; retired" and "The sandbox (SANDBOX-1 in gov launch); the box: switched off now; retired"; §2.1, §2.2. A retirement, not a feature: no new acceptance tests; tests whose subject is the retired guard or sandbox are deleted, tests of what stays are kept green.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

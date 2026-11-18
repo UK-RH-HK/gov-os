@@ -1,6 +1,6 @@
 ---
 id: DAEO-w19l
-status: in_progress
+status: closed
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -100,3 +100,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-36), as approved (DEC-729). The list row
 - **Errors** (`GovError` codes): `DISCOVER_EXISTS`, `DISCOVER_CHANGE_NOT_FOUND`, `DISCOVER_SPEC_NOT_READY`, `DISCOVER_NO_WORDS` (or argparse's usage exit), `READINESS_INVALID` from the checker for a record it cannot judge.
 
 **Known, not this ticket's:** `gov check`'s gap-ticket check (`src/gov/check/claims.py`) flags every `MISSING` row, required or not, so a LITE spec's 16 unrequired rows read as `GAP_TICKET_MISSING` there; `gov readiness` judges only required rows. Noted for the CTO.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

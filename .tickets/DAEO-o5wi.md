@@ -1,6 +1,6 @@
 ---
 id: DAEO-o5wi
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-18T09:00:00Z
@@ -63,3 +63,5 @@ All three are `gov` command modules (`src/gov/<name>/command.py`, the convention
 **`gov memaudit scan`** (`src/gov/memaudit/command.py`, logic in `src/gov/memaudit/scan.py`). `gov memaudit scan --set <path> --since <ISO> [--until <ISO>] [--id <id>]... [--allow-session <id>]... [--projects <dir>]`. Exit 0 nothing found; 1 found (`MEASURE_VOID`, the measure is void); 3 nothing found but a transcript unreadable (`SCAN_INCOMPLETE`). Result `{set, since, until, ids_count, transcripts_read, findings: [{file, session, line, role, kind, match}], allowed: [...], problems: [...]}`. The set's files are listed, never opened; no output carries a transcript line's text. `python3 -m gov.memaudit` is unchanged.
 
 **`gov decisions basis`** (`src/gov/decisions/command.py`, logic in `src/gov/decisions/basis.py`). `gov decisions basis [--range <A>..<B>] [--register <path>]` and `gov decisions basis --week [--since <YYYY-MM-DD>]`. Exit 0 all pass (always 0 with `--week`); 1 `BASIS_MISSING` naming the failing entries. Reads git objects only.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

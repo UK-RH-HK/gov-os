@@ -2,7 +2,7 @@
 id: DAEO-v6pf
 wbs_id: W2-191
 external-ref: W2-191
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-16T14:45:01Z
@@ -63,3 +63,5 @@ the lead brings its new bytes as a CIT-P for the owner before any merge. For rel
 **Started now** on the owner's line of 2026-11-16 14:5x ("Launch leads now for the two new tickets … nothing blocks building them"); it lands in 0.1.2.
 
 **Path case 2026-11-16 15:2x (P-W2-191-1 (b); the CTO, DEC-1156 (7); listed for the owner's reading):** the tests run returned DONE (27 cases, 17 red, 10 guards, 045e10bd8). For S2's strict and reused close to run an outside target (0.1.2 is EXAMIN's release; a strict close there must not silently skip its suites), the ticket gains `src/gov/close/command.py` (`_scope_form`: the run line names outside targets), and an independent test designer adds one acceptance case for it.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

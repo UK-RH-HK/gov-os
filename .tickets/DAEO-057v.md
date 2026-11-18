@@ -1,6 +1,6 @@
 ---
 id: DAEO-057v
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -89,3 +89,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-18), as approved (DEC-729). The list row
 - **Where the pin lives:** in the repository's git common dir, `<common>/gov/`: `envs/<version>/` (a virtual environment with the system's packages, the release's wheel installed with `pip --no-deps --no-index`), `bin/gov` (a link switched by an atomic rename), `pin.json` (the version, the wheel's name and sha256, the manifest's sha256, the source and the release commit). Every worktree of the repository shares it, nothing in it is tracked, and the machine's own pin (`~/.local/bin/gov`) is untouched.
 - **The wheel:** built from the release commit exactly as `gov release` builds it (`SOURCE_DATE_EPOCH` the commit's time), or taken from `--wheel <file>`; either is installed only when its sha256 is the manifest's.
 - **No guard, no sandbox, no ACTs (§2):** `gov install` is an ordinary command; the hook command lines change by an ordinary commit (2.10).
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

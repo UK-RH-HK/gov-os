@@ -2,7 +2,7 @@
 id: DAEO-kq8b
 wbs_id: W2-194
 external-ref: W2-194
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-16T15:51:18Z
@@ -55,3 +55,5 @@ Filed 2026-11-16 by the CTO on the owner's word (DEC-1203 (3)).
 **Problem (EXAMIN, exa-g6db's close; F-030, F-031).** gov close counted 111 reds of type `absent` as the change's though each is red at the base b17cd5a; `--base` refused a short hash (BASE_UNKNOWN); and `close: scoped` applies no `accepted_reds` (command.py:1136), so a scoped project has no route to accept reds red at its base.
 
 **Approach.** Match absent reds against the base run's own selection; resolve short hashes; let scoped mode accept owner-named base reds under the ratchet's owner-entry rule (or record why not, with the owner's route). Evidence: `drafts/w2-27-findings/PRODUCT-FINDINGS.md` (F-030, F-031).
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

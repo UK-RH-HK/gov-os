@@ -1,6 +1,6 @@
 ---
 id: DAEO-sdhj
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -76,3 +76,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
 - **The update's steps, in order:** check the lock (held release A) and a clean tree; verify release B in the source (`_src_path` of `.copier-answers.yml`, or `--source`) at its tag `vB`: the record's manifest against `manifest.sha256`, every template file at the tag against the manifest, the wheel against the manifest's sha256; plan each shipped file three ways (release A's render, the project's file, release B's render, both rendered by `copier copy --skip-tasks` in temporary folders); with `--check`, print the plan and stop. Otherwise record the point (HEAD and the pin), install B's gov (W2-18's `gov install`), apply the plan (never writing an existing file under `governance/project/`), write `.copier-answers.yml` from B's render and the lock with B's verified manifest, regenerate the adapters with the pinned gov, check the overlay and the lock, commit with the record `governance/updates/B.json`, then refresh the memory store with the pinned gov's `gov rebuild`. Any failure before the commit rolls back to the recorded point; a store refresh that fails after the commit leaves the update applied and exits non-zero saying `gov rebuild` is to run.
 - **A project's change to a shipped file** (the owner's to settle; built as recommended): a clean three-way text merge is applied; a conflicting one keeps the project's file whole and writes the release's copy beside the record for a hand merge. Alternatives: keep the project's file whole always; or the release wins and the project's copy is saved aside.
 - **No guard, no sandbox, no ACTs (§2):** `gov update` is an ordinary command of the project's owner or CTO; its lock and answers file change by its own commit (2.10).
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

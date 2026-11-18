@@ -1,6 +1,6 @@
 ---
 id: DAEO-j9z6
-status: in_progress
+status: closed
 deps: [DAEO-emq1]
 links: [DAEO-emq1]
 created: 2026-11-11T23:59:00Z
@@ -89,3 +89,5 @@ unchanged.
 added to this ticket: DONE is the green landing itself (accept green, the land's checks green, the close written);
 the Definition of Done shrinks to those three lines and DOD-4 and DOD-6 go (success line 9). The kernel text for it
 is approved by the CTO's message (§3.5).
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).

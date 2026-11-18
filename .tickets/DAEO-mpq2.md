@@ -2,7 +2,7 @@
 id: DAEO-mpq2
 wbs_id: W2-192
 external-ref: W2-192
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-16T14:45:01Z
@@ -78,3 +78,5 @@ the skill's text and the Contract's CAP-44 line by CIT-P. For the release after 
 **Started now** on the owner's line of 2026-11-16 14:5x ("Launch leads now for the two new tickets … nothing blocks building them"); it lands in the release after 0.1.1.
 
 **Path case 2026-11-16 15:3x (P-W2-192-P1 (a), P2 (a); the CTO, DEC-1156 (7); listed for the owner's reading):** the tests run returned DONE (30 cases, 5a9a6ca7a). Other tickets' adoption cases run A3 straight after A2, which stage AS now precedes: the ticket gains `src/gov/adopt/project.py` (the stage chain, the engineer's) and the shared support helpers of W1-41, W2-23, W2-88 and W2-190 (acceptance folders: an independent test designer's change, each case's assertion unchanged, AS run before A3). P2 (a): F1's owner route stays as the cases state (AS and A3 leave every gap's answer empty). The kernel CIT-P (the adopt skill, CAP-44's line) comes back once the code is green.
+
+**Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
