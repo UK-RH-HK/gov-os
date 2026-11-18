@@ -160,7 +160,9 @@ def _collected(*args):
     """The node ids the test runner collects for ``args`` in this repository, with this worktree's code."""
     import os
 
-    env = {**os.environ, "PYTHONPATH": str(support.SRC)}
+    # Always with the opt-in suites on, so the result does not depend on how the parent run was told (``--optin`` on
+    # its command line is not carried to a child, ``GOV_TESTS_OPTIN`` is): W1-16's cases are all in the opt-in lists.
+    env = {**os.environ, "PYTHONPATH": str(support.SRC), "GOV_TESTS_OPTIN": "lifted,breadth"}
     done = subprocess.run([sys.executable, "-m", "pytest", *args, "--collect-only", "-q", "-p", "no:cacheprovider"],
                           cwd=str(support.REPO_ROOT), env=env, capture_output=True, text=True,
                           stdin=subprocess.DEVNULL)

@@ -57,6 +57,7 @@ namespaces:
       - "docs/contract/**"
       - "docs/emergency-2/*"
       - "docs/emergency-2/audits/**"
+      - "docs/emergency-2/briefs/**"
       - "docs/emergency-2/release-0.1.2/**"
       - "docs/imported/**"
       - "docs/interfaces/**"
@@ -436,6 +437,26 @@ acceptance_exemptions:
     decision: DEC-1173  # W2-104 run 3's WIP merge kept the W1-07 and W1-32 files' markers for the test designer, as DEC-1031 item 3
   - commit: "0e469cc379cdec81b0fccf3e58f33e171646f95f"
     decision: DEC-1175  # W2-104 run 4's merge took integrate's side of the W1-07 and W1-32 conflicts exactly, a resolution all the same
+  - commit: "6b0de11921f8d6e7c35b338385a6d95baf24c92e"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): gov's command list records memory-use, queue, backup, decisions, memaudit
+  - commit: "6a16c4b8a702701f8c27043dc5070ae7adb2b637"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): W2-13 names the archive among what the keyword index keeps out
+  - commit: "2631bde8c3ebb7104a91039a2dbd57e720979997"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): gov discover lands whole: discover in the command lists
+  - commit: "24a384ae89562632289068d7292583c6f8a6a39b"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): the model rule's tests (audit 09 decisions 2 and 3)
+  - commit: "b33eecd9ea16b9b4aa678063ddd8c28d4438d5de"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): gov launch passes the no-prompt mode unless the caller names a mode
+  - commit: "1c1a282bd9421a7b4b9aa67b0d1a815cec0f8ddc"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): the lead's resume sentence names EMERGENCY-2.md section 4; W2-93 S5 counts its own commits
+  - commit: "b9eb21d5d5053e4045076d0c2bbde4262a28137a"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): W2-86: the archive's leaving memory's index is not a moved verdict
+  - commit: "85710e6e6c7723be15c953669941e3b35bb90294"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): 0.1.2: gov launch without the guard and the sandbox
+  - commit: "5849e19e860af88b86457ce75181f57206a8e169"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): Emergency 2 step 3: W2-55's backfill case checks each lands-in place
+  - commit: "bddad45b25077c907cbd92d68ece757decdb0639"
+    decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): Emergency 2 step 3: the old start-up documents archived
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200

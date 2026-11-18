@@ -66,7 +66,17 @@ def test_docs_imported_is_left_out_by_name_and_no_other_folder(tmp_path):
     bad = TICKET.replace("AUTHORITATIVE", "NOPE")
     findings, result = schema.run(_project(tmp_path, {"docs/imported/T.md": bad, "docs/imported-x/T.md": bad}))
     assert [f["path"] for f in findings] == ["docs/imported-x/T.md"]
-    assert result["left_out"] == [{"path": "docs/imported/", "files": 1, "why": schema.LEFT_OUT_WHY}]
+    assert result["left_out"][0] == {"path": "docs/imported/", "files": 1, "why": schema.LEFT_OUT_WHY}
+
+
+def test_the_emergency_2_archive_is_left_out_and_counted_and_the_same_record_elsewhere_is_a_finding(tmp_path):
+    no_type = TICKET.replace("type: task\n", "")
+    archive, elsewhere = "docs/emergency-2/archive/memory/a.md", "docs/emergency-2/other/a.md"
+    findings, result = schema.run(_project(tmp_path, {archive: no_type, elsewhere: no_type}))
+    assert [(f["code"], f["path"]) for f in findings] == [("SCHEMA_INVALID_TYPE", elsewhere)]
+    entry = next(e for e in result["left_out"] if e["path"] == "docs/emergency-2/archive/")
+    assert entry["files"] == 1 and "EMERGENCY-2" in entry["why"] and "11.1" in entry["why"]
+    assert result["left_out"][0]["path"] == "docs/imported/" and result["left_out"][0]["files"] == 0
 
 
 def test_a_timestamp_is_written_as_its_iso_text():
