@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 1; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" -E \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/context_watch.py\"",
+            "command": "h=\"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/context_watch.py\"; c=\"$(git -C \"$CLAUDE_PROJECT_DIR\" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)\"; g=\"$c/gov/bin/gov\"; [ -n \"$c\" ] && [ -f \"$g\" ] || g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no gov at ${c:-(no git repository)}/gov/bin/gov, $HOME/.local/bin/gov or on PATH, so $h was not run\" >&2; exit 0; }; { read -r p; read -r q; } < \"$g\"; p=\"${p#'#!'}\"; [ \"$p\" != /bin/sh ] || { q=\"${q#\"'''exec' \"}\"; q=\"${q%' \"$0\" \"$@\"'}\"; q=\"${q#\\\"}\"; p=\"${q%\\\"}\"; }; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" -E \"$h\"",
             "timeout": 10
           }
         ]
