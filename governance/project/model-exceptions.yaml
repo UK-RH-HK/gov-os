@@ -1,1 +1,7 @@
-exceptions: []  # the owner's exceptions to the helper model rule (audit 09 decision 2); each: {subagent_type, model, decided}
+# The owner's exceptions to the helper model rule (audit 09 decision 2); each: {subagent_type, model, decided}.
+# C3 work (audit 4 Table 3: the kernel and the Contract, the landing and close, the memory measure and sets, release,
+# update and pin, the path map) runs its test designer and engineer on Opus (the owner, 2026-11-18: "Opus only for you
+# and C3 roles"; DEC-1214 K1). A lead names `model: opus` only for a C3 ticket's helpers; everything else is Sonnet.
+exceptions:
+  - {subagent_type: independent-test-designer, model: opus, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
+  - {subagent_type: engineer, model: opus, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
