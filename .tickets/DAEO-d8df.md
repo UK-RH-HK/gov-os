@@ -60,6 +60,7 @@ allowed_paths:
 - tests/acceptance/W2-175/test_w2_175_templates.py
 - tests/acceptance/W2-60b/w2_60b_support.py
 - tests/acceptance/W2-174/w2_174_support.py
+- tests/acceptance/W2-197/w2_197_support.py  # W2-197 (merged in d904d0236) plants an auditor brief without the skill
 - tests/acceptance/W2-88/w2_88_support.py
 - tests/unit/launch/test_w2_184_launch.py  # their planted independent-auditor role files gain the skill (S3's launch check; the lead's path case)
 - tests/unit/launch/test_w2_184_r_fixes.py
