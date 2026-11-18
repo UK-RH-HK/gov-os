@@ -83,7 +83,9 @@ def test_s7_a_clean_scoped_close_writes_every_key(tmp_path, no_lists, runs):
     assert all(t not in ("tests", "tests/") for targets in runs for t in targets)
 
 
-def test_s5_an_unowned_red_is_named_opened_and_never_refuses(tmp_path, no_lists):
+def test_s5_an_unowned_red_is_named_and_opens_no_repair_ticket_and_never_refuses(tmp_path, no_lists):
+    """Rewrite-Reason: W2-193 S6 (EMERGENCY-2 4.2, CAP-31: a known bug is a fix, not a ticket); was
+    ``test_s5_an_unowned_red_is_named_opened_and_never_refuses``, which asserted a repair ticket for the red."""
     repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN})
     green_night(repo)  # P1-K (a): an unowned red needs a green base on HEAD's line to be judged against
     change(repo, {"src/pkg/feature.py": FEATURE})
@@ -91,19 +93,17 @@ def test_s5_an_unowned_red_is_named_opened_and_never_refuses(tmp_path, no_lists)
     record = _record(repo)
     [red] = record["reds"]
     assert red["test"] == f"{OWN_SUITE}test_broken.py::test_broken"
-    assert red["caused"] is False and red["failure_type"] == "AssertionError" and red["reason"]
-    repair = red["repair_ticket"]
-    from gov.tasks.tickets import frontmatter
-    front = frontmatter(repo.root / f".tickets/{repair}.md")
-    assert front["assignee"] == "orchestrator" and front["status"] == "open"
-    text = (repo.root / f".tickets/{repair}.md").read_text(encoding="utf-8")
-    assert red["test"] in text and "AssertionError" in text
+    assert red["caused"] is False and red["failure_type"] == "AssertionError" and "base" in red["reason"].lower()
+    assert "repair_ticket" in red and red["repair_ticket"] is None
+    assert sorted(p.name for p in (repo.root / ".tickets").glob("*.md")) == [f"{TICKET}.md"]
 
 
 def test_s3_with_no_green_record_a_red_the_oldest_own_parent_has_is_not_the_changes(tmp_path, no_lists):
     """W2-193 S3 (supersedes DEC-1150 (2)): no green base on HEAD's line, so the red is judged at the parent of the
     ticket's oldest own commit; red there with the same failure type, it is not the change's: the close passes,
-    names the base and where it came from, and opens a repair ticket for the red."""
+    names the base and where it came from, and opens no repair ticket for the red.
+
+    Rewrite-Reason: W2-193 S6 (EMERGENCY-2 4.2, CAP-31): the record lists the base red with ``repair_ticket`` null."""
     repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN})
     parent = repo.git("rev-parse", "HEAD").strip()
     change(repo, {"src/pkg/feature.py": FEATURE})
@@ -111,7 +111,9 @@ def test_s3_with_no_green_record_a_red_the_oldest_own_parent_has_is_not_the_chan
     record = _record(repo)
     assert record["base"] == parent and record["base_from"] == "ticket" and record["base_run"] is None
     [red] = record["reds"]
-    assert red["caused"] is False and red["repair_ticket"]
+    assert red["caused"] is False and "repair_ticket" in red and red["repair_ticket"] is None
+    assert "base" in red["reason"].lower()
+    assert sorted(p.name for p in (repo.root / ".tickets").glob("*.md")) == [f"{TICKET}.md"]
 
 
 def test_f1_with_no_green_record_a_red_the_oldest_own_parent_lacks_is_caused(tmp_path, no_lists):

@@ -103,6 +103,18 @@ def test_s11_a_standard_ticket_without_a_record_needs_no_review(tmp_path):
     assert got["verdict"] == "READY" and got["record"] is None
 
 
-def test_s11_a_full_ticket_without_a_record_refuses(tmp_path):
+def test_s11_a_full_ticket_without_a_record_needs_no_review(tmp_path):
+    """Rewrite-Reason: W2-193 S7 (EMERGENCY-2 3.6: no ticket gets a reviewer); was
+    ``test_s11_a_full_ticket_without_a_record_refuses``, which asserted VERDICT_MALFORMED for an absent record."""
     repo = _full(tmp_path)
-    assert command.review_verdict(repo.root, TICKET, _front(repo))["verdict"] == command.VERDICT_MALFORMED
+    got = command.review_verdict(repo.root, TICKET, _front(repo))
+    assert got["verdict"] == "READY" and got["record"] is None
+
+
+def test_s11_a_full_ticket_with_a_record_that_has_no_verdict_block_still_refuses(tmp_path):
+    """W2-193 S7 (the CTO's reading): a review did happen where a record is present, so a record without a verdict
+    block fails closed; only an absent record is no review."""
+    repo = _full(tmp_path)
+    _review(repo, "# probe\n\nno block here\n")
+    got = command.review_verdict(repo.root, TICKET, _front(repo))
+    assert got["verdict"] == command.VERDICT_MALFORMED and got["record"] is None

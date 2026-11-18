@@ -1506,9 +1506,10 @@ def _write_close_record(root: Path, ticket: str, record: dict,
 # The project's ``governance/project/close.yaml`` holds ``close: scoped`` or ``close: strict`` (S1). No file is the
 # strict close, everything above unchanged (F4); an unreadable file or another value refuses (fail closed). The
 # scoped close (DEC-953 item 1, DEC-983) runs only the scoped selection (``gov.close.select.scoped``) in the warm
-# clone (``gov.close.attribution``), refuses only on a red its change caused (S4), opens a repair ticket for every
-# other red (S5), computes READY from the reviewer's verdict block (S11) and writes its close record (S7). It
-# runs none of the lifted gates and reads no load-sensitive list; of the path map's lists it reads only the counted
+# clone (``gov.close.attribution``), refuses only on a red its change caused (S4), lists every other red in its record
+# with no repair ticket (S5; W2-193 S6, EMERGENCY-2 4.2), computes READY from the reviewer's verdict block (S11; no
+# record is no review, W2-193 S7) and writes its close record (S7). It runs none of the lifted gates and reads no
+# load-sensitive list; of the path map's lists it reads only the counted
 # ``accepted_reds`` entries (DEC-757's owner-entry rule), which accept a red that is red at the base (W2-194 S3,
 # DEC-1206 (1), ``_accept_base_reds``); it writes none.
 
@@ -1829,9 +1830,9 @@ def _kpi_id(value) -> str | None:
 def review_verdict(root: Path, ticket: str, front: dict) -> dict:
     """READY computed from the probe record's fenced ``verdict`` block (S11; DEC-1010 item 1, JUDGEMENT.md):
     ``{"verdict": READY or a refusal code, "record", "reasons"}``. The newest committed record of
-    ``docs/probes/<ticket>/`` with a block decides, by its last block. ``VERDICT_NOT_REVIEWER``: the block was last
+    ``docs/probes/<ticket>/`` with a block decides, by its last block; no record at all is no review, READY (W2-193 S7). ``VERDICT_NOT_REVIEWER``: the block was last
     written by a commit whose ``Role:`` is not the reviewer's alone, or by none. ``VERDICT_MALFORMED``: no block on
-    a FULL ticket, a block that is not the structured form, a KPI line missing, an unknown value. ``FINDING_BLOCKS``:
+    a record present on a FULL ticket, a block that is not the structured form, a KPI line missing, an unknown value. ``FINDING_BLOCKS``:
     a KPI line marked fail, or a finding in scope, ordinary work yes, that fails open or loses work."""
     root = Path(root)
     profile = str(front.get("profile", "STANDARD")).upper()
@@ -1843,8 +1844,12 @@ def review_verdict(root: Path, ticket: str, front: dict) -> dict:
     with_block = [rel for rel in candidates if _last_block((root / rel).read_text(encoding="utf-8",
                                                                                  errors="replace"))]
     if not with_block:
-        if profile != "FULL":
-            return {"verdict": READY, "record": None, "reasons": [f"a {profile} ticket needs no review"]}
+        if profile != "FULL" or not candidates:
+            # no ticket gets a reviewer (EMERGENCY-2 3.6, W2-193 S7): no record is no review, so READY
+            return {"verdict": READY, "record": None, "reasons": [
+                f"a {profile} ticket needs no review" if profile != "FULL"
+                else f"no probe record under {folder}/: no review happened, none is required"]}
+        # a record is present without a verdict block: a review happened, so fail closed
         return {"verdict": VERDICT_MALFORMED, "record": None,
                 "reasons": [f"no probe record under {folder}/ holds a fenced verdict block (fail closed)"]}
     rel = with_block[0]
@@ -1950,7 +1955,7 @@ def _accept_base_reds(root: Path, reds: list[dict]) -> tuple[list[dict], list[di
     """The path map's ``accepted_reds`` applied to the scoped close's reds (W2-194 S3, DEC-1206 (1); DEC-757's
     owner-entry rule unchanged, ``gov.close.ratchet.counted_entries``): ``(accepted, findings)``. A red that a
     counted entry lists by its exact id and that is red at the base (its alone run there or the base run, any
-    failure type) is accepted: not caused, its decision named, no repair ticket. A listed red green or not collected
+    failure type) is accepted: not caused, its decision named. A listed red green or not collected
     at the base is never accepted. An entry that does not count covers nothing and is a finding."""
     if not reds:
         return [], []
@@ -2063,8 +2068,11 @@ def _run_scoped(root: Path, args, config: dict):
         raise GovError("RED_CAUSED", f"{len(caused)} red(s) caused by the change of {ticket}: "
                        + "; ".join(f"{r['test']} ({r['failure_type']}): {r['reason']}" for r in caused),
                        details, exit_code=EXIT_CHECK_FAILED)
-    for red in reds:
-        red["repair_ticket"] = None if red.get("accepted") else _tool.open_red_repair(root, ticket, red)
+    for red in reds:  # no repair ticket for a red not caused by the change (EMERGENCY-2 4.2, W2-193 S6)
+        red["repair_ticket"] = None
+        if not red["caused"] and not red.get("accepted") and (red.get("red_at_base") or night.get("record")):
+            red["reason"] += (f"; red at the base ({base[:12] if base else 'the nightly record'}) and listed here: "
+                              "no repair ticket is opened, a known bug is a fix in its ticket's record")
     record = {
         "close": SCOPED,
         "commit": commit,
