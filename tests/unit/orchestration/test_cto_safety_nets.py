@@ -42,10 +42,13 @@ def transcript(path, entries):
 def isolated(tmp_path):
     """The switch's files in the case's own folder, never the CTO's live ones: a live stand-by note made the verdict
     `standby` and a case's line in the live log tripped the sentinel check (D-10 run 1, 2026-11-10). A case's own
-    later arguments win (argparse keeps the last)."""
+    later arguments win (argparse keeps the last). The dispatcher's `--inbox-stale` note is isolated too: its default is
+    the live ORCH/dispatch/inbox-stale.txt, and the watch prints its `inbox:` line, so an unread live inbox turned
+    three watch cases red on any machine (2026-11-18)."""
     return ["--log", str(tmp_path / "deadman.log"), "--state", str(tmp_path / "dm-state.json"),
             "--standby", str(tmp_path / "no-standby.txt"), "--inbox", str(tmp_path / "inbox"),
-            "--session-file", str(tmp_path / "no-session.txt")]
+            "--session-file", str(tmp_path / "no-session.txt"),
+            "--inbox-stale", str(tmp_path / "no-inbox-stale.txt")]
 
 
 def deadman(projects, now, tmp_path):
