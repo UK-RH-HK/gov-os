@@ -12,6 +12,8 @@ and starts nothing: no session, no record, no gate; it refuses as a launch does 
 ``--reason``, ``--trial`` and ``--owner-named`` (W2-184, RUBRIC-2, DEC-1120) go to ``launcher.launch`` as the keywords
 ``reason``, ``trial`` and ``owner_named``; ``--plan`` does not read them, and written after ``--`` they are CLI arguments.
 A lead (``orchestrator``, ``lead``) given any of them is refused here with exit 2, before the launcher (W2-184 R1).
+``--projection-usd N`` (W2-156; a number above 0) goes to ``launcher.launch`` as ``projection_usd``, recorded on the launch
+record for ``gov spend``'s brake; a lead writes no launch record, so it is refused there likewise.
 """
 
 from __future__ import annotations
@@ -28,9 +30,24 @@ CHILD_EXIT_CODE = True   # the session's exit code is the command's
 EXIT_CODES = {EXIT_GATE_SHUT: "the resource gate is shut: no session starts"}
 
 
+def _positive(text: str) -> float:
+    """``--projection-usd``: a finite number above 0; anything else is argparse's usage error (exit 2)."""
+    import argparse
+    import math
+
+    try:
+        value = float(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"not a number: {text!r}") from None
+    if not math.isfinite(value) or value <= 0:
+        raise argparse.ArgumentTypeError(f"a number above 0, not {text!r}")
+    return value
+
+
 def add_arguments(parser) -> None:
     parser.usage = ("gov launch <role> <ticket> [--plan] [--tests-worktree] [--gate-override DEC-NNN] "
-                    "[--gpu-need-mib N] [--reason <text>] [--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]")
+                    "[--gpu-need-mib N] [--reason <text>] [--trial <id>] [--owner-named <DEC-id>] "
+                    "[--projection-usd N] [-- <CLI arguments>]")
     parser.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
                         "independent-auditor, research or product-spec")
     parser.add_argument("ticket", metavar="<ticket>", help="an in_progress ticket")
@@ -48,6 +65,9 @@ def add_arguments(parser) -> None:
                         "admits the launch's model and effort")
     parser.add_argument("--owner-named", metavar="<DEC-id>", help="the owner's decision that admits a review "
                         "repeating a recorded setting, or a third review")
+    # W2-156 (DEC-1091 (2), DEC-1126 (4)): the projection the runaway brake counts against, on the launch record.
+    parser.add_argument("--projection-usd", metavar="<N>", type=_positive, help="the session's projected cost in USD "
+                        "(a number above 0; recorded on the launch record; `gov spend` brakes at twice it)")
 
 
 OPTIONS = (("reason", "--reason"), ("trial", "--trial"), ("owner_named", "--owner-named"))
@@ -69,6 +89,12 @@ def run(root: Path, args, config: dict) -> int:
         print(f"gov launch: error: a lead launch ({args.worker_role}) takes none of --reason, --trial and "
               f"--owner-named; given: {given}", file=sys.stderr)
         return EXIT_USAGE
+    projection = getattr(args, "projection_usd", None)
+    if args.worker_role in launcher.LEAD_ROLES and projection is not None:
+        # W2-156: as the three above: a lead writes no launch record, so it takes no projection
+        print(f"gov launch: error: a lead launch ({args.worker_role}) takes no --projection-usd: it writes no "
+              f"launch record to hold one", file=sys.stderr)
+        return EXIT_USAGE
     return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
                   gate_override=getattr(args, "gate_override", None), gpu_need_mib=getattr(args, "gpu_need_mib", None),
-                  **options)
+                  **options, **({} if projection is None else {"projection_usd": projection}))
