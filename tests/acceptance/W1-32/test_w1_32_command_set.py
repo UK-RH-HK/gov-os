@@ -62,7 +62,8 @@ EXCUSED_UNTIL_RECORDED = ("release",)
 #   wait       (W2-160: DEC-1079; DEC-1163 (6) B).
 # Once W1-07's lines record them too, the overlap changes nothing.
 RECORDED_HERE = ("adapters", "dispatch", "session-watch", "wait",
-                 "install", "msg", "update", "discover", "memory-use", "queue", "backup", "decisions", "memaudit")  # EMERGENCY-2 6.1, 6.3 (W2-18, W2-17, DAEO-5rgj, W2-36, W2-197, W2-115b, W2-198; a fix, 4.2)
+                 "install", "msg", "update", "discover", "memory-use", "queue", "backup", "decisions", "memaudit",
+                 "spend")  # EMERGENCY-2 6.1, 6.3 (W2-18, W2-17, DAEO-5rgj, W2-36, W2-197, W2-115b, W2-198; a fix, 4.2); spend: W2-156 (gov spend check/clear/sum, 50505b081; closed)
 
 
 def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project, sandbox):
