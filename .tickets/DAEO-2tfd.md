@@ -1,6 +1,6 @@
 ---
 id: DAEO-2tfd
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-clon, DAEO-5emz]
 created: 2026-11-09T00:30:17Z
@@ -100,3 +100,10 @@ is refused is measured from the moment the refused start ends (a service that wa
 its own wait); no second wait and no private reranker follow it.
 
 [DEC-1097]
+
+## Closed (EMERGENCY-2 6.2 A-4, 2026-11-17)
+
+Closed by the ticket lead for the in-flight tickets, on the CTO's brief (EMERGENCY-2 6.2 A-4: "W2-145, W2-155 (merged) ... finish: land and close"; no review, 3.6). Checked against `w2/integrate` at `9ef5cba29`:
+- `w2/W2-145` (`1be3e47de`) and `w2/W2-145-tests` (`aadce89d6`) are ancestors of `w2/integrate`; `git cherry w2/integrate w2/W2-145` lists nothing; the branch is 0 commits ahead.
+- The later fix in its record, the reranker's cache folder made only when needed (`61aba98a5`, merged `79159cd44`), is on `w2/integrate`.
+- S7 was seen live after the re-pin and recorded by the CTO (`335c8f3c5`, `docs/changes/W2-145-evidence.md`). S5 (b)'s watcher retirement is the CTO's step; the sandbox it guarded against is retired (EMERGENCY-2 6.1).

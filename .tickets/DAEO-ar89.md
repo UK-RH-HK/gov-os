@@ -1,6 +1,6 @@
 ---
 id: DAEO-ar89
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-zqvn]
 created: 2026-11-11T01:07:01Z
@@ -68,3 +68,10 @@ Filed by the CTO on the owner's decision DEC-1125 (1), 2026-11-11: **after the l
 - **The profile record:** `docs/research/` is outside the paths, so the profile (where the warm query's 0.54-0.59 s goes, by stage, with the method and the machine's load) is returned in the lead's DONE or PACKAGES, not committed; a fix, if any, is in the paths above with a unit case that pins the result unchanged.
 - **The time box** (the owner's note): about two hours of the lead's work; with no simple cause found by then, PACKAGES with the evidence and the options.
 - **The measure:** W1-19's and W2-13's warm real-model latency cases, run alone through heavy_slot.sh, at the machine's load recorded; never generating load.
+
+## Closed (EMERGENCY-2 6.2 A-4, 2026-11-17): option 5, the warm p95 a named red
+
+Closed by the ticket lead for the in-flight tickets, on the CTO's brief (EMERGENCY-2 6.2 A-4: "W2-145, W2-155 (merged) ... finish: land and close"; by 4.2 it is a fix, recorded here).
+- **What was tried:** DEC-1159 (2)'s option 1, `MAX_REQUEST_CHARS` 24,000 to 48,000 (`49f5ec46f`), was measured slower: warm p95 0.76-0.79 s against 0.55-0.57 s at 24,000 (A/B, same load, two rounds), because one request pads all 30 candidates to the longest. It was reverted (`8da607e3d`).
+- **What the branch holds:** `w2/W2-155` is three commits ahead of `w2/integrate`: a merge of integrate (`25fc5f5c8`, already on integrate), the change `49f5ec46f` and its revert `8da607e3d`. These are the two commits audit 5 found with no patch-equivalent on integrate. Their net diff against the merge base is empty, so nothing is left to land. The branch can be deleted.
+- **The outcome:** DEC-1159 (2)'s fallback, option 5. The warm real-model p95 stays a named red, and the 0.5 s budget is unchanged (S3, failure-2). The two `accepted_reds` entries in `governance/project/path-map.yaml` (DEC-1134, W1-19's and W2-13's warm cases) stay. Their `fixed_by: W2-155` now points at this closed record of the decision to keep them as named reds.
