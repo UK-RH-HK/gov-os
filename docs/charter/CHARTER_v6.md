@@ -26,14 +26,16 @@ vendor account (DEC-057).
   configuration (DEC-060).
 - Every Contract v3 capability that survives ADR-0001 is in scope. That includes the full 26-dimension readiness
   contract (DEC-064).
-- The Gov OS is built in three waves: Wave 1 Integrate, Wave 2 Strengthen, Wave 3 Complete. Each wave ends in an exit
-  check and an independent audit.
-- It is qualified on two synthetic programmes (DEC-067) and released **once** as Release 1, a signed `v1.0.0` tag.
-- Adoption into product repositories starts after Release 1 (DEC-064), with one exception: a single pilot adoption in
-  Wave 2 (EXAMIN, DEC-718, DEC-727), allowed only after Track A passes and is audited (W2-25), on a pinned,
-  hash-verified release, with independent verdicts on a copy (W2-28) and on the real repository (W2-30), the owner's
-  go before the real repository is written, and the freeze and rollback in the owner's hands. Every other product
-  repository waits for Release 1.
+- The Gov OS is built in two waves, Wave 1 Integrate and Wave 2 Strengthen, and then released lean (EMERGENCY-2 §8).
+  The release is accepted by §8.2 of EMERGENCY-2: the Contract's checks pass, the proving run on the synthetic
+  repositories passes, EXAMIN's copy is adopted with memory at 95 % or more end to end on a fresh 80, and one EXAMIN
+  feature ticket goes through the flow. After it, the Gov OS changes only from friction with adopted repositories;
+  Wave 3 is the list of items built only then.
+- The release is pinned and hash-verified, cut and re-pinned by the owner (DEC-1214 L3). No tag is signed until
+  friction asks for it.
+- EXAMIN runs Wave 0 as direct work: memory built through `gov adopt` and the refactor, no tickets and no later waves
+  before the release (EMERGENCY-2 §7). Every other product repository adopts on the release, through `gov adopt`, and
+  moves between releases with `gov update`.
 
 ## 2. Threat model
 
@@ -220,7 +222,7 @@ operator agent, its cron launcher and its lock are retired with the ACT pipeline
 | The ACT pipeline, the class rules, the approved lists and the operator agent | A two-line change went through a full decision loop | DEC-1211 (EMERGENCY-2 §2.10) |
 | Plugin trust boundary: hash-binding, descriptor security, self-attestation prevention (CAP-26) | Defends against a same-privilege adversary | DEC-039, DEC-075 (ADR-0001) |
 | Below-floor recovery, break-glass, DEGRADED mode (CAP-60) | Rests on the signed-release-root trust chain, which is not built | DEC-039 (ADR-0001) |
-| Full root of trust: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation (CAP-02 beyond its LITE form) | Same-privilege adversary; the LITE form is SSH-signed tags plus a hash manifest | DEC-027, DEC-074 Q11 |
+| Full root of trust: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation (CAP-02 beyond its LITE form) | Same-privilege adversary; the LITE form is a pinned, hash-verified release with its manifest, and no signing until friction asks | DEC-1214 L3 (DEC-027 superseded), DEC-074 Q11 |
 | In-process authority levels L0–L5, acting-role resolution, sealed human channel (CAP-21 beyond its LITE form) | Same-privilege adversary; approvals come only from the owner's git account | DEC-039, DEC-074 Q11 |
 | Automated tool-install gate, argv classification, install-authority envelopes (CAP-25 beyond its LITE form) | Reading argv cannot determine what executes; the owner approves each install | DEC-040 as amended by DEC-083 |
 | Separate A2A communication layer and three-layer knowledge fabric (CAP-27 beyond its LITE form) | One owner, one harness at a time; kept as "read commands never mutate" | DEC-074 Q11 |

@@ -326,15 +326,15 @@ capabilities:
     provider:
     - W1-24
 - id: CAP-02
-  title: 'Release authenticity (lite: signed git tags)'
+  title: 'Release authenticity (lite: pinned and hash-verified)'
   outcome: The owner can confirm that an installed kernel matches a released version.
-  acceptance: '`gov doctor` reports MATCH for the pinned `framework.lock` manifest, and DRIFT naming the edited file after
-    a one-byte edit; at Release 1, `git tag -v` verifies the release tag (CAP-02.c, W3).'
+  acceptance: '`gov doctor` reports MATCH for the pinned `framework.lock` manifest against the release''s own manifest and
+    file hashes, and DRIFT naming the edited file after a one-byte edit; a release is pinned and hash-verified, and no tag
+    signature is required.'
   wave: W1
-  wave_note: manifest check in W1; the signed v1.0.0 tag is made at Release 1
+  wave_note: manifest check in W1; releases are pinned and hash-verified; a signed tag waits for friction (DEC-1214 L3)
   provider:
   - Copier 9.18.2
-  - git SSH-signed tags
   - W1-39
   - W1-27
   sources:
@@ -347,6 +347,7 @@ capabilities:
   - DEC-027
   - DEC-074
   - DEC-083
+  - DEC-1214 L3
   scenarios:
     dev:
     - CHAOS-X-01
@@ -354,8 +355,9 @@ capabilities:
     - CHAOS-X-Q01
   disposition:
     class: LITE
-    lite_form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key
-      rotation, offline envelopes or bootstrap separation.
+    lite_form: A file-hash manifest in `framework.lock` and the release's own manifest and file hashes, verified by `gov doctor`;
+      releases pinned and hash-verified; no signing until friction asks for it (DEC-1214 L3); no TUF, key rotation, offline
+      envelopes or bootstrap separation.
   covers:
   - id: CAP-02.a
     item: File-hash manifest in framework.lock; gov doctor MATCH/DRIFT
@@ -370,8 +372,8 @@ capabilities:
     source: DEC-027, DEC-039, OWNER-DECISION-P2-0002
     wave: NONE
   - id: CAP-02.c
-    item: SSH-signed release tag, verified by `git tag -v`
-    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027
+    item: 'SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3)'
+    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3
     wave: W3
 - id: CAP-03
   title: Security and sensitivity classification
@@ -1723,7 +1725,7 @@ capabilities:
   title: Feature readiness contract (26-dimension checklist)
   outcome: An agent can see, per feature, which of the 26 readiness rows are open for its profile, and each gap becomes work.
   acceptance: A specification with a row its profile requires MISSING (for example test data at FULL) keeps its production
-    tickets out of READY, and `gov readiness --generate` creates one linked ticket per required open row with its dependencies.
+    tickets out of READY, and `gov discover` opens one linked gap ticket per required open row with its dependencies.
   wave: W2
   wave_note: schema, checker, the READY gate and linked gap tickets (planning skill + gov check, DEC-089) are W1; automatic
     generation is W2
@@ -1731,7 +1733,7 @@ capabilities:
   - OpenSpec custom schema
   - W1-12
   - W1-13
-  - 'W2: gov readiness --generate'
+  - W2-36 (gov discover)
   - W1-26
   - W1-35
   sources:
@@ -1781,9 +1783,11 @@ capabilities:
     - W1-26
     - W1-35
   - id: CAP-30.c
-    item: Automatic generation (gov readiness --generate)
-    source: Contract v3 H3; DEC-089
+    item: Automatic generation of the gap tickets, inside `gov discover` (`gov readiness --generate` is folded into it, W2-36)
+    source: Contract v3 H3; DEC-089; EMERGENCY-2 §6.2 A-4 (DEC-1211)
     wave: W2
+    provider:
+    - W2-36
   - id: CAP-30.d
     item: Scenarios drive data and tests; data provenance recorded; data author independent where practical
     source: Contract v3 H4; Framework v4.1.2 §39
@@ -1898,7 +1902,7 @@ capabilities:
   - MarkItDown
   - 'W3: gov research sync + research records'
   - W1-35
-  - 'W2: gov discover'
+  - W2-36 (gov discover)
   sources:
   - Contract v3 Gate J1, J2
   - Framework v4.1.2 §45, §46
@@ -1946,6 +1950,8 @@ capabilities:
       numbers, back the answer; the same request in plain language works the same way'
     source: DEC-166
     wave: W2
+    provider:
+    - W2-36
 - id: CAP-33
   title: Change-impact transactions (CIT-P simulation, CIT-E execution)
   outcome: An agent can simulate a change before making it (CIT-P) and record what it changed (CIT-E).
@@ -2409,9 +2415,12 @@ capabilities:
     - W1-40
     - W1-02
   - id: CAP-39.b
-    item: G6 qualification (synthetic repos, chaos, soak, hidden tests)
-    source: Contract v3 O5; DEC-067
-    wave: W3
+    item: 'The proving run on the synthetic repositories (G6 qualification, EMERGENCY-2 §8.2 item 2): chaos, soak and hidden
+      tests as the Contract''s checks need them'
+    source: Contract v3 O5; DEC-067; EMERGENCY-2 §8.2 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-81
   - id: CAP-39.c
     item: 'Impact-selected tests at the landing: the landing runs the tests the change''s impact selects (`gov impact`)'
     source: Contract v3 O5; EMERGENCY-2 §4 (DEC-1211)
@@ -2626,8 +2635,8 @@ capabilities:
   acceptance: '`framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of
     them disagrees with the installed kernel.'
   wave: W1
-  wave_note: Release 1 tag at the end of qualification; the manifest and file hashes of a release are W2 (CAP-43.b, lite,
-    DEC-722); release contents of CAP-43.d built before W3 are delivered ahead of that item's wave
+  wave_note: the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); the release is cut and re-pinned
+    by the owner once the release acceptance passes (EMERGENCY-2 §8.3); release contents of CAP-43.d are friction
   provider:
   - Copier 9.18.2
   - W1-39
@@ -2639,6 +2648,8 @@ capabilities:
   - DEC-027
   - DEC-064
   - DEC-722
+  - EMERGENCY-2 §6.1, §8 (DEC-1211)
+  - DEC-1214 L3
   scenarios:
     dev:
     - CHAOS-X-01
@@ -2656,17 +2667,20 @@ capabilities:
   - id: CAP-43.b
     item: 'Release contents, lite: the release''s own manifest and file hashes, built with the release (the lock on the install
       side is CAP-02.a, W1); a release is pinned and hash-verified, not signed'
-    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722
+    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722; DEC-1214 L3
     wave: W2
   - id: CAP-43.c
-    item: Release certification by qualification
-    source: Framework v4.1.2 §75C; DEC-067
-    wave: W3
+    item: 'Release certification by the release acceptance (EMERGENCY-2 §8.2): the Contract''s checks, the proving run, EXAMIN''s
+      copy adopted, one EXAMIN feature ticket through the flow'
+    source: Framework v4.1.2 §75C; DEC-067; EMERGENCY-2 §8.2 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-81
   - id: CAP-43.d
     item: 'Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations,
       schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human
       decisions, rollback procedure'
-    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722
+    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-44
   title: gov init and gov adopt lifecycle
@@ -2743,8 +2757,8 @@ capabilities:
     item: 'A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent
       Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed
       at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary
-      of each index (CAP-55)'
-    source: Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722
+      of each index (CAP-55); the fresh auditor runs at A5, AS, A7 and A10 (DEC-1214 G6)'
+    source: Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722; DEC-1214 G6
     wave: W2
   - id: CAP-44.g
     item: Remediation, finding states, human gates during adoption
@@ -2769,8 +2783,9 @@ capabilities:
       demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS
       when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY;
       only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions
-      it does not check'
-    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
+      it does not check; at the release, EXAMIN''s copy gets its verdict with memory at 95 % or more end to end on a fresh
+      80 (EMERGENCY-2 §8.2 item 3)'
+    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.2 (DEC-1211)
     wave: W2
   - id: CAP-44.i
     item: Interrupted-session recovery and freeze during adoption
@@ -2807,16 +2822,18 @@ capabilities:
     - W2-192
 - id: CAP-45
   title: gov update lifecycle
-  outcome: The owner can update the Gov OS in a repository without losing overlay configuration.
-  acceptance: '`gov update --check` reports the version change and migrations; `copier update` applies them with the overlay
-    files unchanged and `gov doctor` green.'
-  wave: W3
-  wave_note: gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of `gov
-    doctor` is W3 (DEC-165)
+  outcome: The owner can update the Gov OS in a repository without losing his overlay or his own edits, and without re-adopting.
+  acceptance: '`gov update --check` reports the version change and migrations; `gov update` installs the pinned, hash-verified
+    release and applies it with a three-way merge that keeps the owner''s own edits and the overlay files, and `gov doctor`
+    is green, with no re-adopt.'
+  wave: W2
+  wave_note: '`gov update` is built in the release (EMERGENCY-2 §6.1, §7.6), which brings it back from Wave 3, where DEC-1089
+    and DEC-1090 had put it'
   provider:
   - Copier 9.18.2
-  - 'W3: gov update --check'
-  - 'W3: gov doctor pending-update report'
+  - W2-17
+  - W2-18 (pinned install)
+  - 'W2-17: gov doctor pending-update report'
   sources:
   - Contract v3 Gate S5
   - Framework v4.1.2 §82
@@ -2824,6 +2841,9 @@ capabilities:
   - DEC-023
   - DEC-165
   - DEC-1090
+  - EMERGENCY-2 §6.1, §8 (DEC-1211)
+  - DEC-1214 Q-UPD
+  - DEC-1214 L3
   scenarios:
     dev:
     - CHAOS-A-10
@@ -2834,16 +2854,22 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-45.a
-    item: 'gov update: check/impact, authenticated source (the signed tag, CAP-02.c, and the release''s manifest and file
-      hashes, CAP-43.b), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify,
-      rollback, ledger/provenance'
-    source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090
-    wave: W3
+    item: 'gov update: check/impact, authenticated source (the release''s manifest and file hashes, CAP-43.b; no signature,
+      DEC-1214 L3), compatibility/migration, a three-way merge that keeps the owner''s own edits and the overlay, adapters
+      regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance'
+    source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090; EMERGENCY-2 §6.1 (DEC-1211);
+      DEC-1214 Q-UPD
+    wave: W2
+    provider:
+    - W2-17
+    - W2-18
   - id: CAP-45.b
     item: In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and
       their highest lesson severity at session start; the owner decides when to run `gov update`
     source: DEC-165
-    wave: W3
+    wave: W2
+    provider:
+    - W2-17
 - id: CAP-46
   title: Cross-machine sync via git
   outcome: The owner can move to another machine with git alone.
@@ -2966,28 +2992,22 @@ capabilities:
     wave: W3
 - id: CAP-49
   title: Qualification oracle (synthetic repos, fault injection, hidden tests)
-  outcome: The owner can qualify the Gov OS on two synthetic programmes against a held-out oracle before Release 1.
-  acceptance: A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any
-    forbidden outcome fails; the builder sessions had no read access to the oracle. The oracle is hidden from a launched worker's
-    Bash by the sandbox, and from every session started in the repository root by a `Read` deny rule and by the guard refusing
-    any tool call that names its path.
-  wave: W3
-  wave_note: the pack exists (S0b1); executed as qualification after W3 (DEC-067); the hiding of the oracle is W1 (DEC-152,
-    DEC-162)
+  outcome: The owner can prove the Gov OS on synthetic repositories against a held-out oracle before the release.
+  acceptance: 'A fresh executor runs the proving run on W2-81''s synthetic repositories and produces a scorecard in SCORECARD_FORMAT;
+    any forbidden outcome fails; the hidden sets are protected by the transcript scan (CAP-66): the transcripts written between
+    a set''s writing and the end of its measure contain neither its path nor its question ids, or the measure is void.'
+  wave: W2
+  wave_note: the pack exists (S0b1); it runs as the release proving run (EMERGENCY-2 §8.2 item 2)
   provider:
   - synthetic Programmes A and B
   - held-out oracle
   - qualification executor
-  - W1-46
-  - W1-47
+  - W2-81 (the six synthetic repositories)
   sources:
   - Contract v3 Gate V1, V2, V3, V4
   - DEC-067
   - DEC-071
-  - DEC-152
-  - DEC-161
-  - DEC-162
-  - EXP-001 (spike-sandbox/EVIDENCE.md §3.3, §5.4)
+  - EMERGENCY-2 §2.7, §8.2 (DEC-1211)
   scenarios:
     dev: []
     qual: []
@@ -2996,27 +3016,22 @@ capabilities:
     note: DROP in S0a; KEPT as qualification by DEC-067
   covers:
   - id: CAP-49.a
-    item: Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail
-    source: Contract v3 V1–V4; DEC-067
-    wave: W3
+    item: Fault manifest; hidden path-map and memory oracles, protected by the transcript scan (CAP-66); quantitative scoring;
+      forbidden outcomes fail
+    source: Contract v3 V1–V4; DEC-067; EMERGENCY-2 §2.7, §8.2 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-81
   - id: CAP-49.b
-    item: 'In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher
-      passes; hiding is silent: the directory looks empty'
-    source: DEC-152; DEC-161; EXP-001 §3.3, §5.4
-    wave: W1
-    provider:
-    - W1-46
+    item: 'Non-goal: the oracle hidden from a launched worker''s Bash by the sandbox and a `Read` deny rule: no sandbox; the
+      transcript scan (CAP-66) detects a read instead'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-49.c
-    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included,
-      by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the
-      guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s
-      own session is an accepted residual; the oracle path is held in `governance/project/held-out.yaml` and in the committed
-      deny rule built from it; register entry DEC-067 names the directory historically; the guard and the launcher take the
-      path from `held-out.yaml`, and no acceptance test names it'
-    source: DEC-162
-    wave: W1
-    provider:
-    - W1-47
+    item: 'Non-goal: the oracle hidden from every session by a `Read` deny rule in the committed settings and the guard refusing
+      any call that names its path: no guard; the transcript scan (CAP-66) detects a read instead'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
 - id: CAP-50
   title: Artifact flow, dependency consumption and end-to-end traceability
   outcome: An agent can tell which evidence becomes stale when a requirement changes.

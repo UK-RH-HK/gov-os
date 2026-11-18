@@ -32,8 +32,8 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
 | W1 | 36 | 4 | 0 | 40 |
-| W2 | 8 | 0 | 0 | 8 |
-| W3 | 11 | 0 | 0 | 11 |
+| W2 | 10 | 0 | 0 | 10 |
+| W3 | 9 | 0 | 0 | 9 |
 | NONE | 0 | 0 | 3 | 3 |
 | **All** | 55 | 4 | 3 | 62 |
 
@@ -78,18 +78,18 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-01.d` [W1] Mandatory authoritative inputs outrank retrieval and are resolved deterministically — Contract v3 W10 · delivered by W1-24
 - **Scenarios:** dev MR-A-06, CHAOS-A-13, AUDIT-A-01, MR-B-01, MR-B-06, CHAOS-B-13, AUDIT-B-07 · qual CHAOS-A-Q05, AUDIT-A-Q01, AUDIT-A-Q07, AUDIT-A-Q08, A-Q04, AUDIT-A-Q22, AUDIT-A-Q39, AUDIT-A-Q42, AUDIT-A-Q45
 
-### CAP-02 — Release authenticity (lite: signed git tags)
+### CAP-02 — Release authenticity (lite: pinned and hash-verified)
 
 - **Outcome:** The owner can confirm that an installed kernel matches a released version.
-- **Acceptance:** `gov doctor` reports MATCH for the pinned `framework.lock` manifest, and DRIFT naming the edited file after a one-byte edit; at Release 1, `git tag -v` verifies the release tag (CAP-02.c, W3).
-- **Wave:** W1 (manifest check in W1; the signed v1.0.0 tag is made at Release 1)
-- **Provider:** Copier 9.18.2, git SSH-signed tags, W1-39, W1-27
-- **Disposition:** LITE — lite form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key rotation, offline envelopes or bootstrap separation.
-- **Sources:** Contract v3 Gate A2; Framework v4.1.2 §75B-75D; Distribution Protocol v1.2 §5-8; OWNER-DIRECTIVE-0004; OWNER-DECISION-0009; OWNER-DECISION-P2-0005; DEC-027; DEC-074; DEC-083
+- **Acceptance:** `gov doctor` reports MATCH for the pinned `framework.lock` manifest against the release's own manifest and file hashes, and DRIFT naming the edited file after a one-byte edit; a release is pinned and hash-verified, and no tag signature is required.
+- **Wave:** W1 (manifest check in W1; releases are pinned and hash-verified; a signed tag waits for friction (DEC-1214 L3))
+- **Provider:** Copier 9.18.2, W1-39, W1-27
+- **Disposition:** LITE — lite form: A file-hash manifest in `framework.lock` and the release's own manifest and file hashes, verified by `gov doctor`; releases pinned and hash-verified; no signing until friction asks for it (DEC-1214 L3); no TUF, key rotation, offline envelopes or bootstrap separation.
+- **Sources:** Contract v3 Gate A2; Framework v4.1.2 §75B-75D; Distribution Protocol v1.2 §5-8; OWNER-DIRECTIVE-0004; OWNER-DECISION-0009; OWNER-DECISION-P2-0005; DEC-027; DEC-074; DEC-083; DEC-1214 L3
 - **Covers:**
   - `CAP-02.a` [W1] File-hash manifest in framework.lock; gov doctor MATCH/DRIFT — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D · delivered by W1-39, W1-27
   - `CAP-02.b` [NONE] Non-goal: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation, unprovisioned-machine trust anchors — DEC-027, DEC-039, OWNER-DECISION-P2-0002
-  - `CAP-02.c` [W3] SSH-signed release tag, verified by `git tag -v` — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027
+  - `CAP-02.c` [W3] SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3) — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3
 - **Scenarios:** dev CHAOS-X-01 · qual CHAOS-X-Q01
 
 ### CAP-03 — Security and sensitivity classification
@@ -468,15 +468,15 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 ### CAP-30 — Feature readiness contract (26-dimension checklist)
 
 - **Outcome:** An agent can see, per feature, which of the 26 readiness rows are open for its profile, and each gap becomes work.
-- **Acceptance:** A specification with a row its profile requires MISSING (for example test data at FULL) keeps its production tickets out of READY, and `gov readiness --generate` creates one linked ticket per required open row with its dependencies.
+- **Acceptance:** A specification with a row its profile requires MISSING (for example test data at FULL) keeps its production tickets out of READY, and `gov discover` opens one linked gap ticket per required open row with its dependencies.
 - **Wave:** W2 (schema, checker, the READY gate and linked gap tickets (planning skill + gov check, DEC-089) are W1; automatic generation is W2)
-- **Provider:** OpenSpec custom schema, W1-12, W1-13, W2: gov readiness --generate, W1-26, W1-35
+- **Provider:** OpenSpec custom schema, W1-12, W1-13, W2-36 (gov discover), W1-26, W1-35
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate H2, H3, H4; Framework v4.1.2 §37, §38, §39; DEC-005; DEC-064; DEC-085; DEC-089; DEC-103; DEC-104
 - **Covers:**
   - `CAP-30.a` [W1] 26-row readiness checklist, five states, silent N/A invalid, no defaulted N/A — Contract v3 H2; Framework v4.1.2 §37; DEC-085 · delivered by W1-12, W1-13
   - `CAP-30.b` [W1] Readiness gaps generate linked tickets (W1 planning skill + gov check) — Contract v3 H3; Framework v4.1.2 §38; DEC-089 · delivered by W1-13, W1-26, W1-35
-  - `CAP-30.c` [W2] Automatic generation (gov readiness --generate) — Contract v3 H3; DEC-089
+  - `CAP-30.c` [W2] Automatic generation of the gap tickets, inside `gov discover` (`gov readiness --generate` is folded into it, W2-36) — Contract v3 H3; DEC-089; EMERGENCY-2 §6.2 A-4 (DEC-1211) · delivered by W2-36
   - `CAP-30.d` [W3] Scenarios drive data and tests; data provenance recorded; data author independent where practical — Contract v3 H4; Framework v4.1.2 §39
   - `CAP-30.e` [W1] Capability taxonomy for STANDARD rows; extended only through a governed change — Framework v4.1.2 §40 · delivered by W1-12, W1-26
   - `CAP-30.f` [W1] Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code — DEC-103 · delivered by W1-35
@@ -503,14 +503,14 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Outcome:** An agent keeps research as evidence records separate from authority, and experimental results cannot reach production unreviewed.
 - **Acceptance:** A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes it.
 - **Wave:** W3 (experiments as part of discovery, with an evidence record, are W1 (DEC-102); a minimal research role is W1 (DEC-163, CAP-22.d); `gov discover` is W2 (DEC-166); the full research lifecycle is W3)
-- **Provider:** Docling (pinned), MarkItDown, W3: gov research sync + research records, W1-35, W2: gov discover
+- **Provider:** Docling (pinned), MarkItDown, W3: gov research sync + research records, W1-35, W2-36 (gov discover)
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate J1, J2; Framework v4.1.2 §45, §46; DEC-019; DEC-020; DEC-102; DEC-163; DEC-166
 - **Covers:**
   - `CAP-32.a` [W3] Research becomes evidence records separate from authority — Contract v3 J1; Framework v4.1.2 §45
   - `CAP-32.b` [W3] Experiment lifecycle; discovery flow — Contract v3 J2; Framework v4.1.2 §46
   - `CAP-32.c` [W1] Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point; they run in their own experiment folder or worktree, outside production paths, and leave an evidence record (what was tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P — DEC-102; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-35
-  - `CAP-32.d` [W2] `gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way — DEC-166
+  - `CAP-32.d` [W2] `gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way — DEC-166 · delivered by W2-36
 - **Scenarios:** dev A-X-02 · qual AUDIT-A-Q02, AUDIT-A-Q06, AUDIT-A-Q20, AUDIT-A-Q21, AUDIT-A-Q23, AUDIT-A-Q24, AUDIT-A-Q38, AUDIT-A-Q43, CIT-B-Q01
 
 ### CAP-33 — Change-impact transactions (CIT-P simulation, CIT-E execution)
@@ -618,7 +618,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 - **Sources:** Contract v3 Gate O5; Framework v4.1.2 §62-64; DEC-007; DEC-075; DEC-087; EMERGENCY-2 §4.3, §4.4 (DEC-1211)
 - **Covers:**
   - `CAP-39.a` [W1] Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard — Contract v3 O5; EMERGENCY-2 §2.2 (DEC-1211) · delivered by W1-40, W1-02
-  - `CAP-39.b` [W3] G6 qualification (synthetic repos, chaos, soak, hidden tests) — Contract v3 O5; DEC-067
+  - `CAP-39.b` [W2] The proving run on the synthetic repositories (G6 qualification, EMERGENCY-2 §8.2 item 2): chaos, soak and hidden tests as the Contract's checks need them — Contract v3 O5; DEC-067; EMERGENCY-2 §8.2 (DEC-1211) · delivered by W2-81
   - `CAP-39.c` [W2] Impact-selected tests at the landing: the landing runs the tests the change's impact selects (`gov impact`) — Contract v3 O5; EMERGENCY-2 §4 (DEC-1211) · delivered by W2-115b
   - `CAP-39.d` [W1] RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded — Contract v3 O5 · delivered by W1-26
   - `CAP-39.e` [W3] Scheduler beyond the landing's selection: parallel independent checks, isolated worktrees and processes, a cache keyed by content, policy and framework hashes (built only if friction asks) — Contract v3 O5; EMERGENCY-2 §8.4 (DEC-1211)
@@ -678,15 +678,15 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 
 - **Outcome:** The owner can tell exactly which Gov OS version a repository runs; releases never change once tagged.
 - **Acceptance:** `framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of them disagrees with the installed kernel.
-- **Wave:** W1 (Release 1 tag at the end of qualification; the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); release contents of CAP-43.d built before W3 are delivered ahead of that item's wave)
+- **Wave:** W1 (the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); the release is cut and re-pinned by the owner once the release acceptance passes (EMERGENCY-2 §8.3); release contents of CAP-43.d are friction)
 - **Provider:** Copier 9.18.2, W1-39
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate S1, S2; Framework v4.1.2 §75A-75D; Distribution Protocol v1.2 §1-8; DEC-023; DEC-027; DEC-064; DEC-722
+- **Sources:** Contract v3 Gate S1, S2; Framework v4.1.2 §75A-75D; Distribution Protocol v1.2 §1-8; DEC-023; DEC-027; DEC-064; DEC-722; EMERGENCY-2 §6.1, §8 (DEC-1211); DEC-1214 L3
 - **Covers:**
   - `CAP-43.a` [W1] Canonical OS repository separation; developed once — Contract v3 S1; Framework v4.1.2 §75A, §75B · delivered by W1-39
-  - `CAP-43.b` [W2] Release contents, lite: the release's own manifest and file hashes, built with the release (the lock on the install side is CAP-02.a, W1); a release is pinned and hash-verified, not signed — Contract v3 S2; Framework v4.1.2 §75D; DEC-722
-  - `CAP-43.c` [W3] Release certification by qualification — Framework v4.1.2 §75C; DEC-067
-  - `CAP-43.d` [W3] Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations, schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure — Contract v3 S2; Framework v4.1.2 §75D; DEC-722
+  - `CAP-43.b` [W2] Release contents, lite: the release's own manifest and file hashes, built with the release (the lock on the install side is CAP-02.a, W1); a release is pinned and hash-verified, not signed — Contract v3 S2; Framework v4.1.2 §75D; DEC-722; DEC-1214 L3
+  - `CAP-43.c` [W2] Release certification by the release acceptance (EMERGENCY-2 §8.2): the Contract's checks, the proving run, EXAMIN's copy adopted, one EXAMIN feature ticket through the flow — Framework v4.1.2 §75C; DEC-067; EMERGENCY-2 §8.2 (DEC-1211) · delivered by W2-81
+  - `CAP-43.d` [W3] Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations, schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure — Contract v3 S2; Framework v4.1.2 §75D; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
 - **Scenarios:** dev CHAOS-X-01 · qual CHAOS-X-Q01
 
 ### CAP-44 — gov init and gov adopt lifecycle
@@ -703,9 +703,9 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-44.c` [W1] A5 independent review of the path map before any move (Independent Auditor) — Contract v3 S4; Adoption Protocol v3.0 §10; DEC-090 · delivered by W1-41
   - `CAP-44.d` [W1] A6 controlled migration; failed batch rolls back; moves precede new indexing — Adoption Protocol v3.0 §11; Distribution Protocol v1.2 §10, §11 · delivered by W1-41
   - `CAP-44.e` [W1] A8 legacy memory extraction/retirement — Adoption Protocol v3.0 §13; Distribution Protocol v1.2 §10 · delivered by W1-41
-  - `CAP-44.f` [W2] A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary of each index (CAP-55) — Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722
+  - `CAP-44.f` [W2] A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary of each index (CAP-55); the fresh auditor runs at A5, AS, A7 and A10 (DEC-1214 G6) — Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722; DEC-1214 G6
   - `CAP-44.g` [W3] Remediation, finding states, human gates during adoption — Adoption Protocol v3.0 §17–§19
-  - `CAP-44.h` [W2] Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native layout kept, the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor green (exit 0), gov check with no RED family, and one ticket closed by gov close at exit 0 with the repository's own test command; of the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those marked W2 and the lite part named for those marked W3: (1) certified kernel pinned: W3 (the certification by qualification is CAP-43.c), its lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay separate: W3, no lite part, (3) path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5 review and the native layout kept, CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a separate verifier role, CAP-47.a), its lite part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no accidental legacy authority, CAP-48.b), its lite part A8's retirement of legacy memory (CAP-44.e), (6) memory independently verified: W3 (over the A9 knowledge fabric and by a separate role, CAP-44.k, CAP-47.a), its lite part the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit completed: W3 (A11, CAP-44.k), no lite part, (8) critical/high unaccepted findings resolved: W3 (finding states and remediation, CAP-44.g, and the A11 audit), no lite part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b), its lite part the derived state rebuilt from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY; only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions it does not check — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
+  - `CAP-44.h` [W2] Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native layout kept, the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor green (exit 0), gov check with no RED family, and one ticket closed by gov close at exit 0 with the repository's own test command; of the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those marked W2 and the lite part named for those marked W3: (1) certified kernel pinned: W3 (the certification by qualification is CAP-43.c), its lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay separate: W3, no lite part, (3) path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5 review and the native layout kept, CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a separate verifier role, CAP-47.a), its lite part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no accidental legacy authority, CAP-48.b), its lite part A8's retirement of legacy memory (CAP-44.e), (6) memory independently verified: W3 (over the A9 knowledge fabric and by a separate role, CAP-44.k, CAP-47.a), its lite part the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit completed: W3 (A11, CAP-44.k), no lite part, (8) critical/high unaccepted findings resolved: W3 (finding states and remediation, CAP-44.g, and the A11 audit), no lite part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b), its lite part the derived state rebuilt from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY; only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions it does not check; at the release, EXAMIN's copy gets its verdict with memory at 95 % or more end to end on a fresh 80 (EMERGENCY-2 §8.2 item 3) — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.2 (DEC-1211)
   - `CAP-44.i` [W3] Interrupted-session recovery and freeze during adoption — Adoption Protocol v3.0 §4
   - `CAP-44.j` [W1] The path map keeps a healthy native framework/package layout unless the target structure is materially better and the migration risk is justified — Framework v4.1.2 §79.3; Distribution Protocol v1.2 §10 A3 · delivered by W1-41
   - `CAP-44.k` [W3] A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles, A10 over the A9 knowledge fabric) — Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722
@@ -715,15 +715,15 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 
 ### CAP-45 — gov update lifecycle
 
-- **Outcome:** The owner can update the Gov OS in a repository without losing overlay configuration.
-- **Acceptance:** `gov update --check` reports the version change and migrations; `copier update` applies them with the overlay files unchanged and `gov doctor` green.
-- **Wave:** W3 (gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of `gov doctor` is W3 (DEC-165))
-- **Provider:** Copier 9.18.2, W3: gov update --check, W3: gov doctor pending-update report
+- **Outcome:** The owner can update the Gov OS in a repository without losing his overlay or his own edits, and without re-adopting.
+- **Acceptance:** `gov update --check` reports the version change and migrations; `gov update` installs the pinned, hash-verified release and applies it with a three-way merge that keeps the owner's own edits and the overlay files, and `gov doctor` is green, with no re-adopt.
+- **Wave:** W2 (`gov update` is built in the release (EMERGENCY-2 §6.1, §7.6), which brings it back from Wave 3, where DEC-1089 and DEC-1090 had put it)
+- **Provider:** Copier 9.18.2, W2-17, W2-18 (pinned install), W2-17: gov doctor pending-update report
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-023; DEC-165; DEC-1090
+- **Sources:** Contract v3 Gate S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-023; DEC-165; DEC-1090; EMERGENCY-2 §6.1, §8 (DEC-1211); DEC-1214 Q-UPD; DEC-1214 L3
 - **Covers:**
-  - `CAP-45.a` [W3] gov update: check/impact, authenticated source (the signed tag, CAP-02.c, and the release's manifest and file hashes, CAP-43.b), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance — Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090
-  - `CAP-45.b` [W3] In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update` — DEC-165
+  - `CAP-45.a` [W2] gov update: check/impact, authenticated source (the release's manifest and file hashes, CAP-43.b; no signature, DEC-1214 L3), compatibility/migration, a three-way merge that keeps the owner's own edits and the overlay, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance — Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090; EMERGENCY-2 §6.1 (DEC-1211); DEC-1214 Q-UPD · delivered by W2-17, W2-18
+  - `CAP-45.b` [W2] In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update` — DEC-165 · delivered by W2-17
 - **Scenarios:** dev CHAOS-A-10, CHAOS-X-01 · qual CHAOS-X-Q01
 
 ### CAP-46 — Cross-machine sync via git
@@ -768,16 +768,16 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 
 ### CAP-49 — Qualification oracle (synthetic repos, fault injection, hidden tests)
 
-- **Outcome:** The owner can qualify the Gov OS on two synthetic programmes against a held-out oracle before Release 1.
-- **Acceptance:** A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any forbidden outcome fails; the builder sessions had no read access to the oracle. The oracle is hidden from a launched worker's Bash by the sandbox, and from every session started in the repository root by a `Read` deny rule and by the guard refusing any tool call that names its path.
-- **Wave:** W3 (the pack exists (S0b1); executed as qualification after W3 (DEC-067); the hiding of the oracle is W1 (DEC-152, DEC-162))
-- **Provider:** synthetic Programmes A and B, held-out oracle, qualification executor, W1-46, W1-47
+- **Outcome:** The owner can prove the Gov OS on synthetic repositories against a held-out oracle before the release.
+- **Acceptance:** A fresh executor runs the proving run on W2-81's synthetic repositories and produces a scorecard in SCORECARD_FORMAT; any forbidden outcome fails; the hidden sets are protected by the transcript scan (CAP-66): the transcripts written between a set's writing and the end of its measure contain neither its path nor its question ids, or the measure is void.
+- **Wave:** W2 (the pack exists (S0b1); it runs as the release proving run (EMERGENCY-2 §8.2 item 2))
+- **Provider:** synthetic Programmes A and B, held-out oracle, qualification executor, W2-81 (the six synthetic repositories)
 - **Disposition:** KEPT (DROP in S0a; KEPT as qualification by DEC-067)
-- **Sources:** Contract v3 Gate V1, V2, V3, V4; DEC-067; DEC-071; DEC-152; DEC-161; DEC-162; EXP-001 (spike-sandbox/EVIDENCE.md §3.3, §5.4)
+- **Sources:** Contract v3 Gate V1, V2, V3, V4; DEC-067; DEC-071; EMERGENCY-2 §2.7, §8.2 (DEC-1211)
 - **Covers:**
-  - `CAP-49.a` [W3] Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail — Contract v3 V1–V4; DEC-067
-  - `CAP-49.b` [W1] In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher passes; hiding is silent: the directory looks empty — DEC-152; DEC-161; EXP-001 §3.3, §5.4 · delivered by W1-46
-  - `CAP-49.c` [W1] The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle's absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator's own session is an accepted residual; the oracle path is held in `governance/project/held-out.yaml` and in the committed deny rule built from it; register entry DEC-067 names the directory historically; the guard and the launcher take the path from `held-out.yaml`, and no acceptance test names it — DEC-162 · delivered by W1-47
+  - `CAP-49.a` [W2] Fault manifest; hidden path-map and memory oracles, protected by the transcript scan (CAP-66); quantitative scoring; forbidden outcomes fail — Contract v3 V1–V4; DEC-067; EMERGENCY-2 §2.7, §8.2 (DEC-1211) · delivered by W2-81
+  - `CAP-49.b` [NONE] Non-goal: the oracle hidden from a launched worker's Bash by the sandbox and a `Read` deny rule: no sandbox; the transcript scan (CAP-66) detects a read instead — EMERGENCY-2 §2.2 (DEC-1211)
+  - `CAP-49.c` [NONE] Non-goal: the oracle hidden from every session by a `Read` deny rule in the committed settings and the guard refusing any call that names its path: no guard; the transcript scan (CAP-66) detects a read instead — EMERGENCY-2 §2.2 (DEC-1211)
 - **Scenarios:** dev — · qual —
 
 ### CAP-50 — Artifact flow, dependency consumption and end-to-end traceability
