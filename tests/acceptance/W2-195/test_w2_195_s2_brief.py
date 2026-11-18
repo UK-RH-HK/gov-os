@@ -4,7 +4,7 @@ A fixture project (this tree's kernel templates and facts file, one READY ticket
 ``template/governance/kernel/skills/judging-work/SKILL.md`` and the preloaded copy ``.claude/skills/judging-work/SKILL.md``
 (the generated form). Each judging brief (``gov brief independent-auditor``, ``gov brief qa-engineer``, ``gov brief lead
 --run review``) holds sections 1 to 3 of the kernel file as one contiguous byte-for-byte substring and one line holding both
-``judging-work`` and ``version 1.0.0``; the engineer's and the test designer's briefs hold neither.
+``judging-work`` and ``version 1.1.0``; the engineer's and the test designer's briefs hold neither.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import w2_195_support as s
 @pytest.mark.parametrize("which", list(s.JUDGING_BRIEFS))
 def test_s2_a_judging_brief_holds_sections_1_to_3_byte_for_byte_and_names_the_version(tmp_path, which):
     """success-2: the brief holds the kernel file's sections 1 to 3 as one substring, and a line naming ``judging-work`` and
-    ``version 1.0.0``."""
+    ``version 1.1.0``."""
     project = s.BriefProject(tmp_path / "repo")
     brief = s.brief_text(project.brief(*s.JUDGING_BRIEFS[which]))
     want = s.sections(s.kernel_text())

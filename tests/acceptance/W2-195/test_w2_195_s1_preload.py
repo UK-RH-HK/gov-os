@@ -51,8 +51,8 @@ def test_s1_the_rulesync_subagent_mirror_preloads_judging_work(role):
 def test_s1_s3_read_role_of_a_judging_role_carries_judging_work_named_with_its_version(tmp_path, role):
     """success-1 (the launch half, interface item 4) and success-3 (the same role with the skill passes): on a root holding
     this tree's ``roles/<role>.md`` as it is, the kernel skill file and a preloaded copy of every skill its Skills line
-    names (``judging-work``'s in the generated form, version 1.0.0), ``read_role`` is not refused and its ``skills`` hold
-    one entry ``name: judging-work`` with ``named: True`` and ``version: 1.0.0``."""
+    names (``judging-work``'s in the generated form, version 1.1.0), ``read_role`` is not refused and its ``skills`` hold
+    one entry ``name: judging-work`` with ``named: True`` and ``version: 1.1.0``."""
     root = s.LaunchRoot(tmp_path / "root", role)
     answer = root.read_role()
     assert answer.get("ok") is True, f"read_role({role}) was refused: {answer}"

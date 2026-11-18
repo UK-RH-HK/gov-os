@@ -3,8 +3,8 @@
 Every case builds what it needs under ``tmp_path`` and drives the public interfaces the lead's interface statement names
 (DEC-1157): ``python3 -m gov.cli.main brief ...`` as a child process, ``gov.launch.role.read_role(root, role)`` in a child
 process (``read_role_child.py``), ``python3 -m gov.cli.main adapters generate``, ``copier copy`` and a wheel built from
-HEAD. The skill's text is this folder's own copy (``data/judging-work.kernel.SKILL.md``, the approved 0fc1c502 with its
-``description`` value quoted: sha256 ``3fd8864b...``), so the brief and launch fixtures never depend on the kernel file
+HEAD. The skill's text is this folder's own copy (``data/judging-work.kernel.SKILL.md``, the approved text trimmed to
+EMERGENCY-2 3.4/3.6 (A-13) at ef82e15fa, version 1.1.0: sha256 ``34ae6c21...``), so the brief and launch fixtures never depend on the kernel file
 existing in this tree. Nothing here reads the ticket's implementation.
 """
 
@@ -36,11 +36,11 @@ KERNEL_SKILL_REL = "template/governance/kernel/skills/judging-work/SKILL.md"    
 ADOPTED_SKILL_REL = "governance/kernel/skills/judging-work/SKILL.md"             # a tree with no template/ (a kit or adopted tree)
 MIRROR_REL = "template/.rulesync/skills/judging-work/SKILL.md"
 PRELOADED_REL = ".claude/skills/judging-work/SKILL.md"
-KERNEL_SHA256 = "3fd8864b4b095b01b8748da01acd6a5a0dbd1295aa28ee7e97007dc21d48bf4d"
-KERNEL_SIZE = 3683
-SECTIONS_SHA256 = "36f94490027fdaaddb32105e651621a7a83af7d82fdb36a31a8263df79ec7ac3"   # sections 1 to 3 of 1.0.0
-VERSION = "1.0.0"
-OTHER_VERSION = "1.0.1"
+KERNEL_SHA256 = "34ae6c218ab35191e3e5ac3e3443a0118b86017a91d94b8adb5919ce76f3a4d5"
+KERNEL_SIZE = 4135
+SECTIONS_SHA256 = "9844057dfd42a23da972e805a40aee0fd7c498a2b5daf2186bfca1049a9d9d98"   # sections 1 to 3 of 1.1.0
+VERSION = "1.1.0"
+OTHER_VERSION = "1.1.1"
 START, END = "## 1. The threat model\n", "## 4. Doing it\n"
 
 TICKET_ID = "DAEO-jw01"

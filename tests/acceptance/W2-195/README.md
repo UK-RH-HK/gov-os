@@ -2,7 +2,7 @@
 
 Ticket `DAEO-d8df` (W2-195), profile FULL, class C3 (the kernel). Written by the independent test designer (MR-3) on
 the base `06cd7f869` from the ticket's four success lines and its failure line, DEC-1204, `P-GOLDEN-RULE-1.md`
-sections 2 to 4, the approved skill (`judging-work.SKILL.md`, sha256 `0fc1c502…`) and the lead's interface statement
+sections 2 to 4, the approved skill (`judging-work.SKILL.md`, sha256 `0fc1c502…`; re-pinned to the CTO's trim at `ef82e15fa`, EMERGENCY-2 §3.4/§3.6, A-13) and the lead's interface statement
 (DEC-1157), with the integrated code the brief and launch work with (`src/gov/brief/`, `src/gov/launch/role.py`,
 `src/gov/adopt/fabric.py`, `src/gov/adapters/` as they stand on the base). Nothing of this ticket's implementation was
 read.
@@ -25,11 +25,11 @@ skipped, as W2-88's is.
 
 ## What the cases do
 
-- **The skill's text is this folder's own copy:** `data/judging-work.kernel.SKILL.md`, the approved text with its
-  `description` value in double quotes (YAML refuses the unquoted `": "`), every other byte as approved: sha256
-  `3fd8864b4b095b01b8748da01acd6a5a0dbd1295aa28ee7e97007dc21d48bf4d`, 3683 bytes, version 1.0.0. Sections 1 to 3 are
+- **The skill's text is this folder's own copy:** `data/judging-work.kernel.SKILL.md`, the approved text as trimmed
+  at `ef82e15fa` (its `description` value in double quotes): sha256
+  `34ae6c218ab35191e3e5ac3e3443a0118b86017a91d94b8adb5919ce76f3a4d5`, 4135 bytes, version 1.1.0. Sections 1 to 3 are
   the bytes from the start of the line `## 1. The threat model` up to, not including, the line `## 4. Doing it` (sha256
-  `36f94490…`). The brief, launch and F1 fixtures plant this copy, so their reds are about `gov brief` and
+  `9844057d…`). The brief, launch and F1 fixtures plant this copy, so their reds are about `gov brief` and
   `read_role`, never a missing kernel file; one S4 case checks the kernel file and its mirror equal it.
 - **The preloaded copy** (`.claude/skills/judging-work/SKILL.md`) is planted in the form `gov adapters generate`
   writes (rulesync's): front matter `name`, `description` and `metadata.version` only (no top-level `version`), the
@@ -62,15 +62,15 @@ skipped, as W2-88's is.
 | success-2 | `test_w2_195_s2_brief.py::test_s2_a_judging_brief_holds_sections_1_to_3_byte_for_byte_and_names_the_version` (3: independent-auditor, qa-engineer, lead-review) | auditor and lead: `the <role> brief does not hold sections 1 to 3 of the installed judging-work skill, byte for byte`; qa-engineer: `gov brief did not succeed: exit 2` (argparse: invalid choice 'qa-engineer') |
 | success-2 | `test_w2_195_s2_brief.py::test_s2_in_an_adopted_tree_the_auditor_brief_reads_governance_kernel` | `the auditor brief in an adopted tree does not hold sections 1 to 3` |
 | success-2 | `test_w2_195_s2_brief.py::test_s2_a_non_judging_brief_holds_neither_the_sections_nor_the_version_line` (2: engineer, independent-test-designer) | `the contrast: the auditor brief on this fixture does not hold the sections, so nothing is shown` |
-| success-3 | `test_w2_195_s3_check.py::test_s3_a_judging_brief_without_the_skill_or_with_another_version_is_refused_by_name` (9: three judging briefs, each with the kernel file removed, the preloaded copy removed, the preloaded copy at version 1.0.1) | auditor and lead: `gov brief did not refuse (exit 0): it printed a brief`; qa-engineer: `--json printed no JSON envelope (the refusal is not gov's): exit 2` (argparse) |
+| success-3 | `test_w2_195_s3_check.py::test_s3_a_judging_brief_without_the_skill_or_with_another_version_is_refused_by_name` (9: three judging briefs, each with the kernel file removed, the preloaded copy removed, the preloaded copy at version 1.1.1) | auditor and lead: `gov brief did not refuse (exit 0): it printed a brief`; qa-engineer: `--json printed no JSON envelope (the refusal is not gov's): exit 2` (argparse) |
 | success-3 | `test_w2_195_s3_check.py::test_s3_an_auditor_brief_whose_kernel_file_has_no_sections_1_to_3_is_refused_by_name` | `gov brief did not refuse (exit 0): it printed a brief` |
 | success-3 | `test_w2_195_s3_check.py::test_s3_without_json_the_refusal_prints_no_brief_and_names_its_code` | `gov brief did not refuse: exit 0` |
-| success-3 | `test_w2_195_s3_check.py::test_s3_a_judging_launch_without_the_skill_or_with_another_version_is_refused_by_name` (6: independent-auditor and qa-engineer, each with the Skills line lacking judging-work, the preloaded copy removed, the preloaded copy at 1.0.1) | line lacking and other version: `read_role(<role>) (...) was not refused: the launch would start without the rule`; copy removed: `is refused LAUNCH_REFUSED, not LAUNCH_JUDGING_RULE_MISSING` |
+| success-3 | `test_w2_195_s3_check.py::test_s3_a_judging_launch_without_the_skill_or_with_another_version_is_refused_by_name` (6: independent-auditor and qa-engineer, each with the Skills line lacking judging-work, the preloaded copy removed, the preloaded copy at 1.1.1) | line lacking and other version: `read_role(<role>) (...) was not refused: the launch would start without the rule`; copy removed: `is refused LAUNCH_REFUSED, not LAUNCH_JUDGING_RULE_MISSING` |
 | success-4 | `test_w2_195_s4_shipped.py::test_s4_the_kernel_skill_and_its_mirror_are_the_approved_bytes` (2: kernel, rulesync-mirror) | `<rel> does not exist: the skill is not in the kernel` |
 | success-4 | `test_w2_195_s4_shipped.py::test_s4_fabric_packaged_and_kernel_folders_name_the_skill_once` | `fabric.PACKAGED names template/governance/kernel/skills/judging-work 0 times` |
 | success-4 | `test_w2_195_s4_shipped.py::test_s4_a_wheel_built_from_head_carries_the_skill_bytes` | `the wheel of HEAD does not carry gov/_shipped/template/governance/kernel/skills/judging-work/SKILL.md` |
 | success-4 | `test_w2_195_s4_shipped.py::test_s4_the_kit_delivers_the_skill_and_adapters_generate_preloads_it` | `copier copy of the kit installed no governance/kernel/skills/judging-work/SKILL.md` |
-| failure-1 | `test_w2_195_f1_text.py::test_f1_the_sections_a_brief_carries_hash_as_the_installed_files_sections` (6: three judging briefs, each with the approved 1.0.0 text and with a 1.0.1 copy whose section 2 has one word changed) | auditor and lead: `the brief carries no section 1 heading of judging-work`; qa-engineer: `gov brief did not succeed: exit 2` (argparse) |
+| failure-1 | `test_w2_195_f1_text.py::test_f1_the_sections_a_brief_carries_hash_as_the_installed_files_sections` (6: three judging briefs, each with the approved 1.1.0 text and with a 1.1.1 copy whose section 2 has one word changed) | auditor and lead: `the brief carries no section 1 heading of judging-work`; qa-engineer: `gov brief did not succeed: exit 2` (argparse) |
 
 **Red run on the base** (`heavy_slot.sh`, the sandbox's TMPDIR, an empty HOME, 2026-11-16): `tests/acceptance/W2-195`
 **45 cases, 45 failed, each for the reason in the table, 0 passed, 0 skipped**; none is red by an import, a fixture
@@ -101,6 +101,6 @@ stays green (the new item lets the copy through once it exists). Both cases are 
   the top-level `version` dropped, only `metadata.version` kept) and drops the blank line after it: this tree's own
   `.claude/skills/{audit,retrieval,qa-review,test-design}/SKILL.md` differ from their kernel files the same way. No
   engineer can make the generated copy the kernel bytes, so the kit case asserts what holds: the copy exists, is named
-  `judging-work`, carries version 1.0.0, its body (after the front matter, leading blank lines dropped) is the
+  `judging-work`, carries version 1.1.0, its body (after the front matter, leading blank lines dropped) is the
   kernel's, and so it holds sections 1 to 3 byte for byte. The kernel file and the rulesync mirror the kit installs are
   asserted byte for byte.

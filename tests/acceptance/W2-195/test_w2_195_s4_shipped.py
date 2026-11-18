@@ -1,7 +1,7 @@
 """success-4 (S4, Shipped; DEC-1204 (5); P-GOLDEN-RULE-1 section 3 S4; the lead's interface item 7).
 
-- The kernel skill and its rulesync mirror are the approved text with its ``description`` quoted (sha256 ``3fd8864b...``,
-  3683 bytes, version 1.0.0).
+- The kernel skill and its rulesync mirror are the approved text (trimmed at ef82e15fa: sha256 ``34ae6c21...``,
+  4135 bytes, version 1.1.0).
 - ``gov.adopt.fabric.PACKAGED`` names ``template/governance/kernel/skills/judging-work`` once, and ``fabric.KERNEL_FOLDERS``
   holds the pair ``(template/governance/kernel/skills/judging-work, .claude/skills/judging-work)`` once.
 - A wheel built from HEAD (``git archive`` of ``src/`` and ``pyproject.toml``, ``pip wheel --no-deps --no-build-isolation
@@ -9,7 +9,7 @@
   the kernel bytes.
 - The kit: ``copier copy`` from a clone of HEAD's ``copier.yml`` and ``template/`` delivers
   ``governance/kernel/skills/judging-work/SKILL.md`` and ``.rulesync/skills/judging-work/SKILL.md`` with the kernel bytes; after
-  ``gov adapters generate``, ``.claude/skills/judging-work/SKILL.md`` is there, named ``judging-work``, version 1.0.0, its body
+  ``gov adapters generate``, ``.claude/skills/judging-work/SKILL.md`` is there, named ``judging-work``, version 1.1.0, its body
   the kernel's (rulesync rewrites the front matter and drops the blank line after it, so not the kernel's whole bytes:
   README, "The generated copy"), and so sections 1 to 3 byte for byte.
 
@@ -61,8 +61,8 @@ def _export(names: list[str], dest: Path, scratch: Path) -> None:
 
 @pytest.mark.parametrize("rel", [s.KERNEL_SKILL_REL, s.MIRROR_REL], ids=["kernel", "rulesync-mirror"])
 def test_s4_the_kernel_skill_and_its_mirror_are_the_approved_bytes(rel):
-    """success-4: ``<rel>`` exists and is the approved text with its description quoted: sha256 ``3fd8864b...``, 3683 bytes,
-    front matter ``version: "1.0.0"``."""
+    """success-4: ``<rel>`` exists and is the approved text: sha256 ``34ae6c21...``, 4135 bytes,
+    front matter ``version: "1.1.0"``."""
     path = s.REPO / rel
     assert path.is_file(), f"{rel} does not exist: the skill is not in the kernel"
     data = path.read_bytes()
@@ -108,7 +108,7 @@ def test_s4_the_kit_delivers_the_skill_and_adapters_generate_preloads_it(tmp_pat
     """success-4 (the kit): ``copier copy --trust --defaults --skip-tasks`` of a clone of HEAD's ``copier.yml`` and
     ``template/`` (a planted tag) installs the kernel skill and its rulesync mirror with the kernel bytes; ``gov adapters
     generate --json`` then exits 0 and writes ``.claude/skills/judging-work/SKILL.md``: name ``judging-work``, version
-    1.0.0, its body the kernel's, so sections 1 to 3 byte for byte."""
+    1.1.0, its body the kernel's, so sections 1 to 3 byte for byte."""
     copier = shutil.which("copier", path=s.search_path())
     if copier is None:
         pytest.skip("copier is not installed on this machine")

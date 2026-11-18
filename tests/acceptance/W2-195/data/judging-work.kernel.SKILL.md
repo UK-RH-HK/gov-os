@@ -1,16 +1,16 @@
 ---
 name: judging-work
-description: "The one rule for judging work (ADR-0001, DEC-801, DEC-1010, merged by DEC-1204): the threat model, what may block, how reviews converge. Preloaded by every role that judges work; loaded by the CTO whenever it triages findings."
-version: "1.0.0"
+description: "The one rule for judging work (ADR-0001, DEC-801, DEC-1010, merged by DEC-1204; applied by EMERGENCY-2 §3): the threat model, what may block, when a review happens and how it converges. Preloaded by every role that judges work; loaded by the CTO whenever it triages findings."
+version: "1.1.0"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Judging work
 
 The golden rule for every review, probe, audit, QA check, moderation and triage of findings in a Gov OS project,
-and in every repository that adopts it. It grants nothing; the guard and the role file decide what a session may do
-(CAP-24.b). Source: DEC-1204, which merges ADR-0001 (DEC-039), DEC-801 and DEC-1010.
+and in every repository that adopts it. It grants nothing (CAP-24.b). Source: DEC-1204, which merges ADR-0001
+(DEC-039), DEC-801 and DEC-1010, as EMERGENCY-2 §3 applies it.
 
 ## 1. The threat model
 - Gov OS guards against **honest agent mistakes, plausible accidents and drift in ordinary work**.
@@ -31,7 +31,11 @@ Ask of every finding, word for word:
 - Every finding in a probe, review or audit record carries two lines:
   `Ordinary work: yes|no, because ...` and `Consequence: fails open|loses work|other`.
 
-## 3. How reviews converge
+## 3. When a review happens, and how it converges
+- **A review only when something is not working:** a red test, a failed landing or merge, or a feature that does not
+  work as intended. Work that went through green needs none, and no ticket gets a reviewer of its own. Most causes are
+  found and fixed by the CTO, a senior engineer or the engineer, without review.
+- **Batched:** when several issues come together (for example after the nightly run), one review takes them all.
 - **A moderator, not a circle of reviewers.** The moderator (the QA engineer or the Senior Engineer; the CTO until
   those layers run) triages every finding against the change's own scope and KPI lines, by section 2, before
   anything goes back to the builder.
@@ -54,5 +58,5 @@ Ask of every finding, word for word:
   recommendation.
 
 ## 5. What this skill is not
-- It does not lower a wall: a finding an honest agent can hit that fails open is fixed, always.
-- It does not replace the guard, the walls or the held-out rules; those still decide what any session may read.
+- It does not lower the bar: a finding an honest agent can hit that fails open or loses work is fixed, always.
+- It does not call a review of its own: section 3 says when one happens.
