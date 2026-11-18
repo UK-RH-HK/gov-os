@@ -148,7 +148,7 @@ def test_f2_the_built_arguments_are_integrate_s_but_for_the_one_flag(bed, baseli
     mine = _without_mode(support.without_flag(bed.normalised(ours["calls"][0])))
     base = bed.normalised(theirs["calls"][0])
     if role in WORKER_ROLES:  # the settings compared as values: the JSON text is rebuilt once W2-60a's are taken out
-        mine = _without_w2_60a(mine, role)
+        mine = _without_cache_ttl(_without_w2_60a(mine, role), role)
         mine, base = [mine[0], _rules_sorted(json.loads(mine[1])), *mine[2:]], [
             base[0], _rules_sorted(_without_emergency_2(json.loads(base[1]))), *base[2:]]
     assert mine == base,f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
@@ -188,6 +188,18 @@ def _without_emergency_2(settings: dict) -> dict:
         settings["permissions"]["deny"] = [rule for rule in deny
                                            if not (rule.startswith("Edit(/") or rule.startswith("Read(/"))]
     return settings
+
+
+def _without_cache_ttl(argv: list[str], role: str) -> list[str]:
+    """A worker's normalised arguments with the prompt-cache pin taken out of ``--settings`` ``env``: commit 7f6aaaeb8
+    (the owner's audit 09 item, 2026-11-18) made the launcher write ``CLAUDE_CODE_PROMPT_CACHE_TTL=5m`` for a worker;
+    integrate's launcher at the baseline has none. Checked present, with the value ``5m``, first, so the pin stays a
+    real check; what is left must be integrate's. A lead takes no settings and does not come here."""
+    assert argv[:1] == ["--settings"], argv
+    settings = json.loads(argv[1])
+    assert settings["env"].pop("CLAUDE_CODE_PROMPT_CACHE_TTL", None) == "5m", (
+        f"{role}: the worker's settings env has no CLAUDE_CODE_PROMPT_CACHE_TTL=5m: {argv[1]}")
+    return ["--settings", json.dumps(settings), *argv[2:]]
 
 
 def _without_w2_60a(argv: list[str], role: str) -> list[str]:
