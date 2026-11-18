@@ -36,7 +36,7 @@ def test_two_patterns_overlap_when_some_path_matches_both(a, b, expected):
 
 def test_a_literal_path_is_judged_by_the_guards_own_matcher(monkeypatch):
     calls = []
-    monkeypatch.setattr(overlap.decide, "_match_pattern", lambda path, pattern: calls.append((path, pattern)) or True)
+    monkeypatch.setattr(overlap.patterns, "_match_pattern", lambda path, pattern: calls.append((path, pattern)) or True)
     overlap.patterns_overlap.cache_clear()
     try:
         assert patterns_overlap("src/q.py", "src/*.txt") is True

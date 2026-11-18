@@ -277,4 +277,5 @@ def test_a_rulesync_regeneration_of_the_template_keeps_the_allow_rule(tmp_path):
     generated = json.loads((tmp_path / ".claude" / "settings.json").read_text(encoding="utf-8"))
     kernel = json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8"))
     assert generated["permissions"]["allow"] == kernel["permissions"]["allow"] == ["Bash(gov launch:*)"]
-    assert generated["hooks"]["PreToolUse"] == kernel["hooks"]["PreToolUse"]
+    # The guard's PreToolUse line left both with the guard (EMERGENCY-2 6.1, DAEO-gr7t).
+    assert "PreToolUse" not in generated.get("hooks", {}) and "hooks" not in kernel
