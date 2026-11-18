@@ -70,16 +70,26 @@ def test_the_rulesync_mirror_preloads_judging_work_and_is_still_the_composition(
     assert mirror.read_text(encoding="utf-8") == portability.compose(REPO / "template", name)
 
 
-# The base these files are compared with: w2/integrate's head as last merged into the ticket branch (5d95aad65 merged
-# 9ef5cba29), which holds none of W2-195's kernel changes, so the merged-in lines of other tickets (DEC-1209's line in
-# the orchestrator mirror) are not counted as W2-195's.
-BEFORE = "9ef5cba29"
+# The base these files are compared with: w2/integrate's head as last merged into this branch, i.e. the merge-base of
+# HEAD and w2/integrate, which holds none of W2-195's kernel changes, so the lines other tickets merged in (the owner's
+# launch defaults, DEC-1209's line in the orchestrator mirror) are not counted as W2-195's. A clone without the ref
+# falls back to PINNED, a commit that was integrate's head once (it can lag behind later merges). Once W2-195 has
+# landed, HEAD is integrate itself, the base holds the change already and the case skips.
+PINNED = "9ef5cba29"
+
+
+def _git(*args: str) -> str:
+    import subprocess
+    done = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True)
+    return done.stdout if done.returncode == 0 else ""
+
+
+def _base() -> str:
+    return _git("merge-base", "HEAD", "w2/integrate").strip() or PINNED
 
 
 def _at_base(rel: str) -> list[str]:
-    import subprocess
-    text = subprocess.run(["git", "-C", str(REPO), "cat-file", "blob", f"{BEFORE}:{rel}"], capture_output=True,
-                          text=True, check=True).stdout
+    text = _git("cat-file", "blob", f"{_base()}:{rel}")
     assert text, rel
     return text.split("\n")
 
@@ -97,6 +107,8 @@ def _appended(line: str) -> str:
                          + ["template/governance/kernel/templates/role-reviewer.md"])
 def test_each_file_changes_only_its_skills_lines_by_appending_judging_work(rel):
     old, new = _at_base(rel), (REPO / rel).read_text(encoding="utf-8").split("\n")
+    if old == new:
+        pytest.skip("the base already holds W2-195's change (HEAD is integrate after the landing)")
     assert len(old) == len(new)
     changed = [(a, b) for a, b in zip(old, new) if a != b]
     assert changed, rel
