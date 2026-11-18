@@ -1,8 +1,8 @@
 ---
 id: CHARTER-v6
-status: ACCEPTED
+status: PROPOSED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
-decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173]
+decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173, DEC-848, DEC-1204, DEC-1211, DEC-1212, DEC-1214]
 type: specification
 state_class: AUTHORITATIVE
 ---
@@ -17,7 +17,11 @@ texts. The originals are kept unchanged as provenance (DEC-058).
 ## 1. Purpose and scope
 
 **Purpose.** The Gov OS keeps AI agents accurate, bounded and traceable while they build software for one human
-owner (DEC-039). It extends the agents' context and memory. The authoritative memory is the repository: git-tracked
+owner (DEC-039). It stops drift and makes the owner's agents work, and record their work, as a good software company
+does: not a security battle, not a rule battle. It needs four things: memory; help with the spec and the KPIs; roles
+that keep conflicting work apart; and governance of the WBS and of tickets' launching and closing, governing the
+traffic, not a city (EMERGENCY-2 §1.1). What matters is tests and code that match the KPIs and the spec and pass green;
+everything else must justify itself (DEC-1047). It extends the agents' context and memory. The authoritative memory is the repository: git-tracked
 records plus derived indexes that can be rebuilt from git on any machine. It never lives in an agent session or a
 vendor account (DEC-057).
 
@@ -240,9 +244,12 @@ operator agent, its cron launcher and its lock are retired with the ACT pipeline
 3. **ADRs** (`docs/adr/`);
 4. everything else: specifications, tickets, skills, lessons.
 
-- The decision register (`docs/DECISION_REGISTER.md`) records the owner's decisions that these documents carry. Where
-  a document conflicts with an ACCEPTED or DONE decision, the decision wins, and the document is corrected by a new
-  version.
+- The decision register (`docs/DECISION_REGISTER.md`) records the owner's decisions that these documents carry; once
+  the old register is archived read-only (EMERGENCY-2 §11.3), decisions are read from the register that replaces it.
+  Where a document conflicts with an ACCEPTED or DONE decision, the decision wins, and the document is corrected by a
+  new version.
+- EMERGENCY-2 supersedes anything that contradicts it until this re-baseline is approved and lands (EMERGENCY-2
+  §11.2).
 - Where any of the above conflicts with the originals (Framework v4.1.2, the two protocols, Contract v3), **the ADRs
   supersede the originals** (DEC-053 Q5, DEC-058).
 - The originals remain provenance only. They leave the working tree after S1-A closes (DEC-082).
