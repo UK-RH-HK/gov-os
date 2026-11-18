@@ -74,20 +74,26 @@ WELL = "well formed"   # the table's "present and well formed, value not asserte
 _H = (OPUS, "high")
 _S = (SONNET, "high")
 _CRIT_ENGINEER = {"C3": _H, "C2": _S, "C1": _S, "C0": WELL}
-_CRIT_QA = {"C3": _H, "C2": "qa-c2", "C1": _S, "C0": WELL}
-# role file -> (Launch default, Launch by criticality or None for "absent"): S7's table (DEC-1120 (2), DEC-1119 (2)).
+_CRIT_QA = {"C3": _H, "C2": _S, "C1": _S, "C0": WELL}
+_CRIT_AUDITOR = {"C3": _H, "C2": _S, "C1": _S, "C0": WELL}
+# role file -> (Launch default, Launch by criticality or None for "absent"): S7's table (DEC-1120 (2), DEC-1119 (2)),
+# as DEC-1214 K1 changes it.
+# Rewrite-Reason: DEC-1214 K1 (the owner, 2026-11-18): the rubric is audit 4's Table 3 with audit 09's model changes
+# (W2-201 S1): the CTO (orchestrator) and the senior engineer on Opus, effort high, no table line; the ticket lead on
+# Sonnet; the independent auditor's default Sonnet with a table line (C3 Opus, C2 and C1 Sonnet); the QA engineer's
+# default Sonnet and its C2 entry plain Sonnet (no Opus on FULL any more). C0 stays "well formed, value not asserted".
 TABLE = {
-    # the three lead roles on Sonnet, effort high: DEC-1212 (3), role files since 24a384ae8, line form 76073838d
-    "orchestrator": (_S, None),
+    "orchestrator": (_H, None),
     "ticket-lead": (_S, None),
-    "senior-engineer": (_S, None),
+    "senior-engineer": (_H, None),
     "engineer": (_S, _CRIT_ENGINEER),
     "independent-test-designer": (_S, _CRIT_ENGINEER),
-    "qa-engineer": (WELL, _CRIT_QA),
-    "independent-auditor": (_H, None),
+    "qa-engineer": (_S, _CRIT_QA),
+    "independent-auditor": (_S, _CRIT_AUDITOR),
     "product-spec": (_S, None),
     "research": (_S, None),
 }
+# The QA engineer's C2 entry before DEC-1214 K1 (Opus on FULL): the F2 plant writes it back, and the table refuses it.
 QA_C2 = f"C2 model {OPUS}, effort high on FULL, model {SONNET}, effort high otherwise"
 
 
@@ -442,7 +448,7 @@ def s8_senior_engineer(text: str) -> list[str]:
     line, count = one_line(text, SKILLS_HEAD)
     if count != 1 or SKILLS_LINE.fullmatch(line) is None:
         out.append(f"{name}.md: has no whole `- **Skills:** a, b` line")
-    want = f"- **Launch default:** model {SONNET}, effort high"
+    want = f"- **Launch default:** model {OPUS}, effort high"  # DEC-1214 K1: the senior engineer on Opus (W2-201 S1)
     line, count = one_line(text, DEFAULT_HEAD)
     if count != 1 or line.rstrip() != want:
         out.append(f"{name}.md: its Launch default line must be exactly `{want}`")
@@ -579,7 +585,7 @@ _SAMPLE_SE = """- **Reads:** everything except the five rules' refusals; its lea
 - **Brief contents:** its stream, its coordination ticket, its tickets with their state, the playbook and checkpoint.
 - **Handover:** typed handoffs up to the CTO and the lead brief down to each lead.
 - **Skills:** checkpoint, retrieval
-- **Launch default:** model claude-sonnet-5-5, effort high
+- **Launch default:** model claude-opus-5-5, effort high
 """
 _SAMPLE_RULE = ("- `PACKAGE_INSTALL`: the guard asks only the orchestrator on the project's coordination ticket for an "
                 "install (the key `coordination_ticket` of the roster; its session's `GOV_TICKET` is that ticket); "

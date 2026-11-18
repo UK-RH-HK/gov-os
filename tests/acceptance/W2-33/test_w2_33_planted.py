@@ -111,11 +111,15 @@ PLANTS = {
     "test-designer-c3-sonnet": (_change("independent-test-designer", W.CRITICALITY_HEAD,
                                         lambda l: l.replace(f"C3 model {W.OPUS}", f"C3 model {W.SONNET}", 1)),
                                 "Launch by criticality"),
-    "qa-c2-not-the-full-form": (_change("qa-engineer", W.CRITICALITY_HEAD, lambda l: l.replace(W.QA_C2, f"C2 model {W.SONNET}, effort high")),
-                                "Launch by criticality"),
+    # Rewrite-Reason: DEC-1214 K1 (W2-201 S1): the QA engineer's C2 entry is plain Sonnet now, so the departure is
+    # the old Opus-on-FULL form written back (was "qa-c2-not-the-full-form"); the auditor's file now varies by class,
+    # so "a line where RUBRIC-2 does not vary" is planted in the orchestrator's file (was the auditor's).
+    "qa-c2-opus-on-full-again": (_change("qa-engineer", W.CRITICALITY_HEAD,
+                                         lambda l: l.replace(f"C2 model {W.SONNET}, effort high", W.QA_C2, 1)),
+                                 "Launch by criticality"),
     "criticality-line-removed-where-it-varies": (_drop_lines("engineer", W.CRITICALITY_HEAD), "Launch by criticality"),
     "criticality-line-where-rubric-2-does-not-vary": (
-        _change("independent-auditor", W.DEFAULT_HEAD,
+        _change("orchestrator", W.DEFAULT_HEAD,
                 lambda l: l + f"\n- **Launch by criticality:** C3 model {W.OPUS}, effort high; C2 model {W.OPUS}, "
                           f"effort high; C1 model {W.OPUS}, effort high; C0 model {W.SONNET}, effort high"),
         "Launch by criticality"),
