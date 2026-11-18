@@ -31,8 +31,12 @@ def test_with_no_green_record_a_red_red_at_the_parent_of_the_oldest_own_commit_i
                                                                                                    sandbox):
     """S3 (and S4's ``base_run`` when no base run is needed): no green record; W2-bb's known red is red at M, the
     parent of the ticket's oldest own commit, with the same failure type. The close passes, the ticket closes, the
-    record names ``base: M`` and ``base_from: ticket``, marks the red not caused with a repair ticket, the red ran
-    alone at M (and failed there), and ``base_run`` says no base run was made (null, or ``ran: false``)."""
+    record names ``base: M`` and ``base_from: ticket``, marks the red not caused (reason: red at the base) with no
+    repair ticket, the red ran alone at M (and failed there), and ``base_run`` says no base run was made (null, or
+    ``ran: false``).
+
+    Rewrite-Reason: EMERGENCY-2 4.2, W2-193 S6: a base red opens no repair ticket (it asserted one, naming the red,
+    with ``repair_ticket`` set)."""
     told = tmp_path / "project-told"
     reds = {BB_KNOWN.split("::")[0]: support.telling(BB_KNOWN.split("::")[0], "test_bb_known", told,
                                                     support.KNOWN_RED, name="test_bb_known")}
@@ -49,8 +53,9 @@ def test_with_no_green_record_a_red_red_at_the_parent_of_the_oldest_own_commit_i
     assert front.get("base_from") == support.FROM_TICKET, f"base_from is not 'ticket': {front.get('base_from')!r}"
     entry = support.red_entry(front, BB_KNOWN)
     assert entry.get("caused") is False, f"a red already red at the base is recorded as the change's: {entry}"
-    assert entry.get("repair_ticket"), f"the base red names no repair ticket: {entry}"
-    assert support.repair_tickets_naming(made, before, BB_KNOWN), "no repair ticket names the base red"
+    assert "base" in str(entry.get("reason") or "").lower(), f"the reason does not say it was red at the base: {entry}"
+    assert "repair_ticket" in entry and entry["repair_ticket"] is None, f"the base red names a repair ticket: {entry}"
+    assert support.tickets(made) == before, f"the close created tickets: {support.tickets(made) - before}"
     base_runs = support.calls(support.base_side(support.told_runs(told, "test_bb_known")))
     assert base_runs and not any(r["ok"] for r in base_runs), \
         f"the red was not run alone at the base (where it fails): {base_runs}"
