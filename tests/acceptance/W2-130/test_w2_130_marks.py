@@ -102,7 +102,8 @@ def test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_a
     # The line is about the clean-up's marks, the census's pairs: one of them added after e12f8a30c is in c4420040f
     # or a follow-up marks commit, append-only. A later commit's own change of a status line of the 87 (DEC-866's
     # marking of a new decision's change, e.g. 518772b5c's DEC-989<-DEC-1141) adds no census pair; it may stay out of
-    # a marks commit, but its line must keep the old line whole (an append), never an edit in the middle.
+    # a marks commit, but its line must keep the old line whole (an append), never an edit in the middle. The
+    # appended ` · **Class:** ...` segment (audit 8's class, DEC-1214 G4) is the owner's classification, not a mark.
     ids = set(record.data("ids-87"))
     census = record.data("census")
     allowed = set(s.marks_commits(record))
@@ -116,12 +117,24 @@ def test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_a
                 if change["kind"] not in ("append", "status"):
                     bad.append((commit[:12], change["id"], change["kind"]))
                 continue
-            tail = change["new"][len(change["old"]):]
-            if not change["new"].startswith(change["old"]):
-                bad.append((commit[:12], change["id"], "edited outside a marks commit, not an append"))
-            elif set(s.ids_in(tail)) & set(census[change["id"]]):
-                bad.append((commit[:12], change["id"], "a census pair marked outside a marks commit"))
+            problem = s.outside_marks_problem(change["old"], change["new"], census[change["id"]])
+            if problem:
+                bad.append((commit[:12], change["id"], problem))
     assert not bad, f"a register status line of the 87 changed outside a marks commit or not append-only: {bad[:5]}"
+
+
+def test_s1_a_class_segment_naming_a_census_changer_is_not_a_mark_but_the_same_id_elsewhere_in_the_tail_is():
+    old = "- **Status:** ACCEPTED (owner, 2026-01-01) \u00b7 **Basis:** SUGGESTION"
+    census = ["DEC-393", "DEC-396"]
+    class_only = old + " \u00b7 **Class:** kept (items changed: amended by DEC-393, DEC-396)"
+    elsewhere = old + "; amended by DEC-393 \u00b7 **Class:** kept"
+    before_class = old + " \u00b7 **Changed by:** amended by DEC-396 \u00b7 **Class:** kept (items changed: DEC-393)"
+    assert s.outside_marks_problem(old, class_only, census) is None
+    assert s.outside_marks_problem(old, old + " \u00b7 **Class:** history", census) is None
+    assert s.outside_marks_problem(old, elsewhere, census) == "a census pair marked outside a marks commit"
+    assert s.outside_marks_problem(old, before_class, census) == "a census pair marked outside a marks commit"
+    assert s.outside_marks_problem(old, old.replace("2026-01-01", "2026-02-02") + " \u00b7 **Class:** kept",
+                                   census) == "edited outside a marks commit, not an append"
 
 
 # ---------------------------------------------------------------------------------------------------------- S2
