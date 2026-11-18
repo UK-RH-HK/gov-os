@@ -118,7 +118,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Alternatives:** `bd` v1.3.x (Dolt), wedow/ticket, Beans, Backlog.md.
 
 ### DEC-014 — Code-structural memory: codebase-memory-mcp
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Class:** kept
 - **Decision:** Use codebase-memory-mcp for call graphs, impact analysis, routes, dead code.
 - **Evidence:** 31-repo evaluation: 83% answer quality vs 92% for a file-exploration agent at ~10× fewer tokens and 2.1× fewer tool calls. [E-CBM-PAPER]
 - **Pin & hygiene:**
@@ -134,13 +134,13 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Install note:** Serena's maintainers advise installing via their Quick Start, not MCP/plugin marketplaces. [E-SERENA]
 
 ### DEC-016 — Lexical + semantic index: SQLite FTS5 + sqlite-vec, fused with RRF
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074 (R1)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074 (R1) · **Class:** kept
 - **Decision:** One derived `.gov-runtime/index.sqlite` with FTS5 (lexical) + sqlite-vec (vectors), Reciprocal Rank Fusion. Content-hash gating for incremental embedding. Brute-force vector search is adequate to ~100K vectors — far above expected spec/decision/research corpus size. [E-VEC]
 - **Upgrade path:** LanceDB if vectors exceed ~100K or latency degrades.
 - **Gates:** C3, C4, D1, D2, D3, D6
 
 ### DEC-017 — Embedding & reranking models
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074 (R1)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074 (R1) · **Class:** kept
 - **Decision:** Qwen3-Embedding-0.6B + Qwen3-Reranker-0.6B via Ollama, resident on GPU (~3 GB VRAM total). Pin revisions in the index manifest (D5).
 - **Licence rule:** only permissively licensed models (Apache-2.0/MIT). Some top-ranked embedders (e.g. jina-embeddings-v3) are non-commercial and are excluded for commercial projects. [E-EMBED]
 - **Gates:** D4, D5
@@ -236,7 +236,7 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 ## 4. Retrieval decisions
 
 ### DEC-030 — Retrieval completeness principle
-- **Status:** ACCEPTED · **Basis:** OWNER · **Changed by:** DEC-080
+- **Status:** ACCEPTED · **Basis:** OWNER · **Changed by:** DEC-080 · **Class:** kept
 - **Decision:** A top-k or per-query token allowance (e.g. 8k) is a batch size, not an evidence-completeness limit. Retrieval supports multiple batches, pagination/continuation, facets, adaptive follow-up, multi-hop, provenance-preserving merge, deduplication, authority/current/superseded filtering, and an explicit stopping reason. Parallel facet retrieval → merge/filter → unresolved dependencies → sequential follow-up → repeat → bounded context compilation. Evidence larger than one packet uses hierarchical synthesis whose notes are derived, cited, lineage-preserving, disclose unresolved evidence, and are rebuildable.
 - **Gates extended:** D2, D3, C9, W4, W10
 
@@ -245,15 +245,15 @@ Core risk identified: a naive Governance OS becomes token-heavy (governance cons
 - **Decision:** (1) *retrieval spend budget* — scales with impact radius; (2) *final context packet budget* — fixed ceiling. Hitting (1) is a governed event, never silent truncation.
 
 ### DEC-032 — Retrieval loop runs in a disposable context
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (harness subagents) + SUGGESTION · **Changed by:** DEC-080
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (harness subagents) + SUGGESTION · **Changed by:** DEC-080 · **Class:** kept
 - **Decision:** Iterative retrieval and synthesis run inside a research subagent; only the compiled, cited bundle returns to the implementing context.
 
 ### DEC-033 — Deterministic worklist for closure facets
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080 · **Class:** kept
 - **Decision:** `gov retrieve` resolves referenced IDs (spec, ADR, task, symbol) through the frontmatter graph and codebase-memory callers/callees to a radius-scaled depth at T0 (no LLM). LLM judgement only for the semantic facet. Completeness for deterministic facets = dependency closure to depth N; for semantic facets = saturation.
 
 ### DEC-034 — Stopping reasons (enumerated)
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080 · **Changed by:** DEC-396
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080 · **Changed by:** DEC-396 · **Class:** kept (items changed: amended by DEC-080, DEC-396)
 ```text
 CLOSURE_COMPLETE             # no unresolved referenced IDs within depth limit
 SATURATED                    # follow-up batch added < ~10% novel sources after dedup
@@ -263,7 +263,7 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 ```
 
 ### DEC-035 — Radius-scaled budgets and task-class facets
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION (numbers are placeholders to tune from telemetry) · **Changed by:** DEC-080 (numbers stay placeholders)
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION (numbers are placeholders to tune from telemetry) · **Changed by:** DEC-080 (numbers stay placeholders) · **Class:** kept
 
   | Impact radius | Facets | Max follow-up rounds | Synthesis |
   |---|---|---|---|
@@ -274,11 +274,11 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
   Facet selection also by task class (bug fix → code, tests, history, failures; spec change → decisions, graph, tests).
 
 ### DEC-036 — Synthesis notes: derived + deterministic citation check
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (RAPTOR/GraphRAG/map-reduce patterns) + SUGGESTION (check) · **Changed by:** DEC-080
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (RAPTOR/GraphRAG/map-reduce patterns) + SUGGESTION (check) · **Changed by:** DEC-080 · **Class:** kept (items changed: amended by DEC-080)
 - **Decision:** Notes stored in `.gov-runtime/` (derived); invalidated when any cited `source_sha256` changes. G2 verifies every cited source ID exists at the cited hash and every quoted span appears in the source.
 
 ### DEC-037 — Zero-result canaries on every index
-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION, motivated by ESTABLISHED evidence · **Changed by:** DEC-080
+- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION, motivated by ESTABLISHED evidence · **Changed by:** DEC-080 · **Class:** kept
 - **Decision:** Each derived index (FTS/vector, codebase-memory, RAGFlow if adopted) has a small set of canary queries with known expected hits, run at G1 after reindex and at G4/G5. A canary miss marks the facet `FACET_UNAVAILABLE`, never "no evidence exists".
 - **Motivation:** 2026 silent-zero defects in RAGFlow retrieval and connectors [E-RF-ZERO][E-RF-GH]; Contract rule "NOT_FOUND is never proof of absence".
 
@@ -836,7 +836,7 @@ round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
   the verdict is issued from Wave 3.
 
 ### DEC-091 — Hierarchical (parent-child) retrieval in Wave 1
-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-4 option (a) · **Consistent with:** DEC-080
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-4 option (a) · **Consistent with:** DEC-080 · **Class:** kept
 - **Decision:** Chunk records carry `parent_id` (section level for documents, function/module level for code), and
   `gov retrieve` expands a child hit to its parent within the bundle budget and names the expansion. Both are Wave 1.
 
@@ -3873,7 +3873,7 @@ W1-28 DP-10, W1-19's packages and installs, and the launcher. DEC-372 stays as r
   left out; a percentage per tier; the mean of the two tiers.
 
 ### DEC-381 — W1-19 DP-6: a namespace that is not embedded never reaches the vectors
-- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-6 option (a) · **Settles:** the DEC-289 residual on `embedding_policy` · **Under:** CAP-10.a, CAP-03
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-6 option (a) · **Settles:** the DEC-289 residual on `embedding_policy` · **Under:** CAP-10.a, CAP-03 · **Class:** kept
 - **Decision:** A namespace whose `embedding_policy` is `not embedded` never reaches the vectors. This holds before
   any live index is built.
 
@@ -3952,7 +3952,7 @@ designer's, the lead's and the orchestrator's recommendations agree, and the con
 owner was told of all three on 2026-10-05 and may reverse any of them.
 
 ### DEC-388 — W1-19 DP-8 and DP-9: an unknown `embedding_policy` is not embedded; hit@5 follows S0b2's stated method
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-19 packages DP-8 option (a), confidence medium-high, and DP-9 option (a), confidence medium · **Under:** DEC-380, DEC-381, DEC-383, CAP-09
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-19 packages DP-8 option (a), confidence medium-high, and DP-9 option (a), confidence medium · **Under:** DEC-380, DEC-381, DEC-383, CAP-09 · **Class:** kept (items changed: DP-9 (hit@5 method) history)
 - **Decision:**
   - DP-8: the closed list of `embedding_policy` values is `embedded` and `not embedded`. Any other value is read as
     not embedded (fail closed). This repository's path map gives `template/**` the value
@@ -4021,7 +4021,7 @@ orchestrator's recommendations agree, and the confidence is medium or higher. On
 of stopping reasons of ADR-0002 §4 and goes to the owner.
 
 ### DEC-391 — W1-20 DP-1 to DP-7: the interface, the ids, the depth, the code facet and the gaps of `gov closure`
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-20 packages DP-1 (a), DP-2 (a), DP-3 (a), DP-4 (a), DP-5 (gap reasons), DP-6 (a), DP-7 (b); confidence medium to high · **Under:** CAP-57.a, CAP-09, DEC-033, DEC-034, DEC-035, DEC-080, DEC-317, DEC-322, DEC-344 · **Changed by:** DEC-393, DEC-396
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-20 packages DP-1 (a), DP-2 (a), DP-3 (a), DP-4 (a), DP-5 (gap reasons), DP-6 (a), DP-7 (b); confidence medium to high · **Under:** CAP-57.a, CAP-09, DEC-033, DEC-034, DEC-035, DEC-080, DEC-317, DEC-322, DEC-344 · **Changed by:** DEC-393, DEC-396 · **Class:** kept (items changed: amended by DEC-393, DEC-396)
 - **Decision:**
   - DP-1: both `gov closure (--depth N | --radius R) <id>...` and `gov.closure.closure(root, ids, depth=N)`, which
     returns the envelope's `result`. Its keys: `start`, `depth`, `stopping_reason`, `closure` (`id`, `kind`), `gaps`
@@ -8575,7 +8575,7 @@ W2-50's run-6 engineer found that `src/gov/guard/protected.py`, outside W2-50's 
 The owner answered P-W2-32, P-W2-33 and P-W2-34, ruled on W2-50's run-7 review, and set two standing rules: stacked starts and the final line of every report.
 
 ### DEC-782 — A read command may write the query-vector cache, and only that, under limits (P-W2-32 (a))
-- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-379, DEC-768, DEC-773, DEC-757 item 6, DEC-766 · **Basis:** W2-54's run 2.
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-379, DEC-768, DEC-773, DEC-757 item 6, DEC-766 · **Basis:** W2-54's run 2. · **Class:** kept (items changed: (4) history)
   - It stored query vectors in `.gov-runtime/query-vectors.db` (model, revision, text). Context-reproducibility turned green (128.67 s).
   - The write on read turned W1-21 ×4 ("a read command writes nothing") and W1-19 ×1 ("one shared store") red, against DEC-379 (`refresh=False` never writes).
   - No embedder setting removes the variation: `num_thread` 1 and 20, `seed` 42, 6 of 6 repeats differ.
@@ -9122,7 +9122,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. After W2-59 merges, the owner re-runs the pin commands at its merge commit (the pin ladder by hand until W2-16 and W2-18).
 
 ### DEC-836 — Memory used, not just built: keystone 4's exit (item 1e)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-828, DEC-829 item 2 (4), CAP-37 · **Basis:** OWNER, 2026-10-19: memory used, not just built.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-828, DEC-829 item 2 (4), CAP-37 · **Basis:** OWNER, 2026-10-19: memory used, not just built. · **Class:** kept (items changed: (1) superseded §5.5; (3) history)
 - **Decision:** keystone 4 is done only when all three hold:
   1. **the orchestrator builds every brief with `gov context`;**
   2. **every lead and worker brief tells its agent to use `gov retrieve`** for what it needs to know;
@@ -9346,7 +9346,7 @@ The owner committed DEC-853 to DEC-855 (`7f95e6f5`) and answered P-W2-50 (`gover
 The owner committed DEC-856 to DEC-858 (`ccf28d5c`), with the path-map edit, and set two standing principles. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
 
 ### DEC-859 — The code graph: targeted traversal for questions, pages for whole-graph jobs, never a query over the cap (standing; W2-37)
-- **Status:** ACCEPTED (owner, 2026-10-20; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-829 (lens G R1), DEC-812, CAP-33.b, CAP-33.g · **Basis:** OWNER, 2026-10-20. After DEC-856, this repository's code graph holds 28,923 nodes and 117,939 edges, still over the code-graph tool's 100,000-row cap (lens G: our wrapper pulls the whole graph and fails above it).
+- **Status:** ACCEPTED (owner, 2026-10-20; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-829 (lens G R1), DEC-812, CAP-33.b, CAP-33.g · **Basis:** OWNER, 2026-10-20. After DEC-856, this repository's code graph holds 28,923 nodes and 117,939 edges, still over the code-graph tool's 100,000-row cap (lens G: our wrapper pulls the whole graph and fails above it). · **Class:** kept
 - **Decision:**
   1. **Agents' questions use the code-graph tool's own traversal** (`trace_path`, `search_graph`, `query_graph`), with small, targeted answers; our wrapper never loads the whole graph to answer a question.
   2. **Whole-graph jobs** (a full impact map, an audit of every dependency) read the graph in pages, never one query over the tool's row cap.
@@ -9355,7 +9355,7 @@ The owner committed DEC-856 to DEC-858 (`ccf28d5c`), with the path-map edit, and
   5. W2-37's card carries these; its ticket file gains them in its resume, committed first by its lead in its worktree (a reviewed ticket's file is not edited on `w2/integrate`). Every brief that asks a code question says item 1.
 
 ### DEC-860 — Context: never one giant query, never one giant context; retrieval in batches, ranked and stacked (standing; W2-04, W2-61, W2-15b)
-- **Status:** ACCEPTED (owner, 2026-10-20; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-833, DEC-836, DEC-725, CAP-10, CAP-15.d · **Basis:** OWNER, 2026-10-20: the same principle as DEC-859, for context.
+- **Status:** ACCEPTED (owner, 2026-10-20; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-833, DEC-836, DEC-725, CAP-10, CAP-15.d · **Basis:** OWNER, 2026-10-20: the same principle as DEC-859, for context. · **Class:** kept (items changed: (2) superseded §5.2/§5.3; (3) superseded §5.5)
 - **Decision:**
   1. **Never one giant query and never one giant context.** Retrieval for a large question runs in batches, ranks them and stacks them, so the agent gets all the evidence the question needs, in order of relevance, within its budget.
   2. **This is the stacking that W2-15b measures against the owner's 99 % goal** (DEC-833): the share of questions whose stacked context holds all their needed evidence, across batches.
@@ -13151,7 +13151,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.448 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1064. Next free id: DEC-1065. |
 
 ### DEC-1065 — No CPU fallback for embeddings; search respects role separation; the fusion as a gap if a single route beats it; the search's speed near the pin's (standing for 1 and 2)
-- **Status:** ACCEPTED (owner, 2026-11-03 ~22:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`; items 1 and 2 standing) · **Under:** DEC-1031, DEC-1052 G-14, DEC-1056, DEC-1063, DEC-1064, DEC-1055, ACT-RERANK-WAIT-1, DEC-957 (memory's target 95 %)
+- **Status:** ACCEPTED (owner, 2026-11-03 ~22:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`; items 1 and 2 standing) · **Under:** DEC-1031, DEC-1052 G-14, DEC-1056, DEC-1063, DEC-1064, DEC-1055, ACT-RERANK-WAIT-1, DEC-957 (memory's target 95 %) · **Class:** kept (items changed: (3),(4) history)
 - **Decision:** (1) **No CPU fallback for embeddings, anywhere** (standing): when the shared GPU embedders cannot be reached (the launch sandbox included), the search reports its semantic part unavailable, named, and answers by keywords; it never starts a private embedder on the CPU, the same rule as the reranker's (ACT-RERANK-WAIT-1). Every place a CPU embedder can still start today is found and the change put where it fits, in place before the lift. (2) **Search respects role separation** (standing): `gov retrieve`'s results are filtered by the caller's `role_paths`, as the guard filters reads: an engineer never gets its own ticket's acceptance tests through a search, a test designer never the ticket's new code (the keyword index holds the tests). In place before W2-127 opens the sandbox to the shared services and before leads restart after the lift. (3) **The five-mode comparison** gives each mode's hit@5 and full evidence on the same 48 questions; if any single route beats the fused search, the fusion (its weights, the reranker's use) is a gap even outside W2-32's menu, brought with the other gaps, and the owner decides whether W2-32's KPIs change. The aim is as high as the fused search can go: **95 % the owner's target, 100 % believed reachable**; the hidden half keeps the score honest (at least 21 of 24 at measure 3). (4) **The 4x slowdown** (W2-92's record route reading every record's title in each `gov retrieve` process) is fixed (the titles built once at rebuild, or read only when a question names a record), with a speed target per search near the pin's ~1 s, before re-pin window 3. Then D-4b goes on in the plan's order: the gaps to the owner, D-7 and measure 2, W2-32's rounds (the stores rebuilt as each needs), measure 3, re-pin window 3 and the integration store.
 - **Basis:** question 1 (memory and role separation, the Gov OS's aim) and question 2 (a private CPU embedder skews the measures and loads the machine; a search that hands an engineer its own tests fails open on separation); question 4 for item 4 (agents deliver more when a search takes a second, not four).
 
@@ -13763,7 +13763,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   and is reported, a normal run is never cut).
 
 ### DEC-1092 — E2 accepted: "search again once" a standing practice (a package); E3-E5-DESIGN approved; the fresh 80 and the K9 bar wait for E3 to E5's results, chosen from the 138 before the 80 runs
-- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1085 (5), (6), (7), DEC-1087 (11), (12), DEC-1078 (3), DEC-1086 C, DEC-1091, DEC-1088 (4) · **Source:** `governance/project/orchestration/packages/LIFT-1/E2-RESULT.md`, `E3-E5-DESIGN.md`
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1085 (5), (6), (7), DEC-1087 (11), (12), DEC-1078 (3), DEC-1086 C, DEC-1091, DEC-1088 (4) · **Source:** `governance/project/orchestration/packages/LIFT-1/E2-RESULT.md`, `E3-E5-DESIGN.md` · **Class:** kept (items changed: (2) history)
 - **Decision:**
   - (1) **E2 accepted:** "search again once" becomes a standing practice for agents, brought to the owner as a package
     (skills, the role templates through W2-128, hooks if needed), as DEC-1085 (5) set.
@@ -13852,7 +13852,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (agents search and ask in the repository's own words, so more questions are answered right).
 
 ### DEC-1097 — The experiments decided: the fresh 80 judges window 4's configuration (search again once) against K9's end-to-end bar; ACT-GUARD-SETS-1 rebuilt and applied before it; a seven-reviewer readiness review; keep the 0.6B; G3 no change; the overdue items given their fates
-- **Status:** ACCEPTED (owner, 2026-11-08, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-08)`), item (6) decided (b) by the owner (chat, 2026-11-08, after the 09:00 digest) · **Under:** DEC-1092 (4), DEC-1095 (3), DEC-1087 (12), DEC-1083 (2), DEC-1084, DEC-1082 (3), DEC-1090 (4), DEC-1093, DEC-1094 (1), DEC-1096, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-08), after reading FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, ACT-GUARD-SETS-1 and DECIDED-NOT-DONE · **Changed by:** DEC-1179 (2), a 95 % bar beside (1)(d); DEC-1164 (7) ((1)(g)'s and (9)'s holds for the 80 spent)
+- **Status:** ACCEPTED (owner, 2026-11-08, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-08)`), item (6) decided (b) by the owner (chat, 2026-11-08, after the 09:00 digest) · **Under:** DEC-1092 (4), DEC-1095 (3), DEC-1087 (12), DEC-1083 (2), DEC-1084, DEC-1082 (3), DEC-1090 (4), DEC-1093, DEC-1094 (1), DEC-1096, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-08), after reading FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, ACT-GUARD-SETS-1 and DECIDED-NOT-DONE · **Changed by:** DEC-1179 (2), a 95 % bar beside (1)(d); DEC-1164 (7) ((1)(g)'s and (9)'s holds for the 80 spent) · **Class:** kept (items changed: (1)(a),(5) kept; (1)(d) superseded §5.2; (2) superseded §2.10; rest history)
 - **Decision, the experiments:**
   - (1) **FRESH-80-1:** (a) the configuration judged is window 4's pin (`pin-bcea09060ebc`), the pool on, today's
     bundle (6,000 tokens), search again once (A2); (b) at window 4's commit `c00d525f`, with the visible-40 control
@@ -13907,7 +13907,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   lost).
 
 ### DEC-1098 — The fresh 80 accepted and the measured configuration made Gov OS's memory standard; P-SELECT-GRAPH closed (do not build) with three cheaper fixes to propose; W2-130's sitting accepted; a sandbox-and-guard experiment before W2-56; ADR-0002 accepted; the work restarts in order
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (1) standing · **Under:** DEC-1097, DEC-1083 (2), DEC-1062, DEC-1073 (5)(a), DEC-1074 (7) O2, DEC-1093 (3), DEC-1072 (2), DEC-799, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after FRESH-80-RESULT, P-SELECT-GRAPH-RESULT, W2-130-SITTING and ADR-0002-REFRESH · **Changed by:** DEC-1179 (7); DEC-1164 (7) ((6) spent at the lift); DEC-1128 (4): item (4)'s sandbox experiment loses set-up B (dropped entirely, not a Wave 3 row); set-up A stays
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (1) standing · **Under:** DEC-1097, DEC-1083 (2), DEC-1062, DEC-1073 (5)(a), DEC-1074 (7) O2, DEC-1093 (3), DEC-1072 (2), DEC-799, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after FRESH-80-RESULT, P-SELECT-GRAPH-RESULT, W2-130-SITTING and ADR-0002-REFRESH · **Changed by:** DEC-1179 (7); DEC-1164 (7) ((6) spent at the lift); DEC-1128 (4): item (4)'s sandbox experiment loses set-up B (dropped entirely, not a Wave 3 row); set-up A stays · **Class:** kept (items changed: (1),(2) kept; (4) superseded §2.2; (3),(5),(6) history)
 - **Decision:**
   - (1) **The fresh 80 accepted; K9's memory line is met** (FRESH-80-RESULT: right end to end 78 of 79, wrong claims
     0). **Standing:** the measured configuration (the 0.6B reranker, the pool on, today's 6,000-token bundle widened to
@@ -13972,7 +13972,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   question 5 (proven in use before it enters the product).
 
 ### DEC-1101 — Memory quality audited periodically with fresh questions, for Gov OS and every adopted repository; the "not found" and "may be incomplete" answers counted weekly; independent writers, checkers and labellers launched automatically in walled folders, with fixed briefs the owner approves once
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (2) standing, active from now; **item (1)'s cadence changed by DEC-1125 (2): weekly while development is active, monthly once stable** · **Under:** DEC-1098 (1), (4), DEC-1099 (1) Q5, (2), DEC-1100, DEC-1078, DEC-1070 (14), DEC-820, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09); its item 1 repeats DEC-1100 (recorded `1d49ca86`) · **Changed by:** DEC-1179 (7)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (2) standing, active from now; **item (1)'s cadence changed by DEC-1125 (2): weekly while development is active, monthly once stable** · **Under:** DEC-1098 (1), (4), DEC-1099 (1) Q5, (2), DEC-1100, DEC-1078, DEC-1070 (14), DEC-820, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09); its item 1 repeats DEC-1100 (recorded `1d49ca86`) · **Changed by:** DEC-1179 (7) · **Class:** kept (items changed: 85 % bar superseded §5.3; hit@k reporting superseded §5.2)
 - **Decision:**
   - (1) **Standing: memory quality is audited periodically with new questions,** for Gov OS and for every adopted
     repository (through W2-88). Each audit: an independent writer writes a fresh set, weighted toward what was added or
@@ -15070,7 +15070,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Basis:** the owner's messages of 2026-11-13 and 14: "W2-94 GOLD: (a) for q01 and q12; for the draw, the check accepts the brief's literal \"SEED+k=\", so the set stays unchanged; correct §6 to \"SEED+<k>=\" for future sets"; "yes ACT-LANDING-CTO-ROUTE-1 973eba5f, §7 neither now, (a) later as its own small ACT"; "yes ACT-CLASS-RULES-AGENTS-1 244d5a39"; "yes ACT-CLAUDE-RULES-1 38d4a2df"; "LANDING-72C6 (a)"; "P-9b (a)"; "h10's category: callers. So (b)".
 
 ### DEC-1176 — Memory for any repository is built, measured and maintained per repository in its own Wave 0, not proven by measuring other repositories; W2-88b becomes a smoke run of gov adopt on grafana and redis (no questions, no measure, no validation)
-- **Status:** ACCEPTED (owner, 2026-11-14 ~00:30, in the chat: "yes DEC-1176, A5 (a)"; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`; item (1) standing) · **Under:** DEC-954 Q9f, DEC-1150 (1), DEC-1099 (2), DEC-1098 (1), DEC-1072 (2), DEC-957 (memory's target 95 %), DEC-974, DEC-728 · **Changes:** DEC-954 Q9f (its proof list), DEC-1150 (1) (W2-88b's content and its copies line), DEC-1099 (2) (as it adopted W2-88-STANDARD-1 §3: the 10 questions per real repository) · **Changed by:** DEC-1179 (7), spends (1)'s "until then"
+- **Status:** ACCEPTED (owner, 2026-11-14 ~00:30, in the chat: "yes DEC-1176, A5 (a)"; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`; item (1) standing) · **Under:** DEC-954 Q9f, DEC-1150 (1), DEC-1099 (2), DEC-1098 (1), DEC-1072 (2), DEC-957 (memory's target 95 %), DEC-974, DEC-728 · **Changes:** DEC-954 Q9f (its proof list), DEC-1150 (1) (W2-88b's content and its copies line), DEC-1099 (2) (as it adopted W2-88-STANDARD-1 §3: the 10 questions per real repository) · **Changed by:** DEC-1179 (7), spends (1)'s "until then" · **Class:** kept (items changed: (2)-(4) history)
 - **Decision:**
   - (1) **Standing: memory is proven per repository.** Each adopted repository's memory is built in that repository's own Wave 0 (refactoring, indexing, embeddings, stores), measured there on its own hidden questions to at least 95 %, and kept there by weekly maintenance and re-measuring. Memory for any repository (DEC-954 Q9f) is not proven by measuring other repositories. How the weekly re-measure works (the same hidden questions, against today's fresh set measured once) is decided separately, on `MEMORY-AUDIT.md`. Until then DEC-1101 (1), DEC-1125 (2), DEC-1098 (1) and the adopt skill's step 6 stand as written.
   - (2) **W2-88b (DAEO-aks1) re-scoped to a smoke run.** gov adopt runs on copies of grafana/grafana (large) and redis/redis (smaller) under `~/gov-os-runs/W2-88b/`, with the memory tools it runs: the assessment (MA), the index, the embeddings and the stores (A9 lite, run with no `--questions`). Its only purpose is to test whether gov adopt works on repositories different from this one, small and large, and where it fails.
@@ -15185,7 +15185,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** DEC-1178 (3); DEC-1180 (4); DEC-1171 (6); DEC-838; DEC-1156 (7); DEC-1010; DEC-1154; W2-88 (DAEO-2bdu) escalation 2491c9bec and run 8's return (P-W2-88-L8-1 (a) by the CTO); W2-188 (DAEO-zlog) 790357f0215d; the CTO's trial figures of 2026-11-14 ~22:00.
 
 ### DEC-1184 — The refresh accepted as changes-only (Q-REFRESH-1 (a)); EXAMIN's secret protection is the guard's path rule every day plus the weekly scan, no pre-commit scan (Q-SCAN-1 (a)); W2-111 reopened for the guard's 100 ms on Bash calls and many trees (Q-SCAN-2 (a)); the EXAMIN CTO's first brief b70ff233 approved; W2-61h and W2-94 close on the operator's results
-- **Status:** ACCEPTED (owner, 2026-11-14 ~22:50, in the chat, the new CTO session's first prompt; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-14)`; (1) and (2) standing) · **Under:** DEC-1182, DEC-1178 (1), (3), DEC-1179 (6), DEC-1180, DEC-1101 (2), DEC-979, DEC-906, DEC-1157 (12) · **Changes:** DEC-1182 (3) and (4) (their open questions Q-SCAN-1 and Q-REFRESH-1 answered); W2-111's "Not here: the hook itself" (the reopen takes the hook's two costs, (3))
+- **Status:** ACCEPTED (owner, 2026-11-14 ~22:50, in the chat, the new CTO session's first prompt; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-14)`; (1) and (2) standing) · **Under:** DEC-1182, DEC-1178 (1), (3), DEC-1179 (6), DEC-1180, DEC-1101 (2), DEC-979, DEC-906, DEC-1157 (12) · **Changes:** DEC-1182 (3) and (4) (their open questions Q-SCAN-1 and Q-REFRESH-1 answered); W2-111's "Not here: the hook itself" (the reopen takes the hook's two costs, (3)) · **Class:** kept (items changed: (1) kept; (2) superseded §2.11/§2.2; (3)-(6) history)
 - **Decision:**
   - (1) **`Q-REFRESH-1 (a)`: the seeded rebuild is the refresh "on the changes only"**, here and for EXAMIN: only files whose content changed are re-embedded and re-checked; the derived stores (lexical, graph and the rest) are re-made from the files in about 1-2 minutes; a cold, whole build runs only at a re-pin (the code that builds the stores changed) or when no usable base exists. No ticket for true per-entry updates of every store. Standing.
   - (2) **`Q-SCAN-1 (a)`: EXAMIN's secret protection** is the guard's secret-path rule on every call, every day (`src/gov/guard/reads.py`: reads and writes of secret, key and credential paths refused by name), plus one full gitleaks scan a week in the memory audit's weekly cycle, before EXAMIN's weekly push (DEC-1182 (2)). **No pre-commit scan** (the staged scan built at `ci/command.py:99-125` stays installed nowhere), and no scan at a ticket's close or at a store refresh. Standing.
@@ -15455,7 +15455,7 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 - **Governing sources:** DEC-1047; DEC-1204; DEC-1208; packages PROVISIONAL-RUBRIC.md, P-PERMISSIONS-1.md; drafts/session-sandbox/P-BOX-EXCEPTION-1.md; drafts/retro-2026-11/.
 
 ### DEC-1210 — P-FRESH-80-1 (a) with A13 (b): every memory measure a fresh 80 measured end to end at 95 % (the hidden half's judged figure the verdict, hit@k and the stacked share diagnostics); the amendments recorded now; W2-187 and W2-188 reopened only when the emergency lifts; the first fresh 80 queued as a measurement job
-- **Status:** ACCEPTED (owner, 2026-11-16 17:36, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`; standing) · **Under:** DEC-1207, DEC-1209, DEC-1179, DEC-1097, DEC-1098, DEC-1204 · **Changes:** DEC-1179 (1)-(6) and its options O1, O2, O5; DEC-1186 (4)
+- **Status:** ACCEPTED (owner, 2026-11-16 17:36, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-16)`; standing) · **Under:** DEC-1207, DEC-1209, DEC-1179, DEC-1097, DEC-1098, DEC-1204 · **Changes:** DEC-1179 (1)-(6) and its options O1, O2, O5; DEC-1186 (4) · **Class:** kept (items changed: (4) superseded §5.2; (9) history; (5),(8) kept)
 - **Decision:** P-FRESH-80-1 (packages/P-FRESH-80-1.md, sha256 27c8f0ba…) option (a) with A13 (b):
   - (1) **A1:** every memory measure, scheduled or at a decision point, uses a fresh 80 (40 visible, 40 hidden) written by the walled writer for that measure at a pinned snapshot of the commit and its store, measured straight after on the same snapshot; no set is reused; the bar is the end-to-end judged figure at 95 %, by DEC-1097/DEC-1098's configuration (the reader with the whole ranked bundle as a second reranker, one more search in its own words, Opus grading, Sonnet agreement, answer and citation both right); hit@5, hit@10, hit@20 and the stacked share per mode are diagnostics beside it; the visible half is released for diagnosis after its measures, the hidden half stays sealed.
   - (2) **A2-A7 (DEC-1179 (2)-(6), O1, O2, O5):** dropping stale questions dropped (a fresh set cannot go stale); the monthly check against fitting retired (nothing reused, nothing fitted); R9 retired, R1-R8 stand ("the next scheduled fresh measure"); the weekly/monthly cadence (O3 (b)) kept for the fresh measure; the maintenance pass's re-anchoring hand-over retired; O1 is the first fresh 80 (JOB-20261116-15), O2 every measure 80, O5 retired.
