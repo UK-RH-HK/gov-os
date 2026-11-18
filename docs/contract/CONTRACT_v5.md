@@ -31,8 +31,8 @@ Contract v5 states what the Gov OS must do, as outcomes with **one observable ac
 
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
-| W1 | 37 | 4 | 0 | 41 |
-| W2 | 6 | 0 | 0 | 6 |
+| W1 | 36 | 4 | 0 | 40 |
+| W2 | 7 | 0 | 0 | 7 |
 | W3 | 12 | 0 | 0 | 12 |
 | NONE | 0 | 0 | 3 | 3 |
 | **All** | 55 | 4 | 3 | 62 |
@@ -43,7 +43,7 @@ DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation valida
 
 - **Scale envelope** (DEC-078). Tested up to ≈ 80k nodes / 270k edges of code graph at ≈ 2.2 GB peak RSS for codebase-memory-mcp; larger graphs are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder gets its own index.
 - **RAM budget** (DEC-078). Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare; incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker, VRAM peak ≈ 5.2 of 16 GiB.
-- **Token budget** (DEC-004, DEC-086). Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md ≤ ~1.5k tokens. A breach is a health finding, never a silent cost.
+- **Token budget** (DEC-004, DEC-086, DEC-1211, DEC-1214). Governance tokens ≤ 15 % of a ticket's fresh input + output tokens, reported weekly with its baseline (56 % before EMERGENCY-2) by P1's method until `gov telemetry` measures it (EMERGENCY-2 §10.2, A-7). Governance tokens = text the Gov OS injects or returns (instruction files, the brief, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. AGENTS.md ≤ ~1.5k tokens. There is no context packet and no packet ceiling anywhere: `gov context` is retired (DEC-1214 M1), and the brief carries the ticket's retrieval uncut. A breach is a health finding, never a silent cost.
 - **Boundary** (DEC-039, DEC-075, DEC-087, DEC-848, DEC-1211). No guard, no sandbox, no box and no permission prompts (EMERGENCY-2 §2). Agents have full permission in the repository, the worktree and the run folder they work in; sessions stay apart by where each starts, the folders it is given and its brief, and nothing enforces it. Mistakes are caught and corrected at the landing and by the transcript scan, not prevented. The hard boundary is git history; the owner's own `git push` and release from his own terminal; two settings deny lines, `git push` and `sudo`, which hold in every permission mode; and an hourly `git bundle` of each repository, kept outside the tree. The landing merges into integration and only the owner pushes. The lefthook pre-push gate G3 on the owner's machine and GitHub Actions CI G4–G5 stay as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks). `main` is not protected; enabling protection later changes no other decision.
 - **Loop budget** (DEC-044, DEC-096). Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) continues until it converges or until three consecutive iterations fail to converge; the third failure produces an escalation package for the owner (each iteration's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides. The iteration count and budget are held by the orchestrator or gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).
 - **Tool installs** (DEC-083, DEC-157, DEC-163). The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version, source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`, and the sandbox's write fence enforces this (DEC-157, DEC-158, DEC-163).
@@ -66,11 +66,11 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 ### CAP-01 — Authority precedence and hard invariants
 
 - **Outcome:** An agent can tell which of two conflicting records governs, by a deterministic precedence (Charter → Contract → ADRs → specifications → tasks → retrieval → inference) and by supersession status.
-- **Acceptance:** Given two conflicting records at different precedence levels, `gov context` puts only the higher one in the authority block and marks the lower one superseded.
+- **Acceptance:** Given two conflicting records at different precedence levels, `gov retrieve` returns the higher one as in force and marks the lower one superseded.
 - **Wave:** W1
 - **Provider:** MADR + check-jsonschema 0.38.2, W1-10, W1-11, W1-24, W1-26
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate A1; Framework v4.1.2 §2, §21; OWNER-CLARIFICATION-P2-0004; DEC-012; DEC-046; DEC-083
+- **Sources:** Contract v3 Gate A1; Framework v4.1.2 §2, §21; OWNER-CLARIFICATION-P2-0004; DEC-012; DEC-046; DEC-083; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
 - **Covers:**
   - `CAP-01.a` [W1] Machine-readable precedence: Charter → Contract → ADRs → specifications → tasks → retrieval → inference — Contract v3 A1; Framework v4.1.2 §2, §21 · delivered by W1-24
   - `CAP-01.b` [W1] Project files cannot manufacture authority; approvals are owner git facts — OWNER-CLARIFICATION-P2-0004; DEC-046 · delivered by W1-11
@@ -195,11 +195,11 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 ### CAP-10 — Semantic memory (vector/embedding retrieval)
 
 - **Outcome:** An agent can find a record from a paraphrased question.
-- **Acceptance:** On the dev query set, paraphrased questions reach the gold record in the top 5 at least as often as the S0b2 R1 baseline (mean hit@5 85).
+- **Acceptance:** A fresh 80 (40 visible questions, 40 hidden), written and measured at once on a pinned snapshot, is judged end to end at 95 % or more: the reader reads the whole ranked bundle and searches once more in its own words, and both the answer and its citation must be right; the hidden half's figure is the verdict. hit@k is a diagnostic only, never a target or a floor.
 - **Wave:** W1 (moved from W2 by DEC-074 R1/Q3 and DEC-080)
 - **Provider:** Ollama 0.35.0 + qwen3-embedding:0.6b, sqlite-vec 0.1.9, W1-19
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate C3; Framework v4.1.2 §11.3, §14; OWNER-DIRECTION-BR-0006 §1, §5 (provisional BGE, replaceable); OWNER-CLARIFICATION-BR-0002 (whole-repo corpus); DEC-016; DEC-017; DEC-074; DEC-080
+- **Sources:** Contract v3 Gate C3; Framework v4.1.2 §11.3, §14; OWNER-DIRECTION-BR-0006 §1, §5 (provisional BGE, replaceable); OWNER-CLARIFICATION-BR-0002 (whole-repo corpus); DEC-016; DEC-017; DEC-074; DEC-080; DEC-1210; EMERGENCY-2 §5.2, §5.3 (DEC-1211)
 - **Covers:**
   - `CAP-10.a` [W1] Paraphrase retrieval with pinned embedder (Qwen3-Embedding-0.6B via Ollama) — Contract v3 C3; Framework v4.1.2 §11.3, §14; DEC-074 · delivered by W1-19
   - `CAP-10.b` [W2] Embedder replaceable (provisional choice) — OWNER-DIRECTION-BR-0006 §5
@@ -255,22 +255,22 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-14.a` [W1] Failed approaches recorded and surfaced before a retry — Contract v3 C8; Framework v4.1.2 §11.8; OWNER-DIRECTION-BR-0006 §1 · delivered by W1-21
 - **Scenarios:** dev CHAOS-B-01, CHAOS-B-04, RETR-X-04, B-X-02 · qual AUDIT-A-Q02, AUDIT-A-Q20, AUDIT-A-Q22, AUDIT-A-Q23, AUDIT-A-Q25, CHAOS-B-Q13, B-Q02, SEC-B-Q03, RETR-X-Q04
 
-### CAP-15 — Context packet compilation
+### CAP-15 — The brief carries the ticket's retrieval
 
-- **Outcome:** An agent starts every task with a compiled context packet: mandatory inputs by id and hash, an authority block first, under a ceiling.
-- **Acceptance:** `gov context <ticket>` writes a packet that contains every mandatory input by id and sha256, stays under the configured ceiling (default ~6k tokens), carries its own hash, and is delivered as a file path plus a summary of at most ~2.5k tokens; when the ticket's evidence exceeds the ceiling, the packet carries synthesis notes that cite source ids and sha256, pass the validator, disclose unresolved evidence and are invalidated when a cited source changes.
-- **Wave:** W1 (DEC-080)
-- **Provider:** W1-24, W1-29, W1-23
+- **Outcome:** An agent starts every task with a brief that carries the ticket's whole retrieval bundle, uncut, with its mandatory inputs by id and hash and the authority record first.
+- **Acceptance:** `gov brief <role> <ticket>` writes a brief that holds the ticket's whole retrieval bundle, uncut, every mandatory input by id and sha256 and no unfilled placeholder (no `{QUESTION}`), refuses when a mandatory input is missing or the ticket is not READY, and the memory-use log has a line for it; `gov context` is retired and no packet ceiling exists.
+- **Wave:** W2 (the Wave 1 packet (`gov context`) is retired (DEC-1214 M1); the brief carries the retrieval (W2-197, EMERGENCY-2 §5.4))
+- **Provider:** W1-23, W2-197
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate C9; Framework v4.1.2 §15; Contract v3 Gate W4, W9, W10; OWNER-DIRECTION-BR-0005 (multi-batch retrieval); OWNER-DIRECTION-BR-0006 §4 (hierarchical synthesis); DEC-030, DEC-031, DEC-032; DEC-003; DEC-004; DEC-036; DEC-080
+- **Sources:** Contract v3 Gate C9; Framework v4.1.2 §15; Contract v3 Gate W4, W9, W10; OWNER-DIRECTION-BR-0005 (multi-batch retrieval); OWNER-DIRECTION-BR-0006 §4 (hierarchical synthesis); DEC-030, DEC-031, DEC-032; DEC-003; DEC-004; DEC-036; DEC-080; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
 - **Covers:**
-  - `CAP-15.a` [W1] Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate — Contract v3 C9, W3, W4, W10; Framework v4.1.2 §15 · delivered by W1-24
-  - `CAP-15.b` [W1] Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency — Contract v3 W3 · delivered by W1-24
-  - `CAP-15.c` [W1] Missing mandatory input → refusal or explicit BLOCKED; superseded input cannot satisfy a current requirement; conflicting inputs → contradiction handling — Contract v3 W3, W4 · delivered by W1-24
-  - `CAP-15.d` [W1] Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies — Contract v3 W10 · delivered by W1-24
-  - `CAP-15.e` [W1] Packet hash/provenance proves what the worker received — Contract v3 W4 · delivered by W1-24
-  - `CAP-15.f` [W1] Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable — DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4 · delivered by W1-23
-  - `CAP-15.g` [W1] File path + summary ≤ ~2.5k tokens (harness output caps) — DEC-025; architecture v0.3 §2.3 · delivered by W1-24, W1-29
+  - `CAP-15.a` [W2] Brief: mandatory inputs by id, version and sha256; the authority record first; the supplementary block separate; all carried in the brief — Contract v3 C9, W3, W4, W10; Framework v4.1.2 §15; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1 · delivered by W2-197
+  - `CAP-15.b` [W2] Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency; carried in the brief — Contract v3 W3; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1 · delivered by W2-197
+  - `CAP-15.c` [W2] Missing mandatory input → `gov brief` refuses or reports BLOCKED; a superseded input cannot satisfy a current requirement; conflicting inputs → contradiction handling — Contract v3 W3, W4; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1 · delivered by W2-197
+  - `CAP-15.d` [NONE] Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov context` — EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+  - `CAP-15.e` [W2] The brief's hash and provenance prove what the worker received — Contract v3 W4; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1 · delivered by W2-197
+  - `CAP-15.f` [W3] Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only if friction asks; off with `gov context`) — DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4; EMERGENCY-2 §9.2 (DEC-1211) · delivered by W1-23
+  - `CAP-15.g` [NONE] Non-goal: a file path plus a summary of at most ~2.5k tokens: packet mechanics, retired with `gov context` — EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
 - **Scenarios:** dev CHAOS-A-11, ISO-X-01, RETR-X-04 · qual ISO-X-Q01, RETR-X-Q02
 
 ### CAP-16 — Multi-batch, multi-hop, paginated retrieval
@@ -291,13 +291,13 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** An agent never receives stale evidence silently: changed files are re-indexed before the next retrieval, or the facet is reported unavailable.
 - **Acceptance:** After one decision file is edited, the next `gov retrieve` returns the edited content, or reports the facet FACET_UNAVAILABLE; it never returns the old text as current.
-- **Wave:** W1 (commit-time re-index hook (G-23) is W2)
-- **Provider:** W1-17, W1-22, W2: G-23 re-index hook
+- **Wave:** W1 (the landing refreshes the store after each land (replaces the commit-time hook G-23, W2))
+- **Provider:** W1-17, W1-22, W2: the landing's store refresh (W2-115b)
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate D1; Framework v4.1.2 §13; DEC-037 (zero-result canaries); DEC-080
 - **Covers:**
   - `CAP-17.a` [W1] Changed content re-indexed before the next retrieval, or facet reported unavailable — Contract v3 D1; Framework v4.1.2 §13 · delivered by W1-17
-  - `CAP-17.b` [W2] Commit-time re-index hook — G-23
+  - `CAP-17.b` [W2] The landing rebuilds the store after each land, and `gov retrieve` reports a stale store — G-23; EMERGENCY-2 §4.4 (DEC-1211)
   - `CAP-17.c` [W1] Zero-result canaries after reindex — DEC-037; DEC-080 · delivered by W1-22
 - **Scenarios:** dev CHAOS-A-02, CHAOS-A-03, CHAOS-A-12, CHAOS-B-02, CHAOS-B-03, CHAOS-B-09, CHAOS-B-12, B-06, B-10, RETR-X-01 · qual RETR-X-Q01
 
@@ -325,7 +325,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 - **Covers:**
   - `CAP-19.a` [W2] Components separable; model swap by configuration under a fail-closed pin — Contract v3 D4; Framework v4.1.2 §14.2; DEC-046 (D-0005/6)
   - `CAP-19.b` [W3] Evidence-driven model selection (bake-off, per-repository benchmark) — Contract v3 D5; Framework v4.1.2 §14.3
-  - `CAP-19.c` [W2] Retrieval learning loop: a miss is a memory-quality event → root cause → repair → held-out regression test — Framework v4.1.2 §18
+  - `CAP-19.c` [W2] Retrieval learning loop: a miss is a memory-quality event → root cause → fix → judged by the next fresh 80 (no set is reused) — Framework v4.1.2 §18; DEC-1207 (3); DEC-1210
 - **Scenarios:** dev RETR-X-01 · qual RETR-X-Q01
 
 ### CAP-20 — Rebuild guarantee (delete derived, rebuild from git)
@@ -761,7 +761,7 @@ The rule texts are in Charter v6 §4, verbatim from architecture v0.3 §1A. Each
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate U; Framework v4.1.2 §75, §76; DEC-004
 - **Covers:**
-  - `CAP-48.a` [W3] SLOs tracked with thresholds: suite freshness, product-test health, retrieval Recall@K, stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success — Contract v3 U; Framework v4.1.2 §75
+  - `CAP-48.a` [W3] SLOs tracked with thresholds: suite freshness, product-test health, the end-to-end judged memory figure (not Recall@K), stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success — Contract v3 U; Framework v4.1.2 §75; EMERGENCY-2 §5.2 (DEC-1211)
   - `CAP-48.b` [W3] HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived memory rebuildable — Contract v3 U; Framework v4.1.2 §76
 - **Scenarios:** dev SOAK-X-02 · qual SOAK-X-Q02
 

@@ -66,14 +66,16 @@ Full statement: [ADR-0001](../adr/ADR-0001-threat-model.md) (DEC-039 as amended 
 2. **Agnostic.** One release line, with an overlay per project. Adapters are generated for Claude Code and AGENTS.md
    from one source (DEC-060, DEC-074 Q6).
 3. **Governance is code, not prose.** Agents never read the originals or this Charter during normal work. Rules
-   compile into hooks, `gov check`, lefthook and CI. Agents see a short AGENTS.md (≤ ~1.5k tokens), a compiled
-   context packet and terse `gov` output (DEC-003).
+   compile into the landing, the templates, the briefs, the skills, `gov check`, lefthook and CI. Agents see a short
+   AGENTS.md (≤ ~1.5k tokens), a brief that carries their retrieval, and terse `gov` output (DEC-003; EMERGENCY-2 §1.2,
+   §5.4).
 4. **Deterministic where it can be, judgement where it must be.**
    - Code resolves authority, closure, hashes and checks.
    - Models do discovery, relevance and planning by following skills.
    - Code checks the models' output (architecture v0.3 §3).
 5. **Governance costs little.** Governance tokens are at most 10–15 % of a task's tokens (DEC-004, measured as in
-   DEC-086). The context packet is at most ~6k tokens. Packets are delivered as a file path plus a short summary.
+   DEC-086), reported weekly. There is no context packet and no packet ceiling: `gov context` is retired and the brief
+   carries the ticket's retrieval uncut (EMERGENCY-2 §5.4, §10.2; DEC-1214 M1).
 6. **Retrieval is complete, not top-k.** A batch size is never an evidence limit. Every answer carries a stopping
    reason from a fixed list, and NOT_FOUND is never proof of absence (DEC-030, DEC-080).
 7. **Paths are allowed, not forbidden.** Paths are declared on the ticket and checked at the landing; nothing is refused

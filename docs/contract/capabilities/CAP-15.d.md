@@ -3,14 +3,14 @@ id: CAP-15.d
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
+title: 'Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov context`'
 depends_on:
 - CAP-15
 ---
 
-# CAP-15.d: Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
+# CAP-15.d: Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov context`
 
-A covers item of CAP-15 (Context packet compilation). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-15 (The brief carries the ticket's retrieval). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
-- **Wave:** W1
+- **Item:** Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov context`
+- **Wave:** NONE

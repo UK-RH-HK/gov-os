@@ -3,14 +3,14 @@ id: CAP-15.f
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable'
+title: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only if friction asks; off with `gov context`)'
 depends_on:
 - CAP-15
 ---
 
-# CAP-15.f: Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable
+# CAP-15.f: Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only if friction asks; off with `gov context`)
 
-A covers item of CAP-15 (Context packet compilation). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-15 (The brief carries the ticket's retrieval). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable
-- **Wave:** W1
+- **Item:** Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only if friction asks; off with `gov context`)
+- **Wave:** W3
