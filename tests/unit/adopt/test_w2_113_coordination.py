@@ -2,7 +2,8 @@
 
 Regression evidence only (DEC-136): each line of the lead's specification through ``stages.run`` in a planted git
 repository of its own under ``tmp_path`` (the vendored ``tk`` copied from the template, as an adopted project holds
-it), and the guard's rule (``cto_install``) on what A0 wrote.
+it), and ``gov.adopt.coordination.coordination_ticket`` on what A0 wrote (the guard's install rule that read it was
+retired with the guard, EMERGENCY-2 6.1).
 """
 from __future__ import annotations
 
@@ -20,14 +21,12 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
 from gov.adopt import project, stages  # noqa: E402
-from gov.guard import install  # noqa: E402
-from gov.guard.install import cto_install  # noqa: E402
+from gov.adopt import coordination  # noqa: E402
 from gov.tasks.tickets import TK_REL  # noqa: E402
 
 ROSTER = "governance/project/roster.yaml"
 KEY = "coordination_ticket"
 NAME = "acme-app"
-OTHER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research")
 OLD_KEYS = ("baseline_commit", "backup_ref", "tree", "set_up")
 
 
@@ -89,12 +88,6 @@ def tickets(root):
     return sorted(p.name for p in folder.glob("*.md")) if folder.is_dir() else []
 
 
-def refusal(root, role="orchestrator", ticket="x", subagent=None):
-    allowed, reason = cto_install(str(root), role, subagent, ticket)
-    assert allowed is False
-    return reason
-
-
 # ---------------------------------------------------------------------------------------------------------------
 # I1: a planted repository adopted
 # ---------------------------------------------------------------------------------------------------------------
@@ -135,20 +128,6 @@ def test_a0s_old_record_keys_are_kept_and_the_new_ones_added(tmp_path):
     assert isinstance(rec["coordination"], str) and rec[KEY] in rec["coordination"]
 
 
-def test_the_ctos_install_is_asked_and_every_other_session_is_refused(tmp_path):
-    root = planted(tmp_path)
-    a0(root)
-    ident = record(root)[KEY]
-    add_ticket(root, "oth-0001", wbs="P-77")
-    assert cto_install(str(root), "orchestrator", None, ident) == (True, "")
-    for role in OTHER_ROLES:
-        assert refusal(root, role, ident)                    # even on the coordination ticket
-        assert refusal(root, role, "oth-0001")
-    assert refusal(root, "orchestrator", "oth-0001")         # an orchestrator on another ticket
-    assert refusal(root, "orchestrator", None)               # a session with no ticket
-    assert refusal(root, "", ident)                          # a session with no role
-
-
 def test_a_second_a0_run_creates_no_second_ticket(tmp_path):
     root = planted(tmp_path)
     a0(root)
@@ -173,7 +152,7 @@ def test_a_roster_naming_an_existing_ticket_is_kept_and_nothing_is_created(tmp_p
     rec = record(root)
     assert rec[KEY] == value and rec["roster"] == ROSTER and "kept" in rec["coordination"]
     assert sh(root, "status", "--short") == ""
-    assert cto_install(str(root), "orchestrator", None, "own-0001") == (True, "")
+    assert coordination.coordination_ticket(str(root))[0] == str((root / ".tickets" / "own-0001.md").resolve())
 
 
 def test_a_roster_naming_an_existing_ticket_needs_no_tk(tmp_path):
@@ -198,7 +177,7 @@ def test_a_roster_without_the_key_gets_the_key_and_changes_nothing_else(tmp_path
     assert text[len(roster):].strip() == f"{KEY}: {ident}"
     assert roster_of(root) == {**(yaml.safe_load(roster) or {}), KEY: ident}
     assert tickets(root) == [f"{ident}.md"] and sh(root, "status", "--short") == ""
-    assert cto_install(str(root), "orchestrator", None, ident) == (True, "")
+    assert coordination.coordination_ticket(str(root))[0] == str((root / ".tickets" / f"{ident}.md").resolve())
 
 
 def test_a_roster_that_cannot_take_a_key_line_is_left_as_it_is(tmp_path):
@@ -219,9 +198,7 @@ def test_tk_missing_completes_without_a_ticket_or_a_key_and_the_record_says_so(t
     words = rec["coordination"]
     assert "no coordination ticket was created" in words and "no key written" in words and "tk" in words
     assert sh(root, "status", "--short") == ""
-    for role, ticket in (("orchestrator", "anything"), ("engineer", "anything")):
-        reason = refusal(root, role, ticket)
-        assert "GOV_TICKET" in reason and "Set the top-level key" in reason
+    assert coordination.coordination_ticket(str(root))[0] is None
 
 
 def test_a_key_naming_no_ticket_is_left_as_it_is_and_the_record_says_so(tmp_path):
@@ -231,7 +208,7 @@ def test_a_key_naming_no_ticket_is_left_as_it_is_and_the_record_says_so(tmp_path
     assert (root / ROSTER).read_text(encoding="utf-8") == roster and tickets(root) == []
     rec = record(root)
     assert rec[KEY] is None and "gone-0000" in rec["coordination"] and "no coordination ticket was created" in rec["coordination"]
-    assert "GOV_TICKET" in refusal(root, "orchestrator", "gone-0000")
+    assert coordination.coordination_ticket(str(root))[0] is None
 
 
 @pytest.mark.parametrize("roster", ["- a\n- b\n", "roles: [unclosed\n"])
@@ -240,24 +217,3 @@ def test_a_roster_that_is_not_a_readable_mapping_is_left_as_it_is(tmp_path, rost
     a0(root)
     assert (root / ROSTER).read_text(encoding="utf-8") == roster and tickets(root) == []
     assert record(root)[KEY] is None
-
-
-# ---------------------------------------------------------------------------------------------------------------
-# S2: the refusal when the rule cannot run
-# ---------------------------------------------------------------------------------------------------------------
-
-@pytest.mark.parametrize("roster", [None, "roles: {}\n", f"{KEY}: gone-0000\n", f"{KEY}:\n", f"{KEY}: ''\n"])
-def test_the_refusal_names_gov_ticket_and_how_to_set_the_key_and_claims_no_key_was_set(tmp_path, roster):
-    root = planted(tmp_path, roster, tk=False)
-    for role, ticket in (("orchestrator", "c-0000"), ("engineer", "c-0000"), (None, None)):
-        reason = refusal(root, role, ticket)
-        assert "GOV_TICKET" in reason
-        assert "Set the top-level key" in reason and ROSTER in reason and KEY in reason
-        assert "set at adoption" not in reason.lower()
-        assert install.ESCALATE in reason and reason.endswith(install.ESCALATE)
-        assert "is not set" in reason                        # what is true: no key names a ticket
-
-
-def test_the_refusal_is_the_same_decision_as_before_a_refusal_not_an_ask(tmp_path):
-    root = planted(tmp_path, None, tk=False)
-    assert cto_install(str(root), "orchestrator", None, "c-0000")[0] is False

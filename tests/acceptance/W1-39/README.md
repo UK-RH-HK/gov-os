@@ -1,5 +1,7 @@
 # W1-39 acceptance tests: the Copier kernel template and the lock
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** `test_w1_39_hook_time_limit.py` (the time limit on the kernel settings' guard hook entries) is deleted.
+
 Ticket `DAEO-5ylr`, profile STANDARD. Written by the Independent Test Designer before implementation (MR-3),
 and brought to DEC-488 and DEC-493 before any implementer commit: 61 cases. Three cases were added after
 implementation began, then DEC-499's (one case rewritten, three added): 67 cases in five files.
@@ -253,10 +255,6 @@ the installed file is judged against the hook programs installed in the same pro
 
 | Case | Holds | Red reason |
 |---|---|---|
-| `test_a_created_project_has_the_time_limit_on_every_guard_hook_entry` | after `copier copy`, every guard hook entry of the installed settings carries the number 60 under `timeout` | `governance/kernel/settings.json of a project created by copier copy: a guard hook entry without "timeout": 60 (DEC-580)`, then the three entries, each `carries no timeout` |
-| `test_a_project_that_had_settings_of_its_own_gets_the_time_limit_on_the_guard_s_entries` | the same where the folder held settings of its own before the copy | the same sentence, `… that had settings of its own before copier copy` |
-| `test_copy_leaves_a_project_s_own_settings_as_they_were` | those settings (a hook entry with a limit of its own, one without, a deny rule) are byte for byte what they were | Green: it holds what must not change |
-| `test_a_project_of_an_earlier_release_gets_the_time_limit_by_an_update` | a project installed from a release whose guard entries had no limit has it after `copier update` to the release that ships the template as it is | the same sentence, `… updated by copier update …` |
 
 The three red cases were run once, outside the tree, against a temporary template source whose settings carried
 the limit on the three entries: all four cases passed. The earlier release of the update case is built in the

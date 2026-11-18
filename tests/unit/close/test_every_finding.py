@@ -52,7 +52,7 @@ def test_a_ticket_without_a_commit_says_that_its_containment_was_not_measured():
     with pytest.raises(_Finding) as raised:
         _check_trailers("/p", [], TICKET, NO_HISTORY)
     assert raised.value.not_measured == [f"the containment of the commits of {TICKET}: not measured, it has no commit"]
-    with patch("gov.guard.containment.judge_commits") as judge:
+    with patch("gov.containment.judge_commits") as judge:
         _check_containment("/p", [])
     judge.assert_not_called()
 

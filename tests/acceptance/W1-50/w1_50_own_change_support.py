@@ -44,7 +44,7 @@ TICKET_FILE = symmetric.NARROWED_FILE                        # .tickets/DAEO-zz9
 LONG_TEST = f"{support.ACCEPTANCE}/{support.WBS}/test_long.py"   # an acceptance test of twenty lines
 LONG_TEST_LINES = 20
 
-MODULE = "gov.guard.containment_merge"
+MODULE = "gov.containment.merge"
 SOURCES = check_support.REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL
 
 
@@ -53,7 +53,7 @@ SOURCES = check_support.REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL
 # --------------------------------------------------------------------------
 
 def helper_module(monkeypatch):
-    """A function that returns the module ``gov.guard.containment_merge``, imported from this repository's
+    """A function that returns the module ``gov.containment.merge``, imported from this repository's
     ``src`` when it is first called, in a process that says nothing of a caller. For a fixture of a test file."""
     for name in (check_support.ROLE_ENV, check_support.TICKET_ENV, "CLAUDE_PROJECT_DIR"):
         monkeypatch.delenv(name, raising=False)

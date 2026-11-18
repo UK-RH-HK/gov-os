@@ -28,8 +28,6 @@ SUBAGENTSTOP_REL = "template/governance/kernel/hooks/subagentstop.py"
 REAL_PYTHON = os.path.realpath(sys.executable)
 SYSTEM_PATH = "/usr/bin:/bin"
 
-GUARD_PROGRAM = "hooks/pretooluse.py"        # how the launcher recognises the guard (I1 §2.3, launcher.py GUARD_HOOK)
-CONTAINMENT_PROGRAM = "hooks/posttooluse.py"
 PROGRAM_PATH = re.compile(r"\$\{?CLAUDE_PROJECT_DIR\}?/([^\"' ;|&)]+\.py)")
 
 TWELVE_FIELDS = (
@@ -85,17 +83,6 @@ class Line:
     @property
     def program_name(self) -> str:
         return self.program_rel.rsplit("/", 1)[-1]
-
-
-def guarded_lines() -> list:
-    """Every line of both sources that runs the guard (preToolUse) or the containment program (postToolUse and
-    postToolUseFailure): the lines DEC-880 item 3 makes fail closed."""
-    lines = []
-    for source in SOURCES:
-        for event, index, command in entries(source):
-            if (event == "preToolUse" and GUARD_PROGRAM in command) or CONTAINMENT_PROGRAM in command:
-                lines.append(Line(source, event, index, command))
-    return lines
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -159,15 +146,6 @@ def hook_input(event: str, project: Path) -> dict:
                         "tool_response": {"stdout": "", "stderr": "", "interrupted": False}},
         "postToolUseFailure": {**common, "hook_event_name": "PostToolUseFailure", **bash, "error": "exit code 1"},
     }[event]
-
-
-def place_program(box: Box, line: Line, text: str | None) -> Path:
-    """Put the stand-in program where the line looks for it (``None``: leave it absent)."""
-    target = box.project / line.program_rel
-    if text is not None:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(text, encoding="utf-8")
-    return target
 
 
 def run_line(line: Line, box: Box, timeout: int = 60) -> Run:

@@ -40,8 +40,6 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
 MEASURE = "gov.retrieval.measure"
-GUARD_SOURCE = REPO_ROOT / "template/governance/kernel/hooks/pretooluse.py"
-GUARD_REL = "governance/kernel/hooks/pretooluse.py"
 PATH_MAP_TEMPLATE = REPO_ROOT / "template/governance/project/path-map.yaml"
 PATH_MAP_REL = "governance/project/path-map.yaml"
 HELD_OUT_LIST_REL = "governance/project/held-out.yaml"
@@ -69,8 +67,6 @@ HIDDEN_ITEM_PATH = "docs/zqxw61hiddenitem.md"    # a retrieved item of a hidden 
 HIDDEN_ITEM_TEXT = "zqxw61hiddenitemtext"
 HIDDEN_FAILURE = "zqxw61hiddenfailuremessage"   # the planted gov's error message on a hidden question
 HIDDEN_UNKNOWN = "zqxw61hiddenunknownfield"      # an unknown field's value in a hidden question
-HIDDEN_WORDS = ("zqxw61hidden", HIDDEN_QUESTION, HIDDEN_ANSWER, HIDDEN_SOURCE_DIR, "zqxw61hiddenheading",
-                HIDDEN_ITEM_PATH, HIDDEN_ITEM_TEXT, HIDDEN_FAILURE, HIDDEN_UNKNOWN)
 ANSWER_WORD = "zqxw61quotedanswer"               # what the quoting files (report, fixture, test) hold
 GATE_ANSWER = "four gigabytes free"              # v03's gold answer, quoted verbatim by the quoting files
 UNKNOWN_WORD = "zqxw61unknownfieldvalue"         # an unknown field's value
@@ -179,8 +175,7 @@ def base_files():
         HIDDEN_SOURCE: f"# Hidden governing\n\n{HIDDEN_HEADING}\nThe answer is {HIDDEN_ANSWER}.\n\n## Other\nx\n",
         HIDDEN_ITEM_PATH: f"{HIDDEN_ITEM_TEXT} {HIDDEN_ANSWER}\n",
         PATH_MAP_REL: path_map_text(),
-        SETTINGS_REL: json.dumps({"hooks": {"PreToolUse": [{"matcher": "*", "hooks": [
-            {"type": "command", "command": f'python3 "$CLAUDE_PROJECT_DIR"/{GUARD_REL}'}]}]}}, indent=2) + "\n",
+        SETTINGS_REL: "{}\n",   # no guard is registered (EMERGENCY-2 6.1, DAEO-gr7t)
     }
     for n in range(1, 13):
         files[f"docs/noise/n{n:02d}.md"] = f"# Noise {n}\n\nNothing of use, part {n}.\n"
@@ -531,8 +526,6 @@ def make_world(tmp_path, files=None, commit=True):
     contents.update(files or {})
     for rel, text in contents.items():
         world.write(rel, text)
-    (repo / GUARD_REL).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(GUARD_SOURCE, repo / GUARD_REL)
     git(repo, "init", "-q", "-b", "main")
     if commit:
         world.commit(message="W2-61 fixture: the planted project")
@@ -655,68 +648,6 @@ def records_in(folder):
     if not folder.is_dir():
         return {}
     return {path: json.loads(path.read_text(encoding="utf-8")) for path in sorted(folder.rglob("*.json"))}
-
-
-# --------------------------------------------------------------------------
-# The guard (W2-58's way)
-# --------------------------------------------------------------------------
-
-@dataclass(frozen=True)
-class Call:
-    tool: str
-    input: dict
-    label: str
-
-    def __str__(self):
-        return self.label
-
-
-def read_call(path):
-    return Call("Read", {"file_path": str(path)}, f"Read {path}")
-
-
-def grep_call(path=None, pattern="zqxw61"):
-    data = {"pattern": pattern, "output_mode": "content"}
-    if path is not None:
-        data["path"] = str(path)
-    return Call("Grep", data, f"Grep {pattern!r} in {path}")
-
-
-def glob_call(pattern, path=None):
-    data = {"pattern": pattern}
-    if path is not None:
-        data["path"] = str(path)
-    return Call("Glob", data, f"Glob {pattern!r} in {path}")
-
-
-def bash_call(command):
-    return Call("Bash", {"command": command, "description": "W2-61 acceptance call"}, f"Bash `{command}`")
-
-
-def ask_guard(world, call, role, ticket):
-    """The guard's decision (allow, ask, deny or error) on one call of a session of ``role`` on ``ticket``."""
-    data = {"session_id": "w2-61-acceptance", "transcript_path": str(world.base / "transcript.jsonl"),
-            "cwd": str(world.repo), "permission_mode": "default", "hook_event_name": "PreToolUse",
-            "tool_name": call.tool, "tool_input": call.input, "tool_use_id": "toolu_w2_61_000001"}
-    env = world.environment(role, ticket)
-    env["CLAUDE_PROJECT_DIR"] = str(world.repo)
-    try:
-        proc = subprocess.run([sys.executable, str(world.repo / GUARD_REL)], input=json.dumps(data),
-                              capture_output=True, text=True, cwd=str(world.repo), env=env, timeout=TIMEOUT_S)
-    except subprocess.TimeoutExpired:
-        return "error", "timed out"
-    if proc.returncode == 2:
-        return "deny", proc.stderr.strip()
-    if proc.returncode != 0:
-        return "error", proc.stderr.strip()
-    try:
-        data = json.loads(proc.stdout.strip() or "null")
-    except ValueError:
-        return "allow", ""
-    specific = data.get("hookSpecificOutput") if isinstance(data, dict) else None
-    if isinstance(specific, dict) and specific.get("permissionDecision") in ("deny", "ask"):
-        return specific["permissionDecision"], str(specific.get("permissionDecisionReason") or "")
-    return "allow", ""
 
 
 # --------------------------------------------------------------------------

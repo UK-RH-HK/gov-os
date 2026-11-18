@@ -19,13 +19,12 @@ import sys
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
-for _name in ("W1-30", "W1-02"):
+for _name in ("W1-30",):
     _folder = str(_HERE.parent / _name)
     if _folder not in sys.path:
         sys.path.insert(0, _folder)
 
 import w1_30_support as close_support  # noqa: E402  (a project gov close runs in, and the telling tests)
-import w1_02_support as guard_support  # noqa: E402  (the guard hook in a project, timed as the harness waits)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
@@ -179,32 +178,3 @@ def nightly_form(root, folder="tests", workers=2):
                                                     capture_output=True, text=True, timeout=600,
                                                     stdin=subprocess.DEVNULL)))
     return runs
-
-
-# ---------------------------------------------------------------------------
-# A test designer's read through the guard, on a ticket branch with changes (I1 F-10)
-# ---------------------------------------------------------------------------
-
-BASE_BRANCH = "w2/integrate"       # the base Policy 2 (c) reads the branch's changes against (DEC-826 Q2)
-CHANGED_FILES = 120                # a ticket branch of ordinary size: real branches held 48 to 318 (I1 F-10)
-
-
-def designer_world(base):
-    """W1-02's fixture project with the guard installed, its first commit on ``w2/integrate``, then the ticket's
-    own branch ``w2/<wbs>`` with ``CHANGED_FILES`` files of the ticket's code changed. Returns (project, sandbox)."""
-    sandbox = guard_support.make_sandbox(Path(base) / "sandbox")
-    project = guard_support.make_project(Path(base) / "project")
-    guard_support.git(project, "branch", "-m", "main", BASE_BRANCH)
-    guard_support.git(project, "checkout", "-q", "-b", f"w2/{guard_support.TICKET_WBS_ID}")
-    for index in range(CHANGED_FILES):
-        (project / "src/gov/guard" / f"change_{index:03d}.py").write_text(f"VALUE = {index}\n", encoding="utf-8")
-    guard_support.git(project, "add", "-A")
-    guard_support.git(project, "commit", "-q", "-m", "the ticket's own work")
-    return project, sandbox
-
-
-def designer_read(project, sandbox, rel):
-    """One Read of ``rel`` by the ticket's test designer, through the installed guard, timed as the harness
-    waits for it (W1-02's ``run_hook``: the hook process, start to exit)."""
-    return guard_support.run_hook(project, "Read", {"file_path": str(project / rel)}, sandbox,
-                                  role=guard_support.TEST_DESIGNER, ticket=guard_support.TICKET_ID)

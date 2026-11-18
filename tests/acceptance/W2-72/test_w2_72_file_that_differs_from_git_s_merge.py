@@ -36,32 +36,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import w2_72_support as support  # noqa: E402
-from w2_72_support import call, guard_hook, hook, judge, project, sandbox  # noqa: E402,F401  fixtures
+from w2_72_support import judge, project, sandbox  # noqa: E402,F401  fixtures
 
 check_support = support.check_support
 
 ORCHESTRATOR = support.ORCHESTRATOR
 TICKET = support.TICKET
-
-
-@pytest.mark.parametrize("case", sorted(support.FAILURE), ids=sorted(support.FAILURE))
-def test_the_live_check_still_flags_an_acceptance_file_that_differs_from_git_s_own_merge(project, sandbox, call,
-                                                                                         case):
-    """The check reports and records the acceptance test as flagged, in a finding for the merge commit, and
-    moves nothing."""
-    shape = support.FAILURE[case](project, sandbox)
-    before = support.full_id(project, "HEAD")
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    merge_id = support.full_id(project, "HEAD")
-    support.assert_shape(project, shape, before, merge_id)
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    check_support.assert_caught(result, shape.path, what=what, action=check_support.FLAGGED)
-    for_the_merge = support.findings_for(result, merge_id, what)
-    assert any(shape.path in check_support.finding_paths(result, f) for f in for_the_merge), (
-        f"{what}: no finding for the merge commit {merge_id[:12]} names {shape.path}; findings: "
-        f"{[f['reason'] for f in check_support.new_findings(result, what)]}"
-    )
-    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 @pytest.mark.parametrize("case", sorted(support.FAILURE), ids=sorted(support.FAILURE))

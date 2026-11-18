@@ -29,7 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import w2_72_support as support  # noqa: E402
-from w2_72_support import call, guard_hook, hook, judge, project, sandbox  # noqa: E402,F401  fixtures
+from w2_72_support import judge, project, sandbox  # noqa: E402,F401  fixtures
 
 check_support = support.check_support
 
@@ -50,17 +50,6 @@ def _assert_across_a_rename(project, shape, before, merge_id):
     )
 
 
-def test_the_live_check_is_silent_on_git_s_own_merge_across_a_rename(project, sandbox, call):
-    shape = support.clean_merge_across_a_rename(project, sandbox)
-    before = support.full_id(project, "HEAD")
-    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
-    merge_id = support.full_id(project, "HEAD")
-    _assert_across_a_rename(project, shape, before, merge_id)
-    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    check_support.assert_silent(result, what)
-    check_support.assert_left_as_the_call_left_it(project, left, what)
-
-
 def test_judge_commits_returns_no_finding_for_git_s_own_merge_across_a_rename(project, sandbox, judge):
     shape = support.clean_merge_across_a_rename(project, sandbox)
     before = support.full_id(project, "HEAD")
@@ -73,14 +62,3 @@ def test_judge_commits_returns_no_finding_for_git_s_own_merge_across_a_rename(pr
         f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding (DEC-918 item 1, DEC-912)"
     )
 
-
-def test_git_s_own_merge_across_a_rename_over_two_calls_is_kept(project, sandbox, judge):
-    """F1 (b)'s form for the same history: neither call's check restores, flags or reports; the merge commit
-    holds git's own merge (the new name with ``main``'s edit, the old path gone); ``judge_commits`` finds
-    nothing."""
-    shape = support.two_calls_across_a_rename(project, sandbox)
-    problems, told = support.merge_back_over_two_calls(project, sandbox, judge, shape)
-    assert not problems, (
-        f"{shape.what}, in the orchestrator's own calls on {TICKET} (DEC-918 item 1): " + "; ".join(problems)
-        + f". {told}"
-    )

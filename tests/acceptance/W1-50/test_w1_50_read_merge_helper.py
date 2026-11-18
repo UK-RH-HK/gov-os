@@ -1,4 +1,4 @@
-"""W1-50 — the one helper that reads a merge: ``gov.guard.containment_merge.read_merge``.
+"""W1-50 — the one helper that reads a merge: ``gov.containment.merge.read_merge``.
 
 Added after implementation; reason: owner decision, DEC-398.
 
@@ -10,7 +10,7 @@ is merged."
 
 Its public name, fixed for this batch::
 
-    from gov.guard.containment_merge import read_merge
+    from gov.containment.merge import read_merge
     reading = read_merge(root, commit)   # root: the repository's path (str); commit: a merge commit's id
     reading.own       # sorted list of repository-relative paths the merge commit changed itself
     reading.brought   # sorted list of paths a parent brought
@@ -56,7 +56,7 @@ AS_DESIGNER = support.AS_DESIGNER
 AS_ENGINEER = support.AS_ENGINEER
 AS_ORCHESTRATOR = support.AS_ORCHESTRATOR
 
-MODULE = "gov.guard.containment_merge"
+MODULE = "gov.containment.merge"
 SOURCES = check_support.REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL
 
 RENAMED_FROM = support.NOTES

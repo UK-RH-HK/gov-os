@@ -137,7 +137,7 @@ def _share(root: Path, tickets) -> dict:
 
 def _pause(root: Path) -> dict:
     """What the guard will do: frozen by the marked flag (DEC-402) or by its mirror (DEC-429)."""
-    from gov.guard.decide import FREEZE_FLAG, _mirror_frozen, freeze_state
+    from gov.util.freeze import FREEZE_FLAG, _mirror_frozen, freeze_state
 
     flag, mirror = freeze_state(str(root)), _mirror_frozen(str(root))
     if flag == "unmarked" and stat.S_ISCHR(os.stat(root / FREEZE_FLAG).st_mode):

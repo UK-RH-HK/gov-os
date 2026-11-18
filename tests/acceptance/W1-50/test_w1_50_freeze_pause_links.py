@@ -43,14 +43,6 @@ pause_support = support.pause_support
 OTHER_TEXT = b"another file, not a flag\n"
 
 
-def _assert_a_real_flag(project, sandbox, what):
-    """At the project's flag path: a regular file, not a link, that the guard reads as a freeze."""
-    flag = support.flag(project)
-    assert not flag.is_symlink(), f"{what}: gov pause said paused and {support.FLAG_REL} is still a symbolic link"
-    assert flag.is_file(), f"{what}: gov pause said paused and {support.FLAG_REL} is not a regular file"
-    support.assert_frozen(support.guard_write(project, sandbox), f"{what}: gov pause said paused; the next write")
-
-
 # --------------------------------------------------------------------------
 # A link at the flag's path
 # --------------------------------------------------------------------------
@@ -74,25 +66,6 @@ LINKS = {
     "a-link-to-another-file": _to_another_file,
     "a-dangling-link": _to_nothing,
 }
-
-
-@pytest.mark.parametrize("already_there", sorted(LINKS))
-def test_pause_over_a_link_at_the_flag_s_path_is_a_real_pause(freeze_project, freeze_sandbox, freeze_pause,
-                                                              freeze_interface, already_there):
-    target, content = LINKS[already_there](freeze_sandbox)
-    support.put_link(freeze_project, target)
-    what = f"after gov pause over {already_there}"
-
-    run = freeze_pause()
-
-    if already_there == "a-link-to-another-file":
-        now = target.read_bytes() if target.is_file() else None
-        assert now == content, \
-            f"{what}: the command wrote through the link, or removed its target: {target} now holds {now!r}"
-    if already_there == "a-dangling-link":
-        assert not os.path.lexists(target), f"{what}: the command created the link's target, {target}"
-    pause_support.succeeded(run, freeze_interface)
-    _assert_a_real_flag(freeze_project, freeze_sandbox, what)
 
 
 # --------------------------------------------------------------------------
@@ -154,19 +127,3 @@ def test_a_pause_leaves_no_other_name_beside_the_flag(freeze_project, freeze_san
 # Lifting a pause when a directory is at the flag's path
 # --------------------------------------------------------------------------
 
-def test_lifting_a_pause_over_a_directory_is_refused_in_the_envelope(freeze_project, freeze_sandbox, freeze_pause,
-                                                                     freeze_interface):
-    """The guard reads a directory at the path as a freeze; ``--off`` cannot lift it and must say so."""
-    support.put_directory(freeze_project)
-    support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox), "with a directory at the flag's path")
-
-    # DEC-409: the owner in person, through the function the command calls. Under the session that runs this suite
-    # the command line refuses before it looks at the path.
-    run = support.lift_support.lift(freeze_project, freeze_sandbox)
-
-    assert run.status == support.lift_support.REFUSED, f"the lift over a directory was not refused: {run.describe()}"
-    error = run.error
-    assert support.FLAG_REL in json.dumps(error), \
-        f"the refusal does not name {support.FLAG_REL}: {error}"
-    assert support.flag(freeze_project).is_dir(), "gov pause --off ended with an error and removed the directory"
-    support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox), "after the refused gov pause --off")

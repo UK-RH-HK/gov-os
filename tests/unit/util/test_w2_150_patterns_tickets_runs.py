@@ -72,10 +72,8 @@ def test_runs_root_without_an_absolute_home_is_none(monkeypatch):
 
 
 def test_the_old_modules_name_the_same_objects():
-    from gov.guard import decide, runs
     from gov.tasks import tickets as task_tickets
+    from gov.util import runs
 
-    assert decide._match_pattern is patterns._match_pattern and decide._has_glob is patterns._has_glob
-    assert decide._parse_frontmatter is tickets._parse_frontmatter
     assert task_tickets.TICKETS_REL is tickets.TICKETS_REL
     assert runs.root is runs_root.root and runs.ROOT_NAME == runs_root.ROOT_NAME

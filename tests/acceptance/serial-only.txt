@@ -30,9 +30,6 @@
 # name says and whatever markers it carries: a marker routes nothing.
 
 # --- latency: kept serial, each alone
-tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms  # serial: latency: p95 of the guard's decision under 100 ms over 40 hook processes (DEC-149)
-tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook  # serial: latency: p95 of the live hook's decision under 100 ms (DEC-149)
-tests/acceptance/W2-57/test_w2_57_designer_read_p95.py  # serial: latency: p95 under 100 ms of a test designer's read on a branch with changes (I1 F-10)
 tests/acceptance/W1-07/test_w1_07_help.py::test_help_answers_in_under_300_ms  # serial: latency: the median of nine gov help runs under 300 ms
 tests/acceptance/W1-10/test_w1_10_dev_tier.py::test_a_full_load_of_a_dev_tier_takes_less_than_5_seconds  # serial: latency: a full load of a dev tier under 5 s
 tests/acceptance/W1-17/test_w1_17_dev_tier.py::test_one_changed_file_is_re_indexed_by_the_next_retrieval_within_the_bound  # serial: latency: the retrieval after one changed file within its bound
@@ -40,11 +37,6 @@ tests/acceptance/W1-18/test_w1_18_deadline.py::test_a_daemon_that_never_becomes_
 tests/acceptance/W1-18/test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call  # serial: latency: the time taken against the hang limit
 tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder  # serial: latency: the check on 60 small files and one large SQLite store within 15 s
 tests/acceptance/W2-13/test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget  # serial: latency: warm p95 of the lexical route, no model, over each dev tier's query set at most 0.5 s (W1-19's budget)
-tests/acceptance/W2-111/test_w2_111_bash_p95.py  # serial: latency: p95 under 100 ms of the hook's own work on an engineer's Bash calls (a plain command, a pipe, a redirect); red only inside the close's parallel phase at load 10 to 20 (rv-3 F2)
-tests/acceptance/W2-111/test_w2_111_many_trees_p95.py  # serial: latency: p95 under 100 ms of the hook's own work on a Read, a Write and a Bash call with 150 worktrees registered (rv-3 F2)
-tests/acceptance/W2-111/test_w2_111_slow_hook.py  # serial: latency: a planted hook doing 150 ms of its own work per call fails each of W2-111's six timing cases, three rounds each (rv-3 F2)
-tests/acceptance/W2-111/test_w2_111_live_hook_diff_p95.py  # serial: latency: the live hook's patched copy within 100 ms at p95 of its own work, paired against the applied hook in the same run (rv-3 F2: red in the parallel phase at load 10 to 20)
-tests/acceptance/W2-111/test_w2_111_live_hook_slow_hook.py  # serial: latency: a planted hook doing 150 ms of its own work per call fails the live-hook case's judgement, paired, three rounds each (rv-3 F2)
 
 # --- race: kept serial in this run
 tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # serial: race: claims raced from separate processes
@@ -92,17 +84,9 @@ tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped
 tests/acceptance/W1-16/test_w1_16_ui_off.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
 
 # --- live-session: routed to the nightly (DEC-889 item 5; I1 F-1, F-2; I3 F6)
-tests/acceptance/W1-46/test_w1_46_live_sessions.py  # nightly: live-session: launched engineer and research sessions; the host cases need the network
-tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays  # nightly: live-session: launches a real worker session
-tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path  # nightly: live-session: launches a real worker session
 tests/acceptance/W1-25/test_w1_25_live_session.py  # nightly: live-session: a real session answers from its checkpoint
 tests/acceptance/W1-49/test_w1_49_live_session.py  # nightly: live-session: a real session is compacted
-tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_collects_its_own_acceptance_tests  # nightly: live-session: a real engineer session through gov launch
-tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_runs_its_tests_and_sees_their_results  # nightly: live-session: a real engineer session through gov launch
-tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_test_designer_imports_the_branch_s_changed_code  # nightly: live-session: a real test designer session through gov launch
-tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_session_shows_no_phantom_deletion  # nightly: live-session: two real sessions through gov launch
 tests/acceptance/W2-62/test_w2_62_live_resume.py  # nightly: live-session: a real session is resumed from its section
-tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py  # nightly: live-session: a real haiku worker started through gov launch
 tests/acceptance/W2-60a/test_w2_60a_live_sessions.py  # nightly: live-session: one real engineer session through gov launch shows its role text, its named skill and a start with no connector, user-level agent or skill, or memory
 
 # --- real-model: routed to the nightly (DEC-889 item 5; I3 F6)

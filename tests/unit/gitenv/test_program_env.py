@@ -12,7 +12,8 @@ import pytest
 
 from gov.adapters import portability
 from gov.check import runner
-from gov.guard import decide
+from gov.containment import scope
+from gov.util import freeze as decide
 from gov.util.gitenv import program_env
 
 CLEAN = {"PATH": "/usr/bin:/bin", "HOME": "/nonexistent", "LC_ALL": "C", "GIT_CONFIG_NOSYSTEM": "1",
@@ -62,7 +63,7 @@ def test_the_freeze_look_up_refuses_when_no_git_is_resolved_or_it_hangs(repo, mo
     with pytest.raises(decide.FreezeLookupUnavailable):
         decide._mirror_path(str(repo))
     assert decide._mirror_frozen(str(repo)) is True
-    verdict, reason = decide.decide("Read", {"file_path": str(repo / "a")}, str(repo), "engineer", None)
+    verdict, reason = scope.decide("Read", {"file_path": str(repo / "a")}, str(repo), "engineer", None)
     assert verdict == "deny" and "freeze look-up" in reason
 
     def hang(*_args, **kwargs):

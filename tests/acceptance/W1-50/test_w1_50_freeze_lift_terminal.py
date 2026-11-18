@@ -45,19 +45,6 @@ def _assert_secret(project, run, code, what):
     assert code not in run.says(), f"{what}: the code {code} is in what the function gave back: {run.says()}"
 
 
-def test_the_shown_code_typed_back_on_a_terminal_lifts(freeze_frozen, freeze_sandbox):
-    run = lift.lift(freeze_frozen, freeze_sandbox)
-
-    assert run.status == lift.LIFTED, f"the shown code was typed back on a terminal: {run.describe()}"
-    code = _the_one_code(run, "the lift")
-    assert run.typed == code + "\n"
-    assert isinstance(run.result, dict) and run.result.get("paused") is False, \
-        f"the result does not say that the pause is lifted: {run.result!r}"
-    assert not os.path.lexists(support.flag(freeze_frozen)), f"the lift left {support.FLAG_REL}"
-    support.assert_not_frozen(support.guard_write(freeze_frozen, freeze_sandbox), "after the lift")
-    _assert_secret(freeze_frozen, run, code, "after the lift")
-
-
 @pytest.mark.parametrize("terminal", [lift.PIPE_IN, lift.PIPE_OUT, lift.PIPES, lift.NO_TERMINAL])
 def test_without_a_terminal_on_both_sides_the_lift_refuses(freeze_frozen, freeze_sandbox, terminal):
     """Piped input; an output that is no terminal; neither. Whatever is shown is typed back right, and it still
@@ -72,26 +59,6 @@ def test_without_a_terminal_on_both_sides_the_lift_refuses(freeze_frozen, freeze
     support.assert_nothing_changed(freeze_frozen, before, terminal)
     for code in set(lift.CODE.findall(run.shown)):
         _assert_secret(freeze_frozen, run, code, terminal)
-
-
-@pytest.mark.parametrize("reply", [lift.WRONG, lift.EMPTY_LINE, lift.END_OF_INPUT])
-def test_anything_but_the_shown_code_refuses_at_once(freeze_frozen, freeze_sandbox, reply):
-    """One attempt for each run: a wrong code, an empty line or the end of the input ends the run. A function that
-    asks again, or goes on waiting, does not come back and the case fails."""
-    before = support.flag_state(freeze_frozen)
-
-    run = lift.lift(freeze_frozen, freeze_sandbox, reply=reply)
-
-    assert run.status == lift.REFUSED, f"{reply}: the lift was not refused: {run.describe()}"
-    code = _the_one_code(run, reply)
-    after_the_reply = run.shown[len(run.shown_before_reply):]
-    typed = (run.typed or "").strip()
-    assert not [c for c in lift.CODE.findall(after_the_reply) if c != typed], \
-        f"{reply}: a code was shown again after the reply: {after_the_reply!r}"
-    assert NAMES_THE_CODE.search(run.message), f"{reply}: the refusal does not name the code: {run.message!r}"
-    support.assert_nothing_changed(freeze_frozen, before, reply)
-    support.assert_frozen(support.guard_write(freeze_frozen, freeze_sandbox), f"after the refused lift ({reply})")
-    _assert_secret(freeze_frozen, run, code, reply)
 
 
 def test_the_code_is_new_on_every_run_and_no_seed_fixes_it(freeze_frozen, freeze_sandbox):

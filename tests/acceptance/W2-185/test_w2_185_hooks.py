@@ -1,5 +1,8 @@
 """W2-185 (DAEO-qyt2): adopted projects get the context watch, and portability's lift is per hook.
 
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. S1 no longer asks for the template's
+posttooluse.py entry (retired), and the kernel's hook scripts are five.
+
 S1 reads the template's hooks source; S2 and F1 call portability's hooks comparison over stand-in roots built in
 ``tmp_path``; S3 reads W1-38's fixture. Behaviour and files only, no network, no model.
 """
@@ -22,13 +25,11 @@ def test_s1_the_template_wires_context_watch_in_post_tool_use_beside_posttooluse
         "the command is the root's context_watch.py command with the adopted path governance/kernel/hooks/:\n"
         f"expected {root_entry['command']!r}\nfound    {watch[0]['command']!r}")
     assert "template/governance" not in watch[0]["command"]
-    assert any(support.names_script(e["command"], "posttooluse.py") for e in post), \
-        "the template's existing posttooluse.py entry stays in postToolUse"
 
 
 def test_s1_every_kernel_hook_script_is_named_by_a_command_of_the_template_hooks_source():
     scripts = sorted(path.name for path in support.KERNEL_HOOKS.glob("*.py"))
-    assert len(scripts) >= 7 and "context_watch.py" in scripts, scripts
+    assert len(scripts) >= 5 and "context_watch.py" in scripts, scripts   # five since EMERGENCY-2 6.1 (DAEO-gr7t)
     named = support.commands(support.read_source(support.TEMPLATE_HOOKS))
     unwired = [name for name in scripts if not any(support.names_script(command, name) for command in named)]
     assert not unwired, f"no command of template/.rulesync/hooks.jsonc runs: {unwired}"

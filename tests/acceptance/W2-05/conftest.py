@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -64,20 +63,3 @@ def decoy(tmp_path):
     repo = support.make_decoy(tmp_path / "elsewhere")
     return repo, support.folder_fingerprint(repo)
 
-
-@pytest.fixture()
-def fifo_cleanup():
-    """Fifos a case put in place of a git file: at the end every git still waiting on one is let go."""
-    fifos = []
-    yield fifos
-    for fifo in fifos:
-        for _ in range(50):
-            try:
-                handle = os.open(fifo, os.O_WRONLY | os.O_NONBLOCK)
-            except OSError:
-                break
-            os.close(handle)
-        try:
-            os.unlink(fifo)
-        except OSError:
-            pass

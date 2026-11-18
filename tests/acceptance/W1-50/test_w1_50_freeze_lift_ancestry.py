@@ -50,18 +50,6 @@ def _assert_refused(run, what):
 # A Claude Code session among the ancestors
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("shape", sorted(lift.SESSION_ANCESTRIES))
-def test_a_claude_code_session_among_the_ancestors_refuses_the_lift(freeze_frozen, freeze_sandbox, shape):
-    """Rule 1, with a terminal and the shown code typed back, so nothing else can be the reason."""
-    before = support.flag_state(freeze_frozen)
-
-    run = lift.lift(freeze_frozen, freeze_sandbox, ancestry=lift.SESSION_ANCESTRIES[shape])
-
-    _assert_refused(run, shape)
-    assert NAMES_A_SESSION.search(run.message), \
-        f"{shape}: the refusal does not name the Claude Code session as its reason: {run.message!r}"
-    support.assert_nothing_changed(freeze_frozen, before, shape)
-    support.assert_frozen(support.guard_write(freeze_frozen, freeze_sandbox), f"after the refused lift ({shape})")
 
 
 @pytest.mark.parametrize("shape", sorted(lift.UNREADABLE_ANCESTRIES))
@@ -88,23 +76,6 @@ def test_gov_role_does_not_turn_a_session_into_the_owner(freeze_frozen, freeze_s
     support.assert_nothing_changed(freeze_frozen, before, f"GOV_ROLE={role!r}")
 
 
-@pytest.mark.parametrize("name, ancestry", [("a plain terminal", lift.PLAIN_TERMINAL),
-                                            ("a terminal inside the editor", lift.EDITOR_TERMINAL)],
-                         ids=["plain-terminal", "editor-terminal"])
-def test_without_a_session_among_the_ancestors_the_owner_lifts(freeze_frozen, freeze_sandbox, name, ancestry):
-    """The control of the cases above: the same call with no Claude Code session in the chain lifts.
-
-    The editor's own processes (``node``, ``sh``) are no session: only a Claude Code process is.
-    """
-    run = lift.lift(freeze_frozen, freeze_sandbox, ancestry=ancestry)
-
-    assert run.status == lift.LIFTED, f"from {name}, with the shown code typed back, the lift failed: {run.describe()}"
-    assert isinstance(run.result, dict) and run.result.get("paused") is False, \
-        f"the result does not say that the pause is lifted: {run.result!r}"
-    assert not os.path.lexists(support.flag(freeze_frozen)), f"the lift from {name} left {support.FLAG_REL}"
-    support.assert_not_frozen(support.guard_write(freeze_frozen, freeze_sandbox), f"after the lift from {name}")
-
-
 # --------------------------------------------------------------------------
 # The real command line
 # --------------------------------------------------------------------------
@@ -114,16 +85,6 @@ def _assert_the_command_line_refused(run, project, before, interface, what):
     assert error["message"].strip()
     support.assert_nothing_changed(project, before, what)
     return error
-
-
-def test_the_command_line_refuses_the_lift_wherever_this_suite_runs(freeze_frozen, freeze_sandbox, freeze_interface):
-    """``python3 -m gov.cli.main pause --off --json`` with ``GOV_ROLE`` unset: a worker's ``env -u GOV_ROLE``."""
-    before = support.flag_state(freeze_frozen)
-
-    run = support.run_cli(freeze_frozen, freeze_sandbox, "pause", "--off", "--json")
-
-    _assert_the_command_line_refused(run, freeze_frozen, before, freeze_interface, "gov pause --off")
-    support.assert_frozen(support.guard_write(freeze_frozen, freeze_sandbox), "after the refused gov pause --off")
 
 
 # Names an implementer might give a way round the checks. None may be one.
@@ -178,15 +139,3 @@ def test_the_help_shows_no_option_for_the_checks(freeze_project, freeze_sandbox)
 # Setting a freeze stays open (KPI success 7)
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("role, who", [(None, support.OWNER_NAME), (support.ORCHESTRATOR, support.ORCHESTRATOR)],
-                         ids=["gov-role-unset", "orchestrator"])
-def test_setting_a_freeze_stays_open_under_a_session(freeze_project, freeze_sandbox, freeze_interface, role, who):
-    """Rule 1 is about the lift. ``gov pause`` under this suite's own ancestry, which is an agent session's
-    (the operator console's case when ``GOV_ROLE`` is unset), sets the flag; the marker names the caller of
-    DEC-365, as built."""
-    run = support.run_cli(freeze_project, freeze_sandbox, "pause", "--json", role=role)
-
-    result = pause_support.succeeded(run, freeze_interface)
-    assert result.get("paused") is True, f"gov pause did not say paused: {result}"
-    support.assert_marker(support.flag(freeze_project), who, "after gov pause under a session")
-    support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox), "after gov pause under a session")

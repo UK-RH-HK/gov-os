@@ -27,11 +27,6 @@ from gov.close import select
 
 ROOT = Path(__file__).resolve().parents[3]
 
-# S1
-SETTINGS_PATHS = (".claude/settings.json", ".rulesync/hooks.jsonc", ".rulesync/permissions.jsonc")
-SETTINGS_SUITES = ("tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
-                   "tests/acceptance/W1-46/test_w1_46_research_installs.py",
-                   "tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py")
 # S2
 CHECKS_FOLDER = "template/governance/kernel/checks"
 TIME_LIMIT_FILE = "tests/acceptance/W2-54/test_w2_54_time_limit.py"
@@ -176,13 +171,6 @@ def unresolved_targets(targets, tracked, root=ROOT):
     return out
 
 
-# -- S1: settings and hook wiring --------------------------------------------------
-
-@pytest.mark.parametrize("path", SETTINGS_PATHS)
-def test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites(live_map, path):
-    targets = reached(live_map, path)
-    missing = [suite for suite in SETTINGS_SUITES if not any(covers_file(t, suite) for t in targets)]
-    assert not missing, f"no coupling the live map declares takes a change of {path} to {missing}"
 
 
 # -- S2: the declared checks reach W2-54's no-weakening case alone -------------------

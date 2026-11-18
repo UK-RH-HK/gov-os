@@ -1,5 +1,7 @@
 # W2-60a acceptance tests: the role, its skills, its model and effort at launch; the launch record
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The fixture project no longer carries the guard script or a settings file that registers it.
+
 Ticket `DAEO-cv58` (W2-60a, FULL). Written by the independent test designer (MR-3) from the ticket's KPI lines,
 its card (`docs/plan/WAVE_2_WBS.md` §2, W2-60 and W2-60a), DEC-826 Q1/Q2/Q5, DEC-832, DEC-838, DEC-839, today's
 launcher on `w2/integrate`, and the design's behaviour sections and the lead's corrections as the brief gave them

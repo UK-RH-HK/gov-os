@@ -1,5 +1,7 @@
 # W1-30 Acceptance Tests — `gov close`
 
+**Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** `tests/acceptance/serial-only.txt` and the r11 tables of `test_w1_30_r11_declared_here.py` no longer name a case of a deleted file (the guard's p95, the live hooks, the launched-session and sandbox cases), and the case that held the report's two guard-timing figures is deleted. `judge_commits` is read from `gov.containment.commits`.
+
 Ticket: DAEO-2lwj (W1-30, "gov close"), profile FULL.
 Round 5 (see "Round 5" below): containment without exemption, context failures, the repair ticket,
 the probe, the time limit. Round 5b (see "Round 5b"): the four points DEC-470 decides. The rule for

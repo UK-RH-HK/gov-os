@@ -93,7 +93,6 @@ KNOWN_ROLES = (ORCHESTRATOR, PRODUCT_SPEC, TEST_DESIGNER, ENGINEER, AUDITOR)
 HOOK_TIMEOUT_S = 30.0
 BASH_TIMEOUT_S = 30.0
 SESSION_ID = "w1-03-acceptance-session"
-OTHER_SESSION_ID = "w1-03-acceptance-session-two"   # a second session in the same working tree
 CLOCK_ENV = "W1_03_CLOCK_SHIFT_S"
 
 # The fields of a containment finding (DEC-122) and the two values of ``action``.
@@ -394,16 +393,6 @@ class Call:
 _CALL_NUMBERS = itertools.count(1)
 
 
-def script_call(sandbox, command):
-    """Save ``command`` as a script outside the project; the call is ``bash <script>``."""
-    number = next(_CALL_NUMBERS)
-    directory = sandbox.elsewhere / "calls"
-    directory.mkdir(exist_ok=True)
-    script = directory / f"call-{number:04d}.sh"
-    script.write_text(command + "\n", encoding="utf-8")
-    return Call(f"bash {shlex.quote(str(script))}", f"toolu_w1_03_{number:04d}")
-
-
 def literal_call(command):
     """A call whose command reaches the hooks word for word."""
     return Call(command, f"toolu_w1_03_{next(_CALL_NUMBERS):04d}")
@@ -611,23 +600,6 @@ def run_guard_earlier(project, call, sandbox, seconds, **who):
     return guard
 
 
-def run_guard_for_file_tool(project, sandbox, tool_name, tool_input, role=None, ticket=None, subagent=None,
-                            agent_id=None, session_id=None, environment=None):
-    """Run the installed PreToolUse hook once for a file-tool call (``Write`` or ``Edit``).
-
-    The harness runs the guard before every write tool. The containment check
-    is registered for Bash only, so no PostToolUse run follows a file-tool call.
-    """
-    project = Path(project)
-    entry = project / PRODUCT_HOOK_DIR_REL / guard_entry().name
-    data = payload(project, Call("", f"toolu_w1_03_{next(_CALL_NUMBERS):04d}"), sandbox, "PreToolUse",
-                   subagent=subagent, agent_id=agent_id, session_id=session_id)
-    data["tool_name"] = tool_name
-    data["tool_input"] = tool_input
-    returncode, stdout, stderr, _ = _run(entry, json.dumps(data), project, sandbox, role, ticket, environment)
-    return GuardResult(_guard_decision(returncode, stdout), returncode, stdout, stderr)
-
-
 def finding_lines(project):
     """The non-empty lines of ``.gov-runtime/findings.jsonl``; empty when the file is absent."""
     path = Path(project) / FINDINGS_REL
@@ -763,16 +735,6 @@ def finding_paths(result, finding):
     return names
 
 
-def _covers(entry, path):
-    """The recorded entry is ``path`` itself or a directory above it."""
-    return entry == path or path.startswith(entry + "/")
-
-
-def _related(entry, name):
-    name = name.rstrip("/")
-    return _covers(entry, name) or entry.startswith(name + "/")
-
-
 # --------------------------------------------------------------------------
 # Assertions
 # --------------------------------------------------------------------------
@@ -783,69 +745,6 @@ def assert_let_through(guard, call):
         f"the PreToolUse hook did not let the fixture call `{call.command}` through, "
         f"so no Bash call would follow: {guard.describe()}"
     )
-
-
-def assert_reported(result, *names, what):
-    """The check told the agent, and the report names every one of ``names``."""
-    assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
-    for name in names:
-        assert name in result.report, (
-            f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
-        )
-
-
-def assert_recorded(result, *names, what, action=None):
-    """This call added a finding for every one of ``names``; with ``action``, each has that action.
-
-    A name may be a file or a directory. A finding answers for it when one of
-    its ``paths`` is that name, a directory above it, or a path below it.
-    """
-    findings = new_findings(result, what)
-    assert findings, f"{what}: no containment finding was added to {FINDINGS_REL}"
-    for name in names:
-        matching = [f for f in findings if any(_related(e, name) for e in finding_paths(result, f))]
-        assert matching, (
-            f"{what}: no finding names {name!r}; recorded paths: {[f['paths'] for f in findings]}"
-        )
-        if action is not None:
-            assert all(f["action"] == action for f in matching), (
-                f"{what}: the finding for {name!r} has action {[f['action'] for f in matching]}, not {action!r}"
-            )
-    return findings
-
-
-def assert_not_recorded(result, *paths, what):
-    """No finding added by this call answers for any of ``paths``."""
-    for finding in new_findings(result, what):
-        for path in paths:
-            assert not any(_related(e, path) for e in finding_paths(result, finding)), (
-                f"{what}: a finding names {path!r}, which this call did not change out of scope: "
-                f"{finding['paths']}"
-            )
-
-
-def assert_caught(result, *names, what, action=None):
-    """Reported to the agent and recorded as a containment finding (KPI success 1, failure 1)."""
-    assert_reported(result, *names, what=what)
-    return assert_recorded(result, *names, what=what, action=action)
-
-
-def assert_silent(result, what):
-    """The check found nothing: exit code 0, no text for the agent, no finding."""
-    assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
-    assert result.returncode == 0, f"{what}: the check did not exit with code 0: {result.describe()}"
-    assert not result.new_lines, (
-        f"{what}: the check found nothing and still added to {FINDINGS_REL}: {result.new_lines}"
-    )
-
-
-def assert_changed(project, *names, command):
-    """Guard against an empty test: the Bash command really changed the named paths."""
-    status = porcelain_all(project)
-    for name in names:
-        assert name in status, (
-            f"the fixture command `{command}` did not change {name}; git status --porcelain is:\n{status}"
-        )
 
 
 # --------------------------------------------------------------------------
@@ -873,14 +772,3 @@ def assert_left_as_the_call_left_it(project, left, what):
     for path, text in contents.items():
         assert read(project, path) == text, f"{what}: the check changed {path}"
 
-
-def assert_flagged_and_nothing_reverted(project, result, left, what):
-    """Reported to the agent, recorded as ``flagged`` with no ``reverted`` next to it, and the tree left alone."""
-    assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
-    findings = new_findings(result, what)
-    assert findings, f"{what}: no finding was added to {FINDINGS_REL}"
-    actions = [finding["action"] for finding in findings]
-    assert FLAGGED in actions and REVERTED not in actions, (
-        f"{what}: the findings have the actions {actions}; the call is flagged and nothing is reverted"
-    )
-    assert_left_as_the_call_left_it(project, left, what)

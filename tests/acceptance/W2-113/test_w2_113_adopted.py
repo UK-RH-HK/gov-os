@@ -1,9 +1,13 @@
-"""KPI success 1 and failure 1: Stage A0 names the CTO, so the orchestrator on the new ticket is asked at once.
+"""KPI success 1: Stage A0 names the CTO: it creates the coordination ticket and writes the roster key.
 
 Interface I1: A0 creates the coordination ticket (title ``<project> coordination``, ``class: coordination``), writes
 ``governance/project/roster.yaml`` with the top-level ``coordination_ticket: <new id>``, records both in A0's record and
 commits them in A0's commit with its set-up files. Interface I3: the planted repository is generated from the template,
 then ``gov adopt --lite --stage A0`` runs, and nobody edits a roster or a ticket after it.
+
+Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The cases that put an install through the
+guard's CTO-only rule are deleted with the guard (the "asked at once" case, the roster-names-the-CTO case, the guard-stays-closed
+case, and the files of the refusals and the refusal words); the cases of what A0 writes stay.
 """
 
 from __future__ import annotations
@@ -75,18 +79,3 @@ def test_the_ticket_and_the_roster_are_in_a0_s_commit_and_the_tree_is_clean(adop
     assert w23.porcelain(project) == "", f"A0 left the tree dirty:\n{w23.porcelain(project)}"
     for rel in (f"{support.TICKETS_REL}/{ticket}.md", support.ROSTER_REL):
         assert w23.at_head(project, rel) == (project / rel).read_bytes(), f"{rel} is not committed as it stands"
-
-
-# --- failure 1 and success 1, second half: the orchestrator on that ticket is asked, with no edit ----------------------
-
-@pytest.mark.parametrize("command", support.INSTALLS)
-def test_the_orchestrator_on_the_new_ticket_is_asked_for_an_install(adoption, decide, command):
-    """Failure 1: the CTO's install refused until the key is written by hand. Here no hand edit is made."""
-    adopted = adoption("standard")
-    support.assert_succeeded(adopted)
-    ticket = adopted.new_ticket()
-    answer = decide(w110.cto(ticket), command)
-    assert answer.settings_rule is None, f"a generated settings rule refuses the call before the hook: {answer.describe()}"
-    assert answer.decision == "ask", (
-        f"in a freshly adopted repository the orchestrator on the coordination ticket {ticket} must be asked for "
-        f"`{command}`, with no key edited by hand; the decision was {answer.decision}: {answer.describe()}")

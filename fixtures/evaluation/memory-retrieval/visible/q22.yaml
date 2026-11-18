@@ -1,21 +1,17 @@
-# Re-anchored at 00a2f3e2557a (DEC-1122 (3)): reads.py gained 119 lines after the run-2 anchor (c9742b08910a), so its two
-# cited lines drifted (227 -> 233, 245 -> 251). Same three callers, same facts; the two reads.py sources now cite the
-# calling function's def line as the heading (the measure's rule: the heading governs, the stated lines give the span's
-# width), so a later edit above them does not move the gold again. measure.py's source already cited a heading.
+# Re-anchored at b18c3ddeccd6 (EMERGENCY-2 6.1, the guard retired, DAEO-gr7t): check_sets and _hidden left with
+# src/gov/guard/reads.py; the callers of set_fault are now measure (src/gov/retrieval/measure.py) and the memory audit's
+# matcher (src/gov/memaudit/matcher.py). The CTO's call (visible material; DEC-1210 retires reuse at the next measure).
 category: callers
-commit: 00a2f3e2557a
+commit: b18c3ddeccd6
 question: "Which functions call set_fault?"
 gold_answer: >-
-  Three: check_sets (src/gov/guard/reads.py, line 233) and _hidden (reads.py, line 251), each raising PolicyError
-  on a fault, and measure in src/gov/retrieval/measure.py (line 477), which refuses a set that is not declared well
-  formed in the path map's evaluation_sets.
+  Two: measure in src/gov/retrieval/measure.py (line 477), which refuses a set that is not declared well formed in
+  the path map's evaluation_sets, and the memory audit's matcher in src/gov/memaudit/matcher.py (line 40), which
+  raises MatcherError("set") for the same fault. set_fault itself lives in src/gov/util/parts.py.
 sources:
-  - path: src/gov/guard/reads.py
-    heading: "def check_sets(root: str) -> None:"
-    lines: [230, 233]
-  - path: src/gov/guard/reads.py
-    heading: "def _hidden(root: str, role: str, ticket_id: str | None) -> list[str]:"
-    lines: [238, 251]
   - path: src/gov/retrieval/measure.py
     heading: "        if not isinstance(entry, dict) or set_fault(entry):"
     lines: [477, 477]
+  - path: src/gov/memaudit/matcher.py
+    heading: "    if not isinstance(entry, dict) or M.set_fault(entry):"
+    lines: [40, 40]

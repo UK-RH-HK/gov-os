@@ -208,44 +208,6 @@ def roster_naming(value: str) -> str:
 # What a refusal must say (KPI success 2)
 # ---------------------------------------------------------------------------------------------------------------
 
-NAMES_THE_VARIABLE = "GOV_TICKET"
-
-# "Claims a key was set" (README, "Success 2: the words"). A text that tells the reader the key exists, was written, or
-# was written at adoption, as a fact. Narrow on purpose: a true text ("the key is not set", "adoption writes it when it
-# runs", "set it ...", "to be set at adoption") passes.
-_NOT_A_FACT = r"(?<!to be )(?<!should be )(?<!must be )(?<!will be )(?<!can be )(?<!shall be )"
-_FALSE_CLAIMS = (
-    # "set at adoption" / "was set at adoption" / "is set at adoption" stated, not asked for
-    re.compile(_NOT_A_FACT + r"\bset at adoption\b", re.IGNORECASE),
-    # "was set by adoption", "has been written at the last adoption", ...: a key said to be written by adoption
-    re.compile(r"\b(?:was|were|has been|have been|is|are)\s+(?:set|written|added|created)\s+(?:at|by|during|in)\s+"
-               r"(?:the\s+)?(?:last\s+|earlier\s+)?adoption\b", re.IGNORECASE),
-    # "the key is already set" (not "is not already set")
-    re.compile(r"(?<!not )(?<!never )\balready\s+(?:set|written)\b", re.IGNORECASE),
-)
-# Only where there is no key at all (no roster, or a roster without the key): a text that speaks of the key's value.
-_CLAIMS_A_VALUE = re.compile(
-    r"\bthe\s+(?:top-level\s+)?key\s+(?:'?coordination_ticket'?\s+)?(?:names|holds|is set|has the value|points)\b",
-    re.IGNORECASE)
-
-
-def claims_a_key_was_set(reason: str, key_exists: bool) -> list:
-    """The false claims the refusal makes, as the matched phrases: ``[]`` for a text that makes none.
-
-    For every case: "set at adoption" as a fact (not preceded by "to be", "should be", "must be", "will be", "can be",
-    "shall be"); "was/were/has been/have been/is/are" + "set/written/added/created" + "at/by/during/in" + "[the]
-    [last|earlier] adoption"; "already set/written" (not after "not"/"never"). Phrases such as "no key has been set",
-    "the key is not set" and "adoption writes the key" are not claims.
-    Where no key exists (``key_exists`` False): also "the key names/holds/is set/has the value/points ..."."""
-    found = [m.group(0) for pattern in _FALSE_CLAIMS for m in pattern.finditer(reason)]
-    if not key_exists:
-        found += [m.group(0) for m in _CLAIMS_A_VALUE.finditer(reason)]
-    return found
-
-
-def names_the_variable(reason: str) -> bool:
-    return NAMES_THE_VARIABLE in reason
-
 
 def says_how_to_set_the_key(reason: str) -> bool:
     """W2-110's predicate: the file ``governance/project/roster.yaml`` and the key ``coordination_ticket`` are named."""

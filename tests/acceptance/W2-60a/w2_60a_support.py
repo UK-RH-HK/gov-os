@@ -34,16 +34,15 @@ passes (on the line and in the settings). What a real session's start shows is
 the live file's (``test_w2_60a_live_sessions.py``).
 
 **The fixture project** is a git repository built from scratch at
-``<HOME>/work/repo``: fixture tickets, a settings file that registers a copy of
-the kernel guard, fixture role files at ``template/governance/kernel/roles/``
+``<HOME>/work/repo``: fixture tickets, a settings file that registers nothing (the guard is retired,
+EMERGENCY-2 6.1), fixture role files at ``template/governance/kernel/roles/``
 (each with its version line, its default line and, for some, a skills line),
 fixture generated agents at ``.claude/agents/`` (whose text is not the role
 file's), fixture skills at ``.claude/skills/`` (the copies the session loads)
 and kernel copies at ``template/governance/kernel/skills/`` with other versions
 (which the record must not take), and the eight template copies at
 ``.claude/templates/<stem>.md`` (W2-153; any bytes). Nothing is copied from
-this repository but the guard script and the research allowlist, as single
-named files. Every ``gov`` child's environment names an open resource gate
+this repository but the research allowlist, as a single named file. Every ``gov`` child's environment names an open resource gate
 planted in the test home (``plant_open_gate``, W2-20 S19).
 """
 
@@ -68,9 +67,6 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SUITE_DIR = Path(__file__).resolve().parent
 PYPROJECT = REPO_ROOT / "pyproject.toml"
-GUARD_SOURCE = REPO_ROOT / "template/governance/kernel/hooks/pretooluse.py"
-GUARD_REL = "governance/kernel/hooks/pretooluse.py"
-GUARD_COMMAND = f'python3 "$CLAUDE_PROJECT_DIR"/{GUARD_REL}'
 ALLOWLIST_REL = "template/governance/kernel/launch/research-allowlist.yaml"
 ALLOWLIST_SOURCE = REPO_ROOT / ALLOWLIST_REL
 
@@ -431,7 +427,7 @@ def write(path, text):
 
 
 def settings_text(extra=None):
-    data = {"hooks": {"PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": GUARD_COMMAND}]}]}}
+    data = {}
     data.update(extra or {})
     return json.dumps(data, indent=2) + "\n"
 
@@ -480,7 +476,7 @@ def make_project(sandbox, roles=WORKER_ROLES, skills=SKILLS, kernel_skills=True,
     files.update(extra or {})
     for rel, text in files.items():
         write(project / rel, text)
-    for rel, source in ((GUARD_REL, GUARD_SOURCE), (ALLOWLIST_REL, ALLOWLIST_SOURCE)):
+    for rel, source in ((ALLOWLIST_REL, ALLOWLIST_SOURCE),):
         (project / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, project / rel)
     if commit:

@@ -44,39 +44,6 @@ q = support.q
 MAIN, OTHER, NO_W2_ID = support.MAIN, support.OTHER, support.NO_W2_ID
 ENGINEER, TEST_DESIGNER, ORCHESTRATOR = support.ENGINEER, support.TEST_DESIGNER, support.ORCHESTRATOR
 
-def _refused(result, what, sandbox, *paths):
-    names = []
-    for path in paths:
-        names += support.why_words(path, sandbox)
-    support.assert_refused(result, what, *names)
-
-
-def _ask(box, project, tool_name, target, role=ENGINEER, ticket=MAIN.tk):
-    return support.ask_guard(box, tool_name, support.tool_input(tool_name, target), role, ticket, project)
-
-
-def _all_refused(box, project, target, what, role=ENGINEER, ticket=MAIN.tk, *why):
-    """Write, Edit and a judged Bash redirect on ``target``, each refused with the guard's reason."""
-    for tool_name in ("Write", "Edit"):
-        _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
-                 *why)
-    command = f"echo written > {q(target)}"
-    _refused(_ask(box, project, "Bash", command, role, ticket), f"Bash `{command}` {what}", box, target, *why)
-
-
-def _all_allowed(box, project, target, what, role=ENGINEER, ticket=MAIN.tk):
-    for tool_name in ("Write", "Edit"):
-        support.assert_allowed(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}")
-    command = f"echo written > {q(target)}"
-    support.assert_allowed(_ask(box, project, "Bash", command, role, ticket), f"Bash `{command}` {what}")
-
-
-def _folder_refused(box, project, folder, what, ticket):
-    """Write, Edit, a Bash redirect and ``mkdir -p`` in ``folder``, each refused, for the engineer on ``ticket``."""
-    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
-    command = f"mkdir -p {q(folder / 'clone')}"
-    _refused(_ask(box, project, "Bash", command, ENGINEER, ticket), f"Bash `{command}` {what}", box, folder)
-
 
 def _ticket_named(tk, name, status="in_progress"):
     """The suite's ticket text for an engineer ticket ``tk`` whose ``external-ref`` is ``name``, as written."""
@@ -110,80 +77,8 @@ def _folders_under_the_root(box):
 # 1. A project that lies inside the session's own folder keeps every in-project rule
 # --------------------------------------------------------------------------
 
-@dataclasses.dataclass(frozen=True)
-class _InsideTheOwnFolder(support.Sandbox):
-    """The suite's sandbox, with the fixture project at ``~/gov-os-runs/W2-90/clone`` instead of the worktree."""
-
-    @property
-    def project(self):
-        return self.root / MAIN.folder / "clone"
-
-
-def _inside_the_own_folder(box):
-    return _InsideTheOwnFolder(**{field.name: getattr(box, field.name) for field in dataclasses.fields(box)})
-
 
 LOCATIONS = ("a-worktree", "inside-the-own-folder")
-
-
-@pytest.fixture(params=LOCATIONS)
-def located(request, sandbox):
-    """``(box, project)``: the fixture project in a worktree (the control) or inside MAIN's own folder."""
-    box = sandbox if request.param == "a-worktree" else _inside_the_own_folder(sandbox)
-    project = support.make_project(box)
-    if request.param == "inside-the-own-folder":
-        assert support.covers(os.path.realpath(box.own(MAIN)), project), f"{project} is not in {box.own(MAIN)}"
-    return box, project
-
-
-# The places a project's rules refuse, by the role that is refused, with words its reason may hold.
-IN_PROJECT_REFUSALS = {
-    "an-acceptance-test-by-the-engineer": (ENGINEER, "tests/acceptance/W2-90/test_new.py", "acceptance"),
-    "an-acceptance-test-by-the-orchestrator": (ORCHESTRATOR, "tests/acceptance/W2-90/test_new.py", "acceptance"),
-    "the-freeze-flag": (ENGINEER, ".gov-runtime/freeze", "freeze"),
-    "a-runtime-record": (ENGINEER, ".gov-runtime/findings.jsonl", ".gov-runtime"),
-    "a-ticket-file": (ENGINEER, ".tickets/DAEO-zz90.md", ".tickets"),
-    "the-settings-file": (ENGINEER, ".claude/settings.json", "settings"),
-    "the-guard-hook": (ENGINEER, support.GUARD_REL, "hook"),
-    "a-path-outside-the-tickets-paths": (ENGINEER, "docs/notes.md", "allowed_paths"),
-}
-
-# What the same rules leave open, by the role that may write it.
-IN_PROJECT_OPEN = {
-    "a-path-inside-the-tickets-paths": (ENGINEER, "src/app/main.py"),
-    "the-projects-scratch": (ENGINEER, ".gov-runtime/scratch/notes.md"),
-    "an-acceptance-test-by-the-test-designer": (TEST_DESIGNER, "tests/acceptance/W2-90/test_new.py"),
-}
-
-
-@pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
-def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
-    """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
-    box, project = located
-    role, rel, word = IN_PROJECT_REFUSALS[place]
-    _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
-                 MAIN.tk, word)
-
-
-@pytest.mark.parametrize("place", sorted(IN_PROJECT_OPEN))
-def test_a_project_inside_the_own_folder_keeps_what_its_rules_allow(located, place):
-    """The control of the refusals: the same project, the same session, its allowed paths written as anywhere else."""
-    box, project = located
-    role, rel = IN_PROJECT_OPEN[place]
-    _all_allowed(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
-                 MAIN.tk)
-
-
-def test_the_own_folder_outside_a_project_inside_it_gives_that_session_nothing(sandbox):
-    """DEC-108's counterpart: a project in the own folder does not get the own folder's allowance outside itself."""
-    box = _inside_the_own_folder(sandbox)
-    project = support.make_project(box)
-    own = box.own(MAIN)
-    support.write(own / "notes.txt", "beside the clone\n")
-    for target in (own / "notes.txt", own / "another-clone" / "README.md"):
-        _all_refused(box, project, target, f"(beside the project {project}, in the own folder)")
-    command = f"mkdir -p {q(own / 'another-clone')}"
-    _refused(_ask(box, project, "Bash", command), f"Bash `{command}` (beside the project)", box, own)
 
 
 # --------------------------------------------------------------------------
@@ -211,29 +106,6 @@ PLAIN = "W2-90_b.1"      # letters, digits, '.', '_' and '-', starting with a le
 
 def _named_project(box, name):
     return support.make_project(box, extra={f".tickets/{NAMED.tk}.md": _ticket_named(NAMED.tk, name)})
-
-
-@pytest.mark.parametrize("case", sorted(NOT_PLAIN))
-def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
-    """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
-    name, matched = NOT_PLAIN[case]
-    project = _named_project(sandbox, name)
-    what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
-    _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
-    if matched:
-        _all_refused(sandbox, project, sandbox.root / matched / "notes.txt", f"{what}, a folder the glob matches",
-                     ENGINEER, NAMED.tk)
-
-
-def test_a_plain_folder_name_with_dot_and_underscore_names_the_folder(sandbox):
-    """The control: a ticket written the same way, with a plain name, has its folder.
-
-    Rewritten under DEC-751: the folder is made by ``gov launch`` of the ticket first.
-    """
-    project = _named_project(sandbox, PLAIN)
-    support.open_own_folder(sandbox, NAMED.tk, ENGINEER, PLAIN)
-    _all_allowed(sandbox, project, sandbox.root / PLAIN / "notes.txt",
-                 f"by the engineer on {NAMED.tk} (external-ref {PLAIN!r})", ENGINEER, NAMED.tk)
 
 
 LAUNCHED_NOT_PLAIN = ("a-star", "a-double-star", "a-bracket", "a-quote", "a-space", "a-leading-dash", "dot-dot")
@@ -277,39 +149,6 @@ def _sharing_project(box, status="in_progress"):
 def _crossing_project(box):
     """The fixture project with CROSS, whose external-ref is the tk id NO_W2_ID's folder is named by."""
     return support.make_project(box, extra={f".tickets/{CROSS.tk}.md": _ticket_named(CROSS.tk, NO_W2_ID.tk)})
-
-
-@pytest.mark.parametrize("status", ("in_progress", "open", "closed"))
-def test_a_folder_two_tickets_name_is_refused_to_the_session_of_either(sandbox, status):
-    """Two tickets with the external-ref W2-90: MAIN's session may not write there, whatever SHARER's status."""
-    project = _sharing_project(sandbox, status)
-    _folder_refused(sandbox, project, sandbox.own(MAIN), f"by the engineer on {MAIN.tk} ({SHARER.tk} names it too, "
-                    f"{status})", MAIN.tk)
-
-
-def test_the_other_ticket_naming_the_folder_gets_it_neither(sandbox):
-    project = _sharing_project(sandbox)
-    _folder_refused(sandbox, project, sandbox.own(MAIN), f"by the engineer on {SHARER.tk} (external-ref "
-                    f"{MAIN.folder}, as {MAIN.tk}'s)", SHARER.tk)
-
-
-@pytest.mark.parametrize("ticket", (NO_W2_ID, CROSS), ids=("the-ticket-named-by-its-tk-id", "the-ticket-whose-ref-is-it"))
-def test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_both(sandbox, ticket):
-    """CROSS's external-ref is DAEO-zz98, the name of NO_W2_ID's folder (it has no external-ref): neither gets it."""
-    project = _crossing_project(sandbox)
-    _folder_refused(sandbox, project, sandbox.root / NO_W2_ID.tk, f"by the engineer on {ticket.tk} "
-                    f"({CROSS.tk}'s external-ref is {NO_W2_ID.tk})", ticket.tk)
-
-
-def test_a_ticket_whose_name_no_other_shares_keeps_its_folder(sandbox):
-    """The control, in the same project: OTHER's W2-91 is named by no other ticket, so its folder stays open.
-
-    Rewritten under DEC-751: the folder is made by ``gov launch`` of OTHER first.
-    """
-    project = _sharing_project(sandbox)
-    support.open_own_folder(sandbox, OTHER)
-    _all_allowed(sandbox, project, sandbox.own(OTHER) / "notes.txt", f"by the engineer on {OTHER.tk}", ENGINEER,
-                 OTHER.tk)
 
 
 SHARED_LAUNCHES = {

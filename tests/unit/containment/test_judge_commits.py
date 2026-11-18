@@ -67,7 +67,7 @@ def _commit(project, path, *trailers, message="work"):
 # ---- ContainmentError is a proper subclass ----
 
 def test_containment_error_is_a_subclass_of_exception():
-    from gov.guard.containment import ContainmentError
+    from gov.containment.commits import ContainmentError
     assert issubclass(ContainmentError, Exception)
     assert ContainmentError is not Exception
 
@@ -75,7 +75,7 @@ def test_containment_error_is_a_subclass_of_exception():
 # ---- empty list raises ----
 
 def test_empty_list_raises(tmp_path):
-    from gov.guard.containment import ContainmentError, judge_commits
+    from gov.containment.commits import ContainmentError, judge_commits
     project = _make_project(tmp_path)
     import pytest
     with pytest.raises(ContainmentError):
@@ -85,7 +85,7 @@ def test_empty_list_raises(tmp_path):
 # ---- not a repo raises ----
 
 def test_not_a_repo_raises(tmp_path):
-    from gov.guard.containment import ContainmentError, judge_commits
+    from gov.containment.commits import ContainmentError, judge_commits
     empty = tmp_path / "empty"
     empty.mkdir()
     import pytest
@@ -96,7 +96,7 @@ def test_not_a_repo_raises(tmp_path):
 # ---- unknown commit raises ----
 
 def test_unknown_commit_raises(tmp_path):
-    from gov.guard.containment import ContainmentError, judge_commits
+    from gov.containment.commits import ContainmentError, judge_commits
     project = _make_project(tmp_path)
     import pytest
     with pytest.raises(ContainmentError):
@@ -106,7 +106,7 @@ def test_unknown_commit_raises(tmp_path):
 # ---- a commit inside its paths passes ----
 
 def test_engineer_inside_paths_passes(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     cid = _commit(project, "src/main.py",
                   f"Task: {TICKET}", "Role: engineer")
@@ -117,7 +117,7 @@ def test_engineer_inside_paths_passes(tmp_path):
 # ---- a commit outside its paths is a finding ----
 
 def test_engineer_outside_paths_is_finding(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     cid = _commit(project, "README.md",
                   f"Task: {TICKET}", "Role: engineer")
@@ -130,7 +130,7 @@ def test_engineer_outside_paths_is_finding(tmp_path):
 # ---- no trailers judged as orchestrator ----
 
 def test_no_trailers_judged_as_orchestrator(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     cid = _commit(project, "README.md")
     findings = judge_commits(str(project), [cid])
@@ -138,7 +138,7 @@ def test_no_trailers_judged_as_orchestrator(tmp_path):
 
 
 def test_no_trailers_acceptance_test_is_finding(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     cid = _commit(project, "tests/acceptance/W1-01/test_one.py")
     findings = judge_commits(str(project), [cid])
@@ -149,7 +149,7 @@ def test_no_trailers_acceptance_test_is_finding(tmp_path):
 # ---- Role: owner is always a finding ----
 
 def test_role_owner_is_finding(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     cid = _commit(project, "README.md", "Role: owner")
     findings = judge_commits(str(project), [cid])
@@ -160,7 +160,7 @@ def test_role_owner_is_finding(tmp_path):
 # ---- read-only: nothing written ----
 
 def test_read_only(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     import os
     project = _make_project(tmp_path)
     cid = _commit(project, "README.md",
@@ -195,7 +195,7 @@ def test_read_only(tmp_path):
 # ---- mixed list returns only findings in order ----
 
 def test_mixed_list_returns_findings_in_order(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     clean = _commit(project, "src/main.py",
                     f"Task: {TICKET}", "Role: engineer")
@@ -209,7 +209,7 @@ def test_mixed_list_returns_findings_in_order(tmp_path):
 # ---- freeze: everything is a finding ----
 
 def test_freeze_makes_everything_a_finding(tmp_path):
-    from gov.guard.containment import judge_commits
+    from gov.containment.commits import judge_commits
     project = _make_project(tmp_path)
     cid = _commit(project, "src/main.py",
                   f"Task: {TICKET}", "Role: engineer")
@@ -219,19 +219,3 @@ def test_freeze_makes_everything_a_finding(tmp_path):
     findings = judge_commits(str(project), [cid])
     assert len(findings) == 1
     assert findings[0].commit == cid
-
-
-# ---- _parse_log_output is used by _move_commits (regression) ----
-
-def test_parse_log_output_used_by_move_commits(tmp_path):
-    from gov.guard.containment import _move_commits
-    project = _make_project(tmp_path)
-    old = _git(project, "rev-parse", "HEAD").strip()
-    cid = _commit(project, "src/main.py",
-                  f"Task: {TICKET}", "Role: engineer")
-    commits = _move_commits(str(project), old, cid)
-    assert len(commits) == 1
-    assert commits[0][0] == cid
-    assert commits[0][2] == ["engineer"]
-    assert commits[0][3] == [TICKET]
-    assert "src/main.py" in commits[0][4]

@@ -81,8 +81,6 @@ def test_a_workers_rollback_of_an_unknown_ticket_is_refused_as_a_workers_and_set
 def test_the_orchestrator_can_pause(project, sandbox, pause, interface):
     support.succeeded(pause(role=support.ORCHESTRATOR), interface)
     assert support.is_paused(project), f"the orchestrator's gov pause did not set {support.FREEZE_FLAG_REL}"
-    support.assert_denied(support.guard_write(project, sandbox, support.ORCHESTRATOR),
-                          "after its own pause, the orchestrator's write")
 
 
 def test_the_orchestrator_can_cancel_agents(project, pause, interface, claims):
@@ -100,15 +98,12 @@ def test_the_orchestrator_cannot_lift_a_pause(project, sandbox, pause, interface
     support.succeeded(pause(role=support.ORCHESTRATOR), interface)
     support.refused(pause("--off", role=support.ORCHESTRATOR), interface)
     assert support.is_paused(project), "the orchestrator's gov pause --off cleared the flag"
-    support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER),
-                          "after the orchestrator's refused --off, the write")
 
 
 def test_the_owner_lifts_a_pause_the_orchestrator_set(project, sandbox, pause, lift, interface):
     support.succeeded(pause(role=support.ORCHESTRATOR), interface)
     lift()  # DEC-409: the owner in person
     assert not support.is_paused(project), "the owner's gov pause --off left the orchestrator's freeze"
-    support.assert_allowed(support.guard_write(project, sandbox, support.ENGINEER), "after the owner's --off, the write")
 
 
 # --------------------------------------------------------------------------
@@ -118,7 +113,7 @@ def test_the_owner_lifts_a_pause_the_orchestrator_set(project, sandbox, pause, l
 def test_the_owner_is_the_call_without_gov_role_whatever_the_session_that_runs_the_tests_has(project, pause, lift,
                                                                                          interface, monkeypatch):
     """The tests run in a worker's session. Its ``GOV_ROLE`` does not reach the command: the call is the owner's."""
-    monkeypatch.setenv(support.guard_support.ROLE_ENV, support.ENGINEER)
+    monkeypatch.setenv("GOV_ROLE", support.ENGINEER)
     support.succeeded(pause(), interface)
     assert support.is_paused(project)
     lift()  # DEC-409: the owner in person; the session's GOV_ROLE does not reach that call either
