@@ -51,16 +51,16 @@ allowed_paths:
 - .claude/templates/role-reviewer.md  # Gov OS's byte copy of the kernel reviewer template (EMERGENCY-2 2.10)
 - tests/unit/adopt/test_w2_174_fields.py  # unit fixtures that plant a judging brief or count A9's kernel skills (the lead's P3)
 - tests/unit/adopt/test_w2_88_ignored.py
-- tests/unit/adopt/test_w2_88_nc1.py
 - tests/unit/adopt/test_w2_88_p1.py
 - tests/unit/adopt/test_w2_88_run4.py
 - tests/acceptance/W2-152/w2_152_support.py  # other tickets' acceptance support, revised by the test designer (P3, P4)
 - tests/acceptance/W2-174/test_w2_174_fields.py
-- tests/acceptance/W2-153/test_w2_153_sources.py
+- tests/acceptance/W2-153/w2_153_support.py
+- tests/acceptance/W2-152/test_w2_152_fill.py
 - tests/acceptance/W2-175/test_w2_175_templates.py
-- tests/acceptance/W2-60b/test_w2_60b_s7_s8_roles.py
+- tests/acceptance/W2-60b/w2_60b_support.py
+- tests/acceptance/W2-174/w2_174_support.py
 - tests/acceptance/W2-88/w2_88_support.py
-- tests/acceptance/W2-88/test_w2_88_f3_ignored.py
 - tests/unit/launch/test_w2_184_launch.py  # their planted independent-auditor role files gain the skill (S3's launch check; the lead's path case)
 - tests/unit/launch/test_w2_184_r_fixes.py
 - tests/unit/launch/test_session_record_launch.py
