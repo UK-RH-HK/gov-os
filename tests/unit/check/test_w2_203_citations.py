@@ -30,3 +30,12 @@ def test_a_tree_without_the_archive_has_no_ids_of_it_and_no_finding_of_its_own(p
     project.write("old/reg.md", ENTRY.format("DEC-100"))
     project.commit("The archive")
     assert project.flagged() == [("DECISION_UNRECORDED", before, "DEC-100")]
+
+
+def test_an_archive_heading_without_a_status_line_is_recorded_too(project):  # noqa: F811
+    project.configure(decision_register="reg.md", decision_register_archive="old/reg.md")
+    project.write("reg.md", ENTRY.format("DEC-200"))
+    project.write("old/reg.md", "### DEC-027 — An old rule\nA paragraph first.\n")
+    project.write("reg2.md", "### DEC-028 — Not the register\nA paragraph.\n")
+    project.commit("Under DEC-027")
+    assert project.flagged() == []

@@ -50,8 +50,18 @@ def rows(root: Path, sql: str) -> list[tuple]:
         connection.close()
 
 
-def test_ids_in_gives_the_live_entries_headings_and_leaves_out_an_entry_the_loader_refuses():
-    assert archive.ids_in(ARCHIVE) == {"DEC-100": "### DEC-100 — The old rule", "DEC-200": "### DEC-200 — The kept rule"}
+IDS = {"DEC-100": "### DEC-100 — The old rule", "DEC-027": "### DEC-027 — No status line",
+       "DEC-200": "### DEC-200 — The kept rule"}
+
+
+def test_ids_in_gives_every_entry_heading_with_or_without_a_status_line():
+    assert archive.ids_in(ARCHIVE) == IDS
+
+
+def test_ids_in_reads_no_heading_in_a_fence_or_a_comment_and_an_id_under_two_headings_once():
+    text = ("```\n### DEC-301 — In a fence\n```\n<!--\n### DEC-302 — In a comment\n-->\n### DEC-303 — First\n\n"
+            "### DEC-303 — Second\n### DEC-30 — Too short\n### dec-304 — Not the grammar\n### DEC-305\n")
+    assert archive.ids_in(text) == {"DEC-303": "### DEC-303 — First"}
 
 
 def test_read_is_heads_archive_and_none_where_none_is_named_or_held(tmp_path):

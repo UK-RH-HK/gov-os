@@ -96,8 +96,8 @@ SUPERSEDES = "SUPERSEDES"  # a decision -> a decision it supersedes whole: the s
 AMENDS = "AMENDS"  # a decision -> a decision it changes in part: amendments, and supersessions of a part
 UNDER = "UNDER"  # a decision -> a decision it stands under (**Under:**)
 # W2-203 (EMERGENCY-2 11.3): the ids and headings of the archived register (the file the path map names under
-# ``ARCHIVE_KEY``), so that a decision id of the archive still resolves, as history. One row per live entry of the
-# archive; none where no archive is named or ``HEAD`` holds none (no refusal). A table of its own, out of the digest
+# ``ARCHIVE_KEY``), so that a decision id of the archive still resolves, as history. One row per entry heading of the
+# archive (a status line is not asked of history; an id under two headings is one id, its first heading); none where no archive is named or ``HEAD`` holds none (no refusal). A table of its own, out of the digest
 # like the titles and part of the schema version: an archive-only id is no record, no register entry and no edge.
 ARCHIVE_KEY = "decision_register_archive"
 ARCHIVE_TABLE = "archived_decisions"
@@ -175,16 +175,11 @@ def _register(root: Path, tree: dict) -> tuple[str, str] | None:
     return path, text
 
 
-def register_entries(text: str) -> tuple[list[dict], list[str]]:
-    """The live entries of a register's ``text``, and the reason each heading of the entry form is no entry.
-
-    A live entry is a heading of DEC-473's grammar outside fenced code blocks and HTML comments, whose first line
-    that is not blank is a status line with a word in capitals (W2-L221, W2-M145, W2-M106). Its ``span`` is its own
-    text, from its heading to the line before the next heading, without the blank lines that end it; its
-    ``content_hash`` is the sha256 of the span (AR-1). An id under two headings is no entry, named with both lines.
-    The store and the decision-citations check count entries by this one rule.
-    """
-    lines, ends, heads, fence, comment = text.split("\n"), [], [], None, False
+def _headings(lines: list[str]) -> tuple[list[int], list[int]]:
+    """``(ends, heads)`` of a register's lines, by number from 0: where an entry's text ends (every heading outside
+    fenced code blocks, a heading inside an HTML comment too) and the headings an entry may stand under (those
+    outside fenced blocks and HTML comments). The archive's ids are read by the same scan (``gov.util.archive``)."""
+    ends, heads, fence, comment = [], [], None, False
     for number, line in enumerate(lines):
         mark = _FENCE.match(line)
         if fence is not None:
@@ -202,6 +197,20 @@ def register_entries(text: str) -> tuple[list[dict], list[str]]:
                 heads.append(number)
             if "<!--" in line:
                 comment = "-->" not in line.rpartition("<!--")[2]
+    return ends, heads
+
+
+def register_entries(text: str) -> tuple[list[dict], list[str]]:
+    """The live entries of a register's ``text``, and the reason each heading of the entry form is no entry.
+
+    A live entry is a heading of DEC-473's grammar outside fenced code blocks and HTML comments, whose first line
+    that is not blank is a status line with a word in capitals (W2-L221, W2-M145, W2-M106). Its ``span`` is its own
+    text, from its heading to the line before the next heading, without the blank lines that end it; its
+    ``content_hash`` is the sha256 of the span (AR-1). An id under two headings is no entry, named with both lines.
+    The store and the decision-citations check count entries by this one rule.
+    """
+    lines = text.split("\n")
+    ends, heads = _headings(lines)
     ends.append(len(lines))
     found, refused = {}, []
     for number in heads:

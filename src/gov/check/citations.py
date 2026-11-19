@@ -83,6 +83,17 @@ def _entries(content: bytes) -> set[str] | None:
     return {entry["id"] for entry in register_entries(text)[0]}
 
 
+def _archived(content: bytes) -> set[str]:
+    """The ids an archived register holds by its entry headings (``gov.util.archive``); none where it is not text."""
+    from gov.util import archive
+
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return set()
+    return set() if "\0" in text else set(archive.ids_in(text))
+
+
 def _register(root: Path, objects: _Objects, commit: str, register: str | None,
               archive: str | None = None) -> tuple[set[str], list[tuple]]:
     """The decision ids recorded in the tree of ``commit`` by its decision files, by the file ``register`` and by the
@@ -104,8 +115,8 @@ def _register(root: Path, objects: _Objects, commit: str, register: str | None,
             else:
                 recorded |= entries
         if path == archive and path != register and mode.startswith("100"):
-            recorded |= _once(objects, ("entries", blob),
-                              lambda: _entries(_content(objects, blob, commit, path))) or set()
+            recorded |= _once(objects, ("archived", blob),
+                              lambda: _archived(_content(objects, blob, commit, path)))
         if not path.endswith(".md"):
             continue
         if blob not in objects.known:  # the id a file records, "" for none, None where it cannot be read
