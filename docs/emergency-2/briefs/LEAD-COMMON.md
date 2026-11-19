@@ -44,3 +44,5 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Every session runs the model and effort the rubric gives its role; none chooses its own. Leads and every helper run
 Sonnet; a spawn naming another model is refused by `.claude/hooks/agent_model.py`. An exception goes to the owner as one
 line through the CTO. Watch the quality: if Sonnet's work drops for a role, say so in your return.
+
+**The C3 trial (the owner, DEC-1222 (2); `docs/emergency-2/C3-TRIAL.md`):** on a ticket whose code is C3 (`governance/project/criticality.yaml`), the independent test designer runs **Opus** (spawn with `model: opus`, the prompt carrying `Task: <ticket id>`) and the engineer runs **Sonnet** (no model). C3 text (the Contract, the Charter, kernel text) is written on Sonnet and the CTO checks it before it lands. In your return, give for the trial: the number of acceptance runs from the engineer's first commit to the first all-green `gov accept`, and each send-back to the engineer with its cause.
