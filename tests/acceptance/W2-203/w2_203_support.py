@@ -40,7 +40,9 @@ SCHEMA_REL = "template/governance/kernel/schemas/path-map.schema.json"
 BUILDER_REL = "docs/emergency-2/audits/08-new-register.py"
 ARCHIVE_KEY = "decision_register_archive"
 ARCHIVE_TABLE = "archived_decisions"
-FIRST_LATE = 1211  # every entry from this id on is in the kept register, whatever its class
+# Audit 8 classed DEC-001 to DEC-1210. Every entry from this id on is in the register whatever its class, and is the
+# register's own: live, amended in place, never held to the archive's copy of it (the amended S2, S6 and F1).
+FIRST_LATE = 1211
 STORE_REL = ".gov-runtime/store.db"
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -123,11 +125,21 @@ def number_of(record_id: str) -> int:
 
 
 def kept(record_id: str, text: str) -> bool:
-    """Whether the kept register must hold the entry: an id from DEC-1211 on, or the class ``kept``."""
+    """Whether a first build from the archive writes the entry: an id from DEC-1211 on, or the class ``kept``."""
     if number_of(record_id) >= FIRST_LATE:
         return True
     found = _CLASS.search(text)
     return bool(found) and found.group(1) == "kept"
+
+
+def live(record_id: str) -> bool:
+    """An entry from DEC-1211 on: the register's own, which may differ from the archive's copy of it."""
+    return number_of(record_id) >= FIRST_LATE
+
+
+def classed_kept(record_id: str, text: str) -> bool:
+    """An entry audit 8 classed ``kept`` (below DEC-1211): the register holds it as the archive has it, verbatim."""
+    return not live(record_id) and kept(record_id, text)
 
 
 def cited(text: str) -> set[str]:
