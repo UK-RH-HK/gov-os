@@ -2,6 +2,12 @@
 
 Repository-state cases on this tree's register and archive; the doctor case runs ``gov doctor --json`` as a child on
 two temporary clones (the base and HEAD), offline, with an empty ``HOME``.
+
+S2 as the CTO amended it (2026-11-19): the register in force is live. Its kept part, every entry of the archive that
+audit 8 classed ``kept`` (DEC-001 to DEC-1210), is the archive's, verbatim and in the archive's order. Its entries from
+DEC-1211 on are its own: amended in place (DEC-1215 (2) orders its revert recorded in its entry) and followed by new
+decisions the archive never holds, so they are held only to being there, DEC-1211 to DEC-1216, as entries the store's
+loader accepts. The archive is frozen and never follows.
 """
 
 from __future__ import annotations
@@ -17,29 +23,39 @@ def _read(rel: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _expected() -> list[tuple[str, str]]:
-    """The archive's entries the kept register must hold, in the archive's order."""
-    wanted = [(record_id, text) for record_id, text in s.entries(_read(s.ARCHIVE_REL)) if s.kept(record_id, text)]
-    assert len(wanted) > 100, f"premise: the archive holds {len(wanted)} kept or late entries"
+LIVE_AT_THE_MOVE = [f"DEC-{number}" for number in range(s.FIRST_LATE, 1217)]  # the decisions since audit 8's classes
+
+
+def _archive_kept() -> list[tuple[str, str]]:
+    """The archive's entries of class ``kept`` (below DEC-1211), in the archive's order: the register's kept part."""
+    wanted = [(record_id, text) for record_id, text in s.entries(_read(s.ARCHIVE_REL))
+              if s.classed_kept(record_id, text)]
+    assert len(wanted) > 100, f"premise: the archive holds {len(wanted)} entries of class kept"
     return wanted
 
 
-def test_s2_the_register_holds_the_kept_entries_and_every_late_one_in_the_archives_order_and_no_other():
-    wanted = [record_id for record_id, _ in _expected()]
+def test_s2_the_register_holds_the_archives_kept_entries_in_its_order_then_its_own_from_dec_1211_on():
+    wanted = [record_id for record_id, _ in _archive_kept()]
     held = [record_id for record_id, _ in s.entries(_read(s.REGISTER_REL))]
-    assert held == wanted, (f"the register holds {len(held)} entries, the archive has {len(wanted)} kept or late: "
-                            f"missing {[i for i in wanted if i not in held][:8]}, "
-                            f"not kept {[i for i in held if i not in wanted][:8]}"
-                            + ("" if sorted(held) != sorted(wanted) else ", in another order"))
-    late = [record_id for record_id in held if s.number_of(record_id) >= s.FIRST_LATE]
-    assert late[:1] == ["DEC-1211"] and len(late) >= 6, f"the entries from DEC-1211 on: {late}"
+    kept_part = [record_id for record_id in held if not s.live(record_id)]
+    assert kept_part == wanted, (f"the register holds {len(kept_part)} entries below DEC-{s.FIRST_LATE}, the archive "
+                                 f"has {len(wanted)} of class kept: missing "
+                                 f"{[i for i in wanted if i not in kept_part][:8]}, "
+                                 f"not kept {[i for i in kept_part if i not in wanted][:8]}"
+                                 + ("" if sorted(kept_part) != sorted(wanted) else ", in another order"))
+    late = held[len(kept_part):]
+    assert kept_part + late == held and all(s.live(record_id) for record_id in late), \
+        f"an entry below DEC-{s.FIRST_LATE} stands after one from DEC-{s.FIRST_LATE} on: {late[:12]}"
+    assert [record_id for record_id in late if record_id in LIVE_AT_THE_MOVE] == LIVE_AT_THE_MOVE, \
+        f"the entries from DEC-{s.FIRST_LATE} on do not hold {LIVE_AT_THE_MOVE} once each, in order: {late}"
 
 
-def test_s2_each_entry_is_the_archives_verbatim():
+def test_s2_each_kept_entry_is_the_archives_verbatim():
+    """The kept part only: an entry from DEC-1211 on is the register's own and may differ from the archive's copy."""
     held = dict(s.entries(_read(s.REGISTER_REL)))
-    wanted = _expected()
+    wanted = _archive_kept()
     differing = [record_id for record_id, text in wanted if held.get(record_id) != text]
-    assert not differing, f"{len(differing)} entries are not the archive's text: {differing[:10]}"
+    assert not differing, f"{len(differing)} kept entries are not the archive's text: {differing[:10]}"
     for record_id, text in wanted[:1] + wanted[-1:]:  # the heading, the status line and its class are in that text
         lines = text.split("\n")
         assert lines[0].startswith(f"### {record_id}") and "**Status:**" in lines[1]
@@ -49,9 +65,13 @@ def test_s2_the_store_loader_reads_the_register_with_no_refusal():
     from gov.store.loader import register_entries
 
     _read(s.ARCHIVE_REL)  # the register is the kept one only once the archive exists
-    live, refused = register_entries(_read(s.REGISTER_REL))
+    text = _read(s.REGISTER_REL)
+    live, refused = register_entries(text)
     assert refused == [], f"the store's loader refuses headings of the kept register: {refused[:5]}"
-    assert [entry["id"] for entry in live] == [record_id for record_id, _ in _expected()]
+    read = [entry["id"] for entry in live]
+    assert read == [record_id for record_id, _ in s.entries(text)], "the loader does not read every entry, in order"
+    absent = [record_id for record_id in LIVE_AT_THE_MOVE if record_id not in read]
+    assert not absent, f"the loader reads no entry for {absent}: the decisions since audit 8's classes are the register's"
 
 
 def test_s2_the_head_says_what_the_file_is_and_names_the_archive_and_audit_8():
