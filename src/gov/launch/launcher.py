@@ -1160,10 +1160,11 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
         # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
         # folder made here is marked as this repository's; a folder that is there without this repository's marker,
         # or that cannot be named, made or marked, is not opened: the session then has none.
-        name = runs.folder(str(root), ticket_id, role)
+        # W2-201 fix X8: a fix gets the folder whatever its ticket's status, an earlier marked one reused as it is.
+        name = runs.folder(str(root), ticket_id, role, kind)
         if name is not None and not os.path.lexists(name):
             runs.make(name, str(root))
-        own = runs.own_folder(str(root), ticket_id, role)
+        own = runs.own_folder(str(root), ticket_id, role, kind)
         # W2-60a: the appended file (the role's text, then the template) and the record are made in _run
         return _run(root, cli, settings, cli_args, temp_prefix=TEMP_PREFIX, own=own, entry=(label, role),
                     lock=lock, worker=plan)
