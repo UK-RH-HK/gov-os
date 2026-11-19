@@ -39,7 +39,7 @@ Copy this checklist into your notes and tick each step as you go.
 - [ ] 5. **Judge each finding** by the audit skill's judgement rules: the two questions, word for word, and the two lines `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808). Give it a severity tied to P3/P2/P1 (below).
 - [ ] 6. **Write the findings report** at `<the QA findings path>/<ticket id>.md`, then check it against "Done when".
 
-**Severity**, tied to P3/P2/P1 of the escalation rubric (DEC-957):
+**Severity**, tied to P3/P2/P1 of the escalation rubric (DEC-1219 (2)):
 
 - **P1:** ordinary work "yes" and it fails open or loses work; or a KPI line neither tested nor built. It blocks the merge.
 - **P2:** ordinary work "yes" and a wrong result or a broken KPI line, with no fail-open and no loss; or a failure line with no test. Fixed in the ticket's current round or its next resume (DEC-802).
@@ -56,7 +56,7 @@ Copy this checklist into your notes and tick each step as you go.
 
 ## Escalation
 
-- A P1, or any bug the lead's repair does not resolve, goes to the stream's Senior Engineer, then the orchestrator, then the owner (DEC-957); never to the owner directly.
+- A P1, or any bug the lead's repair does not resolve, goes to the stream's Senior Engineer, then the orchestrator, then the owner (DEC-1219 (2)); never to the owner directly.
 - An Emergency (a secret exposed, a risk of losing data, the disk below its floor, the guard failing open) stops the review at once and goes up as a P1.
 
 ## Never

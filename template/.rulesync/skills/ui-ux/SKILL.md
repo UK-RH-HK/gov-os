@@ -102,7 +102,7 @@ If any is false: fix, then check again.
 
 ## Escalation
 
-**When to escalate:** ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-957), to whoever started the session,
+**When to escalate:** ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-1219 (2)), to whoever started the session,
 never to the owner directly; the owner sees scenarios, carried by the one who started you.
 
 - P3: a wording choice inside a reviewed scenario that changes no step; note it in `discoveries`.
