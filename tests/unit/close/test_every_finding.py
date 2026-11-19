@@ -110,9 +110,11 @@ def test_the_probe_gate_ends_at_its_first_finding_and_says_what_it_did_not_ask(r
 
 # ---- the one refusal ----
 
-def _refused(root, found, disposition=None, packet=None):
+def _refused(root, found, disposition=None):
+    """The one refusal of ``found``. Since DEC-1214 M1 (W2-200) the refusal path is given no context packet: the fifth
+    argument is None, which is no packet where the parameter stays and the default test runs where it is gone."""
     with pytest.raises(GovError) as raised:
-        _refuse_for(root, TICKET, found, disposition, packet)
+        _refuse_for(root, TICKET, found, disposition, None)
     return raised.value
 
 
@@ -153,27 +155,24 @@ def test_gates_with_one_code_keep_it(root):
 
 
 def test_without_a_class_the_findings_await_it_and_no_context_hash_is_recorded(root):
-    error = _refused(root, [_Finding("CHECK_FAILED", "tests or checks failed")], packet={"hash": "ab" * 32})
+    """Rewrite-Reason: DEC-1214 M1 (W2-200 S7): the refusal is given no packet (the context command is retired); the
+    findings still await their class and no context hash is recorded."""
+    error = _refused(root, [_Finding("CHECK_FAILED", "tests or checks failed")])
     assert error.details["disposition"] == "unclassed" and "disposition" in error.details["note"]
     assert error.message.endswith("await disposition")
     assert "context_hash" not in frontmatter(_tickets(root)[0])
 
 
-def test_with_a_class_the_repair_ticket_has_the_context_hash(root):
-    error = _refused(root, [_Finding("CHECK_FAILED", "tests or checks failed")], "narrow", {"hash": "ab" * 32})
+def test_with_a_class_the_repair_ticket_records_it_and_no_context_hash(root):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200 S7): was ``test_with_a_class_the_repair_ticket_has_the_context_hash``; the
+    context command is retired, so the repair ticket records the class and no ``context_hash``, and no line of it
+    speaks of a context."""
+    error = _refused(root, [_Finding("CHECK_FAILED", "tests or checks failed")], "narrow")
     assert error.details["disposition"] == "narrow" and "note" not in error.details
+    assert "context" not in error.details
     front = frontmatter(_tickets(root)[0])
-    assert (front["disposition"], front["context_hash"]) == ("narrow", "ab" * 32)
-
-
-def test_with_a_class_a_context_that_failed_is_a_finding_and_is_named_on_the_repair_ticket(root):
-    error = _refused(root, [_Finding("CHECK_FAILED", "tests or checks failed", None, ["FAILED a"]),
-                            _Finding("CONTEXT_FAILED", "the context cannot be built: no store")], "repair")
-    assert error.details["findings"] == ["FAILED a", "the context cannot be built: no store"]
-    assert error.details["context"] == "the context cannot be built: no store"
-    text = _tickets(root)[0].read_text(encoding="utf-8")
-    assert "without whole-system context: the context cannot be built: no store" in text
-    assert "context_hash" not in frontmatter(_tickets(root)[0])
+    assert front["disposition"] == "narrow" and "context_hash" not in front
+    assert "context" not in _tickets(root)[0].read_text(encoding="utf-8").lower()
 
 
 # ---- the run asks every gate of a phase (DEC-868 item 3: the commit gates, then the pre-close gate, then the
@@ -181,7 +180,7 @@ def test_with_a_class_a_context_that_failed_is_a_finding_and_is_named_on_the_rep
 
 COMMIT_GATES = ("_check_trailers", "_check_unmeasured")
 PRE_CLOSE_GATES = ("check_collection", "_check_governance_blocks", "_check_checkpoint")
-TEST_GATES = ("_check_containment", "_check_acceptance", "_check_tests", "_build_context")
+TEST_GATES = ("_check_containment", "_check_acceptance", "_check_tests")  # the context gate retired (DEC-1214 M1)
 PHASES = (COMMIT_GATES, PRE_CLOSE_GATES, TEST_GATES)
 GATES = COMMIT_GATES + PRE_CLOSE_GATES + TEST_GATES
 
@@ -206,8 +205,7 @@ def _run(root, **answers):
             asked.append(name)
             if name in answers:
                 raise answers[name]
-            return {"_check_acceptance": dict(COUNTS), "_check_tests": dict(COUNTS),
-                    "_build_context": {"hash": "h", "mandatory": []}}.get(name, {})
+            return {"_check_acceptance": dict(COUNTS), "_check_tests": dict(COUNTS)}.get(name, {})
         return check
 
     args = SimpleNamespace(ticket=TICKET, disposition=None, owner_decision=None, timeout=None)

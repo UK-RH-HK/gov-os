@@ -75,7 +75,7 @@ def test_a_record_reading_test_turned_red_by_a_record_only_commit_refuses_the_sc
 
 def test_the_record_reading_set_reads_the_pre_close_gate_s_own_check_result(fixture, sandbox, tmp_path):
     """KPI 5: the gate's ``gov check --json`` output, given with ``--check-result``, reaches the set's tests in
-    ``GOV_CLOSE_CHECK_RESULT``, so that a context-reproducibility or core-schema case reads it instead of running
+    ``GOV_CLOSE_CHECK_RESULT``, so that a core-schema case reads it instead of running
     ``gov check`` again."""
     support.widget_change(fixture, sandbox)
     gate = support.close_support.run_gov(fixture.root, sandbox, "check", "--json")

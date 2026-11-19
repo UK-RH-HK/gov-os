@@ -1,8 +1,8 @@
 """KPI 4 and the "not done" line (DEC-969, DEC-968 item 3).
 
 - W2-54's time limits are not raised and its tests are not changed (failure line 4): no commit of this ticket
-  touches W2-54's tests or the context check's declaration, nothing there is changed and uncommitted, and the
-  declared limit is not above 600 s.
+  touches W2-54's tests or the context check's declaration, and nothing there is changed and uncommitted. The case
+  on that declaration's limit is deleted with the declaration (the context check is retired, DEC-1214 M1, W2-200).
 - The measure itself (the context check timed before and after) is the engineer's research record, not an
   acceptance test: this file checks only that the record exists and names the loads, the time in the freshness
   checks and in query embedding, and the batching verdict.
@@ -14,14 +14,12 @@ import re
 import subprocess
 
 import pytest
-import yaml
 
 import w2_108_support as S
 
 TASK = "DAEO-zoex"
 W2_54_TESTS = "tests/acceptance/W2-54"
-DECLARATIONS = ("template/governance/kernel/checks/context-reproducibility.yaml",
-                "governance/kernel/checks/context-reproducibility.yaml")
+DECLARATIONS = tuple(f"{kernel}/checks/context-reproducibility.yaml" for kernel in ("template/governance/kernel", "governance/kernel"))  # retired by DEC-1214 M1: read only in this ticket's history
 LIMIT_FIELD = "timeout-seconds"
 W2_54_LIMIT_S = 600       # DEC-969: "the time limit is not raised"; the target is under W2-54's 600 s
 RECORD_REL = "docs/research/W2-108-freshness-once.md"
@@ -35,6 +33,9 @@ def git_out(*args):
 
 
 def test_w2_54_is_not_changed_by_this_ticket():
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the context check's declaration is retired; it is still a path this
+    ticket's commits must not have touched, and git reads its history whether or not it exists now. Unchanged
+    otherwise."""
     if not (S.REPO_ROOT / ".git").exists():
         pytest.skip(f"{S.REPO_ROOT} has no .git: this ticket's history cannot be read there")
     paths = [W2_54_TESTS, *DECLARATIONS]
@@ -42,15 +43,6 @@ def test_w2_54_is_not_changed_by_this_ticket():
     assert not commits, f"commits of {TASK} change W2-54's tests or the context check's limit:\n{commits}"
     pending = git_out("status", "--porcelain", "--", *paths).strip()
     assert not pending, f"W2-54's tests or the context check's declaration are changed in the working tree:\n{pending}"
-
-
-def test_the_context_checks_limit_is_not_raised():
-    declared = [rel for rel in DECLARATIONS if (S.REPO_ROOT / rel).is_file()]
-    assert declared, f"no declaration of the context check at {DECLARATIONS}"
-    for rel in declared:
-        limit = yaml.safe_load((S.REPO_ROOT / rel).read_text(encoding="utf-8")).get(LIMIT_FIELD)
-        assert isinstance(limit, (int, float)) and limit <= W2_54_LIMIT_S, \
-            f"{rel}: {LIMIT_FIELD} is {limit!r}, above W2-54's {W2_54_LIMIT_S} s (DEC-969: not raised)"
 
 
 def test_the_research_record_names_the_measure():

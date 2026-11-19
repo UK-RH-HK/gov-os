@@ -14,7 +14,7 @@ A method for the independent auditor role, and for the reviewer's probe of a FUL
 
 The audit runs in a fresh session with no prior context (CAP-47). The only inputs are:
 
-1. The bounded context pack from `gov context`, which carries the mandatory inputs by id and sha256.
+1. The ticket and the records it names in its sources and decisions, read by id (the register's entries), and `gov retrieve` for the rest [DEC-1214 M1].
 2. The repository at the audited commit.
 
 The role file states that the session is read-only with respect to audited files: the auditor does not edit audited files (MR-4). The guard decides what the session may write: an auditor or a reviewer writes only its own audit or review record.

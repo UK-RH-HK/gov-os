@@ -36,7 +36,8 @@ def test_row_2_t5_a_whole_branch_diff_uses_stat_or_excludes_the_acceptance_tests
 
 @pytest.mark.parametrize("stem", LEAD_AND_CTO)
 def test_row_3_a_worker_brief_is_built_with_gov_brief_and_role(stem):
-    # Emergency 2 (EMERGENCY-2.md 5.5, DEC-1209): gov context is switched off; a worker's brief is built by gov brief
+    # Emergency 2 (EMERGENCY-2.md 5.5, DEC-1209): the context command is switched off (retired by DEC-1214 M1); a
+    # worker's brief is built by gov brief
     hits = s.units_with(stem, "gov brief", "role")
     _cited(hits, stem, 3)
 

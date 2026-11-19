@@ -25,7 +25,7 @@ success and failure, and the key edge cases.
 - **Public interfaces only:** `gov.retrieval.lexical.freshness`, `lexical.search(root, query, refresh=False)`,
   `lexical.refresh`, `gov.retrieval.semantic.search(root, query, refresh=False)`, `semantic.refresh`,
   `gov.retrieval.retrieve.retrieve` (with a stand-in reranker that does not rerank: the rerank is not under test),
-  `gov.context.context`, and `gov.store.load` to build the record graph.
+  and `gov.store.load` to build the record graph.
 - **One process per scenario.** A driver written to a temporary folder runs a list of steps in one Python process:
   calls, and between them edits, removals, git commands, or another process that rebuilds the store.
 - **What is counted (KPI 1).** The driver installs a Python audit hook (`sys.addaudithook`) and records, per call:
@@ -134,3 +134,11 @@ Cases: 27 in the full run, 0 in `breadth`, 0 in `lifted`.
 | F4: W2-54's time limits raised, or its tests changed. | `test_w2_108_scope.py::test_the_context_checks_limit_is_not_raised`, `test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket` | the ticket's words |
 
 **Citations (DEC-1109 (2), 2026-11-09):** `OllamaStandIn`'s docstring says what the stand-in reports since W2-32's S10, the model wholly on the GPU, and names DEC-1033 in place of DEC-798's CPU; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).
+
+## W2-200 revision (DEC-1214 M1)
+
+The context command, its library and its check are retired (DEC-1214 M1, W2-200). Deleted:
+`test_w2_108_unchanged.py::test_this_repositorys_context_packet_is_unchanged` and
+`test_w2_108_scope.py::test_the_context_checks_limit_is_not_raised` (no declaration is left to raise);
+`test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket` still reads this ticket's history of the retired
+declaration's path (`Rewrite-Reason:` in the case).

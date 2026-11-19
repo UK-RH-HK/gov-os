@@ -47,7 +47,7 @@ COMMANDS = {
     "identity": None,
     "where": None,
     "retrieve": ('gov retrieve "<question>"', "gov retrieve --help"),
-    "context": ("gov context {ID} --role {WORKER_ROLE}", "gov context --help"),
+    "decisions": ("gov decisions in-force", "gov decisions --help"),  # the in-force list moved here from gov context (DEC-1214 M1)
     "links": ("gov links --since {BASE}", "gov links --help"),
     "accept": ("gov accept {ID} --root {WRITE_TREE}", "gov accept --help"),
     "pytest_folder": None,
@@ -62,7 +62,6 @@ COMMANDS = {
     "merge_tests": None,
     "tests_worktree_remove": None,
     "checkpoint": ('gov checkpoint --ticket {ID} --trigger ticket-transition --next "{NEXT}"', "gov checkpoint --help"),
-    "context_ceiling": ("gov context {ID} --json", "gov context --help"),
 }
 
 TAIL = """\
@@ -96,9 +95,9 @@ steps:
     line: 'Before every heavy run and at the end, give the scratch size and inode count in `evidence`.'
     match: 'du -s'
   context_ceiling:
-    "on": true
-    line: 'Before DONE, run {CMD:context_ceiling} once; on CONTEXT_OVER_CEILING return the figures and a package naming what to trim.'
-    match: 'gov(\\.cli\\.main)? context \\S+ --json'
+    "on": false
+    line: 'No size ceiling is checked before DONE: the close records the decisions the ticket cites.'
+    match: 'context_ceiling'
   checkpoint_record:
     "on": true
     line: 'At the end, before the final probe, record {CMD:checkpoint} with the next step.'

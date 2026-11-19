@@ -1,5 +1,6 @@
-"""KPI success 3 (and the "green here" half of KPI success 4): ``gov check`` on this repository gives
-context-reproducibility green, and core-schema green, against the store the lead built [DEC-768].
+"""KPI success 3 (and the "green here" half of KPI success 4): ``gov check`` on this repository gives core-schema
+green, against the store the lead built [DEC-768]. The context check of success 3 is retired with the context
+command (DEC-1214 M1, W2-200): its case is deleted; core-schema's stays.
 
 These cases need this worktree's store. One ``gov check --json`` runs for the module (about six minutes at a
 load of 12 to 21 on 20 processors), in this worktree, with this worktree's ``src/`` on ``PYTHONPATH``.
@@ -10,8 +11,8 @@ commit in the same tree after the rebuild, and starts no ``gov check``; outside 
 above. A result that is missing or not gov check's envelope with its checks fails the cases, naming the file. The
 last four cases prove those routes with planted envelopes; none of them runs a real ``gov check``.
 
-Red reasons, today: context-reproducibility is RED ("did not end within its time limit of 60 seconds"), and
-core-schema is RED (``SCHEMA_INVALID_TYPE`` on ``docs/audit/wave-1/W1-43-wave-1-exit-audit.md``).
+Red reasons, at the time: core-schema was RED (``SCHEMA_INVALID_TYPE`` on
+``docs/audit/wave-1/W1-43-wave-1-exit-audit.md``).
 """
 
 from __future__ import annotations
@@ -28,20 +29,6 @@ import w2_54_support as S
 def test_the_suite_runs_this_worktree_s_code(code_under_test):
     """DEC-732: ``gov`` is imported from this worktree's ``src/``."""
     assert code_under_test.startswith(str(S.SRC)), code_under_test
-
-
-def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
-    """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
-    that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
-
-    Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
-    real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
-    done, checks = gov_check_here
-    entry = checks.get(S.CONTEXT_CHECK_ID)
-    assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
-    assert entry.get("status") == S.GREEN, \
-        f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
-    assert entry.get("severity") == "hard-block"
 
 
 def test_gov_check_gives_core_schema_green_here(gov_check_here):
@@ -82,7 +69,10 @@ def _check(check_id, status=S.GREEN, severity="hard-block"):
     return {"id": check_id, "status": status, "severity": severity, "findings": []}
 
 
-GREEN_CHECKS = [_check(S.CONTEXT_CHECK_ID), _check(S.CORE_SCHEMA_ID), _check("secrets-indexing", S.RED)]
+# Rewrite-Reason: DEC-1214 M1 (W2-200): the planted green check beside core-schema is core-graph, no longer the
+# retired context check.
+OTHER_GREEN_ID = "core-graph"
+GREEN_CHECKS = [_check(OTHER_GREEN_ID), _check(S.CORE_SCHEMA_ID), _check("secrets-indexing", S.RED)]
 
 
 @pytest.fixture()
@@ -113,7 +103,10 @@ def test_in_a_close_the_fixture_reads_the_check_result_and_starts_no_gov_check(t
 
 def test_outside_a_close_the_fixture_runs_gov_check_in_this_worktree(monkeypatch):
     """KPI success 2 (W2-75): with GOV_CLOSE_CHECK_RESULT unset or empty, the fixture's route runs ``gov check --json``
-    in this worktree, with this worktree's ``src/`` and the same timeout as before (1800 s)."""
+    in this worktree, with this worktree's ``src/`` and the same timeout as before (1800 s).
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the route's answer is read for the planted core-graph check, no longer the
+    retired context check; what it asserts of the route is unchanged."""
     calls = []
 
     class Done:
@@ -135,24 +128,27 @@ def test_outside_a_close_the_fixture_runs_gov_check_in_this_worktree(monkeypatch
         assert argv[-2:] == ["check", "--json"] and argv[1:3] == ["-c", S._GOV], f"{environ}: {argv}"
         assert cwd == S.REPO_ROOT and pythonpath == str(S.SRC), f"{environ}: {cwd}, {pythonpath}"
         assert timeout == S.GOV_CHECK_TIMEOUT_S == 1800.0, f"{environ}: {timeout}"
-        assert checks[S.CONTEXT_CHECK_ID]["status"] == S.GREEN
+        assert checks[OTHER_GREEN_ID]["status"] == S.GREEN
 
 
 def test_a_check_result_that_is_missing_or_broken_is_never_read_as_green(tmp_path, no_process):
     """KPI success 3 (W2-75): a GOV_CLOSE_CHECK_RESULT that is missing, a folder, empty, not JSON, not gov check's
     envelope, or lists no checks fails, naming the file and what is wrong; it is never read as green, and no
-    ``gov check`` is started in its place (the route chosen: README, "W2-75")."""
+    ``gov check`` is started in its place (the route chosen: README, "W2-75").
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the planted texts name the core-graph check and another command
+    (``retrieve``) in place of the retired context check and command; the forms refused are unchanged."""
     green = _envelope(GREEN_CHECKS)
     broken = {
         "missing": None,
         "a folder": "folder",
         "empty": "",
-        "not JSON": "context-reproducibility GREEN\n",
+        "not JSON": "core-graph GREEN\n",
         "a JSON list": json.dumps(GREEN_CHECKS),
-        "another command's envelope": json.dumps(_envelope(GREEN_CHECKS, command="context")),
+        "another command's envelope": json.dumps(_envelope(GREEN_CHECKS, command="retrieve")),
         "no ok": json.dumps({k: v for k, v in green.items() if k != "ok"}),
         "no checks": json.dumps({**green, "result": {}}),
-        "checks not a list": json.dumps({**green, "result": {"checks": {S.CONTEXT_CHECK_ID: GREEN_CHECKS[0]}}}),
+        "checks not a list": json.dumps({**green, "result": {"checks": {OTHER_GREEN_ID: GREEN_CHECKS[0]}}}),
         "an empty list of checks": json.dumps(_envelope([])),
         "a check that is no object": json.dumps(_envelope([*GREEN_CHECKS, "GREEN"])),
     }
@@ -170,9 +166,11 @@ def test_a_check_result_that_is_missing_or_broken_is_never_read_as_green(tmp_pat
 
 def test_a_red_or_missing_check_in_the_close_s_result_still_fails_the_cases(tmp_path, no_process):
     """KPI success 4 (W2-75): read from the close's result, a check that is RED, missing, or not hard-block still
-    fails its case, naming the check and its status, exactly as it does from the fixture's own ``gov check``."""
-    cases = ((test_gov_check_gives_context_reproducibility_green_here, S.CONTEXT_CHECK_ID),
-             (test_gov_check_gives_core_schema_green_here, S.CORE_SCHEMA_ID))
+    fails its case, naming the check and its status, exactly as it does from the fixture's own ``gov check``.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the context check's case is deleted with the check, so the routes are proved
+    on core-schema's case alone; the forms (RED, missing, advisory) are unchanged."""
+    cases = ((test_gov_check_gives_core_schema_green_here, S.CORE_SCHEMA_ID),)
     for case, check_id in cases:
         others = [check for check in GREEN_CHECKS if check["id"] != check_id]
         for form, checks, said in (("RED", [*others, _check(check_id, S.RED)], f"{check_id} is RED"),

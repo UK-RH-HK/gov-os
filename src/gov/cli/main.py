@@ -96,7 +96,6 @@ COMMANDS = (
     Command("readiness", "read", "readiness of a ticket or a gate"),
     Command("doctor", "read", "health of the installation and the project"),
     Command("rebuild", "act", "rebuild derived state"),
-    Command("context", "read", "the context for a ticket (--dry-run)"),
     Command("closure", "read", "the lineage of a feature and its missing links"),
     Command("retrieve", "read", "retrieve records"),
     Command("checkpoint", "act", "write a checkpoint"),

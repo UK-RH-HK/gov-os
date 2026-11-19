@@ -45,11 +45,15 @@ def _commit(root, env, message="fixture"):
 # --------------------------------------------------------------------------
 
 def test_families_count():
-    assert len(runner.FAMILIES) == 17
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): sixteen families, not seventeen: the context family is retired with its one
+    check (the context command's), and no family takes its place."""
+    assert len(runner.FAMILIES) == 16
+    assert not [family for family in runner.FAMILIES if family.startswith("context")]
 
 
 def test_families_unique():
-    assert len(set(runner.FAMILIES)) == 17
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the sixteen families, each once."""
+    assert len(set(runner.FAMILIES)) == 16
 
 
 # --------------------------------------------------------------------------
@@ -238,6 +242,7 @@ def test_pathmap_no_pathmap(tmp_path):
 # --------------------------------------------------------------------------
 
 def test_run_checks_returns_families_and_checks(tmp_path):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the result names the sixteen families (the context family is retired)."""
     import shutil
     root = tmp_path / "project"
     env = _git_init(root)
@@ -251,7 +256,7 @@ def test_run_checks_returns_families_and_checks(tmp_path):
     assert "families" in result
     assert "checks" in result
     families = result["families"]
-    assert len(families) == 17
+    assert len(families) == 16
     for fam_name in runner.FAMILIES:
         assert fam_name in families
         assert families[fam_name]["status"] in ("RED", "YELLOW", "GREEN")
@@ -309,9 +314,11 @@ def test_only_the_success_form_with_exit_code_0_is_no_finding(tmp_path, printed,
 
 
 def test_a_policy_key_is_covered_by_enforces_and_never_by_a_family_name(tmp_path):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the family name that holds the key is a planted one ("context budget"),
+    since the kernel's own (the context family) is retired; what is asserted is unchanged."""
     _write(tmp_path, runner.PATH_MAP_REL, "namespaces: {}\npolicies:\n  security: hard-block\n  context: warning\n")
     _declare(tmp_path, "states-it", "exit 0", "enforces: [security]\n")
-    families = set(runner.FAMILIES)  # holds "context reproducibility"
+    families = set(runner.FAMILIES) | {"context budget"}  # a family name holding the key, which covers nothing
     reported = runner._check_policy_enforcement(tmp_path, "abc123", families)
     assert [(entry["id"], entry["status"]) for entry in reported] == [("policy-context", "YELLOW")]
 

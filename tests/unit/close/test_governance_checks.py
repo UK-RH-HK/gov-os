@@ -133,7 +133,8 @@ def test_an_error_of_the_runner_is_not_caught():
 
 def _close(root, *, tests=True, entries=(), test_findings=(), families=None, blocks=True):
     """``run`` on the conftest's project: the gates before the tests pass, the test runs answer
-    ``test_findings``, the runner answers ``entries``, ``families`` and ``blocks``."""
+    ``test_findings``, the runner answers ``entries``, ``families`` and ``blocks``. (Since DEC-1214 M1, W2-200, the
+    close has no context gate to stand in for.)"""
     if tests is not None:
         folder = root / "tests" / "acceptance" / TICKET / ("" if tests else "notes")
         folder.mkdir(parents=True)
@@ -142,7 +143,7 @@ def _close(root, *, tests=True, entries=(), test_findings=(), families=None, blo
     with patch.object(command, "_ticket_commits", return_value=[_commit(HEAD, NOTES)]), \
             patch.object(command, "_check_trailers"), patch.object(command, "_check_containment"), \
             patch.object(command, "_check_tree"), patch.object(command, "_commits_since", return_value=[]), \
-            patch.object(command, "_check_checkpoint"), patch.object(command, "_build_context"), \
+            patch.object(command, "_check_checkpoint"), \
             patch.object(command, "_run_tests", return_value=(list(test_findings), dict(COUNTS))) as ran, \
             patch.object(command, "_git", return_value=HEAD + "\n"), \
             patch("gov.check.runner.run_checks",

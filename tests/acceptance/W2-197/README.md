@@ -87,7 +87,7 @@ below: 12 lines (S1-S9, F1-F3), 90 cases (parametrised functions are named once 
 
 ## Kinds
 
-Every case is acceptance kind but one: `test_f3_gov_context_and_its_tests_are_untouched_since_the_base` is
+Every case is acceptance kind but one: `test_f3_no_commit_of_this_ticket_touches_the_context_library_or_its_tests` (was `test_f3_gov_context_and_its_tests_are_untouched_since_the_base`) is
 **repository-state** (it reads this repository's git history, not the code): it belongs to the record-reading set,
 and it is meant to hold from this ticket's base through its landing.
 
@@ -140,7 +140,7 @@ and it is meant to hold from this ticket's base through its landing.
 | F2 | `test_w2_197_log.py::test_f2_retrieve_output_is_the_same_with_an_unwritable_log` | red (2 rows: a folder, a read-only file) | the writable log got no line (no writer to fail) |
 | F2 | `test_w2_197_log.py::test_f2_brief_output_is_the_same_with_an_unwritable_log` | red (2 rows) | no `--store` option; no line |
 | F2 | `test_w2_197_log.py::test_f2_append_never_raises` | red | no module `gov.memory_use` |
-| F3 | `test_w2_197_text.py::test_f3_gov_context_and_its_tests_are_untouched_since_the_base` | green (guard, repository-state) | nothing under `src/gov/context` or `tests/unit/context` differs from the base; red only if this change touches them |
+| F3 | `test_w2_197_text.py::test_f3_no_commit_of_this_ticket_touches_the_context_library_or_its_tests` | green (guard, repository-state) | no commit with `Task: DAEO-3d3o` touches `src/gov/context` or `tests/unit/context` (rewritten for DEC-1214 M1, W2-200) |
 
 Red on the base: 89 of 90 cases, each for the reason above; green: 1 (F3's guard).
 
@@ -169,3 +169,10 @@ written into the repository (W2-152's three F3 cases).
   library oracle, the block and log readers.
 - `conftest.py`: the session's planted store, the stand-ins, the cleared variables and the case's own log.
 - `test_w2_197_block.py` (S1, S2, F1), `test_w2_197_text.py` (S3-S7, F3), `test_w2_197_log.py` (S8, S9, F2).
+
+## W2-200 revision (DEC-1214 M1)
+
+W2-200 retires the context library and its unit tests (DEC-1214 M1), so F3's guard can no longer compare the two
+folders with the base: `test_f3_no_commit_of_this_ticket_touches_the_context_library_or_its_tests` (was
+`test_f3_gov_context_and_its_tests_are_untouched_since_the_base`) reads this ticket's history instead: no commit with
+`Task: DAEO-3d3o` touches `src/gov/context` or `tests/unit/context` (`Rewrite-Reason:` in the case).

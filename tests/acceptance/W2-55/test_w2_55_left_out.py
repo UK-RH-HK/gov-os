@@ -1,8 +1,9 @@
 """KPI 3 and failure 2: what agents see leaves out superseded and done entries, and says how many (S4).
 
-``gov retrieve <query> --json`` and ``gov context <ticket> --json`` leave out evidence from the register whose entry
-is superseded (its status word, or another entry's ``**Supersedes:**``) or done (its tags' ``· done``); the bundle and
-the packet then carry ``left_out: {count, superseded, done}``. A changed entry is still served. With nothing to
+``gov retrieve <query> --json`` leaves out evidence from the register whose entry is superseded (its status word, or
+another entry's ``**Supersedes:**``) or done (its tags' ``· done``); the bundle then carries
+``left_out: {count, superseded, done}``. The context packet's cases are deleted with the context command
+(DEC-1214 M1, W2-200); the close's own record of a decision that no longer stands is W2-200's S5. A changed entry is still served. With nothing to
 leave out the key is absent. Lens B's Q05 (a superseded decision served unmarked, F4) is a case.
 """
 
@@ -140,38 +141,3 @@ def test_lens_b_q05_serves_the_decision_in_force_and_no_superseded_one(retrieval
     left = bundle.get("left_out") or {}
     assert left.get("superseded") == ["DEC-138", "DEC-148", "DEC-149"] and left.get("count") == 3, \
         f"Q05: the bundle does not say it left out the three superseded entries: {bundle.get('left_out')!r}"
-
-
-# --------------------------------------------------------------------------
-# gov context <ticket>
-# --------------------------------------------------------------------------
-
-def test_context_leaves_out_superseded_and_done_entries_from_the_supplementary_context(retrieval_api, harbour):
-    packet = retrieval_api.gov(harbour, "context", "HARB-0001").result
-    got = s.served(packet["supplementary"], REGISTER_TEXT)
-    assert not got & NOT_SERVED, f"superseded or done entries reached the packet: {sorted(got & NOT_SERVED)}"
-    assert "DEC-104" in got, f"the changed entry DEC-104 is not in the supplementary context: {sorted(got)}"
-
-
-def test_context_says_how_many_it_left_out(retrieval_api, harbour):
-    packet = retrieval_api.gov(harbour, "context", "HARB-0001").result
-    assert packet.get("left_out") == LEFT_OUT, f"the packet's left_out is {packet.get('left_out')!r}, not {LEFT_OUT}"
-
-
-def test_context_with_nothing_to_leave_out_has_no_key(retrieval_api, plain_harbour):
-    packet = retrieval_api.gov(plain_harbour, "context", "HARB-0001").result
-    assert "left_out" not in packet, f"nothing was left out, yet the packet has left_out: {packet['left_out']!r}"
-    got = s.served(packet["supplementary"], PLAIN_REGISTER)
-    assert {"DEC-202", "DEC-203"} <= got, f"entries in force are missing from the supplementary context: {sorted(got)}"
-
-
-def test_a_superseded_mandatory_input_still_refuses(retrieval_api, harbour):
-    answer = retrieval_api.gov(harbour, "context", "HARB-0002")
-    envelope = answer.envelope
-    assert envelope["ok"] is False and (envelope.get("error") or {}).get("code") == "BLOCKED", answer.describe()
-
-
-def test_a_done_entry_declared_as_a_source_is_still_read(retrieval_api, harbour):
-    packet = retrieval_api.gov(harbour, "context", "HARB-0003").result
-    assert "DEC-103" in [item["id"] for item in packet["mandatory"]], \
-        f"the done source DEC-103 is not a mandatory input of the packet: {packet['mandatory']}"

@@ -376,3 +376,12 @@ Cases: 108 in the full run, 70 in `breadth`, 0 in `lifted`.
 | F2: A scoped close whose record says full; a skip, a left-out suite or a failure the record does not name; a record without its JUnit XML or failur... | `test_w2_66_evidence.py::test_the_junit_xml_of_a_refused_close_holds_the_failure_text_and_the_skip`, `test_w2_66_evidence.py::test_a_full_close_names_every_suite_it_ran_and_its_junit_xml_holds_every_case`, `test_w2_66_scoped_selection.py::test_the_junit_xml_holds_every_case_run_and_no_case_left_out` | the ticket's words |
 | F3: A record-reading test outside the set on a head with record-only commits; a record-only path list that hides a code path. | `test_w2_66_live_test_map.py::test_the_record_only_list_hides_no_code_path`, `test_w2_66_followed_couplings.py::test_a_record_reading_test_turned_red_by_a_record_only_commit_refuses_the_scoped_close`, `test_w2_66_unresolved_targets.py::test_a_red_the_renamed_record_reading_case_catches_refuses_the_close` | the ticket's words |
 | F4: A per-test limit that lets a hung test hold the close; worksteal switched on before the nested reruns are gone. | `test_w2_66_limits.py::test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit` (2 of 2), `test_w2_66_limits.py::test_without_pytest_timeout_the_close_does_not_pass_silently`, `test_w2_66_live_test_map.py::test_the_per_test_limit_is_above_the_slowest_test_measured` | the ticket's words |
+
+## W2-200 revision (DEC-1214 M1)
+
+The context command, its library and its check are retired (DEC-1214 M1, W2-200). `test_w2_66_live_test_map.py`:
+`WHOLE_GOV_CHECK` no longer names W2-54's deleted context-check case; the fixture-input couplings no longer name the
+deleted W1-24 suite; the coupling row of `src/gov/context/command.py` (to W1-31) is gone with the file (the parametrised
+row `test_each_coupling_imports_cannot_see_is_declared[src/gov/context/command.py]`). The live test map
+(`governance/project/test-map.yaml`) still names `src/gov/context/**` in two couplings: the CTO's (governance/, a
+non-goal of W2-200).
