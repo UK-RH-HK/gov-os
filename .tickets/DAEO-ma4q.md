@@ -1,6 +1,6 @@
 ---
 id: DAEO-ma4q
-status: in_progress
+status: closed
 deps: [DAEO-0cd2, DAEO-zlog]
 links: [DAEO-0cd2, DAEO-zlog]
 created: 2026-11-19T01:30:00Z
@@ -162,3 +162,5 @@ match the commit), `FR-LOCK` (another `fresh` holds the tag's run folder), and `
 window could not be read). `say` lets exactly two whole lines of `fresh` hold the word `hidden` (`FRESH plan: ...`, `FRESH VERDICT
 hidden ...`); every other use of `hidden` is still refused. The configuration's environment variable is `MEMAUDIT_CONFIG`
 (no `GOV_` prefix: the planted worlds of W2-171, W2-172 and W2-187 strip `GOV_` variables from their children).
+
+**Closed at the land, 2026-11-19 06:04 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 7c4d9f3ab (branch `e2/memaudit-adopted` at a65783b0d). On the merged tree, through the slot with workers: `tests/unit/memaudit`, `tests/unit/optin` and the acceptance folders W2-204, W1-32, W2-61h, W2-81, W2-88, W2-94, W2-170, W2-171, W2-172, W2-187, W2-188, W2-198: 2,690 passed, 13 skipped; `gov accept W2-204`: 169 passed, 0 failed (again 169 of 169 on W2-200's landing branch). `gov memaudit check` on this repository: `CONFIG ok half 40 categories 12 domains 5 subsystems 7 control memory-retrieval`. `prompts.py` and `claude.py` unchanged by the merge (DEC-1098). The CTO's rulings on the lead's lines: `say.py`'s two `FRESH` lines and the variable name `MEMAUDIT_CONFIG` stand; `fresh` keeps its plain rebuild of the snapshot. Owed (the CTO's): the adopt skill's step 6 and the practice record's text (the evidence record §4); the choice of briefs for Gov OS's own first fresh 80. For the owner: release 0.1.4, so EXAMIN gets these commands by `gov update` (R-1).
