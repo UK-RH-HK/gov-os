@@ -154,3 +154,11 @@ the only change to existing test files, made by the independent test designer wi
   `.gov-runtime` and `product/data`);
 - the exact commands EXAMIN's CTO runs after `gov update`, from the briefs to the judged figure;
 - what W2-188's adopt skill step 6 and the practice record should now say (for the CTO).
+
+## Added by the lead at the land (2026-11-19)
+Refusal codes the build added beyond the lines above, so that each refusal names itself: `BR-NOSET` and `BR-NONOTES` (`brief`: the
+delivered set or notes it must copy are not there), `FR-SNAPSHOT` (the snapshot's clone or store could not be built or does not
+match the commit), `FR-LOCK` (another `fresh` holds the tag's run folder), and `STOPPED <audit> scan 3` (a transcript in the scan's
+window could not be read). `say` lets exactly two whole lines of `fresh` hold the word `hidden` (`FRESH plan: ...`, `FRESH VERDICT
+hidden ...`); every other use of `hidden` is still refused. The configuration's environment variable is `MEMAUDIT_CONFIG`
+(no `GOV_` prefix: the planted worlds of W2-171, W2-172 and W2-187 strip `GOV_` variables from their children).
