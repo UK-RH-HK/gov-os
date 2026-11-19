@@ -17,6 +17,10 @@ role: engineer
 profile: FULL
 depends_on: []
 waits_on: []
+closes:
+- CAP-35.a
+- CAP-35.b
+- CAP-35.c
 allowed_paths:
 - src/gov/launch/**
 - governance/project/criticality.yaml

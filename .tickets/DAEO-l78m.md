@@ -15,6 +15,10 @@ class: test-design
 state_class: AUTHORITATIVE
 role: independent-test-designer
 depends_on: []
+closes:
+- CAP-39.b
+- CAP-43.c
+- CAP-49.a
 allowed_paths:
 - tests/acceptance/W2-81/w2_81_judge.py
 - tests/acceptance/W2-81/test_w2_81_judge.py

@@ -17,6 +17,9 @@ role: engineer
 profile: FULL
 depends_on: [DAEO-5rgj]
 waits_on: []
+closes:
+- CAP-64.c
+- CAP-64.d
 allowed_paths:
 - src/gov/dispatch/**
 - src/gov/resources/slots.py

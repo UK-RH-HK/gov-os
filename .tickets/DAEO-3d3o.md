@@ -15,6 +15,14 @@ class: implementation
 role: engineer
 profile: STANDARD
 state_class: AUTHORITATIVE
+closes:
+- CAP-15.a
+- CAP-15.b
+- CAP-15.c
+- CAP-15.e
+- CAP-65.a
+- CAP-65.b
+- CAP-65.c
 allowed_paths:
 - src/gov/brief/**
 - src/gov/retrieve/command.py
