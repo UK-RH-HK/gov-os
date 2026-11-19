@@ -1,6 +1,6 @@
 ---
 id: DAEO-rt3s
-status: deferred
+status: open
 deps: [DAEO-rt2s]
 links: [DAEO-5rgj, DAEO-rt2s]
 created: 2026-11-19T02:30:00Z
@@ -24,9 +24,9 @@ allowed_paths:
 - src/gov/checkpoint/**
 - template/governance/kernel/hooks/stop.py
 - template/governance/kernel/hooks/sessionstart.py
-- tests/unit/dispatch/test_w2_200*
+- tests/unit/dispatch/test_w2_205*
 - tests/unit/msg/**
-- tests/unit/launch/test_w2_200*
+- tests/unit/launch/test_w2_205*
 - tests/unit/checkpoint/**
 est_loc: 600
 kpis:
