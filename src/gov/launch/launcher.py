@@ -909,6 +909,17 @@ def _session_key(worker: dict | None, cli_args: list[str]) -> dict:
     return {}
 
 
+def _kind_key(worker: dict | None, env: dict) -> dict:
+    """W2-201 fix X7 (DEC-1219 (5)): the launch's ``kind`` and ``kind_line`` for its registry entry, so that a relaunch
+    starts the same kind: a worker's from its plan, a lead's from ``build_lead_settings``'s env values. A feature's
+    entry holds neither key, as before."""
+    if worker is not None:
+        kind, line = worker.get("kind") or (FEATURE, None)
+    else:
+        kind, line = env.get(KIND_ENV) or FEATURE, env.get(KIND_LINE_ENV)
+    return {} if kind == FEATURE else {"kind": kind, "kind_line": line}
+
+
 def _notify_address() -> str:
     """Whoever launched: the launching process's ``$GOV_MSG_ADDRESS`` when it is an address, else ``cto``."""
     from gov.dispatch import inbox
@@ -1244,7 +1255,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                 try:
                     state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address,
                                                        launcher_pid=os.getpid(),
-                                                       **_session_key(worker, cli_args))
+                                                       **_session_key(worker, cli_args), **_kind_key(worker, own_env))
                     state["registered"] = pid
                 except (OSError, GovError) as error:
                     raise _refuse(f"the session cannot be entered in the machine-wide registry "
