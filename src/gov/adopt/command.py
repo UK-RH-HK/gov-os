@@ -60,7 +60,10 @@ def _steps(root: Path, args) -> dict:
     today = datetime.datetime.now(datetime.timezone.utc).date()
     if args.facts:
         from gov.adopt import facts
-        return facts.write_default(root, today)
+        written = facts.write_default(root, today)
+        if written["written"]:  # W2-202 A5: with the facts it writes; a repository with its own facts stays as it is
+            facts.write_queue_settings(root)
+        return written
     from gov.adopt import verify_pass
     if args.verify_list:
         found = verify_pass.missing(root)

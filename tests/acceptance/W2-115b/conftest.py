@@ -204,8 +204,8 @@ def build_onto(folder):
     return _run(p, "release", A.id, "--onto", "release", main=support.rev(p.root, "main"))
 
 
-def build_unexplained(folder):
-    """A's change reaches a test that is red on the base too."""
+def build_base_red(folder):
+    """A's change reaches a test that is red on the base too: a known base red (DEC-1214 L2, Q-CLOSE; W2-202 A1)."""
     told = folder / "told"
     p = support.Planted(folder / "project", told,
                         extra={support.KNOWN_RED: support.telling(support.KNOWN_RED, told, ["widget"],

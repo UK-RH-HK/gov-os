@@ -296,6 +296,20 @@ def substitute(root: Path, model: str, effort: str) -> tuple[str, str]:
         return model, effort
 
 
+def substitution_active(root: Path) -> bool:
+    """True while DEC-1215's substitution of Opus by Claude Fable 5.2 is active and its ``until`` has not passed
+    (``substitute``'s rule; the helper hook's ``substitution``). Anything missing or unreadable is inactive."""
+    try:
+        from datetime import datetime, timezone
+        data = yaml.safe_load((Path(root) / SUBSTITUTION_REL).read_text(encoding="utf-8")) or {}
+        if not data.get("active") or data.get("to") != "claude-fable-5-2":
+            return False
+        until = data.get("until")
+        return not (until and datetime.now(timezone.utc) >= datetime.fromisoformat(str(until)))
+    except Exception:
+        return False
+
+
 def launch_default(root: Path, role: str) -> tuple[str, str]:
     """The model and effort of the role file's default line alone, for ``gov launch --plan`` (DEC-1167 (2)): the same
     file and the same refusals as ``read_role``; no other line of it is read."""

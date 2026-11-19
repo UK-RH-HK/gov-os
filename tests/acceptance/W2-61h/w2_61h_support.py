@@ -314,18 +314,21 @@ def judge_all(named: dict[str, dict], root: Path = REPO_ROOT) -> tuple[list[str]
     return faults, changed
 
 
-class GoldBlockChanged(UserWarning):
-    """The maintenance list (DEC-1178 (1), DEC-1180 (1)): gold blocks or sections that changed at HEAD, named by file
-    and entry only."""
+# The notice's category is a built-in one, never a class of this folder: under pytest-xdist the worker sends a warning
+# to the controller by its category's module name, and the controller cannot import this folder's modules (a class
+# defined here crashed the worker with ModuleNotFoundError once a cited block changed). The notice is told apart by
+# its text: it starts with ``NOTICE_PREFIX``.
+GoldBlockChanged = UserWarning
+NOTICE_PREFIX = "W2-61h S4 maintenance list"
 
 
 def notify_changed(changed: list[str]) -> None:
-    """Show the list in the run's own output: a ``GoldBlockChanged`` warning, which pytest's default summary prints
+    """Show the list in the run's own output: a ``UserWarning`` (``GoldBlockChanged``) starting ``NOTICE_PREFIX``, which pytest's default summary prints
     for a passing run (no flag, no file written). Nothing is shown when the list is empty. Under ``-W error`` the
     warning would raise, so the list is printed instead: the check never fails for it."""
     if not changed:
         return
-    message = (f"W2-61h S4 maintenance list (DEC-1178 (1), DEC-1180 (1)): {len(changed)} cited block(s) or "
+    message = (f"{NOTICE_PREFIX} (DEC-1178 (1), DEC-1180 (1)): {len(changed)} cited block(s) or "
                f"section(s) changed at HEAD, for the walled writer: " + "; ".join(changed))
     try:
         warnings.warn(message, GoldBlockChanged, stacklevel=2)

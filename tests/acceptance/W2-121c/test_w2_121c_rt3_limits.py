@@ -3,8 +3,10 @@
 Line 8 (RT-3a): ``gov dispatch limits`` prints the detected CPUs, RAM and GPU memory and each derived limit with its
 rule; each watch pass writes the same into state.json. The rules (the ticket's, computed here exactly):
 
-- ``heavy_slots`` = max(1, min(floor(0.15 x CPUs), floor(0.5 x RAM / verification peak) when gate.json has one))
-- ``workers_per_slot`` = max(1, floor(0.9 x CPUs / heavy_slots))
+- ``heavy_slots`` = max(1, min(floor(0.1 x CPUs), floor(0.5 x RAM / verification peak) when gate.json has one))
+- ``workers_per_slot`` = max(1, floor((load_limit - start_below) / (margin x heavy_slots))) with ``start_below`` = 0.6 x CPUs,
+  ``load_limit`` = the CPUs and ``margin`` 1.0 with no runtime log (W2-199, DAEO-rt2s, success line 3 replaced slice 1's
+  ``0.15`` and ``0.9`` formulas for these two keys)
 - ``sessions_max`` = max(1, min(floor(0.5 x CPUs), floor(0.6 x RAM / working size) when gate.json has one))
 - ``gpu_budget_mib`` = floor(0.875 x the GPU's total MiB), 0 with no GPU
 
@@ -32,14 +34,14 @@ KEYS = ("heavy_slots", "workers_per_slot", "sessions_max", "gpu_budget_mib")
 
 def expected(profile, peak=None, working=None, gpu=True) -> dict:
     cpus, ram = profile["cpus"], profile["ram"]
-    heavy = math.floor(F(15, 100) * cpus)
+    heavy = math.floor(F(1, 10) * cpus)
     if peak:
         heavy = min(heavy, math.floor(F(1, 2) * ram / peak))
     heavy = max(1, heavy)
     sessions = math.floor(F(1, 2) * cpus)
     if working:
         sessions = min(sessions, math.floor(F(6, 10) * ram / working))
-    return {"heavy_slots": heavy, "workers_per_slot": max(1, math.floor(F(9, 10) * cpus / heavy)),
+    return {"heavy_slots": heavy, "workers_per_slot": max(1, math.floor((cpus - F(6, 10) * cpus) / heavy)),
             "sessions_max": max(1, sessions),
             "gpu_budget_mib": math.floor(F(875, 1000) * profile["gpu_total"]) if gpu else 0}
 
@@ -78,8 +80,9 @@ def test_rt3a_the_text_form_names_the_machine_and_each_limit_with_its_value_and_
         lines = [line for line in done.stdout.splitlines() if key in line]
         assert any(re.search(rf"(?<![\d.]){want[key]}(?![\d.])", line) for line in lines), (
             f"no line names {key} with its value {want[key]}\n{s.said(done)}")
-    for ratio in ("0.15", "0.9", "0.5", "0.875"):
-        assert ratio in done.stdout, f"the rules are not printed (no ratio {ratio})\n{s.said(done)}"
+    for ratio in ("0.1", "0.5", "0.875"):
+        assert re.search(rf"(?<![\d.]){re.escape(ratio)}(?!\d)", done.stdout), (
+            f"the rules are not printed (no ratio {ratio})\n{s.said(done)}")
     assert re.search(r"(?<!\d)32(?!\d)", done.stdout), f"the detected CPUs (32) are not printed\n{s.said(done)}"
 
 

@@ -2518,6 +2518,11 @@ def build_tree(st, repo, commit, excluded):
                     shutil.copyfileobj(src, f, 1 << 20)
                 os.chmod(dest, 0o444)
                 files += 1
+        # tarfile stops at the end-of-archive marker: git archive may not have written its padding or exited yet (a
+        # loaded machine). Read its output to the end and let it exit by itself; killing it here gave -9 and a
+        # good build refused as 14 "archive" (W2-94's flaky refusals under load).
+        while proc.stdout.read(1 << 16):
+            pass
     finally:
         if proc.poll() is None:
             proc.stdout.close()

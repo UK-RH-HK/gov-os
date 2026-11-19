@@ -20,6 +20,9 @@ Nothing waits for him except the 99 % push; bring everything else in the morning
 - **The night's priority order, his sleep and the reporting rule are DEC-1216** (added by the fresh CTO, 23:5x): the
   six priorities in his words; only the 99 % push wakes him; every report ends with the status block from
   `.gov-runtime/scratch/orchestrator/tools/status_block.py`, run each time; the morning brief's contents.
+- **The plan's resets (DEC-1215):** the owner's first Fable reset was used on 2026-11-19 at 02:06 (the plan 99 % at
+  02:04, pushed 02:05; after it 84 % all models, Fable 0 %). One Fable reset is left; when it is used, DEC-1215 (1)
+  ends and the revert of (2) is the CTO's to make and record.
 - **Leads end into your inbox:** `PYTHONPATH=src python3 -m gov.cli.main msg read cto` (start_lead.sh sends a wake).
 
 ## 1. Running at the handover (nothing is to be stopped)

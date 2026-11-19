@@ -1,8 +1,9 @@
 """W2-184, review round 1's findings F1, F8 and F2 (batch td-4).
 
 F1 (blocking) and F8 (rides along) -- interface 1.5 as amended: the project's own ``governance/project/criticality.yaml``
-puts a ticket whose ``allowed_paths`` name a hidden evaluation set (``fixtures/evaluation/<set>/hidden/**``) or a
-permission file in C3 (highest class wins, so also with a ``docs/probes/<id>/**  # the probe record`` path beside it).
+puts a ticket whose ``allowed_paths`` name a hidden evaluation set (``fixtures/evaluation/<set>/hidden/**``) in C3
+(highest class wins, so also with a ``docs/probes/<id>/**  # the probe record`` path beside it). F8's permission files
+were C3 too; DEC-1214 K1 (W2-201 S2) took them off the C3 list, and the F8 cases now hold that they are not C3.
 The file is the one at the root of the tree these tests live in, found from this file's own path; the tickets are
 front-matter maps built here, and the hidden-set paths are only strings in them: nothing under ``fixtures/evaluation/``
 is opened.
@@ -78,24 +79,28 @@ def test_r1_f1_this_ticket_s_own_paths_stay_c2(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# F8: permissions are C3
+# F8: permissions were C3; since DEC-1214 K1 they are not (rewritten for W2-201 S2)
 # --------------------------------------------------------------------------
 
+# Rewrite-Reason: DEC-1214 K1 (the owner, 2026-11-18): the criticality list is audit 4's Table 3, which drops the
+# settings, secrets, walls and held-out entries with the retired guard and permissions (W2-201 S2: "the guard, the
+# hooks, the settings, secrets, walls, held-out and operator entries of the old list are not C3 rules"). The five
+# permission paths are therefore no longer C3, alone or beside the probe record; the hidden-set cases (F1) stay C3
+# under Table 3's `fixtures/evaluation/**`.
 PERMISSIONS = [".claude/settings.json", ".claude/settings.local.json", "governance/project/secrets.yaml",
                "governance/project/indep-walls/**", "governance/project/held-out.yaml"]
 
 
 @pytest.mark.parametrize("profile", ["STANDARD", "FULL"])
 @pytest.mark.parametrize("path", PERMISSIONS)
-def test_r1_f8_a_ticket_working_in_a_permission_file_is_c3(tmp_path, path, profile):
-    """Fails at the current head for the first four paths (no such glob in the project file: C2); the held-out file is
-    already C3 there, so its two cases are guards."""
-    assert _criticality(tmp_path, [path], profile) == "C3"
+def test_r1_f8_a_ticket_working_in_a_permission_file_is_not_c3_since_dec_1214_k1(tmp_path, path, profile):
+    """Red on W2-201's base: the project file still holds the five permission globs as C3."""
+    assert _criticality(tmp_path, [path], profile) != "C3"
 
 
 @pytest.mark.parametrize("path", PERMISSIONS)
-def test_r1_f8_a_permission_path_beside_the_probe_record_is_still_c3(tmp_path, path):
-    assert _criticality(tmp_path, [path, PROBE_BESIDE], "FULL") == "C3"
+def test_r1_f8_a_permission_path_beside_the_probe_record_is_not_c3_since_dec_1214_k1(tmp_path, path):
+    assert _criticality(tmp_path, [path, PROBE_BESIDE], "FULL") != "C3"
 
 
 # --------------------------------------------------------------------------

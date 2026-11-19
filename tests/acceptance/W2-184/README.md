@@ -276,7 +276,10 @@ paths are strings in the tickets the cases build).
   `gov.launch.criticality` does not exist ("no module": every other F1/F8 case). **Red at the engineer's current head**
   (the project file without the hidden-set and permission globs): each F1 case and the first four F8 paths give C2, not C3.
   `governance/project/held-out.yaml` is already C3 there, so its cases are guards; so are `test_r1_f1_this_ticket_s_own_paths_stay_c2`
-  and the two "no round limit" cases of F2.
+  and the two "no round limit" cases of F2. **Rewritten 2026-11-18 for DEC-1214 K1 (W2-201 S2):** Table 3 drops the
+  settings, secrets, walls and held-out entries, so the two F8 functions now assert that the five permission paths are
+  **not** C3 (renamed `..._is_not_c3_since_dec_1214_k1`); they are red on W2-201's base, where the old list still holds
+  them. The F1 hidden-set cases are unchanged (C3 under Table 3's `fixtures/evaluation/**`).
 - **F2** drives `gov launch` (and `launcher.launch` where `--owner-named` is given, interface 7.2) on a FULL ticket in the
   fixture project that has a `criticality.yaml`. **Red on the base:** no table (the launch line carries the default line's
   Sonnet, medium) and no keys. **Red on a launcher that only refuses a repeated setting:** round 3 after a round 2 on
@@ -289,8 +292,8 @@ paths are strings in the tickets the cases build).
 | success-1 | `test_w2_184_r1_rows.py::test_r1_f1_a_ticket_working_in_a_hidden_set_is_c3` (8: two sets x STANDARD, FULL x alone, with the probe record) | no module; at the head: C2, no hidden-set glob |
 | success-1 | `test_w2_184_r1_rows.py::test_r1_f1_a_ticket_naming_a_file_inside_a_hidden_set_is_c3` (2) | no module; at the head: C2 |
 | success-1 | `test_w2_184_r1_rows.py::test_r1_f1_this_ticket_s_own_paths_stay_c2` | no module; green at the head (guard, interface 1.5) |
-| success-1 | `test_w2_184_r1_rows.py::test_r1_f8_a_ticket_working_in_a_permission_file_is_c3` (10: five paths x STANDARD, FULL) | no module; at the head: C2 for four paths, held-out green |
-| success-1 | `test_w2_184_r1_rows.py::test_r1_f8_a_permission_path_beside_the_probe_record_is_still_c3` (5) | no module; at the head: as above |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f8_a_ticket_working_in_a_permission_file_is_not_c3_since_dec_1214_k1` (10: five paths x STANDARD, FULL) | rewritten for DEC-1214 K1 (W2-201 S2): red on W2-201's base, the project file still gives the five permission paths C3 |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f8_a_permission_path_beside_the_probe_record_is_not_c3_since_dec_1214_k1` (5) | rewritten for DEC-1214 K1: as above |
 | success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_second_round_on_xhigh_is_accepted` | no table / no keys |
 | success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_third_round_with_no_option_after_a_second_on_xhigh_is_refused_naming_the_round_and_dec_1010` | no table; at the head: round 3 accepted |
 | success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_refused_third_round_leaves_no_record_so_the_owner_named_one_is_still_round_3` | no table; at the head: round 3 accepted |
