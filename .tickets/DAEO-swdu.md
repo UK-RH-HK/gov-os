@@ -1,6 +1,6 @@
 ---
 id: DAEO-swdu
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-rd0g, DAEO-0pyc, DAEO-2ds6, DAEO-2bdu]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -95,3 +95,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-15b), as approved (DEC-729). The list ro
 ## The wbs_id
 
 This ticket has no `wbs_id`: the kernel's grammar (`common.schema.json`, `^W[0-9]+-[0-9]{2,}$`) refuses the letter suffix. Its W2 id is its `external-ref`, which `gov close` reads when `wbs_id` is absent (`src/gov/close/command.py`).
+
+**Closed on its record, 2026-11-19 13:10 (the CTO, at the owner's word of 2026-11-19: "Close W2-00, W2-15b, W2-46, W2-47 and W2-82 on their records"; EMERGENCY-2 6.2, A-4):** W2-15b, memory's pass 2, is retired: EMERGENCY-2 §5.1 and §5.3 make the standard the end-to-end judged figure on a fresh 80 (95 % or better), not a second measurement pass against 99 %. The condition A-4 attached stays open and is not this ticket's: if the first fresh 80 on today's repository is below 95 %, the work that closes the gap is a new ticket with its own KPI lines.

@@ -1,6 +1,6 @@
 ---
 id: DAEO-4k3l
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-10-29T19:07:34Z
@@ -98,3 +98,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-82), from the owner's decision of 2026-1
 **After W2-27 (DEC-1099 (3), 2026-11-09):** the owner took FORECAST-W2-1's proposal: W2-82 waits on W2-27 (`DAEO-h4rh`), EXAMIN's copy, in `depends_on` and `deps`. [changed, DEC-1099 (3)]
 
 **Wait dropped 2026-11-16 (DEC-1202):** W2-27 left Wave 2 (DEC-1201); W2-82 needs no adopted repository (its checks run on any repository's tickets), so its wait on W2-27 (DEC-1099 (3)) is dropped.
+
+**Closed on its record, 2026-11-19 13:10 (the CTO, at the owner's word of 2026-11-19: "Close W2-00, W2-15b, W2-46, W2-47 and W2-82 on their records"; EMERGENCY-2 6.2, A-4):** W2-82, a Definition of Ready checked by gov claim and gov launch, is folded into the templates: READY is computed by code (DEC-1052, DEC-1116; gov readiness, and gov brief refuses a ticket that is not READY). What is still owed of it is not a separate feature: READY exists in three places (audit 1 §2), and merging them is listed with the landing's follow-ups.
