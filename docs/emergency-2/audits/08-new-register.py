@@ -12,7 +12,7 @@ this script is in.
   archive whose first ``**Class:**`` is ``kept`` and every entry from DEC-1211 on, whatever the last id is. The same
   archive gives the same bytes.
 - ``--check`` compares the register with what the archive requires, one line per failure: ``REGISTER_KEPT_MISSING
-  <id>`` for an entry the register must hold and does not, ``REGISTER_ENTRY_DIFFERS <id>`` for an entry both files
+  <id>`` for an entry the register must hold and does not, ``REGISTER_ENTRY_DIFFERS <id>`` for a kept entry (below DEC-1211; the later ones are live) both files
   hold with different text. Exit 1 where there is one; otherwise a line starting ``ok`` and exit 0. An entry the
   archive does not hold (a decision made since) is no failure.
 
@@ -87,9 +87,17 @@ def check(archive_text, register_text):
         if entry_id not in held:
             if required(entry_id, text):
                 lines.append(f"REGISTER_KEPT_MISSING {entry_id}")
-        elif held[entry_id] != text:
+        elif held[entry_id] != text and _live(entry_id) is False:
             lines.append(f"REGISTER_ENTRY_DIFFERS {entry_id}")
     return lines
+
+
+def _live(entry_id):
+    """True for a decision made after audit 8's classes (DEC-1211 and later): the register in force is live there, an
+    entry is amended in place (DEC-1215's revert is recorded in its entry) and the frozen archive never follows; so
+    only the kept entries below it are held to the archive's text. None where the id carries no number."""
+    digits = "".join(ch for ch in entry_id.split("-")[-1] if ch.isdigit())
+    return int(digits) >= FIRST_SINCE if digits else None
 
 
 def _named(root, key, given=None):
