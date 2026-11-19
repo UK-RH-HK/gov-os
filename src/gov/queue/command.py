@@ -278,12 +278,18 @@ def _run_on_head(clone: Path, cand: dict, base: str, chosen: dict, folder: Path,
             done["flaky"].append(test)
         else:
             kinds[test] = alone
+    named = []  # its own acceptance run failed without naming a test: the ticket's, with no run before the merge
     for red in more["failing"]:
+        if red["test"] not in kinds and red.get("culprit") == ticket:
+            named.append(red["test"])
         kinds.setdefault(red["test"], red["failure_type"])
     done["reds"] = list(kinds)
-    if kinds:
+    done["explains"] = {test: [ticket] for test in named}
+    if len(kinds) > len(named):
         attribution.checkout(clone, cand["since"])
         for test, kind in kinds.items():
+            if test in named:
+                continue
             there = attribution.run_alone(clone, test, options, folder / "alone", timeout, "before")
             if there == kind and kind not in attribution.NEVER_MATCH:
                 done["base_reds"].append({"test": test, "failure_type": kind, "base": cand["since"]})
