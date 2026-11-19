@@ -198,9 +198,9 @@ def test_s4_f3_judges_each_source_at_its_own_commit_on_planted_data(tmp_path):
         "p03.yaml source entry 1", "p05.yaml source entry 1"], f"the red sources: {faults}"
     assert changed == ["p02.yaml entry 1", "p06.yaml entry 1", "p07.yaml entry 1", "p08.yaml entry 1",
                        "p10.yaml entry 1"], f"the listed sources (p10's entry once, p09 not at all): {changed}"
-    with pytest.warns(s.GoldBlockChanged) as shown:
+    with pytest.warns(s.GoldBlockChanged, match=s.NOTICE_PREFIX) as shown:
         s.notify_changed(changed)
-    messages = [str(w.message) for w in shown]
+    messages = [str(w.message) for w in shown if str(w.message).startswith(s.NOTICE_PREFIX)]
     assert len(messages) == 1 and all(item in messages[0] for item in changed), messages
     assert not any(name in messages[0] for name in ("p01", "p03", "p04", "p05", "p09")), messages
     everything = "\n".join(faults + changed + messages).lower()
@@ -301,3 +301,18 @@ def test_s4_no_new_visible_source_names_the_set_s_own_files(name):
     bad = [a["path"] for e in s.entries(data) or [] for a in e
            if a["path"].removeprefix("./") in declared or a["path"].removeprefix("./").startswith("fixtures/evaluation/")]
     assert not bad, f"{name}: {bad}"
+
+
+def test_s4_the_notice_category_is_importable_without_this_folder_on_the_path():
+    """S4: the changed-block notice crosses from an xdist worker to the controller by its category's module and name;
+    the controller has not this folder on its path. So the category is importable from a clean interpreter (``-I``,
+    no folder on ``sys.path``) and is the very class the notice is emitted with."""
+    cat = s.GoldBlockChanged
+    done = subprocess.run([sys.executable, "-I", "-c",
+                           f"import importlib; m = importlib.import_module({cat.__module__!r}); "
+                           f"assert getattr(m, {cat.__name__!r}).__name__ == {cat.__name__!r}"],
+                          capture_output=True, text=True, timeout=s.TIMEOUT_S, cwd="/")
+    assert done.returncode == 0, f"{cat.__module__}.{cat.__name__} cannot be imported by a controller:\n{done.stderr}"
+    with pytest.warns(Warning) as shown:
+        s.notify_changed(["q99.yaml entry 1"])
+    assert [w.category for w in shown if str(w.message).startswith(s.NOTICE_PREFIX)] == [cat]
