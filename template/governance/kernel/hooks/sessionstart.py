@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
-SessionStart hook (W1-49 resume injection + W1-29 context packet, CAP-37).
+SessionStart hook (W1-49 resume injection + W1-29 context packet, CAP-37;
+W2-205 the recorded next step first, RT-5 and RT-6).
 
 Combined injection, within the 10,000-character cap:
+
+First part (W2-205, any role with a ticket, on compact/clear/resume,
+critical, ahead of every other part): the latest checkpoint record's
+next step, "Resume at the recorded next step (<ticket>): <next_action>
+(checkpoint <path>)", and the line "Read your inbox: gov msg read".
+With no checkpoint record there is no such part.
 
 Critical parts (W1-49, W2-62, orchestrator only, never cut):
   - instruction to read the prompt the roster names and the checkpoint
@@ -119,6 +126,19 @@ def main() -> None:
     ticket = os.environ.get("GOV_TICKET", "")
 
     critical_parts: list[str] = []
+    resume = None
+    if source in ("compact", "clear", "resume") and ticket:
+        try:
+            _add_src(project_root)
+            from gov.checkpoint.record import brief
+            resume = brief(Path(project_root), ticket)
+            critical_parts.append(
+                f"Resume at the recorded next step ({resume['ticket']}): {resume['next_action']} "
+                f"(checkpoint {resume.get('path', '')})\nRead your inbox: gov msg read")
+        except Exception as exc:
+            resume = None
+            _no_gov(exc, "the checkpoint resume brief was not added")
+
     if role == "orchestrator":
         from precompact import STAMP, checkpoint_rel, split
 
@@ -175,17 +195,11 @@ def main() -> None:
     except Exception:
         pass
 
-    if source in ("compact", "clear", "resume") and ticket:
-        try:
-            _add_src(project_root)
-            from gov.checkpoint.record import brief
-            b = brief(Path(project_root), ticket)
-            optional_parts.append(
-                f"Checkpoint resume: ticket={b['ticket']}, "
-                f"next_action={b['next_action']}, "
-                f"path={b.get('path', '')}")
-        except Exception as exc:
-            _no_gov(exc, "the checkpoint resume brief was not added")
+    if resume:
+        optional_parts.append(
+            f"Checkpoint resume: ticket={resume['ticket']}, "
+            f"next_action={resume['next_action']}, "
+            f"path={resume.get('path', '')}")
 
     critical_text = "\n\n".join(critical_parts)
     optional_text = "\n\n".join(optional_parts)
