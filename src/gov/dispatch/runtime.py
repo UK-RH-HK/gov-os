@@ -12,7 +12,11 @@ non-blocking ``flock`` on the folder ``~/.gov-os/runtime/`` itself (held: exit 4
    ``notify`` (else ``cto``), and so does a session tracked by an earlier pass whose entry went with its process;
 4. checks each watch: a pid gone or an exit file written is one wake message to the watch's ``to``; a transcript
    silent past its limit is one wake message (and, with ``push``, one detached run of that command) per incident;
-5. writes ``state.json`` whole (a temporary file and a rename) and appends its events to ``log.jsonl``.
+5. (slice 2) reads the heavy jobs from the log's run events (``jobs``: the running and the waiting, a live pid
+   each), the load admission now (``admission``: ``load_1m``, ``start_below``, ``load_limit``, ``margin``, ``room`` and
+   ``binding``, what would hold a start) and the GPU (``gpu``, with one ``gpu`` event a pass: ``used_mib``, ``total_mib``,
+   ``budget_mib``, ``spill``); a load that cannot be read is named in ``problems`` and the pass still runs (F2);
+6. writes ``state.json`` whole (a temporary file and a rename) and appends its events to ``log.jsonl``.
 
 Message ids make every send idempotent (F1): a session's end ``end:<boot>:<pid>:<start_ticks>`` (``end:<pid>:<started>``
 without the identity, as the launcher's), a watch's end ``watch:<request id>``, a stall
@@ -32,7 +36,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from gov.dispatch import inbox, limits
+from gov.dispatch import admission, inbox, limits
 from gov.resources import machine
 from gov.resources.config import machine_dir
 
@@ -60,6 +64,13 @@ def end_id(entry: dict) -> str:
     if boot and isinstance(ticks, int) and not isinstance(ticks, bool):
         return f"end:{boot}:{entry['pid']}:{ticks}"
     return f"end:{entry['pid']}:{entry.get('started')}"
+
+
+def admission_epoch(text) -> float | None:
+    try:
+        return datetime.datetime.fromisoformat(str(text).replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
 
 
 def clock() -> tuple[float, str | None]:
@@ -279,6 +290,53 @@ class Pass:
         incidents[wid] = {"key": key, "since": iso(changed), "silent_min": minutes, "pushed": pushed}
         self.event("stall", id=key, watch=wid, name=name, silent_min=minutes, pushed=pushed)
 
+    def jobs(self) -> dict:
+        """The heavy jobs the runs' events show: ``{"running": [...], "waiting": [...]}``, each with a live pid."""
+        seen: dict[str, list[dict]] = {}
+        for item in admission.events(newest=5000, want=lambda e: isinstance(e.get("job"), str) and
+                                     e.get("event") in ("ready", "wait", "admitted", "started", "ended")):
+            seen.setdefault(item["job"], []).append(item)
+        running, waiting = [], []
+        for job, items in seen.items():
+            names = {e["event"] for e in items}
+            pid = items[0].get("pid")
+            if "ended" in names or not isinstance(pid, int) or not machine.alive(pid):
+                continue
+            if "started" in names:
+                began = next(e for e in items if e["event"] == "started")
+                running.append({"job": job, "kind": began.get("kind"), "slot": began.get("slot"), "pid": pid,
+                                "workers": began.get("workers"), "cpus": began.get("cpus"), "started": began.get("at")})
+            elif "ready" in names and "admitted" not in names:
+                asked = next(e for e in items if e["event"] == "ready")
+                held = [e for e in items if e["event"] == "wait"]
+                since = admission_epoch(asked.get("at"))
+                waiting.append({"job": job, "kind": asked.get("kind"), "pid": pid,
+                                "reason": held[-1].get("reason") if held else None,
+                                "waited_s": None if since is None else round(max(0.0, time.time() - since), 1)})
+        return {"running": running, "waiting": waiting}
+
+    def admitted(self, detected: dict) -> dict:
+        """The load admission as a start would meet it now; a reading that cannot be taken is a problem."""
+        workers = detected["limits"].get("workers_per_slot") or 1
+        ok, _reason, readings = admission.room("test", workers)
+        if readings.get("problem"):
+            self.problem(f"admission: {readings['problem']}")
+        return {"load_1m": readings["load_1m"], "start_below": readings["start_below"],
+                "load_limit": readings["load_limit"], "margin": readings["margin"], "room": ok,
+                "binding": readings["binding"]}
+
+    def gpu(self, detected: dict) -> dict:
+        """The GPU's reading (one ``gpu`` event a pass where there is a GPU): spill is the used MiB over the budget."""
+        found, budget = detected["machine"], detected["limits"]["gpu_budget_mib"]
+        if not detected["gpu"]["present"]:
+            return {"present": False, "reason": detected["gpu"].get("reason")}
+        used, total = found["gpu_used_mib"], found["gpu_total_mib"]
+        reading = {"present": True, "used_mib": used, "total_mib": total, "budget_mib": budget,
+                   "spill": used is not None and used > budget, "at": iso(time.time())}
+        self.event("gpu", job="watch", kind="gpu", pid=os.getpid(), used_mib=used, total_mib=total, budget_mib=budget,
+                   spill=reading["spill"])
+        return reading
+
     def run(self) -> dict:
         for stray in self.place.glob(TEMP_PREFIX + "*"):  # a pass killed while writing left its temporary file
             try:
@@ -300,8 +358,12 @@ class Pass:
                     incidents.pop(wid, None)
             except Exception as error:  # one watch never stops the pass (F2)
                 self.problem(f"watch {wid}: {type(error).__name__}: {error}")
+        jobs = self.jobs()
+        admitted = self.admitted(detected)
+        gpu = self.gpu(detected)
         state = {"format": FORMAT, "pass": {"at": iso(self.now), "ok": not self.problems},
-                 "machine": detected["machine"], "limits": detected["limits"], "sessions": sessions,
+                 "machine": detected["machine"], "limits": detected["limits"], "jobs": jobs, "admission": admitted,
+                 "gpu": gpu, "sessions": sessions,
                  "watches": watches, "incidents": {k: v for k, v in incidents.items() if k in watches},
                  "problems": list(self.problems)}
         with tempfile.NamedTemporaryFile("w", dir=self.place, prefix=TEMP_PREFIX, delete=False) as handle:

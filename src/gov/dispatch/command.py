@@ -7,7 +7,11 @@ convention is in ``gov.cli.main``).
 - ``watch`` (the run-time tool, RT-2, RT-7): one machine-wide watch pass (``gov.dispatch.runtime``); ``--root`` is not
   read and no ``dispatch.yaml`` is needed. Exit 0, or 4 when another pass holds the runtime folder's lock.
 - ``limits [--gpu-need-mib <n>]`` (the run-time tool, RT-3): the machine detected now and each limit with its rule
-  (``gov.dispatch.limits``); with a GPU need, ``admit`` (exit 0), ``wait`` or ``refuse`` (exit 3). No project is read.
+  (``gov.dispatch.limits``), the load admission's ``start_below``, ``load_limit`` and ``margin`` among them; with a GPU
+  need, ``admit`` (exit 0), ``wait`` or ``refuse`` (exit 3). No project is read.
+- ``waits [--over <s>]`` (the run-time tool, slice 2, RT-1): per heavy job the seconds it waited and the seconds of them
+  with room, from the runtime log (``gov.dispatch.waits``); exit 3 and each job named whose with-room wait passed the
+  limit (default 600), else 0.
 
 Exit codes: 0 a pass done or nothing to do (``status``: always 0), 3 the gate, the disk or the forecast refused a start
 (named in the status), 4 another pass holds the lock. 1 (the pass failed) and 2 (a configuration error) are the command
@@ -29,15 +33,18 @@ CHILD_EXIT_CODE = True
 EXIT_REFUSED, EXIT_LOCKED = 3, 4
 EXIT_CODES = {EXIT_REFUSED: "the gate, the disk or the forecast refused a start; limits: a GPU need waits or is "
                             "refused", EXIT_LOCKED: "another pass holds the lock"}
-ACTIONS = ("tick", "status", "watch", "limits")
+ACTIONS = ("tick", "status", "watch", "limits", "waits")
 
 
 def add_arguments(parser) -> None:
-    parser.usage = "gov dispatch {tick,status,watch,limits} [--gpu-need-mib <n>] [--root <project>] [--json]"
-    parser.add_argument("action", choices=ACTIONS, metavar="{tick,status,watch,limits}",
+    parser.usage = ("gov dispatch {tick,status,watch,limits,waits} [--gpu-need-mib <n>] [--over <s>] [--root <project>] "
+                    "[--json]")
+    parser.add_argument("action", choices=ACTIONS, metavar="{tick,status,watch,limits,waits}",
                         help="tick: one pass; status: print the last pass's status; watch: one machine-wide watch "
-                             "pass; limits: the machine's limits")
+                             "pass; limits: the machine's limits; waits: the heavy jobs' waits")
     parser.add_argument("--gpu-need-mib", type=int, metavar="<n>", help="limits: may a GPU need of <n> MiB start now")
+    parser.add_argument("--over", type=float, metavar="<s>", help="waits: the with-room wait that is a finding "
+                                                                  "(default 600)")
 
 
 def _say(args, ok: bool, result: dict, text: str, error: str | None = None) -> None:
@@ -60,6 +67,8 @@ def run(root: Path, args, config: dict) -> int:
         return _watch(args)
     if args.action == "limits":
         return _limits(args)
+    if args.action == "waits":
+        return _waits(args)
     if args.action == "status":
         found = status.read(states.State(root), states.now())
         if found is None:
@@ -104,6 +113,16 @@ def _watch(args) -> int:
             f"{len(state['problems'])} problems\n" + "".join(f"problem: {p}\n" for p in state["problems"]))
     _say(args, True, state, text)
     return code
+
+
+def _waits(args) -> int:
+    from gov.dispatch import admission, runtime, waits
+    over = getattr(args, "over", None)
+    over = waits.OVER_S if over is None else over
+    rows = waits.analyse(admission.events(), runtime.clock()[0])
+    found = waits.findings(rows, over)
+    _say(args, True, {"jobs": rows, "over_s": over, "findings": found}, waits.render(rows, found, over))
+    return EXIT_REFUSED if found else 0
 
 
 def _limits(args) -> int:
