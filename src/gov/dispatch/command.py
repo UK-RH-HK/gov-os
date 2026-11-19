@@ -11,7 +11,9 @@ convention is in ``gov.cli.main``).
   need, ``admit`` (exit 0), ``wait`` or ``refuse`` (exit 3). No project is read.
 - ``waits [--over <s>]`` (the run-time tool, slice 2, RT-1): per heavy job the seconds it waited and the seconds of them
   with room, from the runtime log (``gov.dispatch.waits``); exit 3 and each job named whose with-room wait passed the
-  limit (default 600), else 0.
+  limit (default 600), else 0. ``waits --ends`` (slice 3, RT-2): each end's gap, its message's time less its end
+  (``gov.dispatch.ends``), an end with no message yet the gap to now (``unsent``); exit 3 and each end named whose gap
+  passed 120 s, else 0.
 
 Exit codes: 0 a pass done or nothing to do (``status``: always 0), 3 the gate, the disk or the forecast refused a start
 (named in the status), 4 another pass holds the lock. 1 (the pass failed) and 2 (a configuration error) are the command
@@ -44,7 +46,9 @@ def add_arguments(parser) -> None:
                              "pass; limits: the machine's limits; waits: the heavy jobs' waits")
     parser.add_argument("--gpu-need-mib", type=int, metavar="<n>", help="limits: may a GPU need of <n> MiB start now")
     parser.add_argument("--over", type=float, metavar="<s>", help="waits: the with-room wait that is a finding "
-                                                                  "(default 600)")
+                                                                  "(default 600; with --ends, the gap: 120)")
+    parser.add_argument("--ends", action="store_true", help="waits: each end's gap (its message's time less its end), "
+                                                            "a gap over 120 s a finding")
 
 
 def _say(args, ok: bool, result: dict, text: str, error: str | None = None) -> None:
@@ -118,10 +122,21 @@ def _watch(args) -> int:
 def _waits(args) -> int:
     from gov.dispatch import admission, runtime, waits
     over = getattr(args, "over", None)
+    if getattr(args, "ends", False):
+        return _ends(args, runtime, admission, over)
     over = waits.OVER_S if over is None else over
     rows = waits.analyse(admission.events(), runtime.clock()[0])
     found = waits.findings(rows, over)
     _say(args, True, {"jobs": rows, "over_s": over, "findings": found}, waits.render(rows, found, over))
+    return EXIT_REFUSED if found else 0
+
+
+def _ends(args, runtime, admission, over) -> int:
+    from gov.dispatch import ends
+    over = ends.OVER_S if over is None else over
+    rows = ends.analyse(admission.events(), runtime.clock()[0])
+    found = ends.findings(rows, over)
+    _say(args, True, {"ends": rows, "over_s": over, "findings": found}, ends.render(rows, found, over))
     return EXIT_REFUSED if found else 0
 
 

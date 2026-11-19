@@ -760,6 +760,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
     if plan.get("projection_usd") is not None:  # W2-156: the runaway brake's projection; absent, the key is absent
         data["projection_usd"] = plan["projection_usd"]
     written = record.write(plan["records"], data)
+    plan["session_id"] = session_id  # W2-205 RT-5: the registry entry records it, for a relaunch
     head = [*OWN_SWITCHES, *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
@@ -772,8 +773,11 @@ def _end_message(entry: dict | None, code) -> None:
     if entry is None:
         return
     try:
-        from gov.dispatch import inbox, runtime
+        from gov.dispatch import ends, inbox, runtime
         role, ticket = entry.get("role"), entry.get("ticket")
+        # W2-205 RT-2: the end event first (a send that fails then shows as an unsent end), ended_at = now
+        ends.record(runtime.end_id(entry), "lead" if role == LEAD_GOV_ROLE else "worker", entry["notify"],
+                    ends.stamp(), ticket=ticket)
         inbox.send(entry["notify"], "wake", f"session {role} {ticket} ended with exit code {code}",
                    sender=entry["address"], message_id=runtime.end_id(entry),
                    data={"role": role, "ticket": ticket, "pid": entry.get("pid"), "exit_code": code,
@@ -781,6 +785,20 @@ def _end_message(entry: dict | None, code) -> None:
     except Exception as error:  # noqa: BLE001 - nothing here may end the launch
         _say(f"gov launch: the end message to {entry.get('notify')} could not be sent: "
              f"{' '.join(str(getattr(error, 'message', error)).split())}\n")
+
+
+def _session_key(worker: dict | None, cli_args: list[str]) -> dict:
+    """W2-205 RT-5: the session's id for its registry entry, so that a death can resume it: a worker's is the one its
+    plan gave (``--session-id``); a lead's is the one it was given (``--session-id``, else the one it resumes), or none."""
+    if worker is not None:
+        return {"session_id": worker["session_id"]} if worker.get("session_id") else {}
+    for index, arg in enumerate(cli_args):
+        for flag in ("--session-id", "--resume"):
+            found = cli_args[index + 1] if arg == flag and index + 1 < len(cli_args) else \
+                arg[len(flag) + 1:] if arg.startswith(flag + "=") else None
+            if found is not None and _UUID.fullmatch(found):  # a bare --resume is the CLI's picker: no id
+                return {"session_id": found}
+    return {}
 
 
 def _notify_address() -> str:
@@ -1094,7 +1112,9 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:
-                    state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address)
+                    state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address,
+                                                       launcher_pid=os.getpid(),
+                                                       **_session_key(worker, cli_args))
                     state["registered"] = pid
                 except (OSError, GovError) as error:
                     raise _refuse(f"the session cannot be entered in the machine-wide registry "

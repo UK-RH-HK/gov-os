@@ -24,7 +24,7 @@ import uuid
 from pathlib import Path
 
 ADDRESS = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:@+-]{0,127}$")
-KINDS = ("wake", "notice")
+KINDS = ("wake", "notice", "relay")   # a relay never wakes (RT-6): only the audit names it
 RUNTIME = "runtime"           # the watch pass's own inbox; the only one that takes "watch" messages
 MESSAGES, MARK = "messages.jsonl", "mark"
 WAIT_DEFAULT_S, WAIT_MAX_S, POLL_S = 540, 570, 1.0
@@ -176,6 +176,22 @@ def read(address: str, peek: bool = False) -> dict:
     finally:
         os.close(fd)
     return {"address": address, "messages": found, "mark": end}
+
+
+def messages(address: str) -> list[dict]:
+    """Every message of ``address``'s inbox, read or not, in the order sent (empty where there is no file)."""
+    try:
+        return _whole_lines((folder(address) / MESSAGES).read_bytes())[0]
+    except OSError:
+        return []
+
+
+def sent_at(address: str, message_id: str) -> str | None:
+    """The ``at`` of the first message with ``message_id`` in ``address``'s inbox, or None."""
+    for item in messages(address):
+        if item.get("id") == message_id:
+            return item.get("at")
+    return None
 
 
 def wakes(address: str) -> list[dict]:

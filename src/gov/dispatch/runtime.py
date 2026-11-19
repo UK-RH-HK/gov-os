@@ -36,7 +36,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from gov.dispatch import admission, inbox, limits
+from gov.dispatch import admission, ends, inbox, limits, relaunch
 from gov.resources import machine
 from gov.resources.config import machine_dir
 
@@ -114,6 +114,9 @@ def push(command: str, text: str) -> None:
 class Pass:
     def __init__(self, place: Path):
         self.place, self.events, self.problems = place, [], []
+        self.ended_ids: set[str] = set()   # the ends this pass has an event for already
+        self.relaunching: bool | None = None  # config.json's relaunch key, read when a session is found dead
+        self.previous_at = iso(time.time())  # the previous pass's time: an end it detects is estimated to it
         self.now, why = clock()
         if why:
             self.problem(why)
@@ -135,6 +138,13 @@ class Pass:
         if sent["sent"]:
             self.event("sent", id=message_id, to=to, kind="wake")
         return sent["sent"]
+
+    def end_event(self, ident: str, kind: str, to: str, ended_at: str, **fields) -> None:
+        """RT-2: the ``end`` event of an end this pass detects (``estimated``), once per id, before its message."""
+        if ident in self.ended_ids or ends.known(ident):
+            return
+        self.ended_ids.add(ident)
+        self.event("end", id=ident, kind=kind, to=to, ended_at=ended_at, estimated=True, **fields)
 
     # --- the pass -------------------------------------------------------------------------------------------------
 
@@ -181,17 +191,62 @@ class Pass:
             return "no absolute path"
         return None
 
-    def end_session(self, entry: dict, sid: str) -> None:
-        notify = entry.get("notify")
+    @staticmethod
+    def notified(entry: dict) -> str:
+        """Whom an end of the entry's session is told to: its ``notify`` address, else ``cto``."""
         try:
-            to = inbox.check(notify) if notify else FALLBACK
+            return inbox.check(entry.get("notify")) if entry.get("notify") else FALLBACK
         except inbox.InboxError:
-            to = FALLBACK
+            return FALLBACK
+
+    def end_session(self, entry: dict, sid: str, note: str | None = None) -> None:
+        to = self.notified(entry)
         role, ticket, pid = entry.get("role"), entry.get("ticket"), entry.get("pid")
+        self.end_event(sid, "lead" if role == "orchestrator" else "worker", to, self.previous_at, ticket=ticket)
         text = f"session {role} {ticket} ended (pid {pid}); the watch pass does not know its exit code"
+        if note:
+            text += f"; {note}"
         if self.send(to, text, sid, {"role": role, "ticket": ticket, "pid": pid, "exit_code": None,
                                      "repository": entry.get("repository")}):
             self.event("ended", id=sid, role=role, ticket=ticket, pid=pid)
+
+    def relaunch_on(self) -> bool:
+        """Whether ``config.json`` switches the relaunch on (read once a pass, when a session is found dead)."""
+        if self.relaunching is None:
+            self.relaunching, why = relaunch.enabled(self.place)
+            if why:
+                self.problem(why)
+        return self.relaunching
+
+    def died(self, entry: dict, sid: str) -> None:
+        """A registry entry's process is gone: an end (RT-2), or with the relaunch on (RT-5) a session that died
+        without a return is relaunched once at its recorded next step; a second death of the ticket in the boot is one
+        ``died twice`` message, and an entry with no session id is an end that says it cannot resume."""
+        verdict = relaunch.decide(self.place, entry, self.relaunch_on())
+        ticket, role = entry.get("ticket"), entry.get("role")
+        if verdict in ("claimed", "ending"):
+            return  # already relaunched (the claim is the idempotence), or its launcher has not told its end yet
+        if verdict == "unresumable":
+            return self.end_session(entry, sid, "it cannot resume: no session id was recorded")
+        if verdict == "twice":
+            to, said = self.notified(entry), f"died-twice:{ticket}:{entry.get('boot')}"
+            self.end_event(said, "lead" if role == "orchestrator" else "worker", to, self.previous_at, ticket=ticket)
+            self.send(to, f"session {role} {ticket} died twice in this boot (pid {entry.get('pid')}): not relaunched",
+                      said, {"role": role, "ticket": ticket, "pid": entry.get("pid"), "died_twice": True,
+                             "boot": entry.get("boot"), "repository": entry.get("repository")})
+            return
+        if verdict == "go":
+            if not relaunch.claim(self.place, entry):
+                return  # claimed between the two looks: another pass has it
+            try:
+                child = relaunch.spawn(self.place, entry)
+            except (OSError, ValueError, KeyError) as error:  # the claim stands: a relaunch is never retried
+                self.problem(f"the relaunch of {ticket} cannot be started: {error}")
+                return self.end_session(entry, sid, f"it could not be relaunched: {error}")
+            self.event("relaunched", id=relaunch.claim_id(entry), ticket=ticket, role=role,
+                       session_id=entry.get("session_id"), pid=entry.get("pid"), launch_pid=child)
+            return
+        self.end_session(entry, sid)  # off, or it returned: slice 1's end message
 
     def sessions(self, tracked: dict) -> dict:
         live, ended = {}, set()
@@ -215,17 +270,18 @@ class Pass:
             sid = end_id(entry)
             if machine.alive(pid) and machine.same_process(pid, entry):
                 live[sid] = {key: entry.get(key) for key in ("pid", "role", "ticket", "repository", "started", "boot",
-                                                             "start_ticks", "notify", "address")}
+                                                             "start_ticks", "notify", "address", "session_id",
+                                                             "launcher_pid", "exit_file")}
             else:
                 ended.add(sid)
-                self.end_session(entry, sid)
+                self.died(entry, sid)
         for sid, entry in tracked.items():  # an entry removed by another reader: its process judged here
             if sid in live or sid in ended or not isinstance(entry, dict) or not isinstance(entry.get("pid"), int):
                 continue
             if machine.alive(entry["pid"]) and machine.same_process(entry["pid"], entry):
                 live[sid] = entry
             else:
-                self.end_session(entry, sid)
+                self.died(entry, sid)
         return live
 
     def check_watch(self, wid: str, data: dict, incidents: dict) -> bool:
@@ -235,6 +291,7 @@ class Pass:
             pid = data["pid"]
             if machine.alive(pid) and (not isinstance(data.get("start_ticks"), int) or machine.same_process(pid, data)):
                 return False
+            self.end_event(f"watch:{wid}", "job", to, self.previous_at, job=name)
             return self.send(to, f"watch {name}: process {pid} ended", f"watch:{wid}",
                              {"watch": wid, "name": name, "pid": pid}) is not None
         if data["form"] == "exit-file":
@@ -248,6 +305,7 @@ class Pass:
                 return False
             code = int(first) if first.isascii() and first.isdigit() else None
             said = f"exit code {code}" if code is not None else f"no exit code ({first[:40]!r})"
+            self.end_event(f"watch:{wid}", "job", to, iso(path.stat().st_mtime), job=name)
             return self.send(to, f"watch {name}: the exit file {path} holds {said}", f"watch:{wid}",
                              {"watch": wid, "name": name, "exit_file": str(path), "exit_code": code}) is not None
         self.check_stall(wid, data, incidents)
@@ -344,6 +402,7 @@ class Pass:
             except OSError:
                 pass
         previous = self.previous()
+        self.previous_at = (previous.get("pass") or {}).get("at") or iso(self.now)
         detected = limits.detect()
         for problem in detected["problems"]:
             self.problem(problem)
