@@ -39,7 +39,7 @@ def quota_stated(text: str, name: str, count: int) -> bool:
 
 class Briefs:
     """Every brief call of the module, made once: the second repository's (its own file at the commit) and Gov OS's
-    (W2-171's planted repository with ``GOV_MEMAUDIT_CONFIG`` naming Gov OS's file)."""
+    (W2-171's planted repository with ``MEMAUDIT_CONFIG`` naming Gov OS's file)."""
 
     def __init__(self, base):
         self.world = world = K.build(base / "w")

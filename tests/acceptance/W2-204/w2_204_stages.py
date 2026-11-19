@@ -16,9 +16,9 @@ halves are delivered into the sets root (planted as files, as a delivery leaves 
 - ``round2``: the visible half clean and accepted; the hidden half's round 1 has a thin domain, its round 2 is
   repaired and its second notes reject ``q05``. Calls: ``plan``, ``r1``, ``notes1``, ``r2``, ``final``.
 - ``stopped-thin`` / ``stopped-heavy``: both halves thin (a domain under its minimum) or heavy (a subsystem over its
-  maximum) in round 1 and still so in round 2. Calls: ``plan``, ``r1``, ``r2``, ``again``.
+  maximum) in round 1 and still so in round 2 (thin ends at ``void``, heavy at the final pre-flight). Calls: ``plan``, ``r1``, ``r2``, ``again``.
 - ``govos``: W2-171's world (Gov OS's shape) twice, one driven by ``python3 -m gov.memaudit`` (``module``), one by
-  ``gov memaudit`` (``cli``), with ``GOV_MEMAUDIT_CONFIG`` naming Gov OS's own file (the trial form). Calls:
+  ``gov memaudit`` (``cli``), with ``MEMAUDIT_CONFIG`` naming Gov OS's own file (the trial form). Calls:
   ``<entry>:preflight|void|measure|declare|judge|figures|usage``.
 """
 
@@ -126,10 +126,10 @@ def _stopped(folder: Path, specs) -> dict:
 
 
 def gov_os_call(world, entry: str, step: str, flags) -> K.Call:
-    """One step on a W2-171 world (Gov OS's shape), with ``GOV_MEMAUDIT_CONFIG`` naming Gov OS's own file."""
+    """One step on a W2-171 world (Gov OS's shape), with ``MEMAUDIT_CONFIG`` naming Gov OS's own file."""
     argv = [*K.ENTRIES[entry], step, *map(str, flags)]
     done = subprocess.run(argv, cwd=world.work, capture_output=True, text=True, timeout=900,
-                          env=W171.child_env(world.home, world.env({"GOV_MEMAUDIT_CONFIG": str(K.GOV_OS_CONFIG)})))
+                          env=W171.child_env(world.home, world.env({"MEMAUDIT_CONFIG": str(K.GOV_OS_CONFIG)})))
     return K.Call(done.returncode, done.stdout, done.stderr, argv)
 
 

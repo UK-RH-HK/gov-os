@@ -113,13 +113,13 @@ def test_s3_check_names_the_one_fault_of_the_repository_s_own_file(world, name):
 
 @pytest.mark.parametrize("name", sorted(FAULTS))
 def test_s3_a_step_names_the_same_fault_and_writes_nothing(world, name, tmp_path):
-    """The trial form (``GOV_MEMAUDIT_CONFIG``): ``preflight`` on a delivered half refuses with the fault's line."""
+    """The trial form (``MEMAUDIT_CONFIG``): ``preflight`` on a delivered half refuses with the fault's line."""
     fault, pattern = FAULTS[name]
     trial = tmp_path / "trial.yaml"
     trial.write_text(_text(fault), encoding="utf-8")
     _delivered(world)
     before = W171.snapshot(world.sets)
-    run = world.step("preflight", HIDDEN, entry="module", env={"GOV_MEMAUDIT_CONFIG": str(trial)})
+    run = world.step("preflight", HIDDEN, entry="module", env={"MEMAUDIT_CONFIG": str(trial)})
     _one_line(world, run, pattern)
     _nothing_happened(world, before)
 
@@ -132,7 +132,7 @@ def test_s3_every_step_refuses_a_faulty_file_with_exit_1(world, step, entry, tmp
     trial.write_text(_text(fault), encoding="utf-8")
     _delivered(world)
     before = W171.snapshot(world.sets)
-    run = world.step(step, HIDDEN, entry=entry, env={"GOV_MEMAUDIT_CONFIG": str(trial)}, tag=FREE_TAG)
+    run = world.step(step, HIDDEN, entry=entry, env={"MEMAUDIT_CONFIG": str(trial)}, tag=FREE_TAG)
     _one_line(world, run, pattern)
     _nothing_happened(world, before)
 
@@ -152,5 +152,5 @@ def test_s3_a_file_without_a_fault_is_ok_and_check_prints_its_counts(world, entr
     assert (run.code, run.lines) == (0, ["CONFIG ok half 40 categories 12 domains 5 subsystems 3 control second-control"]), run
     trial = tmp_path / "trial.yaml"
     trial.write_text(K.config_text(K.config_doc(control="none")), encoding="utf-8")
-    run = world.step("check", entry=entry, env={"GOV_MEMAUDIT_CONFIG": str(trial)})
+    run = world.step("check", entry=entry, env={"MEMAUDIT_CONFIG": str(trial)})
     assert (run.code, run.lines) == (0, ["CONFIG ok half 40 categories 12 domains 5 subsystems 3 control none"]), run

@@ -1,7 +1,7 @@
 """W2-204's fixtures: the planted second repository per test (``world``), the planted runs built once per session
 (``stage``), and the two guards every case runs under.
 
-``GOV_MEMAUDIT_CONFIG`` (set for every test by ``tests/conftest.py``, W2-204 I6) is removed here for every case of this
+``MEMAUDIT_CONFIG`` (set for every test by ``tests/conftest.py``, W2-204 I6) is removed here for every case of this
 folder: a repository is judged by its own file. A case of the trial form sets the variable itself, in the child's
 environment.
 """
@@ -22,7 +22,7 @@ import w2_204_support as K  # noqa: E402
 
 @pytest.fixture(autouse=True)
 def _a_repository_s_own_file(monkeypatch):
-    monkeypatch.delenv("GOV_MEMAUDIT_CONFIG", raising=False)
+    monkeypatch.delenv("MEMAUDIT_CONFIG", raising=False)
 
 
 @pytest.fixture(scope="session", autouse=True)

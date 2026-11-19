@@ -1,8 +1,8 @@
 """W2-204's planted second repository ("Second Harbour"): its own domains, categories, quotas, subsystems (two by the
 record key ``feature``, one by path), its own control set, a sets root, a pinned fake ``gov``, a fake ``claude``, a
 rebuild stub and a transcripts folder. Everything lies under pytest's temporary folder; every child gets a planted
-``HOME`` and this tree's ``src/`` first on ``PYTHONPATH``; no child ever sees ``GOV_MEMAUDIT_CONFIG`` unless a case
-passes it (W2-171's ``child_env`` drops every ``GOV_`` variable).
+``HOME`` and this tree's ``src/`` first on ``PYTHONPATH``; no child ever sees ``MEMAUDIT_CONFIG`` unless a case
+passes it (``World.run`` drops it from the child's environment; the folder's conftest from the test's).
 
 W2-171's helpers are imported by path and never edited: its ``child_env``, ``git``, ``install_script``, ``snapshot``,
 ``Run``, the planted register, the fake ``gov`` and ``claude`` and the scenario's ``calls_for``.
@@ -466,8 +466,10 @@ class World:
     # -- running
     def run(self, entry: str, *args, env: dict | None = None, cwd: Path | None = None) -> Call:
         argv = [*ENTRIES[entry], *map(str, args)]
-        done = subprocess.run(argv, cwd=cwd or self.work, capture_output=True, text=True, timeout=900,
-                              env=W171.child_env(self.home, {"W171_STATE": str(self.state), **(env or {})}))
+        child = W171.child_env(self.home, {"W171_STATE": str(self.state)})
+        child.pop("MEMAUDIT_CONFIG", None)  # a repository's own file, unless the case passes the trial form itself
+        child.update(env or {})
+        done = subprocess.run(argv, cwd=cwd or self.work, capture_output=True, text=True, timeout=900, env=child)
         return Call(done.returncode, done.stdout, done.stderr, argv)
 
     def common(self, audit: str) -> list[str]:

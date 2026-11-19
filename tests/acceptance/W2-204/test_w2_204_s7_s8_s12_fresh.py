@@ -86,10 +86,17 @@ def test_s7b_no_round_2_is_asked_when_every_line_accepts_and_the_first_pre_fligh
         assert [e["event"] for e in run.world.ledger(audit)].count("preflight") == 2
 
 
-# -- S7 (c) and (d): a round 2 the final pre-flight refuses ---------------------------------------------------------
-@pytest.fixture(params=["stopped-thin", "stopped-heavy"])
+# -- S7 (c) and (d): a round 2 that cannot go on ----------------------------------------------------------------------
+# A half still thin in a domain ends at ``void`` itself (VOID-DOMAIN); a subsystem over its maximum is a refusal only the
+# final pre-flight sees. The stopping step, and the pre-flights the half's ledger then holds (the lead's ruling on S7 (c)).
+STOPS = {"stopped-thin": ("void", 1), "stopped-heavy": ("preflight-final", 2)}
+
+
+@pytest.fixture(params=sorted(STOPS))
 def stopped_run(request, stage) -> ST.Stage:
-    return stage(request.param)
+    run = stage(request.param)
+    run.stop_step, run.preflights = STOPS[request.param]
+    return run
 
 
 def test_s7c_a_refused_first_pre_flight_asks_round_2(stopped_run):
@@ -97,11 +104,11 @@ def test_s7c_a_refused_first_pre_flight_asks_round_2(stopped_run):
     assert call.code == 5 and waiting(call) and waiting(call)[-1][1] == "writer-2" and not stopped(call), call
 
 
-def test_s7c_a_round_2_the_final_pre_flight_refuses_stops_the_run_with_exit_2(stopped_run):
+def test_s7c_a_round_2_that_cannot_go_on_stops_the_run_with_exit_2_at_its_step(stopped_run):
     call = stopped_run["r2"]
     assert call.code == 2 and len(stopped(call)) == 1, call
     audit, step = stopped(call)[0]
-    assert audit in BOTH and step == "preflight-final" and not has(call, "FRESH VERDICT"), call
+    assert audit in BOTH and step == stopped_run.stop_step and not has(call, "FRESH VERDICT"), call
 
 
 def test_s7c_nothing_is_spent_at_a_stop_no_used_no_measure(stopped_run):
@@ -121,7 +128,7 @@ def test_s7d_a_second_call_after_a_stop_repeats_no_recorded_step(stopped_run):
     audit = stopped(first)[0][0]
     at_stop = stopped_run.record["events_at_stop"][audit]
     now = [e["event"] for e in world.ledger(audit)]
-    assert now.count("preflight") == at_stop.count("preflight") == 2, (at_stop, now)   # one first, one final
+    assert now.count("preflight") == at_stop.count("preflight") == stopped_run.preflights, (at_stop, now)
     assert now.count("drop") == at_stop.count("drop") == 1, (at_stop, now)
 
 

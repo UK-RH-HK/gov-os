@@ -104,7 +104,7 @@ def _trial(tmp_path, **control) -> dict:
     doc["control"] = "none" if control.get("none") else {**doc["control"], **control}
     path = tmp_path / "trial-memory-audit.yaml"
     path.write_text(K.config_text(doc), encoding="utf-8")
-    return {"GOV_MEMAUDIT_CONFIG": str(path)}
+    return {"MEMAUDIT_CONFIG": str(path)}
 
 
 def test_s6_a_control_at_the_file_s_baseline_is_in_range(world, tmp_path):
