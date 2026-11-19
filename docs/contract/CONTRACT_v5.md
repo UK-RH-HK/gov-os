@@ -95,14 +95,14 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
 
 ### CAP-03 — Security and sensitivity classification
 
-- **Outcome:** An agent can rely on secrets never reaching an index, a brief or an export: the path map's sensitivity classes keep secret-class files out of every index, and one full gitleaks scan runs before a repository goes public or is shared.
-- **Acceptance:** After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include one full gitleaks scan before any public push or sharing, and no gitleaks scan runs on a private repository.
+- **Outcome:** An agent can rely on secrets never reaching an index, a brief or an export: the path map's sensitivity classes keep secret-class files out of every index, and one full gitleaks scan runs once before a repository goes public or is shared with a third party; no scan runs while it is private.
+- **Acceptance:** After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include one full gitleaks scan, run once before the repository goes public or is shared with a third party, and no gitleaks scan runs while it is private.
 - **Wave:** W1
 - **Provider:** gitleaks 8.30.1, W1-15, W1-16, W1-01, W1-08, W1-17
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate A3; Framework v4.1.2 §16, §72; Distribution Protocol v1.2 §14, §17; DEC-074; DEC-076; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
 - **Covers:**
-  - `CAP-03.a` [W1] Sensitivity class per path/dataset/namespace before read, index or export; secret-class paths excluded from every index by default-deny; one full gitleaks scan runs before a repository goes public or is shared — Contract v3 A3; Framework v4.1.2 §16, §72; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182 · delivered by W1-15, W1-08
+  - `CAP-03.a` [W1] Sensitivity class per path/dataset/namespace before read, index or export; secret-class paths excluded from every index by default-deny; one full gitleaks scan runs once before a repository goes public or is shared with a third party, and no scan runs while it is private — Contract v3 A3; Framework v4.1.2 §16, §72; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182 · delivered by W1-15, W1-08
   - `CAP-03.b` [W1] Development/governance memory separated from customer/runtime product data — Framework v4.1.2 §16 · delivered by W1-15, W1-08
   - `CAP-03.c` [W1] Each namespace declares sensitivity class, permitted roles, retention, export policy, embedding policy, provenance and deletion/rebuild behaviour (path-map namespace fields) — Framework v4.1.2 §16 · delivered by W1-08
   - `CAP-03.d` [W1] Whole-repository corpus minus secrets — OWNER-CLARIFICATION-BR-0002 · delivered by W1-17
@@ -655,7 +655,7 @@ The rule texts are in Charter v6 §4, from architecture v0.3 §1A; EMERGENCY-2 r
   - `CAP-41.d` [W1] Phase-2 lessons carried (L-0074, anti-stall, no manufactured history, anti-snowball) — DEC-046; OWNER-DECISION-P2-0008 §9; OWNER-DIRECTION-BR-0004 §2D; OWNER-AMENDMENT-P2-0010 §7 · delivered by W1-44
   - `CAP-41.e` [NONE] Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j) — Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7; DEC-165
   - `CAP-41.f` [W1] Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical); both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration — DEC-165; DEC-168 · delivered by W1-08
-  - `CAP-41.g` [W3] A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets; the product's orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan while the inbox is private, one full scan before it is shared — DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182; EMERGENCY-2 §8.4 (DEC-1211)
+  - `CAP-41.g` [W3] A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets; the product's orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan runs while the inbox is private, one full scan runs once before it is shared with a third party — DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-41.h` [W3] A high or critical lesson is raised to the owner immediately, as a decision package — DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-41.i` [W3] The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release's notes list the lessons fixed, with their severity — DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
   - `CAP-41.j` [W3] Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox — DEC-165; EMERGENCY-2 §8.4 (DEC-1211)

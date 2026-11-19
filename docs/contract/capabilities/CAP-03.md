@@ -12,8 +12,8 @@ depends_on:
 
 Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
-- **Outcome:** An agent can rely on secrets never reaching an index, a brief or an export: the path map's sensitivity classes keep secret-class files out of every index, and one full gitleaks scan runs before a repository goes public or is shared.
-- **Acceptance:** After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include one full gitleaks scan before any public push or sharing, and no gitleaks scan runs on a private repository.
+- **Outcome:** An agent can rely on secrets never reaching an index, a brief or an export: the path map's sensitivity classes keep secret-class files out of every index, and one full gitleaks scan runs once before a repository goes public or is shared with a third party; no scan runs while it is private.
+- **Acceptance:** After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include one full gitleaks scan, run once before the repository goes public or is shared with a third party, and no gitleaks scan runs while it is private.
 - **Wave:** W1
 - **Disposition:** KEPT
 - **Covers:** CAP-03.a, CAP-03.b, CAP-03.c, CAP-03.d, CAP-03.e

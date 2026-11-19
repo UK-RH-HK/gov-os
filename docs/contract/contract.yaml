@@ -63,7 +63,7 @@ change_log:
     rounds (MR-1 to MR-3, CAP-23.c, CAP-31, CAP-38, CAP-39, CAP-53, CAP-59, §2 Loop budget); a fresh audit only at the release
     acceptance and at adoption stages A5, AS, A7 and A10 (MR-4, CAP-47.d, CAP-38.f, CAP-24.c, CAP-33.d); the lean release
     pinned and hash-verified, no signing, `gov update` in the release (CAP-02, CAP-43, CAP-45, CAP-44.f/.h, CAP-49); gitleaks
-    only before a repository goes public (CAP-03, CAP-41.g); the run-time tool and the rubric (CAP-04, CAP-22.b, CAP-23.b,
+    runs once before a repository goes public or is shared with a third party, never while it is private (CAP-03, CAP-41.g); the run-time tool and the rubric (CAP-04, CAP-22.b, CAP-23.b,
     CAP-35, CAP-37, CAP-40); the CTO approves every install (§2 Tool installs, CAP-25); Wave 3 is friction. New CAP-63 to
     CAP-69 (the landing, the run-time tool, memory by construction, the hidden-set scan, backups, the basis line, transcripts
     kept). Status PROPOSED until the owner approves. CAP-44.m''s leftovers settled: the records'' version, DEC-1200 in the
@@ -397,10 +397,10 @@ capabilities:
 - id: CAP-03
   title: Security and sensitivity classification
   outcome: 'An agent can rely on secrets never reaching an index, a brief or an export: the path map''s sensitivity classes
-    keep secret-class files out of every index, and one full gitleaks scan runs before a repository goes public or is shared.'
+    keep secret-class files out of every index, and one full gitleaks scan runs once before a repository goes public or is shared with a third party; no scan runs while it is private.'
   acceptance: After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted
     string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include
-    one full gitleaks scan before any public push or sharing, and no gitleaks scan runs on a private repository.
+    one full gitleaks scan, run once before the repository goes public or is shared with a third party, and no gitleaks scan runs while it is private.
   wave: W1
   provider:
   - gitleaks 8.30.1
@@ -445,7 +445,7 @@ capabilities:
   covers:
   - id: CAP-03.a
     item: Sensitivity class per path/dataset/namespace before read, index or export; secret-class paths excluded from every
-      index by default-deny; one full gitleaks scan runs before a repository goes public or is shared
+      index by default-deny; one full gitleaks scan runs once before a repository goes public or is shared with a third party, and no scan runs while it is private
     source: Contract v3 A3; Framework v4.1.2 §16, §72; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
     wave: W1
     provider:
@@ -2611,7 +2611,7 @@ capabilities:
   - id: CAP-41.g
     item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code,
       data or secrets; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan
-      while the inbox is private, one full scan before it is shared'
+      runs while the inbox is private, one full scan runs once before it is shared with a third party'
     source: DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.h
