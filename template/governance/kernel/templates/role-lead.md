@@ -23,7 +23,7 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-3 in the 
 **Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
 
 ## Every run
-- Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
+- Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}` [DEC-1209].
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - Check that the ticket's interface (where config lives, error names, function signatures) is stated in the ticket before the pair starts; if it is not, return PACKAGES [DEC-1052].
 - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].

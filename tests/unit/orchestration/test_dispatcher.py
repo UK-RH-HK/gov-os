@@ -513,8 +513,10 @@ def test_missing_peaks_fall_back_to_gate_check(w):
 
 
 def test_a_heavy_step_outside_a_slot_is_named_and_holds_starts(wp):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the heavy step is the retrieval check (one of the dispatcher's heavy
+    modules), no longer the context check, retired with the context command; what is asserted is unchanged."""
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
-    outside = {"cmd": "/usr/bin/python3 -P -m gov.context.context_check", "cwd": str(wp.wt / "W2-B"), "pid": 500,
+    outside = {"cmd": "/usr/bin/python3 -P -m gov.retrieval.retrieve_check", "cwd": str(wp.wt / "W2-B"), "pid": 500,
                "ppid": 1, "age_s": 400}
     leads(wp, 1, extra=[outside])
     tick(wp)
@@ -524,9 +526,11 @@ def test_a_heavy_step_outside_a_slot_is_named_and_holds_starts(wp):
 
 
 def test_a_heavy_step_inside_a_slot_is_not_a_finding(wp):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the heavy step is the retrieval check (one of the dispatcher's heavy
+    modules), no longer the context check, retired with the context command; what is asserted is unchanged."""
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
-    slot = {"cmd": "bash /x/tools/heavy_slot.sh python3 -m gov.context.context_check", "cwd": "/", "pid": 600, "ppid": 1}
-    step = {"cmd": "/usr/bin/python3 -P -m gov.context.context_check", "cwd": str(wp.wt / "W2-B"), "pid": 601,
+    slot = {"cmd": "bash /x/tools/heavy_slot.sh python3 -m gov.retrieval.retrieve_check", "cwd": "/", "pid": 600, "ppid": 1}
+    step = {"cmd": "/usr/bin/python3 -P -m gov.retrieval.retrieve_check", "cwd": str(wp.wt / "W2-B"), "pid": 601,
             "ppid": 600, "age_s": 900}
     leads(wp, 1, extra=[slot, step])
     tick(wp)
@@ -3047,9 +3051,11 @@ def test_nightly_slot_each_missing_condition_leaves_the_run_outside_a_slot(wp, c
 
 
 def test_nightly_slot_a_heavy_step_elsewhere_still_holds_starts_while_the_nightly_runs(wp):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the heavy step is the retrieval check (one of the dispatcher's heavy
+    modules), no longer the context check, retired with the context command; what is asserted is unchanged."""
     plant_nightly(wp)
     procs = json.loads(wp.procs.read_text())
-    procs.append({"cmd": "/usr/bin/python3 -P -m gov.context.context_check", "cwd": str(wp.wt / "W2-B"), "pid": 500,
+    procs.append({"cmd": "/usr/bin/python3 -P -m gov.retrieval.retrieve_check", "cwd": str(wp.wt / "W2-B"), "pid": 500,
                   "ppid": 1, "age_s": 400})
     wp.procs.write_text(json.dumps(procs))
     tick(wp)

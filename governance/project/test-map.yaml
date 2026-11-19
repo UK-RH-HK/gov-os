@@ -134,7 +134,7 @@ couplings:
     why: "the session-start and PreCompact hooks are also run by these suites (I3 §4.1 item 5)"
   - paths: ["governance/project/path-map.yaml", ".gitleaks.toml", "template/.gitleaks.toml"]
     suites: ["tests/acceptance/W1-16/", "tests/acceptance/W1-17/", "tests/acceptance/W1-20/",
-             "tests/acceptance/W1-22/", "tests/acceptance/W1-24/", "tests/acceptance/W2-54/"]
+             "tests/acceptance/W1-22/", "tests/acceptance/W2-54/"]
     why: "fixture inputs: the live path map and the gitleaks configurations are copied into these suites' fixtures (I3 §4.1 item 6); W1-19 and W1-21 left out by DEC-1061 item 9 (T-6)"
   # DEC-1061 item 9 (DEC-1052 T-6): the real-model suites are selected by a model-path change only: the embedder (its
   # model pin, the Ollama client, the vector cache), the reranker (its pin, service and worker) and the dev tier's baseline

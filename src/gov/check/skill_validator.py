@@ -44,7 +44,7 @@ import sys
 from pathlib import Path
 
 from gov.check.commands import GOV_COMMANDS
-from gov.context import TOKEN_CHARS
+from gov.util.tokens import TOKEN_CHARS
 from gov.util.frontmatter import with_body as _parse_frontmatter
 
 _MAX_DESC_TOKENS = 60

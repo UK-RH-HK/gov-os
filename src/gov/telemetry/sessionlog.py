@@ -21,7 +21,7 @@ import shlex
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.context import _tokens
+from gov.util.tokens import _tokens
 
 VERSION = re.compile(r"\d+(\.\d+){1,3}")  # what a line's version looks like: nothing else of a line is given out
 LOG_SOURCES = PACKET, HOOKS, GOV = ("sessionstart_packet", "hook_output", "gov_output")

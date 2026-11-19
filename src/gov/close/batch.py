@@ -699,6 +699,7 @@ def run_scoped(root: Path, tickets: list[str], timeout: float = 3600) -> tuple[d
     closes. A ticket whose review is not READY (S11) refuses the batch before anything runs."""
     from gov.close import attribution as _attribution
     from gov.close import command as _command
+    from gov.close import decisions as _decisions
     from gov.tasks.tickets import TICKETS_REL, frontmatter
 
     root = Path(root)
@@ -733,6 +734,16 @@ def run_scoped(root: Path, tickets: list[str], timeout: float = 3600) -> tuple[d
     except _select.SelectionRefused as refused:
         raise GovError(_select.SELECTION_REFUSED, f"landed at {land[:12]} but nothing closed: {refused.reason}",
                        result, exit_code=EXIT_RED)
+    # W2-200 (DEC-1214 M1): each landed ticket's decisions, from its own sources and the land commit's register, as
+    # every close records them; a cited decision the register lacks refuses before any close record is written
+    try:
+        decided = {t: _decisions.record_fields(root, t, frontmatter(root / TICKETS_REL / f"{t}.md") or {})
+                   for t in result["landed"]}
+    except GovError as refused:
+        if refused.code != _decisions.NOT_FOUND:
+            raise
+        raise GovError(refused.code, f"landed at {land[:12]} but nothing closed: {refused.message}",
+                       {**result, **refused.details}, exit_code=EXIT_RED)
     runs = result.get("rest_runs") or result.get("runs") or []
     night = _attribution.nightly_reading(root)
     clone = result["clone"]
@@ -750,6 +761,7 @@ def run_scoped(root: Path, tickets: list[str], timeout: float = 3600) -> tuple[d
             "base": base_sha,
             "changed": chosen[ticket]["changed"],
             "batch": {"candidates": result["candidates"], "landed": result["landed"], "land_commit": land},
+            **decided[ticket],
         }
         close_rel, checkpoint = _command._record_and_close(root, ticket, record, list(chosen[ticket]["own"]))
         outputs = [f"{TICKETS_REL}/{ticket}.md", f"docs/close/{ticket}", f"docs/checkpoints/{ticket}"]

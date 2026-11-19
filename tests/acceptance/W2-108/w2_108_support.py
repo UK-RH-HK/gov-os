@@ -10,8 +10,8 @@ How the tests run (README, "How the suite chooses the code under test"):
   holds the ``gov`` package the pytest process imports; every child process gets that folder (and nothing of
   this worktree hard-coded) on its ``PYTHONPATH``.
 - **Through public interfaces only:** ``gov.retrieval.lexical.search``/``freshness``/``refresh``,
-  ``gov.retrieval.semantic.search``/``refresh``, ``gov.retrieval.retrieve.retrieve`` and
-  ``gov.context.context``. Each scenario runs in one child process, through a small driver written to a
+  ``gov.retrieval.semantic.search``/``refresh`` and ``gov.retrieval.retrieve.retrieve`` (the context packet's case
+  is deleted with the context command, DEC-1214 M1, W2-200). Each scenario runs in one child process, through a small driver written to a
   temporary folder, that makes the calls one after another (and, between them, edits files, commits, or starts
   another process that rebuilds the store).
 - **The work is counted through its public effects:** the driver installs a Python audit hook
@@ -58,7 +58,6 @@ GOV_SRC = gov_src()
 LEXICAL = "gov.retrieval.lexical"
 SEMANTIC = "gov.retrieval.semantic"
 RETRIEVE = "gov.retrieval.retrieve"
-CONTEXT = "gov.context"
 STORE = "gov.store"
 
 STORE_REL = ".gov-runtime/store.db"

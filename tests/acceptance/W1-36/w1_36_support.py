@@ -62,7 +62,7 @@ SOURCE_PATTERN = re.compile(r"(DEC-\d+|CAP-\d+|MR-\d+)")
 FAMILIES_RAW = (
     "schema/invariants", "graph integrity", "index freshness",
     "retrieval regression", "authority/role limits", "mutation scope",
-    "path-map compliance", "context reproducibility",
+    "path-map compliance",   # the context family retired with its check (DEC-1214 M1, W2-200)
     "concurrency/claims", "adapter/model portability",
     "skill regression", "command-contract consistency",
     "secrets indexing", "recovery/rebuild",

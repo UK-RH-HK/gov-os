@@ -206,13 +206,17 @@ def test_s7_adopt_facts_writes_the_question_as_text(tmp_path):
 BASE = "067cd2946"  # the ticket's base on w2/integrate (EMERGENCY-2 6.1 build row): none of its implementation
 
 
-def test_f3_gov_context_and_its_tests_are_untouched_since_the_base():
+def test_f3_no_commit_of_this_ticket_touches_the_context_library_or_its_tests():
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): was ``test_f3_gov_context_and_its_tests_are_untouched_since_the_base``,
+    which compared the two folders with the base; W2-200 retires them, so the guard reads this ticket's own history
+    instead: no commit with ``Task: DAEO-3d3o`` touches ``src/gov/context`` or ``tests/unit/context``. Skipped where
+    the base is not in the clone, as before."""
     import subprocess
 
     known = subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", f"{BASE}^{{commit}}"], capture_output=True)
     if known.returncode:
         pytest.skip(f"the base {BASE} is not in this clone")
-    done = subprocess.run(["git", "-C", str(REPO), "diff", "--name-only", BASE, "--", "src/gov/context",
-                           "tests/unit/context"], capture_output=True, text=True, check=True)
+    done = subprocess.run(["git", "-C", str(REPO), "log", "--no-merges", "--format=%h %s", "--grep=^Task: DAEO-3d3o$",
+                           "--", "src/gov/context", "tests/unit/context"], capture_output=True, text=True, check=True)
     changed = [line for line in done.stdout.splitlines() if line.strip()]
-    assert not changed, f"gov context or its tests changed since {BASE}: {changed}"
+    assert not changed, f"commits of W2-197 (DAEO-3d3o) touch the context library or its tests: {changed}"

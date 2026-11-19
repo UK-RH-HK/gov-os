@@ -17,7 +17,6 @@ import w1_30_r15_support as r15
 
 support = r15.support
 
-CONTEXT_CHECK = "context-reproducibility"
 AUTHORITY_CHECK = "core-authority"
 
 TEMPLATE_TICKET_SOURCE = f"{r15.TEMPLATE_KERNEL}/templates/ticket.md"     # in this repository

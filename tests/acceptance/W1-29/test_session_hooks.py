@@ -56,7 +56,7 @@ import w1_49_support
 
 # ======================================================================
 # SUCCESS LINE 1
-# SessionStart injects gov context --brief plus tk ready within the
+# SessionStart injects the context brief plus tk ready within the
 # 2.5k-token cap; PreCompact and Stop write checkpoints and respect
 # stop_hook_active  [CAP-15.g, CAP-37.b]
 # ======================================================================
@@ -66,8 +66,9 @@ class TestSessionStart:
     """SessionStart injects context and tk ready within the token cap."""
 
     def test_injects_context_brief_on_startup(self, w49_project, run):
-        """On startup, SessionStart injects gov context --brief output and tk
-        ready, within the 2.5k-token cap.  [CAP-15.g]"""
+        """On startup, SessionStart injects its brief and tk ready, within the
+        2.5k-token cap.  [CAP-15.g] (The hook no longer runs the context
+        command, retired by DEC-1214 M1; the cap is what is asserted.)"""
         result = run.sessionstart(
             w49_project, "startup", role="engineer", ticket="TEST-abcd",
         )

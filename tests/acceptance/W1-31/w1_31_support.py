@@ -135,7 +135,8 @@ def ccusage_sessions(logs, home):
 # --------------------------------------------------------------------------
 
 def tokens(text):
-    """W1-24's counter (``gov.context``), which W1-29's cap uses too: 4 characters a token, rounded up."""
+    """The 4-characters-a-token counter (``gov.util.tokens``, moved from the retired context library by DEC-1214 M1),
+    which W1-29's cap uses too: 4 characters a token, rounded up."""
     return -(-len(text) // 4)
 
 

@@ -41,7 +41,7 @@ A fresh checkpoint exits 0; a stale one exits 3 with the reasons. The watchdog o
 
 ## The resume rule
 
-The orchestrator's checkpoint opens with a RESUME HERE section. RESUME HERE holds the full session state: what is happening, what was decided, what is next and where things are. It sets no size limit of its own; DEC-792's 8,000-character limit is lifted (DEC-837). Knowledge of the repository comes from retrieval (`gov retrieve`) and the context packets (`gov context`), not from the resume (DEC-837).
+The orchestrator's checkpoint opens with a RESUME HERE section. RESUME HERE holds the full session state: what is happening, what was decided, what is next and where things are. It sets no size limit of its own; DEC-792's 8,000-character limit is lifted (DEC-837). Knowledge of the repository comes from retrieval (`gov retrieve`), not from the resume (DEC-837; the context packets are retired, DEC-1214 M1).
 
 A checkpoint is written at every handover: a worker's return, a merge, a package and a compaction (DEC-837).
 

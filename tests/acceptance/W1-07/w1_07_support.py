@@ -41,8 +41,10 @@ PATH_MAP_REL = "governance/project/path-map.yaml"
 HELD_OUT_REL = "governance/project/held-out.yaml"   # DEC-385: no fixture copies it into a temporary project
 CHECKS_REL = "template/governance/kernel/checks"
 
-# The twelve Wave 1 governance operations the registry reserves (ticket KPI, CAP-28.b).
-RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "context", "closure", "retrieve",
+# The twelve Wave 1 governance operations the registry reserves (ticket KPI, CAP-28.b), less ``context``: the owner
+# retired that command, its library and its check (DEC-1214 M1, W2-200), so eleven remain and the cases of the
+# retired one (its registry row and its read row) are gone with it. Rewrite-Reason: DEC-1214 M1.
+RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "closure", "retrieve",
                      "checkpoint", "close", "adopt", "pause")
 
 # DEC-542: four commands are recorded in the command list beside the twelve, one line each (DEC-546). The first
@@ -101,8 +103,8 @@ def invocation(name):
 
 
 # The read commands of CAP-27's acceptance line, as argument lists, plus ``check --list`` (DEC-186).
-READ_COMMANDS = (("status",), ("check",), ("check", "--list"), ("readiness",), ("doctor",), ("context", "--dry-run"),
-                 invocation("closure"), ("retrieve",))
+READ_COMMANDS = (("status",), ("check",), ("check", "--list"), ("readiness",), ("doctor",),
+                 invocation("closure"), ("retrieve",))   # the retired command's row is gone (DEC-1214 M1)
 
 # Planned revision (DEC-190, "planned: command implemented"): W1-21 builds ``retrieve``; its cases are in
 # ``tests/acceptance/W1-21/``. It requires a question, so the cases that run every command give it one.
@@ -111,14 +113,8 @@ NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
 REQUIRED_ARGUMENTS["retrieve"] = ("no line of the W1-07 fixture holds this text",)
 READ_COMMANDS = tuple(invocation("retrieve") if args == ("retrieve",) else args for args in READ_COMMANDS)
 
-# Planned revision (DEC-190, "planned: command implemented"): W1-24 builds ``context``; its cases are in
-# ``tests/acceptance/W1-24/``. It requires a ticket argument, and its ``--dry-run`` form is in the read commands
-# list. Add to ``REQUIRED_ARGUMENTS`` and revise ``READ_COMMANDS``.
-BUILT_LATER = BUILT_LATER + ("context",)
-NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
-REQUIRED_ARGUMENTS["context"] = ("W1-07-NO-SUCH-TICKET",)
-READ_COMMANDS = tuple(("context", "--dry-run", *REQUIRED_ARGUMENTS["context"]) if args == ("context", "--dry-run")
-                      else args for args in READ_COMMANDS)
+# W1-24 built the context command (DEC-190); the owner retired it (DEC-1214 M1, W2-200): its planned revision is gone
+# with its rows above.
 
 # Planned revision (DEC-190, "planned: command implemented"): W1-27 builds ``doctor`` and ``rebuild``; their cases are
 # in ``tests/acceptance/W1-27/``.

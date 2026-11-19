@@ -4,8 +4,8 @@ whenever its key matches [owner, 2026-10-18, P-W2-30 (a)].
 
 Seen from outside, through public interfaces only: what a search gives (``gov.retrieval.semantic.search(root, q,
 refresh=False)``: its hits, their order and their distances), what the retrieval's public entry gives
-(``gov.retrieval.retrieve.retrieve``), what ``gov context --json`` gives, and what the context-reproducibility check
-says. No case names where or how a vector is kept.
+(``gov.retrieval.retrieve.retrieve``). No case names where or how a vector is kept. Part 2 (two computations of a
+ticket's context, and the context check over them) is retired with the context command (DEC-1214 M1, W2-200).
 
 The embedder is the stand-in of the README ("The stand-in embedder"): like the real one, it gives a text a slightly
 different vector when a different text was embedded just before it, and the same vector on a repeat. ``targets``
@@ -18,7 +18,6 @@ keep (README, "Round 2").
 
 from __future__ import annotations
 
-import collections
 import unicodedata
 
 import pytest
@@ -92,68 +91,7 @@ def test_the_retrieval_s_public_entry_gives_one_bundle_for_one_question_whatever
         assert S.canonical(bundle) == S.canonical(bundles[0]), "one question, two bundles in one store"
 
 
-# ---- 2. two computations of every ticket's context in one store give one hash -------------------------------------
-
-@STAND_IN
-def test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet(box, embedder, tmp_path):
-    """*Red.* Three tickets, each asking the retrieval its own question. ``gov context --json`` for each, then for
-    each again after the others, then in the opposite order: one packet and one hash per ticket."""
-    project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
-    tickets = list(S.QUESTION_TICKETS)
-    packets = collections.defaultdict(list)
-    for ticket_id in tickets + tickets + tickets[::-1]:
-        done = S.gov(box, "context", "--json", "--root", project, ticket_id, env=S.embed_env(box, embedder))
-        assert done.returncode == 0, done.describe()
-        packets[ticket_id].append(done.envelope()["result"])
-    assert len(embedder.embedded()) > 0, "the premise: no context asked the embedder anything"
-    for ticket_id, computed in packets.items():
-        assert computed[0][S.K_SUPPLEMENTARY], f"the premise: {ticket_id}'s context holds no retrieval item"
-        hashes = [packet[S.K_HASH] for packet in computed]
-        assert len(set(hashes)) == 1, (
-            f"{ticket_id}: {len(set(hashes))} hashes in {len(hashes)} computations in one store: {hashes}\n"
-            f"supplementary ids: {[[item.get('id') for item in p[S.K_SUPPLEMENTARY]] for p in computed]}")
-        assert len({S.canonical(packet) for packet in computed}) == 1, f"{ticket_id}: two packets in one store"
-
-
-@STAND_IN
-def test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary(
-        box, embedder, tmp_path):
-    """*Red.* The embedder whose vectors vary is behind every process. Each ticket's title, asked through ``gov
-    retrieve`` in a process of its own, then again after the others, reaches the embedder after other texts and gets
-    one bundle every time. The context-reproducibility check, run as its declaration says over the three tickets,
-    is green, and its contexts send the embedder nothing.
-
-    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. The check's contexts no longer reach the
-    embedder (W2-04's addendum: ``gov context`` sends nothing to an embedder), so the premise "the check's contexts
-    reached the embedder" moves to ``gov retrieve``, the read that does, and is held as round 2 holds a read: one
-    question, one bundle, whatever was asked before. The check stays green over several tickets. Today the check's
-    contexts send the embedder their questions."""
-    project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
-    env = S.embed_env(box, embedder)
-    titles = list(S.QUESTION_TICKETS.values())
-    bundles = collections.defaultdict(list)
-    before = len(embedder.embedded())
-    for title in titles + titles[::-1]:
-        done = S.gov(box, "retrieve", "--json", "--root", project, title, env=env)
-        assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
-        bundles[title].append(done.envelope()["result"])
-    sent = embedder.embedded()[before:]
-    assert all(embedder.asked_for(title) >= 1 for title in titles) and \
-        any(a != b for a, b in zip(sent, sent[1:])), \
-        f"the premise: the questions did not reach the embedder one after another: {[text[-40:] for text in sent]}"
-    for title, found in bundles.items():
-        assert found[0].get("evidence") and found[0]["facets"].get("semantic", {}).get("available") is True, \
-            f"the premise: gov retrieve {title!r} gave no semantic answer: {found[0].get('facets')}"
-        assert len({S.canonical(bundle) for bundle in found}) == 1, \
-            f"one question, two bundles in one store: {title!r}"
-    before = len(embedder.embedded())
-    done = S.run(["sh", "-c", S.yaml.safe_load(
-        (S.REPO_ROOT / S.CONTEXT_DECLARATION_REL).read_text(encoding="utf-8"))["command"]],
-        cwd=project, env=env, timeout=S.CHECK_TIMEOUT_S)
-    assert done.returncode == 0 and "FAIL" not in done.stdout, \
-        f"two computations of a ticket's context in one store give two hashes\n{done.describe()}"
-    assert len(embedder.embedded()) == before, \
-        f"the check's contexts sent the embedder {len(embedder.embedded()) - before} texts"
+# ---- 2. two computations of every ticket's context: retired with the context command (DEC-1214 M1, W2-200) ---
 
 
 # ---- 3. a stored vector is never taken for another key ------------------------------------------------------------
