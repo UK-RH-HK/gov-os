@@ -17,7 +17,8 @@ this script is in.
   archive does not hold (a decision made since) is no failure.
 
 An entry runs from its ``### DEC-n`` heading to the line before the next such heading, a ``## `` heading or a ``---``
-line, its trailing blank lines dropped.
+line, its trailing blank lines dropped. The version table that ends a section of the archive (``| Version | Date |
+Change |`` after a blank line) follows the section's last entry and is no part of it: the register holds entries only.
 """
 import argparse
 import re
@@ -28,6 +29,7 @@ PATH_MAP_REL = "governance/project/path-map.yaml"
 ARCHIVE_KEY, REGISTER_KEY = "decision_register_archive", "decision_register"
 FIRST_SINCE = 1211  # the first decision made after audit 8's classes (DEC-001 to DEC-1210)
 HEADING = re.compile(r"### (DEC-\d+)")
+VERSION_TABLE = "| Version |"  # the change log that ends a section of the archived register
 CLASS = re.compile(r"\*\*Class:\*\* (\w+)")
 HEAD = """# Governance OS — Decision Register (in force)
 
@@ -57,6 +59,10 @@ def entries(text):
         j = i + 1
         while j < end and not lines[j].startswith("## ") and lines[j] != "---":
             j += 1
+        for at in range(i + 1, j):  # the section's version table, after a blank line, is the old file's, not the entry's
+            if lines[at].startswith(VERSION_TABLE) and not lines[at - 1].strip():
+                j = at
+                break
         out.append((HEADING.match(lines[i]).group(1), "\n".join(lines[i:j]).rstrip("\n")))
     return out
 
