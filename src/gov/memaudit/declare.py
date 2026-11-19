@@ -15,6 +15,7 @@ import tempfile
 import time
 from pathlib import Path
 
+from gov.memaudit import config as _config
 from gov.memaudit import layout, ledger
 from gov.memaudit.common import (FILES_KEY, HEX64, UsageError, blob_at, read_json, resolve_commit, set_digest,
                                  sha256_bytes, sha256_file, toplevel, utc_iso, write_whole)
@@ -238,6 +239,7 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
     if decision is not None and not (isinstance(decision, str) and DECISION_RE.fullmatch(decision)):
         raise UsageError("decision")
     commit = resolve_commit(repo, commit)
+    _config.load(repo, commit)  # a repository without its configuration declares nothing (W2-204 S2)
     if os.path.lexists(p["used"]):
         return "used", {"used": True}
 

@@ -16,6 +16,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+from gov.memaudit import config as _config
 from gov.memaudit import layout, preflight, schedule, tables
 from gov.memaudit.common import UsageError, read_json, set_digest
 
@@ -199,7 +200,8 @@ def declare(sets_root, name, *, repo=None, runs_dir=None, replaces=None) -> tupl
         return "refused", {"code": "STANDING_BRIEFS"}
     files, _ = layout.entries(hidden)
     loaded = [(f, preflight._load(f)) for f in files]
-    if len(files) < MIN_FILES or not all(preflight.form_ok(d, f.stem) for f, d in loaded):
+    categories = _config.load(repo).quotas  # the repository's own categories
+    if len(files) < MIN_FILES or not all(preflight.form_ok(d, f.stem, categories) for f, d in loaded):
         return "refused", {"code": "STANDING_FORM"}
 
     row = {"event": "declared", "set": name, "set_digest": set_digest(hidden), "n": len(files),

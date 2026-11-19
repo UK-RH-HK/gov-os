@@ -15,6 +15,7 @@ import warnings
 
 from gov.memaudit import EXIT
 from gov.memaudit.common import UsageError
+from gov.memaudit.config import ConfigError
 from gov.memaudit.say import say
 
 
@@ -58,6 +59,8 @@ def parser() -> argparse.ArgumentParser:
                         description="Moves every question the notes do not accept aside (never deleted), recomputes "
                                     "the scales on the kept ones and writes DROPS.json; exit 2 when the audit is void.")
     _common(vd)
+    vd.add_argument("--repo", metavar="DIR", help="the git repository whose configuration and records are read "
+                                                  "(default: the top level)")
     dc = sub.add_parser("declare", help="the set's map entry, DECLARATION.json, then USED",
                         description="The set's entry in the sets root's own path map, then DECLARATION.json, then "
                                     "USED, then the ledger lines; refuses while USED exists.")
@@ -110,7 +113,40 @@ def parser() -> argparse.ArgumentParser:
     pi.add_argument("--sets", nargs="+", metavar="NAME",
                     help="import exactly these sets' kept questions (default: the 79 and the 138, as before)")
     _driver(sub)
+    _adopted(sub)
     return ap
+
+
+def _adopted(sub):
+    """W2-204: the steps an adopted repository's CTO runs (Interface I3 to I5)."""
+    ck = sub.add_parser("check", help="the repository's memory-audit configuration: ok, or its first fault",
+                        description="Reads governance/project/memory-audit.yaml (the file MEMAUDIT_CONFIG names, "
+                                    "else the commit's, else the working tree's) and prints its counts or its first fault.")
+    ck.add_argument("--repo", metavar="DIR", help="the repository (default: the top level)")
+    ck.add_argument("--commit", metavar="REV", help="the commit whose file and tracked paths are read (default: the "
+                                                    "working tree's file, HEAD's tracked paths)")
+    ck.add_argument("--sets-root", metavar="ROOT", help=argparse.SUPPRESS)
+    from gov.memaudit import brief, deliver, fresh
+    brief.add_arguments(sub.add_parser("brief", help="a writer's or checker's brief, filled from the configuration",
+                                       description=brief.DESCRIPTION))
+    deliver.add_arguments(sub.add_parser("deliver", help="take a writer's set or a checker's notes into the sets root",
+                                         description=deliver.DESCRIPTION))
+    fresh.add_arguments(sub.add_parser("fresh", help="a whole fresh pair of halves on a pinned snapshot it builds",
+                                       description=fresh.DESCRIPTION))
+
+
+def _check(args, emit) -> str:
+    from gov.memaudit import config
+    from gov.memaudit.common import resolve_commit, toplevel
+    from pathlib import Path
+    repo = Path(args.repo) if args.repo else toplevel()
+    if args.commit:
+        cfg = config.load(repo, resolve_commit(repo, args.commit))
+    else:
+        cfg = config.load(repo, tree=resolve_commit(repo, "HEAD"))
+    emit(f"CONFIG ok half {cfg.half_size} categories {len(cfg.categories)} domains {len(cfg.domains)} "
+         f"subsystems {len(cfg.subsystems)} control {cfg.control.set if cfg.control else 'none'}")
+    return "ok"
 
 
 def _driver(sub):
@@ -199,6 +235,11 @@ def _run(args, emit) -> str:
     cmd = args.command
     if cmd == "standing":
         return _standing(args, emit)
+    if cmd == "check":
+        return _check(args, emit)
+    if cmd in ("brief", "deliver", "fresh"):
+        import importlib
+        return importlib.import_module(f"gov.memaudit.{cmd}").from_args(args, emit)
     from gov.memaudit import layout
     audit, week = getattr(args, "audit", None), getattr(args, "week", None)
     layout.check_week(week)
@@ -221,7 +262,7 @@ def _run(args, emit) -> str:
         return word
     if cmd == "void":
         from gov.memaudit import drops
-        word, counts = drops.apply(args.sets_root, args.audit)
+        word, counts = drops.apply(args.sets_root, args.audit, repo=args.repo)
         for line in drops.lines(word, counts):
             emit(line)
         return word
@@ -287,7 +328,7 @@ def main(argv=None) -> int:
     root = None
     try:
         args = parser().parse_args(argv)
-        root = args.sets_root
+        root = getattr(args, "sets_root", None)
 
         def emit(line):
             say(line, root)  # a refused line ends the process with exit 4
@@ -295,6 +336,9 @@ def main(argv=None) -> int:
         return EXIT[_run(args, emit)]
     except SystemExit as e:  # --help: argparse's own exit 0; a line say refused: 4
         return 0 if e.code == 0 else EXIT["usage"]
+    except ConfigError as e:  # the repository's configuration is absent or faulty: its one line, exit 1 (W2-204 I2)
+        say(e.line, root)
+        return EXIT["refused"]
     except BaseException as e:  # noqa: BLE001: one line, the class only; no traceback, no text (F1)
         say(f"ERROR: {type(e).__name__}", root, err=True)
         return EXIT["usage"]
