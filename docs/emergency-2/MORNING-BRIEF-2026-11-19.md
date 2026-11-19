@@ -1,8 +1,8 @@
 # Morning brief, 2026-11-19 (the Gov OS CTO)
 
-`docs/emergency-2/MORNING-BRIEF-2026-11-19.md` · the night of 18 to 19 November · written from 06:05, completed at 13:35
+`docs/emergency-2/MORNING-BRIEF-2026-11-19.md` · the night of 18 to 19 November · written from 06:05, completed at 13:17
 
-**Not delivered at 08:00.** The plan stood at 100 % from 05:47, and this session was stopped by the limit from 07:02 until the owner's message at 13:09. The page was finished then; the figures below are the night's, and the status block is counted at 13:35.
+**Not delivered at 08:00.** The plan stood at 100 % from 05:47, and this session was stopped by the limit from 07:02 until the owner's message at 13:09. The page was finished then; the figures below are the night's, and the status block is counted at 13:17.
 
 **In one line.** All six of your priorities are landed, eight tickets closed, and the register is archived. The base is
 not green yet: the full suite of 05:18 gave 18,610 passed, 9 failed and 94 skipped. Two of the nine wait for your answer G1-X; the other seven are being fixed.
@@ -60,7 +60,7 @@ Also done: the T2 proposal page; the install rule (G7) in the tool registry; DEC
 | The 43 GB beside the repository (G3) | later, as you decided | — |
 | Release acceptance (§8.2) | 1: waits for G5. 2: the proving run. 3: EXAMIN's fresh 80, waits for release 0.1.4. 4: one EXAMIN feature ticket, after 3 | R-1 below |
 
-W2-00, W2-15b, W2-46, W2-47 and W2-82 were closed on their records at 13:15, at your word (retired, replaced or folded by EMERGENCY-2 §6.2).
+W2-00, W2-15b, W2-46, W2-47 and W2-82 were closed on their records at 13:10, at your word (retired, replaced or folded by EMERGENCY-2 §6.2).
 
 ## 4. EXAMIN's Wave 0, in two lines
 

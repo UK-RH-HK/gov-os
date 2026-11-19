@@ -1,6 +1,6 @@
 # The test suite: what the numbers count, an inventory, and what to keep and retire
 
-`docs/emergency-2/TEST-INVENTORY-2026-11-19.md` · the CTO, 2026-11-19 13:30 · research only: nothing is deleted or moved before the owner's yes
+`docs/emergency-2/TEST-INVENTORY-2026-11-19.md` · the CTO, 2026-11-19 13:17 · research only: nothing is deleted or moved before the owner's yes
 
 Counted at `76bd725f5` by collecting every test id (`pytest --collect-only`, with and without the opt-in suites) and by reading each test function's source. Run times are from the full suite of 05:18 to 07:01 on `712c71cba` (3 workers).
 
@@ -15,9 +15,9 @@ A **test function** is one `def test_...`. A **case** is one run of it: a parame
 | 21,120 | I did not find this figure verbatim. The full suite ran 21,260 cases on 16 November (21,081 parallel, 179 serial) and 21,626 on 17 November | 16 to 17 November |
 | 18,273 | cases in the full suite's parallel phase after the guard's tests were retired | 18 November 23:06 |
 | 18,639 | cases in the full suite's parallel phase; with the 75 serial cases, 18,714 | 19 November 05:18 |
-| 18,651 | cases the default run collects now | 19 November 13:20 |
-| 24,471 | every case that exists now, the two opt-in suites included | 19 November 13:20 |
-| 13,649 | test functions now | 19 November 13:20 |
+| 18,651 | cases the default run collects now | 19 November, about 13:12 |
+| 24,471 | every case that exists now, the two opt-in suites included | 19 November, about 13:12 |
+| 13,649 | test functions now | 19 November, about 13:12 |
 
 How it grew: 5,017 functions on 10 October; 7,264 on 1 November; 13,649 now. The default run was 15,500 cases on 21 October, fell to 9,650 on 10 November when the opt-in suites were cut out, then rose by 11,800 cases in one week (10 to 17 November).
 
