@@ -4,7 +4,11 @@
 every transcript written in the window that names the set's path or one of its question ids (the logic is
 ``gov.memaudit.scan``). Exit 0 when none; 1 when any (``MEASURE_VOID``: the measure is void); 3 when none is found but
 a transcript could not be read (``SCAN_INCOMPLETE``). It prints its own output (the envelope under ``--json``), never a
-transcript line's text and never a set file's contents. ``python3 -m gov.memaudit`` is a separate entry and is unchanged.
+transcript line's text and never a set file's contents.
+
+``gov memaudit preflight|void|declare|measure|judge|figures|brief|deliver|check|fresh ...`` (W2-204 S11, I3): each
+takes the flags of ``python3 -m gov.memaudit <step>`` and is handed to that entry unparsed; ``gov`` ends with its exit
+code (0 ok, 1 refused, 2 void or stopped, 3 used, 4 usage, 5 waiting) and its lines are that entry's own (``say``).
 """
 
 from __future__ import annotations
@@ -15,11 +19,26 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-HELP = "memory audit tools: scan transcripts for a hidden set's path or question ids (exit 1 void, 3 incomplete)"
+HELP = ("memory audit tools: the measure's steps (preflight, void, declare, measure, judge, figures, brief, deliver, "
+        "check, fresh) and the transcript scan for a hidden set's path or question ids")
+STEPS = {
+    "preflight": "the checks of a delivered half before any search",
+    "void": "the drop and void rule after the checker's last pass",
+    "declare": "the declaration and the use-once marker",
+    "measure": "the declaration, the control, the attempts and the retrieval figures",
+    "judge": "the judged reader run, the verdict and FIGURES.json",
+    "figures": "one JSON line of an audit's figures",
+    "brief": "a writer's or checker's brief, filled from the repository's configuration",
+    "deliver": "take a writer's set or a checker's notes into the sets root",
+    "check": "the repository's memory-audit configuration: ok, or its first fault",
+    "fresh": "a whole fresh pair of halves on a pinned snapshot it builds",
+}
 CLASS = "read"
 CHILD_EXIT_CODE = True
 EXIT_INCOMPLETE = 3
-EXIT_CODES = {EXIT_INCOMPLETE: "scan: nothing found but a transcript in the window could not be read"}
+EXIT_CODES = {EXIT_INCOMPLETE: "scan: nothing found but a transcript in the window could not be read; a step: used",
+              4: "a step: usage (a flag or value refused, or an unexpected error)",
+              5: "fresh: waiting for a delivery"}
 
 
 def _moment(text: str) -> datetime:
@@ -38,8 +57,11 @@ def _common(sub) -> None:
 
 
 def add_arguments(parser) -> None:
-    parser.usage = "gov memaudit scan --set <path> --since <ISO> [options]"
-    actions = parser.add_subparsers(dest="action", metavar="{scan}", required=True)
+    parser.usage = "gov memaudit <step> [the step's flags] | gov memaudit scan --set <path> --since <ISO> [options]"
+    actions = parser.add_subparsers(dest="action", metavar="{" + ",".join([*STEPS, "scan"]) + "}", required=True)
+    for name, line in STEPS.items():  # the step's own flags are parsed by ``python3 -m gov.memaudit``'s parser
+        step = actions.add_parser(name, help=line, add_help=False, prefix_chars="\x00")
+        step.add_argument("rest", nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
     scan = actions.add_parser("scan", help="the transcripts of a window that name a set's path or ids")
     scan.add_argument("--set", required=True, metavar="<path>", help="the set's folder (its *.yaml names are the ids)")
     scan.add_argument("--since", required=True, type=_moment, metavar="<ISO>", help="the window's start")
@@ -73,6 +95,9 @@ def _finding_line(found: dict) -> str:
 def run(root: Path, args, config: dict) -> int:
     import os
 
+    if args.action in STEPS:
+        from gov.memaudit.__main__ import main
+        return main([args.action, *args.rest])
     from gov.memaudit.scan import scan
 
     if not Path(args.set).exists():

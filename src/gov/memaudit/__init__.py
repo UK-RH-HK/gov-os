@@ -9,4 +9,4 @@ W2-171 adds ``measure``, ``judge``, ``classes``, ``pool`` and ``pool-import`` (t
 word ``stopped`` is exit 2, as ``void`` is: the audit began and cannot go on, and the owner decides.
 """
 
-EXIT = {"ok": 0, "refused": 1, "void": 2, "stopped": 2, "used": 3, "usage": 4}
+EXIT = {"ok": 0, "refused": 1, "void": 2, "stopped": 2, "used": 3, "usage": 4, "waiting": 5}
