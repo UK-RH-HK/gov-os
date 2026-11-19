@@ -1,6 +1,6 @@
 ---
 id: DAEO-rt3s
-status: in_progress
+status: closed
 deps: [DAEO-rt2s]
 links: [DAEO-5rgj, DAEO-rt2s]
 created: 2026-11-19T02:30:00Z
@@ -68,3 +68,5 @@ Written 2026-11-19 by the slice 2 lead; started by the CTO's brief the same nigh
 - **Relaunch.** The pass reads `~/.gov-os/runtime/config.json` (`{"relaunch": true}`; absent, unreadable or false means off). The launcher records `session_id` in a worker's registry entry (and a lead's when it has one). A death: the entry's process is gone, no message with the entry's end id from `entry.address` in `entry.notify`'s inbox, and no `exit_file` of the entry holding 0. The pass claims `~/.gov-os/runtime/relaunch/<id>` (O_EXCL) before it starts `gov launch <role> <ticket> -- --resume <session id> "<text naming next_action>"` in `entry.repository` (detached, the `gov` the pass itself runs as), then logs `relaunched`. Any earlier claim for the same ticket and boot makes a death `died twice` (one wake message to `entry.notify`, id `died-twice:<ticket>:<boot>`).
 - **Hooks.** `sessionstart.py` for source `compact`, `clear`, `resume` with a ticket: its first context part is `Resume at the recorded next step (<ticket>): <next_action> (checkpoint <path>)` plus the line `Read your inbox: gov msg read`; no checkpoint, no such part. `precompact.py` is not changed (the CTO approved two kernel hooks, `stop.py` and `sessionstart.py`): it keeps writing the automatic record, and the inbox line `gov msg read` is carried by SessionStart alone.
 
+
+**Closed at the land, 2026-11-19 03:47 (the CTO; EMERGENCY-2 4.3 step 5):** merged as decf9b8f1 (branch `e2/rt-slice3` at eed9cefa7). On the merged tree, through the slot with workers: `tests/unit/dispatch` 192 passed; `tests/unit/msg`, `launch`, `checkpoint`, `hooks` and `tests/acceptance/W2-205`, `W2-121c`, `W2-05`, `W1-29`, `W2-199`: 1,479 passed, 9 skipped; `gov accept W2-205`: 38 passed, 0 failed. Live from the merge in this repository: the Stop check (the root's Stop hook runs the template's file); not switched: the cron line, the scratch dispatcher, the scratch slot, the relaunch (off). Owed as a follow-up line: after a compaction the resumed session's next step is the fixed "Resume after compaction", not the step it had. Slice 4 (the cut-over) is W2-207 (DAEO-rt4s): by day, the relaunch on after one day of the new pass (the CTO's call).
