@@ -46,7 +46,7 @@ what a planted project needs), never from the implementation. EMERGENCY-2 §4.3 
 | notices | `main`; A: a commit inside its allowed paths (the widget), one outside (`governance/project/notes.yaml`) | `PROJ-aaaa=topic/aa` |
 | feature | `main`; `queue.yaml`: `integration: main`, `work_branch: "feature/{wbs}"`; branch `feature/F-aa` | `PROJ-aaaa` |
 | onto | `main` checked out; `queue.yaml`: `integration: main`, `work_branch: "work/{ticket}"`; branch `work/PROJ-aaaa`; a branch `release` | `PROJ-aaaa --onto release` |
-| unexplained | `main`; `tests/unit/test_known_red.py` red on the base, importing the widget; A changes the widget | `PROJ-aaaa=topic/aa` |
+| base_red | `main`; `tests/unit/test_known_red.py` red on the base, importing the widget; A changes the widget | `PROJ-aaaa=topic/aa` |
 | moved | `main` checked out; M's suite holds a test that commits once to the root (its path written in at plant time) while the run runs | `PROJ-mmmm=topic/mm` |
 | refusals | a fresh project per case: a detached root with no `--onto` and no `queue.yaml`; no branch form, a named branch that names no commit, a `queue.yaml` form naming no branch | see the cases |
 
@@ -63,13 +63,25 @@ what a planted project needs), never from the implementation. EMERGENCY-2 §4.3 
 | success-7 | `test_w2_115b_settings.py::test_the_queue_s_code_names_no_project`, `test_w2_115b_settings.py::test_queue_yaml_on_main_with_feature_branches_lands`, `test_w2_115b_settings.py::test_onto_and_the_ticket_form_land_on_the_named_branch`, `test_w2_115b_settings.py::test_a_detached_root_with_no_onto_and_no_queue_yaml_is_integration_unknown`, `test_w2_115b_settings.py::test_a_ticket_without_a_work_branch_is_branch_unknown` | as success-1; the grep case: "there is no src/gov/queue/" |
 | success-8 | `test_w2_115b_land.py::test_the_queue_s_record_is_written_and_holds_the_answer`, `test_w2_115b_land.py::test_the_seconds_of_each_step_and_the_total` | as success-1 |
 | success-9 | `test_w2_115b_dod.py::test_the_project_s_facts_hold_exactly_three_dod_lines`, `test_w2_115b_dod.py::test_the_facts_gov_adopt_writes_hold_exactly_three_dod_lines`, `test_w2_115b_dod.py::test_no_kernel_template_or_generated_copy_quotes_the_dropped_lines`, `test_w2_115b_dod.py::test_the_ticket_template_s_done_when_is_the_three_ids`, `test_w2_115b_dod.py::test_each_claude_templates_copy_is_its_kernel_template_with_three_lines` | the base's facts files (the project's and the one `gov adopt --facts` writes) hold DOD-1 to DOD-6; `role-lead.md` (kernel and `.claude/templates/` copy), `ticket.md` and the orchestrator agent files (`.claude/agents/`, both `.rulesync/subagents/`) quote DOD-4..6 or "DOD-1 to DOD-6"; `ticket.md`'s `done_when` lists six ids |
-| failure-1 | `test_w2_115b_unmoved.py::test_a_red_run_does_not_move_the_integration_branch`, `test_w2_115b_unmoved.py::test_a_red_on_the_base_too_is_batch_unexplained_and_moves_nothing`, `test_w2_115b_unmoved.py::test_a_g1_refusal_moves_nothing`, `test_w2_115b_unmoved.py::test_a_head_moved_during_the_run_is_head_moved_and_stays_as_moved` | as success-1 |
-| failure-2 | `test_w2_115b_land.py::test_green_closed_exactly_when_merged`, `test_w2_115b_red.py::test_red_closed_exactly_when_merged`, `test_w2_115b_batch.py::test_batch_closed_exactly_when_merged`, `test_w2_115b_authors.py::test_authors_closed_exactly_when_merged`, `test_w2_115b_authors.py::test_authors_alone_closed_exactly_when_merged`, `test_w2_115b_notices.py::test_notices_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_feature_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_onto_closed_exactly_when_merged`, `test_w2_115b_unmoved.py::test_unexplained_closed_exactly_when_merged`, `test_w2_115b_unmoved.py::test_moved_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_a_detached_root_with_no_onto_and_no_queue_yaml_is_integration_unknown`, `test_w2_115b_settings.py::test_a_ticket_without_a_work_branch_is_branch_unknown` | as success-1 (each first reads the queue's envelope, so none is green on the base by nothing having landed) |
+| failure-1 | `test_w2_115b_unmoved.py::test_a_red_run_does_not_move_the_integration_branch`, `test_w2_115b_unmoved.py::test_a_red_on_the_base_too_is_a_known_base_red_and_the_branch_moves_only_to_the_tested_merge`, `test_w2_115b_unmoved.py::test_a_g1_refusal_moves_nothing`, `test_w2_115b_unmoved.py::test_a_head_moved_during_the_run_is_head_moved_and_stays_as_moved` | as success-1; the base-red case, rewritten in W2-202 (below): on W2-202's base the queue refuses `BATCH_UNEXPLAINED` |
+| failure-2 | `test_w2_115b_land.py::test_green_closed_exactly_when_merged`, `test_w2_115b_red.py::test_red_closed_exactly_when_merged`, `test_w2_115b_batch.py::test_batch_closed_exactly_when_merged`, `test_w2_115b_authors.py::test_authors_closed_exactly_when_merged`, `test_w2_115b_authors.py::test_authors_alone_closed_exactly_when_merged`, `test_w2_115b_notices.py::test_notices_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_feature_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_onto_closed_exactly_when_merged`, `test_w2_115b_unmoved.py::test_base_red_closed_exactly_when_merged`, `test_w2_115b_unmoved.py::test_moved_closed_exactly_when_merged`, `test_w2_115b_settings.py::test_a_detached_root_with_no_onto_and_no_queue_yaml_is_integration_unknown`, `test_w2_115b_settings.py::test_a_ticket_without_a_work_branch_is_branch_unknown` | as success-1 (each first reads the queue's envelope, so none is green on the base by nothing having landed) |
 
 Every case is an acceptance test but four of success 9's, which are **repository-state** cases (they read this
 repository's own files: `facts.yaml`, the kernel templates and the generated copies) and belong to the record-reading
 set; `test_w2_115b_dod.py::test_the_facts_gov_adopt_writes_hold_exactly_three_dod_lines` is an acceptance case on a
 planted repository. No case is green on the base.
+
+## Rewritten in W2-202 (DEC-1214 L2, Q-CLOSE)
+
+- `test_a_red_on_the_base_too_is_batch_unexplained_and_moves_nothing` asserted the refusal W2-202's A1 replaces: a red
+  that is red on the base too refused the batch (`BATCH_UNEXPLAINED`) and nothing moved. By DEC-1214 L2 and Q-CLOSE
+  such a red is a known base red: the ticket lands and its close record holds the red (`reds`: `verdict: base`;
+  `base_reds`). The case is now `test_a_red_on_the_base_too_is_a_known_base_red_and_the_branch_moves_only_to_the_tested_merge`
+  (the branch still moves only to the tested merge with its close commits, failure line 1's other half); the planted
+  run is `base_red` (it was `unexplained`). W2-202's own folder holds the line's full cases.
+- The planted acceptance folders' READMEs now hold a KPI map (`w2_115b_support.readme_text`), as a real ticket's
+  folder does: W2-202's A3 runs each landed ticket's folder through the runner `gov accept` uses, which refuses a
+  folder with no map.
 
 ## Readings this suite takes
 

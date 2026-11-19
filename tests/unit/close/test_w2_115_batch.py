@@ -58,15 +58,22 @@ def test_s6_a_green_batch_lands_whole(tmp_path):
     assert repo.git("rev-parse", "main").strip() == result["land_commit"]
 
 
-def test_f3_a_red_no_single_candidate_explains_refuses_and_nothing_lands(tmp_path):
+def _base_reds(result):
+    return [r if isinstance(r, str) else r.get("test") for r in result.get("base_reds") or []]
+
+
+def test_f3_a_red_that_is_red_at_the_base_too_is_a_known_base_red_and_the_batch_lands(tmp_path):
+    """Rewritten for DEC-1214 L2, Q-CLOSE (W2-202 A1): a red that stays red with every candidate left out and is
+    red at the base with the same failure type no longer refuses the batch (it was ``BATCH_UNEXPLAINED``, nothing
+    landed): it is a known base red, named in the result, and no candidate is its culprit."""
     repo = project(tmp_path, extra={f"{OWN_SUITE}test_old.py": "def test_old():\n    assert 1 == 2\n"})
     base = repo.git("rev-parse", "HEAD").strip()
     _branch(repo, "a", {"src/pkg/other.py": "def other():\n    return 1  # a\n"})
     _branch(repo, "b", {"docs/b.md": "# b\n"})
-    with pytest.raises(GovError) as raised:
-        batch.isolate(repo.root, base, ["a", "b"], targets=[OWN_SUITE], onto="main", timeout=120)
-    assert raised.value.code == batch.BATCH_UNEXPLAINED
-    assert repo.git("rev-parse", "main").strip() == base
+    result, code = batch.isolate(repo.root, base, ["a", "b"], targets=[OWN_SUITE], onto="main", timeout=120)
+    assert code == 0 and result["culprits"] == [] and result["landed"] == ["a", "b"]
+    assert _base_reds(result) == [f"{OWN_SUITE}test_old.py::test_old"]
+    assert repo.git("rev-parse", "main").strip() == result["land_commit"] != base
 
 
 def test_s6_a_candidate_that_cannot_be_isolated_refuses(tmp_path, monkeypatch):
@@ -180,7 +187,11 @@ def test_s6_run_a_ticket_without_its_work_branch_is_not_isolated(tmp_path):
     assert repo.git("rev-parse", "main").strip() == base
 
 
-def test_f3_run_a_red_no_candidate_explains_lands_nothing_and_closes_nothing(tmp_path, monkeypatch):
+def test_f3_run_a_red_that_is_red_at_the_base_too_does_not_refuse_and_closes_exactly_what_landed(tmp_path,
+                                                                                                 monkeypatch):
+    """Rewritten for DEC-1214 L2, Q-CLOSE (W2-202 A1): the red is red at the base (committed there before the
+    run), so ``isolate`` no longer refuses the batch with ``BATCH_UNEXPLAINED`` (it did, and nothing landed or
+    closed): both candidates land. F3's own guard stays: a ticket is closed exactly when it landed."""
     from gov.tasks.tickets import frontmatter
 
     repo, base = _tickets_three(tmp_path, b_files={"docs/b.md": "# b\n"})
@@ -189,11 +200,14 @@ def test_f3_run_a_red_no_candidate_explains_lands_nothing_and_closes_nothing(tmp
         "suites": ["tests/unit/test_red.py"], "pytest_options": real(clone, c, [OWN_SUITE])["pytest_options"]})
     repo.commit("a red on the base", files={"tests/unit/test_red.py": "def test_red():\n    assert 1 == 2\n"})
     base = repo.git("rev-parse", "HEAD").strip()
-    with pytest.raises(GovError) as raised:
-        batch.run(repo.root, ["T-0001", "T-0002"])
-    assert raised.value.code == batch.BATCH_UNEXPLAINED
-    assert repo.git("rev-parse", "main").strip() == base
-    assert all(frontmatter(repo.root / f".tickets/{t}.md")["status"] != "closed" for t in ("T-0001", "T-0002"))
+    result, _ = batch.run(repo.root, ["T-0001", "T-0002"])
+    assert result["culprits"] == [] and result["landed"] == ["T-0001", "T-0002"]
+    assert _base_reds(result) == ["tests/unit/test_red.py::test_red"]
+    land = result["land_commit"]
+    assert land and land != base and repo.git("merge-base", "--is-ancestor", land, "main") == ""
+    for t in ("T-0001", "T-0002", "T-0003"):
+        closed = frontmatter(repo.root / f".tickets/{t}.md")["status"] == "closed"
+        assert closed == (t in result["landed"]), f"{t}: closed is {closed}"
 
 
 def test_f4_run_in_a_strict_project_is_todays(tmp_path, monkeypatch):

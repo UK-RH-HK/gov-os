@@ -60,12 +60,18 @@ class Repo:
 
 
 def ticket_text(ticket: str = TICKET, wbs: str = WBS, paths: list[str] | None = None, status: str = "open",
-                acceptance: str | None = None) -> str:
+                acceptance: str | None = None, **more) -> str:
     front = {"id": ticket, "status": status, "deps": [], "links": [], "created": "2026-11-17T00:00:00Z",
              "type": "task", "priority": 2, "wbs_id": wbs, "role": "engineer",
              "allowed_paths": paths or ["src/pkg/feature.py", f"tests/acceptance/{wbs}/**"],
              "acceptance_tests": {"path": acceptance or f"tests/acceptance/{wbs}/"}}
+    front.update(more)
     return "---\n" + yaml.safe_dump(front, sort_keys=False) + "---\n# A ticket\n"
+
+
+def readme_text(wbs: str, case: str) -> str:
+    """An acceptance folder's README with the KPI map ``gov accept`` reads: two lines on the suite's one test."""
+    return f"# {wbs}\n\n| KPI | tests |\n|---|---|\n| success-1 | `{case}` |\n| failure-1 | `{case}` |\n"
 
 
 def map_text() -> str:
@@ -90,6 +96,8 @@ def files() -> dict:
                                                "    assert twice(2) == 4\n",
         f"tests/acceptance/{OTHER_WBS}/test_w2.py": "from pkg.gadget import gadget\n\n\ndef test_gadget():\n"
                                                      "    assert gadget() == 1\n",
+        f"tests/acceptance/{WBS}/README.md": readme_text(WBS, "test_w1.py::test_twice"),
+        f"tests/acceptance/{OTHER_WBS}/README.md": readme_text(OTHER_WBS, "test_w2.py::test_gadget"),
         "tests/unit/test_other.py": "from pkg.other import other\n\n\ndef test_other():\n    assert other() == 1\n",
         "tests/unit/test_lonely.py": "from pkg.lonely import VALUE\n\n\ndef test_lonely():\n    assert VALUE == 1\n",
     }
