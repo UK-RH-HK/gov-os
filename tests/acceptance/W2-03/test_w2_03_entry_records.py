@@ -134,8 +134,9 @@ def test_every_entry_of_this_repositorys_register_has_its_own_hash(api, tmp_path
     """The worked example (DEC-746 item 5): the text of this checkout's ``docs/DECISION_REGISTER.md``, read in
     place and committed into a temporary project as its named register. Every entry the store loads from it
     carries the sha256 of its own span, the span is text of the register starting at the entry's heading, and no
-    two entries share a hash."""
-    text = support.OWN_REGISTER.read_text(encoding="utf-8")
+    two entries share a hash. Since the old register was archived (EMERGENCY-2 11.3, DEC-1214 G4) the text is the
+    archive's (``support.WORKED_EXAMPLE``): the same entries, where the register now keeps only those in force."""
+    text = support.WORKED_EXAMPLE.read_text(encoding="utf-8")
     project = support.project_with_register(tmp_path / "project", text)
     _, records = api.load_and_records(project.root)
     entries = support.register_records(records)

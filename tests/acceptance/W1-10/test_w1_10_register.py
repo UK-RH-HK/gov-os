@@ -36,6 +36,10 @@ REGISTER_REL = "decisions/REGISTER.md"
 UNREADABLE = "STORE_REGISTER_UNREADABLE"                 # proposed
 PATH_MAP = "state_class: AUTHORITATIVE\nnamespaces: {}\n"
 OWN_REGISTER = support.REPO_ROOT / "docs" / "DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the old register, archived whole. The worked example is a register of hundreds of
+# entries, three of them held by name: the archive's text where this tree holds it, else the register's.
+OWN_ARCHIVE = support.REPO_ROOT / "docs" / "archive" / "DECISION_REGISTER-2026-11-19.md"
+WORKED_EXAMPLE = OWN_ARCHIVE if OWN_ARCHIVE.is_file() else OWN_REGISTER
 
 REGISTER = """\
 # Decisions
@@ -436,11 +440,12 @@ def test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves(api
 # ---- this repository's register, as the worked example
 
 def test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails(api, tmp_path):
-    """The text of ``docs/DECISION_REGISTER.md`` of this checkout, read in place and committed into a temporary
-    project as its named register. Three of its entries are held by name."""
-    text = OWN_REGISTER.read_text(encoding="utf-8")
+    """The text of ``docs/DECISION_REGISTER.md`` of this checkout (since its move, of the archived old register,
+    ``WORKED_EXAMPLE``), read in place and committed into a temporary project as its named register. Three of its
+    entries are held by name."""
+    text = WORKED_EXAMPLE.read_text(encoding="utf-8")
     headings = _headings(text)
-    assert len(headings) > 500, f"the fixture is wrong: {len(headings)} headings read from {OWN_REGISTER}"
+    assert len(headings) > 500, f"the fixture is wrong: {len(headings)} headings read from {WORKED_EXAMPLE}"
     root = _project(tmp_path, register=text)
 
     summary = api.load(root)

@@ -26,6 +26,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 
 REGISTER = "docs/DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the register the clean-up marked, archived whole; REGISTER keeps the decisions in force
+OLD_REGISTER = "docs/archive/DECISION_REGISTER-2026-11-19.md"
 ARCHIVE = "governance/project/orchestration/ARCHIVE-SUPERSEDED.md"
 IN_FORCE = "governance/project/orchestration/DECISIONS-IN-FORCE.md"
 IN_FORCE_AT_HEAD = "docs/emergency-2/archive/DECISIONS-IN-FORCE.md"  # archived as history (EMERGENCY-2 11.1)
@@ -267,9 +269,13 @@ def classify(old: str, new: str) -> tuple[str, str]:
     return "other", ""
 
 
-def register_delta(old_rev: str, new_rev: str) -> dict:
-    """The register at two commits compared entry by entry: the ids, the masked text and each changed status line."""
-    old_text, new_text = show(old_rev, REGISTER), show(new_rev, REGISTER)
+def register_delta(old_rev: str, new_rev: str, path: str = REGISTER) -> dict:
+    """The register at two commits compared entry by entry: the ids, the masked text and each changed status line.
+    ``path`` is the register's (``REGISTER``) or the archived old register's (``OLD_REGISTER``); a commit that does not
+    hold the file (the archive before the register's move) compares as other ids, with no change."""
+    old_text, new_text = show(old_rev, path), show(new_rev, path)
+    if old_text is None or new_text is None:
+        return {"same_ids": False, "masked_equal": False, "changes": []}
     old_entries, new_entries = entries(old_text), entries(new_text)
     result = {"same_ids": [e[0] for e in old_entries] == [e[0] for e in new_entries],
               "masked_equal": mask_status(old_text) == mask_status(new_text), "changes": []}
@@ -653,6 +659,26 @@ def variant_register(commit: str) -> str:
         if change["kind"] in ("append", "status") and change["tail"]:
             lines[by_id[change["id"]]] = change["new"][: len(change["new"]) - len(change["tail"])]
     return "\n".join(lines)
+
+
+def whole_register(tree: Path) -> str | None:
+    """The register whole, as the clean-up marked it, where ``tree`` has archived it (EMERGENCY-2 11.3, DEC-1214 G4):
+    the archive's text under its first line, each entry's status line the kept register's own where the register still
+    holds the entry (a mark added after the move is added there), and the entries only the register holds (the
+    decisions since) after it. None where ``tree`` holds no archive: its register is whole."""
+    archive = tree / OLD_REGISTER
+    if not archive.is_file():
+        return None
+    lines = archive.read_text(encoding="utf-8").split("\n")[1:]
+    kept_text = (tree / REGISTER).read_text(encoding="utf-8")
+    kept = {entry: line for entry, _, line in entries(kept_text)}
+    for entry, index, _ in entries("\n".join(lines)):
+        if entry in kept:
+            lines[index] = kept[entry]
+    held = set(re.findall(r"(?m)^### (DEC-\d+)\b", "\n".join(lines)))
+    later = [chunk for chunk in re.split(r"(?m)^(?=### DEC-\d+\b)", kept_text)[1:]
+             if re.match(r"### (DEC-\d+)\b", chunk).group(1) not in held]
+    return "\n".join(lines) + ("\n\n" + "".join(later) if later else "")
 
 
 def commit_all(tree: Path, message: str) -> None:

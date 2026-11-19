@@ -2,8 +2,8 @@
 
 ``closure(root, ids, depth)`` follows the start ids through the record graph of the store (the eight typed
 edges, both ways) and through the code index (a symbol's callers and callees), ``depth`` hops far. An id that
-is a record's id is a record; a start id that is none, and a name reached from a symbol, is asked of the code
-index; a record's edge to no record is unresolved without asking. Everything is sorted: the same store, index
+is a record's id is a record; an id of the archived register is history (W2-203: it existed, and memory holds no
+more of it than that); a start id that is neither, and a name reached from a symbol, is asked of the code index; a record's edge to no record is unresolved without asking. Everything is sorted: the same store, index
 and working tree give the same result. It only reads: it builds neither the store nor the code index.
 """
 
@@ -41,6 +41,7 @@ def closure(root: Path, ids: list[str], depth: int) -> dict:
     """The result of ``gov closure``: what is at most ``depth`` hops from ``ids``, and the gaps."""
     from gov import store
     from gov.cli.errors import GovError
+    from gov.store import loader
 
     if depth < 0:
         raise GovError("CLOSURE_DEPTH_INVALID", f"the depth is {depth}: it is a number of hops, 0 or more")
@@ -48,6 +49,10 @@ def closure(root: Path, ids: list[str], depth: int) -> dict:
     connection = store.connect(root)
     try:
         records = {row[0] for row in connection.execute("SELECT id FROM records")}
+        archived = set()  # W2-203: the archived register's ids; a store built before that table holds none
+        if connection.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+                              (loader.ARCHIVE_TABLE,)).fetchone():
+            archived = {row[0] for row in connection.execute(f"SELECT id FROM {loader.ARCHIVE_TABLE}")} - records
         for source, target in connection.execute("SELECT source, target FROM edges"):
             near.setdefault(source, set()).add(target)
             near.setdefault(target, set()).add(source)
@@ -62,6 +67,8 @@ def closure(root: Path, ids: list[str], depth: int) -> dict:
         for item in sorted(front):
             if item in records:
                 kinds[item], found = "record", near.get(item, set())
+            elif item in archived:
+                kinds[item], found = "history", near.get(item, set())
             elif item not in askable:
                 gaps[item], found = UNRESOLVED, set()
             else:

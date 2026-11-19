@@ -26,6 +26,8 @@ FACTS = REPO / "governance/project/facts.yaml"
 FACTS_SCHEMA = SCHEMAS / "facts.schema.json"
 KEYS = TEMPLATES / "keys.yaml"
 REGISTER = REPO / "docs/DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the old register, archived whole; the register keeps the decisions in force
+ARCHIVE = REPO / "docs/archive/DECISION_REGISTER-2026-11-19.md"
 CIT_P = REPO / "docs/changes/W2-128-CIT-P.md"
 TOOLS = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools")
 
@@ -348,10 +350,11 @@ def run_check(name: str, entry, tree: Path, tmp_path: Path, data: dict) -> str |
 # --- the register ------------------------------------------------------------------------------------------------
 
 def register_statuses() -> dict[str, str]:
-    """``DEC-n -> the first word of its status line`` (``- **Status:** ACCEPTED (...)``), read at test time."""
+    """``DEC-n -> the first word of its status line`` (``- **Status:** ACCEPTED (...)``), read at test time: the
+    register's entries, then, for a decision the register no longer holds, the archived old register's."""
     statuses: dict[str, str] = {}
     current = None
-    for line in read(REGISTER).split("\n"):
+    for line in (read(REGISTER) + ("\n" + read(ARCHIVE) if ARCHIVE.is_file() else "")).split("\n"):
         heading = re.match(r"^###\s+(DEC-\d+)\b", line)
         if heading:
             current = heading.group(1)

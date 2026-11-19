@@ -97,13 +97,17 @@ def _example(stem: str) -> str:
 
 
 def _judge(tmp_path, rel: str, text: str) -> tuple[dict | None, int, str]:
-    """A temporary repository holding the register, the path map and the one planted record, judged by
+    """A temporary repository holding the register, the archived old register where this tree has one (the path
+    map names both; EMERGENCY-2 11.3, DEC-1214 G4), the path map and the one planted record, judged by
     ``gov links --all --json`` (this tree's code). One record a repository: a planted ticket's prefix would
     otherwise make another template's placeholder id (``DAEO-0000``) read as a ticket id."""
     tree = tmp_path / "repo"
     (tree / "governance/project").mkdir(parents=True)
     (tree / "docs").mkdir()
     shutil.copy(s.REGISTER, tree / "docs/DECISION_REGISTER.md")
+    if s.ARCHIVE.is_file():
+        (tree / s.ARCHIVE.relative_to(s.REPO)).parent.mkdir(parents=True)
+        shutil.copy(s.ARCHIVE, tree / s.ARCHIVE.relative_to(s.REPO))
     shutil.copy(s.REPO / "governance/project/path-map.yaml", tree / "governance/project/path-map.yaml")
     (tree / rel).parent.mkdir(parents=True, exist_ok=True)
     (tree / rel).write_text(text, encoding="utf-8")

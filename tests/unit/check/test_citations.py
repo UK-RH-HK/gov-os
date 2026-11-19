@@ -98,14 +98,14 @@ def test_a_register_that_is_not_text_has_no_entries_to_give(content):
 # --------------------------------------------------------------------------
 
 def test_no_path_map_and_a_path_map_without_the_keys_name_nothing(project):
-    assert citations._configured(project.root) == (None, None)
+    assert citations._configured(project.root) == (None, None, None)
     project.configure()
-    assert citations._configured(project.root) == (None, None)
+    assert citations._configured(project.root) == (None, None, None)
 
 
 def test_the_two_keys_are_read(project):
     project.configure(decision_register=REGISTER, decision_citations_base='"0123abcd"')
-    assert citations._configured(project.root) == (REGISTER, "0123abcd")
+    assert citations._configured(project.root) == (REGISTER, "0123abcd", None)
 
 
 @pytest.mark.parametrize("key", ["decision_register", "decision_citations_base"])

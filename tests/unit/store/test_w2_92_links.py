@@ -204,8 +204,11 @@ _VERBLESS = {f"**{name}:**" for name in loader._IN_LABELS}  # S11 (DEC-1109 (2))
 
 @_NO_CENSUS
 def test_this_repositorys_register_statements_are_the_censuss_one_for_one():
-    """The census's statements one for one, but for S11's verbless change labels: those are the census's, fewer."""
-    text = (REPO / REGISTER).read_text(encoding="utf-8")
+    """The census's statements one for one, but for S11's verbless change labels: those are the census's, fewer.
+    The register read is the old one whole: where this tree has archived it (EMERGENCY-2 11.3, DEC-1214 G4), the archive's
+    text, whose entries the pairs below name; else the register's."""
+    archive = REPO / "docs/archive/DECISION_REGISTER-2026-11-19.md"
+    text = (archive if archive.is_file() else REPO / REGISTER).read_text(encoding="utf-8")
     census = _census_statements(REPO, text)
     found = loader.register_statements(text)
     assert len(census) > 1000

@@ -49,6 +49,7 @@ NO_BINARY_TOOLS = frozenset({
 
 HISTORICAL_PATHS = [
     "docs/DECISION_REGISTER.md",
+    "docs/archive/DECISION_REGISTER-2026-11-19.md",
     "docs/changes/",
     "governance/project/bootstrap.md",
     "docs/source/",
