@@ -82,6 +82,15 @@ brief on the fixture with the skill succeeds) and by `test_s1_s3_read_role_...` 
 named, read_role not refused). A launch root whose Skills line names the skill already passes `read_role` on the base,
 so no separate S3 "pass" case is written for the launch: it would be green on the base and show nothing new.
 
+## The Skills-line regression case (success-1, outside this folder)
+
+`tests/unit/launch/test_w2_195_preload.py::test_each_skills_line_ends_with_judging_work_and_lost_no_skill_since_pinned`
+(9: the four kernel role files, their `template/.rulesync/subagents/` copies, `role-reviewer.md`), a regression case
+that is no part of `gov accept W2-195`. Rewritten under DEC-1219: it had compared each file with the merge-base with
+`w2/integrate` and demanded that only the Skills line differed, which fails at once when a later ticket edits the
+kernel text. It now reads only the Skills lines: each ends with `judging-work`, named once, and none lost a skill
+since `9ef5cba29` (the commit before W2-195; skipped when the clone lacks it, the appending alone is then checked).
+
 ## W2-88's shipped list (success-4, outside this folder)
 
 `tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py`: `ITEMS` gains `"the-judging-work-skill":
