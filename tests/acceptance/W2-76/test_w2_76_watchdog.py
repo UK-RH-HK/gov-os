@@ -56,6 +56,14 @@ def _names_slow_stage(record):
     return running is not None and any(name in json.dumps(running) for name in ("lexical", "secrets"))
 
 
+def _names_planted_process(record):
+    """Whether the record's process list holds the planted slow gitleaks (its command line runs the stand-in from
+    the ``slow-tools`` folder; the real gitleaks, which it hands on to, does not name that folder)."""
+    procs = record.get(support.first_key(record, support.PROCESSES_KEYS) or "") or []
+    return any(isinstance(p, dict) and "slow-tools" in str(p.get(support.first_key(p, support.CMDLINE_KEYS) or "", ""))
+               for p in procs)
+
+
 def _check_live_record(record, text, rebuild_pid):
     """One record read while the slow rebuild runs: every part the design names, in one of the accepted names."""
     problems = []
@@ -160,7 +168,13 @@ def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock, monkeypa
                      for record, _ in during}
     assert len(writes_during) >= 2, \
         f"the record was not rewritten while the slow stage ran (times of the writes: {writes_during})"
-    problems = _check_live_record(*during[-1], background.pid)
+    # The stage spans work before the planted child starts and after it exits, so its last record may follow the
+    # child's exit: what must hold is that a record read in the slow stage names the planted process, and that
+    # record is the one judged.
+    planted = [(record, text) for record, text in during if _names_planted_process(record)]
+    assert planted, f"no record read in the slow stage lists the planted slow gitleaks ({len(during)} records read " \
+                    f"in that stage)"
+    problems = _check_live_record(*planted[-1], background.pid)
     assert not problems, "the live record lacks what it must hold:\n- " + "\n- ".join(problems)
 
     flagged = [line for line in run.stderr.splitlines() if line.startswith("rebuild: slow:")]
