@@ -78,3 +78,9 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
 - **No guard, no sandbox, no ACTs (§2):** `gov update` is an ordinary command of the project's owner or CTO; its lock and answers file change by its own commit (2.10).
 
 **Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
+
+## Fix: two deny lines only; gov update takes the legacy lines out; the held-out Read deny step retires (DEC-1217 (6), DEC-1219 (4))
+- **The bug:** `gov update` 0.1.3 put back the deny and allow lines Emergency 2 removed (`Edit(.tickets/**)`, `Bash(gov launch:*)`, one `Read` deny per held-out path), found in EXAMIN's report 28 (2026-11-18).
+- **The fix (built on branch `e2/kit-e2` under the W2-208 ticket `DAEO-kt8e`, before the owner's ruling that it is a fix here reached its lead; merged into `w2/integrate` at `fc8a52fb9` on 2026-11-19):** the kit's permission source and kernel settings hold the two deny lines (`git push`, `sudo`) and no allow line (K1, `c81e9b796`); `gov update` takes the legacy lines out of a project's settings through its journal and keeps a line the owner added by hand (K2, F2, `f8b4a677f`); the held-out `Read` deny step retires (`write_read_rules` gone; K3, F1, `62658001c`). Its tests are `tests/acceptance/W2-208/` (K1 to K3, F1, F2; designer commit `d513e8559`), read by `gov accept W2-208`.
+- **The chore beside it (DEC-1217 (7)):** the golden rules head the kit's CLAUDE.md and AGENTS.md and `judging-work` 1.2.0 agrees (K4 to K6: `1589dd08a`, `fa4bf7346`, `dced49bb6`): kernel text, the CTO's (EMERGENCY-2 3.5).
+- **Evidence on the merged tree:** W2-208, W2-17, W1-38, W2-195, W2-56, W2-188, W2-201 and the adapters, update, brief, launch and opt-in unit tests: 1,958 passed, 0 failed.

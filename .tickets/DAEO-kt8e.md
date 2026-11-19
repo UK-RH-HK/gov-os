@@ -1,6 +1,6 @@
 ---
 id: DAEO-kt8e
-status: in_progress
+status: closed
 deps: [DAEO-sdhj]
 links: [DAEO-sdhj]
 created: 2026-11-19T20:00:00Z
@@ -99,3 +99,6 @@ Written 2026-11-19 by the kit lead from the CTO's brief `docs/emergency-2/briefs
 - **Update's settings step:** after `forget_generated` (the old release's generation unmerged) and the pinned gov's `adapters generate`, `gov.update.core` removes the legacy lines by exact text (the held-out ones from the project's own `governance/project/held-out.yaml`, read before the update) from `permissions.deny` and `permissions.allow`, journals the write, and records `settings: {"removed": [...]}` in the report (key `settings`) and in `governance/updates/<B>.json`. It then compares the deny and allow lines before and after (F2). `--check` lists the removal under `settings`.
 - **The head:** `template/.rulesync/rules/governance.md` front matter as today (`root: true`, targets claudecode and agentsmd); the head's text from the brief; the nine roles one line each, after it.
 - **The check:** `gov.adapters.portability.kit_text_findings(root)` returns findings `{"code": "KIT_TEXT_GUARD_IN_FORCE", "file": ..., "line": ...}`; `main()` runs it for a project that has the head file.
+
+## Closed on its record (the owner, DEC-1219 (4))
+W2-208 should not have been a ticket: by the rubric its deny-line work is a fix recorded in `gov update`'s own ticket W2-17 (`DAEO-sdhj`, section "Fix: two deny lines only ...") and its golden-rules head is a chore. The owner's ruling (2026-11-19 about 13:55) did not reach the running lead (a message to a `claude -p` lead is not read), so the work was built and committed here; it is recorded under W2-17 and this ticket is closed on this record. Its acceptance folder `tests/acceptance/W2-208/` stays as the fix's tests.
