@@ -369,9 +369,11 @@ def run(sets_root, *, repo=None, commit, tag, runs_dir=None, rebuild_cmd=None, g
         emit(f"FRESH plan: visible {visible} hidden {hidden} at {commit[:12]}")
         if not job.snapshot():
             return "refused"
-        words = [job.half(audit)[0] for audit in (visible, hidden)]
-        if "stopped" in words:
-            return "stopped"
+        words = []
+        for audit in (visible, hidden):
+            words.append(job.half(audit)[0])
+            if words[-1] == "stopped":  # a stop ends the call: one STOPPED line, the other half is not taken further
+                return "stopped"
         if "waiting" in words:
             return "waiting"
         return job.close(since, projects, list(allow or ()))
