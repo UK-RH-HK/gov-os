@@ -191,12 +191,9 @@ def test_s4_real_every_archived_id_a_kept_entry_cites_resolves(head_clone, moved
     from gov import closure, records, store
     from gov.util import archive
 
-    from gov.store.loader import register_entries
-
-    live = {entry["id"] for entry in register_entries((head_clone / s.ARCHIVE_REL).read_text(encoding="utf-8"))[0]}
     held = {record_id for record_id, _ in moved["register"]}
-    # the archive's live entries, as the store counts them: a heading with no status line was no record on the base
-    cited = sorted(({record_id for _, text in moved["register"] for record_id in s.cited(text)} - held) & live)
+    # every heading of the archive is an archived id, a status line or none (the lead's reading of the interface)
+    cited = sorted({record_id for _, text in moved["register"] for record_id in s.cited(text)} - held)
     assert len(cited) > 300, f"premise: the kept entries cite {len(cited)} ids the register does not hold"
     read = archive.read(head_clone)
     assert read and not [record_id for record_id in cited if record_id not in read], \
@@ -207,6 +204,9 @@ def test_s4_real_every_archived_id_a_kept_entry_cites_resolves(head_clone, moved
     answer = closure.closure(head_clone, cited, 0)
     kinds = {item["id"]: item["kind"] for item in answer["closure"]}
     wrong = [record_id for record_id in cited if kinds.get(record_id) != "history"]
-    assert not wrong and not answer["gaps"], f"not history: {wrong[:10]}; gaps: {answer['gaps'][:5]}"
+    assert not wrong, f"not history: {wrong[:10]}"
+    # a neighbour named at the depth and not looked up (DEPTH_LIMIT_REACHED) is any record's, not the archive's
+    gaps = [gap for gap in answer["gaps"] if gap["reason"] == "UNRESOLVED" or gap["id"] in cited]
+    assert not gaps, f"{len(gaps)} gaps unresolved or of a cited id: {gaps[:5]}"
     about = [row for row in records.dangling(head_clone) if row["target"] in moved["only"]]
     assert not about, f"{len(about)} dangling references name an archived id: {about[:5]}"

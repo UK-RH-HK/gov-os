@@ -103,12 +103,16 @@ def test_f4_no_archive_only_decision_is_a_register_entries_row(planted):
 
 
 def test_f4_no_chunk_of_the_keyword_index_is_of_the_archive(planted):
+    from gov.retrieval import lexical
+
     assert s.archived_rows(planted.root)
     chunks = {row[0] for row in s.rows(planted.root, "SELECT path FROM lexical_chunk")}
     assert s.REGISTER_REL in chunks, "premise: the kept register is indexed"
     assert not {path for path in chunks if path.startswith(ARCHIVE_DIR)}, f"indexed: {sorted(chunks)}"
     files = dict(s.rows(planted.root, "SELECT path, indexed FROM lexical_file"))
-    assert not files.get(s.ARCHIVE_REL), "the keyword index's file table counts the archive as indexed"
+    assert files.get(s.ARCHIVE_REL) == lexical.KEPT_OUT, \
+        f"the file table records the archive as {files.get(s.ARCHIVE_REL)!r}, not kept out by the path map's policy"
+    assert files.get(s.REGISTER_REL) == 1, f"the file table records the kept register as {files.get(s.REGISTER_REL)!r}"
     assert _search(planted.root, s.ARCHIVE_WORD) and not _paths(_search(planted.root, s.ARCHIVE_WORD)), \
         f"a word only the archive holds is found: {_paths(_search(planted.root, s.ARCHIVE_WORD))}"
 

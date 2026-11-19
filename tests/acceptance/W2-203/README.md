@@ -61,9 +61,12 @@ GPU, no vector; never the shared store, never a real worktree's `.gov-runtime/`.
   vectors are built from the keyword index's chunks, so the chunk table's case covers the vector chunk.
 - **S3 "no row in edges":** no edge and no stated link has an archive-only id as its *source*; a kept entry's
   `SUPERSEDES` edge to it stays, as the interface says.
-- **S4 "every archived id a kept entry cites":** the ids a kept entry's text names that the register does not hold
-  and that are live entries of the archive by the store's own grammar. `DEC-027` and `DEC-974` are headings of the
-  archive with no status line first: no record on the base, no row of the table now; two kept entries cite them.
+- **S4 "every archived id a kept entry cites":** the ids a kept entry's text names that the register does not hold.
+  Every `### DEC-n` heading of the archive is an archived id, with a status line or without (the lead's reading:
+  `DEC-027` and `DEC-974`, no records on the base, resolve as archived ids). In the closure each is `history`, none
+  is itself a gap and no gap is `UNRESOLVED`; a `DEPTH_LIMIT_REACHED` gap of a neighbour is any record's at depth 0.
+- **F4 the file table:** `lexical_file.indexed` of the archive is `lexical.KEPT_OUT` (kept out by the path map's
+  policy), the kept register's is 1.
 - **S5 `acceptance_exemptions`:** `gov.close.ratchet.counted_entries` reads `accepted_reds` and `load_sensitive`
   only (its `FIELDS`); the exemptions are read by `gov.close.gates.owner_listed`, so that is the function the case
   calls, with `gov.close.history.accepted_history` for the accepted history.
