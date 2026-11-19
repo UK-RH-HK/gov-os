@@ -28,6 +28,7 @@ Each role's tools and paths are in its role file under `template/governance/kern
 
 ## Golden rule: how work is judged (DEC-1204, as EMERGENCY-2 §3 applies it)
 
+- **Value first.** What matters is tests and code that match the KPIs and the spec and pass green. Everything else, practicality and security work included, must justify itself against that.
 - **Threat model:** honest agent mistakes, plausible accidents and drift in ordinary work, not a same-privilege adversary.
 - **What may block:** only a finding within the change's scope that an honest agent can hit in ordinary work and that fails open or loses work. A finding that needs a deliberate construction is a Wave 3 row, never a new round.
 - **When a review happens:** only for a red test, a failed landing or merge, or a feature that does not work as intended; batched when several come together. Work that went through green needs none. Most causes are found and fixed by the CTO, a senior engineer or the engineer, without review.
