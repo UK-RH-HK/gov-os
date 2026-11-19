@@ -1,6 +1,6 @@
 ---
 id: DAEO-l2bd
-status: in_progress
+status: closed
 deps: [DAEO-j9z6]
 links: [DAEO-j9z6]
 created: 2026-11-18T23:30:00Z
@@ -68,3 +68,5 @@ the retirements (B) wait for the owner's yes.
 W2-115b's own cases that assert `BATCH_UNEXPLAINED` for a red that is red at the base (its "red on the base too" case)
 assert the behaviour A1 replaces: the independent test designer rewrites them in this ticket with the line naming
 DEC-1214 Q-CLOSE and `Rewrite-Reason:`.
+
+**Closed at the land, 2026-11-19 02:10 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 2b54f3d1a (branch `e2/l2-build` at 04802659f). On the merged tree, through the slot with workers: `tests/unit/queue`, `close`, `adopt`, `optin` and `tests/acceptance/W2-115`, `W2-115b`, `W2-193`, `W2-194`, `W2-202`, `W2-174`: 1,099 passed; `gov accept W2-202`: 39 passed, 0 failed (14 of 14 lines). Acceptance commits by the independent test designer (38f3b5c4d, 3e7412ac6). The CTO's rulings on the lead's lines: A5 S2 stays as reworded (a repository with its own facts is left byte-identical); a fast-forwarded hand merge stays refused. Next in this stream: A2 after W2-200 (M1) lands, then A6 to A8.
