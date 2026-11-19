@@ -29,7 +29,9 @@ ROOT = Path(__file__).resolve().parents[3]
 CIT_P = "docs/changes/W2-49-CIT-P.md"
 CIT_E = "docs/changes/W2-49-CIT-E.md"
 CONTRACT_YAML = "docs/contract/contract.yaml"
-CONTRACT_MD = "docs/contract/CONTRACT_v4.md"
+CONTRACT_MD = "docs/contract/CONTRACT_v4.md"  # the text as at the base and at W2-49's apply (git show); the file no longer exists
+# Rewrite-Reason: DEC-1219 (Contract v5 is ACCEPTED): the Contract's text now lives in CONTRACT_v5.md, which keeps the 4.0 to 4.4 change rows.
+CONTRACT_V5_MD = "docs/contract/CONTRACT_v5.md"
 
 BASE_COMMIT = "a02e3485"
 

@@ -251,9 +251,11 @@ def test_normalising_keeps_the_words():
 
 def test_this_repository_declares_its_families():
     root = Path(__file__).resolve().parents[3]
+    # Rewrite-Reason: DEC-1219 (the owner's approval of Contract v5 on 2026-11-19): CONTRACT_v4.md no longer exists; the contract
+    # family is matched on CONTRACT_v5.md.
     declared = {f.reason: f for f in measure.families(root, root)}
     assert set(declared) >= {"contract", "kernel", "agents"}
-    for name, paths in {"contract": ["docs/contract/CONTRACT_v4.md", "docs/contract/contract.yaml",
+    for name, paths in {"contract": ["docs/contract/CONTRACT_v5.md", "docs/contract/contract.yaml",
                                      "docs/contract/capabilities/CAP-10.a.md", "docs/contract/master-rules/MR-1.md"],
                         "kernel": ["template/governance/kernel/roles/engineer.md", ".claude/agents/engineer.md",
                                    ".rulesync/subagents/engineer.md"],

@@ -28,6 +28,7 @@ from w2_49_support import (
     CAP_43B_REST,
     CAPABILITIES_MOVED_BY_DEC_1093,
     CONTRACT_MD,
+    CONTRACT_V5_MD,
     CONTRACT_YAML,
     COVERS_MOVED_BY_DEC_1093,
     MOVED_ITEMS,
@@ -127,46 +128,44 @@ def _md_change_rows(text: str) -> dict[str, str]:
     return {m.group(1): m.group(0) for m in re.finditer(r"^\|\s*(\d+\.\d+)\s*\|.*$", text, re.MULTILINE)}
 
 
-def test_markdown_version_is_4_2_with_a_change_row_citing_dec_722():
-    text = read_doc(CONTRACT_MD)
-    model = md_model(text)
-    require_v42(model)
+def test_markdown_v5_keeps_the_4_0_and_4_1_change_rows_and_the_4_2_row_citing_dec_722():
+    """CONTRACT_v5.md's change-log table still carries the 4.0 and 4.1 rows as at the base and a 4.2 row citing DEC-722."""
+    # Rewrite-Reason: DEC-1219 (the owner's approval of Contract v5 on 2026-11-19): CONTRACT_v4.md no longer exists; the text
+    # is CONTRACT_v5.md, whose own version is 5.0. The test no longer says the document is version 4.2: it asserts that the
+    # 4.2 row (and the 4.0 and 4.1 rows before it) are kept in the v5 change log (CAP-33.e, every version is kept).
+    text = read_doc(CONTRACT_V5_MD)
     rows = _md_change_rows(text)
-    assert "4.2" in rows, "CONTRACT_v4.md's version table has no row for 4.2"
-    assert has(r"DEC-722", rows["4.2"]), "the 4.2 row of CONTRACT_v4.md does not cite DEC-722"
+    assert "4.2" in rows, "CONTRACT_v5.md's version table has no row for 4.2"
+    assert has(r"DEC-722", rows["4.2"]), "the 4.2 row of CONTRACT_v5.md does not cite DEC-722"
     before = _md_change_rows(read_base(CONTRACT_MD))
     for version, row in before.items():
-        assert rows.get(version) == row, f"the {version} row of CONTRACT_v4.md was changed or removed"
+        assert rows.get(version) == row, f"the {version} row of CONTRACT_v5.md was changed or removed"
 
 
-def test_markdown_has_a_4_3_change_row_citing_w2_27_cit_p_dec_1093_dec_1089_dec_1090():
-    """Contract 4.3 (W2-27-CIT-P §5.2): a `| 4.3 |` row after the 4.2 row, citing the note, DEC-1093, DEC-1089 and
-    DEC-1090; the 4.2 row as W2-49 applied it; the frontmatter, title and version line state one version, the
-    YAML's, and the frontmatter `decisions` gain DEC-1089 and DEC-1090."""
-    # Added-For: DEC-1093 (1) — V (i), the 4.3 row and version lines (the note's §5.2).
-    text = read_doc(CONTRACT_MD)
+def test_markdown_v5_keeps_the_4_3_change_row_after_the_4_2_row_citing_w2_27_cit_p_dec_1093_dec_1089_dec_1090():
+    """CONTRACT_v5.md keeps a `| 4.3 |` row right after the 4.2 row, citing the note, DEC-1093, DEC-1089 and DEC-1090, and
+    the 4.2 row as W2-49 applied it; its own version is the YAML's (5.0), later than 4.3."""
+    # Rewrite-Reason: DEC-1219 (the owner's approval of Contract v5 on 2026-11-19): was "has a 4.3 row" in CONTRACT_v4.md
+    # with the document's own version 4.3; v5's change log still carries the 4.2 and 4.3 rows, and the document is 5.0.
+    text = read_doc(CONTRACT_V5_MD)
     rows = _md_change_rows(text)
-    assert "4.3" in rows, "CONTRACT_v4.md's version table has no row for 4.3"
+    assert "4.3" in rows, "CONTRACT_v5.md's version table has no row for 4.3"
     order = list(rows)
     assert order.index("4.3") == order.index("4.2") + 1, f"the 4.3 row does not follow the 4.2 row: {order}"
     missing = [name for name, pattern in V43_CITES.items() if not has(pattern, rows["4.3"])]
-    assert not missing, f"the 4.3 row of CONTRACT_v4.md does not cite {missing}: {rows['4.3'][:300]}"
+    assert not missing, f"the 4.3 row of CONTRACT_v5.md does not cite {missing}: {rows['4.3'][:300]}"
     cells = [c.strip() for c in rows["4.3"].strip().strip("|").split("|")]
     assert len(cells) >= 2 and iso_date_on_or_after(cells[1]), f"the 4.3 row's date {cells[1:2]} is not on or after {APPROVED_ON}"
     v42 = _md_change_rows(read_at(V42_COMMIT, CONTRACT_MD))
-    assert rows.get("4.2") == v42.get("4.2"), f"the 4.2 row of CONTRACT_v4.md differs from Contract 4.2 as applied ({V42_COMMIT})"
+    assert rows.get("4.2") == v42.get("4.2"), f"the 4.2 row of CONTRACT_v5.md differs from Contract 4.2 as applied ({V42_COMMIT})"
     meta, _ = frontmatter(text)
     version = str(meta.get("version"))
     assert version == str(load_yaml_text(read_doc(CONTRACT_YAML)).get("version")), (
-        f"CONTRACT_v4.md is version {version!r}, contract.yaml {load_yaml_text(read_doc(CONTRACT_YAML)).get('version')!r}"
+        f"CONTRACT_v5.md is version {version!r}, contract.yaml {load_yaml_text(read_doc(CONTRACT_YAML)).get('version')!r}"
     )
-    assert version_key(version) is not None and version_key(version) >= (4, 3), f"CONTRACT_v4.md is version {version!r}, not 4.3 or later"
-    assert iso_date_on_or_after(meta.get("revised")), f"CONTRACT_v4.md's revised {meta.get('revised')!r} is not on or after {APPROVED_ON}"
-    v = re.escape(version)
-    assert re.search(rf"^# .*Contract v4 \(version {v}\)\s*$", text, re.MULTILINE), f"the title does not state version {version}"
-    assert re.search(rf"^\*\*Version {v}\*\* \(", text, re.MULTILINE), f"the version line does not state version {version}"
+    assert version_key(version) is not None and version_key(version) >= (4, 3), f"CONTRACT_v5.md is version {version!r}, not 4.3 or later"
     decisions = [str(d) for d in meta.get("decisions") or []]
-    assert {"DEC-722", "DEC-1089", "DEC-1090"} <= set(decisions), f"the frontmatter decisions lack DEC-1089 or DEC-1090: {decisions[-5:]}"
+    assert {"DEC-722", "DEC-1089", "DEC-1090"} <= set(decisions), f"the frontmatter decisions lack DEC-722, DEC-1089 or DEC-1090"
 
 
 # --------------------------------------------------------------------------
@@ -244,13 +243,8 @@ def test_cap_02c_signed_release_tag_stays_in_wave_3(model):
     assert has(r"sign", item.text) and has(r"tag", item.text), f"{model.source}: CAP-02.c no longer states the signed tag"
 
 
-def test_qualification_certificate_cap_43c_stays_in_wave_3(model):
-    """The qualification certificate (CAP-43.c, release certification by qualification) stays in Wave 3."""
-    require_v42(model)
-    item = model.by_id().get("CAP-43.c")
-    assert item is not None, f"{model.source}: CAP-43.c is missing"
-    assert item.wave == "W3", f"{model.source}: CAP-43.c is in {item.wave}, not W3"
-    assert has(r"certif", item.text), f"{model.source}: CAP-43.c no longer states the certification by qualification"
+# Retired (DEC-1219): test_qualification_certificate_cap_43c_stays_in_wave_3, both forms. CAP-43.c is Wave 2 in Contract v5,
+# certified by the release acceptance (EMERGENCY-2 section 8.2); nothing in Wave 3 is left to keep.
 
 
 # --------------------------------------------------------------------------
