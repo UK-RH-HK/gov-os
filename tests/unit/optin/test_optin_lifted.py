@@ -1,7 +1,8 @@
 """The opt-in suites (DEC-1061, D-4's cut; T-10): ``tests/conftest.py`` leaves every entry of
 ``tests/optin-<name>*.txt`` out of a run unless the run opts in to ``<name>`` (``--optin=<name>`` or
-``GOV_TESTS_OPTIN=<name>``): ``lifted`` (the switched-off features) and ``breadth`` (tier 2's cap and the
-representatives' other rows; the CTO's P-1 (b)), each alone or both (``lifted,breadth``).
+``GOV_TESTS_OPTIN=<name>``): ``lifted`` (the switched-off features), ``breadth`` (tier 2's cap and the
+representatives' other rows; the CTO's P-1 (b)) and ``weekly`` (the slow cases of live features, DEC-1220 (1), TI-5),
+each alone or together (``lifted,breadth``).
 
 The mechanism is shown on a planted tree that carries a copy of the root conftest and a list of its own, so the
 real lists can change without changing these cases; the real lists are checked only for entries that name nothing.
@@ -159,7 +160,8 @@ def _root_conftest():
 
 @pytest.mark.parametrize("name, suite", [("optin-lifted.txt", "lifted"), ("optin-lifted-guard.txt", "lifted"),
                                          ("optin-lifted-breadth.txt", "breadth"),
-                                         ("optin-lifted-guard-breadth.txt", "breadth")])
+                                         ("optin-lifted-guard-breadth.txt", "breadth"),
+                                         ("optin-weekly.txt", "weekly"), ("optin-weekly-more.txt", "weekly")])
 def test_each_list_belongs_to_its_suite_by_its_name(name, suite):
     assert _root_conftest().optin_name(Path(name)) == suite
 
@@ -197,3 +199,51 @@ def test_every_entry_of_the_real_lists_names_a_test_path_or_function_that_exists
         elif rest and re.sub(r"\[.*$", "", rest) not in _functions(where):
             stale.append(f"{listing}: {target} (no such function)")
     assert not stale, "entries that name nothing:\n" + "\n".join(stale)
+
+
+# --- the weekly tier (DEC-1220 (1), TI-5): tests/optin-weekly*.txt, run once a week with --optin=weekly -----------------
+
+WEEKLY = """# planted weekly list: the slow cases of live features
+tests/a/test_a.py::test_kept  # slow
+tests/some/test_other.py  # a slow file
+"""
+WEEKLY_ONLY = {"test_kept", "test_o"}
+
+
+@pytest.fixture
+def planted_weekly(planted):
+    (planted / "tests" / "optin-weekly.txt").write_text(WEEKLY)
+    return planted
+
+
+def test_a_run_that_does_not_opt_in_leaves_the_weekly_cases_out(planted_weekly):
+    ids, files, out = collected(planted_weekly)
+    assert ids == EVERY - LIFTED - BREADTH_ONLY - WEEKLY_ONLY, out
+    assert "tests/some/test_other.py" not in files, out
+    assert "deselected" in out, out
+
+
+@pytest.mark.parametrize("how", ["option", "environment"])
+def test_opting_in_to_weekly_collects_its_cases_and_still_leaves_lifted_and_breadth_out(planted_weekly, how):
+    args, extra = ((["--optin=weekly"], None) if how == "option" else ([], {"GOV_TESTS_OPTIN": "weekly"}))
+    ids, files, out = collected(planted_weekly, *args, env_extra=extra)
+    assert ids == EVERY - LIFTED - BREADTH_ONLY, out
+    assert "tests/some/test_other.py" in files, out
+
+
+def test_opting_in_to_lifted_or_breadth_leaves_the_weekly_cases_out(planted_weekly):
+    for name, left_in in (("lifted", LIFTED), ("breadth", BREADTH_ONLY), ("lifted,breadth", LIFTED | BREADTH_ONLY)):
+        ids, _, out = collected(planted_weekly, f"--optin={name}")
+        assert ids == EVERY - WEEKLY_ONLY - (LIFTED | BREADTH_ONLY) | left_in, (name, out)
+        assert not WEEKLY_ONLY & ids, (name, out)
+
+
+def test_opting_in_to_all_three_collects_every_case(planted_weekly):
+    ids, _, out = collected(planted_weekly, "--optin=lifted,breadth,weekly")
+    assert ids == EVERY, out
+    assert "deselected" not in out, out
+
+
+def test_a_weekly_case_named_by_its_node_id_on_the_command_line_is_run(planted_weekly):
+    ids, _, out = collected(planted_weekly, "tests/a/test_a.py::test_kept")
+    assert "test_kept" in ids, out

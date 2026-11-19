@@ -35,8 +35,9 @@ def _hit(nodeid, entry):
 def pytest_collection_modifyitems(config, items):
     opted = {name.strip() for name in os.environ.get("GOV_TESTS_OPTIN", "").split(",") if name.strip()}
     entries = []
-    for listing in HERE.glob("optin-lifted*.txt"):
-        if ("breadth" if "breadth" in listing.name else "lifted") in opted:
+    for listing in [*HERE.glob("optin-lifted*.txt"), *HERE.glob("optin-weekly*.txt")]:
+        name = "weekly" if listing.name.startswith("optin-weekly") else "breadth" if "breadth" in listing.name else "lifted"
+        if name in opted:
             continue
         for raw in listing.read_text().splitlines():
             line = raw.split("#", 1)[0].strip()

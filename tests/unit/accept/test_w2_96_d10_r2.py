@@ -121,6 +121,21 @@ def test_w2_96_d10r2_lifted_is_never_enabled_and_its_only_line_is_report_only(pr
     assert list(temp.iterdir()) == []
 
 
+def test_w2_96_d10r2_weekly_is_enabled_for_a_case_the_map_names(project, capsys):
+    """DEC-1220 (1), TI-5: a slow case in ``optin-weekly.txt`` is a default run's left-out case; a ticket whose map names
+    it gets the suite for its own folder (as ``breadth``), so ``gov accept`` still runs it."""
+    root, temp = project
+    readme = "| KPI | Test |\n|---|---|\n| S1 | `test_a.py::test_wide` |\n| S2 | `test_a.py::test_default` |\n"
+    _plant(root, readme, {"test_a.py": TESTS}, {"optin-weekly.txt": "tests/acceptance/T1/test_a.py::test_wide  # slow\n"})
+    code, envelope, _ = _accept(root, capsys)
+    result = envelope["result"]
+    assert code == 0, envelope
+    assert result["outcome"] == "pass"
+    assert result["optin"] == ["weekly"] and not result.get("report_only")
+    assert _lines(result) == [("success-1", "pass", 1, 0), ("success-2", "pass", 1, 0)]
+    assert list(temp.iterdir()) == []
+
+
 def test_w2_96_d10r2_the_text_form_says_report_only_lifted(project, capsys):
     root, _ = project
     readme = "| KPI | Test |\n|---|---|\n| S1 | `test_a.py::test_off` |\n| S2 | `test_a.py::test_wide` |\n"
