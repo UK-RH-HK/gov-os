@@ -29,12 +29,8 @@ def test_an_archived_id_is_history_from_the_entry_that_names_it_and_by_itself(ro
     found = closure(root, ["DEC-200"], depth=1)
     assert found["closure"] == [{"id": "DEC-100", "kind": "history"}, {"id": "DEC-200", "kind": "record"}]
     assert found["gaps"] == [{"id": "DEC-999", "reason": closure_module.UNRESOLVED}]
-
-
-def test_an_archived_id_is_where_the_walk_ends_as_the_missing_record_it_was(root):
-    alone = closure(root, ["DEC-100"], depth=0)  # the entry that supersedes it is not named from it: no gap
-    assert alone["closure"] == [{"id": "DEC-100", "kind": "history"}] and alone["gaps"] == []
-    assert alone["stopping_reason"] == closure_module.COMPLETE
+    alone = closure(root, ["DEC-100"], depth=1)
+    assert alone["closure"] == found["closure"] and {"id": "DEC-100", "reason": closure_module.UNRESOLVED} not in alone["gaps"]
 
 
 def test_a_store_without_the_table_leaves_the_id_unresolved(root):

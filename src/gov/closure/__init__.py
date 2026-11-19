@@ -3,9 +3,8 @@
 ``closure(root, ids, depth)`` follows the start ids through the record graph of the store (the eight typed
 edges, both ways) and through the code index (a symbol's callers and callees), ``depth`` hops far. An id that
 is a record's id is a record; an id of the archived register is history (W2-203: it existed, and memory holds no
-more of it than that, so the walk ends there); a start id that is neither, and a name reached from a symbol, is
-asked of the code index; a record's edge to no record is unresolved without asking. Everything is sorted: the same
-store, index and working tree give the same result. It only reads: it builds neither the store nor the code index.
+more of it than that); a start id that is neither, and a name reached from a symbol, is asked of the code index; a record's edge to no record is unresolved without asking. Everything is sorted: the same store, index
+and working tree give the same result. It only reads: it builds neither the store nor the code index.
 """
 
 from __future__ import annotations
@@ -68,8 +67,8 @@ def closure(root: Path, ids: list[str], depth: int) -> dict:
         for item in sorted(front):
             if item in records:
                 kinds[item], found = "record", near.get(item, set())
-            elif item in archived:  # where the walk ends, as at the missing record it was: nothing is named from it
-                kinds[item], found = "history", set()
+            elif item in archived:
+                kinds[item], found = "history", near.get(item, set())
             elif item not in askable:
                 gaps[item], found = UNRESOLVED, set()
             else:
