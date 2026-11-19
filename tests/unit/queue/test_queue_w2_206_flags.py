@@ -47,7 +47,8 @@ def test_a_dry_run_answers_as_the_landing_and_moves_writes_and_leaves_nothing(pr
                                                      "verify.exit"]
     assert (out / "verify.exit").read_text(encoding="utf-8") == "0\n"
     chosen = json.loads((out / "select.json").read_text(encoding="utf-8"))
-    assert chosen["ticket"] == TICKET and "tests/unit/test_other.py" in chosen["suites"]
+    assert (chosen["ticket"], chosen["tickets"]) == (TICKET, [TICKET])
+    assert "tests/unit/test_other.py" in chosen["suites"]
     assert "exit 0" in (out / "summary.txt").read_text(encoding="utf-8")
     # the landing itself then gives the same answer
     landed, landed_code = command.land(project.root, [f"{TICKET}=topic/a"])
@@ -90,7 +91,7 @@ def test_select_prints_the_selection_and_runs_and_records_nothing(project, capsy
     before, base = _refs(project), project.sha("main")
     assert command.select(project.root, [f"{TICKET}=topic/a"]) == 0
     printed = json.loads(capsys.readouterr().out)
-    assert printed == {"ticket": TICKET, "suites": [f"tests/acceptance/{WBS}/", "tests/unit/test_other.py"],
+    assert printed == {"ticket": TICKET, "tickets": [TICKET], "suites": [f"tests/acceptance/{WBS}/", "tests/unit/test_other.py"],
                        "pytest_options": select.pytest_options(select.load_map(project.root)[0])}
     assert _refs(project) == before and _clone_head(project) == base
     assert not (project.root / ".gov-runtime" / "queue").exists()

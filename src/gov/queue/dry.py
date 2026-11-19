@@ -28,10 +28,10 @@ def out_dir(root: Path, given: list[str], out: str | None) -> Path:
 
 
 def selection_object(tickets: list[str], suites: list[str], options: list[str]) -> dict:
-    """The selection as ``--select`` prints it: ``ticket`` for one ticket (``gov close --select``'s object), else
-    ``tickets``; ``suites``; ``pytest_options``."""
-    named = {"ticket": tickets[0]} if len(tickets) == 1 else {"tickets": list(tickets)}
-    return {**named, "suites": list(suites), "pytest_options": list(options)}
+    """The selection as ``--select`` prints it: ``tickets``, and ``ticket`` too for one ticket (with ``suites`` and
+    ``pytest_options``, ``gov close --select``'s object); ``suites``; ``pytest_options``."""
+    named = {"ticket": tickets[0]} if len(tickets) == 1 else {}
+    return {**named, "tickets": list(tickets), "suites": list(suites), "pytest_options": list(options)}
 
 
 class Out:
