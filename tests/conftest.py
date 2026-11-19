@@ -39,8 +39,9 @@
   with ``--optin=<name>`` or ``GOV_TESTS_OPTIN=<name>`` (several:
   ``lifted,breadth`` or the option given twice). Each ``optin-lifted*breadth*.txt``
   is ``breadth`` (tier 2's cap and the representatives' other rows; the CTO's
-  P-1 (b)); every other ``optin-lifted*.txt`` is ``lifted`` (the switched-off
-  features' cases, run report-only in D-10's window). One entry a line: a path
+  P-1 (b)); every ``optin-weekly*.txt`` is ``weekly`` (the slow cases of live features, over 5 s in the
+  nightly of 2026-11-19, run once a week: ``--optin=weekly``; DEC-1220 (1), TI-5); every other
+  ``optin-lifted*.txt`` is ``lifted`` (the switched-off features' cases, run report-only in D-10's window). One entry a line: a path
   (a folder or a test file, from the repository's root) or a node id
   (``file::name``, ``file::Class::name``, ``file::name[row]``), then ``#`` and
   why. ``rep: <path or file::name>`` keeps, of every parametrised function
@@ -212,8 +213,8 @@ def _drop_rebuild_lock(path: str, former: str | None) -> None:
 
 
 _OPTIN_ENV = "GOV_TESTS_OPTIN"
-_OPTIN_NAMES = ("lifted", "breadth")
-_OPTIN_GLOB = "optin-lifted*.txt"
+_OPTIN_NAMES = ("lifted", "breadth", "weekly")
+_OPTIN_GLOBS = ("optin-lifted*.txt", "optin-weekly*.txt")
 _TESTS = Path(__file__).resolve().parent
 _ROOT = _TESTS.parent
 
@@ -225,17 +226,18 @@ def pytest_addoption(parser):
 
 
 def optin_name(listing: Path) -> str:
-    """The opt-in suite a list belongs to, by its file name: every ``optin-lifted*breadth*.txt`` is ``breadth``
-    (``optin-lifted-breadth.txt``, ``optin-lifted-guard-breadth.txt``), every other ``optin-lifted*.txt`` is
-    ``lifted`` (``optin-lifted.txt``, ``optin-lifted-guard.txt``)."""
-    return "breadth" if "breadth" in Path(listing).name else "lifted"
+    """The opt-in suite a list belongs to, by its file name: every ``optin-weekly*.txt`` is ``weekly``, every
+    ``optin-lifted*breadth*.txt`` is ``breadth`` (``optin-lifted-breadth.txt``, ``optin-lifted-guard-breadth.txt``),
+    every other ``optin-lifted*.txt`` is ``lifted`` (``optin-lifted.txt``, ``optin-lifted-guard.txt``)."""
+    name = Path(listing).name
+    return "weekly" if name.startswith("optin-weekly") else "breadth" if "breadth" in name else "lifted"
 
 
 def optin_entries(folder: Path = _TESTS, skip=()) -> list[tuple[str, str, str]]:
     """Every entry of ``folder``'s opt-in lists but those of the suites in ``skip``: ``(kind, target, list file
     name)``, kind ``case`` or ``rep``."""
     entries = []
-    for listing in sorted(folder.glob(_OPTIN_GLOB)):
+    for listing in sorted(path for glob in _OPTIN_GLOBS for path in folder.glob(glob)):
         if optin_name(listing) in skip:
             continue
         for raw in listing.read_text(encoding="utf-8").splitlines():

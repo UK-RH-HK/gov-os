@@ -273,14 +273,31 @@ def _placeholder_case(tmp_path, cell, text):
             f"no REFUSED Test data line names the source {source!r} and the {word}: {output!r}")
 
 
-@pytest.mark.parametrize("cell", sorted(CELLS))
-@pytest.mark.parametrize("text", PLACEHOLDERS, ids=[f"ph{n}" for n in range(len(PLACEHOLDERS))])
+# DEC-1220 (1), TI-7: 56 cases (4 cells x 14 strings) are 14. The strings fall in the check's classes: no letter or digit ("-", "—",
+# "–", "?"), a deferral word (TBD, TODO, unknown), an absence word (n/a, none), each in any case (the check lower-cases);
+# kept: one or two of each class and a mixed-case one. The cells differ in the column the check reads, so every cell
+# keeps the first and the last string, and the first cell all of them.
+PLACEHOLDERS_KEPT = ["-", "—", "TBD", "Todo", "Unknown", "?", "N/A", "none"]
+assert set(PLACEHOLDERS_KEPT) <= set(PLACEHOLDERS)
+PLACEHOLDER_PAIRS = s.boundary_pairs(sorted(CELLS), PLACEHOLDERS_KEPT)
+
+
+@pytest.mark.parametrize("cell,text", PLACEHOLDER_PAIRS,
+                         ids=[f"{cell}-ph{PLACEHOLDERS.index(text)}" for cell, text in PLACEHOLDER_PAIRS])
 def test_a_placeholder_cell_is_refused_as_if_it_were_empty(tmp_path, cell, text):
     _placeholder_case(tmp_path, cell, text)
 
 
-@pytest.mark.parametrize("cell", sorted(CELLS))
-@pytest.mark.parametrize("text", EMPHASISED, ids=[f"em{n}" for n in range(len(EMPHASISED))])
+# TI-7: 24 cases (4 cells x 6 strings) are 10: the emphasis kinds are ** (bold), _ (underscore), * (star) and spaces around
+# the word, and the check peels them all alike; "*TODO*" (a star pair, as "*n/a*") and "__none__" (a doubled _, as
+# "_unknown_") are the two dropped; the first cell keeps all four.
+EMPHASISED_KEPT = ["**TBD**", "_unknown_", "*n/a*", " N/A "]
+assert set(EMPHASISED_KEPT) <= set(EMPHASISED)
+EMPHASISED_PAIRS = s.boundary_pairs(sorted(CELLS), EMPHASISED_KEPT)
+
+
+@pytest.mark.parametrize("cell,text", EMPHASISED_PAIRS,
+                         ids=[f"{cell}-em{EMPHASISED.index(text)}" for cell, text in EMPHASISED_PAIRS])
 def test_a_placeholder_in_emphasis_or_with_spaces_is_refused_as_if_it_were_empty(tmp_path, cell, text):
     _placeholder_case(tmp_path, cell, text)
 

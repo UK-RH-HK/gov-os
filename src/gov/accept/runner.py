@@ -224,20 +224,21 @@ def names_a_test(item: str) -> bool:
 # --- the opt-in suites the map's cases need (S-D10a, DEC-1112 (3), DEC-1061) -----------------------------------------
 
 OPTIN_ENV = "GOV_TESTS_OPTIN"  # tests/conftest.py's variable: the suites a run opts in to, comma-separated
-OPTIN_GLOB = "optin-lifted*.txt"
+OPTIN_GLOBS = ("optin-lifted*.txt", "optin-weekly*.txt")
 
 
 def optin_name(listing: str) -> str:
-    """The suite a list belongs to, as ``tests/conftest.py`` names it: ``breadth`` for every
-    ``optin-lifted*breadth*.txt``, ``lifted`` for every other ``optin-lifted*.txt``."""
-    return "breadth" if "breadth" in listing else "lifted"
+    """The suite a list belongs to, as ``tests/conftest.py`` names it: ``weekly`` for every ``optin-weekly*.txt``
+    (DEC-1220 (1), TI-5), ``breadth`` for every ``optin-lifted*breadth*.txt``, ``lifted`` for every other
+    ``optin-lifted*.txt``."""
+    return "weekly" if listing.startswith("optin-weekly") else "breadth" if "breadth" in listing else "lifted"
 
 
 def optin_entries(tests: Path) -> list[tuple[str, str]]:
     """``(suite, target)`` for every entry of the project's opt-in lists, read as ``tests/conftest.py`` reads them
     (a ``rep:`` entry's target too: its rows past the first are the suite's). A list it cannot read gives none."""
     entries = []
-    for listing in sorted(tests.glob(OPTIN_GLOB)):
+    for listing in sorted(path for glob in OPTIN_GLOBS for path in tests.glob(glob)):
         try:
             text = listing.read_text(encoding="utf-8")
         except (OSError, ValueError):
@@ -732,7 +733,7 @@ def accept(root: Path, ticket: str, timeout: float, keep_report: Path | None = N
                        {"ticket": ticket, "path": declared})
     try:
         needed = needed_optins(root, folder, mapping)
-        optins = [suite for suite in needed if suite != REPORT_ONLY]  # breadth only, never lifted (scope (b))
+        optins = [suite for suite in needed if suite != REPORT_ONLY]  # breadth and weekly, never lifted (scope (b))
         report_only = [REPORT_ONLY] if REPORT_ONLY in needed else []
         error = _result(ticket, "error", "crash", [], _zero(), _zero(), optins, report_only), EXIT_ERROR  # F3
         left_out: list[Case] | None = [] if report_only else None

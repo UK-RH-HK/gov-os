@@ -274,3 +274,14 @@ def list_items(block):
 def skill_files(folder):
     """Every file of a skill folder, as paths relative to it."""
     return sorted(p.relative_to(folder) for p in Path(folder).rglob("*") if p.is_file())
+
+
+def boundary_pairs(rows, texts):
+    """DEC-1220 (1), TI-7: the cross of ``rows`` (the cells, or none) with ``texts`` (the planted strings), thinned to its
+    boundary: every text with the first row, and every other row with the first and the last text. The rows differ
+    in the code path they reach (the column the check reads); the texts differ in the string planted."""
+    pairs = [(rows[0], text) for text in texts]
+    for row in rows[1:]:
+        pairs += [(row, text) for text in dict.fromkeys((texts[0], texts[-1]))]
+    return pairs
+

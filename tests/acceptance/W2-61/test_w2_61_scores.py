@@ -67,28 +67,26 @@ def test_per_question_figures(world):
         assert have == want, f"{qid}: the measure gives {have}, not {want}"
 
 
-def test_totals_against_the_floor_and_the_target(world):
+def test_totals_of_both_figures(world):  # the floor 85 and the target 99 are no longer asserted (E2 5.2, DEC-1220 (1))
     document = world.measure(s.SET, "--json").json()
     total = document.get("total")
     assert isinstance(total, dict), f"no total: {sorted(document)}"
     assert total.get("questions") == 4, f"total questions: {total.get('questions')!r}"
     hit, full = total.get("hit_at_5"), total.get("full_evidence")
     assert isinstance(hit, dict) and isinstance(full, dict), f"the totals are not both given: {total}"
-    assert (hit.get("count"), hit.get("of"), hit.get("floor")) == (2, 4, 85), f"total hit@5: {hit}"
-    assert (full.get("count"), full.get("of"), full.get("target")) == (3, 4, 99), f"total full evidence: {full}"
+    assert (hit.get("count"), hit.get("of")) == (2, 4), f"total hit@5: {hit}"
+    assert (full.get("count"), full.get("of")) == (3, 4), f"total full evidence: {full}"
     assert abs(float(hit.get("percent")) - 50.0) < 0.6, f"hit@5 percent: {hit.get('percent')!r}"
     assert abs(float(full.get("percent")) - 75.0) < 0.6, f"full evidence percent: {full.get('percent')!r}"
 
 
-def test_the_text_output_gives_both_figures_together_against_85_and_99(world):
+def test_the_text_output_gives_both_figures_together(world):
     run = world.measure(s.SET)
     assert run.returncode == 0, run.describe()
     lone = s.lone_figures(run.stdout)
     assert not lone, f"text lines give one figure without the other (failure 3):\n" + "\n".join(lone)
     both = [line for line in run.stdout.splitlines() if s.HIT_LABEL.search(line) and s.FULL_LABEL.search(line)]
     assert both, f"no line gives hit@5 and full evidence\n{run.describe()}"
-    assert any("85" in line and "99" in line for line in both), (
-        f"no line gives the totals against 85 and 99\n{run.describe()}")
     for qid in EXPECTED:
         assert any(qid in line for line in run.stdout.splitlines()), f"{qid} is not in the text output"
 

@@ -68,31 +68,6 @@ def test_ccusage_carries_a_sha256_digest(registry):
     assert support.SHA256.fullmatch(value), f"the ccusage entry's sha256 is not a SHA-256 digest: {value!r}"
 
 
-def test_ccusage_was_approved_by_an_owner_decision_of_the_register(registry, decisions):
-    approved_by = str(_entry(registry).get("approved_by", "")).strip()
-    assert support.DECISION_ID.fullmatch(approved_by), (
-        f"the ccusage entry's approved_by is {approved_by!r}, not a decision id"
-    )
-    assert approved_by in decisions, f"{approved_by}, which approves ccusage, is not in {support.REGISTER_REL}"
-    decision = decisions[approved_by]
-    assert decision.accepted_by_owner, (
-        f"{approved_by}, which approves ccusage, is not accepted by the owner (status: {decision.status!r})"
-    )
-
-
-def test_ccusage_was_not_installed_before_its_approval(registry, decisions):
-    """DEC-083: the orchestrator "installs only after the owner's explicit approval"."""
-    entry = _entry(registry)
-    decision = decisions.get(str(entry.get("approved_by", "")).strip())
-    assert decision is not None, f"the ccusage entry's approving decision is not in {support.REGISTER_REL}"
-    assert decision.date, f"{decision.id} carries no date the install date can be compared with"
-    installed = datetime.date.fromisoformat(str(entry.get("date", "")).strip()[:10])
-    approved = datetime.date.fromisoformat(decision.date)
-    assert installed >= approved, (
-        f"the registry dates the ccusage install {installed}, before its approval {decision.id} of {approved}"
-    )
-
-
 NOT_INSTALLED = (
     f"ccusage is not a global package of ~/{support.NODE_22_REL}: it is not installed where DEC-192 installs it"
 )

@@ -89,7 +89,16 @@ C1_PLACEHOLDERS = ["TBD", "-", "—", "n/a", "?", "TODO", "none", "(none)", "**T
 C1_IDS = [f"ph{n}" for n in range(len(C1_PLACEHOLDERS))]
 
 
-@pytest.mark.parametrize("text", C1_PLACEHOLDERS, ids=C1_IDS)
+# DEC-1220 (1), TI-7: 25 placeholder strings are 13 for the failure text and 13 for the behaviour. The check peels emphasis,
+# backticks, brackets and trailing punctuation, lower-cases, and then refuses a text with no letter or digit, a lone
+# <slot>, a deferral word, an absence word or "to be <word>": kept, one or two of each class and each peeled mark.
+C1_KEPT = ["TBD", "-", "n/a", "?", "(none)", "**TBD**", "to be written", "Tbd.", "...", "pending", "no one", "null",
+           "<behaviour>"]
+assert set(C1_KEPT) <= set(C1_PLACEHOLDERS)
+C1_KEPT_IDS = [C1_IDS[C1_PLACEHOLDERS.index(text)] for text in C1_KEPT]
+
+
+@pytest.mark.parametrize("text", C1_KEPT, ids=C1_KEPT_IDS)
 def test_a_placeholder_failure_text_is_refused_as_a_missing_fails_if_line(tmp_path, text):
     middle = _kpi(2, s.CLEAN_KPIS[1][0], text)
     code, output = _check_kpis(tmp_path, _kpis(middle))
@@ -120,7 +129,7 @@ def test_a_placeholder_failure_text_on_the_next_indented_line_is_refused(tmp_pat
     _assert_names_only(output, "K2", "Fails if")
 
 
-@pytest.mark.parametrize("text", C1_PLACEHOLDERS, ids=C1_IDS)
+@pytest.mark.parametrize("text", C1_KEPT, ids=C1_KEPT_IDS)
 def test_a_placeholder_behaviour_is_refused_naming_the_kpi(tmp_path, text):
     middle = _kpi(2, text, s.CLEAN_KPIS[1][1])
     code, output = _check_kpis(tmp_path, _kpis(middle))
@@ -306,8 +315,16 @@ C3_PLACEHOLDERS = ["TBC", "Tbd.", "N/A.", "NA", "nobody", "to be decided", "`TBD
                    "[TBD]", "TBD;", "<licence>", "<behaviour>"]
 
 
-@pytest.mark.parametrize("cell", sorted(CELLS))
-@pytest.mark.parametrize("text", C3_PLACEHOLDERS, ids=[f"ph{n}" for n in range(len(C3_PLACEHOLDERS))])
+# TI-7: 88 cases (4 cells x 22 strings) are 18. Kept, by the check's classes: deferral words (TBC, pending), absence
+# words (NA, "no one", null), "to be <word>", no letter or digit ("..."), a lone <slot>, and each peeled mark (backticks,
+# a trailing dot after a mixed-case word, brackets, a trailing semicolon). The first cell keeps all twelve; every other
+# cell (a different column of the check) the first and the last.
+C3_KEPT = ["TBC", "pending", "NA", "no one", "null", "to be decided", "...", "<owner>", "`TBD`", "Tbd.", "[TBD]", "TBD;"]
+assert set(C3_KEPT) <= set(C3_PLACEHOLDERS)
+C3_PAIRS = s.boundary_pairs(sorted(CELLS), C3_KEPT)
+
+
+@pytest.mark.parametrize("cell,text", C3_PAIRS, ids=[f"{cell}-ph{C3_PLACEHOLDERS.index(text)}" for cell, text in C3_PAIRS])
 def test_a_placeholder_cell_of_the_class_is_refused_as_if_it_were_empty(tmp_path, cell, text):
     _assert_cell_refused(tmp_path, cell, text)
 

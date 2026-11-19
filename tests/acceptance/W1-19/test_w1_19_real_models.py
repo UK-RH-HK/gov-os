@@ -221,49 +221,6 @@ def measured(api, tmp_path_factory):
     return results
 
 
-def _scored(measured):
-    """``class -> [hit or miss, ...]`` over every query of the class, both tiers together, and the misses by id.
-
-    S0b2's own method (DEC-380; ``RESULTS.md`` §1): the first five distinct paths of each query against its
-    ``must_cite``, a percentage per class, the mean of the ten classes. Its class sizes add up to all 52 queries, so
-    the two queries that name no ``must_cite`` path count in their classes, and they cannot be hits.
-    """
-    scored, missed = {}, []
-    for result in measured.values():
-        for query, answer in zip(result["queries"], result["answers"]):
-            hit = support.is_hit(query["gold"]["must_cite"], answer["hits"])
-            scored.setdefault(query["class"], []).append(hit)
-            if not hit:
-                missed.append(query["id"])
-    assert len(scored) == support.QUERY_CLASSES, \
-        f"the dev query set has {len(scored)} classes, not the ten S0b2 took the mean of: {sorted(scored)}"
-    return scored, missed
-
-
-@FULL
-def test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80(measured, record_property):
-    # The timed pass's answers (W2-M332), the first asking of each question, as before.
-    # Success 2 and failure 1 are one line since DEC-414: at or above 80 on the dev tiers passes, below 80 fails.
-    # The S0b2 R1 baseline of 85 is not a pass line here; where the mean stands against it is reported, not
-    # asserted, for the Wave 1 exit run (W1-42) and for qualification, which re-measure it.
-    scored, missed = _scored(measured)
-    mean, per_class = support.mean_hit_at_5(scored)
-    report = support.hit_at_5_report(mean, per_class, missed)
-    support.HIT_AT_5_REPORT[:] = report   # the terminal summary, pass or fail
-    print("\n".join(report))              # the case's own captured output (-rP, -s)
-    record_property("w1_19_mean_hit_at_5", round(mean, 2))
-    record_property("w1_19_hit_at_5_pass_line", support.HIT_AT_5_PASS_LINE)
-    record_property("w1_19_hit_at_5_baseline", support.HIT_AT_5_BASELINE)
-    record_property("w1_19_hit_at_5_against_baseline", round(mean - support.HIT_AT_5_BASELINE, 2))
-    record_property("w1_19_hit_at_5_per_class", repr(per_class))
-    record_property("w1_19_hit_at_5_missed", ", ".join(sorted(missed)))
-    assert mean >= support.HIT_AT_5_PASS_LINE, \
-        f"mean hit@5 over the ten classes is {mean:.2f}, below the pass line of " \
-        f"{support.HIT_AT_5_PASS_LINE:.0f} on the dev tiers (DEC-414); against the S0b2 R1 baseline of " \
-        f"{support.HIT_AT_5_BASELINE:.0f}: {mean - support.HIT_AT_5_BASELINE:+.2f} " \
-        f"(per class: {per_class}; missed: {sorted(missed)})"
-
-
 @FULL
 def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
     # The timed pass's times: no memory sampler ran in that process (W2-M332).

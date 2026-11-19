@@ -67,7 +67,6 @@ record_only:
 # widened by lens I's four reports (I1 §4.1, I2 F6, I3 F5, I4 F6), filtered by that rule.
 record_reading:
   # gate (f) and DEC-889 item 2's start
-  - "tests/acceptance/W1-06/test_w1_06_approvals.py"
   - "tests/acceptance/W1-08/test_w1_08_path_map.py"
   - "tests/acceptance/W1-27/test_w1_27_path_compliance.py"
   - "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py"
@@ -86,7 +85,6 @@ record_reading:
   # area 2 (I2 F6): the register's approvals, the probe records, the exit record and Wave 1's tickets
   - "tests/acceptance/W1-48/"
   - "tests/acceptance/W1-26/test_w1_26_probe_records.py"
-  - "tests/acceptance/W1-42/"
   - "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"
   # area 3 (I3 F5): the register, the tickets and the ADRs of this repository
   - "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails"
@@ -95,7 +93,6 @@ record_reading:
   - "tests/acceptance/W2-02/test_w2_02_green_here.py"
   - "tests/acceptance/W1-08/test_w1_08_ticket.py"
   - "tests/acceptance/W1-08/test_w1_08_probe.py"
-  - "tests/acceptance/W1-06/test_w1_06_install_approvals.py"
   - "tests/acceptance/W1-07/test_w1_07_config.py"
   - "tests/acceptance/W1-07/test_w1_07_config_details.py"
   - "tests/acceptance/W1-27/test_w1_27_doctor.py"
@@ -115,10 +112,6 @@ every_close:
 
 # What imports and coverage cannot see (P-IS-1 (a); lens I's synthesis §4, the W2-66 block).
 couplings:
-  - paths: ["src/gov/cli/main.py", "template/governance/kernel/templates/**",
-            "template/governance/kernel/skills/orchestration/**"]
-    suites: ["tests/acceptance/W1-42/"]
-    why: "text read: W1-42 reads src/gov/cli/main.py's command names and the kernel's skill and brief templates (I2 §4.1)"
   - paths: ["tests/acceptance/serial-only.txt"]
     suites: ["tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"]
     why: "text read: W1-30's r11 reads the serial-only list (I2 §4.1)"
