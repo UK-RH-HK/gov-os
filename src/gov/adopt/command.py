@@ -60,6 +60,7 @@ def _steps(root: Path, args) -> dict:
     today = datetime.datetime.now(datetime.timezone.utc).date()
     if args.facts:
         from gov.adopt import facts
+        facts.write_queue_settings(root)  # W2-202 A5: the settings gov queue lands by, where absent; no close.yaml
         return facts.write_default(root, today)
     from gov.adopt import verify_pass
     if args.verify_list:
