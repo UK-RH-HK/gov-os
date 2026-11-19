@@ -9,13 +9,12 @@ register ``HEAD`` holds (``gov.util.register.read``). No store, no retrieval, no
 - ``applied``: the ids that stand, sorted by number. ``inputs``: ``{id, hash}`` for each of them, in that order, the
   hash the sha256 of the UTF-8 bytes of the entry's span of the register.
 - ``not_standing``: ``{id, status}`` for each cited decision that no longer stands, sorted by number; never applied.
-- ``unresolved``: the ids the register does not hold that the ticket names only in a KPI line, and every cited id
+- ``unresolved``: the cited ids neither the register nor the archive holds, sorted by number, and every cited id
   where the project's path map names no register.
 - An id only the archived register holds (the path map's ``decision_register_archive``) is ``not_standing`` with the
   state ``ARCHIVED``: history, never applied, never a refusal.
-- An id named in ``sources`` or ``decisions`` that neither the register nor the archive holds refuses:
-  ``DECISION_NOT_FOUND``, naming
-  the ticket and every such id. The caller asks before any gate runs, so nothing is written.
+- Nothing here refuses (W2-200 S6 as amended at the land): an id neither the register nor the archive holds, wherever
+  the ticket names it, is ``unresolved``, and the close goes on. The close records; it does not prevent.
 
 Ids of other forms (CAP-, W2-, MR-, paths, document names) are not decisions and are left alone.
 """
@@ -25,9 +24,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-from gov.cli.errors import GovError
 
-NOT_FOUND = "DECISION_NOT_FOUND"
 ARCHIVED = "ARCHIVED"  # the state of a decision only the archived register holds
 NO_LONGER_STANDS = ("SUPERSEDED", "RETIRED", "REJECTED")
 TICKETS_REL = ".tickets"
@@ -62,8 +59,8 @@ def cited(front: dict) -> tuple[list[str], list[str]]:
 
 
 def decisions_of(root: Path, ticket: str, front: dict) -> dict:
-    """``{"applied", "not_standing", "unresolved", "inputs"}`` of the decisions ``ticket`` cites (the module's text);
-    ``GovError`` ``DECISION_NOT_FOUND`` where ``sources`` or ``decisions`` name one the register does not hold."""
+    """``{"applied", "not_standing", "unresolved", "inputs"}`` of the decisions ``ticket`` cites (the module's text).
+    It never refuses."""
     from gov.util import register as _register
 
     declared, in_kpis = cited(front or {})
@@ -82,12 +79,6 @@ def decisions_of(root: Path, ticket: str, front: dict) -> dict:
     # is no missing decision. It is listed as no longer standing (ARCHIVED) and never applied.
     from gov.util import archive as _archive
     archived = _archive.read(Path(root)) or {}
-    missing = sorted((found for found in declared if found not in entries and found not in archived), key=_number)
-    if missing:
-        raise GovError(NOT_FOUND, f"{ticket} names {', '.join(missing)} in its sources or decisions, and the decision "
-                                  f"register {register['path']} of HEAD does not hold "
-                                  f"{'it' if len(missing) == 1 else 'them'}; nothing is closed or recorded",
-                       {"ticket": ticket, "missing": missing, "register": register["path"]})
     for found in every:
         entry = entries.get(found)
         if entry is None and found in archived:

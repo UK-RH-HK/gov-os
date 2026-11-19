@@ -7,9 +7,6 @@ from __future__ import annotations
 
 import hashlib
 
-import pytest
-
-from gov.cli.errors import GovError
 from gov.close import decisions
 
 TICKET = "T-0001"
@@ -63,13 +60,12 @@ def test_a_decision_that_no_longer_stands_is_listed_with_its_state_and_never_app
     assert [item["id"] for item in found["inputs"]] == found["applied"]
 
 
-def test_a_decision_of_sources_or_decisions_the_register_lacks_refuses_naming_each(repo):
+def test_a_decision_of_sources_or_decisions_the_register_lacks_is_unresolved_and_nothing_refuses(repo):
     root = _project(repo, _entry(110))
-    with pytest.raises(GovError) as refused:
-        decisions.decisions_of(root, TICKET, {"sources": ["DEC-999", "DEC-110"], "decisions": ["DEC-998"]})
-    assert refused.value.code == decisions.NOT_FOUND == "DECISION_NOT_FOUND"
-    assert refused.value.details["missing"] == ["DEC-998", "DEC-999"] and refused.value.details["ticket"] == TICKET
-    assert TICKET in refused.value.message and "DEC-998" in refused.value.message and "DEC-999" in refused.value.message
+    found = decisions.decisions_of(root, TICKET, {"sources": ["DEC-999", "DEC-110"], "decisions": ["DEC-998"]})
+    assert found["applied"] == ["DEC-110"] and found["unresolved"] == ["DEC-998", "DEC-999"]
+    assert found["not_standing"] == [] and [item["id"] for item in found["inputs"]] == ["DEC-110"]
+    assert not hasattr(decisions, "NOT_FOUND")
 
 
 def test_a_decision_only_in_a_kpi_line_the_register_lacks_is_unresolved(repo):

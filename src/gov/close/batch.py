@@ -735,15 +735,9 @@ def run_scoped(root: Path, tickets: list[str], timeout: float = 3600) -> tuple[d
         raise GovError(_select.SELECTION_REFUSED, f"landed at {land[:12]} but nothing closed: {refused.reason}",
                        result, exit_code=EXIT_RED)
     # W2-200 (DEC-1214 M1): each landed ticket's decisions, from its own sources and the land commit's register, as
-    # every close records them; a cited decision the register lacks refuses before any close record is written
-    try:
-        decided = {t: _decisions.record_fields(root, t, frontmatter(root / TICKETS_REL / f"{t}.md") or {})
-                   for t in result["landed"]}
-    except GovError as refused:
-        if refused.code != _decisions.NOT_FOUND:
-            raise
-        raise GovError(refused.code, f"landed at {land[:12]} but nothing closed: {refused.message}",
-                       {**result, **refused.details}, exit_code=EXIT_RED)
+    # every close records them; nothing refuses here (an id no register holds is recorded unresolved)
+    decided = {t: _decisions.record_fields(root, t, frontmatter(root / TICKETS_REL / f"{t}.md") or {})
+               for t in result["landed"]}
     runs = result.get("rest_runs") or result.get("runs") or []
     night = _attribution.nightly_reading(root)
     clone = result["clone"]

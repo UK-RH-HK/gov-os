@@ -182,8 +182,8 @@ def run(root: Path, args, config: dict):
     _check_tree(root, ticket)
     _check_store(root)
     _batch.check_red_run(root)  # W2-68: on the code of a red batch run, the close waits for a green run
-    # W2-200 (DEC-1214 M1): the decisions the ticket cites, resolved in HEAD's register by id; a cited decision the
-    # register lacks refuses here (DECISION_NOT_FOUND), before any gate runs and before anything is written
+    # W2-200 (DEC-1214 M1): the decisions the ticket cites, resolved in HEAD's register and its archive by id; an id
+    # neither holds is recorded unresolved (nothing refuses here)
     decided = _decisions.record_fields(root, ticket, front)
     if owner_decision:
         state = _state.lift_escalation(root, ticket, owner_decision, state, settings.get(REGISTER_KEY))
@@ -1968,7 +1968,7 @@ def _run_scoped(root: Path, args, config: dict):
     workers = _workers(settings)
     _gates.take_back_interrupted(root, ticket, _close_record_rel(ticket))
     _check_tree(root, ticket)
-    decided = _decisions.record_fields(root, ticket, front)  # W2-200: refuses (DECISION_NOT_FOUND) before any run
+    decided = _decisions.record_fields(root, ticket, front)  # W2-200: the decisions the record states
     commit = _git(root, "rev-parse", "HEAD").strip()
 
     chosen = _selection(root, ticket)

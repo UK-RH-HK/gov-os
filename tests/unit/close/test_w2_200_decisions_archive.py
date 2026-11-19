@@ -1,12 +1,9 @@
 """Builder tests, a fix at the land of W2-200 beside W2-203 (2026-11-19): a decision the register no longer holds
-because it is in the archive (EMERGENCY-2 11.3) is history, not a missing decision. The close does not refuse it; it
-lists it as no longer standing, marked archived, and never applies it. An id in neither file still refuses.
+because it is in the archive (EMERGENCY-2 11.3) is history: the close lists it as no longer standing, marked archived,
+and never applies it. An id in neither file is unresolved; nothing refuses (S6 as amended at the land).
 """
 from __future__ import annotations
 
-import pytest
-
-from gov.cli.errors import GovError
 from gov.close import decisions
 
 TICKET = "T-0001"
@@ -43,15 +40,13 @@ def test_an_archived_decision_named_only_in_a_kpi_line_is_archived_not_unresolve
     assert found["not_standing"] == [{"id": "DEC-150", "status": "ARCHIVED"}] and found["unresolved"] == []
 
 
-def test_an_id_in_neither_the_register_nor_the_archive_still_refuses_naming_only_it(repo):
+def test_an_id_in_neither_the_register_nor_the_archive_is_unresolved_beside_an_archived_one(repo):
     root = _project(repo, _entry(110), _entry(150))
-    with pytest.raises(GovError) as refused:
-        decisions.decisions_of(root, TICKET, {"sources": ["DEC-150", "DEC-999", "DEC-110"]})
-    assert refused.value.code == "DECISION_NOT_FOUND" and refused.value.details["missing"] == ["DEC-999"]
+    found = decisions.decisions_of(root, TICKET, {"sources": ["DEC-150", "DEC-999", "DEC-110"]})
+    assert found["unresolved"] == ["DEC-999"] and found["applied"] == ["DEC-110"]
+    assert found["not_standing"] == [{"id": "DEC-150", "status": "ARCHIVED"}]
 
 
-def test_without_an_archive_a_missing_decision_refuses_as_before(repo):
+def test_without_an_archive_a_missing_decision_is_unresolved(repo):
     root = _project(repo, _entry(110), None)
-    with pytest.raises(GovError) as refused:
-        decisions.decisions_of(root, TICKET, {"sources": ["DEC-150"]})
-    assert refused.value.details["missing"] == ["DEC-150"]
+    assert decisions.decisions_of(root, TICKET, {"sources": ["DEC-150"]})["unresolved"] == ["DEC-150"]
