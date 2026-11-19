@@ -22,10 +22,11 @@ REPO = Path(__file__).resolve().parents[3]
 KERNEL_REL = "template/governance/kernel/skills/judging-work/SKILL.md"
 ADOPTED_REL = "governance/kernel/skills/judging-work/SKILL.md"
 PRELOADED_REL = ".claude/skills/judging-work/SKILL.md"
-# The approved text's bytes (the trimmed text of ef82e15fa) and its sections 1 to 3: the approval is on the committed
-# bytes, so these two stay pinned; every version a test names is read from the file instead (version_in).
-APPROVED_SHA = "34ae6c218ab35191e3e5ac3e3443a0118b86017a91d94b8adb5919ce76f3a4d5"
-SECTIONS_SHA = "9844057dfd42a23da972e805a40aee0fd7c498a2b5daf2186bfca1049a9d9d98"
+# The approved text's bytes (version 1.2.0, W2-208's text agreeing with the kit's head, approved by the CTO by naming
+# it, DEC-1217 (7)) and its sections 1 to 3: the approval is on the committed bytes, so these two stay pinned; every
+# version a test names is read from the file instead (version_in).
+APPROVED_SHA = "8f05fbead54ba3f58af1358339bcec3dcfb282a60d777c14a6ff295c4b432762"
+SECTIONS_SHA = "0e55e871d4027d71a80d9f35c6524d58caa05196abc660f6133ab6d334765e68"
 
 T0 = """---
 name: brief
