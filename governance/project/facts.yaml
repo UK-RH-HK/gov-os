@@ -40,11 +40,8 @@ commands:
   retrieve:
     run: 'gov retrieve --root {STORE_TREE} "<question>"'
     check: 'gov retrieve --help'
-  context:
-    run: 'gov context {ID} --role {WORKER_ROLE}'
-    check: 'gov context --help'
   brief:
-    # the owner's Emergency 2: a worker's brief is built by gov brief, not gov context
+    # the owner's Emergency 2: a worker's brief is built by gov brief
     run: 'gov brief {WORKER_ROLE} {ID}'
     check: 'gov brief --help'
   links:
@@ -92,9 +89,6 @@ commands:
   checkpoint:
     run: 'gov checkpoint --ticket {ID} --trigger ticket-transition --next "{NEXT}"'
     check: 'gov checkpoint --help'
-  context_ceiling:
-    run: 'gov context {ID} --json'
-    check: 'gov context --help'
   keyword_warn:
     run: 'python3 {TOOLS}/keyword_warn.py {TREE}'
     check: 'python3 -I -c "import ast, sys; ast.parse(open(sys.argv[1]).read())" /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/keyword_warn.py'
@@ -150,10 +144,10 @@ steps:
     line: 'Before every heavy run and at the end, give {CMD:scratch_size} and {CMD:scratch_inodes} in `evidence` [DEC-898].'
     match: 'du -s'
   context_ceiling:
-    # off: the owner's Emergency 2 (2026-11-16): gov context out of the lead steps
+    # off: gov context is retired (DEC-1214 M1); the lead templates still carry {STEP:context_ceiling}
     "on": false
-    line: 'Before DONE, run {CMD:context_ceiling} once; on CONTEXT_OVER_CEILING return the figures and a package naming what to trim [DEC-1027].'
-    match: 'gov(\.cli\.main)? context \S+ --json'
+    line: 'No size ceiling is checked before DONE: the close records the decisions the ticket cites [DEC-1214 M1].'
+    match: 'context_ceiling'
   checkpoint_record:
     # off: DEC-511 lifted by DEC-1057 (no committed `gov checkpoint` record per round, R-6).
     "on": false
@@ -175,7 +169,6 @@ budgets:
   role-reviewer: 3500
   role-lead: 8000
   role-cto: 6000
-  close_context_tokens: 65536  # tokens: the close's context packet ceiling (DEC-1165 (1)); the others count characters
 
 # The tools a launched session runs without asking: launch_worker.sh's --allowedTools (the reviewer: no Edit, Write).
 harness_allowed:
