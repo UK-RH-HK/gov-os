@@ -112,11 +112,30 @@ def ticket_class(root: str, front: dict) -> str:
     return max(found, key=CLASSES.index, default=data["default"])
 
 
+def _worktrees(root: str) -> list:
+    """The repository's other worktrees (a lead writes its feature as a ticket on its own branch, so the ticket is in
+    its worktree before it is in the project's own ``.tickets/``); none when git cannot say."""
+    try:
+        import subprocess
+        out = subprocess.run(["git", "-C", root, "worktree", "list", "--porcelain"], capture_output=True, text=True,
+                             timeout=10)
+        if out.returncode != 0:
+            return []
+        here = os.path.realpath(root)
+        paths = [line[len("worktree "):] for line in out.stdout.splitlines() if line.startswith("worktree ")]
+        return [path for path in paths if os.path.realpath(path) != here]
+    except Exception:
+        return []
+
+
 def ticket_front(root: str, ticket: str) -> dict:
     rel = f".tickets/{ticket}.md"
     try:
         import yaml
-        with open(os.path.join(root, rel), encoding="utf-8") as f:
+        path = os.path.join(root, rel)
+        if not os.path.isfile(path):  # the project's own ticket wins; else the first worktree that holds it
+            path = next((p for p in (os.path.join(tree, rel) for tree in _worktrees(root)) if os.path.isfile(p)), path)
+        with open(path, encoding="utf-8") as f:
             lines = f.read().splitlines()
         if not lines or lines[0].strip() != "---":
             raise ValueError
