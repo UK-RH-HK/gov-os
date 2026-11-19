@@ -3,6 +3,13 @@
 # One entry per tool: name, version, sha256, install, uninstall, date, approved_by (the schema is
 # template/governance/kernel/schemas/tool-registry.schema.json). `note` is free text.
 #
+# Who approves an install (the owner, DEC-1214 G7 (c), 2026-11-18): the CTO approves and records every install, so
+# nothing outside the work's scope or beyond the machine's capacity is installed; sudo stays the owner's. A lead or a
+# worker that needs a tool names it in its return or in a message to the CTO (the tool, the version, why the work needs
+# it, its size on disk and in memory); the CTO checks the scope and the capacity, installs it or refuses, and adds the
+# entry here with `approved_by: "CTO (DEC-1214 G7)"` and, in `note`, the work it serves. Entries before that date carry
+# the owner's decision that approved them. An install that needs sudo goes to the owner as one line.
+#
 # sha256 (DEC-196): the one downloaded artefact (npm tarball, release tarball, distribution package), or the binary
 # itself for a single-file tool. The ten stack pins of ADR-0002 §2 (DEC-074, DEC-195) carry the digests S0b2
 # recorded on 2026-09-30: the binary for a single-file tool, and the installed entry script for openspec,

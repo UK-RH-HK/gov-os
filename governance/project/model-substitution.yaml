@@ -1,0 +1,14 @@
+# The owner's temporary model substitution (2026-11-18 night, DEC-1215): every role that runs Opus by the rubric (the
+# CTO, the EXAMIN CTO, C3 roles) runs Claude Fable 5.2 at high effort instead, until the weekly reset (Sunday
+# 2026-11-22 09:00 London) or until the owner's two Fable resets are used, whichever comes first. Sonnet roles stay on
+# Sonnet. The memory measure's reader and grader stay as DEC-1098 defines them (not substituted).
+# Read by gov launch (src/gov/launch/role.py: substitute) and the helper model rule (.claude/hooks/agent_model.py).
+# REVERT: set `active: false` (or let `until` pass: the substitution then stops by itself); then the CTO and EXAMIN CTO
+# start scripts go back to claude-opus-5-5 (governance/project/orchestration/tools/start_cto.sh and the EXAMIN one), and
+# the CTO records the revert in the register under DEC-1215.
+active: true
+from: claude-opus-5-5
+to: claude-fable-5-2
+effort: high
+until: "2026-11-22T09:00:00+00:00"
+decided: "DEC-1215 (the owner, 2026-11-18 night)"

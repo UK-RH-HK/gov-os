@@ -29,6 +29,7 @@ Before grepping for a concept: `gov retrieve --root /home/usain/gov-os-worktrees
 ## Rules that stay
 - Kernel and instruction text (templates, skills, role files) changes when your brief says so: the CTO approved it by naming it (§3.5).
 - A known bug you meet in a feature outside your brief: note it in your return; don't fix it.
+- **Installs (the owner, DEC-1214 G7):** you install nothing outside your worktree's own venv or folders. A tool the work needs: name it in your return or message the CTO (the tool, the version, why, its size); the CTO approves and records it in `governance/project/tool-registry.yaml`, or refuses. `sudo` is the owner's.
 - Commit trailers, one final paragraph:
 ```
 Class: F

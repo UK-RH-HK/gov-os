@@ -45,15 +45,6 @@ W2_92_ADOPTION = "3679ca0ba"
 AUDIT_HEADS = {FIRST: "2f9c80b1f", SECOND: "ce7f10eb8a2a"}
 EIGHT = [("DEC-853", "DEC-884"), ("DEC-1050", "DEC-1057"), ("DEC-120", "DEC-173"), ("DEC-724", "DEC-860"),
          ("DEC-056", "DEC-017"), ("DEC-072", "DEC-064"), ("DEC-162", "DEC-156"), ("DEC-1053", "DEC-880")]
-# Pairs (changed, changer) that gov links reports now and the clean-up's head did not: the owner's approvals after it
-# put a ``Changes:`` mark on an older entry. DEC-1211 (EMERGENCY-2.md v3 approved) marks DEC-1205, DEC-1207 (2),
-# DEC-1203 (1), DEC-820, DEC-313, DEC-314, DEC-1082 and DEC-1128; DEC-1212 (the model rule) marks DEC-1120's table
-# and DEC-1183 (4). They are real changes the owner approved, not drift to repair. Only the two cases that read the
-# live head accept them; the record's judged-wrong and drift-run blocks stay pinned to the clean-up's own head.
-OWNER_APPROVED_AFTER = {("DEC-313", "DEC-1211"), ("DEC-314", "DEC-1211"), ("DEC-820", "DEC-1211"),
-                        ("DEC-1082", "DEC-1211"), ("DEC-1128", "DEC-1211"), ("DEC-1203", "DEC-1211"),
-                        ("DEC-1205", "DEC-1211"), ("DEC-1207", "DEC-1211"), ("DEC-1120", "DEC-1212"),
-                        ("DEC-1183", "DEC-1212")}
 BLOCKS = ["commits", "ids-87", "census", "archive-13", "judged-wrong", "audits", "comparison", "patch-a0",
           "patch-a1", "patch-a2", "patch-b1", "patch-sources-2", "patch-marks-3", "trailer-residuals", "recount",
           "drift", "drift-run", "counts-before", "counts-after", "closed-missing", "no-record", "dec-1123-linked",
@@ -667,6 +658,42 @@ def variant_register(commit: str) -> str:
 def commit_all(tree: Path, message: str) -> None:
     git("add", "-A", cwd=tree)
     git("commit", "-q", "-m", message, cwd=tree)
+
+
+def owner_decided(line: str) -> bool:
+    """Whether a status line records the owner's decision: ``ACCEPTED (owner`` or a ``Decided-by: owner`` trailer."""
+    rest = line[len(PFX):] if line.startswith(PFX) else line
+    return rest.startswith("ACCEPTED (owner") or re.search(r"Decided-by: owner\b", line) is not None
+
+
+def not_owner_marked(pairs, register_text: str) -> list[tuple[str, str]]:
+    """The ``(changed, changer)`` pairs whose changer is not recorded as the owner's decision in ``register_text``.
+
+    A pair whose later decision (the changer) is the owner's is a marked change by rule: the owner approved the
+    change when he decided. A changer the register does not hold counts as not the owner's."""
+    lines = {entry: line for entry, _, line in entries(register_text)}
+    return sorted(pair_ for pair_ in pairs if not owner_decided(lines.get(pair_[1], "")))
+
+
+CLASS_SEGMENT = " \u00b7 **Class:**"
+
+
+def outside_marks_problem(old: str, new: str, census_ids) -> str | None:
+    """Why a status-line change made outside a marks commit is refused, or ``None`` when it is allowed.
+
+    It must keep the old line whole (an append) and its appended tail must name none of ``census_ids`` (the census
+    changers of that entry). The ids inside the appended `` \u00b7 **Class:** ...`` segment (from that text to the end of
+    the line, the form ``docs/emergency-2/audits/08-apply.py`` writes) are audit 8's classification of the entry
+    (DEC-1214 G4), not a clean-up mark, and do not count."""
+    if not new.startswith(old):
+        return "edited outside a marks commit, not an append"
+    tail = new[len(old):]
+    cut = tail.find(CLASS_SEGMENT)
+    if cut != -1:
+        tail = tail[:cut]
+    if set(ids_in(tail)) & set(census_ids):
+        return "a census pair marked outside a marks commit"
+    return None
 
 
 def by_pair(findings: list[dict], code: str = "UNMARKED_CHANGE") -> dict:

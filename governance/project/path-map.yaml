@@ -136,8 +136,7 @@ namespaces:
     provenance: the retiring CTO's records, archived by the owner's Emergency 2 (2026-11-17)
     deletion_rebuild: authoritative; restored from git only
   # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
-  # orchestration record moved to the branch record/w2; only its searchable part (the README, the sync script,
-  # packages, session summaries and the checkpoint copy) stays in this tree, under this namespace.
+  # orchestration record moved to the branch record/w2; only its searchable part (the README, packages, session summaries and the checkpoint copy) stays in this tree, under this namespace.
   # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the overlay is embedded. Its sensitivity and export policy
   # stay as they are: the indexer reads embedding_policy only.
   project-overlay:
@@ -147,11 +146,10 @@ namespaces:
       - "governance/project/*"
       - "governance/project/briefs/**"
       - "governance/project/prompts/**"
-      # ACT-PATHMAP-NS-1 (DEC-1101 (1)): the walls' template (ACT-INDEP-WALLS-1) and the operator agent's install (W2-148)
+      # ACT-PATHMAP-NS-1 (DEC-1101 (1)): the walls' template (ACT-INDEP-WALLS-1); the operator agent's install is gone (DEC-1214 G1)
       - "governance/project/indep-walls/**"
       # ACT-PATHMAP-NS-2 (DEC-1101, DEC-1113): the walled sessions' fixed briefs (ACT-W2-149-INSTALL-1)
       - "governance/project/indep-briefs/**"
-      - "governance/project/operator/**"
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
       # DEC-953 items 1 and 5: the build-phase close records

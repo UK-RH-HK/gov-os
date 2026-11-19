@@ -132,10 +132,7 @@ the baseline and closes each ticket that lands in the same step.
 
 ## The CTO's safety nets (DEC-991)
 
-- `permission_request.py`: a Claude Code `PermissionRequest` hook (ACT-QUIET-DENY-1, in the owner's local settings).
-  Between 02:00 and 07:30 it refuses, at once and with a message, a call that would ask the owner, and queues it in
-  `.gov-runtime/scratch/orchestrator/log/approval-queue.jsonl` for the 09:00 package; by day it says nothing (the
-  normal prompt appears). Any error inside the quiet hours still refuses.
+- `permission_request.py`, `stop_idle_check.py`, `stop_waiter_check.py` are retired (EMERGENCY-2 6.1, DEC-1214 G1; on `archive/pre-emergency-2`).
 - `deadman.py` (cron every 15 minutes, ACT-DEADMAN-1) and `win_toast.ps1`: alerts when the CTO session's last
   `assistant` entry is over 60 minutes old (2 hours in the quiet hours), naming a tool call left waiting. Channels:
   a Windows toast, a headless `claude -p` PushNotification, the pings log.

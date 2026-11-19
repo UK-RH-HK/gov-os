@@ -1,4 +1,5 @@
-"""The CTO's two safety nets (DEC-991): the quiet-hours PermissionRequest hook and the dead-man's switch. Planted
+"""The CTO's safety net (DEC-991): the dead-man's switch. (The quiet-hours PermissionRequest hook and its two cases
+are retired: EMERGENCY-2 6.1, DEC-1214 G1.) Planted
 inputs only: no real transcript, queue, notifier or cron is touched."""
 import json
 import os
@@ -7,32 +8,7 @@ import sys
 from pathlib import Path
 
 TOOLS = Path(__file__).resolve().parents[3] / "governance/project/orchestration/tools"
-HOOK, DEADMAN = TOOLS / "permission_request.py", TOOLS / "deadman.py"
-
-
-def hook(clock, stdin, queue):
-    env = dict(os.environ, GOV_QUIET_NOW=clock, GOV_QUIET_QUEUE=str(queue))
-    return subprocess.run([sys.executable, str(HOOK)], input=stdin, capture_output=True, text=True, env=env)
-
-
-def test_the_hook_refuses_and_queues_inside_the_quiet_hours_only(tmp_path):
-    q = tmp_path / "q.jsonl"
-    call = json.dumps({"tool_name": "Bash", "tool_input": {"command": "rm -rf /tmp/x"}})
-    for clock in ("02:00", "03:00", "07:29"):
-        r = hook(clock, call, q)
-        out = json.loads(r.stdout)["hookSpecificOutput"]
-        assert r.returncode == 0 and out["hookEventName"] == "PermissionRequest"
-        assert out["decision"]["behavior"] == "deny" and "DEC-991" in out["decision"]["message"]
-    for clock in ("01:59", "07:30", "12:00", "23:59"):
-        r = hook(clock, call, q)
-        assert r.returncode == 0 and r.stdout.strip() == ""  # the normal prompt appears
-    lines = [json.loads(x) for x in q.read_text().splitlines()]
-    assert [x["quiet"] for x in lines] == [True] * 3 + [False] * 4 and lines[0]["what"] == "rm -rf /tmp/x"
-
-
-def test_the_hook_still_refuses_at_night_on_bad_input_or_an_unwritable_queue(tmp_path):
-    r = hook("03:00", "not json", tmp_path / "missing-dir" / "q.jsonl")
-    assert json.loads(r.stdout)["hookSpecificOutput"]["decision"]["behavior"] == "deny"
+DEADMAN = TOOLS / "deadman.py"
 
 
 def transcript(path, entries):

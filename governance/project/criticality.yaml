@@ -4,7 +4,7 @@ version: 1
 default: C2                    # the class when no rule matches
 opus: claude-opus-5-5          # the Opus model a promotion and a FULL ticket's probe use
 rules:
-  # C3: the guard, permissions, the path map, hidden sets, the operator agent, the kernel and the Contract
+  # C3: the guard, permissions, the path map, hidden sets, the kernel and the Contract (the operator agent's folder is gone: DEC-1214 G1)
   - class: C3
     paths:
       - "src/gov/guard/*"
@@ -16,7 +16,6 @@ rules:
       - "governance/project/path-map.yaml"
       - "governance/project/held-out.yaml"
       - "fixtures/evaluation/*/hidden/*"   # hidden sets: the path map's hidden halves
-      - "governance/project/operator/*"
       - "template/governance/kernel/*"
       - "governance/kernel/*"
       - "docs/contract/*"
