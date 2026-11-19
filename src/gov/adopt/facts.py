@@ -7,7 +7,8 @@ exists is never touched.
 
 ``write_queue_settings`` (W2-202 A5; L2 section 2) writes ``governance/project/queue.yaml`` where the repository has
 none: the settings ``gov queue`` lands by (the integration branch, the form of a ticket's work branch). The landing
-is the close, so no ``close.yaml`` is written.
+is the close, so no ``close.yaml`` is written. ``gov adopt --facts`` calls it with the facts file it writes: a
+repository that has its own facts file is left wholly as it is (W2-174 S5).
 """
 
 from __future__ import annotations

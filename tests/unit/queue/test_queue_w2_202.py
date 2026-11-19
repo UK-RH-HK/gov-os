@@ -262,5 +262,19 @@ def test_adopt_facts_writes_queue_yaml_where_absent_and_no_close_yaml(tmp_path):
     assert command._settings(tmp_path) == {"integration": "main", "work_branch": "{ticket}"}
     assert not (tmp_path / "governance" / "project" / "close.yaml").exists()
     settings.write_text("integration: develop\n", encoding="utf-8")
+    (tmp_path / "governance" / "project" / "facts.yaml").unlink()
     assert subprocess.run(command_line, capture_output=True, text=True, env=env).returncode == 0
-    assert settings.read_text() == "integration: develop\n"
+    assert settings.read_text() == "integration: develop\n"  # a present queue.yaml is left as it is
+    assert (tmp_path / "governance" / "project" / "facts.yaml").is_file()
+
+
+def test_adopt_facts_leaves_a_repository_with_its_own_facts_file_wholly_as_it_is(tmp_path):
+    env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "src")}
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    own = tmp_path / "governance" / "project" / "facts.yaml"
+    own.parent.mkdir(parents=True)
+    own.write_text("paths: {main: '.'}\n", encoding="utf-8")
+    done = subprocess.run([sys.executable, "-m", "gov.cli.main", "adopt", "--facts", "--root", str(tmp_path),
+                           "--json"], capture_output=True, text=True, env=env)
+    assert done.returncode == 0, done.stdout + done.stderr
+    assert sorted(p.name for p in own.parent.iterdir()) == ["facts.yaml"]
