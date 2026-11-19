@@ -194,8 +194,10 @@ record `docs/close/<ticket>/CL-<ticket>.md` one entry of its front-matter key `f
 none; each entry `{line, branch, tip, tested, landed}`: the `Fix:` line, the branch name, its tip, the tested commit, the
 UTC time) and one body line `- fix landed: <line> (<branch> @ <tip12>)`, keeping everything else of the record as it was;
 where the ticket has no close record, one is written with `fixes` only the way the landing writes a record, and nothing
-else of a first close. The answer's `closes` entry for it adds `fix: true` and `fix_line`; `queue.json` and the dry run's
-answer say the same (a dry run changes nothing and appends nothing); a landed feature's entry is as today. A second fix on
+else of a first close. The answer's `closes` entry for it adds `fix: true` and `fix_line`; `queue.json` says the same. The
+dry run's `closes` stays empty for an ordinary ticket (W2-206) and holds only the entry each fix would get, with `commit`
+and `close_record` null, `fix: true` and `fix_line` (a dry run changes nothing and appends nothing); a landed feature's
+entry is as today. A second fix on
 the same ticket lands the same way and appends a second entry. A fix `Fix:` trailer on an `open` or `in_progress` ticket's
 branch is an ordinary landing (the ticket closes as today; no `fixes` entry). Verify: planted branches through `gov queue`
 and its `--dry-run` on W2-115b's planted project with a closed ticket that has an acceptance folder: (a) a fix branch
