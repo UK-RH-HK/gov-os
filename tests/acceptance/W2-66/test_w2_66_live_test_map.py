@@ -37,7 +37,6 @@ CODE_SUFFIXES = (".py", ".sh", ".js", ".ts", ".toml", ".cfg", ".ini")
 # (I2 F6, I3 F5, I4 F6, I1 §4.1), filtered by KPI 5's rule. ``(target, whole)``: ``whole`` targets must be held
 # whole; the others by any entry within them (the reports name only some of their cases).
 RECORD_READERS = (
-    ("tests/acceptance/W1-06/test_w1_06_approvals.py", True),          # gate (f): the register's approvals
     ("tests/acceptance/W1-08/test_w1_08_path_map.py", True),           # gate (f)
     ("tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py", True), # gate (f): scans the tree
     ("tests/acceptance/W1-07/test_w1_07_envelope.py", True),           # gate (f): every command on the tree
@@ -51,15 +50,15 @@ RECORD_READERS = (
     ("tests/acceptance/W2-02/test_w2_02_green_here.py", True),         # I4 F6: .tickets/ and docs/
     ("tests/acceptance/W1-08/test_w1_08_ticket.py", True),             # I4 F6: the ticket files
     ("tests/acceptance/W1-08/test_w1_08_probe.py", True),              # I4 F6: the probe records
-    ("tests/acceptance/W1-06/test_w1_06_install_approvals.py", True),  # I4 F6: the register's approvals
     ("tests/acceptance/W1-07/test_w1_07_config.py", True),             # I4 F6: the tickets
     ("tests/acceptance/W1-07/test_w1_07_config_details.py", True),     # I4 F6: the tickets
     ("tests/acceptance/W1-27/test_w1_27_doctor.py", True),             # I4 F6: the whole tree's text
-    ("tests/acceptance/W1-42", False),                                 # I2 F6: the tickets, the exit record
     ("tests/acceptance/W1-26/test_w1_26_probe_records.py", False),     # I2 F6: docs/probes
     ("tests/acceptance/W1-48", False),                                 # I2 F6: the register's approvals
 )
 
+# Rewrite-Reason: DEC-1220 (1), TI-6 and the settled rows: the record readers and couplings that named W1-06's approvals, W1-42 and
+# W1-05's switch_over_record (all retired) are out of these lists, as in the test map.
 # Rewrite-Reason: DEC-1050 (T-4, with the CTO's correction R1-22). W2-54's green-here file was held whole; T-4 took
 # out of the record-reading set its three cases that start a whole ``gov check`` (they take the ``gov_check_here``
 # fixture; they run in the full suite only). Every other case of the file is still a reader held case by case, and
@@ -87,8 +86,6 @@ EVERY_CLOSE = ("tests/acceptance/W1-07/test_w1_07_envelope.py", "tests/acceptanc
 
 # KPI 3's couplings and the synthesis's §4 lines: (a tracked path the coupling reads, the suites it must reach).
 COUPLINGS = (
-    ("src/gov/cli/main.py", ("tests/acceptance/W1-42",)),                                  # text read
-    ("template/governance/kernel/templates/brief-lead.md", ("tests/acceptance/W1-42",)),   # text read
     (support.SERIAL_ONLY_REL, ("tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",)),  # text read
     ("src/gov/retrieval/rerank_worker.py", ("tests/acceptance/W1-19/test_w1_19_real_models.py",
                                              "tests/acceptance/W1-21/test_w1_21_dev_tier.py",
@@ -438,7 +435,7 @@ W1_28_SCANNING_CASES = ("test_the_check_finds_the_copying_fixtures_of_the_earlie
 # folder: (kind, path, whether the path is tracked today).
 W1_28_SCANNED = (
     ("conftest", "tests/acceptance/W1-05/conftest.py", True),
-    ("test-file", "tests/acceptance/W1-05/test_w1_05_switch_over_record.py", True),
+    ("test-file", "tests/acceptance/W1-05/test_w1_05_role_subagents.py", True),
     ("support-module", "tests/acceptance/W1-05/w1_05_support.py", True),
     ("other-module", "tests/acceptance/W1-50/w1_50_freeze_lift.py", True),
     ("new-suite-folder", "tests/acceptance/W3-99/test_w3_99_first.py", False),

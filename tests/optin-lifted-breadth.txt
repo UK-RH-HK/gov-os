@@ -7,12 +7,6 @@
 # Each suite's README holds its KPI map after the cut (every kept line names the case that covers it).
 # Written by the cut's designer (part B); regenerate rather than edit by hand. Never delete these cases (DEC-953).
 
-# acceptance/W1-06
-tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_an_install_of_this_ticket_is_not_dated_before_its_approval  # cap
-tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_ccusage_install_command_is_the_approved_one  # cap
-tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_ccusage_uninstall_command_uses_the_same_npm  # cap
-tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_a_stack_pin_cites_dec_074  # cap
-tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_pyyaml_cites_dec_191  # cap
 # DEC-1103 (2): back in the gates (the cap lifted for this case: K18c of the P-SELECT-GRAPH trial reded it); was: tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool  # cap
 tests/acceptance/W1-06/test_w1_06_pins.py::test_superpowers_is_recorded_at_v6_4_2  # cap
 tests/acceptance/W1-06/test_w1_06_pins.py::test_pyyaml_is_recorded_at_6_0_1  # cap
@@ -36,7 +30,6 @@ tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_scratch_clone_is_deleted  
 tests/acceptance/W1-06/test_w1_06_vendor_digest.py::test_the_digest_rule_gives_the_value_worked_out_by_hand  # cap
 tests/acceptance/W1-06/test_w1_06_vendor_digest.py::test_the_superpowers_sha256_is_the_digest_of_the_committed_vendor_folder  # cap
 rep: tests/acceptance/W1-06/test_w1_06_digests.py  # one row per parametrised function
-rep: tests/acceptance/W1-06/test_w1_06_install_approvals.py  # one row per parametrised function
 
 # acceptance/W1-07
 tests/acceptance/W1-07/test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve  # cap
