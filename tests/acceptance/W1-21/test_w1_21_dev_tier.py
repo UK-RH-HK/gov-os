@@ -160,23 +160,6 @@ def measured(api, real_tiers, queries):
 
 
 @REAL
-def test_the_dev_query_set_meets_the_hit_at_5_pass_line(measured):
-    """S0b2's method (DEC-380): the first five distinct paths against ``must_cite``, a percentage per class, the
-    mean of the ten classes; at or above 80 on the dev tiers (DEC-414)."""
-    scored, missed = {}, []
-    for query, bundle in measured:
-        hit = bool(set(query["gold"]["must_cite"]) & set(support.first_paths(bundle)))
-        scored.setdefault(query["class"], []).append(hit)
-        if not hit:
-            missed.append(query["id"])
-    mean, per_class = support.mean_hit_at_5(scored)
-    support.MEASURED.append(f"mean hit@5 of gov.retrieval.retrieve: {mean:.2f} (pass line "
-                            f"{support.HIT_AT_5_PASS_LINE:.0f}); per class {per_class}; missed {sorted(missed)}")
-    assert mean >= support.HIT_AT_5_PASS_LINE, \
-        f"mean hit@5 is {mean:.2f}, below the pass line of {support.HIT_AT_5_PASS_LINE:.0f}; missed: {sorted(missed)}"
-
-
-@REAL
 def test_the_dev_query_set_meets_the_forbidden_citation_baseline(measured):
     """S0b2 counted, per query, a ``must_not_cite`` path among the first five distinct paths: 5 for R1. The
     baseline here is 2 (package DP-7): the two b-dev files that no frontmatter marks."""

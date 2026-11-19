@@ -22,18 +22,9 @@ Table 2's Q09 is matched by the retired original, kept unchanged in ``retired/q0
 item 4, superseded by DEC-1033, so its question names the launch gate's memory rule in force (DEC-961 item 1, the
 floor of DEC-947 item 5) and repeats no Table 2 query; Table 2's Q16 is matched by the retired original, kept
 unchanged in ``retired/q16-pre-dec1067.yaml``.
-Every source exists at this worktree's HEAD, every heading it gives is a line of that file there, and no source
-names lens B's report or ``fixtures/evaluation/**`` (failure KPI 4).
-A source whose path is the decision register (EMERGENCY-2 11.3, DEC-1214 G4; W2-203, 2026-11-19): the old register is
-archived whole at the path map's ``decision_register_archive`` and the register of HEAD holds the kept entries only,
-so such a source is resolved in the register of HEAD when its heading is a line there (the entry is kept, verbatim),
-else in the archive, where the old register's line n is line n plus the archive's header lines (checked against the
-commit that archived it). A source found in neither still fails by name. The fixtures are not changed: the gold that
-resolves only in the archive is history's, which memory does not index (the folder's README).
-Any other source whose file or heading is gone at HEAD (the CTO's ruling of 2026-11-19 on W2-200 and W2-205, which
-removed one source's file and re-worded another's heading): it is resolved at the question's own ``commit`` (the
-source's own where it names one, as the measure reads them); found there, it passes and is named in the case's notice
-list; found in neither, it still fails by name. The set is history's (DEC-1210: a fresh set for every measure).
+No source names lens B's report or ``fixtures/evaluation/**`` (failure KPI 4).
+(The case that every source and heading still exists at HEAD, with the register-archive and at-its-commit readings,
+is retired, DEC-1220 (1), TI-6: the set is history's, DEC-1210, a fresh set for every measure.)
 
 Red now: the folder does not exist.
 """
@@ -43,7 +34,6 @@ from __future__ import annotations
 import functools
 import subprocess
 import sys
-import warnings
 from pathlib import Path
 
 import pytest
@@ -385,106 +375,6 @@ def test_q16_is_relabelled_off_dec_798_and_the_original_is_kept_unchanged():
         "no source of q16 is DEC-961 item 1, the rule in force")
     assert any("The floor goes from 6.4 GiB to 3 GiB" in text for text in spans), (
         "no source of q16 is DEC-947 item 5, the floor")
-    assert not faults, "\n".join(faults)
-
-
-def _git(*args):
-    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), *args], capture_output=True, timeout=s.TIMEOUT_S)
-    return done.stdout.decode("utf-8", "replace") if done.returncode == 0 else None
-
-
-def _holds(source, text):
-    """The source is found in the text: its heading, when it gives one, is a line of it, and its lines, when it gives
-    them, are a span of it."""
-    heading, lines = source.get("heading"), source.get("lines")
-    return ((heading is None or _heading_found(text, str(heading)))
-            and (lines is None or _is_span(lines, text)))
-
-
-def _since(source, gone):
-    """The last commit that removed the file (``gone``) or took the heading out of it, as ``<sha> (<subject>)``, or
-    None when git does not name one: for the notice only, never for the verdict."""
-    how = ["--diff-filter=D"] if gone else ["-S" + str(source.get("heading"))]
-    found = _git("log", "-1", "--format=%h (%s)", *how, "HEAD", "--", source["path"]) or ""
-    return found.strip() or None
-
-
-def _at_its_commit(name, data, source):
-    """A source not found at HEAD, looked for at the question's own ``commit`` (the source's own where it names one,
-    as the measure reads them): the notice line when it is found there (what is gone at HEAD, the commit it is found
-    at and, where git names it, the commit that removed or re-worded it), else None."""
-    rel, heading = source["path"], source.get("heading")
-    commit = next((str(c).strip() for c in (source.get("commit"), data.get("commit")) if c and str(c).strip()), None)
-    then = _git("show", f"{commit}:{rel}") if commit else None
-    if then is None or not _holds(source, then):
-        return None
-    now = _at_head(rel)
-    if now is None:
-        what, by = f"{rel} is no file at HEAD", "removed"
-    elif heading is not None and not _heading_found(now, str(heading)):
-        what, by = f"heading {heading!r} is no line of {rel} at HEAD", "re-worded"
-    else:
-        what, by = f"lines {source.get('lines')!r} are no span of {rel} at HEAD", None
-    since = _since(source, now is None) if by else None
-    return f"{name}: {what}; found at its commit {commit}" + (f"; {by} by {since}" if since else "")
-
-
-def test_every_source_exists_at_head_and_every_heading_is_found_there():
-    """Every source's file is at HEAD, its heading a line of it and its lines a span of it. A source whose path is
-    the decision register (W2-203; EMERGENCY-2 11.3, DEC-1214 G4) is found in the register of HEAD when its entry is
-    kept there, else in the archived register: its heading is a line of one of the two, and its lines, written
-    against the register before the archive, are a span of the register of HEAD or, taken the archive's header lines
-    further on, of the archive. A register source found in neither is a fault by name.
-
-    Any other source whose file or heading is gone at HEAD (the CTO's ruling of 2026-11-19; W2-200 removed q04's
-    last alternative's file, W2-205 re-worded q20's heading) is looked for at the question's own ``commit``: found
-    there (the heading a line, the lines a span), it passes and is named in the notice list, which the case prints
-    and gives as one warning; found in neither, it is a fault by name. No fixture is re-anchored: the set is
-    history's (DEC-1210, a fresh set for every measure)."""
-    register, archive = _register_and_archive()
-    assert register == "docs/DECISION_REGISTER.md", f"the path map's decision_register is {register!r}"
-    faults, notices = [], []
-    for path in _files():
-        data = _load(path)
-        for source in _entries(data):
-            rel = source["path"]
-            heading, lines = source.get("heading"), source.get("lines")
-            text = _at_head(rel)
-            if rel != register:
-                if text is not None and _holds(source, text):
-                    continue
-                notice = _at_its_commit(path.name, data, source)
-                if notice is not None:
-                    notices.append(notice)
-                elif text is None:
-                    faults.append(f"{path.name}: {rel} is not a file at HEAD, nor found at the question's commit "
-                                  f"{data.get('commit')!r}")
-                else:
-                    if heading is not None and not _heading_found(text, str(heading)):
-                        faults.append(f"{path.name}: heading {heading!r} is not a line of {rel} at HEAD, nor found "
-                                      f"at the question's commit {data.get('commit')!r}")
-                    if lines is not None and not _is_span(lines, text):
-                        faults.append(f"{path.name}: lines {lines!r} are not a span of {rel} at HEAD, nor found at "
-                                      f"the question's commit {data.get('commit')!r}")
-                continue
-            if text is None:
-                faults.append(f"{path.name}: {rel} is not a file at HEAD")
-                continue
-            _, text, _ = _resolved(source)
-            if text is None:
-                what = f"heading {heading!r} is not a line" if heading is not None else f"lines {lines!r} are no span"
-                faults.append(f"{path.name}: {what} of {rel} at HEAD nor of its archive {archive}")
-                continue
-            archived = _archive()
-            spans = _is_span(lines, _at_head(rel)) or (archived is not None and _is_span(lines, *archived))
-            if lines is not None and not spans:
-                faults.append(f"{path.name}: lines {lines!r} are not a span of {rel} at HEAD nor, after its header, "
-                              f"of its archive {archive}")
-    if notices:
-        listed = "\n".join(notices)
-        print(f"NOTICE: {len(notices)} gold source(s) gone at HEAD, found at their question's commit:\n{listed}")
-        warnings.warn(f"{len(notices)} gold source(s) gone at HEAD, found at their question's commit "
-                      f"(the set is history's, DEC-1210):\n{listed}", stacklevel=1)
     assert not faults, "\n".join(faults)
 
 
