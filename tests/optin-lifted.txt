@@ -187,3 +187,14 @@ tests/unit/secrets_check/test_w2_107_cache.py  # the secrets scan, off here (DEC
 tests/unit/secrets_check/test_w2_107_engine.py  # the secrets scan, off here (DEC-1045)
 tests/unit/secrets_check/test_w2_107_record.py  # the secrets scan, off here (DEC-1045)
 tests/unit/secrets_check/test_w2_20_pool.py  # the secrets scan, off here (DEC-1045)
+
+# DEC-1214 G1: the guard lists (optin-lifted-guard*.txt) are retired with the guard; their cases now run by default
+# except these six rows, red when the lists were retired: the W2-33 `copy_folder` fixture (it copies the roles folder)
+# is read as a whole-tree copier and needs template/ in the planted root. Not the guard's: left opt-in as they were,
+# for the ticket that owns W1-28 and W1-50 to fix.
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-tracked]  # red: needs template/ in the planted root
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-untracked]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W2-33/w2_33_support.py::copy_folder]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W2-33/w2_33_support.py::copy_folder]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-permissions]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-deny-list]  # red: needs template/ in the planted root

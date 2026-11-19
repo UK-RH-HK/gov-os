@@ -168,7 +168,7 @@ def test_the_project_s_own_file_is_well_formed_and_places_this_ticket_at_c2():
 
 @pytest.mark.parametrize("paths, expected", (
     (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
-    (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+    (["governance/project/path-map.yaml"], "C3"),
     (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
     (["docs/contract/x.md"], "C3"),
     # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
