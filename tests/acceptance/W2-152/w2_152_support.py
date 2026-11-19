@@ -457,6 +457,14 @@ def judging_sections() -> str:
     return text[start:stop].strip()
 
 
+def judging_version() -> str:
+    """The installed judging-work skill's version, read from its front matter (top-level ``version``, else
+    ``metadata.version``), so a version bump of the skill moves no case."""
+    text = JUDGING_SKILL.read_text(encoding="utf-8")
+    front = yaml.safe_load(text.split("---", 2)[1])
+    return str(front.get("version") or front["metadata"]["version"])
+
+
 def golden(name: str) -> str:
     return normal((GOLDEN / name).read_text(encoding="utf-8"))
 
