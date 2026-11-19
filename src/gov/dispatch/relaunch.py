@@ -16,7 +16,7 @@ for the same ticket and boot makes the next death ``twice``, which is never rela
 with the ``gov`` the pass itself runs as; the text names the checkpoint's next step. The checkpoint is read, never
 written: a relaunch does not rewrite it.
 
-W2-201 fix X7 (DEC-1219 (5)): the relaunch starts the same kind the entry records (``kind``, ``kind_line``): a ``fix``
+A fix or a chore (DEC-1219 (5)): the relaunch starts the same kind the entry records (``kind``, ``kind_line``): a ``fix``
 is ``gov launch <role> <ticket> --fix "<line>" ...``, a ``chore`` is ``gov launch <role> --chore "<line>" ...`` with
 no ticket (its entry's ``ticket`` is its ``chore-<8 hex>`` label, passed nowhere, and it has no checkpoint: the text
 is ``FALLBACK_STEP``'s). A ``feature`` entry, or one with neither key, is launched as before.
@@ -136,7 +136,7 @@ def next_step(entry: dict) -> str:
 
 
 def text(entry: dict) -> str:
-    """The relaunched session's prompt; a chore has no checkpoint to read (W2-201 X7)."""
+    """The relaunched session's prompt; a chore has no checkpoint to read."""
     step = FALLBACK_STEP if entry.get("kind") == "chore" else next_step(entry)
     return f"Resume at the recorded next step ({entry.get('ticket')}): {step}"
 
@@ -144,7 +144,7 @@ def text(entry: dict) -> str:
 def spawn(place: Path, entry: dict) -> int:
     """Start the launch, detached; its pid. Its output goes to ``relaunch.log`` beside the state file."""
     kind, line = entry.get("kind"), entry.get("kind_line")
-    if kind == "chore":  # W2-201 X7: the chore's label is not a ticket
+    if kind == "chore":  # the chore's label is not a ticket
         what = ["--chore", str(line)]
     else:
         what = [str(entry["ticket"]), *(["--fix", str(line)] if kind == "fix" else [])]
