@@ -261,3 +261,27 @@ def quiet(result):
 def record_values(result, *keys):
     record = result.record()
     return {key: record.get(key, s.MISSING) for key in keys}
+
+
+# --------------------------------------------------------------------------
+# S9: the owner's temporary substitution file (DEC-1215), in the real file's form
+# --------------------------------------------------------------------------
+
+FABLE = "claude-fable-5-2"
+FABLE_NAMES = ("fable", FABLE)
+SUBSTITUTION_REL = "governance/project/model-substitution.yaml"
+FAR_FUTURE, LONG_PAST = "2099-01-01T09:00:00+00:00", "2020-01-01T09:00:00+00:00"
+# state -> (active, until); "none" plants no file
+SUBSTITUTION_STATES = {"active": (True, FAR_FUTURE), "inactive": (False, FAR_FUTURE), "past-until": (True, LONG_PAST)}
+SUBSTITUTION_OFF = ("none", "inactive", "past-until")
+
+
+def plant_substitution(project, state):
+    """``governance/project/model-substitution.yaml`` in ``project`` in one state of SUBSTITUTION_STATES (from Opus to
+    Fable, effort high, the keys of the real file); ``"none"`` plants nothing. Returns the project."""
+    if state != "none":
+        active, until = SUBSTITUTION_STATES[state]
+        data = {"active": active, "from": OPUS, "to": FABLE, "effort": "high", "until": until,
+                "decided": "DEC-1215 (W2-201 fixture)"}
+        b.write(Path(project) / SUBSTITUTION_REL, yaml.safe_dump(data, sort_keys=False))
+    return Path(project)
