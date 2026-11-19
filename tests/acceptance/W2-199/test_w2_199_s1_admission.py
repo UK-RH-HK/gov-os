@@ -55,18 +55,23 @@ def test_s1_a_load_exactly_at_start_below_holds_the_start(box):
     assert job.finish(timeout=10)[0] == 0
 
 
-def test_s1_the_load_plus_workers_times_margin_must_stay_within_the_limit(box):
-    # load 11.0 is under start_below (12), but 11.0 + 10 workers x margin 1.0 = 21 is over the limit of 20
+def test_s1_a_run_that_can_never_fit_workers_times_margin_within_the_headroom_is_held_by_the_start_threshold_alone(box):
+    # 10 workers x margin 1.0 is over load_limit - start_below (20 - 12 = 8): it can never fit, so only the start
+    # threshold holds it, and an idle machine always admits it
     box.load(11.0)
     job = box.start("a", hold=False, opts=("--workers", "10"))
-    assert job.held_for(2.0), "load 11 + 10 workers x 1.0 > 20: the start is held"
-    box.load(5.0)  # 5 + 10 = 15 <= 20
     job.must_start(3.0)
     assert job.finish(timeout=10)[0] == 0
-    box.load(11.0)
-    again = box.start("b", hold=False, opts=("--workers", "8"))  # 11 + 8 = 19 <= 20: no hold
-    again.must_start(3.0)
-    assert again.finish(timeout=10)[0] == 0
+    box.load(0.5)
+    idle = box.start("b", hold=False, opts=("--workers", "30"))
+    idle.must_start(3.0)
+    assert idle.finish(timeout=10)[0] == 0
+    box.load(12.5)  # over start_below: held whatever its workers
+    held = box.start("c", hold=False, opts=("--workers", "10"))
+    assert held.held_for(1.5), "load 12.5 is over start_below (12): the start is held"
+    box.load(5.0)
+    held.must_start(3.0)
+    assert held.finish(timeout=10)[0] == 0
 
 
 def test_s1_a_start_held_by_the_load_is_polled_until_the_reading_allows_it_not_once(box):

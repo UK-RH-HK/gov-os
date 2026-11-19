@@ -2,7 +2,7 @@
 
 ``governance/project/orchestration/tools/heavy_slot.sh`` (this branch's text) is a wrapper of at most 60 lines over
 ``gov resources --slot test`` (``--held <list>`` passes through): it keeps the callers' forms and exit codes (the command's
-own code, 0 included; the run's own failure to start is a code of the product's, never 213), maps ``GOV_HEAVY_SLOTS``,
+own code, 0 included; the run's own failure to start is a code of the product's, never 213), maps a caller's ``PYTEST_XDIST_AUTO_NUM_WORKERS`` to ``--workers``, ``GOV_HEAVY_SLOTS``,
 ``GOV_HEAVY_WORKERS``, ``GOV_HEAVY_START_BELOW``, ``GOV_HEAVY_PRIORITY``, ``GOV_HEAVY_PRIO_CAP`` to the product's, runs
 ``python3 -m gov.cli.main`` when ``PYTHONPATH`` names a source tree else ``gov``, and reads no ``heavy_slots.conf``; the
 command it runs sees ``PYTEST_XDIST_AUTO_NUM_WORKERS``, ``GOV_HEAVY_SLOT``, ``GOV_HEAVY_CPUS`` and ``GOV_HEAVY_ADMITTED``.
@@ -99,6 +99,18 @@ def test_s10_the_gov_heavy_variables_map_to_the_products(box):
         pass
     first.release_and_finish()
     assert second.wait(timeout=6.0) == 0
+
+
+def test_s10_a_callers_pytest_xdist_auto_num_workers_is_mapped_to_workers(box):
+    for held in ((), ("--held", "1,2")):
+        done = wrapper(box, *held, "sh", "-c", "echo $PYTEST_XDIST_AUTO_NUM_WORKERS",
+                       extra_env={"PYTEST_XDIST_AUTO_NUM_WORKERS": "1"})
+        assert done.returncode == 0, s.said(done)
+        assert done.stdout.strip() == "1", (
+            f"{' '.join(held) or 'a plain run'} with the caller's PYTEST_XDIST_AUTO_NUM_WORKERS=1 gave the command "
+            f"{done.stdout.strip()!r} (the nightly's serial phase)\n{s.said(done)}")
+    done = wrapper(box, "sh", "-c", "echo $PYTEST_XDIST_AUTO_NUM_WORKERS", extra_env={"PYTEST_XDIST_AUTO_NUM_WORKERS": "2"})
+    assert done.stdout.strip() == "2", f"the caller's 2 gave {done.stdout.strip()!r}"
 
 
 def test_s10_a_heavy_slots_conf_beside_the_script_is_not_read(box, tmp_path):

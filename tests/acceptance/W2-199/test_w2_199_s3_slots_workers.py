@@ -7,7 +7,7 @@
   configuration file's ``heavy_slots`` when it has one, else the derived count (a file with none no longer refuses).
 
 The rules are computed here exactly (fractions); the invariant ``start_below + heavy_slots x workers_per_slot x margin
-<= load_limit`` is checked for every CPU count from 4 to 64 with margins 1.0, 1.5 and 2.0 by one process that calls gov's
+<= load_limit`` (wherever ``workers_per_slot`` is above 1) is checked for every CPU count from 4 to 64 with margins 1.0, 1.5 and 2.0 by one process that calls gov's
 entry point (``gov dispatch limits --json``) once per pair.
 """
 
@@ -71,7 +71,8 @@ def test_s3_the_invariant_holds_for_every_cpu_count_from_4_to_64_with_margins_1_
         where = f"{count} CPUs, margin {margin}: heavy_slots {slots}, workers_per_slot {workers}, " \
                 f"start_below {start_below}, load_limit {limit}"
         assert limit == count, where
-        assert start_below + slots * workers * margin <= limit + 1e-9, f"the invariant is broken at {where}"
+        if workers > 1:  # at the floor of one worker the sum may pass the limit (the ticket's amended line)
+            assert start_below + slots * workers * margin <= limit + 1e-9, f"the invariant is broken at {where}"
         want_slots, want_workers, quotient = expected(count, 64 * s.GIB, margin=F(str(margin)))
         assert slots == want_slots, f"heavy_slots is not the rule's {want_slots} at {where}"
         edge = quotient.denominator == 1  # an exact integer: a float rounding may tip it down by one

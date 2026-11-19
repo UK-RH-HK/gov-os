@@ -1,7 +1,7 @@
 # W2-199 acceptance tests: the run-time tool, slice 2 (the machine-aware dispatcher and load balancer)
 
 Ticket DAEO-rt2s (W2-199), profile FULL. Written by the independent test designer (MR-3) from the ticket's ten success
-lines, two failure lines and its `## Interface` section, before any implementation, on the base `543021090`. The code
+lines (as amended at `3e5a1fd36`), two failure lines and its `## Interface` section, before any implementation, on the base `543021090`. The code
 read is the integrated public surface (`gov.cli.main`, `gov resources`, `gov dispatch`, `gov.resources.machine`,
 `gov.dispatch.limits`, slice 1's acceptance support), never this ticket's branch. The scratch `heavy_slot.sh` of the main
 tree was read as the behaviour the wrapper replaces.
@@ -11,7 +11,7 @@ tree was read as the behaviour the wrapper replaces.
     env TMPDIR=$(mktemp -d) PYTHONPATH=<worktree>/src \
       python3 -m pytest tests/acceptance/W2-199 -q -p no:cacheprovider -o tmp_path_retention_policy=failed
 
-73 cases (63 functions), each 1 to 15 s: child `gov` processes (`python3 -m gov.cli.main`), a stub `nvidia-smi`, real `sh`
+75 cases (65 functions), each 1 to 15 s: child `gov` processes (`python3 -m gov.cli.main`), a stub `nvidia-smi`, real `sh`
 commands that write a marker file; no model, no network, never the real `~/.gov-os`, never the machine's real load. Run
 through the machine's heavy slot (the tests start their own `gov resources` children, which are nested runs only where a
 test says so: every child's environment is built from scratch, so `GOV_HEAVY_ADMITTED` of the outer slot never reaches
@@ -55,7 +55,7 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | S1 (RT-3) | `test_w2_199_s1_admission.py::test_s1_load_13_holds_the_start_names_the_wait_once_then_3_starts_it_and_the_exit_code_is_the_commands` | the command starts at load 13 (no load admission) |
 | S1 (RT-3) | `test_w2_199_s1_admission.py::test_s1_load_11_9_under_the_start_threshold_starts_at_once_and_12_1_does_not` | the command starts at load 12.1 (the 11.9 half alone is already met on the base, so the case holds both sides) |
 | S1 (RT-3) | `test_w2_199_s1_admission.py::test_s1_a_load_exactly_at_start_below_holds_the_start` | the command starts at load 12.0 |
-| S1 (RT-3) | `test_w2_199_s1_admission.py::test_s1_the_load_plus_workers_times_margin_must_stay_within_the_limit` | the command starts at load 11 with 10 workers |
+| S1 (RT-3) | `test_w2_199_s1_admission.py::test_s1_a_run_that_can_never_fit_workers_times_margin_within_the_headroom_is_held_by_the_start_threshold_alone` | the command starts at load 12.5 (no load admission) |
 | S1 (RT-3) | `test_w2_199_s1_admission.py::test_s1_a_start_held_by_the_load_is_polled_until_the_reading_allows_it_not_once` | the command starts at load 13 |
 | S2 (RT-3) | `test_w2_199_s2_threshold.py::test_s2_limits_json_gives_start_below_0_6_of_the_cpus_and_load_limit_the_cpus` | no `start_below` / `load_limit` in `gov dispatch limits --json` |
 | S2 (RT-3) | `test_w2_199_s2_threshold.py::test_s2_the_text_form_prints_start_below_load_limit_and_margin_with_their_rules` | no line names `start_below`, `load_limit`, `margin` |
@@ -73,7 +73,7 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_a_peak_over_the_limit_is_counted_in_over_limit_s_and_named_once_on_stderr` | no runtime log: no `ready` event for the run |
 | S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_five_ended_jobs_of_1_2_to_2_4_per_worker_give_the_rules_margin_and_fewer_workers` | no `margin` in `gov dispatch limits --json` (`<missing>`) |
 | S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_margin_is_the_90th_percentile_of_the_last_20_jobs_and_never_under_1` | no `margin` |
-| S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_a_measured_heavier_job_shrinks_the_next_runs_workers_and_holds_a_start_sooner` | no margin: the control run's workers are 1, not 4, and nothing shrinks |
+| S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_a_measured_heavier_job_shrinks_the_next_runs_workers` | no margin: the control run's workers are 1, not 4, and nothing shrinks |
 | S5 (RT-3) | `test_w2_199_s5_nested.py::test_s5_an_inner_run_with_one_slot_held_and_a_load_of_40_exits_5_within_5_s_and_the_outer_with_it` | no `nested` event in the runtime log (0, not 1) |
 | S5 (RT-3) | `test_w2_199_s5_nested.py::test_s5_the_inner_run_inherits_the_outers_slot_cpus_workers_and_admitted_mark` | the job's environment has no `GOV_HEAVY_ADMITTED=1` (empty) |
 | S5 (RT-3) | `test_w2_199_s5_nested.py::test_s5_a_run_with_the_admitted_mark_set_runs_at_once_at_load_40_with_every_slot_held_and_takes_no_slot` | no `nested` event |
@@ -87,6 +87,7 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | S7 (RT-7) | `test_w2_199_s7_runtime_state.py::test_s7_a_finished_run_reads_ready_admitted_started_ended_with_one_job_id_and_the_common_fields` | no `ready` event |
 | S7 (RT-7) | `test_w2_199_s7_runtime_state.py::test_s7_a_run_held_by_the_load_logs_one_load_wait_with_room_false_between_ready_and_admitted` | the run is not held (its command starts at load 13) |
 | S7 (RT-7) | `test_w2_199_s7_runtime_state.py::test_s7_a_run_held_for_a_slot_logs_a_slots_wait` | the second run is not held (`GOV_HEAVY_SLOTS` is not read) |
+| S7 (RT-7) | `test_w2_199_s7_runtime_state.py::test_s7_a_run_held_behind_a_live_priority_waiter_logs_a_priority_wait_with_room_true` | an ordinary run takes the free slot beside a live priority registration |
 | S7 (RT-7) | `test_w2_199_s7_runtime_state.py::test_s7_a_run_with_gov_msg_address_sends_one_wake_message_naming_kind_and_exit_code` | no wake message in `lead:DAEO-x`'s inbox |
 | S7 (RT-7) | `test_w2_199_s7_runtime_state.py::test_s7_a_run_without_gov_msg_address_sends_no_message` | no `ended` event in the log (the guard that the case is not vacuous) |
 | S8 (RT-1) | `test_w2_199_s8_waits.py::test_s8_a_15_minute_wait_on_load_with_room_false_is_listed_and_is_no_finding` | no `gov dispatch waits` (exit 2) |
@@ -107,6 +108,7 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | S10 (RT-3) | `test_w2_199_s10_wrapper.py::test_s10_the_command_sees_its_workers_slot_cpus_and_the_admitted_mark` | `heavy_slot.sh` does not exist |
 | S10 (RT-3) | `test_w2_199_s10_wrapper.py::test_s10_held_1_passes_through_and_prints_the_per_slot_workers` | `heavy_slot.sh` does not exist |
 | S10 (RT-3) | `test_w2_199_s10_wrapper.py::test_s10_the_gov_heavy_variables_map_to_the_products` | `heavy_slot.sh` does not exist |
+| S10 (RT-3) | `test_w2_199_s10_wrapper.py::test_s10_a_callers_pytest_xdist_auto_num_workers_is_mapped_to_workers` | `heavy_slot.sh` does not exist |
 | S10 (RT-3) | `test_w2_199_s10_wrapper.py::test_s10_a_heavy_slots_conf_beside_the_script_is_not_read` | `heavy_slot.sh` does not exist |
 | F1 | `test_w2_199_f1_nothing_lost.py::test_f1_a_run_killed_while_it_waits_for_the_load_starts_nothing_and_leaves_nothing` | the run is not held (its command starts at load 13) |
 | F1 | `test_w2_199_f1_nothing_lost.py::test_f1_a_priority_run_killed_while_it_waits_for_a_slot_leaves_no_registration_and_no_lock` | no `prio-<pid>` registration file for the waiter |
@@ -162,17 +164,23 @@ given a second half that is new, so none is green on the base.
   behaviour); and that `tests/unit/orchestration/test_dispatcher_stall*` and
   `tests/acceptance/W2-121c/test_w2_121c_s11_dispatcher_stall.py` stay green (existing suites the landing runs).
 
-## Questions for the ticket (not edited)
+## Rulings applied (the coordinator, ticket amended at `3e5a1fd36`)
 
-1. **Success 9's Verify numbers are not within the budget they cite.** "used 20,000 and need 4,000 admitted at once; used
-   20,000 and need 2,000 within budget 21,504 admitted": 24,000 and 22,000 are over 21,504. Suggested: "used 10,000 and
-   need 4,000 admitted at once; used 19,504 and need 2,000 (exactly the budget 21,504) admitted; need 2,000 at used 20,500
-   held".
-2. **The `room` of a `slots` and a `priority` wait** (success 7, success 8): when every slot is held and the load is low, is
-   the machine with room (the wait counts against RT-1's ten minutes) or without? Suggested: `room` true for `slots` and
-   `priority` (the machine has load room; the wait is the scheduler's), false for `load` and `gpu`.
-3. **The 90th percentile** (success 4) for fewer than 20 jobs: nearest rank or interpolated. Suggested: nearest rank
-   (`sorted[ceil(0.9 x n) - 1]`), 2.4 for the ticket's five jobs.
-4. **`state.json`'s GPU reading** (success 9): "state.json carries the last reading" gives no key. Suggested: a top-level
-   `gpu` object with the event's fields.
-5. The task named 11 success lines; the ticket has 10 (and 2 failure lines); the map has S1 to S10 and F1, F2.
+1. S9's numbers are the ticket's now (used 10,000 / need 4,000 and 19,504 / 2,000 admitted, 20,500 / 2,000 held).
+2. `room` is true only for a `priority` wait and false for `load`, `gpu` and `slots`: the S7 slots case pins `room` false and
+   a new case holds an ordinary run behind a planted live priority registration (`prio-<pid>` of a live process, an empty file)
+   and pins reason `priority`, room true.
+3. The 90th percentile for fewer than 20 jobs is the nearest rank: 2.4 for the five planted jobs (the tests still accept 2.28).
+4. The key locations are the `limits` object, `jobs.running` / `jobs.waiting` lists and a `gpu` object in state.json.
+5. `GOV_HEAVY_CPUS` is exempt from "no CPU-naming variable". 6. Workers stay derived from the derived `heavy_slots`.
+(a) The invariant sweep checks `start_below + heavy_slots x workers_per_slot x margin <= load_limit` only where
+`workers_per_slot` is above 1 (the equality with the rule still holds everywhere).
+(b) The wrapper maps a caller's `PYTEST_XDIST_AUTO_NUM_WORKERS` to `--workers`: a case runs it with 1 (plain and `--held 1,2`)
+and with 2.
+(c) The clamp: a run whose `workers x margin` is over `load_limit - start_below` is held by the start threshold alone, so the
+"load + workers x margin within the limit" half cannot bind beyond `start_below` for a run that can fit. The old S1 case that
+held load 11 + 10 workers is replaced by one that admits it (and an idle machine at 30 workers) and holds load 12.5; the S4
+case that held a heavier margin's start sooner is cut to the workers' shrink.
+
+## Note
+The task's "11 success lines" were 10 (S1 to S10, F1, F2).

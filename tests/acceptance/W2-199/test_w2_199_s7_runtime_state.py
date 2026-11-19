@@ -11,7 +11,7 @@ command ends, a run without it none. The stall check's own tests (``tests/unit/o
 
 The test designer's readings: an event's ``pid`` is the ``gov resources`` process's own; ``jobs.running`` and
 ``jobs.waiting`` are lists (or objects keyed by job id); ``binding`` is a text naming what would hold a start now (here
-the word ``load``); only the ``load`` and ``gpu`` waits are pinned to ``room`` false.
+the word ``load``); ``room`` is true only for a ``priority`` wait and false for ``load``, ``gpu`` and ``slots`` (the ticket as amended).
 """
 
 from __future__ import annotations
@@ -103,7 +103,8 @@ def test_s7_a_run_held_for_a_slot_logs_a_slots_wait(box):
     second = box.start("second", extra_env=ONE_SLOT, hold=False)
     assert second.held_for(1.5)
     waits = box.events("wait", pid=second.pid)
-    assert waits and waits[0].get("reason") == "slots", f"the wait events of a run held for a slot: {waits}"
+    assert waits and waits[0].get("reason") == "slots" and waits[0].get("room") is False, (
+        f"the wait events of a run held for a slot (room false: the slot count is the machine's capacity): {waits}")
     assert len(waits) == 1, f"one `wait` per reason change: {waits}"
     holder.release_and_finish()
     second.must_start(4.0)
@@ -132,3 +133,19 @@ def test_s7_a_run_without_gov_msg_address_sends_no_message(box):
     found = [path for path in box.inbox_root.rglob("messages.jsonl") if path.read_text().strip()] \
         if box.inbox_root.exists() else []
     assert not found, f"a run without GOV_MSG_ADDRESS sent a message: {found}"
+
+
+def test_s7_a_run_held_behind_a_live_priority_waiter_logs_a_priority_wait_with_room_true(box):
+    # a priority waiter is planted as its registration file for a live process (`prio-<pid>`, an empty file): a slot is
+    # free and the load is low, so only the priority waiter ahead holds the ordinary run
+    sleeper = box.sleeper(60)
+    box.slots_dir.mkdir(parents=True, exist_ok=True)
+    (box.slots_dir / f"prio-{sleeper.pid}").write_text("")
+    job = box.start("a", hold=False)
+    assert job.held_for(1.5), "an ordinary run took a free slot while a live priority waiter was registered"
+    waits = box.events("wait", pid=job.pid)
+    assert waits and waits[0].get("reason") == "priority" and waits[0].get("room") is True, (
+        f"the wait events of a run held behind a priority waiter: {waits}")
+    box.end(sleeper)
+    job.must_start(4.0)
+    assert job.finish()[0] == 0

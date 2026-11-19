@@ -8,10 +8,9 @@ unavailable); nothing offers or selects the CPU (the run's environment names its
 CPU-device variable); each watch pass appends one ``gpu`` event (``used_mib``, ``total_mib``, ``budget_mib``, ``spill``)
 and state.json carries the last reading.
 
-The test designer's readings. The ticket's Verify sentence gives used 20,000 with a need of 4,000 and of 2,000 as
-admitted, which is not within the budget 21,504 (24,000 and 22,000); the cases here are: used 10,000 + need 4,000
-(admitted), used 19,504 + need 2,000 (exactly the budget, admitted), used 19,505 + need 2,000 and used 20,500 + need 2,000
-(held). "No CPU-naming variable" is read as: no variable whose name has CPU in it other than ``GOV_HEAVY_CPUS`` (the slot's
+The cases follow the ticket's Verify numbers (amended): used 10,000 + need 4,000 (admitted), used 19,504 + need 2,000
+(exactly the budget, admitted), used 20,500 + need 2,000 (held); one more held case at 19,505 (one MiB over) is added.
+"No CPU-naming variable" is read as: no variable whose name has CPU in it other than ``GOV_HEAVY_CPUS`` (the slot's
 own CPU set, success lines 3 and 10), no value equal to ``cpu`` and no ``CUDA_VISIBLE_DEVICES`` of ``""`` or ``-1``.
 state.json's last GPU reading is looked for as an object with ``used_mib`` and ``spill`` anywhere in it.
 """
