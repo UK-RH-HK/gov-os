@@ -157,7 +157,7 @@ what is in "Round 6".
 | `test_input_hash_is_of_file_content` | receipt | hash of id string |
 | `test_unmeasurable_inputs_listed_with_reason` | receipt | no reason |
 | `test_ticket_file_is_always_an_input` | receipt | ticket not listed |
-| `test_unresolvable_source_refuses_the_close` | receipt | source dropped |
+| `test_unresolvable_source_is_recorded_unresolved_and_the_close_goes_on` | receipt | the unknown id applied or hashed, or the close refused for it (W2-200 S6 as amended) |
 | `test_sources_resolve_through_defined_lookup` | receipt | tree-wide search |
 | `test_tests_produced_lists_ticket_own_tests` | receipt | other tickets' tests included |
 
@@ -2383,7 +2383,8 @@ designer; each rewritten case carries a `Rewrite-Reason:` naming DEC-1214 M1.
 | deleted file | `test_w1_30_r15_context_tickets.py`, `test_w1_30_r16_context_own_tickets.py` | the context check is retired (W2-200 S1) |
 | rewritten | `test_w1_30_receipt.py::test_close_record_names_its_decisions_and_has_no_packet_hash` (was `test_close_record_has_packet_hash`) | three decision lists, no `packet_hash` (W2-200 S3) |
 | rewritten | `test_w1_30_receipt.py::test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes` (was `test_close_record_packet_hash_matches_context`) | a decision in the sources, held by the register, applied with its span's hash |
-| rewritten | `test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close` | `DECISION_NOT_FOUND` naming the missing id (W2-200 S6), not the packet's `BLOCKED` |
+| rewritten | `test_w1_30_receipt.py::test_unresolvable_source_is_recorded_unresolved_and_the_close_goes_on` (was `test_unresolvable_source_refuses_the_close`) | the missing id is listed in `decisions_unresolved`, never applied or hashed, and the close goes on (W2-200 S6 as the CTO amended it at the land, 2026-11-19: first rewritten to ask for the refusal `DECISION_NOT_FOUND`, which no longer exists) |
+| fixture repaired | `test_w1_30_receipt.py::test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes` and the case above | the ticket's `sources` replace the fixture's one source (`_add_ticket_citing`): a second `sources` key made the frontmatter unreadable and the close was refused `CHECK_FAILED` (`core-authority` RED); no assertion changed (W2-200 at the land, 2026-11-19) |
 | deleted | `test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built`, `::test_no_fallback_hash_when_context_fails`, `::test_context_failure_non_cycle_refuses_close` | no packet: a decision that no longer stands is recorded, never refuses (W2-200 S5) |
 | rewritten | `test_w1_30_disposition.py::test_valid_disposition_records_the_class_and_no_context_hash` (was `test_valid_disposition_builds_context_first`) | the class recorded, no `context_hash` (W2-200 S7) |
 | deleted | `test_w1_30_disposition.py::test_disposition_with_context_failure` | no context can fail |

@@ -44,6 +44,9 @@ KERNEL_TEMPLATES = KERNEL / "templates"
 PATH_MAP_REL = "governance/project/path-map.yaml"
 FACTS_REL = "governance/project/facts.yaml"
 REGISTER_REL = "docs/DECISION_REGISTER.md"
+# The archived register (W2-203): the path map names its file under this key; its entries are history.
+ARCHIVE_KEY = "decision_register_archive"
+ARCHIVE_REL = "docs/archive/DECISION_REGISTER-2026-11-01.md"
 CHECKS_REL = "template/governance/kernel/checks"
 TK_REL = "governance/kernel/bin/tk"
 
@@ -261,10 +264,12 @@ def ticket_text(ticket: str = TICKET, wbs: str = WBS, sources=(), decisions=None
     return f"---\n{text}---\n# {wbs} A ticket\n\n{body}"
 
 
-def path_map(register_rel: str | None = REGISTER_REL) -> str:
+def path_map(register_rel: str | None = REGISTER_REL, archive_rel: str | None = None) -> str:
     text = "namespaces: {all: {paths: ['**']}}\nclose_workers: 2\n"
     if register_rel is not None:
         text += f"decision_register: {register_rel}\n"
+    if archive_rel is not None:
+        text += f"{ARCHIVE_KEY}: {archive_rel}\n"
     return text
 
 
@@ -591,10 +596,29 @@ S5_NOT_STANDING = [{"id": "DEC-121", "status": "SUPERSEDED"}, {"id": "DEC-122", 
                    {"id": "DEC-123", "status": "SUPERSEDED"}, {"id": "DEC-124", "status": "RETIRED"},
                    {"id": "DEC-125", "status": "REJECTED"}]
 
-# S6 and F1
+# S6 and F1 (as amended at the land: an id no register holds is recorded as unresolved, never refused; an id only
+# the archived register holds is not standing, ARCHIVED).
 PLAIN_REGISTER = register(entry(110, "The plain decision"))
-S6_MISSING = ["DEC-198", "DEC-199"]          # DEC-199 in sources, DEC-198 in decisions; the register holds neither
+S6_IN_SOURCES, S6_IN_DECISIONS, S6_IN_KPI = "DEC-999", "DEC-997", "DEC-998"   # no register holds any of the three
+S6_MISSING = [S6_IN_DECISIONS, S6_IN_KPI, S6_IN_SOURCES]
 S6_KPI_ONLY = "DEC-199"
 S6_UNNAMED = ["DEC-110", "DEC-111", "DEC-112"]  # cited where the path map names no register
 S6_UNNAMED_REGISTER = register(entry(110, "Held by a file no path map names"), entry(111, "Also unnamed"),
                                entry(112, "Also unnamed"))
+
+# The archive world: the register holds DEC-110; the archive holds an older wording of DEC-110 (as a kept entry is in
+# both files), DEC-150 (accepted when archived), DEC-151 (its own status line SUPERSEDED) and DEC-152 (a heading and
+# its text, no status line: history is asked for none). DEC-996 is in neither file.
+ARCHIVE_HEAD = ("> Archived, read-only: the planted project's earlier decisions, kept as history.\n\n"
+                "# Decision register (archived)\n\n")
+S6_ARCHIVE = ARCHIVE_HEAD + "".join([
+    entry(110, "The plain decision", body="The archive's older wording of DEC-110."),
+    entry(150, "An old decision"),
+    entry(151, "An old decision superseded before the archive", status="SUPERSEDED (owner, 2026-10-02)"),
+    "### DEC-152 — An old decision with no status line\n\nIts text, as history holds it.\n\n"])
+S6_ARCHIVE_SOURCES = ["DEC-110", "DEC-150", "DEC-151"]
+S6_ARCHIVE_SUCCESS = ["S1 The widget keeps its oldest rule [DEC-152]."]
+S6_ARCHIVE_FAILURE = ["F1 The widget follows a rule nobody wrote down [DEC-996]."]
+S6_ARCHIVED = [{"id": "DEC-150", "status": "ARCHIVED"}, {"id": "DEC-151", "status": "ARCHIVED"},
+               {"id": "DEC-152", "status": "ARCHIVED"}]
+S6_IN_NEITHER = "DEC-996"

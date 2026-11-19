@@ -146,7 +146,7 @@ tests/acceptance/W1-30/test_w1_30_receipt.py::test_deviations_says_not_measured_
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_input_hash_is_of_file_content  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_unmeasurable_inputs_listed_with_reason  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_ticket_file_is_always_an_input  # a lifted gate of the strict close
-tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_is_recorded_unresolved_and_the_close_goes_on  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_sources_resolve_through_defined_lookup  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_tests_produced_lists_ticket_own_tests  # a lifted gate of the strict close
 

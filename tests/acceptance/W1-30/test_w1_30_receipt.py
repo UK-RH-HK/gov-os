@@ -11,8 +11,9 @@ B5: "Outputs produced" lists files from the ticket's commits. "Deviations" says
     "not measured" when not measured, never "none". Unmeasurable inputs listed
     with the reason.
 B7: Sources resolve through a defined lookup. A ticket naming a decision the
-    register does not hold is refused (DECISION_NOT_FOUND, W2-200 S6) and gets no
-    close record. The ticket file is always an input.
+    register does not hold closes, and its close record lists the id as
+    unresolved, never as applied (W2-200 S6 as amended at the land). The ticket
+    file is always an input.
 """
 
 import hashlib
@@ -56,6 +57,17 @@ def _with_register(project, entries=DECISION_ENTRY):
                   support.path_map_text({**support.SUITE_SETTINGS, "decision_register": REGISTER_REL}))
     project.write(REGISTER_REL, REGISTER_HEAD + entries)
     project.commit("the register", who=support.OWNER)
+
+
+def _add_ticket_citing(project, *sources):
+    """The fixture's ticket with ``sources`` in place of the one source every fixture ticket names: a second
+    ``sources`` key beside the first makes the frontmatter unreadable (``core-authority`` RED, the close refused)."""
+    project.add_ticket(TICKET, WBS)
+    rel = support.ticket_path(TICKET)
+    text = (project.root / rel).read_text(encoding="utf-8")
+    base = f"sources:\n- {support.BASE_SOURCE}\n"
+    assert text.count(base) == 1, f"the fixture ticket no longer names its one source as {base!r}"
+    project.write(rel, text.replace(base, "sources:\n" + "".join(f"- {source}\n" for source in sources)))
 
 
 def _span_hashes(text):
@@ -150,7 +162,7 @@ def test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_h
     the record's packet hash with the retired context command's; the receipt's decisions now come from the ticket's
     own sources, resolved in the register by id, each hashed by its span."""
     _with_register(project)
-    project.add_ticket(TICKET, WBS, sources=["DEC-9101"])
+    _add_ticket_citing(project, "DEC-9101")
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
@@ -246,15 +258,16 @@ def test_ticket_file_is_always_an_input(project, sandbox, interface):
         f"the ticket file must always be listed as an input: {ids}"
 
 
-def test_unresolvable_source_refuses_the_close(project, sandbox, interface):
-    """B7 as W2-200 S6 settles it: a ticket naming in its sources a decision the register does not hold is refused,
-    naming it, before anything is written; no close record lists it, because none is written.
+def test_unresolvable_source_is_recorded_unresolved_and_the_close_goes_on(project, sandbox, interface):
+    """B7 as W2-200 S6 settles it: a ticket naming in its sources a decision the register does not hold closes all
+    the same; its close record lists that id as unresolved, and neither applies it nor gives it a hash.
 
-    Rewrite-Reason: DEC-1214 M1 (W2-200 S6): the refusal was the context packet's (``BLOCKED``, read through the
-    retired context command); it is now the close's own ``DECISION_NOT_FOUND``, naming the missing id."""
+    Rewrite-Reason: DEC-1214 M1 (W2-200 S6 and F1 as the CTO amended them at the land; EMERGENCY-2 2.1): was
+    ``test_unresolvable_source_refuses_the_close``, which asked for the refusal ``DECISION_NOT_FOUND``; an id no
+    register holds is now recorded in ``decisions_unresolved`` and the close goes on."""
     missing = "DEC-9199"
     _with_register(project)
-    project.add_ticket(TICKET, WBS, sources=["DEC-9101", missing])
+    _add_ticket_citing(project, "DEC-9101", missing)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
@@ -262,12 +275,14 @@ def test_unresolvable_source_refuses_the_close(project, sandbox, interface):
     project.commit("checkpoint", who=support.ORCHESTRATOR)
 
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False and run.returncode != support.EXIT_OK, f"the close was not refused\n{run.describe()}"
-    error = envelope["error"]
-    assert error["code"] == "DECISION_NOT_FOUND", f"the refusal is {error['code']!r}\n{run.describe()}"
-    assert missing in support.error_text(error), f"the refusal does not name {missing}\n{run.describe()}"
-    support.assert_not_closed(project, TICKET)
+    support.result_of(run, interface)
+    records = support.close_records(project.root, TICKET)
+    assert len(records) == 1, f"the close left {len(records)} close records: {[rel for rel, _ in records]}"
+    front = records[0][1]
+    assert front.get("decisions_unresolved") == [missing], f"decisions_unresolved: {front.get('decisions_unresolved')!r}"
+    assert front.get("decisions_applied") == ["DEC-9101"], f"decisions_applied: {front.get('decisions_applied')!r}"
+    hashed = [inp.get("id") for inp in front.get("inputs") or [] if isinstance(inp, dict)]
+    assert missing not in hashed, f"{missing}, which the register does not hold, is among the inputs: {hashed}"
 
 
 def test_sources_resolve_through_defined_lookup(project, sandbox, interface):

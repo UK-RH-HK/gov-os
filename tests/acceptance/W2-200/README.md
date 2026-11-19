@@ -11,7 +11,7 @@ the facts file, `git`, the files of the code under test, and an import tried in 
 
     TMPDIR=$(mktemp -d) PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-200 -q -p no:cacheprovider
 
-or `gov accept W2-200`. 55 cases, about 45 s (about 15 closes). No network, no model. Every `gov` runs as
+or `gov accept W2-200`. 57 cases, about 45 s (about 16 closes). No network, no model. Every `gov` runs as
 `python3 -m gov.cli.main` (the runner's `PYTHONPATH`, else this worktree's `src/`) with a fixture `HOME` under the
 test's `tmp_path` (its own `.gitconfig`), `TZ=UTC`, every `GIT_*`, `GOV_*` and `PYTEST_*` variable of the caller removed,
 proxies and the embedder's address pointed at a dead local port.
@@ -29,8 +29,9 @@ proxies and the embedder's address pointed at a dead local port.
   (`conftest.py`).
 - **The register's ids.** The ticket's verify names DEC-10, DEC-11, DEC-12 and DEC-99, but the register's grammar
   (W2-03, `gov.store.loader`) holds only `DEC-` and three digits or more: `### DEC-10 — …` is no entry. The cases use
-  DEC-110, DEC-111, DEC-112 (and DEC-1013, to tell sorting by number from sorting as text) and DEC-199/DEC-198 for the
-  ticket's DEC-10, -11, -12 and -99: the same classes, in the grammar.
+  DEC-110, DEC-111, DEC-112 (and DEC-1013, to tell sorting by number from sorting as text) for the ticket's DEC-10,
+  -11 and -12: the same classes, in the grammar. S6 as amended names DEC-999, DEC-998 and DEC-150, which the grammar
+  holds: the cases use them as written (and DEC-199 in the KPI-only world, unchanged since the first commit).
 - **S3's ticket**: `sources: [DEC-1013, DEC-110, CAP-1, W2-9, docs/notes/plain.md, EMERGENCY-2 5.5]`,
   `decisions: [DEC-111, DEC-110]`, KPI lines citing `[DEC-112, DEC-111]` and `[DEC-112]`, and the look-alikes
   `PREDEC-141` and `DEC-1400x` (no whole-word id); the register holds the four and DEC-150 (cited nowhere). A clone of the
@@ -40,8 +41,14 @@ proxies and the embedder's address pointed at a dead local port.
 - **S5**: one cited decision in each state: DEC-120 stands; DEC-121 `SUPERSEDED` by its status word, DEC-122 by
   DEC-127's `**Supersedes:**` (its own status ACCEPTED), DEC-123 `SUPERSEDED by DEC-128`; DEC-124 `RETIRED`, DEC-125
   `REJECTED`; DEC-126 tagged `· done`.
-- **S6**: DEC-199 in `sources` and DEC-198 in `decisions` (neither held); DEC-199 only in a KPI line; a path map naming
-  no register (a register file at the usual path, unnamed, holding the three cited ids); a ticket with `sources: []`.
+- **S6** (as amended at the land): DEC-999 in `sources`, DEC-997 in `decisions` and DEC-998 in a KPI line, held by no
+  register, no archive named; DEC-199 only in a KPI line; a path map naming no register (a register file at the usual
+  path, unnamed, holding the three cited ids); a ticket with `sources: []`.
+- **S6's archive**: the path map names `decision_register_archive: docs/archive/DECISION_REGISTER-2026-11-01.md` beside
+  the register. The register holds DEC-110. The archive holds an older wording of DEC-110 (a kept entry is in both
+  files), DEC-150 (status line ACCEPTED), DEC-151 (its own status line SUPERSEDED) and DEC-152 (a heading and its text,
+  no status line). The ticket cites DEC-110, DEC-150 and DEC-151 from `sources`, DEC-152 from a success line and DEC-996
+  (in neither file) from a failure line.
 - **S7**: a failing acceptance test, `gov close --disposition repair`.
 - **S1, F2's `gov check`**: a project holding this tree's kernel check declarations (`template/governance/kernel/checks/`
   copied whole, as an adopted project holds its kernel).
@@ -60,14 +67,14 @@ proxies and the embedder's address pointed at a dead local port.
 | S3 | `test_w2_200_s3_decisions_recorded.py::test_s3_the_close_passes_and_records_each_cited_decision_once_sorted_by_number`, `test_w2_200_s3_decisions_recorded.py::test_s3_inputs_hold_the_ticket_then_each_applied_decision_with_the_hash_of_its_span`, `test_w2_200_s3_decisions_recorded.py::test_s3_ids_of_other_forms_are_not_decisions_and_are_left_alone`, `test_w2_200_s3_decisions_recorded.py::test_s3_the_record_has_no_packet_hash`, `test_w2_200_s3_decisions_recorded.py::test_s3_the_same_ticket_at_the_same_commit_gives_the_same_lists_and_hashes` | the close is refused `CONTEXT_FAILED` alone ("mandatory input 'CAP-1' not found in the store"): every other gate passes |
 | S4 | `test_w2_200_s4_no_ceiling.py::test_s4_a_decision_over_a_million_characters_and_a_long_ticket_close_and_are_recorded`, `test_w2_200_s4_no_ceiling.py::test_s4_an_invalid_close_context_tokens_setting_is_ignored`, `test_w2_200_s4_no_ceiling.py::test_s4_no_close_output_names_a_retired_code`, `test_w2_200_s4_no_ceiling.py::test_s4_the_code_names_no_ceiling_code_and_no_setting` | `CONTEXT_FAILED` alone: `CONTEXT_OVER_CEILING` (375,175 tokens against 6,000) and `CONTEXT_SETTING_INVALID` ('abc'); `src/` names the four words on 14 lines |
 | S5 | `test_w2_200_s5_not_standing.py::test_s5_the_close_passes_and_applies_the_standing_and_the_done_tagged`, `test_w2_200_s5_not_standing.py::test_s5_the_others_are_listed_not_standing_with_their_states_sorted_by_number`, `test_w2_200_s5_not_standing.py::test_s5_no_decision_is_both_applied_and_not_standing` | `CONTEXT_FAILED` alone: "mandatory input 'DEC-121' is SUPERSEDED" |
-| S6 | `test_w2_200_s6_not_found.py::test_s6_a_missing_id_in_sources_or_decisions_refuses_decision_not_found_naming_ticket_and_ids`, `test_w2_200_s6_not_found.py::test_s6_the_refusal_exits_as_a_close_refusal_of_its_kind`, `test_w2_200_s6_not_found.py::test_s6_the_refusal_writes_nothing`, `test_w2_200_s6_not_found.py::test_s6_an_id_only_in_a_kpi_line_and_not_in_the_register_is_unresolved_and_the_close_passes`, `test_w2_200_s6_not_found.py::test_s6_where_the_path_map_names_no_register_every_cited_id_is_unresolved`, `test_w2_200_s6_not_found.py::test_s6_a_ticket_citing_no_decision_closes_with_empty_lists` | the missing id gives `CONTEXT_FAILED` (exit 3, after the tests, a repair ticket committed), not `DECISION_NOT_FOUND`; the KPI-only id closes with no `decisions_unresolved`; no register: `CONTEXT_FAILED`; no citation: `CONTEXT_FAILED` ("declares no mandatory inputs") |
+| S6 | `test_w2_200_s6_not_found.py::test_s6_an_id_no_register_holds_in_sources_decisions_or_a_kpi_line_is_unresolved_and_the_close_goes_on`, `test_w2_200_s6_not_found.py::test_s6_the_close_of_a_ticket_citing_an_unknown_id_is_whole_and_no_output_names_the_refusal`, `test_w2_200_s6_not_found.py::test_s6_an_id_only_in_a_kpi_line_and_not_in_the_register_is_unresolved_and_the_close_passes`, `test_w2_200_s6_not_found.py::test_s6_a_decision_only_the_archived_register_holds_is_not_standing_as_archived_and_never_applied`, `test_w2_200_s6_not_found.py::test_s6_an_archived_decision_is_archived_whatever_its_own_status_line_and_wherever_it_is_cited`, `test_w2_200_s6_not_found.py::test_s6_beside_an_archive_the_register_s_entry_is_applied_and_an_id_in_neither_is_unresolved`, `test_w2_200_s6_not_found.py::test_s6_where_the_path_map_names_no_register_every_cited_id_is_unresolved`, `test_w2_200_s6_not_found.py::test_s6_a_ticket_citing_no_decision_closes_with_empty_lists` | on the base every close is refused `CONTEXT_FAILED` (the KPI-only id closes with no `decisions_unresolved`). At the land before the amendment's change (`6a7918fa7`): the first two are red, the close refused `DECISION_NOT_FOUND` (exit 1, "names DEC-997, DEC-999 in its sources or decisions", nothing closed or recorded); the other six are green (the KPI-only id, the three archive cases since the fix `f59534941`, no register, no citation) |
 | S7 | `test_w2_200_s7_refusal_path.py::test_s7_the_refusal_keeps_its_code_and_class`, `test_w2_200_s7_refusal_path.py::test_s7_the_repair_ticket_has_the_fields_of_before_less_context_hash`, `test_w2_200_s7_refusal_path.py::test_s7_no_line_of_the_repair_ticket_speaks_of_a_context` | the repair ticket holds `context_hash: <64 digits>`; the first case is **green on the base by design** (a guard: `CHECK_FAILED`, exit 3, the class, no `CONTEXT_FAILED`) |
 | S8 | `test_w2_200_s8_adopt_facts.py::test_s8_the_facts_file_holds_no_context_command_and_no_gov_context_text`, `test_w2_200_s8_adopt_facts.py::test_s8_the_context_ceiling_step_stays_off_with_a_line_naming_no_command`, `test_w2_200_s8_adopt_facts.py::test_s8_gov_brief_lead_on_the_adopted_facts_leaves_no_placeholder` | `commands.context` is written; `steps.context_ceiling.on` is true with `{CMD:context_ceiling}`; the brief case is **green on the base by design** (a guard: the brief never carries the step's line) |
 | S9 | `test_w2_200_s9_tests_retired.py::test_s9_no_test_file_outside_w2_200_matches_a_retired_pattern`, `test_w2_200_s9_tests_retired.py::test_s9_every_retired_file_listed_is_deleted`, `test_w2_200_s9_tests_retired.py::test_s9_every_rewritten_case_listed_carries_its_rewrite_reason` | on the base: about 75 test files match the four patterns, the retired files exist, the rewritten cases carry no reason; green once this designer's retirements are in (they are in this commit) |
-| F1 | `test_w2_200_f1_never_applied.py::test_f1_a_decision_that_no_longer_stands_is_never_applied_nor_hashed`, `test_w2_200_f1_never_applied.py::test_f1_an_id_the_register_does_not_hold_is_never_applied_nor_hashed`, `test_w2_200_f1_never_applied.py::test_f1_a_refused_close_leaves_no_record_no_checkpoint_and_no_state_change` | the S5 and no-register closes are refused (`CONTEXT_FAILED`), so there is no record to read; the refused close commits a repair ticket |
+| F1 | `test_w2_200_f1_never_applied.py::test_f1_a_decision_that_no_longer_stands_is_never_applied_nor_hashed`, `test_w2_200_f1_never_applied.py::test_f1_an_id_neither_register_holds_is_never_applied_nor_hashed`, `test_w2_200_f1_never_applied.py::test_f1_an_archived_decision_is_never_applied_nor_hashed` | on the base the S5 and no-register closes are refused (`CONTEXT_FAILED`), so there is no record to read. At the land before the amendment's change: the second is red (the world citing DEC-999 and DEC-997 is refused `DECISION_NOT_FOUND`, so it has no record); the first and the third are green |
 | F2 | `test_w2_200_f2_no_dangling_consumer.py::test_f2_the_command_never_imports_gov_context_nor_names_gov_context`, `test_w2_200_f2_no_dangling_consumer.py::test_f2_the_other_close_gates_judge_as_before` | `gov --help`, `gov check` (through `gov.adapters.portability` and the skill validator) and `gov close` import `gov.context`; `gov adopt --facts`, `gov brief lead` and the four gate cases (`TRAILER_MISSING` 3, `CHECKPOINT_MISSING` 3, `STORE_STALE` 1, `CONTAINMENT_FINDING` 3) are **green on the base by design** (guards) |
 
-Count: 44 functions, 55 cases (S1 8, S2 5, S3 5, S4 4, S5 3, S6 6, S7 3, S8 3, S9 6, F1 3, F2 9).
+Count: 46 functions, 57 cases (S1 8, S2 5, S3 5, S4 4, S5 3, S6 8, S7 3, S8 3, S9 6, F1 3, F2 9).
 
 ## Red result on the base (`0123c8b5f` plus this commit's tests)
 
@@ -76,6 +83,40 @@ above (S7's first case, S8's brief case, F2's adopt and brief cases and its four
 refused by `CONTEXT_FAILED` alone (or, for the KPI-only id, closed without the new fields): the fixtures are proven up to
 the retired behaviour. With this commit's retirements in (the second commit): 41 failed, 14 passed in 40 s: S9's six
 cases are green as well, and every other case is red for the reason in the map.
+
+## Revision at the land: S6 and F1 as the CTO amended them (2026-11-19, `6a7918fa7`)
+
+Before: a `DEC-<n>` in a ticket's `sources` or `decisions` that the register does not hold refused the close
+(`DECISION_NOT_FOUND`, nothing written). Amended: an id neither the register at `HEAD` nor the archived register holds
+is listed in `decisions_unresolved` and the close goes on; an id only the archived register holds is listed in
+`decisions_not_standing` as `{id, status: ARCHIVED}`; neither is ever applied or hashed (F1). The reason: the refusal was
+a new blocking rule with no incident behind it (EMERGENCY-2 2.1; DEC-1214 M1 (c): the close records), and W2-203
+archived most decisions the same night (EMERGENCY-2 11.3).
+
+| Case | Was | Now |
+|---|---|---|
+| `test_w2_200_s6_not_found.py::test_s6_an_id_no_register_holds_in_sources_decisions_or_a_kpi_line_is_unresolved_and_the_close_goes_on` | `::test_s6_a_missing_id_in_sources_or_decisions_refuses_decision_not_found_naming_ticket_and_ids` | the close passes; `decisions_unresolved` holds the three ids, `decisions_applied` DEC-110 alone, `inputs` the ticket and DEC-110 |
+| `test_w2_200_s6_not_found.py::test_s6_the_close_of_a_ticket_citing_an_unknown_id_is_whole_and_no_output_names_the_refusal` | `::test_s6_the_refusal_exits_as_a_close_refusal_of_its_kind`, `::test_s6_the_refusal_writes_nothing` | no output names `DECISION_NOT_FOUND`; exit 0, a close record, the ticket `closed`, no repair ticket |
+| `test_w2_200_s6_not_found.py::test_s6_a_decision_only_the_archived_register_holds_is_not_standing_as_archived_and_never_applied` | new | DEC-150 is `{id: DEC-150, status: ARCHIVED}`, in no other list and not in `inputs` |
+| `test_w2_200_s6_not_found.py::test_s6_an_archived_decision_is_archived_whatever_its_own_status_line_and_wherever_it_is_cited` | new | DEC-150, DEC-151 (its own status SUPERSEDED) and DEC-152 (no status line, cited from a KPI line) are ARCHIVED, sorted by number |
+| `test_w2_200_s6_not_found.py::test_s6_beside_an_archive_the_register_s_entry_is_applied_and_an_id_in_neither_is_unresolved` | new | DEC-110 (in both files) is applied with the hash of the register's span; DEC-996 is unresolved |
+| `test_w2_200_f1_never_applied.py::test_f1_an_id_neither_register_holds_is_never_applied_nor_hashed` | `::test_f1_an_id_the_register_does_not_hold_is_never_applied_nor_hashed` (two worlds) | four worlds: the unresolved one and the archive's DEC-996 as well |
+| `test_w2_200_f1_never_applied.py::test_f1_an_archived_decision_is_never_applied_nor_hashed` | new | no archived id is applied or hashed |
+
+Deleted with the refusal: `test_w2_200_f1_never_applied.py::test_f1_a_refused_close_leaves_no_record_no_checkpoint_and_no_state_change`
+(F1 no longer speaks of a refusal). Unchanged: the KPI-only, no-register and no-citation cases of S6, and F1's first.
+Outside this folder: W1-30's receipt case (the Rewritten list below), a lifted case (`--optin=lifted`): red before the
+engineer's change for the same refusal. Its fixture is repaired with it: `add_ticket(..., sources=[...])` wrote a second
+`sources` key beside the fixture's own, an unreadable frontmatter (`core-authority` RED, `CHECK_FAILED`), which the
+refusal hid in this case and which kept
+`test_w1_30_receipt.py::test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes` (lifted, so
+never run by `gov accept`) red on the landed code; both cases now replace the fixture's one source, and that case is
+green.
+
+Red on the tree at the land before the engineer's change (`6a7918fa7`, the implementation still refusing): 3 failed, 54
+passed. Red: S6's first two cases and F1's second, each for the refusal `DECISION_NOT_FOUND` of the world citing DEC-999
+and DEC-997. Green already: the three archive cases of S6 and F1's archive case (the CTO's fix `f59534941` made an
+archived id not standing), and every unchanged case.
 
 ## The test designer's readings where the ticket is open
 
@@ -86,11 +127,12 @@ cases are green as well, and every other case is red for the reason in the map.
 - **`decisions_not_standing`'s status** is `SUPERSEDED` for all three forms of supersession, including DEC-122, whose
   own status word is ACCEPTED and which a successor's `**Supersedes:**` supersedes ("recorded as such"). Returned as a
   package.
-- **"exit as other close refusals of that kind"** is read as the exit of the close's `TICKET_UNKNOWN` refusal (a
-  `GovError` raised before any gate, exit 1).
-- **"git status and .governance as they were"**: no project has a `.governance`; read as every file outside `.git` and
-  `.gov-runtime` (the `governance/` folder included) byte for byte, `git status` and `HEAD` unchanged, no close record,
-  no new checkpoint, and no iteration counter (`.gov-runtime/iterations/<ticket>.json`, the close's state) created.
+- **S6's two readings of the refusal** ("exit as other close refusals of that kind", "git status and .governance as they
+  were") are withdrawn with the refusal (the revision at the land, above).
+- **The archive's entries** are its `### DEC-<n>` headings (W2-203): an archived id is ARCHIVED whatever its own status
+  line says and with none at all (W2-203 asks no status line of history). An id both files hold (every kept entry)
+  is "only the archive's" by no reading: it stands by the register and is hashed by the register's span.
+- **`decisions_unresolved`'s order** is not stated by the ticket: the cases compare it sorted.
 - **S8's brief**: on the adopted defaults `gov brief lead <ticket>` needs `--run` (`BRIEF_RUN_MISSING`) and is refused
   for eight `PLACEHOLDER_LEFT UNSET_*` commands by W2-174's design; the case fills those commands first and then holds
   "no `PLACEHOLDER_LEFT`". The brief never carries `{STEP:context_ceiling}`'s line (the lead's run section stops before
@@ -183,7 +225,7 @@ Each case rewritten for DEC-1214 M1; its docstring carries the `Rewrite-Reason:`
 | `tests/acceptance/W1-30/test_w1_30_r8_last_step.py::test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the_rebuild` | DEC-1214 M1 (W2-200): the case read the fixture through the retired context command (a context built before the owner's commit, and refused for the superseded base decision after the store was loaded again). Those two readings are deleted with the command; the owner's commit still makes the loaded store older than the commit bei… |
 | `tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_names_its_decisions_and_has_no_packet_hash` | DEC-1214 M1 (W2-200 S3): was ``test_close_record_has_packet_hash``; the close builds no context packet, so the receipt has no ``packet_hash`` and states its decisions in three lists. |
 | `tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes` | DEC-1214 M1 (W2-200 S3): was ``test_close_record_packet_hash_matches_context``, which compared the record's packet hash with the retired context command's; the receipt's decisions now come from the ticket's own sources, resolved in the register by id, each hashed by its span. |
-| `tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close` | DEC-1214 M1 (W2-200 S6): the refusal was the context packet's (``BLOCKED``, read through the retired context command); it is now the close's own ``DECISION_NOT_FOUND``, naming the missing id. |
+| `tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_is_recorded_unresolved_and_the_close_goes_on` | DEC-1214 M1 (W2-200 S6 and F1 as the CTO amended them at the land; EMERGENCY-2 2.1): was ``test_unresolvable_source_refuses_the_close``, which asked for the refusal ``DECISION_NOT_FOUND``; an id no register holds is now recorded in ``decisions_unresolved`` and the close goes on. |
 | `tests/acceptance/W1-36/test_w1_36_audit_skill.py::test_the_skill_says_inputs_are_context_pack_and_repository` | DEC-1214 M1 (W2-200): the alternative that named the retired context command is dropped; the skill's own words (a context pack or packet, and the repository) are asked as before. |
 | `tests/acceptance/W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket` | DEC-1214 M1 (W2-200): the context check's declaration is retired; it is still a path this ticket's commits must not have touched, and git reads its history whether or not it exists now. Unchanged otherwise. |
 | `tests/acceptance/W2-197/test_w2_197_text.py::test_f3_no_commit_of_this_ticket_touches_the_context_library_or_its_tests` | DEC-1214 M1 (W2-200): was ``test_f3_gov_context_and_its_tests_are_untouched_since_the_base``, which compared the two folders with the base; W2-200 retires them, so the guard reads this ticket's own history instead: no commit with ``Task: DAEO-3d3o`` touches ``src/gov/context`` or ``tests/unit/context``. Skipped where the base is… |
@@ -233,6 +275,7 @@ holds what replaces them).
 | `tests/acceptance/W2-55/test_w2_55_left_out.py`: the five context-packet cases | the packet is retired; S5 holds the close's record |
 | `tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_each_coupling_imports_cannot_see_is_declared[src/gov/context/command.py]` | the file is gone |
 | `tests/acceptance/W2-108/test_w2_108_scope.py::test_the_context_checks_limit_is_not_raised`, `test_w2_108_unchanged.py::test_this_repositorys_context_packet_is_unchanged` | no declaration, no packet |
+| `tests/acceptance/W2-200/test_w2_200_s6_not_found.py::test_s6_a_missing_id_in_sources_or_decisions_refuses_decision_not_found_naming_ticket_and_ids`, `::test_s6_the_refusal_exits_as_a_close_refusal_of_its_kind`, `::test_s6_the_refusal_writes_nothing`; `test_w2_200_f1_never_applied.py::test_f1_a_refused_close_leaves_no_record_no_checkpoint_and_no_state_change` | S6 and F1 as amended at the land: no refusal for a decision id; the unresolved and archive cases replace them |
 | `tests/unit/close/test_every_finding.py::test_with_a_class_a_context_that_failed_is_a_finding_and_is_named_on_the_repair_ticket` and the `_build_context` rows of its gate cases | no context gate |
 | `tests/unit/close/test_repair_ticket.py::test_a_context_that_failed_is_named_and_no_hash_is_recorded` | no context can fail |
 | `tests/unit/retrieval/test_w2_13_role_filter.py::test_a_supplementary_block_whose_role_paths_cannot_be_read_is_empty_and_says_why`, `::test_gov_context_with_role_given_withholds_the_engineers_tests_and_names_it`, `::test_gov_context_command_passes_role_through_to_the_block`, `::test_a_packet_built_from_another_tickets_session_judges_the_packets_own_ticket_too` | the context command and its wrapper are retired; `supplementary.stack`'s cases stay |

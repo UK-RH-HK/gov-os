@@ -66,17 +66,25 @@ def s5_world(tmp_path_factory):
 
 
 @pytest.fixture(scope="session")
-def s6_refused(tmp_path_factory):
-    """S6, first fixture: DEC-199 in the sources and DEC-198 in the decisions list, neither in the register. The
-    state before the close is taken after the store is rebuilt (the store is not the close's to judge here)."""
-    _, project = _project(tmp_path_factory, "s6-refused", s.PLAIN_REGISTER, sources=["DEC-110", "DEC-199"],
-                          decisions=["DEC-198"])
-    project.rebuild()
-    before = SimpleNamespace(status=project.status(), files=s.tree_files(project.root), head=project.head(),
-                             checkpoints=project.checkpoints(), iteration=project.iteration_file().exists())
-    run = project.close(rebuild=False)
-    unknown = project.gov("close", "NO-SUCH-TICKET", "--json")  # a refusal of the same kind, before any gate
-    return SimpleNamespace(project=project, run=run, before=before, unknown=unknown)
+def s6_unresolved(tmp_path_factory):
+    """S6, first fixture: DEC-999 in the sources, DEC-997 in the decisions list and DEC-998 in a KPI line; the
+    register holds none of them and the path map names no archive."""
+    _, project = _project(tmp_path_factory, "s6-unresolved", s.PLAIN_REGISTER, sources=["DEC-110", s.S6_IN_SOURCES],
+                          decisions=[s.S6_IN_DECISIONS],
+                          success=[f"S1 The widget names its rule [{s.S6_IN_KPI}]."])
+    return SimpleNamespace(project=project, run=project.close())
+
+
+@pytest.fixture(scope="session")
+def s6_archive(tmp_path_factory):
+    """S6, the archive: the path map names an archived register beside the register. The ticket cites DEC-110 (the
+    register's, and in the archive too), DEC-150 and DEC-151 (the archive's alone) from its sources, DEC-152 (the
+    archive's alone, no status line) and DEC-996 (in neither) from a KPI line each."""
+    _, project = _project(tmp_path_factory, "s6-archive", s.PLAIN_REGISTER,
+                          extra_files={s.PATH_MAP_REL: s.path_map(archive_rel=s.ARCHIVE_REL),
+                                       s.ARCHIVE_REL: s.S6_ARCHIVE},
+                          sources=s.S6_ARCHIVE_SOURCES, success=s.S6_ARCHIVE_SUCCESS, failure=s.S6_ARCHIVE_FAILURE)
+    return SimpleNamespace(project=project, run=project.close())
 
 
 @pytest.fixture(scope="session")
