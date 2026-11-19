@@ -2,7 +2,7 @@
 id: DAEO-r3gx
 wbs_id: W2-203
 external-ref: W2-203
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-19T00:10:00Z
@@ -108,3 +108,5 @@ tree; `gov links` counts them among the ids that exist. Where a lookup needs an 
 
 **Decided by the CTO** (not reopened): audit 8 step 5 (b); step 6 teaches the code to read the archive; the archive's
 name and the key beside `decision_register`.
+
+**Closed at the land, 2026-11-19 04:30 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 0a7d1301a (branch `e2/register-exit` at 60faf4271). On the merged tree, through the slot with workers: the acceptance folders W2-203, W2-130, W1-48, W2-129, W2-51, W2-49, W1-06, W2-188, W2-03, W1-10, W2-128 and the unit folders store, check, links, doctor, decisions, records, closure: 1,144 passed and 2 collection errors; the unit folders retrieval, plan, memaudit, close, optin: 1,332 passed; `gov accept W2-203`: 61 passed, 0 failed. The 2 errors were this ticket's (a fix here, the CTO's): `tests/unit/closure/test_w2_203_history.py` and `tests/unit/records/test_w2_203_dangling.py` imported the store folder's builder file by its bare name, which the acceptance folder's file of the same name takes in one collection (the full suite's); they load it by path now, and W2-203's acceptance folder with the store, closure and records unit folders in one run: 119 passed. The builder's check on the merged tree: ok, 161 entries. The main tree's store rebuilt at 0a7d1301a; a search for an archived decision returned 0 of 19 evidence items from `docs/archive/`. Owed: the 271 lines of old version tables that 43 kept entries carry; DEC-085, DEC-086 and DEC-894 (no class, archive only) for the CTO to settle; W2-203's repository-reading cases in the test map's `record_reading` list.
