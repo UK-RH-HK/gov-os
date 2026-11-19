@@ -386,9 +386,13 @@ class TestGeneratedFindings:
 
 
 class TestHeldOutStep:
-    """DEC-635: with a held-out file the generated settings get the generator's step before the comparison.
-    The held-out file is a stand-in naming invented paths."""
-    SETTINGS = heldout.SETTINGS_REL
+    """DEC-635 as DEC-1217 (6) revised it: no held-out step. With a held-out file the generated settings are compared as
+    rulesync writes them. The held-out file is a stand-in naming invented paths.
+
+    Rewrite-Reason: DEC-1217 (6), EMERGENCY-2 2.7; W2-208 K3: the kit writes no ``Read`` deny for a held-out path, so
+    ``heldout.write_read_rules`` retires and the check applies no step; the cases that pinned the step (the step's
+    rules owed, ``HELD_OUT_STEP_FAILED`` for a broken file) are turned to the decided state."""
+    SETTINGS = ".claude/settings.json"
 
     @pytest.fixture()
     def paths(self, tmp_path):
@@ -404,25 +408,26 @@ class TestHeldOutStep:
     def _codes(self, findings):
         return [(f["code"], f.get("file")) for f in findings]
 
+    def _plant_old_rules(self, root, paths):
+        settings = json.loads((root / self.SETTINGS).read_text(encoding="utf-8"))
+        settings.setdefault("permissions", {}).setdefault("deny", []).extend(f"Read(/{path}/**)" for path in paths)
+        _write(root / self.SETTINGS, json.dumps(settings, indent=2) + "\n")
+
     def test_generated_then_the_step_has_no_finding(self, root, tmp_path):
-        assert heldout.write_read_rules(str(root)) == 2
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: the settings as generated, beside a held-out file, have no finding
+        (no step is owed); ``write_read_rules`` is no longer defined."""
+        assert not hasattr(heldout, "write_read_rules")
         assert portability._generated_findings(root, _binary(tmp_path)) == ([], len(GENERATED))
 
     def test_settings_without_the_step_are_a_finding_and_no_path_is_carried(self, root, tmp_path, paths):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: the old step's Read rules are now the finding (no source)."""
+        self._plant_old_rules(root, paths)
         findings, count = portability._generated_findings(root, _binary(tmp_path))
         assert self._codes(findings) == [("GENERATED_DIFFERS", self.SETTINGS)] and count == len(GENERATED)
         assert not any(path in json.dumps(findings) for path in paths)
 
-    def test_one_rule_lost_is_a_finding(self, root, tmp_path):
-        heldout.write_read_rules(str(root))
-        settings = json.loads((root / self.SETTINGS).read_text(encoding="utf-8"))
-        settings["permissions"]["deny"].pop()
-        _write(root / self.SETTINGS, json.dumps(settings, indent=2) + "\n")
-        assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
-            ("GENERATED_DIFFERS", self.SETTINGS)]
-
-    def test_rules_without_a_held_out_file_are_a_finding(self, root, tmp_path):
-        heldout.write_read_rules(str(root))
+    def test_rules_without_a_held_out_file_are_a_finding(self, root, tmp_path, paths):
+        self._plant_old_rules(root, paths)
         (root / heldout.CONFIG_REL).unlink()
         assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
             ("GENERATED_DIFFERS", self.SETTINGS)]
@@ -438,28 +443,36 @@ class TestHeldOutStep:
     ])
     def test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared(
             self, root, tmp_path, paths, text):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: the check reads no held-out file: a broken one is no finding and
+        the generated files are compared (it was one ``HELD_OUT_STEP_FAILED`` and nothing compared)."""
         _write(root / heldout.CONFIG_REL, text.format(key=heldout.CONFIG_KEY, path=paths[0]))
         findings, count = portability._generated_findings(root, _binary(tmp_path))
-        assert self._codes(findings) == [("HELD_OUT_STEP_FAILED", None)] and count == 0
+        assert findings == [] and count == len(GENERATED)
         assert not any(path in json.dumps(findings) for path in paths)
 
     def test_folder_in_place_of_the_held_out_file_is_a_finding(self, root, tmp_path):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: no finding (it was ``HELD_OUT_STEP_FAILED``)."""
         (root / heldout.CONFIG_REL).unlink()
         (root / heldout.CONFIG_REL).mkdir()
-        findings, count = portability._generated_findings(root, _binary(tmp_path))
-        assert self._codes(findings) == [("HELD_OUT_STEP_FAILED", None)] and count == 0
+        assert portability._generated_findings(root, _binary(tmp_path)) == ([], len(GENERATED))
 
     def test_generation_without_settings_is_a_finding_not_a_match(self, root, tmp_path):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: no held-out step fails for want of generated settings (it was
+        ``HELD_OUT_STEP_FAILED``); the files rulesync wrote are compared."""
         files = {rel: text for rel, text in GENERATED.items() if rel != self.SETTINGS}
         findings, count = portability._generated_findings(root, _binary(tmp_path, files=files))
-        assert self._codes(findings) == [("HELD_OUT_STEP_FAILED", None)] and count == 0
+        assert not [code for code, _file in self._codes(findings) if code.startswith("HELD_OUT")]
+        assert count == len(files)
 
     def test_main_is_not_green_and_prints_no_path(self, project, tmp_path, paths, monkeypatch, capsys):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: a broken held-out file gives no ``HELD_OUT_STEP_FAILED``; still no
+        path printed."""
         _write(project / heldout.CONFIG_REL, f"{heldout.CONFIG_KEY}: {paths[0]}\n")
         monkeypatch.chdir(project)
         monkeypatch.setenv("RULESYNC_BIN", _binary(tmp_path))
-        code, printed = portability.main(), capsys.readouterr()
-        assert code == 1 and [f["code"] for f in json.loads(printed.out)["findings"]] == ["HELD_OUT_STEP_FAILED"]
+        portability.main()
+        printed = capsys.readouterr()
+        assert "HELD_OUT_STEP_FAILED" not in [f["code"] for f in json.loads(printed.out)["findings"]]
         assert paths[0] not in printed.out + printed.err
 
 

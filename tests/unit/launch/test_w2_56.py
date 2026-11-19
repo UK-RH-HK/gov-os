@@ -248,6 +248,8 @@ def test_a_cli_that_cannot_be_started_is_refused_and_leaves_no_folder(launched, 
 
 
 # --- S14 (round 2, P-3): the template's rulesync source keeps the one allow rule through a regeneration ---------------
+# Rewrite-Reason: DEC-1217 (6), W2-208 K1: the kit writes two deny lines only and no allow line; the source and the
+# kernel settings allow nothing, and a regeneration of the template writes no allow rule.
 
 TEMPLATE_SOURCE = REPO / "template" / ".rulesync" / "permissions.jsonc"
 TEMPLATE_SETTINGS = REPO / "template" / "governance" / "kernel" / "settings.json"
@@ -258,24 +260,30 @@ def _jsonc(path: Path) -> dict:
                                 if not line.lstrip().startswith("//")))
 
 
+def _kernel_allow() -> list:
+    permissions = json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8")).get("permissions") or {}
+    return list(permissions.get("allow") or [])
+
+
 def test_the_rulesync_source_allows_exactly_the_kernel_settings_allow_rule():
+    """Rewrite-Reason: DEC-1217 (6), W2-208 K1: both allow nothing (it was ``["Bash(gov launch:*)"]``)."""
     source = _jsonc(TEMPLATE_SOURCE)["permission"]
     allowed = [f"Bash({key})" for key, value in source.get("bash", {}).items() if value == "allow"]
     allowed += [f"{tool.capitalize()}({key})" for tool, rules in source.items() if tool != "bash"
                 for key, value in rules.items() if value == "allow"]
-    assert allowed == json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8"))["permissions"]["allow"] \
-        == ["Bash(gov launch:*)"]
+    assert allowed == _kernel_allow() == []
 
 
 @pytest.mark.skipif(shutil.which("rulesync") is None, reason="rulesync is not on PATH")
 def test_a_rulesync_regeneration_of_the_template_keeps_the_allow_rule(tmp_path):
-    """The generation itself (the template's sources only read; the output in an empty folder)."""
+    """The generation itself (the template's sources only read; the output in an empty folder).
+    Rewrite-Reason: DEC-1217 (6), W2-208 K1: the regeneration writes no allow rule, as the kernel settings hold none."""
     done = subprocess.run(["rulesync", "generate", "--targets", "claudecode", "--features", "permissions,hooks",
                            "--input-roots", str(TEMPLATE_SOURCE.parent)], cwd=tmp_path, capture_output=True,
                           text=True, timeout=120)
     assert done.returncode == 0, done.stderr[-1000:]
     generated = json.loads((tmp_path / ".claude" / "settings.json").read_text(encoding="utf-8"))
     kernel = json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8"))
-    assert generated["permissions"]["allow"] == kernel["permissions"]["allow"] == ["Bash(gov launch:*)"]
+    assert list((generated.get("permissions") or {}).get("allow") or []) == _kernel_allow() == []
     # The guard's PreToolUse line left both with the guard (EMERGENCY-2 6.1, DAEO-gr7t).
     assert "PreToolUse" not in generated.get("hooks", {}) and "hooks" not in kernel

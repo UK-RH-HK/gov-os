@@ -14,6 +14,11 @@
   README, "The generated copy"), and so sections 1 to 3 byte for byte.
 
 The wheel and the kit cases build from HEAD, so only committed work is in them.
+
+Rewrite-Reason: DEC-1217 (7), W2-208 K5: the judging-work skill's text is revised to agree with the kit's new head (the
+threat model in the head's words, the Value-first rule) and its version is raised, so the approved bytes of 1.1.0 are no
+longer the kernel's. The kernel file and its mirror are held byte-equal to each other with a version above 1.1.0, and
+the wheel and the kit are held to the kernel file at HEAD (whatever its text), not to the sha256 of 1.1.0.
 """
 
 from __future__ import annotations
@@ -59,16 +64,31 @@ def _export(names: list[str], dest: Path, scratch: Path) -> None:
             (dest / name).write_bytes(data)
 
 
+def _version_tuple(value) -> tuple:
+    parts = str(value or "").split(".")
+    return tuple(int(part) for part in parts) if len(parts) == 3 and all(p.isdigit() for p in parts) else ()
+
+
+def _head_kernel_bytes() -> bytes:
+    """The kernel skill file as HEAD holds it (the wheel and the kit cases build from HEAD)."""
+    done = subprocess.run(["git", "-C", str(s.REPO), "show", f"HEAD:{s.KERNEL_SKILL_REL}"], capture_output=True,
+                          timeout=60, stdin=subprocess.DEVNULL)
+    assert done.returncode == 0, f"HEAD holds no {s.KERNEL_SKILL_REL}: {done.stderr[-500:]!r}"
+    return done.stdout
+
+
 @pytest.mark.parametrize("rel", [s.KERNEL_SKILL_REL, s.MIRROR_REL], ids=["kernel", "rulesync-mirror"])
 def test_s4_the_kernel_skill_and_its_mirror_are_the_approved_bytes(rel):
-    """success-4: ``<rel>`` exists and is the approved text: sha256 ``34ae6c21...``, 4135 bytes,
-    front matter ``version: "1.1.0"``."""
+    """success-4: ``<rel>`` exists, the kernel file and its mirror are byte-equal, and its front matter's version is
+    above 1.1.0. Rewrite-Reason: DEC-1217 (7), W2-208 K5: the text and version are revised (it pinned sha256
+    ``34ae6c21...``, 4135 bytes, version 1.1.0)."""
     path = s.REPO / rel
     assert path.is_file(), f"{rel} does not exist: the skill is not in the kernel"
     data = path.read_bytes()
-    assert s.sha256(data) == s.KERNEL_SHA256 and len(data) == s.KERNEL_SIZE, (
-        f"{rel} is not the approved bytes: sha256 {s.sha256(data)[:12]}, {len(data)} bytes")
-    assert s.version_of(data.decode("utf-8")) == s.VERSION
+    assert data == (s.REPO / s.KERNEL_SKILL_REL).read_bytes() == (s.REPO / s.MIRROR_REL).read_bytes(), (
+        f"{rel}: the kernel skill and its rulesync mirror are not byte-equal")
+    version = s.version_of(data.decode("utf-8"))
+    assert _version_tuple(version) > _version_tuple(s.VERSION), f"{rel} is version {version!r}, not above {s.VERSION}"
 
 
 def test_s4_fabric_packaged_and_kernel_folders_name_the_skill_once(tmp_path):
@@ -86,7 +106,8 @@ def test_s4_fabric_packaged_and_kernel_folders_name_the_skill_once(tmp_path):
 
 def test_s4_a_wheel_built_from_head_carries_the_skill_bytes(tmp_path):
     """success-4 (the release): the wheel built from HEAD's ``src/`` and ``pyproject.toml`` holds
-    ``gov/_shipped/template/governance/kernel/skills/judging-work/SKILL.md``, byte for byte the approved kernel bytes."""
+    ``gov/_shipped/template/governance/kernel/skills/judging-work/SKILL.md``, byte for byte the kernel file at HEAD.
+    Rewrite-Reason: DEC-1217 (7), W2-208 K5: compared with the kernel file at HEAD, not the sha256 of 1.1.0."""
     export, wheels = tmp_path / "export", tmp_path / "wheelhouse"
     _export(["src", "pyproject.toml"], export, tmp_path)
     wheels.mkdir()
@@ -101,14 +122,15 @@ def test_s4_a_wheel_built_from_head_carries_the_skill_bytes(tmp_path):
         names = wheel.namelist()
         assert member in names, f"the wheel of HEAD does not carry {member}"
         data = wheel.read(member)
-    assert s.sha256(data) == s.KERNEL_SHA256, f"the wheel's {member} is not the kernel bytes (sha256 {s.sha256(data)[:12]})"
+    assert data == _head_kernel_bytes(), f"the wheel's {member} is not the kernel bytes (sha256 {s.sha256(data)[:12]})"
 
 
 def test_s4_the_kit_delivers_the_skill_and_adapters_generate_preloads_it(tmp_path):
     """success-4 (the kit): ``copier copy --trust --defaults --skip-tasks`` of a clone of HEAD's ``copier.yml`` and
     ``template/`` (a planted tag) installs the kernel skill and its rulesync mirror with the kernel bytes; ``gov adapters
-    generate --json`` then exits 0 and writes ``.claude/skills/judging-work/SKILL.md``: name ``judging-work``, version
-    1.1.0, its body the kernel's, so sections 1 to 3 byte for byte."""
+    generate --json`` then exits 0 and writes ``.claude/skills/judging-work/SKILL.md``: name ``judging-work``, the
+    kernel's version, its body the kernel's. Rewrite-Reason: DEC-1217 (7), W2-208 K5: the kernel is the file at HEAD
+    (it was the approved 1.1.0 bytes and their sections 1 to 3)."""
     copier = shutil.which("copier", path=s.search_path())
     if copier is None:
         pytest.skip("copier is not installed on this machine")
@@ -121,11 +143,12 @@ def test_s4_the_kit_delivers_the_skill_and_adapters_generate_preloads_it(tmp_pat
     project.mkdir()
     _run([copier, "copy", "--trust", "--defaults", "--skip-tasks", "--overwrite", "--quiet", "--vcs-ref", TAG, clone, project],
          tmp_path, "copier copy of the kit")
-    kernel = s.kernel_text()
+    kernel_bytes = _head_kernel_bytes()
+    kernel = kernel_bytes.decode("utf-8")
     for rel in ("governance/kernel/skills/judging-work/SKILL.md", ".rulesync/skills/judging-work/SKILL.md"):
         path = project / rel
         assert path.is_file(), f"copier copy of the kit installed no {rel}"
-        assert s.sha256(path.read_bytes()) == s.KERNEL_SHA256, f"the kit's {rel} is not the kernel bytes"
+        assert path.read_bytes() == kernel_bytes, f"the kit's {rel} is not the kernel bytes"
     done = subprocess.run([sys.executable, "-B", "-m", "gov.cli.main", "adapters", "generate", "--json", "--root", str(project)],
                           cwd=str(project), env=s.child_env(tmp_path), capture_output=True, text=True, timeout=600,
                           stdin=subprocess.DEVNULL)
@@ -134,6 +157,5 @@ def test_s4_the_kit_delivers_the_skill_and_adapters_generate_preloads_it(tmp_pat
     assert generated.is_file(), f"gov adapters generate wrote no {s.PRELOADED_REL}"
     text = generated.read_text(encoding="utf-8")
     assert s.front_matter(text).get("name") == s.SKILL, f"the generated copy is named {s.front_matter(text).get('name')!r}"
-    assert s.version_of(text) == s.VERSION, f"the generated copy's version is {s.version_of(text)!r}"
+    assert s.version_of(text) == s.version_of(kernel), f"the generated copy's version is {s.version_of(text)!r}"
     assert s.body(text) == s.body(kernel), "the generated copy's body is not the kernel's"
-    assert s.sections(kernel) in text, "the generated copy does not hold sections 1 to 3 byte for byte"

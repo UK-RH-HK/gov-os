@@ -1,7 +1,8 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(gov launch:*)"
+    "deny": [
+      "Bash(git push *)",
+      "Bash(sudo *)"
     ]
   }
 }

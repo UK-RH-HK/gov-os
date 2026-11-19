@@ -2,6 +2,18 @@
 
 **Retired with the guard and the sandbox (EMERGENCY-2 6.1, DAEO-gr7t).** The three hook-line files (`test_w1_38_hooks_any_folder.py`, `test_w1_38_hooks_command_line.py`, `test_w1_38_hooks_source.py`: the guard hook entries' time limit, form and start from any folder) and the class that asked the guard in a generated project are deleted. The held-out step now runs `gov.util.heldout`.
 
+**Revised for W2-208 (DAEO-kt8e, DEC-1217 (6), EMERGENCY-2 2.4 and 2.7; `Rewrite-Reason: DEC-1217 (6), W2-208 K1 and K3`).**
+The kit writes two deny lines only, `Bash(git push *)` and `Bash(sudo *)`, and no `Read` deny for a held-out path.
+`test_w1_38_test_folder_rule.py`: `TestEveryOtherRuleStays` pins the two Bash deny rules (source and generated) and no
+allow rule; `test_the_generated_settings_still_close_the_ticket_folder` (its id kept, as the breadth list names it)
+now holds the ticket folder open: no `Edit` deny rule covers it. `test_w1_38_heldout_step.py` (the round of DEC-635) is turned
+to the decided state: `TestNoHeldOutStep` (a held-out file adds no rule and its settings are green as rulesync
+generates them; the old step's `Read` rules are red on the settings; the old generator writes nothing),
+`TestBrokenHeldOutFile` (a broken held-out file is no finding of the check, still no path printed) and
+`TestHeldOutFileThroughGovCheck`; `TestSettingsAfterTheHeldOutStep`, `TestProjectWithoutAHeldOutFile` and
+`TestStepRepeated` are replaced by them. The tables of the round of DEC-635 below are its history. Red on the base
+(`8e72e0228`): every case that asks for the decided state (the held-out step and the two old rules are still there).
+
 Ticket: `DAEO-3ef2` · Profile: STANDARD · Covers: CAP-52.a, CAP-52.b, CAP-38.b
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-38 -q -p no:cacheprovider -rs`
@@ -762,7 +774,7 @@ its family, its command; the module exists).
 |---|---|
 | CAP-52.a | `TestUnsourcedFile` (skill, command), `TestSettingsHandEdit`, `TestSkillGeneration`, `TestVendoredSkillRegistration`, `TestClaudeMdAndAgentsMd`, `TestOpenSpecCommands`, `TestOpenSpecSkills`, `TestRulesyncVersion`, `TestHookStubs`, `TestGenerateCheck`, `TestDeleteProtection`, `TestHandEditDetected` (CLAUDE.md, AGENTS.md, skill), `TestSourceChangeDetected`, `TestMissingFileDetected::test_missing_agents_md_fails_check` |
 | CAP-52.b | `TestUnsourcedFile` (role), `TestRoleToolsAgainstKernel::test_source_tools_are_the_kernel_role_s`, `TestRoleFieldAgreement`, `TestHandEditDetected::test_hand_edit_role_file` |
-| CAP-38.b | `TestSettingsAfterTheHeldOutStep`, `TestProjectWithoutAHeldOutFile`, `TestBrokenHeldOutFile`, `TestStepRepeated`, `TestHeldOutStepThroughGovCheck` (the round of DEC-635), `TestRoleToolsAgainstKernel` (the two changed-source cases), `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging` |
+| CAP-38.b | `TestNoHeldOutStep`, `TestBrokenHeldOutFile`, `TestHeldOutFileThroughGovCheck` (the round of DEC-635 as DEC-1217 (6) revised it), `TestRoleToolsAgainstKernel` (the two changed-source cases), `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging` |
 
 ## Tools the cases need
 

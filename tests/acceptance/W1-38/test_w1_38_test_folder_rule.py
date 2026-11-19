@@ -25,6 +25,11 @@ are taken out of its permission source, so an adopted product's CTO session reac
 (DEC-172). The cases of behaviour 2 pinned them among the other rules; they now pin the ticket-folder edit rule and
 the sudo rule, and nothing else. The two cases keep their ids ("four other") from DEC-664's round.
 
+Rewrite-Reason: DEC-1217 (6), W2-208 K1: the kit writes two deny lines only, ``Bash(git push *)`` and
+``Bash(sudo *)`` (EMERGENCY-2 2.4). The ticket-folder edit rule and the ``gov launch`` allow leave the template's
+permission source, so the cases of behaviour 2 pin the two Bash deny rules and nothing else, and the case that held
+the ticket folder closed now holds it open (no ``Edit`` deny rule of the generated settings covers it).
+
 Rewrite-Reason: EMERGENCY-2 6.1 (the guard / the sandbox retired), DAEO-gr7t. The class that asked the guard, through the
 PreToolUse commands the generated settings register, about writes under the folder is deleted with the guard, with the
 helpers only it used.
@@ -67,14 +72,14 @@ RULE_LISTS = ("deny", "ask", "allow")
 
 # What the template's source gives beside the rule DEC-664 takes out, and what rulesync makes of each. The two
 # install rules (``npm install*``, ``pip install*``) are taken out too, by DEC-966 item 1.
+# Rewrite-Reason: DEC-1217 (6), W2-208 K1: the kit writes two deny lines only (``git push *`` and ``sudo *``); the
+# ``.tickets/**`` edit rule and the ``gov launch:*`` allow are gone.
 OTHER_SOURCE_RULES = {
-    ("edit", ".tickets/**", "deny"),
+    ("bash", "git push *", "deny"),
     ("bash", "sudo *", "deny"),
-    ("bash", "gov launch:*", "allow"),
 }
 OTHER_GENERATED_RULES = {
-    "allow": ["Bash(gov launch:*)"],
-    "deny": ["Bash(sudo *)", "Edit(.tickets/**)"],
+    "deny": ["Bash(git push *)", "Bash(sudo *)"],
 }
 
 ENGINEER = hooks.ENGINEER
@@ -282,19 +287,21 @@ class TestEveryOtherRuleStays:
     """Green before implementation; it must stay green."""
 
     def test_the_templates_source_gives_the_four_other_rules_and_nothing_else(self, tmp_path):
-        """Since DEC-966 item 1 the other rules are two: the ticket-folder edit rule and the sudo rule (the id is
-        DEC-664's round's)."""
+        """Since DEC-966 item 1 the other rules were two: the ticket-folder edit rule and the sudo rule (the id is
+        DEC-664's round's). Rewrite-Reason: DEC-1217 (6), W2-208 K1: they are the two deny lines, ``git push *`` and
+        ``sudo *``, and nothing else."""
         others = {rule for rule in _source_rules() if not _on_the_folder(rule, tmp_path)}
         assert others == OTHER_SOURCE_RULES, (
-            f"beside the test-folder rule, {SOURCE_REL} must give the ticket-folder edit rule and the sudo rule, "
-            f"and no other (DEC-966 item 1: no install rule); missing: {sorted(OTHER_SOURCE_RULES - others)}, "
+            f"beside the test-folder rule, {SOURCE_REL} must give the git push and the sudo deny rules, "
+            f"and no other (DEC-1217 (6): two deny lines only); missing: {sorted(OTHER_SOURCE_RULES - others)}, "
             f"not expected: {sorted(others - OTHER_SOURCE_RULES)}"
         )
 
     @needs_rulesync
     def test_the_four_other_deny_rules_are_still_generated_and_nothing_else(self, generated_project, tmp_path):
-        """Since DEC-966 item 1 the other deny rules are two: ``Bash(sudo *)`` and ``Edit(.tickets/**)`` (the id is
-        DEC-664's round's)."""
+        """Since DEC-966 item 1 the other deny rules were two: ``Bash(sudo *)`` and ``Edit(.tickets/**)`` (the id is
+        DEC-664's round's). Rewrite-Reason: DEC-1217 (6), W2-208 K1: they are ``Bash(git push *)`` and
+        ``Bash(sudo *)``, and no allow rule."""
         settings = support.load_settings(generated_project)
         permissions = settings.get("permissions")
         assert isinstance(permissions, dict), f"{GENERATED_REL} holds no `permissions` map"
@@ -305,17 +312,20 @@ class TestEveryOtherRuleStays:
         others = {kind: rules for kind, rules in others.items() if rules}
         assert others == OTHER_GENERATED_RULES, (
             f"beside a rule on the acceptance-test folder, {GENERATED_REL} generated from the template's sources "
-            f"must hold the ticket-folder Edit rule and the sudo rule as deny rules, each once, and no other "
-            f"permission rule (DEC-966 item 1: no install rule); it holds {others}"
+            f"must hold the git push and the sudo rules as deny rules, each once, and no other "
+            f"permission rule (DEC-1217 (6): two deny lines only); it holds {others}"
         )
 
     @needs_rulesync
     def test_the_generated_settings_still_close_the_ticket_folder(self, generated_project, tmp_path):
-        """By what the rule covers, not by its spelling: a ticket file that exists and a new one."""
+        """By what the rule covers, not by its spelling: a ticket file that exists and a new one.
+        Rewrite-Reason: DEC-1217 (6), W2-208 K1: the kit writes two deny lines only; no Edit deny rule closes the
+        ticket folder any more, so the case now holds it open (its id is kept: ``tests/optin-lifted-breadth.txt``
+        names it)."""
         specs = _edit_rules(support.load_settings(generated_project))
-        open_ = [rel for rel in (".tickets/DAEO-zz90.md", ".tickets/new/DAEO-zz99.md")
-                 if not launch_support.covers(specs, rel, generated_project, tmp_path / "home")]
-        assert not open_, f"no Edit deny rule of {GENERATED_REL} covers {open_}; rules: {specs}"
+        closed = [rel for rel in (".tickets/DAEO-zz90.md", ".tickets/new/DAEO-zz99.md")
+                  if launch_support.covers(specs, rel, generated_project, tmp_path / "home")]
+        assert not closed, f"an Edit deny rule of {GENERATED_REL} covers {closed}; rules: {specs}"
 
 
 # ===================================================================

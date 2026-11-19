@@ -76,7 +76,10 @@ to the launcher's END_WAIT_S (5 s) and a margin each.
   not on PATH at test time; the daemon folders of one session lie in one folder of its own, apart from another
   session's, gone when the session ends, and each is short enough for the tool's socket (107 bytes, DEC-338).
 - **The template:** `template/governance/kernel/settings.json`'s `permissions.allow` is exactly
-  `["Bash(gov launch:*)"]`, and its hooks stay.
+  `["Bash(gov launch:*)"]`, and its hooks stay. **Revised for W2-208** (`Rewrite-Reason: DEC-1217 (6), W2-208 K1`):
+  the kit writes no allow line, so `test_w2_56_template.py` holds `permissions.allow` empty (S14) and no raw `claude`
+  launch admitted (F6's half that still holds); the `gov launch` half of F6 retires with the allow rule. Red on the
+  base (`8e72e0228`): the allow rule is still there.
 
 ### The second half's interface (DEC-1112 (1))
 

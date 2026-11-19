@@ -6,8 +6,7 @@ Three comparisons, each a finding when it fails or cannot be made:
    with its source's ``claudecode.tools`` (DEC-471);
 3. the generated files, byte for byte, with what rulesync generates from the sources into an empty
    temporary folder; a file of the generated folders that rulesync does not write has no source.
-   When the project has a held-out file, the held-out generator's step (``gov.util.heldout``) is
-   applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
+   Nothing is added to the generated settings before the comparison (the held-out step is retired, W2-208).
 A role with a kernel role template (W2-153, DEC-1050) has its source compared with ``compose(root, role)``: the
 source's own rulesync front matter, with the role's skills list under ``claudecode: skills:`` (where rulesync passes
 it to the generated agent, DEC-1112 (3)), the template's body, one blank line and the role file's body (S3 amended,
@@ -19,6 +18,11 @@ and matchers with the paths normalised (DEC-805), except that the hook ACT 1 lif
 only (posttooluse.py, in postToolUse and postToolUseFailure) is left out of the comparison, per hook, while the
 repository's source does not run it in that event: the rest of those events compares as any other (DEC-971 item 3,
 W2-185 S2; it ends with W2-08, when the hook returns).
+
+In a project that has the kit's head (``.rulesync/rules/governance.md``), the kit's text is read too (W2-208 F1,
+EMERGENCY-2 2.2): a line of the head, the ``judging-work`` skill or the permission files that names the guard, the
+sandbox or a permission prompt as in force is a finding, ``KIT_TEXT_GUARD_IN_FORCE``, naming the file and the line
+(``kit_text_findings``).
 
 Prints ``{"findings": [...], "compared": {...}}`` and exits 0 only without findings.
 """
@@ -36,7 +40,6 @@ from pathlib import Path
 
 import yaml
 
-from gov.util import heldout
 from gov.launch.launcher import ROLE_TEMPLATES, TEMPLATES_REL
 
 REGISTRY = "governance/project/tool-registry.yaml"
@@ -71,6 +74,16 @@ ROLE_SKILLS = {
     "research": ["discovery"],
     "orchestrator": ["orchestration", "judging-work"],
 }
+# W2-208 F1 (DEC-1217 (6)): the kit files whose text may not name the guard, the sandbox or a permission prompt as in
+# force (EMERGENCY-2 2.2), the head first. A line that says one is retired ("no" just before it, as the head's "No
+# guard, no sandbox, no permission prompts", or a form of "retire" on the line) is no finding; "guards" (the verb of
+# the threat model, "Gov OS guards against ...") is another word.
+KIT_TEXT_FILES = (".rulesync/rules/governance.md", ".rulesync/skills/judging-work/SKILL.md",
+                  "governance/kernel/skills/judging-work/SKILL.md", ".rulesync/permissions.jsonc",
+                  "governance/kernel/settings.json")
+KIT_TEXT_IN_FORCE = re.compile(r"\b(?:guard|sandbox(?:es|ed)?|permission[ -]prompts?)\b", re.IGNORECASE)
+KIT_TEXT_NO = re.compile(r"\bno\s+$", re.IGNORECASE)
+KIT_TEXT_RETIRED = re.compile(r"\bretir(?:e|es|ed|ing)\b", re.IGNORECASE)
 # W2-153 S4: the kernel templates copied byte for byte into .claude/templates/ (written only by an ACT, DEC-315).
 TEMPLATE_COPIES = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
                    "role-reviewer", "role-lead", "role-cto")
@@ -391,25 +404,36 @@ def _hooks_findings(root: Path) -> list[dict]:
     return findings
 
 
+def kit_text_findings(root: Path) -> list[dict]:
+    """W2-208 F1: one ``KIT_TEXT_GUARD_IN_FORCE`` finding per line of the files of ``KIT_TEXT_FILES`` (those the
+    project has) that names the guard, the sandbox or a permission prompt as in force; ``line`` is 1-based, the front
+    matter counted."""
+    findings = []
+    for rel in KIT_TEXT_FILES:
+        path = Path(root) / rel
+        if not path.is_file():
+            continue
+        for number, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            if KIT_TEXT_RETIRED.search(line):
+                continue
+            if any(not KIT_TEXT_NO.search(line[:found.start()]) for found in KIT_TEXT_IN_FORCE.finditer(line)):
+                findings.append({"code": "KIT_TEXT_GUARD_IN_FORCE", "file": rel, "line": number,
+                                 "message": "names the guard, the sandbox or a permission prompt as in force: "
+                                            f"{line.strip()}"})
+    return findings
+
+
 def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
     """Comparison 3: ``(findings, number of files compared)``. rulesync generates from the project's
     sources into an empty temporary folder; each file it writes there is compared byte for byte with the
     project's, and a file of the generated folders that it did not write is a file without a source.
-    Without a root rule rulesync has no source for CLAUDE.md and AGENTS.md and would not write them.
-    A project with a held-out file has the generator's Read deny rules written into the generated
-    settings first (DEC-635); a step that fails is a finding of fixed text, and nothing is compared."""
+    Without a root rule rulesync has no source for CLAUDE.md and AGENTS.md and would not write them."""
     rules = sorted((root / SOURCES / "rules").glob("*.md"))
     if not any(isinstance(front := _split(rule)[0], dict) and front.get("root") is True for rule in rules):
         return [_finding("ROOT_RULE_ABSENT", f"{SOURCES}/rules/ holds no rule marked root: true: "
                          "CLAUDE.md and AGENTS.md have no source; the generated files were not compared")], 0
     with tempfile.TemporaryDirectory() as fresh:
         code, out, err = _run(binary, *GENERATE, str((root / SOURCES).resolve()), cwd=Path(fresh))
-        if code == 0 and os.path.lexists(root / heldout.CONFIG_REL):
-            try:
-                heldout.write_read_rules(str(root), os.path.join(fresh, heldout.SETTINGS_REL))
-            except Exception as exc:  # its text may quote the held-out file: the type only
-                return [_finding("HELD_OUT_STEP_FAILED", "the held-out step could not be applied to the generated "
-                                 f"settings ({type(exc).__name__}); the generated files were not compared")], 0
         made = {str(path.relative_to(fresh)): path.read_bytes()
                 for path in sorted(Path(fresh).rglob("*")) if path.is_file()}
     if code != 0 or not made:
@@ -437,6 +461,8 @@ def main(argv: list[str] | tuple[str, ...] = ()) -> int:
     findings, kernel_files = _kernel_findings(root)
     findings += _template_findings(root)
     findings += _hooks_findings(root)
+    if (root / KIT_TEXT_FILES[0]).is_file():
+        findings += kit_text_findings(root)
     generated_files = 0
     if version is not None:
         version["message"] += "; the generated files were not compared"
