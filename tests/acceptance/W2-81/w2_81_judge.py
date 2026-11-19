@@ -3,7 +3,7 @@
 Given one repository's manifest and an adoption's outputs on it, the judge gives
 each planted problem FOUND_AND_HANDLED, MISSED, MISHANDLED or NOT_BUILT, with the
 evidence it read (record and field), and each control CLEAN or FLAGGED. Over all
-the repositories and the question figures, it gives READY or NOT_READY, naming
+the repositories and their end-to-end memory figures, it gives READY or NOT_READY, naming
 each reason. It writes nothing and prints nothing.
 
 **What it reads (the adoption's outputs).** The adopted repository's working tree:
@@ -62,7 +62,7 @@ FINDING_KINDS = ("secret", "orphaned-test", "drift")
 FINDING_STATES = ("OPEN", "ACCEPTED", "RESOLVED")
 VERDICTS = ("ADOPTED_HEALTHY", "ADOPTED_WITH_ACCEPTED_EXCEPTIONS", "NOT_ADOPTED_HEALTHY")
 LEAVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT", "RETIRE", "DELETE_FROM_ACTIVE_TREE")
-from w2_81_score import FLOORS  # noqa: E402 - CAP-10's floor; DEC-833's target, one constant each
+from w2_81_score import E2E_BAR  # noqa: E402 - the one bar: memory judged end to end, 95 % per repository (DEC-1221 (1))
 
 # The record names of the stages project.record_path does not name: A7 and A10 as the lite gates write them
 # (gov.adopt.lite_gates.record_path), and the lite verdict, not built yet (README, "The judge").
@@ -850,9 +850,15 @@ def own_value(manifest, entry, secrets):
     return next((held for held in secrets if held == mine), None)
 
 
+def _is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and value == value  # not a boolean, not NaN
+
+
 def overall(judgements, figures, expected):
     """READY only when every repository expected is judged, every planted problem is FOUND_AND_HANDLED, no control is
-    FLAGGED, every stage is present (none NOT_BUILT), and both figures of every repository meet their floors."""
+    FLAGGED, every stage is present (none NOT_BUILT), and every repository's end-to-end figure (the share of its
+    questions judged right) is at least ``E2E_BAR``. ``figures`` maps a repository to ``{"end_to_end": f}``; hit@5 and
+    the stacked share may sit beside it as diagnostics and are never read: low or absent, they change nothing."""
     reasons = []
     by_name = {j["repository"]: j for j in judgements}
     reasons += [f"{name}: not judged" for name in expected if name not in by_name]
@@ -862,12 +868,11 @@ def overall(judgements, figures, expected):
         reasons += [f"{name}: {c['id']} is FLAGGED" for c in j["controls"] if c["status"] != CLEAN]
         reasons += [f"{name}: stage {s} is {v['status']}" for s, v in j["stages"].items() if v["status"] != "PRESENT"]
         given = (figures or {}).get(name)
-        for figure, floor in FLOORS.items():
-            value = given.get(figure) if isinstance(given, dict) else None
-            if not isinstance(value, (int, float)) or isinstance(value, bool):
-                reasons.append(f"{name}: the figure {figure} is missing (its floor is {floor:g})")
-            elif value < floor:
-                reasons.append(f"{name}: the figure {figure} is {value:g}, below its floor of {floor:g}")
+        value = given.get("end_to_end") if isinstance(given, dict) else None
+        if not _is_number(value):
+            reasons.append(f"{name}: the end-to-end figure is missing (its bar is {E2E_BAR:g})")
+        elif value < E2E_BAR:
+            reasons.append(f"{name}: the end-to-end figure is {value:g}, below its bar of {E2E_BAR:g}")
     return {"verdict": NOT_READY if reasons else READY, "reasons": reasons, "repositories": judgements}
 
 
