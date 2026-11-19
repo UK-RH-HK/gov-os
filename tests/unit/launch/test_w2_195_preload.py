@@ -107,10 +107,10 @@ def _appended(line: str) -> str:
                          + ["template/governance/kernel/templates/role-reviewer.md"])
 def test_each_file_changes_only_its_skills_lines_by_appending_judging_work(rel):
     old, new = _at_base(rel), (REPO / rel).read_text(encoding="utf-8").split("\n")
-    # W2-201 S1 changes the launch lines of these files (and adds the auditor's table line); they are no part of
-    # W2-195's change, so both sides are compared without them
-    old, new = ([line for line in side if not line.startswith(("- **Launch default:**", "- **Launch by criticality:**"))]
-                for side in (old, new))
+    # W2-201 S1 changes the launch lines of these files (and adds the auditor's table line), and its fix X5 the Tools
+    # line (DEC-1219 (5)); they are no part of W2-195's change, so both sides are compared without them
+    other = ("- **Launch default:**", "- **Launch by criticality:**", "- **Tools:**")
+    old, new = ([line for line in side if not line.startswith(other)] for side in (old, new))
     if old == new:
         pytest.skip("the base already holds W2-195's change (HEAD is integrate after the landing)")
     assert len(old) == len(new)
