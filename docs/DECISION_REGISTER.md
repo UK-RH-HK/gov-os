@@ -1960,6 +1960,18 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-19 ("U-1: (a) full pace ... Cut your own cost now ... Tests: TI-8 yes ... Wave 3: close W2-42 with the guard. The revert was right: that was my second Fable reset."); the incidents behind the new rules: (1) the plan reached 100 % at 05:47 and every session stopped from 07:02 to 13:09 on 2026-11-19 with the brief undelivered; (2) the CTO's session read 167 million cached tokens overnight in 436 calls, about 380,000 a call, the largest single spend of the night.
 - **Governing sources:** docs/emergency-2/MORNING-BRIEF-2026-11-19.md; docs/emergency-2/TEST-INVENTORY-2026-11-19.md; DEC-1215; DEC-1216; DEC-1217.
 
+### DEC-1219 — The owner's answers of 19 November afternoon: G5 approved by group (G5-7 worded), CAP-63 to CAP-69 each, T2-1; W2-208 is a fix under W2-17 and a chore, not a ticket; what becomes a ticket goes into code in release 0.1.4
+- **Status:** ACCEPTED (owner, 2026-11-19 about 14:20, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1214, DEC-1217, DEC-1218 · **Changes:** DEC-1214 G5 (approved; the status of Charter v6 and Contract v5 becomes ACCEPTED when they land); DEC-957 (its escalation rubric is replaced by `docs/emergency-2/T2-ESCALATION-RUBRIC.md` §2); DEC-1201's and the build list's W2-208 (no ticket: its work is a fix under W2-17 and a chore)
+- **Decision:**
+  - (1) **G5-1 to G5-13 yes,** with one wording change: G5-7's scan "runs once before a repository goes public or is shared with a third party" (CAP-03, CAP-41.g and the Charter's matching text). **CAP-63, CAP-64, CAP-65, CAP-66, CAP-67, CAP-68 and CAP-69: yes, each.** The CTO then does the approval page's "After your yes" steps.
+  - (2) **T2-1 yes:** the rewritten escalation rubric replaces DEC-957's; the kernel text follows (EMERGENCY-2 3.5), with the page's §3 brought in line (T2-3 (a), DEC-1217 (5)).
+  - (3) **TI-1 to TI-7** come to the owner after the TI-8 audit. **Release 0.1.4:** push the owner the moment the base is green.
+  - (4) **W2-208 is not a ticket.** By the rubric, the deny lines are a fix recorded in `gov update`'s own ticket (W2-17, `DAEO-sdhj`), and the golden rules are kernel text, a chore committed directly. W2-208's work is recorded under W2-17 and W2-208 is closed on its record.
+  - (5) **What becomes a ticket goes into code, in release 0.1.4.** "Only half the rubric is in code: the model and effort part is (W2-201), but what becomes a ticket is not, and a lead can only be launched against a ticket." The launcher accepts a fix under its owning ticket and a chore with no ticket; a new ticket must be a feature with its spec and KPIs, flagged at the landing if not, never refused. Recorded as a fix under W2-201 (`DAEO-k1us`), the rubric in code.
+  - (6) **From now on, a new ticket is opened only for a new feature** (EMERGENCY-2 4.1, 4.2, 4.6).
+- **Basis:** the owner's message of 2026-11-19 ("G5-1 to G5-13 yes, with one wording change ... The rubric is still not applied: W2-208 should not be a ticket ... Fix that in code, in release 0.1.4 ... From now on, open a new ticket only for a new feature."); the incident behind (4) to (6): the CTO opened W2-208 (`8e72e0228`, 2026-11-19 13:39) for a fix and a chore, because `gov launch` takes only a ticket.
+- **Governing sources:** docs/emergency-2/G5-APPROVAL.md (branch e2/g4-g5); docs/emergency-2/T2-ESCALATION-RUBRIC.md; docs/emergency-2/TEST-INVENTORY-2026-11-19.md; EMERGENCY-2 4.1 to 4.6; DEC-1214; DEC-1217; DEC-1218.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
