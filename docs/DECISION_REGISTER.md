@@ -1981,6 +1981,14 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-19 ("TI-1 yes, TI-2 yes, TI-3 b, TI-4 yes, TI-5 yes, TI-6 yes, TI-7 yes, last. The old CTO sessions still show in my app: close them ... After 0.1.4, bring me a design for releasing on my behalf ..."); the incidents behind it: the TI-8 audit (49 % of the default run's time in slow cases, 1,963 cases asserting retired things); a stale CTO session left running after the handover of 13:41; every release so far waited on the owner's hand.
 - **Governing sources:** docs/emergency-2/TEST-AUDIT-TI8-2026-11-19.md; docs/emergency-2/TEST-INVENTORY-2026-11-19.md; EMERGENCY-2 2.5, 2.11, 8.3; DEC-1218; DEC-1219.
 
+### DEC-1221 — W2-81 stays, judging memory end to end on Sonnet; a new feature proposed: adoption of what a repository brings in
+- **Status:** ACCEPTED (owner, 2026-11-19 about 16:10, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing; item (2) is a request for a proposal, not yet a feature) · **Under:** DEC-1210, DEC-1219, DEC-1220 · **Changes:** W2-81's scorer line (hit@5 against CAP-10's floor of 85 and the 99 % stacked-context target) and its re-run line (release 0.1.1)
+- **Decision:**
+  - (1) **W2-81 stays:** "adopting Gov OS across different kinds of repository matters. It judges memory end to end, not by hit@5, and runs on Sonnet." Its memory figure is judged end to end as EMERGENCY-2 5.3 and DEC-1210 (1) define (the reader reads the whole ranked bundle and searches once more in its own words; the answer and its citation must both be right), hit@k at most a diagnostic (EMERGENCY-2 5.2); its sessions run Sonnet; its proving run is release acceptance item 2 (EMERGENCY-2 8.2) on the release candidate.
+  - (2) **A new feature, for the owner's yes, with its spec and KPIs:** adoption of what a repository brings in (other repositories, tools, kernels, data), each classed as a dependency to use, something to assess and absorb the useful parts of, or research to study, and placed in the repository's memory accordingly. When it is built, W2-81 gains a repository that imports things.
+- **Basis:** the owner's message of 2026-11-19 ("W2-81 stays ... A new feature for your proposal, with its spec and KPIs, for my yes ..."); the incident behind (1): W2-81's scorer still held hit@5 against CAP-10's 85, which EMERGENCY-2 5.2 and Contract v5's CAP-10 removed as a floor.
+- **Governing sources:** .tickets/DAEO-l78m.md; EMERGENCY-2 5.2, 5.3, 8.2; DEC-1210; DEC-1219 (6).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
