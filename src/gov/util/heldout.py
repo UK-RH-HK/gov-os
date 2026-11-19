@@ -1,13 +1,14 @@
-"""Held-out paths (W1-47, DEC-162, DEC-215, DEC-218): the list in ``governance/project/held-out.yaml`` and the
-``Read`` deny rules ``gov adapters`` writes from it into the generated settings (DEC-635).
+"""Held-out paths (W1-47, DEC-162, DEC-215, DEC-218): the list in ``governance/project/held-out.yaml``.
 
 Moved from ``gov.guard.heldout`` when the guard was retired (EMERGENCY-2 6.1); the guard's rule that refused a call
-naming a held-out path went with it. No message of this module carries a path.
+naming a held-out path went with it. The step that wrote one ``Read`` deny rule per held-out path into the generated
+settings (DEC-635) is retired too (W2-208, EMERGENCY-2 2.7: a hidden set is protected by the transcript scan, not by a
+deny); ``gov update`` takes the lines it wrote out of a project's settings (``gov.update.core.legacy_lines``). No
+message of this module carries a path.
 """
 
 from __future__ import annotations
 
-import json
 import os
 
 # The duplicate-key YAML reader is ``gov.util.parts``'s: one source (W2-150 S6, DEC-1109 (2)).
@@ -64,29 +65,3 @@ def load_held_out(project_root: str) -> list[str]:
 # path and text; in memory only, never on disk.
 _PARSED: dict = {}
 _MOST_KEPT = 16
-
-
-def write_read_rules(project_root: str, settings_path: str | None = None) -> int:
-    """Write one ``Read`` deny rule per held-out path into a settings file
-    and return how many were added.  Prints nothing (DEC-218)."""
-    paths = load_held_out(project_root)
-    if not paths:
-        raise HeldOutError(f"{CONFIG_REL} does not exist")
-    settings_path = settings_path or os.path.join(project_root, SETTINGS_REL)
-    with open(settings_path, encoding="utf-8") as f:
-        settings = json.load(f)
-    deny = settings.setdefault("permissions", {}).setdefault("deny", [])
-    added = 0
-    for p in paths:
-        rule = f"Read(/{p}/**)"  # //<path> is the absolute form in a rule
-        if rule not in deny:
-            deny.append(rule)
-            added += 1
-    with open(settings_path, "w", encoding="utf-8") as f:
-        f.write(json.dumps(settings, indent=2) + "\n")
-    return added
-
-
-if __name__ == "__main__":
-    root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
-    print(f"{write_read_rules(root)} Read deny rule(s) added to {SETTINGS_REL}")

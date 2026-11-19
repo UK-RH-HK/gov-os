@@ -1,8 +1,8 @@
 """``gov adapters generate`` (W2-23 S2; W2-H050, W2-M229, W2-M232, W2-M312): the adapters from ``.rulesync/``, merged
 into the programme's own files instead of written over them.
 
-``rulesync generate`` runs into an empty temporary folder (the procedure of DEC-645), the held-out step applied to
-its settings as the adapter check applies it (DEC-635); then:
+``rulesync generate`` runs into an empty temporary folder (the procedure of DEC-645); nothing is added to what it
+writes (the held-out step that wrote a ``Read`` deny per held-out path is retired, W2-208, EMERGENCY-2 2.7); then:
 
 - ``CLAUDE.md`` and ``AGENTS.md``: every line of the programme's own file stays, in its order; the generated text
   stands in one marked block after them (``<!-- gov:generated begin -->`` ... ``<!-- gov:generated end -->``), which
@@ -47,7 +47,6 @@ def _refuse(code: str, message: str, **details) -> GovError:
 def generate_into(root: Path, folder: Path) -> dict[str, bytes]:
     """What ``rulesync generate`` writes from the project's ``.rulesync/`` into ``folder``: path -> bytes."""
     from gov.adapters import portability
-    from gov.util import heldout
 
     binary = portability._find_rulesync()
     if binary is None:
@@ -58,11 +57,6 @@ def generate_into(root: Path, folder: Path) -> dict[str, bytes]:
                                       cwd=folder)
     if code != 0:
         raise _refuse("RULESYNC_FAILED", f"rulesync generate ended with {code}: {(err or out).strip()[-500:]}")
-    if os.path.lexists(root / heldout.CONFIG_REL) and (folder / SETTINGS).is_file():
-        try:
-            heldout.write_read_rules(str(root), str(folder / SETTINGS))
-        except Exception as exc:  # its text may quote the held-out file: the type only
-            raise _refuse("HELD_OUT_STEP_FAILED", f"the held-out step failed ({type(exc).__name__})") from None
     return {path.relative_to(folder).as_posix(): path.read_bytes()
             for path in sorted(folder.rglob("*")) if path.is_file()}
 
