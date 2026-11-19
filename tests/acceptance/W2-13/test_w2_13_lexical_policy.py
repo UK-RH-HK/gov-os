@@ -298,8 +298,11 @@ def test_the_repository_marks_the_evaluation_sets_own_documents_not_indexed(pref
 def test_the_repository_keeps_nothing_else_out_of_the_keyword_index():
     """The converse (the D-7 review's F2; DEC-1052 M-4: tests and the close, checkpoint and probe records stay in
     keyword search). This repository's path map says ``lexical_policy: not indexed`` on ``evaluation-sources`` and
-    ``evaluation-fixtures`` only. Every tracked file that a namespace keeps out lies under the decided patterns: lens B's
-    report, W2-15a's raw measure output and the evaluation fixtures (DEC-1066 (3))."""
+    ``evaluation-fixtures`` (DEC-1066 (3)), on ``history-archive`` (EMERGENCY-2 11.1, 11.3) and on ``archive``, the old
+    decision register archived after audit 8 (EMERGENCY-2 11.3, DEC-1214 G4; W2-203), and on no other. Every tracked
+    file that a namespace keeps out lies under the decided patterns: lens B's report, W2-15a's raw measure output, the
+    measure's audit, the evaluation fixtures, the archived start-up documents and ``docs/archive/**``; the register in
+    force (the path map's ``decision_register``) is never among them."""
     namespaces = s6.repository_namespaces()
     marked = {name for name, entry in namespaces.items()
               if isinstance(entry, dict) and entry.get(s6.FIELD) == s6.NOT_INDEXED}
@@ -312,3 +315,8 @@ def test_the_repository_keeps_nothing_else_out_of_the_keyword_index():
     assert kept, "premise: the path map keeps no tracked file out of the keyword index"
     extra = [path for path in kept if not any(s6.matches(path, pattern) for pattern in s6.KEPT_OUT_BY_DECISION)]
     assert not extra, f"{len(extra)} tracked files kept out of the keyword index that no decision names: {extra[:5]}"
+    # W2-203: the archive is kept out, the register in force is not (its entries are what memory answers from)
+    archived = [path for path in kept if path.startswith(s6.REGISTER_ARCHIVE)]
+    assert archived, f"premise: no tracked file under {s6.REGISTER_ARCHIVE} is kept out of the keyword index"
+    assert "docs/DECISION_REGISTER.md" in files and "docs/DECISION_REGISTER.md" not in kept, \
+        "the decision register in force is kept out of the keyword index (only its archive is, EMERGENCY-2 11.3)"
