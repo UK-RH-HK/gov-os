@@ -11,12 +11,17 @@ carries it beside `w2/integrate`. Its first commit (`0412d69e`) imported the rec
 tree for tree: the folder's tree object `46610514` is the same on both branches. The record's earlier history stays in
 `w2/integrate`'s history, unchanged.
 
+**Syncing stopped, 2026-11-18 (DEC-1214 G2, the owner).** `record/w2` and `origin/record/w2` stay as they are (367 commits, the old
+committed record); nothing copies into it any more: `sync_context.py` and its test are removed (they are on
+`archive/pre-emergency-2`), and the worktree `/home/usain/gov-os-worktrees/W2-00-record/` is removed (`git worktree add <dir>
+record/w2` brings it back). Read the branch with `git show record/w2:<path>`. The text below describes the record as it was.
+
 **What stays here, in the main tree, for agents to search:**
 
 | Path | What it holds |
 |---|---|
 | `README.md` | this file |
-| `sync_context.py` | the copy script |
+| `sync_context.py` | (removed, DEC-1214 G2) the copy script |
 | `packages/` | the decision packages brought to the owner |
 | `sessions/` | session summaries, one per compaction or session end |
 | `main/orchestrator/CHECKPOINT.md` | a copy of the orchestrator's checkpoint, its RESUME HERE section first, refreshed with decision-record commits (`sync_context.py --main`) |
