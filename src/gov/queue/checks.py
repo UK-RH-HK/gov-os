@@ -7,6 +7,10 @@
   trailer, each of them ``independent-test-designer`` or ``owner``.
 - **The path notice** (audit 7 C-6): every path a non-merge commit changes outside the ticket's ``allowed_paths``
   and its own record places is listed; it never refuses.
+- **The new ticket notice** (W2-201 fix X4, DEC-1219 (5)): each ticket file ``.tickets/<id>.md`` the branch adds (a
+  path new at the tip, not an edit of one at the base) is a feature when it holds KPIs (a ``kpis.success`` line with
+  its verify) and a spec (a body after its front matter); one that lacks either, or whose front matter cannot be
+  read, is named in one ``NEW_TICKET_NOT_FEATURE`` notice; it never refuses.
 - **The acceptance tests are there** (W2-202 A3): a ticket judged on its tests has an acceptance folder that holds a
   test and a README whose KPI map the runner of ``gov accept`` reads; else it is refused before any run.
 """
@@ -22,6 +26,10 @@ from gov.util.gitenv import git_env
 TEST_ROLES = ("independent-test-designer", "owner")
 ACCEPTANCE = "tests/acceptance/"
 NO_ACCEPTANCE_TESTS = "NO_ACCEPTANCE_TESTS"
+NEW_TICKET_NOT_FEATURE = "NEW_TICKET_NOT_FEATURE"
+TICKETS = ".tickets/"
+NO_KPIS, NO_SPEC, UNREADABLE = ("no kpis.success line with a verify", "no spec (the ticket's body is empty)",
+                                "front matter unreadable")
 
 
 def _git(root: Path, *args: str, ok: bool = False) -> str | None:
@@ -79,6 +87,50 @@ def path_notices(root: Path, base: str, tip: str, allowed: list[str], own: list[
             if any(match(path, p) for p in allowed) or _under(path, own):
                 continue
             notices.append({"commit": commit, "path": path})
+    return notices
+
+
+def _verified(line) -> bool:
+    """A ``kpis.success`` line with its verify: the mapping form's non-blank ``verify``, or the string form's
+    ``Verify:``."""
+    if isinstance(line, dict):
+        return isinstance(line.get("verify"), str) and bool(line["verify"].strip())
+    return isinstance(line, str) and "Verify:" in line
+
+
+def _missing(text: str) -> list[str]:
+    """What a ticket file's text lacks to be a feature: its KPIs, its spec, or a front matter that can be read."""
+    from gov.util.frontmatter import FrontmatterError, parse
+
+    try:
+        front = parse(text)
+    except FrontmatterError:
+        front = None
+    if front is None:
+        return [UNREADABLE]
+    kpis = front.get("kpis")
+    success = kpis.get("success") if isinstance(kpis, dict) else None
+    lines = text.split("\n")
+    body = "\n".join(lines[lines.index("---", 1) + 1:])
+    return ([] if isinstance(success, list) and any(map(_verified, success)) else [NO_KPIS]) + \
+        ([] if body.strip() else [NO_SPEC])
+
+
+def ticket_notices(root: Path, base: str, tip: str) -> list[dict]:
+    """``{"id", "code", "notice"}`` for each ticket file ``.tickets/<id>.md`` that ``tip`` adds against ``base`` (a
+    path ``base`` does not hold) and that, read at ``tip``, is not a feature (``_missing``). ``RuntimeError`` where
+    git cannot read them (the caller says so and lands anyway)."""
+    names = _git(root, "diff", "-z", "--no-renames", "--name-only", "--diff-filter=A", base, tip, "--", TICKETS)
+    notices = []
+    for path in sorted(filter(None, names.split("\0"))):
+        name = path[len(TICKETS):]
+        if not path.startswith(TICKETS) or "/" in name or not name.endswith(".md") or name == ".md":
+            continue
+        ticket = " ".join(name[:-len(".md")].split())  # one line, whatever the file's name
+        missing = _missing(_git(root, "show", f"{tip}:{path}"))
+        if missing:
+            notices.append({"id": ticket, "code": NEW_TICKET_NOT_FEATURE,
+                            "notice": f"{NEW_TICKET_NOT_FEATURE} {ticket}: {'; '.join(missing)}"})
     return notices
 
 

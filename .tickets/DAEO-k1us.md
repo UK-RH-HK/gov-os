@@ -92,3 +92,79 @@ ephemeral_5m: 0}`. Both variables work on this CLI; the launcher keeps the first
 **Fix at the land, 2026-11-19 02:17 (the CTO; the merge was at 02:15; EMERGENCY-2 4.2):** the helper rule read a spawn's ticket only from the project's own `.tickets/`, but a lead writes its feature as a ticket on its own branch, so every running C3 lead's Fable helpers would have been refused from the moment this merged (five leads were running, their tickets W2-200, W2-203, W2-204, W2-205, W2-206 on their branches). The hook now reads a ticket the project does not hold from the repository's other worktrees (`git worktree list`); the project's own copy wins; a ticket in no worktree is still unreadable (Sonnet). The failing tests first: `tests/unit/hooks/test_w2_201_agent_model_worktree.py` (2 of 5 red before, 5 green after; the hook's 65 older unit cases green).
 
 **Closed at the land, 2026-11-19 02:28 (the CTO; EMERGENCY-2 4.3 step 5):** merged as bb3a7bb3e (branch `e2/k1-usage` at d5b7caaad), with the fix above (c3c5a836f). On the merged tree, through the slot with workers: `tests/acceptance/W2-201`, `W2-33`, `W2-184`, `W2-153`, `W2-60a`, `W2-60b`, `W2-195`, `W2-156`, `W1-33`, `tests/unit/launch`, `hooks`, `adapters`, `optin`: 2,724 passed, 24 skipped, and 1 collection error that was the CTO's own new unit file (it imported its sibling by bare name; fixed, `tests/unit/hooks` then 201 passed); `gov accept W2-201`: 240 passed, 0 failed. The CTO's rulings on the lead's lines: the QA engineer's C2 review on Sonnet stays (DEC-1214 K1, "C2 auditors included"); the auditor and the QA engineer stay in the exceptions file for C3 only; the senior engineer's model goes to the owner as one line (K1-1); a W2-184 promotion's Opus under DEC-1215's substitution is a fix still owed in this record. The usage logger's one-hour floor (a scratch tool, not held by this ticket's code) was applied by the CTO at 02:17.
+
+## Fix: what becomes a ticket (DEC-1219 (5))
+
+A fix in this feature, not a new ticket (EMERGENCY-2 4.2; audit 4 Table 3 rows 1 to 4, guardrail 3: it flags, it never
+refuses). The owner, 2026-11-19 (DEC-1219 (5), (6)): half of the rubric was in code (model and effort, S1 to S4) and half
+was not: what becomes a ticket. A lead can only be launched against a ticket, so a fix to a closed feature or a chore had
+no way to start. This fix puts it in code, in release 0.1.4. From now on a new ticket opens only for a new feature
+(DEC-1219 (6)). The CTO approved the kernel text of X5 by naming it in the lead brief (EMERGENCY-2 3.5). The test
+designer and the engineer run Opus: `src/gov/launch/**` and `src/gov/queue/**` are C3 and the prompts carry `Task: DAEO-k1us`.
+
+**Interface.** `gov launch <role> <ticket> --fix "<one line>"` and `gov launch <role> --chore "<one line>"`, both before
+`--`. `<ticket>` becomes optional on the command line. A usage error, exit 2, before the launcher, as W2-184 R1 does it
+(nothing read, started or recorded; the launcher refuses the same with `LAUNCH_REFUSED` as the second fence): `--fix` and
+`--chore` together; `--fix` with no ticket; `--chore` with a ticket; neither flag and no ticket; a blank line. The launch
+record gains two keys, `kind` and `kind_line`: an ordinary launch says `kind` `feature` and `kind_line` null (a launch on an
+in_progress ticket is a feature's, as today). `--plan` and `--tests-worktree` take `--fix` too (the failing test of a fix
+is written first, by a test designer, in a tests worktree of the closed ticket); `--plan` takes `--chore`, `--tests-worktree`
+does not (no ticket). A lead has no launch record (S7), so its kind is carried in its env (X3).
+
+**X1 A fix launches under its owning ticket, closed or not.** `gov launch <role> <ticket> --fix "<line>"` starts the role
+on `<ticket>` when the ticket file exists, whatever its status (`closed`, `open`, `in_progress`); an unknown ticket is
+refused as today. The launch record holds `kind` `fix`, `ticket` the owning ticket, and `kind_line` the line; model and
+effort come from the rubric for that ticket's class as for any launch (the class from its `allowed_paths` and `profile`,
+by `ticket_criticality`), with the same sources (`by criticality`). The role still keeps to its own ticket where it did
+(`_check_ticket`'s role rule); nothing else about a worker launch changes (gate, one writer, repository settings,
+the S4 refusal of another model). Verify: a planted `closed` ticket with C3 and C2 paths and an engineer launched with
+`--fix` on the stub CLI: it starts, the record has the three fields, the stub received `--model` and `--effort` of that
+class (Opus on C3, Sonnet on C2); `--plan --fix` prints the role's default line; `--tests-worktree --fix` makes the tests
+worktree of the closed ticket; the same launches without `--fix` are refused as today (`is not in_progress`).
+
+**X2 A chore launches with no ticket.** `gov launch <role> --chore "<line>"` starts the worker with no ticket: no ticket
+file is read, `GOV_TICKET` is absent from the `--settings` env and from the CLI process (unset, not empty), the launch
+record holds `kind` `chore`, `kind_line` the line, `ticket` null, `ticket_class` null, `criticality` null and `rubric`
+null; model and effort are the role file's `Launch default` (`model_source` and `effort_source` `role default`, whatever
+the class table says); the session has no run folder of its own and no ticket-based spend brake. The gate, the one-writer
+check, the repository settings and the refusal of another model (S4, with no class to lift it) apply as for any launch.
+Verify: a planted launch of an engineer with `--chore` on the stub CLI and no ticket id: it starts, the record says so,
+the stub's `--settings` and process env hold no `GOV_TICKET`, the stub received the role default's model and effort; a
+second planted record of another ticket in the folder is not read as this chore's.
+
+**X3 A lead launches the same way.** `orchestrator` and `lead` take `--fix` and `--chore` as workers do. `--fix`: the
+ticket must exist, whatever its status, and the plan's check (`check_lead`: in the ready list, waits met) is not applied,
+because a fix is not planned; `--chore`: no ticket, no plan check. A lead writes no record, so the kind goes in its env:
+for a fix or a chore only, `GOV_LAUNCH_KIND` (`fix` or `chore`) and `GOV_LAUNCH_LINE` (the line) are added to its
+`--settings` env and the CLI process env; `GOV_TICKET` is the owning ticket for a fix and absent for a chore. A chore
+lead's registry entry and inbox address use the label `chore-<8 hex>` where the ticket would be. A lead launch without
+the flags is unchanged (same env, same plan check, same refusal of a closed ticket). `--reason`, `--trial`,
+`--owner-named` and `--projection-usd` stay refused for a lead, with `--fix` and `--chore` as with any launch. Verify:
+as X1 and X2 for the `orchestrator` role on the stub CLI, reading the stub's env; a planted `closed` ticket outside the
+ready list launches with `--fix` and is refused without it; the gate and `gov pause` still stop it.
+
+**X4 A new ticket that is not a feature is flagged at the landing, never refused.** For each candidate, `gov queue` lists
+the ticket files `.tickets/<id>.md` that the candidate's change adds (added between its `since` and its tip: a path that
+is new, not an edit of one at the base). A new ticket is a feature when it holds a spec and KPIs. The ticket schema has
+no spec key, so the fields read are: **KPIs** = `kpis.success` holds at least one line with a `verify` (the mapping form's
+non-blank `verify`, or the string form's text containing `Verify:`); **spec** = the ticket's body after its front matter
+is not blank (the template puts Problem, Approach and Interface there). For one that lacks either, or whose front matter
+cannot be read, the landing records one notice `NEW_TICKET_NOT_FEATURE <id>: <what is missing>` (`<what is missing>`:
+`no kpis.success line with a verify`, `no spec (the ticket's body is empty)`, `front matter unreadable`, joined by `; `),
+prints it as one line on stderr, and lands anyway: the answer's new key `ticket_notices` (`{ticket, id, code, notice}`
+each, the same in `queue.json`, the dry run's answer and the landed ticket's close record) and the exit code are those
+of a landing without it. A new ticket that is a feature gives no notice; an edited existing ticket gives none; a branch
+that adds no ticket file gives `ticket_notices` `[]`. Verify: three planted branches through `gov queue` (and its
+`--dry-run`): a new ticket with no KPI verify and no body (notice naming both, landed, exit as without), a new ticket with
+both (no notice), an edit of an existing ticket file (no notice).
+
+**X5 Words match code.** The kernel lines that tell a CTO or lead how to launch work say: a new ticket only for a new
+feature; a fix launches under its owning ticket with `gov launch <role> <ticket> --fix "<line>"`; a chore with
+`gov launch <role> --chore "<line>"` and no ticket. Changed lines only, in: `template/governance/kernel/roles/orchestrator.md`,
+`senior-engineer.md` and `ticket-lead.md` (the `Tools:` line, where `gov launch` is named) and
+`template/governance/kernel/skills/orchestration/SKILL.md` (`## Parallel tickets`, one line), each with its copies where a
+copy check holds them equal (`.rulesync/subagents`, `template/.rulesync/subagents`, `.claude/agents`, the skill's copies
+under `.rulesync/skills`, `template/.rulesync/skills` and `.claude/skills`), regenerated with the project's generator,
+not by hand where it generates. Verify: each of those files holds the three statements (the strings `new ticket only for a
+new feature`, `--fix` and `--chore` in the line that names `gov launch`, or in the skill's line); a copy equals what its
+kernel file generates; `gov accept W2-201` and the copy checks (W1-28, W1-33, W2-153 S3) stay green.
