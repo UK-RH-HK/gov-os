@@ -42,6 +42,7 @@ COMMANDS = {
     "identity": None,
     "where": None,
     "retrieve": ('gov retrieve "<question>"', "gov retrieve --help"),
+    "decisions": ("gov decisions in-force", "gov decisions --help"),  # the in-force list moved here from gov context (DEC-1214 M1)
     "links": ("gov links --since {BASE}", "gov links --help"),
     "accept": ("gov accept {ID} --root {WRITE_TREE}", "gov accept --help"),
     "pytest_folder": None,

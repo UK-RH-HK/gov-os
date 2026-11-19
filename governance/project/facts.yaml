@@ -40,6 +40,10 @@ commands:
   retrieve:
     run: 'gov retrieve --root {STORE_TREE} "<question>"'
     check: 'gov retrieve --help'
+  decisions:
+    # the list of decisions in force is generated, never kept by hand (DEC-1073; gov context --in-force moved here, DEC-1214 M1)
+    run: 'gov decisions in-force'
+    check: 'gov decisions --help'
   brief:
     # the owner's Emergency 2: a worker's brief is built by gov brief
     run: 'gov brief {WORKER_ROLE} {ID}'
