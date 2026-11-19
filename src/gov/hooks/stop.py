@@ -66,14 +66,16 @@ def main() -> None:
 
     root = Path(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
     ticket = os.environ.get("GOV_TICKET", "")
+    said = False
     if ticket:
         try:
             from gov.checkpoint.record import write
             write(root, ticket, "stop", "Resume after stop", [], dest="automatic")
         except Exception as exc:
-            _no_gov(exc, "the checkpoint record was not written")
+            said = _no_gov(exc, "the checkpoint record was not written; the stop check was not run")
 
-    _stop_check(str(root))
+    if not said:  # no gov importable: said once (W2-18), and the check that needs gov is not tried
+        _stop_check(str(root))
 
 
 if __name__ == "__main__":
