@@ -1,6 +1,6 @@
 ---
 id: DAEO-rt2s
-status: in_progress
+status: closed
 deps: [DAEO-5rgj]
 links: [DAEO-5rgj, DAEO-cb2b]
 created: 2026-11-18T23:15:00Z
@@ -75,3 +75,5 @@ track: A
 **The wrapper** `governance/project/orchestration/tools/heavy_slot.sh`: for the CTO to copy over the live script after the land; the wrapper is not run from the main tree by this branch.
 
 **Records.** Slice 1's `tests/acceptance/W2-121c/test_w2_121c_rt3_limits.py` and `tests/unit/dispatch/test_w2_121c_limits.py` encode the `0.15` and `0.9` formulas: the independent test designer changes the acceptance file to KPI 3's formulas, the engineer the unit one, and the ticket DAEO-5rgj gets one line in its record that W2-199 replaced those two formulas (a fix to a record, not a new ticket).
+
+**Closed at the land, 2026-11-19 02:28 (the CTO; EMERGENCY-2 4.3 step 5):** merged as befe40431 (branch `e2/rt-slice2` at 37962099b). On the merged tree, through the slot with workers: `tests/acceptance/W2-199`, `W2-121c`, `W2-20`, `tests/unit/dispatch`, `resources`, `orchestration`, `rebuild`, `optin`: 1,427 passed, 4 skipped, and 2 collection errors that were the run's own (`tests/unit/dispatch` and `tests/unit/resources` in one pytest call clash on their `conftest` modules; `tests/unit/dispatch` alone: 170 passed); `gov accept W2-199`: 75 passed, 0 failed. Not switched by the land: the live scratch slot, the live dispatcher, the cron line (slice 4, the cut-over). The CTO's rulings on the lead's lines: the gate file's `heavy_slots` is settled at the cut-over; slice 3's Stop check does not block for a launchable ticket. Slice 3 is W2-205 (DAEO-rt3s).
