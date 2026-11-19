@@ -1,6 +1,7 @@
 """W2-13 success S5: search respects role separation (DEC-1065 (2); DEC-1056, DEC-1063, DEC-1052 G-14).
 
-KPI: gov retrieve's results (every route) and gov context's supplementary block are filtered by the caller's
+KPI: gov retrieve's results (every route) and the context command's supplementary block (retired with that command,
+DEC-1214 M1, W2-200: its case is deleted) are filtered by the caller's
 role_paths (GOV_ROLE or --role, and GOV_TICKET; the same path checks as the guard's, from one product module): an
 engineer never receives its own ticket's acceptance tests, a test designer never the ticket's new code; what is
 filtered is named in the bundle (how many, by which rule), never dropped silently; no role_paths section means no
@@ -77,26 +78,6 @@ def test_engineer_retrieve_returns_none_of_its_own_tickets_acceptance_tests(box,
     lost = sorted(set(kept) - roles.evidence_paths(bundle))
     assert not lost, f"the filter held back more than the ticket's tests: {lost} are gone\n{roles.shown(bundle)}"
     _named(bundle, roles.ENGINEER, (OWN_GLOB,), "gov retrieve")
-
-
-@pytest.mark.parametrize("how", HOW)
-def test_engineer_context_supplementary_holds_none_of_its_own_tickets_acceptance_tests(box, engineer_project, how):
-    """An engineer's ``gov context <its ticket>``: the supplementary block returns none of the ticket's acceptance
-    tests, names what it held back, and still returns another ticket's tests and the integrated code."""
-    root = engineer_project
-    baseline = roles.context(box, how, root, roles.OWN_ID, ticket_id=roles.OWN_ID)
-    _premise(roles.stacked_paths(baseline), roles.OWN_TESTS, f"gov context {roles.OWN_ID}")
-
-    packet = roles.context(box, how, root, roles.OWN_ID, role=roles.ENGINEER, ticket_id=roles.OWN_ID)
-    leaked = sorted(path for path in roles.supplementary_paths(packet) if path.startswith(OWN_GLOB + "/"))
-    assert not leaked, f"the engineer's supplementary block holds its own acceptance tests: {leaked}\n" \
-                       f"{roles.shown(packet)}"
-    assert not roles.markers_in(packet, roles.OWN_TESTS), \
-        f"the text of {roles.OWN_WBS}'s acceptance tests is in the engineer's packet\n{roles.shown(packet)}"
-    kept = {**roles.OTHER_TESTS, **roles.INTEGRATED}
-    lost = sorted(set(kept) - roles.stacked_paths(packet))
-    assert not lost, f"the filter held back more than the ticket's tests: {lost} are gone\n{roles.shown(packet)}"
-    _named(packet, roles.ENGINEER, (OWN_GLOB,), "gov context")
 
 
 def test_engineer_retrieve_holds_back_its_tickets_cases_revised_in_another_folder(box, engineer_project):

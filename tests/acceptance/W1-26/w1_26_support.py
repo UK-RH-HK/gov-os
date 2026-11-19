@@ -1,7 +1,7 @@
 """Support code for the W1-26 acceptance tests (``gov check``).
 
 W1-26 builds the ``gov check`` command: it runs every declared check, reports
-each of the 17 governance test families as RED/YELLOW/GREEN, records provenance,
+each of the governance test families (17, 16 since DEC-1214 M1) as RED/YELLOW/GREEN, records provenance,
 and fails planted defects.
 
 How the tests run:
@@ -48,7 +48,8 @@ NOT_IMPLEMENTED = cli_support.NOT_IMPLEMENTED
 CHECKS_REL = cli_support.CHECKS_REL
 TEMPLATE_OPENSPEC = readiness_support.TEMPLATE_OPENSPEC
 
-# The 17 governance test families (CAP-38.b, Contract v3 O2).
+# The governance test families (CAP-38.b, Contract v3 O2): seventeen, less the context family, whose one check the
+# owner retired with the context command (DEC-1214 M1, W2-200). Rewrite-Reason: DEC-1214 M1.
 FAMILIES = (
     "schema/invariants",
     "graph integrity",
@@ -57,7 +58,6 @@ FAMILIES = (
     "authority/role limits",
     "mutation scope",
     "path-map compliance",
-    "context reproducibility",
     "concurrency/claims",
     "adapter/model portability",
     "skill regression",
@@ -68,7 +68,7 @@ FAMILIES = (
     "product traceability",
     "audit reproducibility",
 )
-assert len(FAMILIES) == 17
+assert len(FAMILIES) == 16
 
 # The 7 core checks this ticket registers.
 CORE_CHECKS = {
@@ -91,10 +91,9 @@ CORE_CHECKS = {
 # The 3 checks already declared by other tickets.
 ALREADY_DECLARED = ("index-freshness", "secrets-indexing", "fresh-agent-reconstruction")
 
-# The 7 families not yet registered by any ticket.
+# The families not yet registered by any ticket at W1-26 (seven; six since the context family is retired, DEC-1214 M1).
 NOT_YET_REGISTERED = (
     "retrieval regression",
-    "context reproducibility",
     "adapter/model portability",
     "skill regression",
     "recovery/rebuild",
@@ -494,7 +493,7 @@ def assert_family_present(result, family_name):
 
 
 def assert_all_families_named(result):
-    """All 17 families are named in the result."""
+    """Every family of ``FAMILIES`` is named in the result."""
     fam = families_of(result)
     for family in FAMILIES:
         assert family in fam, f"family {family!r} is not named in the result: {sorted(fam)}"
@@ -527,7 +526,6 @@ def complete_rows(profile="FULL"):
 # out, and their families are then YELLOW (unmeasured, never GREEN: DEC-425).
 NOT_MEASURABLE_HERE = {
     "adapter-portability": "no governance/project/tool-registry.yaml and no rulesync source",
-    "context-reproducibility": "no store",
     "index-freshness": "no lexical index",
     "recovery-rebuild": "no store (unmeasured)",
     "retrieval-regression": "GOV_DEV_TIERS is not configured: the environment",

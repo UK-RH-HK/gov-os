@@ -1,14 +1,14 @@
 """S6: every command and hook works in a repository whose path contains a space (``~/EXAMIN APP``).
 
 Interface item 7: "every name in ``gov.cli.main`` COMMANDS plus the discovered command modules, each with ``--help``
-and with one real read invocation (status, doctor, retrieve, context --dry-run, adopt --lite --stage A0 on a clean
-fixture), and the six hooks of ``template/governance/kernel/hooks/`` fed a minimal event JSON, through the settings'
+and with one real read invocation (status, doctor, retrieve, adopt --lite --stage A0 on a clean fixture; the
+context command's dry run went with that command, DEC-1214 M1), and the six hooks of ``template/governance/kernel/hooks/`` fed a minimal event JSON, through the settings'
 own hook command lines, with ``CLAUDE_PROJECT_DIR`` holding a space."
 
 The same repository is planted twice: in a folder named ``EXAMIN APP`` under ``tmp_path`` and at a path without a
 space. Each run must end with the same exit code in both, and print no word-splitting or path error the run without
-a space does not print. ``retrieve`` and ``context --dry-run`` are run only outside the launch sandbox (``local_only``,
-DEC-1065: no ``gov retrieve`` or ``gov context`` there).
+a space does not print. ``retrieve`` is run only outside the launch sandbox (``local_only``, DEC-1065: no
+``gov retrieve`` there).
 """
 
 from __future__ import annotations
@@ -82,10 +82,13 @@ def test_s6_the_read_invocations_exit_alike_at_a_path_with_a_space(tmp_path):
 
 
 @pytest.mark.local_only
-def test_s6_retrieve_and_context_exit_alike_at_a_path_with_a_space(tmp_path):
-    """Outside the launch sandbox only (DEC-1065); no model is reachable from the planted HOME."""
+def test_s6_retrieve_exits_alike_at_a_path_with_a_space(tmp_path):
+    """Outside the launch sandbox only (DEC-1065); no model is reachable from the planted HOME.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): was ``test_s6_retrieve_and_context_exit_alike_at_a_path_with_a_space``; the
+    context command is retired, so its dry run is no longer one of the invocations; retrieve's is asserted as before."""
     pair = _pair(tmp_path)
-    invocations = (("retrieve", "where is the guide", "--json"), ("context", "HARB-0001", "--dry-run", "--json"))
+    invocations = (("retrieve", "where is the guide", "--json"),)
     runs = {f"gov {' '.join(args)}": _both(pair, *args) for args in invocations}
     problems = _compare(runs, pair[0][0])
     assert not problems, "\n\n".join(problems)

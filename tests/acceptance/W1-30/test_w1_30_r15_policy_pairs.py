@@ -235,27 +235,8 @@ def test_a_registry_that_pins_another_rulesync_than_the_installed_one_turns_the_
     )
 
 
-# --------------------------------------------------------------------------
-# context: a ticket's context can be built and reproduces (CAP-15.c, CAP-15.e)
-# --------------------------------------------------------------------------
-
-@proves("context", "context-reproducibility")
-def test_a_ticket_whose_mandatory_input_is_missing_turns_the_context_check_red(scratch, sandbox):
-    """Planted: a ticket names a source the store does not hold, so its context cannot be built. Until piece 1
-    of the round is built the check is red before the violation too (it finds no ticket), and this case is red
-    for that reason. Not caught by this check: a packet over its ceiling, a superseded input, a contradiction."""
-    project = scratch()
-    project.write(r15.PATH_MAP_REL, "namespaces: {all: {paths: ['**']}}\n")
-    project.base_source()
-    project.write(f".tickets/{TICKET}.md", r15.ticket_text(TICKET, "W9-01"))
-    project.declare_as_the_kernel_does("context-reproducibility")
-    project.load_store(sandbox)
-    before, _, run = r15.status_of(project, sandbox, "context-reproducibility", commit=False)
-    project.write(".tickets/PROJ-cccc.md",
-                  r15.ticket_text("PROJ-cccc", "W9-09").replace(f"- {support.BASE_SOURCE}", "- DEC-999"))
-    project.load_store(sandbox)
-    after, _, run = r15.status_of(project, sandbox, "context-reproducibility", commit=False)
-    _assert_turns(before, after, "context", "context-reproducibility", "a mandatory input is missing", run)
+# context: the context check is retired with the context command (DEC-1214 M1, W2-200); its evidence case is deleted
+# and the pair is no longer decided (below).
 
 
 # --------------------------------------------------------------------------
@@ -321,10 +302,13 @@ def test_a_tracked_file_the_index_does_not_hold_turns_the_index_freshness_check_
 
 PAIRS = sorted(EVIDENCE)
 # Round 16 (DEC-627): nine pairs. ``human_gate``, which no check stated in round 15, is stated by core-authority;
-# no key that is not informational is left without a check.
+# no key that is not informational is left without a check. Rewrite-Reason: DEC-1214 M1 (W2-200): eight pairs; the
+# context pair went with its check, retired with the context command, and the key is left without a check (below).
 DECIDED = [("authority", "core-authority"), ("change", "core-claims"), ("checkpoint", "fresh-agent-reconstruction"),
-           ("context", "context-reproducibility"), ("human_gate", "core-authority"), ("memory", "index-freshness"),
+           ("human_gate", "core-authority"), ("memory", "index-freshness"),
            ("security", "secrets-indexing"), ("test", "core-mutation"), ("tool", "adapter-portability")]
+# The keys a decision left without a check, each with that decision (the key's warning stays in the kernel minimum).
+LEFT_BY_DECISION = {"context": "DEC-1214 M1"}
 
 
 def _stated():
@@ -348,16 +332,21 @@ def test_the_kernel_declaration_of_the_check_states_the_key_it_is_proved_to_enfo
 
 
 def test_every_key_a_kernel_declaration_states_is_a_policy_key():
-    """The thirteen keys of DEC-230. Passes before the round (no declaration states a key) and guards it."""
-    assert len(r15.kernel_declarations()) == 20, \
-        f"the kernel template holds {len(r15.kernel_declarations())} declarations; twenty were examined"
+    """The thirteen keys of DEC-230. Passes before the round (no declaration states a key) and guards it.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the kernel template holds nineteen declarations, not twenty: the context
+    check is retired with the context command."""
+    assert len(r15.kernel_declarations()) == 19, \
+        f"the kernel template holds {len(r15.kernel_declarations())} declarations; nineteen were examined"
     unknown = sorted((key, check_id) for key, check_id in _stated() if key not in r15.POLICIES)
     assert not unknown, f"a declaration states a key that is no policy key: {unknown}"
 
 
 def test_the_kernel_template_states_exactly_the_pairs_that_are_proved():
     """A pair declared without an evidence case, or proved and not declared, is red; the proved pairs are the
-    nine decided ones (DEC-627). Red before round 16: (human_gate, core-authority) is proved and not declared."""
+    nine decided ones (DEC-627). Red before round 16: (human_gate, core-authority) is proved and not declared.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): eight decided pairs; the context pair is gone with its retired check."""
     stated, proved = _stated(), set(PAIRS)
     assert PAIRS == DECIDED, f"the evidence cases of this module prove {PAIRS}; decided are {DECIDED}"
     assert stated - proved == set(), \
@@ -367,7 +356,12 @@ def test_the_kernel_template_states_exactly_the_pairs_that_are_proved():
 
 def test_no_policy_key_that_is_not_informational_is_left_without_a_check():
     """Every key of the kernel minimum that is hard-block or warning is stated by a declaration of the kernel
-    template (round 16, DEC-627). Red before round 16: ``human_gate`` is stated by none."""
-    owed = {key for key, strength in r15.POLICIES.items() if strength != r15.INFORMATIONAL}
+    template (round 16, DEC-627). Red before round 16: ``human_gate`` is stated by none.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the ``context`` key's one check is retired with the context command and no
+    check replaces it (the ticket's non-goals), so it is owed by none, by that decision (``LEFT_BY_DECISION``); every
+    other key that is not informational still needs a declaration that states it."""
+    owed = {key for key, strength in r15.POLICIES.items()
+            if strength != r15.INFORMATIONAL and key not in LEFT_BY_DECISION}
     left = sorted(owed - {key for key, _ in _stated()})
     assert not left, f"no declaration of the kernel template states: {left}"

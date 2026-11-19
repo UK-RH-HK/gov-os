@@ -1391,7 +1391,7 @@ class World:
         check("no allow rule opens a shell, the web or a path outside the wall and its tree; writes out/ only",
               all(not a.startswith(("Bash", "WebFetch", "WebSearch")) and (f"/{w}/" in a or f"/{m['tree']}/" in a)
                   for a in allow) and all(f"/{w}/out/" in a for a in allow if a.startswith(("Edit", "Write"))))
-        need = ["Bash", "WebFetch", "WebSearch", "Task", "Bash(gov retrieve *)", "Bash(gov context *)", "Bash(git *)",
+        need = ["Bash", "WebFetch", "WebSearch", "Task", "Bash(gov retrieve *)", "Bash(gov context *)", "Bash(git *)",  # DEC-1214 M1: the wall template's deny of the retired command (governance/, a non-goal)
                 f"Read(/{m['runs']}/**)", f"Read(/{m['home']}/.claude/**)", f"Read(/{m['repo']}/**)",
                 f"Read(/{sr}/runs/**)", f"Read(/{sr}/transcripts/**)", f"Read(/{sr}/fixtures/**)",
                 f"Read(/{W}/APPROVED)", f"Edit(/{w}/.claude/**)", f"Edit(/{m['tree']}/**)"]

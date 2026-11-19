@@ -7,7 +7,8 @@ The tests use only the public forms the lead's interface specification fixes (S1
 - ``gov.store.load(root)`` first, as every caller does, then ``gov.decisions.check_tags(root)``,
   ``gov.decisions.check_propagation(root)`` and W2-03's ``gov.decisions.check(root)``, each in a child process;
 - the commands ``python3 -m gov.decisions.tags`` and ``python3 -m gov.decisions.propagation``, run in a project root;
-- ``gov retrieve <query> --json`` and ``gov context <ticket> --json`` / ``gov context --in-force --json``
+- ``gov retrieve <query> --json`` and ``gov decisions in-force --json`` (the digest's command since DEC-1214 M1;
+  the context packet's cases are deleted with the context command, W2-200)
   (``python3 -m gov.cli.main ...``), after ``gov.retrieval.lexical.refresh`` and ``gov.store.load`` built what they
   read (never ``gov rebuild``, never this repository's store).
 

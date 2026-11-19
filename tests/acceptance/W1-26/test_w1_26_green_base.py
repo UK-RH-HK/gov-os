@@ -18,7 +18,11 @@ import w1_26_support as support
 @pytest.mark.parametrize("base", ("green_project", "green_project_with_dimensions"))
 def test_the_base_project_is_green_before_any_defect(base, request, sandbox, interface):
     """``ok`` and exit 0; no check RED; each check the revised cases judge GREEN with no finding; the checks left
-    out are not run, and their families are not GREEN (unmeasured, DEC-425)."""
+    out are not run, and their families are not GREEN (unmeasured, DEC-425).
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the context family and its check are retired with the context command, so
+    the check is no longer among those left out of the base and its family is no longer among those held not GREEN;
+    every other assertion is unchanged."""
     project = request.getfixturevalue(base)
     run = support.run_check(project, sandbox)
     result, envelope = support.result_and_envelope(run, interface)
@@ -32,7 +36,7 @@ def test_the_base_project_is_green_before_any_defect(base, request, sandbox, int
     ran = {entry.get("id") for entry in support.checks_of(result) if isinstance(entry, dict)}
     assert not ran & set(support.NOT_MEASURABLE_HERE), \
         f"a check left out of the base still ran: {sorted(ran & set(support.NOT_MEASURABLE_HERE))}"
-    for family in ("index freshness", "retrieval regression", "context reproducibility",
+    for family in ("index freshness", "retrieval regression",   # the context family retired (DEC-1214 M1)
                    "adapter/model portability", "secrets indexing", "recovery/rebuild"):
         assert support.family_status(result, family) not in (None, support.GREEN), (
             f"the family {family!r}, whose check is left out of the base, is "

@@ -154,7 +154,7 @@ def test_gov_retrieve_takes_role_and_names_the_filter_on_the_stated_gap_too(repo
     assert "role_filter" not in command.run(repo, _args("What did DEC-4242 say?"), {})
 
 
-# -- gov context's supplementary block (gov.retrieval.supplementary) -----------------------------------------------
+# -- the supplementary block (gov.retrieval.supplementary; the retired context command's, DEC-1214 M1) ------------
 
 def _block_paths(block) -> set:
     return {item["path"] for item in block["supplementary"]} | {item["path"] for item in block["further_batch"]}
@@ -179,17 +179,8 @@ def test_the_supplementary_block_withholds_the_engineers_tests_and_names_it_in_d
     assert len(named) == 1 and "1 paths" in named[0]["reason"] and "{ticket_tests}" in named[0]["reason"]
 
 
-def test_a_supplementary_block_whose_role_paths_cannot_be_read_is_empty_and_says_why(repo, monkeypatch):
-    from gov import context
-    with open(repo / "governance/project/path-map.yaml", "a", encoding="utf-8") as f:
-        f.write("role_paths:\n  engineer: [\"{ticket_tests}\"]\n")  # a second, malformed section
-    monkeypatch.setenv("GOV_ROLE", "engineer")
-    block = context._try_supplementary(repo, "The heron ledger", [], 5000, set(), set())
-    assert block["supplementary"] == [] and block["further_batch"] == []
-    assert block["dropped"][0]["id"] == "supplementary" and "role_paths" in block["dropped"][0]["reason"]
-
-
-# -- gov context --role: the role given reaches the supplementary block (the CTO's red, 2026-11-03) ---------------
+# -- a role given reaches the supplementary block (the CTO's red, 2026-11-03; its context-command cases are deleted
+# with that command, DEC-1214 M1, W2-200) ---------------------------------------------------------------------------
 
 _CTX_ENV = {"PATH": "/usr/bin:/bin", "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t",
             "GIT_AUTHOR_EMAIL": "t@t.invalid", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t.invalid"}
@@ -208,7 +199,7 @@ _CTX_FILES = {
 
 @pytest.fixture()
 def project(tmp_path, monkeypatch):
-    """A gov context project whose ticket W2-99 has an acceptance case and a note, both about the quokka."""
+    """A project whose ticket W2-99 has an acceptance case and a note, both about the quokka."""
     monkeypatch.setattr(lexical, "indexable", lambda root, paths: list(paths))  # no gitleaks needed
     subprocess.run(["git", "-C", str(tmp_path), "init", "-q", "-b", "main"], check=True, capture_output=True,
                    env=_CTX_ENV)
@@ -223,48 +214,6 @@ def project(tmp_path, monkeypatch):
     monkeypatch.delenv("GOV_ROLE", raising=False)
     monkeypatch.setenv("GOV_TICKET", "TK-1")
     return tmp_path
-
-
-def _packet_paths(packet) -> set:
-    return {item["path"] for item in packet["supplementary"]} | {item["path"] for item in packet["further_batch"]}
-
-
-def test_gov_context_with_role_given_withholds_the_engineers_tests_and_names_it(project, monkeypatch):
-    from gov import context
-    plain = context.context(project, "TK-1")
-    assert _CTX_CASE in _packet_paths(plain) and all(e["id"] != "role_filter" for e in plain["dropped"])
-    packet = context.context(project, "TK-1", role="engineer")  # gov context ... --role engineer, GOV_ROLE unset
-    assert _CTX_CASE not in _packet_paths(packet) and "notes/quokka.md" in _packet_paths(packet)
-    named = [entry for entry in packet["dropped"] if entry["id"] == "role_filter"]
-    assert len(named) == 1 and "1 paths" in named[0]["reason"] and "engineer" in named[0]["reason"]
-    monkeypatch.setenv("GOV_ROLE", "engineer")  # a role given never lifts the session's
-    assert _CTX_CASE not in _packet_paths(context.context(project, "TK-1", role="orchestrator"))
-
-
-def test_gov_context_command_passes_role_through_to_the_block(project):
-    from gov.context import command as context_command
-    args = argparse.Namespace(ticket="TK-1", brief=False, budget=None, dry_run=False, in_force=False, role="engineer")
-    packet = context_command.run(project, args, {})  # gov context TK-1 --role engineer, GOV_ROLE unset
-    assert _CTX_CASE not in _packet_paths(packet) and "notes/quokka.md" in _packet_paths(packet)
-    assert [entry["id"] for entry in packet["dropped"]].count("role_filter") == 1
-    assert _CTX_CASE in _packet_paths(context_command.run(project, argparse.Namespace(**{**vars(args), "role": None}),
-                                                          {}))
-
-
-def test_a_packet_built_from_another_tickets_session_judges_the_packets_own_ticket_too(project, monkeypatch):
-    """Review S5-F1: the CTO's session (W2-00's ticket) builds an engineer's packet for TK-1: TK-1's tests withheld."""
-    from gov.context import command as context_command
-    args = argparse.Namespace(ticket="TK-1", brief=False, budget=None, dry_run=False, in_force=False, role="engineer")
-    monkeypatch.setenv("GOV_ROLE", "orchestrator")
-    for session_ticket in ("DAEO-sdxk", None):  # another ticket's session, and no GOV_TICKET at all
-        if session_ticket:
-            monkeypatch.setenv("GOV_TICKET", session_ticket)
-        else:
-            monkeypatch.delenv("GOV_TICKET", raising=False)
-        packet = context_command.run(project, args, {})
-        assert _CTX_CASE not in _packet_paths(packet) and "notes/quokka.md" in _packet_paths(packet)
-        named = [entry["reason"] for entry in packet["dropped"] if entry["id"] == "role_filter"]
-        assert len(named) == 1 and "1 paths" in named[0] and "TK-1" in named[0]
 
 
 def test_a_leads_own_packet_is_unchanged_by_the_packets_ticket(project):

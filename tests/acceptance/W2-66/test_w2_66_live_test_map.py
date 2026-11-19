@@ -65,8 +65,9 @@ RECORD_READERS = (
 # fixture; they run in the full suite only). Every other case of the file is still a reader held case by case, and
 # the three are held by no entry (``test_w2_54_s_cases_that_start_a_whole_gov_check_are_not_in_the_record_reading_set``).
 GREEN_HERE = "tests/acceptance/W2-54/test_w2_54_green_here.py"
-WHOLE_GOV_CHECK = ("test_gov_check_gives_context_reproducibility_green_here",
-                   "test_gov_check_gives_core_schema_green_here", "test_the_w1_43_audit_report_is_untouched")
+# Rewrite-Reason: DEC-1214 M1 (W2-200): the green-here case of the context check is deleted with that check; two
+# cases that start a whole ``gov check`` remain.
+WHOLE_GOV_CHECK = ("test_gov_check_gives_core_schema_green_here", "test_the_w1_43_audit_report_is_untouched")
 
 
 def _green_here_cases():
@@ -102,17 +103,19 @@ COUPLINGS = (
                                                         "tests/acceptance/W1-38", "tests/unit/telemetry")),
     # Rewrite-Reason: DEC-1061 item 9, T-6 (D4-LIST-B §4 row 2): W1-19 and W1-21 (the real-model suites) are selected
     # only by model-path changes, no longer by the fixture-inputs coupling (FIXTURE_INPUTS_NOT_REACHING below).
+    # Rewrite-Reason: DEC-1214 M1 (W2-200): W1-24 (the context command's suite) is retired with the command, so the
+    # fixture-input couplings no longer name it; the other suites they reach are unchanged.
     (support.PATH_MAP_REL, tuple(f"tests/acceptance/{w}" for w in
-                                 ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
+                                 ("W1-16", "W1-17", "W1-20", "W1-22", "W2-54"))),
     (".gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                             ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
+                             ("W1-16", "W1-17", "W1-20", "W1-22", "W2-54"))),
     ("template/.gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                                      ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
+                                      ("W1-16", "W1-17", "W1-20", "W1-22", "W2-54"))),
     ("src/gov/checkpoint/record.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-31")),
     ("src/gov/decisions/checker.py", ("tests/acceptance/W1-30",)),
     ("src/gov/closure/command.py", ("tests/acceptance/W1-30",)),
     ("src/gov/adapters/portability.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-26")),
-    ("src/gov/context/command.py", ("tests/acceptance/W1-31",)),
+    # src/gov/context/command.py -> W1-31: gone with the context command (DEC-1214 M1, W2-200).
     ("src/gov/secrets/__init__.py", ("tests/acceptance/W1-40",)),
     ("src/gov/retrieval/validate.py", ("tests/unit/validate",)),
     ("src/gov/retrieval/canary.py", ("tests/unit/validate",)),

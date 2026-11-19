@@ -18,11 +18,13 @@ def _tickets(root):
 
 
 def test_the_repair_ticket_has_the_parent_the_dependency_the_findings_and_the_class(root):
-    repair = _open_repair_ticket(root, TICKET, ["test_x failed", "test_y failed"], "narrow", "ab" * 32)
+    """Rewrite-Reason: DEC-1214 M1 (W2-200 S7): the repair ticket is opened with no context hash (the context command
+    is retired): it records the class and holds no ``context_hash``."""
+    repair = _open_repair_ticket(root, TICKET, ["test_x failed", "test_y failed"], "narrow")
     path = root / ".tickets" / f"{repair}.md"
     front = frontmatter(path)
     assert front["parent"] == TICKET and front["deps"] == [TICKET]
-    assert front["disposition"] == "narrow" and front["context_hash"] == "ab" * 32
+    assert front["disposition"] == "narrow" and "context_hash" not in front
     text = path.read_text(encoding="utf-8")
     assert "test_x failed" in text and "test_y failed" in text
 
@@ -38,13 +40,6 @@ def test_the_ticket_tool_reads_the_dependency_back(root):
 def test_without_a_class_the_ticket_records_unclassed_and_no_hash(root):
     front = frontmatter(root / ".tickets" / f"{_open_repair_ticket(root, TICKET, ['a finding'])}.md")
     assert front["disposition"] == "unclassed" and "context_hash" not in front
-
-
-def test_a_context_that_failed_is_named_and_no_hash_is_recorded(root):
-    repair = _open_repair_ticket(root, TICKET, ["a finding"], "repair", None, "the context cannot be built: X")
-    path = root / ".tickets" / f"{repair}.md"
-    assert "context_hash" not in frontmatter(path)
-    assert "the context cannot be built: X" in path.read_text(encoding="utf-8")
 
 
 def test_an_absent_tool_opens_nothing_and_is_named(root, monkeypatch):

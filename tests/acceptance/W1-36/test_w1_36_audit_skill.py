@@ -49,10 +49,11 @@ class TestAuditFreshSession:
             "the audit skill must say the session is fresh (no prior context)"
 
     def test_the_skill_says_inputs_are_context_pack_and_repository(self, audit_skill):
+        """Rewrite-Reason: DEC-1214 M1 (W2-200): the alternative that named the retired context command is
+        dropped; the skill's own words (a context pack or packet, and the repository) are asked as before."""
         body = audit_skill["body"].lower()
         has_pack = (
             "context pack" in body
-            or "gov context" in body
             or "context packet" in body
         )
         has_repo = "repository" in body or "repo" in body

@@ -671,7 +671,7 @@ class TestNonTextFields:
 
 
 # ==========================================================================
-# Fix 5: Token count uses the same formula as gov context
+# Fix 5: Token count uses the 4-characters-a-token formula (gov.util.tokens since DEC-1214 M1)
 # ==========================================================================
 
 class TestTokenCountFormula:
@@ -679,8 +679,9 @@ class TestTokenCountFormula:
     def test_body_10001_chars_is_2501_tokens(self, tmp_path):
         """A body of exactly 10001 chars is ceil(10001/4) = 2501 tokens,
         which exceeds the 2500 limit and is a finding. This verifies the
-        validator uses the same ceil(len/TOKEN_CHARS) arithmetic as
-        ``gov context``."""
+        validator uses the same ceil(len/TOKEN_CHARS) arithmetic as the
+        token counter of ``gov.util.tokens`` (moved from the retired context
+        library, DEC-1214 M1)."""
         body = "Z" * 10001
         expected_tokens = math.ceil(10001 / 4)
         assert expected_tokens == 2501

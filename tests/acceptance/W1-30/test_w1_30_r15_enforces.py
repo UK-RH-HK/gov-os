@@ -2,8 +2,8 @@
 
 ``gov check`` reads the ``policies`` block of the project's path map and wants a check for every key that is not
 ``informational``. Measured before the round: a key counts as covered only when its name happens to be part of a
-family name, so ``authority`` and ``context`` are covered in every project (two of the seventeen families hold
-those words) and no other key can be.
+family name, so ``authority`` and ``context`` were covered in every project (two of the seventeen families held
+those words; the context family is retired since DEC-1214 M1) and no other key could be.
 
 DEC-620: "A declaration states the keys it enforces in a list field ``enforces``. A key is covered only by such a
 statement; a family name that happens to contain the key no longer covers it."
@@ -84,11 +84,14 @@ def test_a_key_is_covered_only_by_the_check_that_states_it(scratch, sandbox):
 
 
 def test_a_family_name_that_contains_the_key_no_longer_covers_it(scratch, sandbox):
-    """Checks of the two families whose names hold a policy key, neither stating a key.
-    Red before the round: ``authority`` and ``context`` count as covered by the family names."""
+    """Checks of two families whose names hold a policy key, neither stating a key.
+    Red before the round: ``authority`` and ``context`` count as covered by the family names.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the second family is a planted name holding the key ("context budget"),
+    since the kernel's own (the context family) is retired with its check; what is asserted is unchanged."""
     project = _project(scratch, {"authority": r15.HARD_BLOCK, "context": r15.WARNING},
                        of_authority={"family": "authority/role limits"},
-                       of_context={"family": "context reproducibility"})
+                       of_context={"family": "context budget"})
     reported, run = _reported(project, sandbox)
     assert sorted(reported) == ["authority", "context"], \
         f"a family name covers a policy key no declaration states; reported: {sorted(reported)}\n{run.describe()}"

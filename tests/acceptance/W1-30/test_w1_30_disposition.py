@@ -1,12 +1,13 @@
 """Tests for finding disposition at close: S6 (CAP-59.c), A3, B3.
 
-S6: A finding raised at close is classed into exactly one disposition with
-    whole-system context from gov context before any code change, and the
-    repair ticket records it.
+S6: A finding raised at close is classed into exactly one disposition before
+    any code change, and the repair ticket records it. The whole-system context
+    the class was given with came from the context command, which the owner
+    retired (DEC-1214 M1, W2-200): the repair ticket records the class and no
+    context hash (W2-200 S7), and the case of a context that failed is deleted.
 A3: The disposition class is given by the caller via --disposition (one of the
-    six names). Without it, findings are unclassed. With it, context is built
-    first. Context failure means the class is not recorded as "with whole-system
-    context". No "context": "whole-system" literal ever appears.
+    six names). Without it, findings are unclassed. No "context":
+    "whole-system" literal ever appears.
 B3: The repair ticket is created through the ticket tool, records findings and
     the class, has a dependency on the failing ticket, and has no invented id
     or constant creation date.
@@ -94,7 +95,7 @@ def test_no_disposition_output_names_findings_awaiting_class(project, sandbox, i
 
 
 # --------------------------------------------------------------------------
-# A3: Valid disposition class -> context built, class recorded
+# A3: Valid disposition class -> class recorded
 # --------------------------------------------------------------------------
 
 def test_valid_disposition_records_class(project, sandbox, interface):
@@ -112,8 +113,12 @@ def test_valid_disposition_records_class(project, sandbox, interface):
         f"repair ticket must record the given disposition, got {disposition!r}"
 
 
-def test_valid_disposition_builds_context_first(project, sandbox, interface):
-    """A3: with --disposition, gov context is called first and its hash is recorded."""
+def test_valid_disposition_records_the_class_and_no_context_hash(project, sandbox, interface):
+    """A3: with --disposition, the class is recorded on the repair ticket and no packet goes with it.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200 S7): was ``test_valid_disposition_builds_context_first``, which asked for the
+    context packet's hash on the repair ticket; the context command is retired, so the repair ticket records the
+    class and holds no ``context_hash`` and no 64-digit hash."""
     _project_with_finding(project)
     run = support.run_close(project, sandbox, TICKET,
                             "--disposition", "narrow")
@@ -122,49 +127,10 @@ def test_valid_disposition_builds_context_first(project, sandbox, interface):
     repairs = _repair_tickets(project)
     assert len(repairs) >= 1
     front = _repair_frontmatter(repairs[0])
-    context_hash = front.get("context_hash") or front.get("context")
-    assert context_hash is not None, \
-        f"repair ticket must record the context hash when disposition is given: {sorted(front)}"
-
-
-# --------------------------------------------------------------------------
-# A3: Disposition with context failure
-# --------------------------------------------------------------------------
-
-def test_disposition_with_context_failure(project, sandbox, interface):
-    """A3: if context fails, the class is NOT recorded as 'with whole-system context'.
-
-    The output must say the context failed, and the repair ticket records the class
-    but without the context hash.
-    """
-    _project_with_finding(project)
-    project.add_decision("DEC-9003", "ACTIVE", supersedes="DEC-9004")
-    project.add_decision("DEC-9004", "ACTIVE", supersedes="DEC-9003")
-    project.commit("create contradiction", who=support.OWNER)
-    run = support.run_close(project, sandbox, TICKET,
-                            "--disposition", "defer")
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False
-    error = envelope.get("error", {})
-    full_text = json.dumps(envelope)
-    assert '"context": "whole-system"' not in full_text, \
-        "when context fails, 'context: whole-system' must NOT appear"
-    # Revised for W2-67 (I2 F2, PF2; DEC-868 item 3): the case asserted only the absence of a literal the close
-    # never writes. The two decisions supersede each other, so the ticket's context cannot be built; since W2-07
-    # the pre-close ``gov check`` finds that first and refuses at once, naming what fails. So the answer names both
-    # decisions and carries no hash, and the one repair ticket records the class and no context hash.
-    assert run.returncode == support.EXIT_CHECK_FAILED, f"expected exit code 3\n{run.describe()}"
-    text = support.error_text(error)
-    assert "DEC-9003" in text and "DEC-9004" in text, \
-        f"the answer does not name the decisions that fail the context\n{run.describe()}"
-    assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
-    repairs = _repair_tickets(project)
-    assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
-    front = _repair_frontmatter(repairs[0])
-    assert (front.get("disposition") or front.get("finding_disposition")) == "defer", \
-        f"the repair ticket does not record the class given: {front}"
-    assert front.get("context_hash") is None and not SHA256.search(repairs[0].read_text(encoding="utf-8")), \
-        f"the repair ticket carries a context hash although no context was built: {front}"
+    assert front.get("disposition") == "narrow", f"the repair ticket does not record the class: {sorted(front)}"
+    assert "context_hash" not in front and "context" not in front, \
+        f"the repair ticket still records a context: {sorted(front)}"
+    assert not SHA256.search(repairs[0].read_text(encoding="utf-8")), "the repair ticket carries a 64-digit hash"
 
 
 # --------------------------------------------------------------------------

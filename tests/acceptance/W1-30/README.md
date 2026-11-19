@@ -145,24 +145,20 @@ what is in "Round 6".
 
 | Test | File | Red reason |
 |------|------|------------|
-| `test_close_record_has_packet_hash` | receipt | no packet_hash |
+| `test_close_record_names_its_decisions_and_has_no_packet_hash` | receipt | a packet_hash, no decision lists (W2-200) |
 | `test_close_record_has_input_ids_and_hashes` | receipt | no inputs |
 | `test_close_record_has_outputs` | receipt | no outputs |
 | `test_close_record_has_requirements_implemented` | receipt | no requirements |
 | `test_close_record_has_decisions_applied` | receipt | no decisions |
 | `test_close_record_has_tests_and_deviations` | receipt | no tests/deviations |
-| `test_close_record_packet_hash_matches_context` | receipt | hash mismatch |
-| `test_close_refuses_when_context_cannot_be_built` | receipt | close with broken context |
-| `test_no_fallback_hash_when_context_fails` | receipt | fallback hash |
+| `test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes` | receipt | decisions not from the sources (W2-200) |
 | `test_outputs_lists_files_from_ticket_commits` | receipt | outputs empty |
 | `test_deviations_says_not_measured_when_unverified` | receipt | says "none" |
 | `test_input_hash_is_of_file_content` | receipt | hash of id string |
 | `test_unmeasurable_inputs_listed_with_reason` | receipt | no reason |
 | `test_ticket_file_is_always_an_input` | receipt | ticket not listed |
-| `test_unresolvable_source_listed_with_reason` | receipt | source dropped |
+| `test_unresolvable_source_refuses_the_close` | receipt | source dropped |
 | `test_sources_resolve_through_defined_lookup` | receipt | tree-wide search |
-| `test_context_failure_non_cycle_refuses_close` | receipt | superseded source accepted |
-| `test_failing_close_with_context_failure_no_context_hash` | receipt | context hash in repair |
 | `test_tests_produced_lists_ticket_own_tests` | receipt | other tickets' tests included |
 
 ### S6: Finding disposition
@@ -173,8 +169,7 @@ what is in "Round 6".
 | `test_no_disposition_records_unclassed` | disposition | auto-classified |
 | `test_no_disposition_output_names_findings_awaiting_class` | disposition | no mention of class |
 | `test_valid_disposition_records_class` | disposition | class not recorded |
-| `test_valid_disposition_builds_context_first` | disposition | no context hash |
-| `test_disposition_with_context_failure` | disposition | "context: whole-system" |
+| `test_valid_disposition_records_the_class_and_no_context_hash` | disposition | a context hash (W2-200) |
 | `test_only_six_disposition_names_accepted` | disposition | invented name accepted |
 | `test_all_six_dispositions_recognized` | disposition | (unit, always passes) |
 | `test_no_context_whole_system_literal` | disposition | literal appears |
@@ -2367,7 +2362,7 @@ Cases: 7 in the full run, 0 in `breadth`, 530 in `lifted`.
 | S2: Holds the iteration count of every review→repair, test→fix and verification loop on the ticket; after three consecutive non-converging iteratio... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_first_failure_records_iteration`, `test_iteration_count_persists_across_failures` \| README (lif... | lifted |
 | S3: Registers the product-traceability family check: the commits of every closed ticket carry Implements: and Task: trailers that resolve [CAP-38.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_product_traceability_check_in_family`, `test_check_red_when_closed_ticket_lacks_implements_trail... | lifted |
 | S4: A ticket that changes governance files cannot close on check results recorded for another commit or inputs hash: gov close re-runs the checks o... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_30_governance_checks`, `test_w1_30_stale` \| README (lifted) | lifted |
-| S5: The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented... | `test_w1_30_receipt.py::test_close_record_has_packet_hash`, `test_w1_30_receipt.py::test_close_record_has_tests_and_deviations` | the ticket's words |
+| S5: The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented... | `test_w1_30_receipt.py::test_close_record_names_its_decisions_and_has_no_packet_hash`, `test_w1_30_receipt.py::test_close_record_has_tests_and_deviations` | the ticket's words |
 | S6: A finding raised at close is classed into exactly one disposition (repair, reuse, delete, narrow, defer or owner) with whole-system context fro... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_no_disposition_records_unclassed`, `test_no_disposition_output_names_findings_awaiting_class` \|... | lifted |
 | S7: A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer, commissioned and ... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_full_ticket_requires_probe_record`, `test_full_ticket_closes_with_valid_probe` \| README (lifted) | lifted |
 | F1: A ticket closes with a failing acceptance test | `test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail` | the ticket's words |
@@ -2375,3 +2370,24 @@ Cases: 7 in the full run, 0 in `breadth`, 530 in `lifted`.
 | F3: The iteration count or budget appears in any output seen by the looping session [CAP-59.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_iteration_count_not_in_output`, `test_budget_not_in_output` \| README (lifted) | lifted |
 
 **Citations (DEC-1109 (2), 2026-11-09):** `test_w1_30_r11_rebuild_mode.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); the comments and docstrings that wrote the planted base decision and the planted WBS id now name `BASE_SOURCE`, `WBS` and `DECLARED`; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).
+
+## W2-200 revision (DEC-1214 M1): the context command, its library and its check retired
+
+The owner retired `gov context`, its library and its check (DEC-1214 M1); `gov close` records the decisions that govern
+the change from the ticket's own sources (W2-200, `tests/acceptance/W2-200/`). Revised by W2-200's independent test
+designer; each rewritten case carries a `Rewrite-Reason:` naming DEC-1214 M1.
+
+| what | case | now |
+|---|---|---|
+| deleted file | `test_w1_30_context_failures.py` | the close builds no packet, so none fails (W2-200 S4, S7) |
+| deleted file | `test_w1_30_r15_context_tickets.py`, `test_w1_30_r16_context_own_tickets.py` | the context check is retired (W2-200 S1) |
+| rewritten | `test_w1_30_receipt.py::test_close_record_names_its_decisions_and_has_no_packet_hash` (was `test_close_record_has_packet_hash`) | three decision lists, no `packet_hash` (W2-200 S3) |
+| rewritten | `test_w1_30_receipt.py::test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes` (was `test_close_record_packet_hash_matches_context`) | a decision in the sources, held by the register, applied with its span's hash |
+| rewritten | `test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close` | `DECISION_NOT_FOUND` naming the missing id (W2-200 S6), not the packet's `BLOCKED` |
+| deleted | `test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built`, `::test_no_fallback_hash_when_context_fails`, `::test_context_failure_non_cycle_refuses_close` | no packet: a decision that no longer stands is recorded, never refuses (W2-200 S5) |
+| rewritten | `test_w1_30_disposition.py::test_valid_disposition_records_the_class_and_no_context_hash` (was `test_valid_disposition_builds_context_first`) | the class recorded, no `context_hash` (W2-200 S7) |
+| deleted | `test_w1_30_disposition.py::test_disposition_with_context_failure` | no context can fail |
+| rewritten | `test_w1_30_r8_last_step.py::test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the_rebuild` | its two readings through the context command are gone; the store gate's refusal is asserted as before |
+| deleted, rewritten | `test_w1_30_r15_policy_pairs.py`: the context evidence case deleted; `::test_every_key_a_kernel_declaration_states_is_a_policy_key` (19 declarations), `::test_the_kernel_template_states_exactly_the_pairs_that_are_proved` (eight pairs), `::test_no_policy_key_that_is_not_informational_is_left_without_a_check` (`context` left by DEC-1214 M1) | the context pair is gone with its check |
+| rewritten | `test_w1_30_r15_enforces.py::test_a_family_name_that_contains_the_key_no_longer_covers_it` | a planted family name ("context budget") in place of the retired family |
+

@@ -465,7 +465,11 @@ longer stands is held by `test_a_record_that_no_longer_stands_does_not_keep_the_
 DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive_migration`,
 `test_an_unknown_artefact_blocks_retirement_too`. **The last two hold the refusing reading, package P-5.**
 
-### Success 9 — the context and sources that live outside the repository [CAP-15.c; DEC-511, DEC-520]
+### Retired by DEC-1214 M1 (W2-200): the ninth success line — the context and sources that live outside the repository [CAP-15.c; DEC-511, DEC-520]
+
+History only: the context command, its library and its check are retired (DEC-1214 M1), and with them this line's two
+files (`test_w1_41_external_references.py`, `test_w1_41_external_follow_up.py`) and the support's context section.
+The tables below record what they held; they map no line.
 
 `test_w1_41_external_references.py`, 45 cases. Reached through the public interface only: the command
 `gov context --json --root <project> [--brief] <ticket>` for the main rows, the function
@@ -792,10 +796,17 @@ Cases: 100 in the full run, 142 in `breadth`, 0 in `lifted`.
 | S6: Retired material leaves the active tree and stays reachable through git history or an archive ref; nothing is deleted without a recorded dispos... | `test_w1_41_legacy.py::test_retired_material_stays_reachable_as_it_was`, `test_w1_41_legacy.py::test_nothing_left_the_tree_without_a_recorded_disposition` | the ticket's words |
 | S7: A3: the path map keeps a healthy native framework or package layout unless the target structure is materially better and the migration risk is ... | `test_w1_41_path_map.py::test_a_native_package_layout_is_kept_where_nothing_else_is_proposed`, `test_w1_41_path_map.py::test_a_justification_that_states_only_one_of_the_two_grounds_is_refused` (2 of 2), `test_w1_41_path_map.py::test_a_justified_move_out_of_a_native_layout_is_recorded_with_both_grounds` | the ticket's words |
 | S8: This ticket closes under the adoption-gap exceptions; they end when this repository's adoption is complete (gov adopt --lite run on it, the gov... | none: a process line (this ticket's own close under the adoption-gap exceptions); no case named it before the cut either | designer |
-| S9: Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references: the context accept... | `test_w1_41_external_follow_up.py::test_an_id_of_a_form_outside_sources_share_is_still_accepted` (1 of 4), `test_w1_41_external_references.py::test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (1 of 2), `test_w1_41_external_references.py::test_a_listed_id_of_the_decision_registers_form_is_refused` (1 of 2) | the ticket's words |
 | F1: Any file content changes during a move batch | `test_w1_41_migration.py::test_no_other_tracked_file_changes_content_during_a_move_batch` | the ticket's words |
 | F2: A move runs without an A5 verdict [CAP-44.c] | `test_w1_41_verdict.py::test_a6_without_any_verdict_moves_nothing`, `test_w1_41_verdict.py::test_a_verdict_that_is_not_a_pass_moves_nothing` (1 of 3) | designer |
 | F3: A legacy rule file stays loaded after retirement | `test_w1_41_legacy.py::test_no_legacy_rule_file_stays_where_an_agent_tool_loads_instructions` | designer |
 | F4: An unknown material artefact is moved or deleted [CAP-06.c] | `test_w1_41_unknown.py::test_a_path_map_that_moves_or_deletes_the_unknown_artefact_is_refused` (4 of 4), `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_the_whole_destructive_migration`, `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_retirement_too` | the ticket's words |
 
 **Citations (DEC-1109 (2), 2026-11-09):** `w1_41_support.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).
+
+## W2-200 revision (DEC-1214 M1)
+
+The ninth success line (CAP-15.c: sources outside the repository, read through the context packet) is retired with the
+context command (DEC-1214 M1). Deleted: `test_w1_41_external_references.py` (45 cases) and
+`test_w1_41_external_follow_up.py` (23 cases); `w1_41_support.py`'s context section and its import of W1-24's support.
+Its row is taken out of the map above. The adoption tool's lines are unchanged.
+

@@ -1,20 +1,21 @@
 """Tests for the close record as a consumption receipt: S5 (CAP-50.c), A4, B5, B7.
 
 S5: The close record is a consumption receipt: the input ids and hashes supplied
-    (packet hash) and used, outputs produced, requirements implemented, decisions
-    applied, tests produced, and deviations.
-A4: When gov context cannot be built, the close refuses (no fallback hash, no
-    silently empty decisions list). The case reaches the context call.
+    and used, outputs produced, requirements implemented, decisions applied,
+    tests produced, and deviations. Since DEC-1214 M1 (W2-200) the decisions
+    applied come from the ticket's own sources, resolved in the register by id,
+    each with the hash of its span; the record has no packet hash.
+A4: (retired with the context command, DEC-1214 M1: the close builds no packet,
+    so no packet can fail; its three cases are deleted.)
 B5: "Outputs produced" lists files from the ticket's commits. "Deviations" says
     "not measured" when not measured, never "none". Unmeasurable inputs listed
     with the reason.
-B7: Sources resolve through a defined lookup. A ticket naming a source that does
-    not resolve is refused and gets no close record (DEC-470, replacing "listed
-    with no hash and a reason"). The ticket file is always an input.
+B7: Sources resolve through a defined lookup. A ticket naming a decision the
+    register does not hold is refused (DECISION_NOT_FOUND, W2-200 S6) and gets no
+    close record. The ticket file is always an input.
 """
 
 import hashlib
-import json
 
 import pytest
 
@@ -43,6 +44,26 @@ def _close_and_find_record(project, sandbox):
     return front
 
 
+REGISTER_REL = "docs/DECISION_REGISTER.md"
+REGISTER_HEAD = "# Decision register\n\n"
+DECISION_ENTRY = "### DEC-9101 — The receipt names its decisions\n- **Status:** ACCEPTED (owner)\n\nIts text.\n"
+
+
+def _with_register(project, entries=DECISION_ENTRY):
+    """The project's path map names a register holding ``entries`` (DEC-1214 M1, W2-200: the close resolves the
+    ticket's decisions there)."""
+    project.write(support.PATH_MAP_REL,
+                  support.path_map_text({**support.SUITE_SETTINGS, "decision_register": REGISTER_REL}))
+    project.write(REGISTER_REL, REGISTER_HEAD + entries)
+    project.commit("the register", who=support.OWNER)
+
+
+def _span_hashes(text):
+    """The sha256 forms of the one entry's span: with or without the line break that ends it."""
+    return {"sha256:" + hashlib.sha256(form.encode("utf-8")).hexdigest()
+            for form in (text, text.rstrip("\n"))}
+
+
 def _green_project(project):
     project.add_decision("DEC-9021", "ACTIVE")
     project.commit("a decision", who=support.OWNER)
@@ -58,15 +79,17 @@ def _green_project(project):
 # S5: The close record is a consumption receipt (CAP-50.c)
 # --------------------------------------------------------------------------
 
-def test_close_record_has_packet_hash(project, sandbox, interface):
-    """KPI S5, CAP-50.c: the close record carries the context packet hash."""
+def test_close_record_names_its_decisions_and_has_no_packet_hash(project, sandbox, interface):
+    """KPI S5, CAP-50.c: the close record names the decisions it applied, those that no longer stand and those it
+    could not resolve, each a list; it carries no packet hash.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200 S3): was ``test_close_record_has_packet_hash``; the close builds no context
+    packet, so the receipt has no ``packet_hash`` and states its decisions in three lists."""
     _green_project(project)
     front = _close_and_find_record(project, sandbox)
-    assert "packet_hash" in front or "hash" in front, \
-        f"close record must carry the packet hash: {sorted(front)}"
-    value = front.get("packet_hash") or front.get("hash")
-    assert isinstance(value, str) and len(value) > 8, \
-        f"packet_hash should be a non-trivial string: {value!r}"
+    assert "packet_hash" not in front, f"the close record still carries a packet hash: {front.get('packet_hash')!r}"
+    for key in ("decisions_applied", "decisions_not_standing", "decisions_unresolved"):
+        assert isinstance(front.get(key), list), f"the close record has no list {key}: {sorted(front)}"
 
 
 def test_close_record_has_input_ids_and_hashes(project, sandbox, interface):
@@ -119,75 +142,26 @@ def test_close_record_has_tests_and_deviations(project, sandbox, interface):
         f"close record must have a deviations field: {sorted(front)}"
 
 
-def test_close_record_packet_hash_matches_context(project, sandbox, interface):
-    """KPI S5, CAP-50.c: the packet_hash equals the one from gov context.
+def test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes(project, sandbox, interface):
+    """KPI S5, CAP-50.c: a decision the ticket names in its sources, held by the register, is applied, and the
+    inputs name it with the hash of its span of the register at HEAD.
 
-    Revised for W2-67 (I2 F2, PF9): when ``gov context`` could not be read, the case accepted any string of more than
-    eight characters, and it could not be read: the record store is loaded only by the close. The store is now
-    loaded first, the case fails when ``gov context`` does not answer, and the close record's packet hash must be
-    exactly the hash it gives."""
-    _green_project(project)
-    support.load_store(project, sandbox)
-    ctx_run = project.gov(sandbox, "context", TICKET, "--json")
-    ctx_data = json.loads(ctx_run.stdout)
-    assert ctx_data.get("ok") is True, \
-        f"gov context does not answer for the ticket, so its hash cannot be compared\n{ctx_run.describe()}"
-    ctx_hash = ctx_data["result"].get("hash")
-    assert isinstance(ctx_hash, str) and len(ctx_hash) > 8, f"gov context gives no hash: {ctx_data['result']}"
-
+    Rewrite-Reason: DEC-1214 M1 (W2-200 S3): was ``test_close_record_packet_hash_matches_context``, which compared
+    the record's packet hash with the retired context command's; the receipt's decisions now come from the ticket's
+    own sources, resolved in the register by id, each hashed by its span."""
+    _with_register(project)
+    project.add_ticket(TICKET, WBS, sources=["DEC-9101"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     front = _close_and_find_record(project, sandbox)
-    record_hash = front.get("packet_hash") or front.get("hash")
-    assert record_hash == ctx_hash, \
-        f"packet_hash {record_hash!r} must match context hash {ctx_hash!r}"
-
-
-# --------------------------------------------------------------------------
-# A4: Context failure refuses close (no fallback hash)
-# --------------------------------------------------------------------------
-
-def test_close_refuses_when_context_cannot_be_built(project, sandbox, interface):
-    """A4: when gov context cannot be built, close refuses with the reason.
-
-    The case reaches the context call: watchdog passes, tests pass, but context
-    fails -> refusal (no fallback hash, no silently empty decisions).
-    """
-    project.add_ticket(TICKET, WBS)
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    project.add_decision("DEC-9003", "ACTIVE", supersedes="DEC-9004")
-    project.add_decision("DEC-9004", "ACTIVE", supersedes="DEC-9003")
-    project.commit("create contradiction for context failure", who=support.OWNER)
-    run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "close must refuse when gov context cannot be built (A4)"
-
-
-def test_no_fallback_hash_when_context_fails(project, sandbox, interface):
-    """A4: no fallback hash from sha256(ticket file) when context fails."""
-    project.add_ticket(TICKET, WBS)
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    project.add_decision("DEC-9005", "ACTIVE", supersedes="DEC-9006")
-    project.add_decision("DEC-9006", "ACTIVE", supersedes="DEC-9005")
-    project.commit("contradiction", who=support.OWNER)
-    before = cli_support.snapshot(project.root)
-    run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    created = support.new_files(project.root, before, after)
-    _, front = support.find_close_record(project.root, created)
-    if front is not None:
-        ticket_path = project.root / ".tickets" / f"{TICKET}.md"
-        fallback = hashlib.sha256(ticket_path.read_bytes()).hexdigest()
-        record_hash = front.get("packet_hash") or front.get("hash", "")
-        assert record_hash != fallback and record_hash != f"sha256:{fallback}", \
-            "the close must not use sha256(ticket file) as fallback hash (A4)"
+    assert front.get("decisions_applied") == ["DEC-9101"], f"decisions_applied: {front.get('decisions_applied')!r}"
+    hashes = {item.get("id"): item.get("hash") for item in front.get("inputs", []) if isinstance(item, dict)}
+    assert hashes.get("DEC-9101") in _span_hashes(DECISION_ENTRY), \
+        f"DEC-9101's input hash is not that of its span: {front.get('inputs')!r}"
+    assert "packet_hash" not in front
 
 
 # --------------------------------------------------------------------------
@@ -273,25 +247,26 @@ def test_ticket_file_is_always_an_input(project, sandbox, interface):
 
 
 def test_unresolvable_source_refuses_the_close(project, sandbox, interface):
-    """B7 as DEC-470 settles it: a ticket naming a source that does not resolve is refused. No close record
-    lists the missing source with a reason, because no close record is written.
+    """B7 as W2-200 S6 settles it: a ticket naming in its sources a decision the register does not hold is refused,
+    naming it, before anything is written; no close record lists it, because none is written.
 
-    The case holds first that ``gov context`` gives ``BLOCKED`` for this ticket, which is otherwise green.
-    """
-    missing = "NO-SUCH-SOURCE-999"
-    project.add_ticket(TICKET, WBS, sources=[missing])
+    Rewrite-Reason: DEC-1214 M1 (W2-200 S6): the refusal was the context packet's (``BLOCKED``, read through the
+    retired context command); it is now the close's own ``DECISION_NOT_FOUND``, naming the missing id."""
+    missing = "DEC-9199"
+    _with_register(project)
+    project.add_ticket(TICKET, WBS, sources=["DEC-9101", missing])
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    support.load_store(project, sandbox)
-    error = support.context_error(project, sandbox, TICKET)
-    assert error["code"] == "BLOCKED", f"the fixture is wrong: gov context gives {error}"
 
-    run = support.run_close(project, sandbox, TICKET, store=False)
-    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
-    assert missing in text, f"the refusal does not name the source that does not resolve\n{run.describe()}"
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False and run.returncode != support.EXIT_OK, f"the close was not refused\n{run.describe()}"
+    error = envelope["error"]
+    assert error["code"] == "DECISION_NOT_FOUND", f"the refusal is {error['code']!r}\n{run.describe()}"
+    assert missing in support.error_text(error), f"the refusal does not name {missing}\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
 
 
@@ -306,43 +281,6 @@ def test_sources_resolve_through_defined_lookup(project, sandbox, interface):
             h = inp.get("hash", "")
             assert h and len(h) > 8, \
                 f"the ticket file input must have a real hash: {inp}"
-
-
-# --------------------------------------------------------------------------
-# A4 extended: context failure from a non-cycle cause (DEC-454, KPI S5/S6)
-# --------------------------------------------------------------------------
-
-def test_context_failure_non_cycle_refuses_close(project, sandbox, interface):
-    """A4, S5: a successful-otherwise close whose context cannot be built
-    (by a cause other than a supersession cycle) refuses with the reason
-    and writes no close record and closes no ticket.
-
-    The cause: the ticket sources a superseded decision (W1-24 README: BLOCKED).
-    """
-    project.add_ticket(TICKET, WBS, sources=["DEC-9001"])
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.add_decision("DEC-9001", "ACTIVE", title="Base")
-    project.add_decision("DEC-9012", "ACTIVE", title="Replacement", supersedes="DEC-9001")
-    project.commit("implement with superseded source", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    before = cli_support.snapshot(project.root)
-    run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "close must refuse when context cannot be built (superseded source, not a cycle)"
-    created = support.new_files(project.root, before, after)
-    _, front = support.find_close_record(project.root, created)
-    assert front is None, \
-        "no close record must be written when context fails"
-    ticket_front = support.read_ticket_frontmatter(project.root, TICKET)
-    assert ticket_front.get("status") != "closed", \
-        "the ticket must not be closed when context fails"
-
-
-# The failing close with a class whose context cannot be built: test_w1_30_context_failures.py.
 
 
 # --------------------------------------------------------------------------
