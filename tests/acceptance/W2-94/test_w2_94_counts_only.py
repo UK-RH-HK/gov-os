@@ -24,7 +24,14 @@ import w2_94_support as s  # noqa: E402
 TABLES = {"s1-form": c.S1_FORM, "s1-draw": c.S1_DRAW, "s1-draw-literal": c.S1_DRAW_LITERAL,
           "s1-draw-forms": c.S1_DRAW_FORMS, "s1-release": c.S1_RELEASE, "s4": c.S4_BREAKS, "s4-holds": c.S4_HOLDS,
           "s4-nonexistent": c.NONEXISTENT_BREAKS, "fail-closed": c.FAIL_CLOSED}
-CASES = sorted((table, name) for table, entries in TABLES.items() for name in entries)
+ALL_CASES = sorted((table, name) for table, entries in TABLES.items() for name in entries)
+# DEC-1220 (1), TI-7: 130 cases are 18. Each case plants the same word and asserts the same rule (the output is lines of the
+# four shapes and holds no planted word) over one more defect; every defect is already refused by name in its own table's
+# test (test_w2_94_s1_split_form, _s4_gold_sources, _fail_closed). What differs is the path of the script that prints, so
+# each table keeps its first and its last row (the boundary of the table): the tables are the nine paths (form, draw, literal
+# draw, draw forms, release, source holds, sources broken, nonexistent, fail-closed).
+CASES = [case for table in TABLES for case in
+         (lambda rows: rows if len(rows) < 3 else [rows[0], rows[-1]])([c_ for c_ in ALL_CASES if c_[0] == table])]
 
 
 def _count(table):
