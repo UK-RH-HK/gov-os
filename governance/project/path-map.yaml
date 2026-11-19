@@ -122,6 +122,20 @@ namespaces:
     lexical_policy: not indexed
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
     deletion_rebuild: authoritative; restored from git only
+  # EMERGENCY-2 11.3, DEC-1214 G4: the old decision register, archived read-only after audit 8: history only, out of
+  # both indexes; the code reads it for ids and headings alone (decision_register_archive below)
+  archive:
+    paths:
+      - "docs/archive/**"
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history; superseded records stay
+    export_policy: allowed
+    embedding_policy: not embedded
+    lexical_policy: not indexed
+    provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
+    deletion_rebuild: authoritative; restored from git only
   # EMERGENCY-2 11.1, 11.3: the old start-up documents and memory, history only, out of both indexes
   history-archive:
     paths:
@@ -403,6 +417,8 @@ systems:
 # The decision-citations check (DEC-473, DEC-474, DEC-479): this project's register file, and the commit
 # after which commits are judged (the commit that records DEC-463).
 decision_register: docs/DECISION_REGISTER.md
+# EMERGENCY-2 11.3, DEC-1214 G4: the register archived after audit 8; a decision id it holds still resolves, as history
+decision_register_archive: docs/archive/DECISION_REGISTER-2026-11-19.md
 decision_citations_base: "46ec8da3"
 # The three ratchet lists below (acceptance_exemptions, accepted_reds, load_sensitive) are frozen by DEC-1052 Q-10: no new entry.
 # Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
