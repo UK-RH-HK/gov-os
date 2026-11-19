@@ -168,3 +168,5 @@ under `.rulesync/skills`, `template/.rulesync/skills` and `.claude/skills`), reg
 not by hand where it generates. Verify: each of those files holds the three statements (the strings `new ticket only for a
 new feature`, `--fix` and `--chore` in the line that names `gov launch`, or in the skill's line); a copy equals what its
 kernel file generates; `gov accept W2-201` and the copy checks (W1-28, W1-33, W2-153 S3) stay green.
+
+**Landed:** merged into `w2/integrate` at `2031f758d` on 2026-11-19 (the CTO); on the merged tree W2-201, `tests/unit/launch`, `tests/unit/queue`, W2-202, W2-206, W2-195 and `tests/unit/optin`: 1,576 passed. Follow-up X6 to X8 (a fix under a closed ticket lands and relaunches): lead `rubric-tickets-2`.
