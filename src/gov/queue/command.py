@@ -26,12 +26,26 @@ A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (
 4. **The land.** One close commit per landed ticket on the tested commit, in the clone (its close record, its
    checkpoint, ``tk close``); then the integration branch moves from the head the run merged onto to the last
    close commit, only if it is still there (``HEAD_MOVED``); where it is checked out, its working tree follows.
+5. **After** (``gov.queue.after``; never refuses): the integration store's refresh where ``rebuild.yaml`` names
+   one, and the structural pass with the landing's base; both are notices under ``after``.
 
 The answer and ``.gov-runtime/queue/<stamp>/queue.json`` hold the same result, with the seconds of each step.
+
+The flags of W2-206 (L2 section 3, A6):
+
+- ``--dry-run [--out <dir>]``: steps 0 to 3 and nothing else. No close commit, no close record, no branch and no
+  ref moves; the warm clone is left at the base. The answer and the exit code are those the landing would have
+  given; ``<dir>`` gets ``select.json``, the run files, ``summary.txt`` and, last, ``verify.exit``
+  (``gov.queue.dry``), also when the dry run is refused as a whole.
+- ``--select``: the selection the run would make, as one JSON object on stdout, exit 0; nothing is run or
+  recorded. ``SELECTION_REFUSED`` goes to stderr with exit 2.
+- ``--full``: the run of step 3 is the whole ``tests/`` of the merged result (``gov.queue.full``), in a pool no
+  wider than its slot; a selection is not computed, so no path is ``SELECTION_REFUSED``.
 """
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
@@ -45,6 +59,8 @@ from gov.cli.errors import GovError
 HELP = "land tickets' branches: one run on the merged result, the close at the land"
 CLASS = "act"
 EXIT_RED = 3
+EXIT_SELECT_REFUSED = 2
+CHILD_EXIT_CODE = True  # --select prints the selection itself and ends with its own code, 0 or 2
 EXIT_CODES = {EXIT_RED: "a candidate did not land, or the run was refused as a whole (nothing of it landed)"}
 ACT_PATHS = (".gov-runtime/**", ".tickets/**", "docs/close/**", "docs/checkpoints/**")
 SETTINGS_REL = "governance/project/queue.yaml"
@@ -62,11 +78,30 @@ def add_arguments(parser) -> None:
     parser.add_argument("--onto", metavar="<branch>", help="the integration branch")
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT, metavar="<seconds>",
                         help="each test run's time limit")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", dest="dry_run", action="store_true",
+                      help="everything but the land: no close commit, no branch moved; the answer and exit code "
+                           "the landing would give, and select.json, the run files, summary.txt and verify.exit "
+                           "under --out")
+    mode.add_argument("--select", action="store_true",
+                      help="print the selection the run would make as one JSON object and run nothing "
+                           "(SELECTION_REFUSED: stderr, exit 2)")
+    parser.add_argument("--out", metavar="<dir>", default=None,
+                        help="--dry-run: the folder of its files (default .gov-runtime/queue/dry/<ticket>/, the "
+                             "tickets joined by +)")
+    parser.add_argument("--full", action="store_true",
+                        help="run the whole tests/ of the merged result instead of the selection, in a pool no "
+                             "wider than the run's slot")
 
 
 def run(root: Path, args, config: dict):
+    given, full = list(args.tickets), bool(getattr(args, "full", False))
     try:
-        return land(Path(root), list(args.tickets), args.onto, args.timeout)
+        if getattr(args, "select", False):
+            return select(Path(root), given, args.onto, full)
+        if getattr(args, "dry_run", False):
+            return dry_run(Path(root), given, args.onto, args.timeout, getattr(args, "out", None), full)
+        return land(Path(root), given, args.onto, args.timeout, full=full)
     except GovError as error:
         if getattr(args, "json", False):  # the envelope on stdout, the line on stderr too (without --json gov prints it)
             print(f"{error.code}: {error.message}", file=sys.stderr)
@@ -253,7 +288,8 @@ def _judged_on_record(clone: Path, base: str, cand: dict, result: dict) -> bool:
     return True
 
 
-def _run_on_head(clone: Path, cand: dict, base: str, chosen: dict, folder: Path, timeout: float, also) -> dict:
+def _run_on_head(clone: Path, cand: dict, base: str, chosen: dict, folder: Path, timeout: float, also,
+                 workers: int = 1) -> dict:
     """The run of a branch already merged, on the integration head itself: ``batch.isolate``'s result keys. A red
     is run again alone (green alone: flaky), then alone at the head before the branch's merge: red there with the
     same failure type it is a known base red, else it is the ticket's, which is not closed."""
@@ -262,9 +298,9 @@ def _run_on_head(clone: Path, cand: dict, base: str, chosen: dict, folder: Path,
 
     ticket, options = cand["ticket"], chosen["pytest_options"]
     done = {"reds": [], "flaky": [], "culprits": [], "base_reds": [], "explains": {}, "landed": [],
-            "land_commit": None, "runs": []}
+            "land_commit": None, "runs": [], "folder": str(folder)}
     attribution.checkout(clone, base)
-    phases = _phases(clone, chosen, folder, timeout, 1)
+    phases = _phases(clone, chosen, folder, timeout, workers)
     done["runs"] = phases["runs"]
     if not phases["complete"]:
         _refuse("RUN_INCOMPLETE", f"the run on the head did not complete: {'; '.join(phases['incomplete'])}; "
@@ -376,15 +412,9 @@ def _write(root: Path, result: dict, error: GovError | None = None) -> None:
     path.write_text(json.dumps(held, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
 
 
-def land(root: Path, given: list[str], onto: str | None = None,
-         timeout: float = DEFAULT_TIMEOUT) -> tuple[dict, int]:
-    """The landing: ``(result, exit code)``, or a ``GovError`` where nothing landed."""
-    from gov.close import attribution, batch, select
-    from gov.queue import acceptance, checks
-
-    start = time.monotonic()
-    root = Path(root).resolve()
-    _hold(root)
+def _start(root: Path, given: list[str], onto: str | None) -> tuple[str, str, list[dict], dict | None]:
+    """The settings and the candidates (step 1): ``(integration branch, base, candidates, the one already
+    merged)``; a refusal as a whole where one cannot be read."""
     settings = _settings(root)
     if not onto:
         onto = settings.get("integration") if isinstance(settings.get("integration"), str) else None
@@ -401,6 +431,126 @@ def land(root: Path, given: list[str], onto: str | None = None,
         _refuse("CANDIDATE_NOT_ISOLATED", f"{alone['ticket']}: its work branch {alone['branch']} is already merged, "
                 f"so it is landed alone (gov queue {alone['ticket']}), apart from branches still to merge; nothing "
                 "lands", {"ticket": alone["ticket"], "branch": alone["branch"]}, EXIT_RED)
+    return onto, base, cands, alone
+
+
+def _merged(clone: Path, base: str, left: list[dict], alone: dict | None) -> str:
+    """The tested merge, checked out in the clone: the candidates merged onto the base (the base itself for a
+    branch already merged)."""
+    from gov.close import attribution, batch
+
+    if alone:
+        attribution.checkout(clone, base)
+        return base
+    merged = batch._build(clone, base, [{"name": c["ticket"], "commit": c["tip"]} for c in left])
+    if merged is None:
+        _refuse("CANDIDATE_NOT_ISOLATED", "the candidates do not merge together onto the integration head; "
+                "nothing lands", {"candidates": [c["ticket"] for c in left]}, EXIT_RED)
+    return merged
+
+
+def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lands") -> tuple[list[str], list[str]]:
+    """The union of the candidates' ``select.scoped`` selections in the clone at the tested merge, each branch's
+    changed paths counted in its change: ``(suites, pytest options)``; ``SELECTION_REFUSED`` for a path the test
+    map does not map."""
+    from gov.close import select
+
+    suites, options = [], None
+    for cand in left:
+        try:
+            chosen = select.scoped(clone, cand["ticket"], change=_changed(root, cand["since"], cand["tip"]))
+        except select.SelectionRefused as refused:
+            _refuse(select.SELECTION_REFUSED, f"{cand['ticket']}: {refused.reason}{said}",
+                    {"candidate": cand["ticket"]}, EXIT_RED)
+        suites += chosen["suites"]
+        options = chosen["pytest_options"]
+    return sorted(dict.fromkeys(suites)), options or []
+
+
+def select(root: Path, given: list[str], onto: str | None = None, full: bool = False) -> int:
+    """``gov queue <T>... --select`` (A6 S2): the selection the run would make, printed as one JSON object; 0.
+    Nothing is run, moved or recorded: the warm clone, where the merged result is read, is left at the base. A
+    selection refused is said on stderr: 2. Any other refusal is the landing's own (a ``GovError``)."""
+    from gov.close import attribution
+    from gov.close.select import SELECTION_REFUSED
+    from gov.queue import dry, full as whole
+
+    root = Path(root).resolve()
+    onto, base, cands, alone = _start(root, given, onto)
+    try:
+        clone = root / attribution.prepare(root, base)["path"]
+    except attribution.CloneError as e:
+        _refuse("CLOSE_CLONE_FAILED", f"the queue's clone cannot be made: {e}", {"base": base})
+    try:
+        _merged(clone, base, cands, alone)
+        if full:
+            chosen = whole.selection(clone, [f for f in (_acceptance(c["at_tip"]) or _acceptance(c["front"])
+                                                         for c in cands) if f])
+            suites, options = chosen["suites"], chosen["pytest_options"]
+        else:
+            suites, options = _union(root, clone, cands, "")
+    except GovError as refused:
+        if refused.code != SELECTION_REFUSED:
+            raise
+        print(f"{SELECTION_REFUSED}: {refused.message}", file=sys.stderr)
+        return EXIT_SELECT_REFUSED
+    finally:
+        _back_to(clone, base)
+    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options)))
+    return 0
+
+
+def _back_to(clone: Path, base: str) -> None:
+    """The warm clone left at the base, where it can be."""
+    from gov.close import attribution
+
+    try:
+        attribution.checkout(clone, base)
+    except attribution.CloneError:
+        pass
+
+
+def dry_run(root: Path, given: list[str], onto: str | None = None, timeout: float = DEFAULT_TIMEOUT,
+            out: str | None = None, full: bool = False) -> tuple[dict, int]:
+    """``gov queue <T>... --dry-run [--out <dir>]`` (A6 S1): the landing's answer and exit code with nothing
+    landed, and the out folder's files; ``verify.exit`` is written last, also where the dry run is refused as a
+    whole (its exit code is then the refusal's)."""
+    from gov.queue import dry
+
+    root = Path(root).resolve()
+    files = dry.Out(dry.out_dir(root, given, out))
+    said = f"queue --dry-run {' '.join(g.partition('=')[0] for g in given)}"
+    try:
+        result, code = land(root, given, onto, timeout, full=full, dry=files)
+    except GovError as error:
+        code = error.exit_code if error.exit_code in EXIT_CODES else 1
+        files.finish(f"{said}: exit {code}: {error.code}: {error.message}", code)
+        raise
+    except BaseException as error:  # the dry run itself failed: its exit file still says so, gov wait returns
+        files.finish(f"{said}: exit 1: {type(error).__name__}", 1)
+        raise
+    runs = "; ".join(f"{r['name']} {r['passed']} passed, {r['failed']} failed, {r['errors']} errors, "
+                     f"{r['skipped']} skipped" for r in result["runs"])
+    told = [f"would land {', '.join(result['landed'])}"] if result["landed"] else ["nothing would land"]
+    told += [f"culprits {', '.join(result['culprits'])}"] if result["culprits"] else []
+    told += [f"refused {', '.join(r['ticket'] + ' (' + r['code'] + ')' for r in result['refused'])}"] \
+        if result["refused"] else []
+    files.finish(f"{said}: exit {code}: {'; '.join(told)}" + (f"; {runs}" if runs else ""), code)
+    return result, code
+
+
+def land(root: Path, given: list[str], onto: str | None = None,
+         timeout: float = DEFAULT_TIMEOUT, *, full: bool = False, dry=None) -> tuple[dict, int]:
+    """The landing: ``(result, exit code)``, or a ``GovError`` where nothing landed. ``full``: the run is the
+    whole ``tests/`` of the merged result (``gov.queue.full``). ``dry`` (the out folder of a dry run,
+    ``gov.queue.dry.Out``): everything but the land; ``landed`` names the tickets that would land."""
+    from gov.close import attribution, batch
+    from gov.queue import acceptance, after, checks, dry as _dry, full as whole
+
+    start = time.monotonic()
+    root = Path(root).resolve()
+    _hold(root)
+    onto, base, cands, alone = _start(root, given, onto)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     seconds = dict.fromkeys(STEPS, 0.0)
     result = {"onto": onto, "base": base, "candidates": [c["ticket"] for c in cands], "landed": [], "culprits": [],
@@ -433,6 +583,15 @@ def land(root: Path, given: list[str], onto: str | None = None,
         seconds["acceptance"] = round(seconds["acceptance"] + time.monotonic() - began, 3)
         return out
 
+    clone, limit = None, None
+    kept = _commit_of(root, batch.LAND_REF) if dry is not None else None  # the root's ref the batch's search moves
+
+    def run_files(done: dict) -> None:
+        """A dry run's run files: those of the run on the merged result."""
+        if dry is not None and done.get("folder"):
+            made = Path(done["folder"])
+            dry.runs(made if alone else made / "batch")
+
     try:
         left = [c for c in cands if _checks(root, base, c, result)]
         if not left:
@@ -446,45 +605,50 @@ def land(root: Path, given: list[str], onto: str | None = None,
         if not left:
             attribution.checkout(clone, base)
             return finish(EXIT_RED)
-        if alone:
-            attribution.checkout(clone, base)
-            merged = base
-        else:
-            merged = batch._build(clone, base, [{"name": c["ticket"], "commit": c["tip"]} for c in left])
+        _merged(clone, base, left, alone)
         timed("merge", began)
-        if merged is None:
-            _refuse("CANDIDATE_NOT_ISOLATED", "the candidates do not merge together onto the integration head; "
-                    "nothing lands", {"candidates": [c["ticket"] for c in left]}, EXIT_RED)
         began = time.monotonic()
-        suites, options = [], None
-        for cand in left:
-            try:
-                chosen = select.scoped(clone, cand["ticket"], change=_changed(root, cand["since"], cand["tip"]))
-            except select.SelectionRefused as refused:
-                _refuse(select.SELECTION_REFUSED, f"{cand['ticket']}: {refused.reason}; nothing lands",
-                        {"candidate": cand["ticket"]}, EXIT_RED)
-            suites += chosen["suites"]
-            options = chosen["pytest_options"]
         own = [c["folder"] for c in left if c["folder"]]  # run by the runner of gov accept: no test runs twice
-        result["selection"] = {"suites": [s for s in sorted(dict.fromkeys(suites)) if not checks._under(s, own)],
-                               "pytest_options": options or []}
+        if full:  # the asked-for widening: the whole tests/, no selection computed, in a pool inside the slot
+            limit = whole.cap(root)
+            result["selection"] = whole.selection(clone, own)
+            result["full"] = {"runs": [], **limit}
+            union = result["selection"]["suites"]
+        else:
+            union, options = _union(root, clone, left)
+            result["selection"] = {"suites": [s for s in union if not checks._under(s, own)],
+                                   "pytest_options": options}
+        if dry is not None:
+            dry.selection(_dry.selection_object([c["ticket"] for c in left], union,
+                                                result["selection"]["pytest_options"]))
         timed("selection", began)
         began, before = time.monotonic(), seconds["acceptance"]
+        workers = limit["workers"] if limit else 1
         try:
-            if alone:
-                done = _run_on_head(clone, alone, base, result["selection"], root / QUEUE_DIR / stamp / "head",
-                                    timeout, acceptance_runs)
-            else:
-                done, _ = batch.isolate(root, base, [f"{c['ticket']}={c['tip']}" for c in left],
-                                        targets=result["selection"]["suites"], onto=None, timeout=timeout,
-                                        also=acceptance_runs)
+            with whole.capped(workers) if limit else contextlib.nullcontext():
+                if alone:
+                    done = _run_on_head(clone, alone, base, result["selection"], root / QUEUE_DIR / stamp / "head",
+                                        timeout, acceptance_runs, workers)
+                else:
+                    done, _ = batch.isolate(root, base, [f"{c['ticket']}={c['tip']}" for c in left],
+                                            targets=result["selection"]["suites"], onto=None, timeout=timeout,
+                                            also=acceptance_runs, workers=workers,
+                                            options=[f"--ignore={f.strip('/')}" for f in own] if full else None)
+        except GovError as refused:
+            run_files(refused.details)
+            if full:
+                result["full"]["runs"] = refused.details.get("runs") or []
+            raise
         finally:
             seconds["run"] = round(time.monotonic() - began - (seconds["acceptance"] - before), 3)
             result["acceptance"] = [{k: a[k] for k in ("ticket", "folder", "outcome", "error_kind", "lines")}
                                     for a in accepted.values()]
+        run_files(done)
         result.update({k: done[k] for k in ("reds", "flaky", "culprits")}, tested=done["land_commit"],
                       base_reds=done.get("base_reds") or [])
         result["runs"] = done.get("runs", []) + [{**r, "name": f"rest:{r['name']}"} for r in done.get("rest_runs", [])]
+        if full:
+            result["full"]["runs"] = result["runs"]
         landed = [c for c in left if c["ticket"] in done["landed"]]
         if result["tested"] is None:
             return finish(EXIT_RED)
@@ -495,6 +659,10 @@ def land(root: Path, given: list[str], onto: str | None = None,
                         "pass; nothing lands", {"candidate": cand["ticket"]}, EXIT_RED)
             cand["acceptance"] = {"folder": cand["folder"], "lines": ran["lines"]} if cand["folder"] else \
                 {"folder": None, "lines": [], "record": cand["record"]}
+        code = EXIT_RED if len(landed) < len(cands) else 0
+        if dry is not None:  # the answer the landing would give; nothing is closed and nothing moves
+            result.update(landed=[c["ticket"] for c in landed], dry_run=True)
+            return finish(code)
         began = time.monotonic()
         explains = done.get("explains") or {}
         at_base = {r["test"]: r for r in result["base_reds"]}
@@ -509,10 +677,22 @@ def land(root: Path, given: list[str], onto: str | None = None,
         _move(root, clone, onto, base, last, result)
         timed("close", began)
         result.update(head=last, landed=[c["ticket"] for c in landed])
-        return finish(EXIT_RED if len(landed) < len(cands) else 0)
+        began = time.monotonic()  # the after-step: notices only, the landing stands whatever they say
+        try:  # where the branch is checked out, in its tree; else the rebuild from the root, the pass in the clone
+            tree = _checked_out(root, onto)
+            result["after"] = after.run(tree or root, onto, base, tree or clone)
+        except Exception as e:  # noqa: BLE001 - never refuses
+            result["after"] = {"ok": False, "reason": f"{type(e).__name__}: {e}"[:600]}
+        result["after"]["seconds"] = round(time.monotonic() - began, 3)
+        return finish(code)
     except RuntimeError as e:  # a git step that failed: nothing has moved
         return finish(1, GovError("GIT_FAILED", f"{e}; nothing lands", {"reds": result["reds"]}))
     except GovError as error:
         result["reds"] = error.details.get("reds", result["reds"])
         error.details["reds"] = result["reds"]
         return finish(EXIT_RED, error)
+    finally:
+        if dry is not None:  # the clone at the base; the root without the ref the batch's search fetched into it
+            if clone is not None:
+                _back_to(clone, base)
+            _git(root, "update-ref", *([batch.LAND_REF, kept] if kept else ["-d", batch.LAND_REF]), ok=True)

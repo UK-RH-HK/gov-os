@@ -530,7 +530,8 @@ def _targets(clone: Path, candidates: list[dict], given: list[str] | None) -> di
 
 
 def isolate(root: Path, base: str, given: list[str], targets: list[str] | None = None, onto: str | None = None,
-            timeout: float = 3600, also=None, workers: int = 1) -> tuple[dict, int]:
+            timeout: float = 3600, also=None, workers: int = 1,
+            options: list[str] | None = None) -> tuple[dict, int]:
     """The batch (S6): ``(result, exit code)``; a ``GovError`` for a refusal (nothing landed).
 
     ``also(commit, names)`` is called after the selection's run on each merged result (the clone checked out at
@@ -540,7 +541,8 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
     that carries ``culprit`` (a candidate's name: a run of that candidate's own that failed without naming a test,
     W2-206) is explained by that candidate as it is: no search runs for it.
 
-    ``workers``: the parallel phase's xdist pool on each merged result (1: no pool, as before)."""
+    ``workers``: the parallel phase's xdist pool on each merged result (1: no pool, as before). ``options``:
+    pytest options added to the selection's own on every run (the queue's full run leaves folders out by them)."""
     from gov.close import attribution as _attribution
     from gov.close.command import _phases
 
@@ -593,6 +595,8 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
         chosen = {"suites": [], "pytest_options": _select.pytest_options(_select.load_map(clone)[0])}
     else:
         chosen = _targets(clone, candidates, targets)
+    if options:
+        chosen = {**chosen, "pytest_options": list(chosen["pytest_options"]) + list(options)}
     result["selection"] = chosen
     phases = run_on(whole, chosen, "batch")
     result["runs"] = phases["runs"]
