@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/queue/**
 - src/gov/close/batch.py
 - src/gov/adopt/facts.py
+- src/gov/adopt/command.py
 - tests/unit/queue/**
 - tests/unit/close/**
 - tests/acceptance/W2-202/**
@@ -38,7 +39,7 @@ kpis:
   - 'A3 S3: each KPI line''s pass or fail, from the runner `gov accept` uses on the tested merge, is in each landed ticket''s close record under `acceptance` (the folder, each line with its result) Verify: a planted landing: the record''s lines equal `gov accept`''s own answer on the same tree. [L2 §3 A3 S3]'
   - 'A4 S1: `gov queue <T>` for an open ticket whose work branch tip is already on the integration branch merges nothing, runs the checks and the run on the head, writes the close commit and moves the branch Verify: a planted ticket merged by hand into the integration branch, then `gov queue <T>`: exit 0, the close record is written, the ticket is `closed` at the new head, no merge commit is made by the queue. [L2 §3 A4 S1]'
   - 'A5 S1: while `gov pause` froze the project, `gov queue` lands nothing and says why (`PROJECT_PAUSED`, exit 1, nothing written, the branch unmoved); after `gov pause --off` it lands Verify: a planted repository: pause, queue (exit 1, branch unmoved, ticket open), pause --off, queue (lands). [L2 §3 A5 S1; CAP-05, audit 7 C-1]'
-  - 'A5 S2: `gov adopt --facts` writes `governance/project/queue.yaml` (`integration`, `work_branch`) where absent, and no `close.yaml` Verify: an adopted planted repository: the file holds both keys, a present queue.yaml is left as it is, no `governance/project/close.yaml` exists. [L2 §3 A5 S2]'
+  - 'A5 S2: `gov adopt --facts` writes `governance/project/queue.yaml` (`integration`, `work_branch`) with the facts file it writes, and no `close.yaml`; a repository that has its own facts file is left wholly as it is (W2-174 S5) Verify: an adopted planted repository: the file holds both keys, a present queue.yaml is left as it is, no `governance/project/close.yaml` exists. [L2 §3 A5 S2]'
   failure:
   - 'A1 F1: a red the candidate causes is never recorded as a base red; the candidate does not land Verify: a planted candidate that breaks a test green at the base: exit 3, the candidate in `culprits`, no `base` verdict for that test. [L2 §3 A1 F1]'
   - 'A1 F2: a base red creates no file under `.tickets/` and no line under `docs/` outside `docs/close/` and `docs/checkpoints/` Verify: `git status --porcelain` of the clone and the tree diff of the landed head after the landing of S1 show no such path. [L2 §3 A1 F2]'
