@@ -168,3 +168,64 @@ under `.rulesync/skills`, `template/.rulesync/skills` and `.claude/skills`), reg
 not by hand where it generates. Verify: each of those files holds the three statements (the strings `new ticket only for a
 new feature`, `--fix` and `--chore` in the line that names `gov launch`, or in the skill's line); a copy equals what its
 kernel file generates; `gov accept W2-201` and the copy checks (W1-28, W1-33, W2-153 S3) stay green.
+
+## Fix, part 2: a fix under a closed ticket lands, relaunches and has a run folder (DEC-1219 (5)), lines X6 to X8
+
+The first part (X1 to X5) lets a fix start under a closed ticket, but the owner's model says a fix is recorded in its owning
+ticket, open or closed (EMERGENCY-2 4.2), and three places still treat a closed ticket as the end: `gov queue` refuses it
+(`TICKET_CLOSED`), the relaunch of a dead session restarts it as a plain launch (which a closed ticket refuses), and a worker
+on a closed ticket gets no run folder. The test designer and the engineer run Opus (`src/gov/queue/**` and
+`src/gov/launch/**` are C3; the prompts carry `Task: DAEO-k1us`). The README maps X6 to X8 as `S15` to `S17`, as it maps X1 to
+X5 as `S10` to `S14`. "The relaunch" is `gov.dispatch.relaunch` (the watch pass's relaunch of a dead registry entry); there is
+no `gov relaunch` command.
+
+**X6 A fix branch under a closed ticket lands through `gov queue`; a plain branch on a closed ticket is still refused.** The
+signal is a commit trailer, because the launch record's `kind` is machine-local (`.gov-runtime/launches`) and a branch carries
+nothing of it. A branch is a **fix landing** when the ticket at the integration head is `closed` and at least one commit of
+`<since>..<tip>` has both a `Task: <the ticket>` trailer and a `Fix: <one line>` trailer (the line is the first such
+commit's `Fix:` value, non-blank). Any other branch for a closed ticket is refused `TICKET_CLOSED` as today (a branch whose
+commits carry `Task:` of the closed ticket and no `Fix:` is a plain branch; so is a `Fix:` trailer on commits of another
+ticket's `Task:`). A fix landing runs as any candidate does (G-1, the path and ticket notices, the impact-selected tests, and
+the ticket's acceptance folder through the runner of `gov accept`: the folder named by the ticket file at the integration
+head or the tip), and a red it causes keeps it out of the batch as for any candidate. It lands with **no second close**:
+`tk close` and `CLOSE_RECORD_FAILED` on a closed ticket are not reached, the ticket file stays `closed`, and the landing's
+close commit (subject `fix: <ticket> (gov queue landed at <tested12>)`, `Task: <ticket>`) appends to the ticket's close
+record `docs/close/<ticket>/CL-<ticket>.md` one entry of its front-matter key `fixes` (a list, created when the record has
+none; each entry `{line, branch, tip, tested, landed}`: the `Fix:` line, the branch name, its tip, the tested commit, the
+UTC time) and one body line `- fix landed: <line> (<branch> @ <tip12>)`, keeping everything else of the record as it was;
+where the ticket has no close record, one is written with `fixes` only the way the landing writes a record, and nothing
+else of a first close. The answer's `closes` entry for it adds `fix: true` and `fix_line`; `queue.json` and the dry run's
+answer say the same (a dry run changes nothing and appends nothing); a landed feature's entry is as today. A second fix on
+the same ticket lands the same way and appends a second entry. A fix `Fix:` trailer on an `open` or `in_progress` ticket's
+branch is an ordinary landing (the ticket closes as today; no `fixes` entry). Verify: planted branches through `gov queue`
+and its `--dry-run` on W2-115b's planted project with a closed ticket that has an acceptance folder: (a) a fix branch
+(`Task:` + `Fix:`) lands, the ticket stays closed, the close record gains `fixes` with the line and the body line, the
+exit code is 0, a second fix branch appends a second entry; (b) a branch whose commits carry the closed ticket's `Task:` and
+no `Fix:`, and a branch with `Fix:` under another ticket's `Task:`, are each refused `TICKET_CLOSED`, exit 1, nothing moved;
+(c) a fix branch whose change breaks the ticket's acceptance folder or a selected test is not landed; (d) the dry run of
+(a) answers the same, changes no ref or file and appends nothing; (e) a `Fix:` branch on an `in_progress` ticket closes it
+as today.
+
+**X7 The relaunch keeps the kind.** The launch's `kind` and `kind_line` are carried in the registry entry (`kind`,
+`kind_line`: for a worker from the plan, for a lead from `build_lead_settings`'s env values; a feature's entry holds
+`feature` and null, or neither key), and `relaunch.spawn` starts the same kind: a `fix` entry is
+`gov launch <role> <ticket> --fix "<line>" --root <repository> -- --resume <session id> "<text>"` and a `chore` entry is
+`gov launch <role> --chore "<line>" --root <repository> -- --resume ...` with no ticket (the chore's `ticket` in the entry is
+its `chore-<8 hex>` label, which is not a ticket and is not passed), for a worker and for a lead; a feature entry, or an
+entry from before this change with neither key, spawns exactly as today (no flag). The claim, the idempotence, `twice` and
+`unresumable` rules, the notify address and the checkpoint text are unchanged (a chore has no checkpoint: the
+`FALLBACK_STEP` text, which names no ticket file for it). Verify: planted dead registry entries (the form W2-205's
+relaunch tests plant) of a worker fix, a worker chore, a lead fix, a lead chore and a feature: the command the pass spawns
+(the stand-in `gov` that records its argv) holds `--fix <line>` with the owning ticket, `--chore <line>` with no ticket id,
+the same for the leads, and neither flag for the feature and the old-form entry; a relaunched fix launch (run on the stub
+CLI through `gov launch`) is not refused and its record holds `kind` `fix` and the same `kind_line`.
+
+**X8 A worker fix gets a run folder.** A worker launched with `--fix` on a closed (or open) ticket gets the run folder an
+`in_progress` ticket's worker gets: `runs.folder` takes the launch's kind and, for `fix`, does not judge the ticket's
+status (every other rule of it stays: the plain name, the root, the project not inside it, the name given once; a feature
+launch on a ticket that is not `in_progress` still gets none, and a chore none, X2); the launcher makes it with its marker
+when it is not there (reusing the ticket's earlier folder where one is marked as this repository's, never removing or
+rewriting what it holds) and hands it to the session as an `in_progress` worker's. Verify: a planted `--fix` launch of an
+engineer on a closed ticket (the stub CLI, a planted runs root): the folder exists under the root with its marker naming the
+repository, the same launch repeated reuses it, and the session's env/settings carry it as an `in_progress` ticket's launch
+does; the same launch without `--fix` on the closed ticket is refused as today; `--chore` makes none.
