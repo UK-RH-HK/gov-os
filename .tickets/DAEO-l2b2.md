@@ -1,6 +1,6 @@
 ---
 id: DAEO-l2b2
-status: in_progress
+status: closed
 deps: [DAEO-l2bd]
 links: [DAEO-l2bd, DAEO-j9z6]
 created: 2026-11-19T03:00:00Z
@@ -70,3 +70,5 @@ until B1 retires them; `gov close --select`'s output is the reference for A6 S2)
 `--select` equals `gov close --select` (each ticket's own acceptance folder is in the selection). (3) A `--full` run
 leaves the candidates' own acceptance folders out of its run (W2-202 A3 F1: no test runs twice in a landing). (4) A6 S4's
 second case plants no number in the path map.
+
+**Closed at the land, 2026-11-19 04:34 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 8e27b6248 (branch `e2/l2-build-2` at 6192547a7). On the merged tree, through the slot with workers: `tests/unit/queue`, `close`, `accept`, `optin` and `tests/acceptance/W2-115`, `W2-115b`, `W2-193`, `W2-194`, `W2-202`, `W2-206`: 724 passed; `gov accept W2-206`: 45 passed, 0 failed. The CTO's rulings on the lead's lines: `--full`'s path-map worker number is also capped by one slot's size (with the A2 ticket); the lead brief's line telling the engineer to read the acceptance folder is corrected (the engineer role's text holds). Not built here: A2 (after W2-200), A7 (the owner's L2-6), the B items (the owner's yes).
