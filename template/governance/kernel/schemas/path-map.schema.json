@@ -126,6 +126,10 @@
       "description": "Optional. The project's decision register: the path of the file from the project's root (DEC-479).",
       "$ref": "#/$defs/text"
     },
+    "decision_register_archive": {
+      "description": "Optional. The project's archived decision register, read for its ids and headings only: the path of the file from the project's root (EMERGENCY-2 11.3).",
+      "$ref": "#/$defs/text"
+    },
     "decision_citations_base": {
       "description": "Optional. The base commit of the decision-citations check: a commit id, full or abbreviated (DEC-479).",
       "$ref": "common.schema.json#/$defs/commit_id"

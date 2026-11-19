@@ -1,11 +1,19 @@
 """Heavy-job slots, their CPU sets and thread budgets, and the out-of-memory trip-wire (W2-20 S7, S11, S15, S17).
 
-- **Slots (S7):** ``gov resources --slot test|rebuild [--tree T] [--workers N] -- CMD...`` waits for one of the
-  configuration's ``heavy_slots`` machine-wide slots (a rebuild first for its tree's lock, the real path of ``--tree``:
+- **Slots (S7):** ``gov resources --slot test|rebuild|measure|embedder|reranker [--tree T] [--workers N] -- CMD...``
+  waits for one of the machine-wide slots (``GOV_HEAVY_SLOTS``, else the configuration's ``heavy_slots``, else the
+  count derived from the machine; a rebuild first for its tree's lock, the real path of ``--tree``:
   a second rebuild of the same tree waits, a rebuild of another tree does not), runs ``CMD`` and gives the slot back
   when it ends. A slot is an advisory lock on ``~/.gov-os/machine/slots/slot-<i>.lock`` held by the runner (the
   ``gov resources`` process) for the whole run, its holder in ``slot-<i>.json``. Sessions take no slot; a full set
   never refuses a session (DEC-983, P-2).
+- **The load admission (W2-199, RT-3, RT-4, RT-7):** before it takes a slot a run waits until the machine has room
+  (``gov.dispatch.admission``: the 1-minute load under ``start_below``, the load plus ``workers x margin`` within the
+  limit, a GPU kind within the GPU's budget), logs ``ready``, ``wait``, ``admitted``, ``started`` and ``ended`` to the
+  runtime log and measures the load while the job runs. A run inside a run (``GOV_HEAVY_ADMITTED``) is nested: never
+  held, no slot, no lock. ``--held 1,2`` runs with those slots' CPUs and their workers and takes no lock (the nightly's
+  form). A priority run (``GOV_HEAVY_PRIORITY``, the merge queue and the closes) is served before an ordinary waiter and
+  holds at most ``GOV_HEAVY_PRIO_CAP`` (default 2) slots; its registration is the file ``prio-<pid>`` in the slots folder.
 - **The CPU set (S17):** the CPUs this process may use (``os.sched_getaffinity``) less every CPU the
   ``embedding_servers`` section names; each slot has ``max(1, len // heavy_slots)`` of them, slot ``i`` its own range
   (disjoint where there are CPUs enough), applied in the started process before it runs, so everything it starts
@@ -32,12 +40,16 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 from pathlib import Path
 
 from gov.resources import machine
 from gov.resources.config import SERVERS, SERVERS_KEY, cpu_list, machine_dir, parse_cpus
 
-KINDS = ("test", "rebuild")
+KINDS = ("test", "rebuild", "measure", "embedder", "reranker")
+GPU_KINDS = ("embedder", "reranker")
+PRIO_PREFIX = "prio-"
+PRIO_CAP = 2
 THREAD_VARIABLES = ("GOMAXPROCS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "RAYON_NUM_THREADS",
                     "NUMEXPR_NUM_THREADS", "NUMEXPR_MAX_THREADS", "VECLIB_MAXIMUM_THREADS", "GOV_HEAVY_THREAD_BUDGET")
 FINDINGS = "findings.jsonl"
@@ -79,12 +91,14 @@ def budget(share: list[int], workers: int, configured: int | None = None) -> int
     return max(1, len(share) // max(1, workers))
 
 
-def job_env(env: dict, share: list[int], workers: int, threads: int, slot: int) -> dict:
-    """The job's environment: the thread budget in every runtime's variable, whatever the caller had."""
+def job_env(env: dict, share: list[int], workers: int, threads: int, slot) -> dict:
+    """The job's environment: the thread budget in every runtime's variable, whatever the caller had, and the mark that
+    the job is admitted (a run it starts is nested: never held, no slot)."""
     out = dict(env)
     for name in THREAD_VARIABLES:
         out[name] = str(threads)
-    out.update(GOV_HEAVY_CPUS=cpu_list(share), GOV_HEAVY_SLOT=str(slot), PYTEST_XDIST_AUTO_NUM_WORKERS=str(workers))
+    out.update(GOV_HEAVY_CPUS=cpu_list(share) if share else "", GOV_HEAVY_SLOT=str(slot),
+               PYTEST_XDIST_AUTO_NUM_WORKERS=str(workers), GOV_HEAVY_ADMITTED="1")
     return out
 
 
@@ -299,6 +313,82 @@ def tripwire(values: dict, available: int | None = None) -> dict:
         os.close(lock)
 
 
+# --- priority runs --------------------------------------------------------------------------------------------------
+
+def _priority() -> bool:
+    return os.environ.get("GOV_HEAVY_PRIORITY", "").strip().lower() not in ("", "0", "false", "no")
+
+
+def _prio_cap() -> int:
+    try:
+        return max(1, int(os.environ.get("GOV_HEAVY_PRIO_CAP", "")))
+    except ValueError:
+        return PRIO_CAP
+
+
+def _register() -> None:
+    path = folder() / f"{PRIO_PREFIX}{os.getpid()}"
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(str(os.getpid()), encoding="utf-8")
+
+
+def _unregister() -> None:
+    try:
+        (folder() / f"{PRIO_PREFIX}{os.getpid()}").unlink()
+    except OSError:
+        pass
+
+
+def _priority_waiting() -> bool:
+    """Whether a live priority run (not this one) is registered; the registration of a dead pid is removed."""
+    place = folder()
+    try:
+        paths = sorted(place.glob(f"{PRIO_PREFIX}*")) if place.exists() else []
+    except OSError:
+        return False
+    for path in paths:
+        tail = path.name[len(PRIO_PREFIX):]
+        if not tail.isdigit() or int(tail) == os.getpid():
+            continue
+        if not _gone(int(tail)):
+            return True
+        try:
+            path.unlink()
+        except OSError:
+            pass
+    return False
+
+
+def _priority_held() -> int:
+    """How many slots live priority runs hold."""
+    return sum(1 for entry in holders()[0] if entry.get("priority"))
+
+
+def slot_count(conf: dict, say) -> int:
+    """The slot count: ``GOV_HEAVY_SLOTS``, else the configuration's ``heavy_slots``, else the count derived from the
+    machine (a file with no ``heavy_slots`` no longer refuses the run), else 1."""
+    from gov.dispatch import admission
+    given = os.environ.get("GOV_HEAVY_SLOTS", "").strip()
+    if given.isdigit() and int(given) >= 1:
+        return int(given)
+    if "heavy_slots" in conf["values"]:
+        return conf["values"]["heavy_slots"]
+    named = "; ".join(f["why"] for f in conf["faults"] if f["key"] == "heavy_slots")
+    if named:
+        say(f"{named}: the slot count is derived from the machine")
+    return admission.sized()["heavy_slots"] or 1
+
+
+def _held_slots(text: str, count: int) -> list[int]:
+    seen: list[int] = []
+    for part in text.split(","):
+        part = part.strip()
+        if part.isdigit() and 1 <= int(part) <= count and int(part) not in seen:
+            seen.append(int(part))
+    return seen
+
+
 # --- the run --------------------------------------------------------------------------------------------------------
 
 def _lock_tree(tree: str, say) -> int:
@@ -313,11 +403,44 @@ def _lock_tree(tree: str, say) -> int:
     return fd
 
 
-def run(kind: str, command: list[str], *, workers: int | None = None, tree: str | None = None,
-        env: dict | None = None) -> int:
-    """Run ``command`` as a heavy job of ``kind`` in a slot; its exit code. Refuses (``GovError``) when the slots
-    cannot be read from the configuration or the CPU set cannot be applied; waits while every slot is held."""
+def _code(raw: int) -> int:
+    return raw if raw >= 0 else 128 - raw
+
+
+def _say(line: str) -> None:
+    print(f"gov resources: {line}", file=sys.stderr, flush=True)
+
+
+def _nested(kind: str, command: list[str], env: dict, job: str) -> int:
+    """A run inside an admitted run: never held, no slot and no lock; the command runs at once in the outer run's CPU set
+    and environment (a ``nested`` event), and its code is the run's."""
     from gov.cli.errors import GovError
+    from gov.dispatch import admission
+
+    admission.log("nested", job, kind, command=" ".join(command)[:300])
+    try:
+        process = subprocess.Popen(command, env=env)
+    except OSError as error:
+        raise GovError("RESOURCE_SLOT_REFUSED", f"the command cannot be started: {error}") from None
+    try:
+        return _code(process.wait())
+    except BaseException:
+        process.terminate()
+        try:
+            process.wait(timeout=STOP_WAIT_S)
+        except subprocess.TimeoutExpired:
+            process.kill()
+        raise
+
+
+def run(kind: str, command: list[str], *, workers: int | None = None, tree: str | None = None,
+        env: dict | None = None, held: str | None = None, gpu_need_mib: int | None = None) -> int:
+    """Run ``command`` as a heavy job of ``kind`` in a slot once the machine has room; its exit code. Refuses
+    (``GovError``) when the CPU set cannot be applied, or a GPU kind has no GPU; waits while the load, the GPU or every
+    slot holds it. A nested run (``GOV_HEAVY_ADMITTED``) runs at once; ``held`` (``"1,2"``) runs with those slots'
+    CPUs and takes no lock."""
+    from gov.cli.errors import GovError
+    from gov.dispatch import admission, limits
     from gov.resources import config as configuration
 
     if kind not in KINDS:
@@ -326,19 +449,30 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
         raise GovError("RESOURCE_SLOT_INVALID", "no command to run in the slot (gov resources --slot KIND -- CMD...)")
     if workers is not None and workers < 1:
         raise GovError("RESOURCE_SLOT_INVALID", f"--workers is a positive count, not {workers}")
-    workers = workers or 1
+    if kind in GPU_KINDS and not gpu_need_mib:
+        raise GovError("RESOURCE_ARGUMENTS_INVALID", f"a {kind} job needs --gpu-need-mib <MiB>: its GPU memory")
+    env = dict(os.environ if env is None else env)
+    job = uuid.uuid4().hex[:12]
+    if os.environ.get("GOV_HEAVY_ADMITTED") or env.get("GOV_HEAVY_ADMITTED"):
+        return _nested(kind, command, env, job)
+    say = _say
     conf = configuration.load()
     values = conf["values"]
-    if "heavy_slots" not in values:
-        named = "; ".join(f["why"] for f in conf["faults"] if f["key"] in ("heavy_slots", configuration.FILE))
-        raise GovError("RESOURCE_SLOT_REFUSED", f"the heavy job cannot take a slot: {named or 'heavy_slots missing'}",
-                       {"faults": conf["faults"]})
-    count = values["heavy_slots"]
-    env = dict(os.environ if env is None else env)
+    count = slot_count(conf, say)
+    sized = admission.sized()
+    per_slot = workers
+    if per_slot is None:
+        given = os.environ.get("GOV_HEAVY_WORKERS", "").strip()
+        if given.isdigit() and int(given) >= 1:
+            per_slot = int(given)
+        else:  # the workers that fit the gate for the slot count in force (a file's or variable's count too)
+            per_slot = limits.workers_for(sized["load_limit"], sized["start_below"], sized["margin"], count)
     tree = os.path.realpath(tree or os.getcwd())
-
-    def say(line: str) -> None:
-        print(f"gov resources: {line}", file=sys.stderr, flush=True)
+    named = _held_slots(held, count) if held is not None else None
+    if held is not None and not named:
+        say(f"--held {held!r} names no slot of {count}: one slot's workers, not confined to CPUs")
+    total = per_slot * len(named) if named and workers is None else per_slot  # --workers is the run's whole count
+    need = gpu_need_mib if kind in GPU_KINDS else None
 
     trip_off = tripwire_off(conf)
     if trip_off:  # S8, S11, review F4: named, never a silently skipped trip-wire
@@ -349,35 +483,65 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
 
     previous = {s: signal.signal(s, ended) for s in (signal.SIGTERM, signal.SIGHUP)
                 if signal.getsignal(s) is not signal.SIG_IGN}
+    priority = _priority() and held is None
+    mark = {"began": None, "code": 1, "sampler": None, "asked": False}
     tree_fd = fd = None
     try:
+        admission.log("ready", job, kind, workers=total, priority=priority, held=held)
+        mark["asked"] = True
         if kind == "rebuild":
             tree_fd = _lock_tree(tree, say)
-        waited = False
-        while True:
-            taken = _take(count)
-            if taken is not None:
-                break
-            if not waited:
-                say(f"all {count} heavy-job slots are taken; waiting")
-                waited = True
-            time.sleep(WAIT_EVERY_S)
-        slot, fd = taken
-        share, note = cpu_set(os.sched_getaffinity(0), count, slot, server_cpus(values))
+
+        def gate():
+            if not priority:
+                return ("priority", "a landing or close waits first; waiting") if _priority_waiting() else None
+            if _priority_held() >= _prio_cap():
+                _unregister()  # capped: not a waiter, so an ordinary run may take the free slot
+                return "priority", f"priority runs hold {_prio_cap()} slots (the cap); waiting"
+            _register()
+            return None
+
+        taken, readings, waited = admission.wait_for_room(
+            job, kind, total, need, say, gate=None if held is not None else gate,
+            take=None if held is not None else (lambda: _take(count)),
+            slots_note=f"all {count} heavy-job slots are taken; waiting")
+        if priority:
+            _unregister()
+        slot, fd = taken if held is None else (None, None)
+        available = os.sched_getaffinity(0)
+        excluded = server_cpus(values)
+        if held is None:
+            share, note = cpu_set(available, count, slot, excluded)
+            label = slot
+        elif named:
+            share, note, label = [], None, "held:" + ",".join(str(i) for i in named)
+            for i in named:
+                got, note = cpu_set(available, count, i, excluded)
+                share = sorted(set(share) | set(got))
+        else:
+            share, note, label = [], None, "held:"
         if note:
             say(note)
-        threads = budget(share, workers, values.get("thread_budget"))
-        holder = {"slot": slot, "kind": kind, "pid": os.getpid(), "command_pid": None, "tree": tree,
-                  "cpus": cpu_list(share), "threads": threads, "workers": workers, "command": " ".join(command)[:300],
+        threads = budget(share or sorted(available), total, values.get("thread_budget"))
+        admission.log("admitted", job, kind, binding=readings["binding"], waited_s=waited)
+        holder = {"slot": slot, "kind": kind, "pid": os.getpid(), "command_pid": None, "tree": tree, "job": job,
+                  "cpus": cpu_list(share), "threads": threads, "workers": total, "priority": priority,
+                  "command": " ".join(command)[:300],
                   "started": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")}
-        record = folder() / f"slot-{slot}.json"
-        record.write_text(json.dumps(holder), encoding="utf-8")
+        record = folder() / f"slot-{slot}.json" if slot else None
+        if record:
+            record.write_text(json.dumps(holder), encoding="utf-8")
 
         def confine():
             os.sched_setaffinity(0, set(share))
 
+        child_env = job_env(env, share, total, threads, label)
+        if need:
+            child_env["GOV_GPU_NEED_MIB"] = str(need)
+        sampler = mark["sampler"] = admission.Sampler(readings.get("load_limit"))
+        sampler.seed(readings.get("load_1m"))
         try:
-            process = subprocess.Popen(command, env=job_env(env, share, workers, threads, slot), preexec_fn=confine,
+            process = subprocess.Popen(command, env=child_env, preexec_fn=confine if share else None,
                                        start_new_session=True)
         except subprocess.SubprocessError as error:
             raise GovError("RESOURCE_SLOT_REFUSED", f"the slot's CPU set {cpu_list(share)} cannot be applied "
@@ -385,7 +549,12 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
         except OSError as error:
             raise GovError("RESOURCE_SLOT_REFUSED", f"the command cannot be started: {error}") from None
         holder["command_pid"] = process.pid
-        record.write_text(json.dumps(holder), encoding="utf-8")
+        if record:
+            record.write_text(json.dumps(holder), encoding="utf-8")
+        mark["began"] = time.monotonic()
+        sampler.begin()
+        admission.log("started", job, kind, slot=slot if slot else label, workers=total, cpus=cpu_list(share),
+                      command_pid=process.pid)
         done = threading.Event()
 
         def watch():  # the kernel's reading only: a planted one is a test's, read by its own passes
@@ -405,14 +574,45 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
             raise
         finally:
             done.set()
-            try:
-                record.unlink()
-            except OSError:
-                pass
-        return code if code >= 0 else 128 - code
+            if record:
+                try:
+                    record.unlink()
+                except OSError:
+                    pass
+        mark["code"] = _code(code)
+        return mark["code"]
+    except SystemExit as stop:
+        mark["code"] = stop.code if isinstance(stop.code, int) else 1
+        raise
+    except GovError as error:
+        mark["code"] = error.exit_code
+        raise
     finally:
+        if priority:
+            _unregister()
+        if mark["asked"]:
+            _finish(job, kind, mark, total)
         for descriptor in (fd, tree_fd):
             if descriptor is not None:
                 os.close(descriptor)
         for number, handler in previous.items():
             signal.signal(number, handler or signal.SIG_DFL)
+
+
+def _finish(job: str, kind: str, mark: dict, workers: int) -> None:
+    """The run's ``ended`` event (also for one that never started: killed while it waited, or refused), the peak named
+    once on stderr, and the wake message of a job that ran."""
+    from gov.dispatch import admission
+
+    code, began, sampler = mark["code"], mark["began"], mark["sampler"]
+    if began is None:
+        admission.log("ended", job, kind, code=code, ran_s=0, started=False)
+        return
+    ran = round(time.monotonic() - began, 2)
+    fields = sampler.finish(workers)
+    admission.log("ended", job, kind, code=code, ran_s=ran, **fields)
+    peak, over = fields["load_peak"], fields["over_limit_s"]
+    limit = sampler.limit
+    if peak is not None and limit is not None and peak > limit:
+        _say(f"the load peaked at {peak:g}, over the limit of {limit:g} (for {over:g} s of the run)")
+    admission.wake(job, kind, code, ran)

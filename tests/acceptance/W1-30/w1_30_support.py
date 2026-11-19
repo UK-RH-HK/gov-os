@@ -416,8 +416,9 @@ class Project:
         self._copy_kernel_templates()
         if self._settings is not None:
             write(self.root, PATH_MAP_REL, path_map_text(self._settings))
-        # The source every fixture ticket names (``sources: [BASE_SOURCE]``): without it the ticket's context
-        # cannot be built (W1-24: a missing mandatory input is BLOCKED), and no ticket could close (DEC-454).
+        # The source every fixture ticket names (``sources: [BASE_SOURCE]``), a record of the project. Since DEC-1214 M1
+        # (W2-200) the close builds no context packet; it resolves the ticket's DEC ids in the register its path map
+        # names, and a project of this suite names none, so the id is left unresolved and refuses nothing.
         write(self.root, f"docs/adr/{BASE_SOURCE}.md", decision(BASE_SOURCE, "ACTIVE", title="The base decision"))
         commit_all(self.root, "initial project")
 
@@ -596,8 +597,8 @@ def judged_by_w1_50(project, sandbox, commits, check=True):
 
 
 def load_store(project, sandbox, check=True):
-    """Load the project's record store, as ``gov.store.load(root)`` does (the W1-24 suite builds what a context
-    reads the same way). ``gov context`` only reads: without a loaded store no context can be built."""
+    """Load the project's record store, as ``gov.store.load(root)`` does: the close refuses a store older than the
+    commit it closes (``STORE_STALE``)."""
     done = subprocess.run([sys.executable, "-c", "import sys\nfrom gov.store import load\nload(sys.argv[1])\n",
                            str(project.root)], cwd=str(project.root), env=sandbox_env(sandbox),
                           capture_output=True, text=True, stdin=subprocess.DEVNULL)
@@ -623,14 +624,6 @@ def decision_check(project, sandbox):
                           env=sandbox_env(sandbox), capture_output=True, text=True, stdin=subprocess.DEVNULL)
     assert done.returncode == 0, f"gov.decisions.check did not answer:\n{done.stdout}\n{done.stderr}"
     return json.loads(done.stdout.strip().splitlines()[-1])
-
-
-def context_error(project, sandbox, ticket):
-    """The error ``gov context <ticket>`` gives in this project; the case fails when it gives none."""
-    run = project.gov(sandbox, "context", ticket, "--json")
-    envelope = run.envelope()
-    assert envelope["ok"] is False, f"the fixture's context can be built, so the case measures nothing\n{run.describe()}"
-    return envelope["error"]
 
 
 def tk(project, *args, script=None):
@@ -687,8 +680,8 @@ def build_ticket(project, ticket, wbs, failing=False, **ticket_keys):
 def run_close(project, sandbox, ticket, *extra_args, store=True, env=None):
     """Run ``gov close <ticket> --json`` and return the Run.
 
-    The record store is loaded first (``store=False`` leaves it as it is), so that the ticket's context can be
-    built wherever the case did not break it on purpose. ``env`` replaces the environment of the close alone
+    The record store is loaded first (``store=False`` leaves it as it is), so that the close's store gate passes
+    wherever the case did not break it on purpose. ``env`` replaces the environment of the close alone
     (round 13: where the session logs are, another ``PATH``).
 
     DEC-453: ``gov close`` adds no exemption to W1-50's judgement of the ticket's commits. So in every case of

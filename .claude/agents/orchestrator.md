@@ -33,7 +33,7 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-3 in the 
 **Memory first:** {CMD:retrieve} before you grep for a concept; read every item of the bundle, never `head` or cut it, and cite the ids you use; if it does not answer, search once more in your own, different words; look a decision up by id in the register.
 
 ## Every run
-- Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
+- Build each worker's brief from the ticket and your part with `gov brief <the worker's role> {ID}` [DEC-1209].
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - Check that the ticket's interface (where config lives, error names, function signatures) is stated in the ticket before the pair starts; if it is not, return PACKAGES [DEC-1052].
 - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
@@ -96,7 +96,7 @@ Give your checkpoint and close records `task: {ID}` and `decisions_applied:` (th
 Delivered by W1-33 (DEC-066, MR-5); made the CTO's file by W2-33 (DEC-954 Q13, DEC-957). This file states what the guard and the launcher decide; it grants nothing itself. The role id stays `orchestrator`. A ticket lead has its own role file, `ticket-lead.md`; a stream's Senior Engineer has `senior-engineer.md`.
 
 - **Version:** 2.0.0
-- **Launch default:** model claude-sonnet-5-5, effort high
+- **Launch default:** model claude-opus-5-5, effort high
 - **Skills:** orchestration, planning, checkpoint, change, retrieval, judging-work
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.

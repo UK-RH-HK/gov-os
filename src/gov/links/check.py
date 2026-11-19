@@ -41,6 +41,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.store import loader
 from gov.store.loader import register_entries, register_statements
+from gov.util import archive
 
 UNMARKED_CHANGE, UNKNOWN_ID, UNLINKED_ID = "UNMARKED_CHANGE", "UNKNOWN_ID", "UNLINKED_ID"
 STATUS_CONFLICT, NOT_IN_FORCE_AS_RULE, ENFORCES_SUPERSEDED = "STATUS_CONFLICT", "NOT_IN_FORCE_AS_RULE", "ENFORCES_SUPERSEDED"
@@ -222,6 +223,8 @@ class _Repo:
                     self.alias.setdefault(front[key].strip(), str(front["id"]))
         self.known = set(self.entry) | {str(front["id"]) for _, front in self.fronts} | set(self.alias)
         self.known |= self.contract_ids | self._list_rows()
+        # W2-203: a decision of the archived register exists (history): it resolves, with no status and no entry
+        self.known |= set(archive.of_tree(root, self.tree) or ())
         self._planted: dict[str, dict[int, list[tuple[int, int]]] | None] = {}
 
     def planted(self, path: str, line: int, column: int) -> bool:

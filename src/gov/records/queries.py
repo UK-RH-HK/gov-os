@@ -10,6 +10,7 @@ from pathlib import Path
 from gov.store import connect
 
 _IS_RECORD = "IN (SELECT id FROM records)"
+ARCHIVE_TABLE = "archived_decisions"  # the loader's: the archived register's ids, which resolve as history (W2-203)
 
 
 def _rows(root: Path, sql: str, **filters) -> list[tuple]:
@@ -51,9 +52,25 @@ def edges(root: Path, type: str | None = None, source: str | None = None, target
 
 
 def dangling(root: Path) -> list[dict]:
-    """Every reference whose target is the id of no record: edges, and trailers (their source is the commit)."""
-    return _edges(_rows(root, f"SELECT type, source, target FROM edges WHERE target NOT {_IS_RECORD}"
-                              f" UNION SELECT upper(key), commit_id, value FROM trailers WHERE value NOT {_IS_RECORD}"))
+    """Every reference whose target is the id of no record: edges, and trailers (their source is the commit). A
+    decision of the archived register is history, not a missing record (W2-203); a store built before that table is
+    read as it always was."""
+    found = _edges(_rows(root, f"SELECT type, source, target FROM edges WHERE target NOT {_IS_RECORD}"
+                               f" UNION SELECT upper(key), commit_id, value FROM trailers WHERE value NOT {_IS_RECORD}"))
+    archived = archived_ids(root)
+    return [edge for edge in found if edge["target"] not in archived]
+
+
+def archived_ids(root: Path) -> set[str]:
+    """The ids of the archived register the store holds; none where the store has no such table (an older store)."""
+    connection = connect(root)
+    try:
+        if not connection.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+                                  (ARCHIVE_TABLE,)).fetchone():
+            return set()
+        return {row[0] for row in connection.execute(f"SELECT id FROM {ARCHIVE_TABLE}")}
+    finally:
+        connection.close()
 
 
 def commits(root: Path, path: str | None = None) -> list[dict]:

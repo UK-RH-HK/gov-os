@@ -32,6 +32,7 @@ STORES = {
             "register_entries": ("id", "heading", "title", "span", "content_hash"),
             "record_titles": ("path", "id", "title"),
             "stated_links": ("type", "source", "target", "via"),
+            "archived_decisions": ("id", "heading"),
             "fingerprints": ("head", "code", "records", "kind"),
         },
     },

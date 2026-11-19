@@ -168,3 +168,9 @@ Cases: 74 in the full run, 10 in `breadth`, 0 in `lifted`.
 | F1: Intermediate retrieval batches appear in the main context | `test_w1_36_retrieval_skill.py::TestRetrievalFailure::test_the_skill_addresses_the_main_context_boundary` | the ticket's words |
 | F2: The audit skill edits audited files | `test_w1_36_audit_skill.py::TestAuditReadOnly::test_the_skill_says_it_does_not_edit_audited_files` | the ticket's words |
 | F3: An owner-level finding becomes a ticket without a decision package | `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_finding_requires_decision_package_before_ticket` | the ticket's words |
+
+## W2-200 revision (DEC-1214 M1)
+
+`test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_inputs_are_context_pack_and_repository` no longer
+accepts the retired context command's name as the skill's wording (`Rewrite-Reason:` in the case); `w1_36_support.py`'s
+families hold sixteen (the context family is retired with its check, DEC-1214 M1, W2-200).

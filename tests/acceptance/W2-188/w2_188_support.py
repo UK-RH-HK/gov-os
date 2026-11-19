@@ -33,6 +33,8 @@ CLAUDE_COPY_REL = ".claude/skills/adopt/SKILL.md"
 PRACTICE_REL = a88.PRACTICE_REL
 CITP_REL = "docs/changes/W2-188-CIT-P.md"
 REGISTER_REL = "docs/DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the old register, archived whole; the register keeps the decisions in force
+ARCHIVE_REL = "docs/archive/DECISION_REGISTER-2026-11-19.md"
 VERIFY_HEADING_PATTERN = r"^Verify clauses for adopted tickets$"
 
 read = a88.read
@@ -260,11 +262,18 @@ def five_point_count(text):
 
 def dec_1179_item_4():
     """DEC-1179 (4)'s text as the register records it, read at test time: the line beginning ``  - (4) `` inside
-    ``### DEC-1179``, from ``**Below 95 %:**`` to the end of the line."""
-    lines = read(REGISTER_REL).splitlines()
-    head = next((i for i, line in enumerate(lines) if line.startswith("### DEC-1179 ")), None)
+    ``### DEC-1179``, from ``**Below 95 %:**`` to the end of the line. The entry is read from the register, or,
+    where the register no longer holds it, from the archived old register (``ARCHIVE_REL``)."""
+    head = None
+    for rel in (REGISTER_REL, ARCHIVE_REL):
+        if rel == ARCHIVE_REL and not (REPO_ROOT / rel).is_file():
+            continue
+        lines = read(rel).splitlines()
+        head = next((i for i, line in enumerate(lines) if line.startswith("### DEC-1179 ")), None)
+        if head is not None:
+            break
     if head is None:
-        pytest.fail(f"{REGISTER_REL} has no `### DEC-1179` entry", pytrace=False)
+        pytest.fail(f"neither {REGISTER_REL} nor {ARCHIVE_REL} has a `### DEC-1179` entry", pytrace=False)
     for line in lines[head + 1:]:
         if line.startswith("### "):
             break

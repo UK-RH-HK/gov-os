@@ -35,6 +35,10 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
 OWN_REGISTER = REPO_ROOT / "docs" / "DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the old register, archived whole. The worked example needs a register of hundreds of
+# entries: it is the archive's text where this tree holds it, else the register's.
+OWN_ARCHIVE = REPO_ROOT / "docs" / "archive" / "DECISION_REGISTER-2026-11-19.md"
+WORKED_EXAMPLE = OWN_ARCHIVE if OWN_ARCHIVE.is_file() else OWN_REGISTER
 PATH_MAP_SCHEMA = REPO_ROOT / "template" / "governance" / "kernel" / "schemas" / "path-map.schema.json"
 CITATIONS_DECLARATION = REPO_ROOT / "template" / "governance" / "kernel" / "checks" / "core-decision-citations.yaml"
 

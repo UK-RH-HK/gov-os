@@ -7,10 +7,10 @@ from pathlib import Path
 VERSION = "1.0.0"
 
 RESERVED_COMMANDS = (
-    "status", "check", "readiness", "doctor", "rebuild", "context",
+    "status", "check", "readiness", "doctor", "rebuild",
     "closure", "retrieve", "checkpoint", "close", "adopt", "pause",
 )
-# Recorded in the command list beside the twelve (DEC-542).
+# Recorded in the command list beside the eleven (DEC-542; the context command retired, DEC-1214 M1).
 RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "resources", "telemetry")
 # brief (W2-152, DEC-1088 (3)), links (W2-129, LINK-INTEGRITY, DEC-1074 (7)) and plan (W2-136, DEC-1088).
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")

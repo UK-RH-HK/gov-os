@@ -49,6 +49,7 @@ NO_BINARY_TOOLS = frozenset({
 
 HISTORICAL_PATHS = [
     "docs/DECISION_REGISTER.md",
+    "docs/archive/DECISION_REGISTER-2026-11-19.md",
     "docs/changes/",
     "governance/project/bootstrap.md",
     "docs/source/",
@@ -568,6 +569,10 @@ def _check_path_compliance(root: Path) -> dict:
         parts = line.split("\t")
         if len(parts) >= 3 and parts[0].startswith("R"):
             moved[parts[1]] = parts[2]
+    # A path HEAD holds is no moved path, whatever its history says: a file renamed away and back (or made anew at
+    # its old place) is where its references say it is.
+    tracked = {line for line in _git(root, "ls-files").splitlines() if line}
+    moved = {old: new for old, new in moved.items() if old not in tracked}
     if not moved:
         return {"status": "pass", "moved_references": [], "historical_excluded": 0}
     refs = []

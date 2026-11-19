@@ -100,9 +100,12 @@ MEASURE_AUDIT = "docs/research/memory-measure-audit/"
 # Written as the decisions word them, not read from the path map. fixtures/memory-quality/** is in evaluation-fixtures
 # by the CTO's map and holds no tracked file (the review's F3, open).
 # EMERGENCY-2 11.1, 11.3 (DEC-1211): the archived start-up documents leave both indexes (path map ``history-archive``)
-NOT_INDEXED_NAMESPACES = {"evaluation-sources", "evaluation-fixtures", "history-archive"}
+# EMERGENCY-2 11.3, DEC-1214 G4 (W2-203): the old decision register, archived read-only after audit 8, leaves both
+# indexes too (path map ``archive``, ``docs/archive/**``); the register in force, docs/DECISION_REGISTER.md, stays in.
+REGISTER_ARCHIVE = "docs/archive/"
+NOT_INDEXED_NAMESPACES = {"evaluation-sources", "evaluation-fixtures", "history-archive", "archive"}
 KEPT_OUT_BY_DECISION = (LENS_B_REPORT, W2_15A_RAW + "**", MEASURE_AUDIT + "**", EVALUATION_FIXTURES + "**",
-                        "fixtures/memory-quality/**", "docs/emergency-2/archive/**")
+                        "fixtures/memory-quality/**", "docs/emergency-2/archive/**", REGISTER_ARCHIVE + "**")
 
 
 # --------------------------------------------------------------------------

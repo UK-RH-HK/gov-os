@@ -5,7 +5,9 @@
 - ``--check [--gpu-need-mib N] [--gpu-kind embedder|reranker|other]``: the start check of one new session; exit 3 and
   ``RESOURCE_GATE_SHUT`` when shut. Without a GPU need it never runs ``nvidia-smi``.
 - ``--register PID --ticket ID --session-role ROLE``: enter a session in the registry.
-- ``--slot test|rebuild [--tree T] [--workers N] -- CMD...``: run a heavy job in a slot; ``CMD``'s exit code.
+- ``--slot test|rebuild|measure|embedder|reranker [--tree T] [--workers N] [--gpu-need-mib N] [--held 1,2] -- CMD...``:
+  run a heavy job in a slot once the machine has room (the load admission, W2-199); ``CMD``'s exit code. A GPU kind
+  needs ``--gpu-need-mib`` (else exit 2) and is refused (exit 3) where there is no GPU. ``--held`` takes no lock.
 - ``--sample`` / ``--remeasure``: one sample; write the measured figures into the configuration file (S9).
 - ``--init-config``: write this machine's dated, sourced configuration file, never over an existing one (P-3).
 - ``--trip-wire``: one pass of the out-of-memory trip-wire (S11).
@@ -30,6 +32,8 @@ EXIT_CODES = {EXIT_GATE_SHUT: "the resource gate is shut: no session starts"}
 PASSTHROUGH = True       # --slot's command follows "--"
 CHILD_EXIT_CODE = True   # --slot ends with its job's exit code
 GPU_KINDS = ("embedder", "reranker", "other")
+SLOT_KINDS = ("test", "rebuild", "measure", "embedder", "reranker")
+EXIT_USAGE = 2
 
 
 def _group(text: str) -> int:
@@ -45,8 +49,9 @@ def add_arguments(parser) -> None:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true", help="the start check: exit 3 when the gate is shut")
     mode.add_argument("--register", metavar="<pid>", type=int, help="enter a session in the machine-wide registry")
-    mode.add_argument("--slot", metavar="<kind>", choices=("test", "rebuild"),
-                      help="run the command after -- as a heavy job in a slot")
+    mode.add_argument("--slot", metavar="<kind>", choices=SLOT_KINDS,
+                      help="run the command after -- as a heavy job in a slot (test, rebuild, measure, embedder, "
+                           "reranker)")
     mode.add_argument("--sample", action="store_true", help="take one memory sample for the re-measure")
     mode.add_argument("--remeasure", action="store_true", help="write the measured figures into the configuration")
     mode.add_argument("--init-config", action="store_true", help="write this machine's configuration file (never "
@@ -57,6 +62,9 @@ def add_arguments(parser) -> None:
     parser.add_argument("--gpu-need-mib", metavar="<MiB>", type=int, help="the start's declared GPU need")
     parser.add_argument("--gpu-kind", metavar="<kind>", choices=GPU_KINDS, default="other",
                         help="the GPU work's kind for its share (embedder, reranker, other; default other)")
+    parser.add_argument("--held", metavar="<slots>", help="--slot: run with these slots' CPUs (e.g. 1,2) and their "
+                        "workers (--workers is then the whole count), taking no lock (a caller that "
+                        "holds the slots itself)")
     parser.add_argument("--tree", metavar="<path>", help="a rebuild's tree (default: the root)")
     parser.add_argument("--workers", metavar="<n>", type=int, help="the heavy job's workers (its thread budget)")
     parser.add_argument("--ticket", metavar="<id>", help="the registered session's ticket")
@@ -69,12 +77,16 @@ def run(root: Path, args, config: dict):
     invalid = lambda message: GovError("RESOURCE_ARGUMENTS_INVALID", message)  # noqa: E731
     if args.slot is None and args.passthrough:
         raise invalid("a command after -- goes with --slot")
-    if (args.tree or args.workers is not None) and args.slot is None:
-        raise invalid("--tree and --workers go with --slot")
+    if (args.tree or args.workers is not None or getattr(args, "held", None) is not None) and args.slot is None:
+        raise invalid("--tree, --workers and --held go with --slot")
     if (args.ticket or args.session_role) and args.register is None:
         raise invalid("--ticket and --session-role go with --register")
-    if args.gpu_need_mib is not None and (args.gpu_need_mib < 1 or not (args.check or _plain(args))):
-        raise invalid("--gpu-need-mib is a positive number of MiB, with --check or the reading")
+    gpu_slot = args.slot in ("embedder", "reranker")
+    if args.gpu_need_mib is not None and (args.gpu_need_mib < 1 or not (args.check or _plain(args) or gpu_slot)):
+        raise invalid("--gpu-need-mib is a positive number of MiB, with --check, the reading or an embedder or "
+                      "reranker slot")
+    if gpu_slot and args.gpu_need_mib is None:  # a usage error, as argparse's: exit 2, nothing runs
+        return _usage_error(args, f"a {args.slot} job needs --gpu-need-mib <MiB>: the GPU memory it will use")
     if getattr(args, "backstop", None):
         from gov.resources.backstop import watch
         return watch(args.backstop, root)
@@ -104,12 +116,26 @@ def run(root: Path, args, config: dict):
         return tripwire(conf["values"])
     if args.slot is not None:
         from gov.resources.slots import run as run_slot
-        return run_slot(args.slot, args.passthrough or [], workers=args.workers, tree=args.tree or str(root))
+        return run_slot(args.slot, args.passthrough or [], workers=args.workers, tree=args.tree or str(root),
+                        held=getattr(args, "held", None), gpu_need_mib=args.gpu_need_mib)
     if args.check:
         from gov.launch.gate import check_start
         return check_start(gpu_need_mib=args.gpu_need_mib, gpu_kind=args.gpu_kind)
     from gov.resources.gate import read
     return read(False, gpu_need_mib=args.gpu_need_mib, gpu_kind=args.gpu_kind)
+
+
+def _usage_error(args, message: str) -> int:
+    """``RESOURCE_ARGUMENTS_INVALID`` ending with exit 2, the command line's usage code (nothing ran)."""
+    import json
+    import sys
+
+    if getattr(args, "json", False):
+        print(json.dumps({"ok": False, "command": "resources", "result": {}, "session": getattr(args, "session", ""),
+                          "error": {"code": "RESOURCE_ARGUMENTS_INVALID", "message": message, "details": {}}}))
+    else:
+        print(f"gov resources: RESOURCE_ARGUMENTS_INVALID: {message}", file=sys.stderr)
+    return EXIT_USAGE
 
 
 def _plain(args) -> bool:

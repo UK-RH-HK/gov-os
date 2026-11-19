@@ -1,4 +1,8 @@
-"""S1 and S2: the marks. The 87 first, then the rest; what gov links and the drift script still find at HEAD."""
+"""S1 and S2: the marks. The 87 first, then the rest; what gov links and the drift script still find at HEAD.
+
+Since the old register moved to ``s.OLD_REGISTER`` (EMERGENCY-2 11.3, DEC-1214 G4), "HEAD's register" is, for these cases,
+the register whole (``whole_tree``: the archive's entries and the later ones): the marked entries stand in the archive.
+"""
 
 from __future__ import annotations
 
@@ -11,8 +15,8 @@ import pytest
 import w2_130_support as s
 
 
-def _head_lines(head_tree) -> dict:
-    return {entry: line for entry, _, line in s.entries((head_tree / s.REGISTER).read_text(encoding="utf-8"))}
+def _head_lines(whole_tree) -> dict:
+    return {entry: line for entry, _, line in s.entries((whole_tree / s.REGISTER).read_text(encoding="utf-8"))}
 
 
 def _judged(record) -> set:
@@ -38,8 +42,8 @@ def test_s1_register_hunks_of_e12f8a30c_are_status_line_appends_only():
     assert not bad, f"status lines of {bad} are not the old line kept whole with marks appended"
 
 
-def test_s1_every_mark_e12f8a30c_appends_is_still_on_its_status_line_at_head(head_tree):
-    lines = _head_lines(head_tree)
+def test_s1_every_mark_e12f8a30c_appends_is_still_on_its_status_line_at_head(whole_tree):
+    lines = _head_lines(whole_tree)
     marks = s.added_marks(s.FIRST)
     assert marks, "e12f8a30c appends no mark"
     missing = [(m["changed"], m["changer"]) for m in marks if not s.names_changer(lines[m["changed"]], m["changer"])]
@@ -65,9 +69,9 @@ def test_s1_ids_87_are_87_distinct_ids_each_a_key_of_the_census(record):
     assert isinstance(census, dict) and not [i for i in ids if i not in census], "an id of ids-87 is no census key"
 
 
-def test_s1_each_of_the_87_names_every_changer_the_census_states_on_its_own_status_line(record, head_tree):
+def test_s1_each_of_the_87_names_every_changer_the_census_states_on_its_own_status_line(record, whole_tree):
     ids, census = record.data("ids-87"), record.data("census")
-    judged, lines = _judged(record), _head_lines(head_tree)
+    judged, lines = _judged(record), _head_lines(whole_tree)
     missing = []
     for entry in ids:
         changers = census[entry]
@@ -102,36 +106,68 @@ def test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_a
     # The line is about the clean-up's marks, the census's pairs: one of them added after e12f8a30c is in c4420040f
     # or a follow-up marks commit, append-only. A later commit's own change of a status line of the 87 (DEC-866's
     # marking of a new decision's change, e.g. 518772b5c's DEC-989<-DEC-1141) adds no census pair; it may stay out of
-    # a marks commit, but its line must keep the old line whole (an append), never an edit in the middle.
+    # a marks commit, but its line must keep the old line whole (an append), never an edit in the middle. The
+    # appended ` · **Class:** ...` segment (audit 8's class, DEC-1214 G4) is the owner's classification, not a mark.
     ids = set(record.data("ids-87"))
     census = record.data("census")
     allowed = set(s.marks_commits(record))
-    log = s.git("log", "--reverse", "--no-merges", "--format=%H", f"{s.full(s.FIRST)}..HEAD", "--", s.REGISTER)
+    # The history is read on both paths, commit by commit: the register's and, since the move, the archive's (no rename
+    # is followed: the move's own commit holds other ids on the first path and no file before it on the second).
+    log = s.git("log", "--reverse", "--no-merges", "--format=%H", f"{s.full(s.FIRST)}..HEAD", "--", s.REGISTER,
+                s.OLD_REGISTER)
     bad = []
     for commit in log.split():
-        for change in s.register_delta(s.parent(commit), commit)["changes"]:
+        for change in [change for path in (s.REGISTER, s.OLD_REGISTER)
+                       for change in s.register_delta(s.parent(commit), commit, path)["changes"]]:
             if change["id"] not in ids:
                 continue
             if commit in allowed:
                 if change["kind"] not in ("append", "status"):
                     bad.append((commit[:12], change["id"], change["kind"]))
                 continue
-            tail = change["new"][len(change["old"]):]
-            if not change["new"].startswith(change["old"]):
-                bad.append((commit[:12], change["id"], "edited outside a marks commit, not an append"))
-            elif set(s.ids_in(tail)) & set(census[change["id"]]):
-                bad.append((commit[:12], change["id"], "a census pair marked outside a marks commit"))
+            problem = s.outside_marks_problem(change["old"], change["new"], census[change["id"]])
+            if problem:
+                bad.append((commit[:12], change["id"], problem))
     assert not bad, f"a register status line of the 87 changed outside a marks commit or not append-only: {bad[:5]}"
+
+
+def test_s1_a_class_segment_naming_a_census_changer_is_not_a_mark_but_the_same_id_elsewhere_in_the_tail_is():
+    old = "- **Status:** ACCEPTED (owner, 2026-01-01) \u00b7 **Basis:** SUGGESTION"
+    census = ["DEC-393", "DEC-396"]
+    class_only = old + " \u00b7 **Class:** kept (items changed: amended by DEC-393, DEC-396)"
+    elsewhere = old + "; amended by DEC-393 \u00b7 **Class:** kept"
+    before_class = old + " \u00b7 **Changed by:** amended by DEC-396 \u00b7 **Class:** kept (items changed: DEC-393)"
+    assert s.outside_marks_problem(old, class_only, census) is None
+    assert s.outside_marks_problem(old, old + " \u00b7 **Class:** history", census) is None
+    assert s.outside_marks_problem(old, elsewhere, census) == "a census pair marked outside a marks commit"
+    assert s.outside_marks_problem(old, before_class, census) == "a census pair marked outside a marks commit"
+    assert s.outside_marks_problem(old, old.replace("2026-01-01", "2026-02-02") + " \u00b7 **Class:** kept",
+                                   census) == "edited outside a marks commit, not an append"
 
 
 # ---------------------------------------------------------------------------------------------------------- S2
 
 
-def test_s2_gov_links_reports_no_unmarked_change_but_the_eight_pairs_the_auditor_judged_wrong(head_findings):
-    # The owner's approvals after the clean-up (DEC-1211, DEC-1212) are the only pairs allowed beside the eight.
-    found = set(s.by_pair(head_findings)) - s.OWNER_APPROVED_AFTER
-    assert found == set(s.EIGHT), (f"extra: {sorted(found - set(s.EIGHT))}; missing: "
-                                   f"{sorted(set(s.EIGHT) - found)}")
+def test_s2_gov_links_reports_no_unmarked_change_but_the_eight_pairs_the_auditor_judged_wrong(whole_findings, whole_tree):
+    # The eight stay reported (the auditor judged each wrong); any other pair must have the owner as its later
+    # decision (a marked change by rule), else it is extra and fails by name.
+    register = (whole_tree / s.REGISTER).read_text(encoding="utf-8")
+    reported = set(s.by_pair(whole_findings))
+    extra = set(s.not_owner_marked(reported, register)) - set(s.EIGHT)
+    missing = set(s.EIGHT) - reported
+    assert not extra and not missing, f"extra: {sorted(extra)}; missing: {sorted(missing)}"
+
+
+def test_s2_a_pair_is_a_marked_change_only_when_its_later_decision_is_recorded_as_the_owners():
+    register = "\n".join([
+        "### DEC-1 — old", "- **Status:** ACCEPTED (owner, 2026-01-01)",
+        "### DEC-2 — by the owner's page", "- **Status:** ACCEPTED (owner, 2026-11-18, in the chat; standing)",
+        "### DEC-3 — by the owner through the orchestrator",
+        "- **Status:** ACCEPTED (the chat; recorded with `Role: orchestrator`, `Decided-by: owner (chat)`)",
+        "### DEC-4 — by the orchestrator", "- **Status:** ACCEPTED (orchestrator, 2026-11-18; standing)",
+        "### DEC-5 — by a decision about the owner", "- **Status:** ACCEPTED (CTO; the owner is told)", ""])
+    pairs = [("DEC-1", "DEC-2"), ("DEC-1", "DEC-3"), ("DEC-1", "DEC-4"), ("DEC-1", "DEC-5"), ("DEC-1", "DEC-9")]
+    assert s.not_owner_marked(pairs, register) == [("DEC-1", "DEC-4"), ("DEC-1", "DEC-5"), ("DEC-1", "DEC-9")]
 
 
 def test_s2_judged_wrong_holds_the_eight_gov_links_pairs_each_with_the_auditors_verdict(record):
@@ -152,10 +188,10 @@ def test_s2_judged_wrong_holds_the_eight_gov_links_pairs_each_with_the_auditors_
 
 @pytest.mark.parametrize("changed,changer", [("DEC-1115", "DEC-1122"), ("DEC-026", "DEC-086")],
                          ids=["dec-1115-dec-1122", "dec-026-dec-086"])
-def test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict(record, head_tree, changed, changer):
+def test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict(record, whole_tree, changed, changer):
     # The pair is the line's; the mark's own wording (its part) is the auditor's to correct (S3), so the commit is
     # the one follow-up marks commit that makes the entry's status line name the changer, appended to the old line.
-    assert s.names_changer(_head_lines(head_tree)[changed], changer), f"HEAD's {changed} does not name {changer}"
+    assert s.names_changer(_head_lines(whole_tree)[changed], changer), f"HEAD's {changed} does not name {changer}"
     audits, first, second = s.audits_by_commit(record), s.full(s.FIRST), s.full(s.SECOND)
     found = []
     for commit in s.marks_commits(record):
@@ -182,11 +218,11 @@ def test_s2_census_has_215_keys_and_archive_13_has_13_distinct_pairs(record):
     assert isinstance(archive, list) and len({s.pair(item) for item in archive}) == 13, "archive-13 is not 13 pairs"
 
 
-def test_s2_each_census_id_names_every_stated_changer_unless_the_auditor_judged_the_pair_wrong(record, head_tree):
+def test_s2_each_census_id_names_every_stated_changer_unless_the_auditor_judged_the_pair_wrong(record, whole_tree):
     # "Named on its own status line" is gov links' own test (check.py's UNMARKED_CHANGE: the changer's id is on the
     # entry's status line). The form (**Changed by:** / SUPERSEDED by) is the S1 line's, for the 87 (checked there);
     # the other census ids name some changers in the register's older forms (**Amended by:**, **Lifted by:**, prose).
-    census, judged, lines = record.data("census"), _judged(record), _head_lines(head_tree)
+    census, judged, lines = record.data("census"), _judged(record), _head_lines(whole_tree)
     missing = []
     for entry, changers in census.items():
         assert isinstance(changers, list) and changers, f"census states no changer for {entry}"
@@ -194,15 +230,15 @@ def test_s2_each_census_id_names_every_stated_changer_unless_the_auditor_judged_
     assert not missing, f"{len(missing)} census pairs are not on their status line: {missing[:6]}"
 
 
-def test_s2_each_archive_only_pair_names_its_changer_unless_the_auditor_judged_it_wrong(record, head_tree):
-    judged, lines = _judged(record), _head_lines(head_tree)
+def test_s2_each_archive_only_pair_names_its_changer_unless_the_auditor_judged_it_wrong(record, whole_tree):
+    judged, lines = _judged(record), _head_lines(whole_tree)
     pairs = [s.pair(item) for item in record.data("archive-13")]
     missing = [(a, b) for a, b in pairs if (a, b) not in judged and not s.names_changer(lines[a], b)]
     assert not missing, f"archive-only pairs not on their status line: {missing}"
 
 
-def _drift(record, head_tree) -> dict:
-    done = subprocess.run([sys.executable, "-"], input=record.block("drift", "python"), cwd=head_tree,
+def _drift(record, whole_tree) -> dict:
+    done = subprocess.run([sys.executable, "-"], input=record.block("drift", "python"), cwd=whole_tree,
                           capture_output=True, text=True, check=False, timeout=300)
     assert done.returncode == 0, f"the drift script failed: {done.stderr.strip()[-300:]}"
     try:
@@ -211,13 +247,15 @@ def _drift(record, head_tree) -> dict:
         pytest.fail(f"the drift script printed no JSON object: {done.stdout[:200]!r}")
 
 
-def test_s2_the_drift_script_on_head_leaves_no_pair_once_the_listed_pairs_are_set_aside(record, head_tree):
-    out = _drift(record, head_tree)
+def test_s2_the_drift_script_on_head_leaves_no_pair_once_the_listed_pairs_are_set_aside(record, whole_tree):
+    out = _drift(record, whole_tree)
     assert isinstance(out.get("drift"), list) and out.get("count") == len(out["drift"]), "drift output form"
     run = record.data("drift-run")
     aside = {s.pair(item) for item in run.get("set_aside", [])}
-    allowed = _judged(record) | aside | s.OWNER_APPROVED_AFTER
-    left = [pair for pair in (s.pair(item) for item in out["drift"]) if pair not in allowed]
+    allowed = _judged(record) | aside
+    register = (whole_tree / s.REGISTER).read_text(encoding="utf-8")
+    drift = [s.pair(item) for item in out["drift"]]
+    left = [pair for pair in s.not_owner_marked(drift, register) if pair not in allowed]
     assert not left, f"{len(left)} drift pairs remain after the set-aside: {left[:6]}"
 
 

@@ -32,7 +32,7 @@ def run(tmp_path):
 def test_limits_prints_each_limit_with_its_rule(run):
     done = run("limits")
     assert done.returncode == 0, done.stderr
-    for word in ("heavy_slots", "workers_per_slot", "sessions_max", "gpu_budget_mib", "floor(0.15 x CPUs)"):
+    for word in ("heavy_slots", "workers_per_slot", "sessions_max", "gpu_budget_mib", "floor(0.1 x CPUs)", "start_below", "load_limit", "margin"):
         assert word in done.stdout
     result = json.loads(run("limits", "--json").stdout)["result"]
     assert result["limits"]["sessions_max"] == 4 and result["machine"]["cpus"] == 8

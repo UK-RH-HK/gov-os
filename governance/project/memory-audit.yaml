@@ -1,0 +1,72 @@
+# Gov OS's own memory-audit configuration (W2-204; schema: template/governance/kernel/schemas/memory-audit.schema.json).
+# The tables every step of `gov memaudit` reads: the categories and their quotas for one half, the governing domains
+# and the subsystems of the spread rule, the paths no question may cite, and the control set. The values are the ones
+# the module held as constants until W2-204 (DEC-1069 (5), DEC-1097 (1)(b)); a change here changes the measure.
+version: 1
+repository: Gov OS
+half_size: 40
+categories:
+  - {name: decision, count: 6, about: "a decision or what replaced it (at least 2 are supersession questions)"}
+  - {name: contract, count: 4, about: "the Contract or the Charter"}
+  - {name: plan, count: 4, about: "the plan's rules"}
+  - {name: ticket, count: 4, about: "tickets and the path map"}
+  - {name: exact-string, count: 4, about: "an exact name, id or message, with its file"}
+  - {name: callers, count: 4, about: "callers, callees and definitions"}
+  - {name: code-paraphrase, count: 3, about: "a code fact asked in other words"}
+  - {name: kernel-template, count: 3, about: "roles, skills, hooks of the kernel template (at least 2 are about roles or skills)"}
+  - {name: multi-file, count: 3, about: "an answer that needs two or more files"}
+  - {name: failure-memory, count: 3, about: "a lesson or failure record (`docs/lessons/**`, failure records); each cites one"}
+  - {name: history, count: 1, about: "why or when something changed"}
+  - {name: nonexistent-id, count: 1, about: "an id that exists nowhere"}
+domains:
+  - {name: decisions, paths: [docs/DECISION_REGISTER.md]}
+  - {name: tickets, paths: [".tickets/**"]}
+  - {name: plan, paths: ["docs/plan/**"]}
+  - {name: contract, paths: ["docs/contract/**", "docs/charter/**"]}
+  - {name: code, paths: ["src/**", "template/governance/kernel/hooks/**", ".claude/hooks/**"]}
+subsystems:
+  - name: retrieval
+    paths: ["src/gov/retrieval/**", "src/gov/retrieve/**", "src/gov/context/**", "src/gov/store/**",
+            "src/gov/codeintel/**", governance/project/retrieval.yaml]
+  - name: guard
+    paths: ["src/gov/guard/**", "src/gov/hooks/**", "template/governance/kernel/hooks/**", ".claude/hooks/**"]
+  - name: close
+    paths: ["src/gov/close/**", "src/gov/closure/**", "src/gov/accept/**", "src/gov/check/**",
+            "src/gov/readiness/**", "src/gov/ci/**", "docs/close/**",
+            "governance/project/orchestration/tools/nightly*"]
+  - name: checkpoint
+    paths: ["src/gov/checkpoint/**", "src/gov/pause/**", "docs/checkpoints/**"]
+  - name: rebuild
+    paths: ["src/gov/rebuild/**", "src/gov/secrets/**", "src/gov/doctor/**"]
+  - name: launch
+    paths: ["src/gov/launch/**", "src/gov/brief/**", "template/governance/kernel/launch/**",
+            governance/project/orchestration/tools/indep_launch.py, "governance/project/indep-walls/**"]
+  - name: release
+    paths: ["src/gov/release/**", "src/gov/adopt/**", "src/gov/adapters/**", "docs/releases/**"]
+spread: {domain_min: 4, subsystem_max: 10}
+# The paths a writer and a checker leave unread and no question cites: the walls' tree-exclude.txt, and the records the
+# approved briefs name by hand (the standing measure's miss records, the audit's own package and walls).
+exclude:
+  - "fixtures/evaluation/**"
+  - docs/assessment/2026-10/B-memory-retrieval.md
+  - "docs/research/EXP-003/**"
+  - "docs/research/memory-measure-audit/**"
+  - docs/research/W2-61-baseline.md
+  - docs/research/W2-88-memory-practice.md
+  - "docs/audit/memory-measure-*"
+  - "docs/audit/memory-measure-*/**"
+  - "docs/audit/memory-verdict-*"
+  - "docs/audit/memory-recall-diagnosis-*"
+  - "governance/project/orchestration/packages/LIFT-1/D4B-*"
+  - "tests/acceptance/W2-61*/**"
+  - ".gov-runtime/**"
+  - "governance/project/indep-briefs/**"
+  - docs/research/W2-86-memory-measure.md
+  - docs/research/W2-87-memory-measure.md
+  - docs/research/W2-92-memory-measure.md
+  - docs/research/D4B-memory-survey.md
+  - docs/research/D4B-memory-survey-package-draft.md
+  - "governance/project/orchestration/packages/MEMORY-AUDIT-1*"
+  - "governance/project/orchestration/packages/MEMORY-AUDIT-1*/**"
+  - "governance/project/indep-walls/**"
+control: {set: memory-retrieval, part: visible, size: 40, baseline: 34, spread: 2}

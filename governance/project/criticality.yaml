@@ -1,29 +1,34 @@
-# Criticality rules (W2-184, DEC-1120 (1), DEC-1167 (2)): a ticket's class is the highest of the rules that match.
-# Read at launch by gov.launch.criticality. A glob matches an allowed path as an fnmatch pattern ('*' crosses '/').
+# Criticality rules (W2-184, DEC-1120 (1), DEC-1167 (2); the list of audit 4's Table 3, DEC-1214 K1, W2-201): a ticket's
+# class is the highest of the rules that match. Read at launch by gov.launch.criticality and by the helper model rule
+# (.claude/hooks/agent_model.py). A glob matches an allowed path as an fnmatch pattern ('*' crosses '/').
 version: 1
 default: C2                    # the class when no rule matches
 opus: claude-opus-5-5          # the Opus model a promotion and a FULL ticket's probe use
 rules:
-  # C3: the guard, permissions, the path map, hidden sets, the operator agent, the kernel and the Contract
+  # C3: the kernel and the Contract; the landing and close; the memory measure and sets; release, update and pin; the
+  # path map. The guard, the hooks, the settings, secrets, walls, held-out and operator entries are retired (DEC-1214 K1).
   - class: C3
     paths:
-      - "src/gov/guard/*"
-      - ".claude/hooks/*"
-      - ".claude/settings.json"
-      - ".claude/settings.local.json"
-      - "governance/project/secrets.yaml"
-      - "governance/project/indep-walls/*"
+      - "template/governance/kernel/**"
+      - "governance/kernel/**"
+      - "docs/contract/**"
+      - "src/gov/close/**"
+      - "src/gov/accept/**"
+      - "src/gov/queue/**"
+      - "src/gov/dispatch/landing.py"
+      - "src/gov/tasks/queue.py"
+      - "governance/project/orchestration/tools/merge_queue.py"
+      - "governance/project/operator/landing_check.py"
+      - "src/gov/memaudit/**"
+      - "fixtures/evaluation/**"
+      - "src/gov/release/**"
+      - "src/gov/update/**"
+      - "src/gov/lock/**"
       - "governance/project/path-map.yaml"
-      - "governance/project/held-out.yaml"
-      - "fixtures/evaluation/*/hidden/*"   # hidden sets: the path map's hidden halves
-      - "governance/project/operator/*"
-      - "template/governance/kernel/*"
-      - "governance/kernel/*"
-      - "docs/contract/*"
-  # C2: product code, launch, gate and plan, test maps, schemas
+  # C2: all other product code, the test map, the schemas
   - class: C2
     paths:
-      - "src/*"
+      - "src/**"
       - "governance/project/test-map.yaml"
       - "*/schemas/*"
   # C1: records and docs

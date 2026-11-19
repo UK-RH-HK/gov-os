@@ -9,11 +9,18 @@ non-blocking ``flock`` on the folder ``~/.gov-os/runtime/`` itself (held: exit 4
 2. takes the ``runtime`` inbox's new watch requests (the mark moves only once the state holding them is written);
 3. reads every ``~/.gov-os/machine/sessions/*.json`` directly (never ``registry.sessions()``, which removes entries):
    a session whose process is gone, or whose pid is another process's now, becomes one wake message to its entry's
-   ``notify`` (else ``cto``), and so does a session tracked by an earlier pass whose entry went with its process;
+   ``notify`` (else ``cto``), and so does a session tracked by an earlier pass whose entry went with its process
+   (slice 3, RT-5: with ``relaunch`` true in ``config.json``, a session that died without a return is relaunched once
+   instead, ``gov.dispatch.relaunch``; a second death in the boot is one ``died twice`` message);
 4. checks each watch: a pid gone or an exit file written is one wake message to the watch's ``to``; a transcript
    silent past its limit is one wake message (and, with ``push``, one detached run of that command) per incident;
-5. writes ``state.json`` whole (a temporary file and a rename) and appends its events to ``log.jsonl``.
+5. (slice 2) reads the heavy jobs from the log's run events (``jobs``: the running and the waiting, a live pid
+   each), the load admission now (``admission``: ``load_1m``, ``start_below``, ``load_limit``, ``margin``, ``room`` and
+   ``binding``, what would hold a start) and the GPU (``gpu``, with one ``gpu`` event a pass: ``used_mib``, ``total_mib``,
+   ``budget_mib``, ``spill``); a load that cannot be read is named in ``problems`` and the pass still runs (F2);
+6. writes ``state.json`` whole (a temporary file and a rename) and appends its events to ``log.jsonl``.
 
+Every end the pass detects is also one ``end`` event in the log, ``estimated`` (slice 3, RT-2, ``gov.dispatch.ends``).
 Message ids make every send idempotent (F1): a session's end ``end:<boot>:<pid>:<start_ticks>`` (``end:<pid>:<started>``
 without the identity, as the launcher's), a watch's end ``watch:<request id>``, a stall
 ``stall:<request id>:<the transcript's mtime, whole seconds>``. A push runs only for a stall message actually appended.
@@ -32,7 +39,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from gov.dispatch import inbox, limits
+from gov.dispatch import admission, ends, inbox, limits, relaunch
 from gov.resources import machine
 from gov.resources.config import machine_dir
 
@@ -60,6 +67,13 @@ def end_id(entry: dict) -> str:
     if boot and isinstance(ticks, int) and not isinstance(ticks, bool):
         return f"end:{boot}:{entry['pid']}:{ticks}"
     return f"end:{entry['pid']}:{entry.get('started')}"
+
+
+def admission_epoch(text) -> float | None:
+    try:
+        return datetime.datetime.fromisoformat(str(text).replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
 
 
 def clock() -> tuple[float, str | None]:
@@ -103,6 +117,9 @@ def push(command: str, text: str) -> None:
 class Pass:
     def __init__(self, place: Path):
         self.place, self.events, self.problems = place, [], []
+        self.ended_ids: set[str] = set()   # the ends this pass has an event for already
+        self.relaunching: bool | None = None  # config.json's relaunch key, read when a session is found dead
+        self.previous_at = iso(time.time())  # the previous pass's time: an end it detects is estimated to it
         self.now, why = clock()
         if why:
             self.problem(why)
@@ -124,6 +141,13 @@ class Pass:
         if sent["sent"]:
             self.event("sent", id=message_id, to=to, kind="wake")
         return sent["sent"]
+
+    def end_event(self, ident: str, kind: str, to: str, ended_at: str, **fields) -> None:
+        """RT-2: the ``end`` event of an end this pass detects (``estimated``), once per id, before its message."""
+        if ident in self.ended_ids or ends.known(ident):
+            return
+        self.ended_ids.add(ident)
+        self.event("end", id=ident, kind=kind, to=to, ended_at=ended_at, estimated=True, **fields)
 
     # --- the pass -------------------------------------------------------------------------------------------------
 
@@ -170,17 +194,62 @@ class Pass:
             return "no absolute path"
         return None
 
-    def end_session(self, entry: dict, sid: str) -> None:
-        notify = entry.get("notify")
+    @staticmethod
+    def notified(entry: dict) -> str:
+        """Whom an end of the entry's session is told to: its ``notify`` address, else ``cto``."""
         try:
-            to = inbox.check(notify) if notify else FALLBACK
+            return inbox.check(entry.get("notify")) if entry.get("notify") else FALLBACK
         except inbox.InboxError:
-            to = FALLBACK
+            return FALLBACK
+
+    def end_session(self, entry: dict, sid: str, note: str | None = None) -> None:
+        to = self.notified(entry)
         role, ticket, pid = entry.get("role"), entry.get("ticket"), entry.get("pid")
+        self.end_event(sid, "lead" if role == "orchestrator" else "worker", to, self.previous_at, ticket=ticket)
         text = f"session {role} {ticket} ended (pid {pid}); the watch pass does not know its exit code"
+        if note:
+            text += f"; {note}"
         if self.send(to, text, sid, {"role": role, "ticket": ticket, "pid": pid, "exit_code": None,
                                      "repository": entry.get("repository")}):
             self.event("ended", id=sid, role=role, ticket=ticket, pid=pid)
+
+    def relaunch_on(self) -> bool:
+        """Whether ``config.json`` switches the relaunch on (read once a pass, when a session is found dead)."""
+        if self.relaunching is None:
+            self.relaunching, why = relaunch.enabled(self.place)
+            if why:
+                self.problem(why)
+        return self.relaunching
+
+    def died(self, entry: dict, sid: str) -> None:
+        """A registry entry's process is gone: an end (RT-2), or with the relaunch on (RT-5) a session that died
+        without a return is relaunched once at its recorded next step; a second death of the ticket in the boot is one
+        ``died twice`` message, and an entry with no session id is an end that says it cannot resume."""
+        verdict = relaunch.decide(self.place, entry, self.relaunch_on())
+        ticket, role = entry.get("ticket"), entry.get("role")
+        if verdict in ("claimed", "ending"):
+            return  # already relaunched (the claim is the idempotence), or its launcher has not told its end yet
+        if verdict == "unresumable":
+            return self.end_session(entry, sid, "it cannot resume: no session id was recorded")
+        if verdict == "twice":
+            to, said = self.notified(entry), f"died-twice:{ticket}:{entry.get('boot')}"
+            self.end_event(said, "lead" if role == "orchestrator" else "worker", to, self.previous_at, ticket=ticket)
+            self.send(to, f"session {role} {ticket} died twice in this boot (pid {entry.get('pid')}): not relaunched",
+                      said, {"role": role, "ticket": ticket, "pid": entry.get("pid"), "died_twice": True,
+                             "boot": entry.get("boot"), "repository": entry.get("repository")})
+            return
+        if verdict == "go":
+            if not relaunch.claim(self.place, entry):
+                return  # claimed between the two looks: another pass has it
+            try:
+                child = relaunch.spawn(self.place, entry)
+            except (OSError, ValueError, KeyError) as error:  # the claim stands: a relaunch is never retried
+                self.problem(f"the relaunch of {ticket} cannot be started: {error}")
+                return self.end_session(entry, sid, f"it could not be relaunched: {error}")
+            self.event("relaunched", id=relaunch.claim_id(entry), ticket=ticket, role=role,
+                       session_id=entry.get("session_id"), pid=entry.get("pid"), launch_pid=child)
+            return
+        self.end_session(entry, sid)  # off, or it returned: slice 1's end message
 
     def sessions(self, tracked: dict) -> dict:
         live, ended = {}, set()
@@ -204,17 +273,18 @@ class Pass:
             sid = end_id(entry)
             if machine.alive(pid) and machine.same_process(pid, entry):
                 live[sid] = {key: entry.get(key) for key in ("pid", "role", "ticket", "repository", "started", "boot",
-                                                             "start_ticks", "notify", "address")}
+                                                             "start_ticks", "notify", "address", "session_id",
+                                                             "launcher_pid", "exit_file")}
             else:
                 ended.add(sid)
-                self.end_session(entry, sid)
+                self.died(entry, sid)
         for sid, entry in tracked.items():  # an entry removed by another reader: its process judged here
             if sid in live or sid in ended or not isinstance(entry, dict) or not isinstance(entry.get("pid"), int):
                 continue
             if machine.alive(entry["pid"]) and machine.same_process(entry["pid"], entry):
                 live[sid] = entry
             else:
-                self.end_session(entry, sid)
+                self.died(entry, sid)
         return live
 
     def check_watch(self, wid: str, data: dict, incidents: dict) -> bool:
@@ -224,6 +294,7 @@ class Pass:
             pid = data["pid"]
             if machine.alive(pid) and (not isinstance(data.get("start_ticks"), int) or machine.same_process(pid, data)):
                 return False
+            self.end_event(f"watch:{wid}", "job", to, self.previous_at, job=name)
             return self.send(to, f"watch {name}: process {pid} ended", f"watch:{wid}",
                              {"watch": wid, "name": name, "pid": pid}) is not None
         if data["form"] == "exit-file":
@@ -237,6 +308,7 @@ class Pass:
                 return False
             code = int(first) if first.isascii() and first.isdigit() else None
             said = f"exit code {code}" if code is not None else f"no exit code ({first[:40]!r})"
+            self.end_event(f"watch:{wid}", "job", to, iso(path.stat().st_mtime), job=name)
             return self.send(to, f"watch {name}: the exit file {path} holds {said}", f"watch:{wid}",
                              {"watch": wid, "name": name, "exit_file": str(path), "exit_code": code}) is not None
         self.check_stall(wid, data, incidents)
@@ -279,6 +351,53 @@ class Pass:
         incidents[wid] = {"key": key, "since": iso(changed), "silent_min": minutes, "pushed": pushed}
         self.event("stall", id=key, watch=wid, name=name, silent_min=minutes, pushed=pushed)
 
+    def jobs(self) -> dict:
+        """The heavy jobs the runs' events show: ``{"running": [...], "waiting": [...]}``, each with a live pid."""
+        seen: dict[str, list[dict]] = {}
+        for item in admission.events(newest=5000, want=lambda e: isinstance(e.get("job"), str) and
+                                     e.get("event") in ("ready", "wait", "admitted", "started", "ended")):
+            seen.setdefault(item["job"], []).append(item)
+        running, waiting = [], []
+        for job, items in seen.items():
+            names = {e["event"] for e in items}
+            pid = items[0].get("pid")
+            if "ended" in names or not isinstance(pid, int) or not machine.alive(pid):
+                continue
+            if "started" in names:
+                began = next(e for e in items if e["event"] == "started")
+                running.append({"job": job, "kind": began.get("kind"), "slot": began.get("slot"), "pid": pid,
+                                "workers": began.get("workers"), "cpus": began.get("cpus"), "started": began.get("at")})
+            elif "ready" in names and "admitted" not in names:
+                asked = next(e for e in items if e["event"] == "ready")
+                held = [e for e in items if e["event"] == "wait"]
+                since = admission_epoch(asked.get("at"))
+                waiting.append({"job": job, "kind": asked.get("kind"), "pid": pid,
+                                "reason": held[-1].get("reason") if held else None,
+                                "waited_s": None if since is None else round(max(0.0, time.time() - since), 1)})
+        return {"running": running, "waiting": waiting}
+
+    def admitted(self, detected: dict) -> dict:
+        """The load admission as a start would meet it now; a reading that cannot be taken is a problem."""
+        workers = detected["limits"].get("workers_per_slot") or 1
+        ok, _reason, readings = admission.room("test", workers)
+        if readings.get("problem"):
+            self.problem(f"admission: {readings['problem']}")
+        return {"load_1m": readings["load_1m"], "start_below": readings["start_below"],
+                "load_limit": readings["load_limit"], "margin": readings["margin"], "room": ok,
+                "binding": readings["binding"]}
+
+    def gpu(self, detected: dict) -> dict:
+        """The GPU's reading (one ``gpu`` event a pass where there is a GPU): spill is the used MiB over the budget."""
+        found, budget = detected["machine"], detected["limits"]["gpu_budget_mib"]
+        if not detected["gpu"]["present"]:
+            return {"present": False, "reason": detected["gpu"].get("reason")}
+        used, total = found["gpu_used_mib"], found["gpu_total_mib"]
+        reading = {"present": True, "used_mib": used, "total_mib": total, "budget_mib": budget,
+                   "spill": used is not None and used > budget, "at": iso(time.time())}
+        self.event("gpu", job="watch", kind="gpu", pid=os.getpid(), used_mib=used, total_mib=total, budget_mib=budget,
+                   spill=reading["spill"])
+        return reading
+
     def run(self) -> dict:
         for stray in self.place.glob(TEMP_PREFIX + "*"):  # a pass killed while writing left its temporary file
             try:
@@ -286,6 +405,7 @@ class Pass:
             except OSError:
                 pass
         previous = self.previous()
+        self.previous_at = (previous.get("pass") or {}).get("at") or iso(self.now)
         detected = limits.detect()
         for problem in detected["problems"]:
             self.problem(problem)
@@ -300,8 +420,12 @@ class Pass:
                     incidents.pop(wid, None)
             except Exception as error:  # one watch never stops the pass (F2)
                 self.problem(f"watch {wid}: {type(error).__name__}: {error}")
+        jobs = self.jobs()
+        admitted = self.admitted(detected)
+        gpu = self.gpu(detected)
         state = {"format": FORMAT, "pass": {"at": iso(self.now), "ok": not self.problems},
-                 "machine": detected["machine"], "limits": detected["limits"], "sessions": sessions,
+                 "machine": detected["machine"], "limits": detected["limits"], "jobs": jobs, "admission": admitted,
+                 "gpu": gpu, "sessions": sessions,
                  "watches": watches, "incidents": {k: v for k, v in incidents.items() if k in watches},
                  "problems": list(self.problems)}
         with tempfile.NamedTemporaryFile("w", dir=self.place, prefix=TEMP_PREFIX, delete=False) as handle:

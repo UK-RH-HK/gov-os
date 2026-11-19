@@ -61,7 +61,6 @@ tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_whose_type_is_
 tests/acceptance/W1-30/test_w1_30_check_blocks.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_commit_models.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_containment_places.py  # a lifted gate of the strict close (home: W2-115, D-9)
-tests/acceptance/W1-30/test_w1_30_context_failures.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_disposition.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_governance_checks.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_iteration.py  # a lifted gate of the strict close (home: W2-115, D-9)
@@ -87,14 +86,12 @@ tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py  # a lifted gate of the st
 tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_command_success.py  # a lifted gate of the strict close (home: W2-115, D-9)
-tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_enforces.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_own_sources.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_record_types.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py  # a lifted gate of the strict close (home: W2-115, D-9)
-tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r16_human_gate.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r8_commits.py  # a lifted gate of the strict close (home: W2-115, D-9)
 tests/acceptance/W1-30/test_w1_30_r8_escalation.py  # a lifted gate of the strict close (home: W2-115, D-9)
@@ -143,24 +140,20 @@ tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_input_ids_an
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_outputs  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_requirements_implemented  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_decisions_applied  # a lifted gate of the strict close
-tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_packet_hash_matches_context  # a lifted gate of the strict close
-tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built  # a lifted gate of the strict close
-tests/acceptance/W1-30/test_w1_30_receipt.py::test_no_fallback_hash_when_context_fails  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_decisions_come_from_the_ticket_s_sources_with_their_span_hashes  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_outputs_lists_files_from_ticket_commits  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_deviations_says_not_measured_when_unverified  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_input_hash_is_of_file_content  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_unmeasurable_inputs_listed_with_reason  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_ticket_file_is_always_an_input  # a lifted gate of the strict close
-tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_is_recorded_unresolved_and_the_close_goes_on  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_sources_resolve_through_defined_lookup  # a lifted gate of the strict close
-tests/acceptance/W1-30/test_w1_30_receipt.py::test_context_failure_non_cycle_refuses_close  # a lifted gate of the strict close
 tests/acceptance/W1-30/test_w1_30_receipt.py::test_tests_produced_lists_ticket_own_tests  # a lifted gate of the strict close
 
 # unit/close: the strict close's builders (DEC-953, Q-2..Q-11); select, serial, nightly, evidence, runs and tool kept
 tests/unit/close/test_batch_refresh.py  # a lifted gate of the strict close
 tests/unit/close/test_batch_reuse.py  # a lifted gate of the strict close
 tests/unit/close/test_collection_gate.py  # a lifted gate of the strict close
-tests/unit/close/test_context.py  # a lifted gate of the strict close
 tests/unit/close/test_decision_records.py  # a lifted gate of the strict close
 tests/unit/close/test_every_finding.py  # a lifted gate of the strict close
 tests/unit/close/test_fingerprint.py  # a lifted gate of the strict close
@@ -187,3 +180,14 @@ tests/unit/secrets_check/test_w2_107_cache.py  # the secrets scan, off here (DEC
 tests/unit/secrets_check/test_w2_107_engine.py  # the secrets scan, off here (DEC-1045)
 tests/unit/secrets_check/test_w2_107_record.py  # the secrets scan, off here (DEC-1045)
 tests/unit/secrets_check/test_w2_20_pool.py  # the secrets scan, off here (DEC-1045)
+
+# DEC-1214 G1: the guard lists (optin-lifted-guard*.txt) are retired with the guard; their cases now run by default
+# except these six rows, red when the lists were retired: the W2-33 `copy_folder` fixture (it copies the roles folder)
+# is read as a whole-tree copier and needs template/ in the planted root. Not the guard's: left opt-in as they were,
+# for the ticket that owns W1-28 and W1-50 to fix.
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-tracked]  # red: needs template/ in the planted root
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-untracked]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W2-33/w2_33_support.py::copy_folder]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W2-33/w2_33_support.py::copy_folder]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-permissions]  # red: needs template/ in the planted root
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-deny-list]  # red: needs template/ in the planted root

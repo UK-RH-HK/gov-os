@@ -1,6 +1,6 @@
 ---
 id: DAEO-fau3
-status: deferred
+status: closed
 deps: [DAEO-g0ip, DAEO-cuao]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -100,3 +100,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-42), as approved (DEC-729). The list row
 **D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. Its S3, atomic saves, comes first.
 
 **Moved to Wave 3's list 2026-11-16 by the owner (DEC-1201 (3)):** W2-42 leaves Wave 2's list (status `deferred`, tag `wave-2` removed); it is not closed and not done. It is listed in `docs/plan/WAVE_3_PARKING.md` under "Moved from Wave 2 (DEC-1201)". `gov plan` no longer offers it.
+
+**Closed on its record, 2026-11-19 13:39 (the CTO, at the owner's word: "Wave 3: close W2-42 with the guard"):** the guard is retired (EMERGENCY-2 2.2, 6.1), so its hardening (missing role, links, late paths, atomic saves) is not built.

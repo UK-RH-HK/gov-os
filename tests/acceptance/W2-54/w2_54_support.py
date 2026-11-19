@@ -1,21 +1,16 @@
 """Support code for the W2-54 acceptance tests (DAEO-0rfi; standard library and PyYAML only).
 
-W2-54 (DEC-768): two computations of a ticket's context give one packet and one hash, whatever order the
-retrieval returns its items in; the context-reproducibility check declares a time limit that fits its run; and
-core-schema knows the ``audit-report`` type exactly as W2-02 defines it at ``2a35fd7b``.
+W2-54 (DEC-768): core-schema knows the ``audit-report`` type exactly as W2-02 defines it at ``2a35fd7b``; a check past
+its declared limit still fails and no hard-block check is weakened; the query vector, its cache and the CPU embedder
+(rounds 2 to 4). The context packet's order and the context check's time limit (its first two KPI lines) are retired
+with the context command (DEC-1214 M1, W2-200): their cases and helpers are deleted.
 
 How the tests run (README, "How the suite runs this worktree's code"):
 
-- **Through public interfaces only:** ``gov context --json`` (and ``--budget``), the context-reproducibility
-  check run as its declaration says (``python3 -m gov.context.context_check`` in the project root), ``gov check
-  --json``, and core-schema (``python3 -m gov.check.schema`` in the project root).
+- **Through public interfaces only:** ``gov retrieve --json``, ``gov check --json``, and core-schema (``python3 -m
+  gov.check.schema`` in the project root).
 - **Every process runs this worktree's ``src/``** (DEC-732): ``PYTHONPATH`` names it, per process, and the
   session first asserts that ``gov.__file__`` points into it.
-- **The order the context's evidence comes in** is produced from outside (W2-04, DEC-1005; README, "W2-04
-  (DEC-1005)"): the project's files written in another order, the index's rows inserted in another order at the
-  same commit, other hash seeds. For the check's two computations, a ``sitecustomize`` first on ``PYTHONPATH``
-  puts the project into another state between them, at the context's public entry ``gov.context.context``; each
-  computation is logged, so a test also proves the two computations saw two states.
 - **Every project is a temporary git repository built from scratch:** single named files of this worktree only
   (the path map, the template's gitleaks rules, two schema files), never a folder, never a clone.
 """
@@ -26,7 +21,6 @@ import hashlib
 import importlib.util
 import json
 import os
-import random
 import re
 import shutil
 import socket
@@ -52,7 +46,6 @@ W2_02_MERGED_COMMIT = "4ce16df2"
 # ---- the files of this worktree the suite reads
 CHECKS_REL = "template/governance/kernel/checks"
 INSTALLED_CHECKS_REL = "governance/kernel/checks"
-CONTEXT_DECLARATION_REL = f"{CHECKS_REL}/context-reproducibility.yaml"
 SCHEMAS_REL = "template/governance/kernel/schemas"
 AUDIT_SCHEMA_REL = f"{SCHEMAS_REL}/audit-report.schema.json"
 COMMON_SCHEMA_REL = f"{SCHEMAS_REL}/common.schema.json"
@@ -71,12 +64,10 @@ GITLEAKS_TEMPLATE_REL = "template/.gitleaks.toml"
 TIMEOUT_FIELD = "timeout-seconds"
 RUNNER_DEFAULT_S = 60          # what a check without a declared limit gets (DEC-595)
 LIMIT_BOUND_S = 600            # the highest limit this suite accepts: the sibling retrieval-regression check's
-CONTEXT_CHECK_ID = "context-reproducibility"
 CORE_SCHEMA_ID = "core-schema"
 GREEN, RED = "GREEN", "RED"
 
-# ---- the packet (W1-24's form) and core-schema's codes, as they are produced today
-K_DROPPED, K_HASH, K_SUPPLEMENTARY = "dropped", "hash", "supplementary"
+# ---- core-schema's codes, as they are produced today
 MISSING_FIELD = "SCHEMA_MISSING_FIELD"
 INVALID_FIELD = "SCHEMA_INVALID_FIELD"
 INVALID_TYPE = "SCHEMA_INVALID_TYPE"
@@ -92,8 +83,7 @@ GOV_CHECK_TIMEOUT_S = 1800.0
 # --------------------------------------------------------------------------
 
 class Box:
-    """A scratch place: HOME, TMPDIR, a PATH of wrappers (python3, git, gitleaks, check-jsonschema), and the
-    stand-in of the project's state between two computations (W2-04, DEC-1005)."""
+    """A scratch place: HOME, TMPDIR and a PATH of wrappers (python3, git, gitleaks, check-jsonschema)."""
 
     def __init__(self, workdir):
         self.workdir = Path(workdir)
@@ -107,7 +97,6 @@ class Box:
                 wrapper = self.workdir / "bin" / tool
                 wrapper.write_text(f'#!/bin/sh\nexec "{found}" "$@"\n', encoding="utf-8")
                 wrapper.chmod(0o755)
-        (self.workdir / "hook" / "sitecustomize.py").write_text(_HOOK, encoding="utf-8")
         # Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the machine-wide vector cache of W2-126 is one folder
         # every process on the machine shares, keyed by model, revision and text, not by the stand-in that computed
         # a vector. Every child names a cache folder (never the user's real one, never the session's HOME); the
@@ -119,8 +108,7 @@ class Box:
         return self.workdir / "log"
 
     def env(self, mode=None, **extra):
-        """The environment of a child process; with ``mode``, the stand-ins' folder is first on ``PYTHONPATH`` (its
-        stand-in acts only where ``W254_STATES`` is set: ``context_check_in_states``)."""
+        """The environment of a child process; with ``mode``, the stand-ins' folder is first on ``PYTHONPATH``."""
         paths = ([str(self.workdir / "hook")] if mode else []) + [str(SRC)]
         env = {
             "PATH": f"{self.workdir / 'bin'}:/usr/bin:/bin",
@@ -153,62 +141,6 @@ class Box:
 
     def has_gitleaks(self):
         return (self.workdir / "bin" / "gitleaks").exists()
-
-
-# Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. The context no longer reaches the retrieval's
-# public entry (P-W2-04-2 (A)), so the stand-in that reordered that entry's items is gone (README, "W2-04 (DEC-1005)").
-# Orders are produced from outside: the project's files written in another order, the index's rows inserted in
-# another order at the same commit, other hash seeds. For the check, whose two computations run in one process, the
-# stand-in below sits at the context's public in-process entry, ``gov.context.context``: before each computation of
-# a ticket it puts the project into one of the states W254_STATES names (a branch checked out, a store built at it
-# copied in), in turn, and logs it; it never touches what the context computes. Every computation is numbered per
-# ticket (across processes), and W254_TARGET limits the turns to one ticket (every other ticket gets the first state).
-_HOOK = r'''
-"""W2-54's stand-in: the project's state between two computations of a ticket's context (acceptance tests only)."""
-import json
-import os
-import shutil
-import subprocess
-from pathlib import Path
-
-_STATES, _LOG = os.environ.get("W254_STATES"), os.environ.get("W254_LOG")
-
-if _STATES and _LOG:
-    import gov.context as _context
-
-    _real = _context.context
-    _states = json.loads(_STATES)
-
-    def _number(key):
-        index = 0
-        while True:
-            try:
-                os.close(os.open(os.path.join(_LOG, f"{key}-{index}"), os.O_CREAT | os.O_EXCL | os.O_WRONLY))
-                return index
-            except FileExistsError:
-                index += 1
-
-    def _apply(root, state):
-        if state.get("branch"):
-            subprocess.run(["git", "-C", str(root), "checkout", "-q", "--force", state["branch"]], check=True,
-                           capture_output=True)
-        runtime = root / ".gov-runtime"
-        for path in runtime.glob("store.db*"):
-            path.unlink()
-        for path in sorted(Path(state["store"]).iterdir()):
-            shutil.copy2(path, runtime / path.name)
-
-    def context(root, ticket, *args, **kwargs):
-        target = os.environ.get("W254_TARGET")
-        number = _number(f"context-{ticket}")
-        index = number % len(_states) if not target or ticket == target else 0
-        _apply(Path(root), _states[index])
-        with open(os.path.join(_LOG, "calls.jsonl"), "a", encoding="utf-8") as handle:
-            handle.write(json.dumps({"pid": os.getpid(), "ticket": ticket, "number": number, "state": index}) + "\n")
-        return _real(root, ticket, *args, **kwargs)
-
-    _context.context = context
-'''
 
 
 class Run:
@@ -316,7 +248,7 @@ def commit_all(project, message="the fixture"):
 
 
 # --------------------------------------------------------------------------
-# A project for the context packet
+# A project, its records
 # --------------------------------------------------------------------------
 
 _NAMESPACE_FIELDS = {
@@ -353,292 +285,8 @@ def ticket(ticket_id, title, sources):
     return frontmatter(front, f"\n# {ticket_id} {title}\n\n{title}.\n")
 
 
-# The words every record shares with the tickets' titles, so the lexical route returns many items for each.
-WORDS = ("context packet dropped order stable hash budget ceiling retrieval supplementary tie break "
-         "reproducibility ticket computation")
-TITLE = "context packet dropped order stable hash budget"
-
-CHARTER_ID = "CHARTER-W254"
-BIG_CHARTER_ID = "CHARTER-W254-BIG"
-ADR_IDS = tuple(f"ADR-W254-{letter}" for letter in "ABCDEF")
-SPLIT_ID = "ADR-W254-SPLIT"      # one record in many sections: several items with the same id
-TK_SMALL = "TK-W254-SMALL"       # small mandatory inputs: its supplementary part fits unless the budget is small
-TK_BIG = "TK-W254-BIG"           # a mandatory input past the default ceiling: it refuses there (W2-04, S2)
-TK_OTHER = "TK-W254-OTHER"       # a second small ticket (W2-04, DEC-1005): the check names only the one that differs
-
-
-def _section(index):
-    return (f"## Section {index}: the {WORDS.split()[index % len(WORDS.split())]} rule\n\n"
-            f"Section {index} states how the {WORDS} are kept. " * 3 + "\n")
-
-
-def corpus(tickets=(TK_SMALL, TK_BIG)):
-    big = " ".join(f"Clause {n}: every agent sees one {WORDS}." for n in range(900))   # about 25,000 tokens
-    files = {
-        "README.md": f"# A project\n\nA fixture project for the W2-54 acceptance tests: {WORDS}.\n",
-        "docs/charter/charter.md": record(CHARTER_ID, "charter", "ACTIVE", f"The {WORDS} of the project."),
-        "docs/charter/big.md": record(BIG_CHARTER_ID, "charter", "ACTIVE", big),
-        "docs/adr/split.md": record(SPLIT_ID, "decision", "ACTIVE", "\n".join(_section(i) for i in range(12))),
-    }
-    for index, adr in enumerate(ADR_IDS):
-        files[f"docs/adr/{adr.lower()}.md"] = record(adr, "decision", "ACTIVE",
-                                                      f"Decision {index}: the {WORDS}.\n\n{_section(index)}")
-    for index in range(8):
-        files[f"docs/notes/note-{index}.md"] = f"# Note {index}\n\n{_section(index)}\nThe {WORDS}.\n"
-    sources = {TK_SMALL: [CHARTER_ID], TK_BIG: [BIG_CHARTER_ID], TK_OTHER: [CHARTER_ID]}
-    for ticket_id in tickets:
-        files[f".tickets/{ticket_id}.md"] = ticket(ticket_id, TITLE, sources[ticket_id])
-    return files
-
-
-def context_project(box, project, tickets=(TK_SMALL, TK_BIG), index=True):
-    """A temporary project with its record store and (unless ``index`` is false) its lexical index."""
-    project = new_repo(project)
-    adopt(project)
-    for rel, text in corpus(tickets).items():
-        write(project, rel, text)
-    commit_all(project)
-    steps = ([("gov.retrieval.lexical", "refresh")] if index else []) + [("gov.store", "load")]
-    script = "import importlib, sys\nfrom pathlib import Path\n" + "".join(
-        f"importlib.import_module({module!r}).{function}(Path(sys.argv[1]))\n" for module, function in steps)
-    done = run([sys.executable, "-c", script, project], cwd=box.workdir / "elsewhere", env=box.env(),
-               timeout=CALL_TIMEOUT_S)
-    assert done.returncode == 0, f"the fixture's store could not be built\n{done.describe()}"
-    return project
-
-
 def canonical(value):
     return json.dumps(value, sort_keys=True, ensure_ascii=False)
-
-
-def multiset(entries):
-    return sorted(canonical(entry) for entry in entries)
-
-
-def context_check(box, project, mode=None, target=None, **extra):
-    """The context-reproducibility check, as its declaration says: its command, by ``sh -c``, in the project."""
-    declaration = yaml.safe_load((REPO_ROOT / CONTEXT_DECLARATION_REL).read_text(encoding="utf-8"))
-    env = box.env(mode, **({"W254_TARGET": target} if target else {}), **extra)
-    return run(["sh", "-c", declaration["command"]], cwd=project, env=env, timeout=CHECK_TIMEOUT_S)
-
-
-# --------------------------------------------------------------------------
-# W2-04 (DEC-1005): orders produced from outside, budgets from the packet's own figures
-# --------------------------------------------------------------------------
-#
-# Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005 (README, "W2-04 (DEC-1005)"). The context no
-# longer reaches the retrieval's public entry; its own lookups are seen in the packet (``supplementary``, ``dropped``,
-# ``further_batch``, ``supplementary_batches``), and the orders its evidence could come in are produced from outside.
-
-K_FURTHER, K_BATCHES, K_TOKENS, K_BUDGET = "further_batch", "supplementary_batches", "tokens", "budget"
-OVER_CEILING = "CONTEXT_OVER_CEILING"
-SPLIT_REL = "docs/adr/split.md"
-# Four files with one text (ties: items of equal relevance), written in an order their paths do not sort in.
-TIE_TEXT = f"# A tie\n\nThe {WORDS} of a tie.\n"
-TIE_PATHS = ("docs/ties/tie-d.md", "docs/ties/tie-b.md", "docs/ties/tie-a.md", "docs/ties/tie-c.md")
-# A ticket whose title (its KPI line too) no file the index holds has a word of: its lookup finds nothing.
-NONE_TICKET, NONE_TITLE = "TK-W254-NONE", "Quince marmalade jars"
-
-
-def tokens(text):
-    """The packet's own count (W2-04, S1): characters divided by 4, rounded up."""
-    return -(-len(text) // 4)
-
-
-def tied_corpus(tickets):
-    """``corpus(tickets)`` with the four tied files."""
-    files = corpus(tickets)
-    files.update({rel: TIE_TEXT for rel in TIE_PATHS})
-    return files
-
-
-def none_corpus():
-    """``corpus``'s files and ``NONE_TICKET``, whose one source is the big charter."""
-    files = corpus((TK_SMALL, TK_BIG))
-    files[f".tickets/{NONE_TICKET}.md"] = ticket(NONE_TICKET, NONE_TITLE, [BIG_CHARTER_ID])
-    return files
-
-
-def in_order(names, how):
-    """``names`` sorted, then ``reverse``d, ``rotate``d (the first last) or ``shuffle``d (seed 54)."""
-    names = sorted(names)
-    if how == "reverse":
-        return names[::-1]
-    if how == "rotate":
-        return names[1:] + names[:1]
-    if how == "shuffle":
-        random.Random(54).shuffle(names)
-        return names
-    raise ValueError(f"no order {how!r}")
-
-
-# The ordered build: the files of argv[3] set aside (outside the project), the lexical index refreshed, then each put
-# back in that order with the index refreshed after it, so their chunks' rows come in that order; then the store.
-_ORDERED_BUILD = r'''
-import json, os, sys
-from pathlib import Path
-import gov.retrieval.lexical as lexical
-import gov.store as store
-
-root, held, order = Path(sys.argv[1]), Path(sys.argv[2]), json.loads(sys.argv[3])
-for rel in order:
-    (held / rel).parent.mkdir(parents=True, exist_ok=True)
-    os.replace(root / rel, held / rel)
-lexical.refresh(root)
-for rel in order:
-    os.replace(held / rel, root / rel)
-    lexical.refresh(root)
-store.load(root)
-'''
-
-
-def build_index(box, project, rows=None, index=True):
-    """The project's store, and (unless ``index`` is false) its lexical index: at once, or with ``rows`` (file names)
-    put back one at a time in that order (``_ORDERED_BUILD``). Any store already there is removed first."""
-    for path in (Path(project) / ".gov-runtime").glob("store.db*"):
-        path.unlink()
-    if rows is None:
-        steps = ([("gov.retrieval.lexical", "refresh")] if index else []) + [("gov.store", "load")]
-        script = "import importlib, sys\nfrom pathlib import Path\n" + "".join(
-            f"importlib.import_module({module!r}).{function}(Path(sys.argv[1]))\n" for module, function in steps)
-        argv = [sys.executable, "-c", script, project]
-    else:
-        held = Path(project).parent / f"{Path(project).name}-held"
-        argv = [sys.executable, "-c", _ORDERED_BUILD, project, held, json.dumps(list(rows))]
-    done = run(argv, cwd=box.workdir / "elsewhere", env=box.env(), timeout=CALL_TIMEOUT_S)
-    assert done.returncode == 0, f"the fixture's store could not be built\n{done.describe()}"
-    if rows is not None:
-        shutil.rmtree(held, ignore_errors=True)
-
-
-def order_project(box, project, files, written=None, rows=None, index=True, classes=None):
-    """A temporary project holding ``files``, written in the order ``written`` (file names; as given when None) and
-    committed as ``context_project`` commits it, so the same files give the same commit whatever order they were
-    written in; then ``build_index``. ``classes``: memory classes for ``adopt``."""
-    project = new_repo(project)
-    adopt(project, classes)
-    for rel in written or files:
-        write(project, rel, files[rel])
-    commit_all(project)
-    build_index(box, project, rows, index)
-    return project
-
-
-def head(project):
-    return git(project, "rev-parse", "HEAD").strip()
-
-
-def row_order(source):
-    """The paths of the lexical index's chunks in the order the store file holds its rows (rowids): the order a reader
-    that names no order gets them in. ``source``: a project, or a folder ``save_store`` wrote."""
-    import sqlite3
-    source = Path(source)
-    path = source / "store.db" if (source / "store.db").is_file() else source / ".gov-runtime" / "store.db"
-    connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
-    try:
-        return [rel for (rel,) in connection.execute("SELECT path FROM lexical_chunk ORDER BY rowid")]
-    finally:
-        connection.close()
-
-
-def save_store(project, folder):
-    """A copy of the project's store files (``.gov-runtime/store.db*``) in ``folder``, outside the project."""
-    folder = Path(folder)
-    folder.mkdir(parents=True, exist_ok=True)
-    for path in (Path(project) / ".gov-runtime").glob("store.db*"):
-        shutil.copy2(path, folder / path.name)
-    return str(folder)
-
-
-def put_state(project, state):
-    """The project put into ``state`` (``{"branch", "store"}``), as the stand-in does before a computation."""
-    if state.get("branch"):
-        git(project, "checkout", "-q", "--force", state["branch"])
-    runtime = Path(project) / ".gov-runtime"
-    for path in runtime.glob("store.db*"):
-        path.unlink()
-    for path in sorted(Path(state["store"]).iterdir()):
-        shutil.copy2(path, runtime / path.name)
-
-
-def context_check_in_states(box, project, states, target=None):
-    """The check as its declaration says, with the stand-in putting the project into ``states`` in turn before each
-    computation of a ticket (only ``target``'s, when given; README, "W2-04 (DEC-1005)")."""
-    return context_check(box, project, "states", target, W254_STATES=json.dumps(states))
-
-
-def context_run(box, project, ticket_id, *extra, env=None):
-    """``gov context --json --root <project> [extra] <ticket>``: the run, whatever its outcome."""
-    return gov(box, "context", "--json", "--root", project, *[str(part) for part in extra], ticket_id,
-               env=env or box.env())
-
-
-def packet_of(done):
-    envelope = done.envelope()
-    assert done.returncode == 0 and envelope.get("ok") is True and isinstance(envelope.get("result"), dict), \
-        f"gov context did not succeed\n{done.describe()}"
-    return envelope["result"]
-
-
-def refused_over_ceiling(done, ticket_id, limit):
-    """W2-04's S2: ``ok: false``, ``CONTEXT_OVER_CEILING``, a non-zero exit, the details naming the ticket and limit."""
-    envelope = done.envelope()
-    assert envelope.get("ok") is False, (f"a budget of {limit} is below the mandatory inputs and gov context gave "
-                                         f"ok: true with tokens {(envelope.get('result') or {}).get(K_TOKENS)}")
-    error = envelope.get("error") or {}
-    assert error.get("code") == OVER_CEILING, f"expected {OVER_CEILING}, got {error.get('code')!r}\n{done.describe()}"
-    assert done.returncode != 0, f"the refusal exits 0\n{done.describe()}"
-    details = error.get("details") or {}
-    assert details.get("ticket") == ticket_id and details.get("limit") == limit, details
-    return envelope
-
-
-def batch_items(packet):
-    """The packet's ``supplementary_batches`` items taken together, in order: ``[(id, path), ...]`` (W2-04's S7a)."""
-    found = packet.get(K_BATCHES)
-    assert isinstance(found, list) and all(isinstance(entry, dict) and isinstance(entry.get("items"), list)
-                                           for entry in found), f"the packet has no list `{K_BATCHES}`: {found!r}"
-    return [(item.get("id"), item.get("path")) for entry in found for item in entry["items"]]
-
-
-def stacked(packet):
-    return [(item.get("id"), item.get("path")) for item in packet[K_SUPPLEMENTARY]]
-
-
-def fixed_part(packet):
-    """The packet's own count less its supplementary items: the ticket's text and its mandatory inputs."""
-    return int(packet[K_TOKENS]) - sum(int(item["tokens"]) for item in packet[K_SUPPLEMENTARY])
-
-
-def room_for_all(box, project, ticket_id):
-    """A budget with room for the ticket's text, its mandatory inputs and every item of its evidence, from the
-    packet's own figures: the default ceiling's packet, or, where the mandatory inputs alone are over it, its
-    refusal's ``mandatory_tokens``; plus the ticket's text, plus four times the text of every file of the project."""
-    envelope = context_run(box, project, ticket_id).envelope()
-    if envelope.get("ok") is True:
-        packet = envelope["result"]
-        assert packet[K_TOKENS] <= packet[K_BUDGET]["limit"], (
-            f"{ticket_id}: ok: true with tokens {packet[K_TOKENS]} over its ceiling of {packet[K_BUDGET]['limit']} "
-            f"(W2-04, S2: the mandatory inputs alone over the ceiling refuse with {OVER_CEILING})")
-        known = fixed_part(packet)
-    else:
-        error = envelope.get("error") or {}
-        assert error.get("code") == OVER_CEILING, f"{ticket_id}: refused with {error.get('code')!r}: {error}"
-        known = int(error["details"]["mandatory_tokens"])
-    project = Path(project)
-    every = sum(tokens(path.read_text(encoding="utf-8", errors="replace")) for path in project.rglob("*")
-                if path.is_file() and not {".git", ".gov-runtime"} & set(path.relative_to(project).parts))
-    return known + tokens((project / ".tickets" / f"{ticket_id}.md").read_text(encoding="utf-8")) + 4 * every
-
-
-def pressure_budget(box, project, ticket_id):
-    """``(budget, packet with room for all)``: a budget the mandatory inputs fit under with room for the first half of
-    the evidence the packet with room for all stacks (every item read and stacked, in rank order)."""
-    everything = packet_of(context_run(box, project, ticket_id, "--budget", room_for_all(box, project, ticket_id)))
-    items = everything[K_SUPPLEMENTARY]
-    assert len(items) >= 2 and everything.get(K_FURTHER) == [], (
-        f"{ticket_id} with room for all: {len(items)} items stacked, `{K_FURTHER}` {everything.get(K_FURTHER)!r}")
-    return fixed_part(everything) + sum(int(item["tokens"]) for item in items[:len(items) // 2]), everything
 
 
 # --------------------------------------------------------------------------
@@ -988,8 +636,8 @@ def green_here_check(environ=None):
 # The embedder is reached over HTTP at OLLAMA_HOST (Ollama's /api/tags and /api/embed). The stand-in below answers
 # that interface on a loopback port and behaves as the real embedder was measured to: a text embedded right after a
 # *different* text gets a slightly different vector; a text embedded right after itself gets its own vector again.
-# Everything is observed through the semantic facet's public search, the retrieval's public entry, `gov context`
-# and the context check; nothing names where or how a vector is kept.
+# Everything is observed through the semantic facet's public search and the retrieval's public entry; nothing names
+# where or how a vector is kept.
 
 SEMANTIC_MODULE = "gov.retrieval.semantic"
 RETRIEVE_MODULE = "gov.retrieval.retrieve"
@@ -1317,7 +965,7 @@ def home_files(box):
     return sorted(path.relative_to(home).as_posix() for path in home.rglob("*") if path.is_file())
 
 
-# Tickets whose questions differ: each ticket's context asks the retrieval its own question.
+# Tickets whose questions differ: each ticket's title is its own question to the retrieval.
 QUESTION_TICKETS = {
     "TK-W254-BAKERY": "Sourdough loaf scoring by the baker",
     "TK-W254-TIDES": "Harbour tide tables read by the pilot",

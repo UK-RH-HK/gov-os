@@ -1,5 +1,9 @@
-"""Failure line 1: the integration branch never advances after a red, a red on the base too, a G-1 refusal, or a
-head that moved during the run (README, "The planted runs": red, unexplained, authors_alone, moved)."""
+"""Failure line 1: the integration branch never advances after a red, a G-1 refusal, or a head that moved during the
+run, and advances only to the tested merge with its close commits (README, "The planted runs": red, base_red,
+authors_alone, moved).
+
+A red that is red on the base too no longer refuses the batch (``BATCH_UNEXPLAINED``): by DEC-1214 L2, Q-CLOSE
+(W2-202 A1) it is a known base red, recorded in the landed ticket's close record, and the ticket lands."""
 
 from __future__ import annotations
 
@@ -23,21 +27,26 @@ def test_a_red_run_does_not_move_the_integration_branch(landing):
 
 
 @pytest.fixture(scope="module")
-def unexplained(landing):
-    return landing("unexplained")
+def base_red(landing):
+    return landing("base_red")
 
 
-def test_a_red_on_the_base_too_is_batch_unexplained_and_moves_nothing(unexplained):
-    error = support.refusal(unexplained.run, "BATCH_UNEXPLAINED", support.EXIT_NOT_ALL_LANDED)
-    reds = (error.get("details") or {}).get("reds") or []
-    assert support.KNOWN_RED_NODE in reds, f"the error's details do not name the red: {error.get('details')}"
-    assert_not_moved(unexplained)
-    assert support.status_at(unexplained.root, "main", A.id) == "open"
+def test_a_red_on_the_base_too_is_a_known_base_red_and_the_branch_moves_only_to_the_tested_merge(base_red):
+    """Rewritten for DEC-1214 L2, Q-CLOSE (W2-202 A1): it asserted ``BATCH_UNEXPLAINED`` and an unmoved branch."""
+    result = support.answer(base_red.run, support.EXIT_LANDED)
+    assert result.get("landed") == [A.id] and result.get("culprits") == [], f"landed: {result.get('landed')}"
+    closes = support.assert_landed_through_close_commits(base_red, result, "main", base_red.old_head)
+    assert list(closes) == [A.id]
+    assert support.status_at(base_red.root, "main", A.id) == "closed"
+    front = support.close_record(base_red, result["head"], A.id)
+    verdicts = [r.get("verdict") for r in front.get("reds") or [] if r.get("test") == support.KNOWN_RED_NODE]
+    assert verdicts == ["base"], f"the close record does not hold the base red: {front.get('reds')}"
+    assert front.get("base_reds") == [support.KNOWN_RED_NODE], f"base_reds: {front.get('base_reds')!r}"
 
 
-def test_unexplained_closed_exactly_when_merged(unexplained):
-    support.envelope(unexplained.run)
-    support.assert_closed_iff_merged(unexplained, "main")
+def test_base_red_closed_exactly_when_merged(base_red):
+    support.envelope(base_red.run)
+    support.assert_closed_iff_merged(base_red, "main")
 
 
 def test_a_g1_refusal_moves_nothing(landing):

@@ -26,6 +26,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 
 REGISTER = "docs/DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the register the clean-up marked, archived whole; REGISTER keeps the decisions in force
+OLD_REGISTER = "docs/archive/DECISION_REGISTER-2026-11-19.md"
 ARCHIVE = "governance/project/orchestration/ARCHIVE-SUPERSEDED.md"
 IN_FORCE = "governance/project/orchestration/DECISIONS-IN-FORCE.md"
 IN_FORCE_AT_HEAD = "docs/emergency-2/archive/DECISIONS-IN-FORCE.md"  # archived as history (EMERGENCY-2 11.1)
@@ -45,15 +47,6 @@ W2_92_ADOPTION = "3679ca0ba"
 AUDIT_HEADS = {FIRST: "2f9c80b1f", SECOND: "ce7f10eb8a2a"}
 EIGHT = [("DEC-853", "DEC-884"), ("DEC-1050", "DEC-1057"), ("DEC-120", "DEC-173"), ("DEC-724", "DEC-860"),
          ("DEC-056", "DEC-017"), ("DEC-072", "DEC-064"), ("DEC-162", "DEC-156"), ("DEC-1053", "DEC-880")]
-# Pairs (changed, changer) that gov links reports now and the clean-up's head did not: the owner's approvals after it
-# put a ``Changes:`` mark on an older entry. DEC-1211 (EMERGENCY-2.md v3 approved) marks DEC-1205, DEC-1207 (2),
-# DEC-1203 (1), DEC-820, DEC-313, DEC-314, DEC-1082 and DEC-1128; DEC-1212 (the model rule) marks DEC-1120's table
-# and DEC-1183 (4). They are real changes the owner approved, not drift to repair. Only the two cases that read the
-# live head accept them; the record's judged-wrong and drift-run blocks stay pinned to the clean-up's own head.
-OWNER_APPROVED_AFTER = {("DEC-313", "DEC-1211"), ("DEC-314", "DEC-1211"), ("DEC-820", "DEC-1211"),
-                        ("DEC-1082", "DEC-1211"), ("DEC-1128", "DEC-1211"), ("DEC-1203", "DEC-1211"),
-                        ("DEC-1205", "DEC-1211"), ("DEC-1207", "DEC-1211"), ("DEC-1120", "DEC-1212"),
-                        ("DEC-1183", "DEC-1212")}
 BLOCKS = ["commits", "ids-87", "census", "archive-13", "judged-wrong", "audits", "comparison", "patch-a0",
           "patch-a1", "patch-a2", "patch-b1", "patch-sources-2", "patch-marks-3", "trailer-residuals", "recount",
           "drift", "drift-run", "counts-before", "counts-after", "closed-missing", "no-record", "dec-1123-linked",
@@ -276,9 +269,13 @@ def classify(old: str, new: str) -> tuple[str, str]:
     return "other", ""
 
 
-def register_delta(old_rev: str, new_rev: str) -> dict:
-    """The register at two commits compared entry by entry: the ids, the masked text and each changed status line."""
-    old_text, new_text = show(old_rev, REGISTER), show(new_rev, REGISTER)
+def register_delta(old_rev: str, new_rev: str, path: str = REGISTER) -> dict:
+    """The register at two commits compared entry by entry: the ids, the masked text and each changed status line.
+    ``path`` is the register's (``REGISTER``) or the archived old register's (``OLD_REGISTER``); a commit that does not
+    hold the file (the archive before the register's move) compares as other ids, with no change."""
+    old_text, new_text = show(old_rev, path), show(new_rev, path)
+    if old_text is None or new_text is None:
+        return {"same_ids": False, "masked_equal": False, "changes": []}
     old_entries, new_entries = entries(old_text), entries(new_text)
     result = {"same_ids": [e[0] for e in old_entries] == [e[0] for e in new_entries],
               "masked_equal": mask_status(old_text) == mask_status(new_text), "changes": []}
@@ -664,9 +661,65 @@ def variant_register(commit: str) -> str:
     return "\n".join(lines)
 
 
+def whole_register(tree: Path) -> str | None:
+    """The register whole, as the clean-up marked it, where ``tree`` has archived it (EMERGENCY-2 11.3, DEC-1214 G4):
+    the archive's text under its first line, each entry's status line the kept register's own where the register still
+    holds the entry (a mark added after the move is added there), and the entries only the register holds (the
+    decisions since) after it. None where ``tree`` holds no archive: its register is whole."""
+    archive = tree / OLD_REGISTER
+    if not archive.is_file():
+        return None
+    lines = archive.read_text(encoding="utf-8").split("\n")[1:]
+    kept_text = (tree / REGISTER).read_text(encoding="utf-8")
+    kept = {entry: line for entry, _, line in entries(kept_text)}
+    for entry, index, _ in entries("\n".join(lines)):
+        if entry in kept:
+            lines[index] = kept[entry]
+    held = set(re.findall(r"(?m)^### (DEC-\d+)\b", "\n".join(lines)))
+    later = [chunk for chunk in re.split(r"(?m)^(?=### DEC-\d+\b)", kept_text)[1:]
+             if re.match(r"### (DEC-\d+)\b", chunk).group(1) not in held]
+    return "\n".join(lines) + ("\n\n" + "".join(later) if later else "")
+
+
 def commit_all(tree: Path, message: str) -> None:
     git("add", "-A", cwd=tree)
     git("commit", "-q", "-m", message, cwd=tree)
+
+
+def owner_decided(line: str) -> bool:
+    """Whether a status line records the owner's decision: ``ACCEPTED (owner`` or a ``Decided-by: owner`` trailer."""
+    rest = line[len(PFX):] if line.startswith(PFX) else line
+    return rest.startswith("ACCEPTED (owner") or re.search(r"Decided-by: owner\b", line) is not None
+
+
+def not_owner_marked(pairs, register_text: str) -> list[tuple[str, str]]:
+    """The ``(changed, changer)`` pairs whose changer is not recorded as the owner's decision in ``register_text``.
+
+    A pair whose later decision (the changer) is the owner's is a marked change by rule: the owner approved the
+    change when he decided. A changer the register does not hold counts as not the owner's."""
+    lines = {entry: line for entry, _, line in entries(register_text)}
+    return sorted(pair_ for pair_ in pairs if not owner_decided(lines.get(pair_[1], "")))
+
+
+CLASS_SEGMENT = " \u00b7 **Class:**"
+
+
+def outside_marks_problem(old: str, new: str, census_ids) -> str | None:
+    """Why a status-line change made outside a marks commit is refused, or ``None`` when it is allowed.
+
+    It must keep the old line whole (an append) and its appended tail must name none of ``census_ids`` (the census
+    changers of that entry). The ids inside the appended `` \u00b7 **Class:** ...`` segment (from that text to the end of
+    the line, the form ``docs/emergency-2/audits/08-apply.py`` writes) are audit 8's classification of the entry
+    (DEC-1214 G4), not a clean-up mark, and do not count."""
+    if not new.startswith(old):
+        return "edited outside a marks commit, not an append"
+    tail = new[len(old):]
+    cut = tail.find(CLASS_SEGMENT)
+    if cut != -1:
+        tail = tail[:cut]
+    if set(ids_in(tail)) & set(census_ids):
+        return "a census pair marked outside a marks commit"
+    return None
 
 
 def by_pair(findings: list[dict], code: str = "UNMARKED_CHANGE") -> dict:

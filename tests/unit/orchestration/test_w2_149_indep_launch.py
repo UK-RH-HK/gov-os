@@ -609,7 +609,7 @@ def test_dry_build_writes_the_wall_by_rule(w):
     s = json.loads((wall / ".claude" / "settings.json").read_text())
     m = json.loads((wall / "WALL.json").read_text())
     walls = str(w.sets / WALLS)
-    need = ["Bash", "WebFetch", "WebSearch", "Task", "Agent", "Bash(gov retrieve *)", "Bash(gov context *)",
+    need = ["Bash", "WebFetch", "WebSearch", "Task", "Agent", "Bash(gov retrieve *)", "Bash(gov context *)",  # DEC-1214 M1: the wall template's deny of the retired command (governance/, a non-goal)
             "Bash(git *)", f"Read(/{m['runs']}/**)", f"Read(/{m['home']}/.claude/**)", f"Read(/{m['repo']}/**)",
             f"Read(/{w.sets}/runs/**)", f"Read(/{w.sets}/transcripts/**)", f"Read(/{w.sets}/fixtures/**)",
             f"Read(/{walls}/APPROVED)", f"Edit(/{wall}/.claude/**)", f"Edit(/{tree}/**)",

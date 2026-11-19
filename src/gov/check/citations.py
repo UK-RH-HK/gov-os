@@ -19,6 +19,7 @@ VERSION = "1.2.0"
 
 CITATION = re.compile(rf"\b(?:{DECISION_ID.pattern})\b")  # the kernel's decision_id grammar, as a whole word
 REGISTER_KEY, BASE_KEY = "decision_register", "decision_citations_base"
+ARCHIVE_KEY = "decision_register_archive"  # W2-203: the archived register, whose ids a commit may still cite
 # DEC-473: a level-3 heading at the start of a line, the id, a space, a colon or a dash, and the title. The check
 # counts entries by the store's rule (register_entries); gov close's lookup of an owner's entry reads these two.
 ENTRY = re.compile(r"### (DEC-[0-9]+)(?=[ :\-–—])[ \t:\-–—]*[^\s:\-–—]")
@@ -36,14 +37,15 @@ def _decision(front: dict) -> str:
     return record_id if valid else ""
 
 
-def _configured(root: Path) -> tuple[str | None, str | None]:
-    """The register file and the base commit the project's path map names; None for the one it does not name."""
+def _configured(root: Path) -> tuple[str | None, str | None, str | None]:
+    """The register file, the base commit and the archived register the project's path map names; None for the
+    one it does not name."""
     path_map = load_config(root).get("path-map.yaml", {})
-    for key in (REGISTER_KEY, BASE_KEY):
+    for key in (REGISTER_KEY, BASE_KEY, ARCHIVE_KEY):
         if key in path_map and not (isinstance(path_map[key], str) and path_map[key].strip()):
             raise GovError("CITATIONS_CONFIG_INVALID", f"{PROJECT_DIR}/path-map.yaml: key '{key}' must be a "
                            "string that is not empty (a commit id of digits alone is written in quotes)")
-    return path_map.get(REGISTER_KEY), path_map.get(BASE_KEY)
+    return path_map.get(REGISTER_KEY), path_map.get(BASE_KEY), path_map.get(ARCHIVE_KEY)
 
 
 def _after(root: Path, base: str) -> str:
@@ -81,9 +83,23 @@ def _entries(content: bytes) -> set[str] | None:
     return {entry["id"] for entry in register_entries(text)[0]}
 
 
-def _register(root: Path, objects: _Objects, commit: str, register: str | None) -> tuple[set[str], list[tuple]]:
-    """The decision ids recorded in the tree of ``commit`` by its decision files and by the file ``register``, and
-    ``(path, reason)`` of each Markdown file and of the named register that cannot be read there."""
+def _archived(content: bytes) -> set[str]:
+    """The ids an archived register holds by its entry headings (``gov.util.archive``); none where it is not text."""
+    from gov.util import archive
+
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return set()
+    return set() if "\0" in text else set(archive.ids_in(text))
+
+
+def _register(root: Path, objects: _Objects, commit: str, register: str | None,
+              archive: str | None = None) -> tuple[set[str], list[tuple]]:
+    """The decision ids recorded in the tree of ``commit`` by its decision files, by the file ``register`` and by the
+    file ``archive`` (the archived register, W2-203: its ids alone; a tree that does not hold it as a file of text
+    has none of them, and that is no finding), and ``(path, reason)`` of each Markdown file and of the named
+    register that cannot be read there."""
     recorded, unreadable = set(), []
     absent = register is not None
     for entry in _git(root, "ls-tree", "-r", "-z", commit).decode("utf-8", "replace").split("\0"):
@@ -98,6 +114,9 @@ def _register(root: Path, objects: _Objects, commit: str, register: str | None) 
                 unreadable.append((path, "the register is not a file of text"))
             else:
                 recorded |= entries
+        if path == archive and path != register and mode.startswith("100"):
+            recorded |= _once(objects, ("archived", blob),
+                              lambda: _archived(_content(objects, blob, commit, path)))
         if not path.endswith(".md"):
             continue
         if blob not in objects.known:  # the id a file records, "" for none, None where it cannot be read
@@ -130,12 +149,12 @@ def check(root: Path) -> list[dict]:
     findings = []
     objects = _Objects(root)
     try:
-        register, base = _configured(root)
+        register, base, archive = _configured(root)
         for commit, message in _commits(root, base):
             cited = sorted({match.group(0) for match in CITATION.finditer(message)})
             if not cited:
                 continue
-            recorded, unreadable = _register(root, objects, commit, register)
+            recorded, unreadable = _register(root, objects, commit, register, archive)
             if unreadable:  # the register of this commit is not known: its citations are not judged
                 findings += [{"code": "REGISTER_UNREADABLE", "commit": commit, "path": path,
                               "message": f"{path} at {commit[:12]}: {reason}"}

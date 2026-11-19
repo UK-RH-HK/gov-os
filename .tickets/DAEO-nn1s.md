@@ -1,6 +1,6 @@
 ---
 id: DAEO-nn1s
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-r9ss, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-swdu, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-0pyc, DAEO-lrre, DAEO-6n5k, DAEO-6ox0, DAEO-ha8z, DAEO-kl5e, DAEO-egsy, DAEO-siiz, DAEO-7rr2, DAEO-0rfi, DAEO-arrl, DAEO-wnnz, DAEO-cy5o, DAEO-5j8b, DAEO-kh9l, DAEO-cv58, DAEO-ecac, DAEO-iw1f, DAEO-h2k3, DAEO-juee, DAEO-pl6k, DAEO-0uhh, DAEO-e82f, DAEO-c1uz, DAEO-9nys, DAEO-2gc7, DAEO-rmbe, DAEO-uzme, DAEO-e8f0, DAEO-ye2a, DAEO-qty6, DAEO-2azm, DAEO-ebmh, DAEO-tgk2, DAEO-b6hm, DAEO-l78m, DAEO-4k3l, DAEO-m1u3, DAEO-gdzh, DAEO-s9qc, DAEO-jsg1, DAEO-2bdu, DAEO-8lmb, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-g87r, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2]
 links: []
 created: 2026-10-16T16:35:12Z
@@ -135,3 +135,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-46), as approved (DEC-729). The list row
   - `gov doctor` green here and in EXAMIN.
 
 **Re-pointed 2026-11-16 by DEC-1202 (EXIT-PROOF yes):** EXAMIN's adoption left Wave 2 (DEC-1201); its two EXAMIN lines now read the proof on adopted repositories, W2-81's S-RERUN (the full re-run on release 0.1.1 across six repositories), and its four EXAMIN deps (W2-27 to W2-30) are dropped.
+
+**Closed on its record, 2026-11-19 13:10 (the CTO, at the owner's word of 2026-11-19: "Close W2-00, W2-15b, W2-46, W2-47 and W2-82 on their records"; EMERGENCY-2 6.2, A-4):** W2-46, the Wave 2 exit run, is replaced by the release acceptance of EMERGENCY-2 §8.2 (the re-baselined Contract's checks, the proving run on the synthetic repositories, EXAMIN's copy adopted on the release with memory at 95 % or better on a fresh 80, one EXAMIN feature ticket through the flow). Nothing is built for this ticket.

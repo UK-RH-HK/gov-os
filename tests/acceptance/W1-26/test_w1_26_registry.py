@@ -1,4 +1,5 @@
-"""KPI S7 (CAP-38.b): the check registry names all 17 governance test families.
+"""KPI S7 (CAP-38.b): the check registry names all the governance test families (17; 16 since DEC-1214 M1 retired
+the context family with the context command, W2-200).
 
 Every declared check runs; absent families are reported by name, never silently
 missing. This ticket registers 7 core checks; 3 are already declared by other
@@ -13,11 +14,14 @@ import w1_26_support as support
 
 
 # --------------------------------------------------------------------------
-# All 17 families named
+# All the families named
 # --------------------------------------------------------------------------
 
-def test_all_17_families_named_in_result(project, sandbox, interface):
-    """The check result names all 17 governance test families."""
+def test_all_families_named_in_result(project, sandbox, interface):
+    """The check result names every governance test family of the list.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): was ``test_all_17_families_named_in_result``; the context family is retired
+    with its one check, so the list holds sixteen; what is asserted of each family is unchanged."""
     project.add_core_declarations()
     project.commit()
     run = support.run_check(project, sandbox)
@@ -26,15 +30,19 @@ def test_all_17_families_named_in_result(project, sandbox, interface):
     support.assert_all_families_named(result)
 
 
-def test_exactly_17_families(project, sandbox, interface):
-    """The result names exactly 17 families, no more, no fewer."""
+def test_exactly_the_sixteen_families(project, sandbox, interface):
+    """The result names exactly the families of the list, sixteen, no more, no fewer.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): was ``test_exactly_17_families``; the context family is retired with its one
+    check (the context command's), so the result names sixteen and none of them is the context family."""
     project.add_core_declarations()
     project.commit()
     run = support.run_check(project, sandbox)
     envelope = support.envelope_of(run, interface)
     result = envelope.get("result") or envelope.get("error", {}).get("details", {})
     families = support.families_of(result)
-    assert len(families) == 17, f"expected 17 families, got {len(families)}: {sorted(families)}"
+    assert len(families) == 16 == len(support.FAMILIES), f"expected 16 families, got {len(families)}: {sorted(families)}"
+    assert sorted(families) == sorted(support.FAMILIES), f"not the families of the list: {sorted(families)}"
 
 
 # --------------------------------------------------------------------------

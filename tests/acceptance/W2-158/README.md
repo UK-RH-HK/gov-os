@@ -47,7 +47,7 @@ parameter runs). Today `--structural` is an unrecognised argument of `gov check`
 | S3 (exit 2 only when it could not run; the reason on stderr) | `test_w2_158_exit.py::test_s3_a_folder_that_is_no_git_work_tree_gives_exit_2_with_the_reason_on_stderr`, `test_w2_158_exit.py::test_s3_a_path_that_does_not_exist_gives_exit_2`, `test_w2_158_exit.py::test_s3_a_folder_inside_a_work_tree_but_not_its_top_gives_exit_2`, `test_w2_158_exit.py::test_s3_a_work_tree_with_no_commit_gives_exit_2` | exit 2 already, but the stderr is argparse's "unrecognized arguments", not `gov check: structural pass could not run: ...` |
 | S3 (usage errors) | `test_w2_158_exit.py::test_s3_a_timeout_that_is_not_a_number_above_zero_is_a_usage_error` (5: `0`, `-1`, `=-3`, `abc`, empty), `test_w2_158_exit.py::test_s3_structural_with_list_is_a_usage_error`, `test_w2_158_exit.py::test_s3_a_base_without_structural_is_a_usage_error` | exit 2 already; red because the error must not be "unrecognized arguments" (an option's own value error or a refused combination never says it) and, for the base case, `--structural <base>` must run |
 | S3 (L8: the module's declarations; the plain command as before) | `test_w2_158_exit.py::test_s3_the_module_declares_a_child_exit_code_and_keeps_its_exit_codes` (`CHILD_EXIT_CODE is True`, `EXIT_CODES == {3: "checks failed"}`), `test_w2_158_exit.py::test_s3_check_list_still_lists_the_declarations_as_before` | the first: `CHILD_EXIT_CODE` missing. The second is **green today** by design (guards `--list`) |
-| S3 / F1 (no commit, close, landing or launch code calls it) | `test_w2_158_exit.py::test_s3_and_f1_no_commit_close_landing_or_launch_code_calls_the_pass` (text search of `src/gov/close`, `src/gov/launch`, `src/gov/queue` where they exist, at least one must; patterns `gov.check.structural`, `from gov.check import ... structural`, `import structural`, `--structural`, `run_structural`, `check.structural`) | **green today** by design (nothing calls it yet): it guards the code the engineer adds |
+| S3 / F1 (no commit, close, landing or launch code calls it to decide a refusal) | `test_w2_158_exit.py::test_s3_and_f1_no_commit_close_landing_or_launch_code_calls_the_pass` (text search of `src/gov/close`, `src/gov/launch`, `src/gov/queue` where they exist, at least one must; patterns `gov.check.structural`, `from gov.check import ... structural`, `import structural`, `--structural`, `run_structural`, `check.structural`; one caller allowed since W2-206, the landing's after-step module in the queue, named in "The landing's after-step" below) | **green today** by design (nothing calls it yet): it guards the code the engineer adds. Red on the tree W2-206 landed in, before the revision of 2026-11-19: "code of close, launch or queue refers to the structural pass: src/gov/queue/after.py:8 ..." |
 | S4 (portability only on a kernel change, or an unresolved base) | `test_w2_158_base.py::test_s4_a_change_under_the_kernels_roles_skills_hooks_or_rulesync_runs_portability` (4 paths), `test_w2_158_base.py::test_s4_a_change_elsewhere_skips_portability_naming_why` (5: docs, src, `roles-old/`, `kernel/checks/`, `.rulesync-old/`), `test_w2_158_base.py::test_s4_a_kernel_change_in_an_earlier_commit_of_the_range_counts`, `test_w2_158_base.py::test_s4_a_change_before_the_base_does_not_count`, `test_w2_158_base.py::test_s4_a_base_may_be_any_git_revision`, `test_w2_158_base.py::test_s4_a_base_that_does_not_resolve_runs_portability` | same |
 | S4 (without a base, both left out and named) | `test_w2_158_base.py::test_s4_without_a_base_portability_and_links_are_left_out_and_named` | same |
 | S4 (links: ok, NOTICE, cannot run, not measured, no folder; after the others; the mark) | `test_w2_158_base.py::test_s4_links_with_nothing_new_reads_ok_with_the_standing_count_and_ran_after_the_others` (nine started checks, links started after the latest end; its arguments, working folder, `PYTHONPATH`; the mark), `test_w2_158_base.py::test_s4_links_with_new_findings_is_a_notice_with_the_first_findings_and_exit_0`, `test_w2_158_base.py::test_s4_a_links_that_cannot_run_is_a_notice_with_its_last_line`, `test_w2_158_base.py::test_s4_a_links_past_the_bound_is_not_measured`, `test_w2_158_base.py::test_s4_a_tree_without_src_gov_links_reads_skipped_naming_why` | same |
@@ -56,6 +56,33 @@ parameter runs). Today `--structural` is an unrecognised argument of `gov check`
 | F2 (a timed-out family reads ok or red) | `test_w2_158_run.py::test_f2_a_timed_out_family_is_a_notice_never_ok_and_never_a_failure_exit`, `test_w2_158_run.py::test_f2_every_family_timing_out_together_ends_within_one_bound_and_exits_0`; also `test_w2_158_run.py::test_s1_a_check_past_the_bound_is_killed_at_the_bound_with_what_it_started`, `test_w2_158_run.py::test_s2_each_state_reads_as_stated`, `test_w2_158_base.py::test_s4_a_links_past_the_bound_is_not_measured` | same |
 | F3 (a check run that is not the tree's declaration) | `test_w2_158_declared.py::test_f3_the_declared_marker_runs_and_no_built_in_command_does` (only `core-schema` declared, the nine built-in stand-ins present: the marker ran, seven families and portability `skipped (no declaration)`, no stand-in ran, with and without a base), `test_w2_158_declared.py::test_f3_a_tree_with_no_declaration_at_all_reads_every_family_as_skipped`, `test_w2_158_declared.py::test_f3_a_declaration_under_governance_kernel_checks_is_used_when_the_template_layout_has_none_and_the_templates_wins`, `test_w2_158_declared.py::test_f3_a_declaration_that_cannot_be_read_makes_only_its_own_family_a_notice_naming_the_file` (4: unparsable YAML, no command, a non-string command, a list) | same |
 | F4 (any change outside the paths) | `test_w2_158_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths` | **green today**: it guards a clean branch (the diff against the merge-base with `w2/integrate` lists only this folder). It judges only this ticket's own branch: on any branch other than `w2/W2-158` and `w2/W2-158-tests` it **skips**, naming why (DECIDED-NOT-DONE row 171) |
+
+## The landing's after-step (DEC-1214 L2; L2-COMMANDS §2 step 8, §3 A8; W2-206)
+
+Revised 2026-11-19. S3 always read "a landing may call it after the fact and log its lines"; the case was written
+stricter (no reference at all) while no caller existed. DEC-1214 L2 decides the one caller: after a landing has moved
+the branch, `gov queue` runs `gov check --structural <base>` as a notice (`src/gov/queue/after.py`, W2-206 A8), which
+never changes the exit code or the landed branch.
+`test_w2_158_exit.py::test_s3_and_f1_no_commit_close_landing_or_launch_code_calls_the_pass` (lines S3 and F1) now
+allows that one file to refer to the pass and is red for each of these:
+
+- any other file under `src/gov/close`, `src/gov/launch` or `src/gov/queue` that matches one of the patterns (the
+  queue's command, its dry run and its full run included);
+- any file under `src/gov/close` or `src/gov/launch` that refers to the after-step (`gov.queue.after`,
+  `from gov.queue import ... after`, `queue.after`): the pass reached before a commit or inside the close's gates by
+  another door;
+- an after-step whose code holds a `raise`, an `assert` or a call that ends the process (read from the syntax tree):
+  its results are notices, so it has nothing to refuse with;
+- W2-206's cases for A8 S2 and A8 F1 gone or skipped. The search cannot see when the pass runs or what its result
+  changes; these three cases of `tests/acceptance/W2-206/test_w2_206_after.py` hold it on a planted landing, and the
+  allowance stands only while they stand:
+  `test_the_structural_pass_ran_once_after_the_move_with_the_landing_s_base` (once, with the branch already at the
+  landed head), `test_a_structural_pass_that_exits_2_is_a_notice_and_the_landing_stands` (exit 0, the branch at the
+  landed head) and `test_a_landing_that_landed_nothing_runs_neither_after_step`.
+
+With no caller at all the case is green, as on W2-158's own base. Each state above was planted in a scratch copy of
+the three source folders and W2-206's folder and turned the case red (12 plants); a comment that merely says "after"
+on an import line of the close stays green.
 
 ## State today (the base: `w2/W2-158-tests` at its claim commit)
 

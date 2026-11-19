@@ -89,8 +89,6 @@ def findings_held(findings: list[str]) -> int:
 
 def open_repair_ticket(root: Path, ticket: str, findings: list[str],
                        disposition: str | None = None,
-                       context_hash: str | None = None,
-                       context_reason: str | None = None,
                        not_measured: list[str] | None = None) -> str:
     """Open the repair ticket of a refused close through the ticket tool: its
     parent and its findings with ``tk create``, its dependency on ``ticket``
@@ -100,7 +98,7 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     import hashlib
     from gov.tasks.tickets import TICKETS_REL
 
-    # A short fingerprint, which no reader takes for the context hash (64 digits) a repair ticket may carry
+    # A short fingerprint of the findings, by which a repeated identical refusal finds its ticket again
     fingerprint = "findings-" + hashlib.sha256("\n".join(sorted(set(findings))).encode("utf-8")).hexdigest()[:16]
     again = _open_repair_of(root, ticket, fingerprint)
     if again:  # a repeated identical refusal reuses its repair ticket (W2-M252)
@@ -115,8 +113,6 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     if not_measured:
         description.append("Not measured by that close:")
         description += [f"- {part}" for part in not_measured]
-    if context_reason:
-        description.append(f"The class was given without whole-system context: {context_reason}")
     try:
         created = tk(root, "create", f"Repair {ticket}: {findings[0][:60]}",
                      "--parent", ticket, "-d", "\n".join(description))
@@ -126,10 +122,8 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     path = Path(root) / TICKETS_REL / f"{repair_id}.md"
 
     # What tk has no option for, as lines of the frontmatter tk wrote (as
-    # gov.tasks.tickets.create adds state_class): the class and the context hash.
+    # gov.tasks.tickets.create adds state_class): the class.
     fields = ["state_class: AUTHORITATIVE", f"disposition: {disposition or 'unclassed'}"]
-    if context_hash:
-        fields.append(f"context_hash: {context_hash}")
     try:
         fields += _contract(root, ticket, findings[:held], fingerprint)
         lines = path.read_text(encoding="utf-8").split("\n")

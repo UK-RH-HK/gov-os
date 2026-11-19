@@ -13,7 +13,7 @@ the CPU embedder at the address the setting ``GOV_QUERY_OLLAMA_HOST`` names (an 
 does is held by ``test_w2_54_shared_gpu.py``, which the lead runs.
 
 Seen from outside, through public interfaces only: which stand-in a command asks, with what (its texts and its
-``options``), what ``/api/ps`` reports there; what a read answers (``gov retrieve --json``, ``gov context --json``,
+``options``), what ``/api/ps`` reports there; what a read answers (``gov retrieve --json``,
 ``gov.retrieval.semantic.search``); what is left on disk; what the stand-in executable was told when a read started it.
 No case names the code that does it.
 
@@ -108,7 +108,7 @@ def _no_option_and_on_gpu(shared):
 
 # ---- 1. query embeddings go to the CPU embedder, and only those ---------------------------------------------------
 
-# Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: ``gov context`` sends nothing to an embedder
+# Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: the context command sent nothing to an embedder
 # (P-W2-04-2 (A)), so the two questions its steps asked are asked through ``gov retrieve``: the tickets' titles.
 TITLE_TIDES, TITLE_BAKERY = S.QUESTION_TICKETS["TK-W254-TIDES"], S.QUESTION_TICKETS["TK-W254-BAKERY"]
 
@@ -119,18 +119,19 @@ def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_sh
     """*Red.* With the shared runner at OLLAMA_HOST and the CPU embedder at its address: four ``gov retrieve``, a
     semantic search and a retrieval through the public entry each send the CPU embedder at least one text to embed
     (the question) and send the shared runner none; the search's answer is the CPU embedder's vector (the kiln,
-    where the shared runner's would be the forge). Two ``gov context`` send neither embedder anything. No request to
-    the shared runner names a runner option, and its model stays on the GPU. Today every question goes to
+    where the shared runner's would be the forge). No request to the shared runner names a runner option, and its model stays on the GPU. Today every question goes to
     OLLAMA_HOST, with ``num_gpu: 0``.
 
     Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-2 (a): the search and the retrieval
     (steps 5 and 6) ask texts no earlier step asked (they asked QUESTION and OTHER again, whose vectors the cache
     rightly serves with no request), so each step has a text the CPU embedder has not embedded yet.
 
-    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: steps 3 and 4 were two ``gov context``, whose
-    question went to the embedder; ``gov context`` now sends none (W2-04's addendum, S4 and S7), so they are two
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: steps 3 and 4 were two reads of the context
+    command, whose question went to the embedder; it then sent none (W2-04's addendum, S4 and S7), so they are two
     ``gov retrieve`` of the two tickets' titles (the read that reaches the semantic route), held as every read is.
-    The two ``gov context`` stay, and add a guarantee: they send neither embedder a text."""
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the context command is retired, so the two context reads kept as a guard
+    ("they send neither embedder a text") are deleted; every other step and assertion is unchanged."""
     project = S.semantic_project(box, tmp_path / "p", shared, S.ticket_files(), cpu=cpu)
     assert shared.embed_requests() and not cpu.embedded(), \
         f"the premise: the index was built through the shared runner only (CPU embedder sent {cpu.embedded()[:2]})"
@@ -156,13 +157,6 @@ def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_sh
         assert len(cpu.embed_requests()) > to_cpu, f"`{what}` sent the CPU embedder nothing to embed"
     assert all(cpu.asked_for(text) >= 1 for text in (QUESTION, OTHER, TITLE_TIDES, TITLE_BAKERY, AGAIN_KILN,
                                                      AGAIN_OTHER)), "the questions never reached the CPU embedder"
-    for ticket_id in ("TK-W254-TIDES", "TK-W254-BAKERY"):
-        to_shared, to_cpu = len(shared.embed_requests()), len(cpu.embed_requests())
-        done = S.gov(box, "context", "--json", "--root", project, ticket_id, env=env)
-        assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
-        sent = [text[-60:] for stand_in, before in ((shared, to_shared), (cpu, to_cpu))
-                for request in stand_in.embed_requests()[before:] for text in request["texts"]]
-        assert not sent, f"`gov context {ticket_id}` sent an embedder texts to embed: {sent}"
     assert answer.get("available") is True and _nearest(answer) == [S.KILN], (
         f"the search's answer is not the CPU embedder's vector (the kiln): {S.hits_of(answer)[:2]}")
     assert not _chunks_in(cpu.embedded()), f"the CPU embedder was sent chunks: {_chunks_in(cpu.embedded())}"

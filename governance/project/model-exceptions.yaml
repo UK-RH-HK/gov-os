@@ -1,7 +1,15 @@
-# The owner's exceptions to the helper model rule (audit 09 decision 2); each: {subagent_type, model, decided}.
+# The owner's exceptions to the model rule (audit 09 decision 2; DEC-1212 (2)); each:
+# {subagent_type, model, decided, class?}. `model` is the alias `opus` or a model id; an entry that names Opus covers
+# every claude-opus-* model. `class: C3` limits the entry to C3 tickets.
 # C3 work (audit 4 Table 3: the kernel and the Contract, the landing and close, the memory measure and sets, release,
-# update and pin, the path map) runs its test designer and engineer on Opus (the owner, 2026-11-18: "Opus only for you
-# and C3 roles"; DEC-1214 K1). A lead names `model: opus` only for a C3 ticket's helpers; everything else is Sonnet.
+# update and pin, the path map) runs its test designer, engineer, independent auditor and QA engineer on Opus (the
+# owner, 2026-11-18: "Opus only for you and C3 roles"; DEC-1214 K1); everything else is Sonnet.
+# Read by one rule in two places (W2-201): the helper hook (.claude/hooks/agent_model.py), which finds the ticket in
+# the spawn prompt's line `Task: <ticket id>` and computes its class from governance/project/criticality.yaml, and
+# gov launch (src/gov/launch/model_exceptions.py) for a caller's `--model`. A fork (`subagent_type: fork`) is refused
+# by the hook unless an entry names `fork` here (DEC-1212 (4)).
 exceptions:
-  - {subagent_type: independent-test-designer, model: opus, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
-  - {subagent_type: engineer, model: opus, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
+  - {subagent_type: independent-test-designer, model: opus, class: C3, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
+  - {subagent_type: engineer, model: opus, class: C3, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
+  - {subagent_type: independent-auditor, model: opus, class: C3, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}
+  - {subagent_type: qa-engineer, model: opus, class: C3, decided: "DEC-1214 K1 (the owner, 2026-11-18)"}

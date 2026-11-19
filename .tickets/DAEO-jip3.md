@@ -1,6 +1,6 @@
 ---
 id: DAEO-jip3
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-nn1s]
 links: []
 created: 2026-10-16T16:35:12Z
@@ -56,3 +56,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-47), as approved (DEC-729). The list row
   - A fresh, read-only auditor gives a finding row to every Wave 2 covers item, every Contract v4.2 lite item, every AR line and every MR clause, against Contract v4.2 and the decisions.
   - The audit→repair loop runs on its findings under DEC-096.
   - The report commits through the hook.
+
+**Closed on its record, 2026-11-19 13:10 (the CTO, at the owner's word of 2026-11-19: "Close W2-00, W2-15b, W2-46, W2-47 and W2-82 on their records"; EMERGENCY-2 6.2, A-4):** W2-47, the Wave 2 exit audit with the audit-and-repair loop's tests, is replaced by the release acceptance of EMERGENCY-2 §8.2 and by DEC-1214 G6 (a fresh audit at the release acceptance and at adoption stages A5, AS, A7, A10; otherwise only for a red, a failed landing or a feature not working). Nothing is built for this ticket.

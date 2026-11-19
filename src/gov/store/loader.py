@@ -95,13 +95,20 @@ OF_TASK = "OF_TASK"  # a checkpoint or close record -> its ticket (task:)
 SUPERSEDES = "SUPERSEDES"  # a decision -> a decision it supersedes whole: the statement names ids alone
 AMENDS = "AMENDS"  # a decision -> a decision it changes in part: amendments, and supersessions of a part
 UNDER = "UNDER"  # a decision -> a decision it stands under (**Under:**)
+# W2-203 (EMERGENCY-2 11.3): the ids and headings of the archived register (the file the path map names under
+# ``ARCHIVE_KEY``), so that a decision id of the archive still resolves, as history. One row per entry heading of the
+# archive (a status line is not asked of history; an id under two headings is one id, its first heading); none where no archive is named or ``HEAD`` holds none (no refusal). A table of its own, out of the digest
+# like the titles and part of the schema version: an archive-only id is no record, no register entry and no edge.
+ARCHIVE_KEY = "decision_register_archive"
+ARCHIVE_TABLE = "archived_decisions"
+_TABLES[ARCHIVE_TABLE] = "id TEXT PRIMARY KEY, heading TEXT NOT NULL"
 LINK_TYPES = (CITES, OF_TASK, SUPERSEDES, AMENDS, UNDER)
 CITE_KEYS = ("sources", "closes", "decisions", "decisions_applied", "decisions_carried", "decisions_recorded",
              "decisions_read", "requirements_implemented")
 TASK_KEYS = ("task",)
 ALIAS_KEYS = ("wbs_id", "external-ref")  # a W2 id stands for the record whose frontmatter names it
 _DIGESTED = tuple(table for table in _TABLES
-                  if table not in (TITLES_TABLE, LINKS_TABLE))  # register_entries stays the last of them
+                  if table not in (TITLES_TABLE, LINKS_TABLE, ARCHIVE_TABLE))  # register_entries stays the last of them
 # W2-68: the one row of the load that built the store (its head, the head's two fingerprints, the kind of load),
 # kept out of the graph's tables and out of the digest, so the recovery-rebuild check (CAP-38.b) is unchanged.
 FINGERPRINTS_TABLE = "fingerprints"
@@ -168,16 +175,11 @@ def _register(root: Path, tree: dict) -> tuple[str, str] | None:
     return path, text
 
 
-def register_entries(text: str) -> tuple[list[dict], list[str]]:
-    """The live entries of a register's ``text``, and the reason each heading of the entry form is no entry.
-
-    A live entry is a heading of DEC-473's grammar outside fenced code blocks and HTML comments, whose first line
-    that is not blank is a status line with a word in capitals (W2-L221, W2-M145, W2-M106). Its ``span`` is its own
-    text, from its heading to the line before the next heading, without the blank lines that end it; its
-    ``content_hash`` is the sha256 of the span (AR-1). An id under two headings is no entry, named with both lines.
-    The store and the decision-citations check count entries by this one rule.
-    """
-    lines, ends, heads, fence, comment = text.split("\n"), [], [], None, False
+def _headings(lines: list[str]) -> tuple[list[int], list[int]]:
+    """``(ends, heads)`` of a register's lines, by number from 0: where an entry's text ends (every heading outside
+    fenced code blocks, a heading inside an HTML comment too) and the headings an entry may stand under (those
+    outside fenced blocks and HTML comments). The archive's ids are read by the same scan (``gov.util.archive``)."""
+    ends, heads, fence, comment = [], [], None, False
     for number, line in enumerate(lines):
         mark = _FENCE.match(line)
         if fence is not None:
@@ -195,6 +197,20 @@ def register_entries(text: str) -> tuple[list[dict], list[str]]:
                 heads.append(number)
             if "<!--" in line:
                 comment = "-->" not in line.rpartition("<!--")[2]
+    return ends, heads
+
+
+def register_entries(text: str) -> tuple[list[dict], list[str]]:
+    """The live entries of a register's ``text``, and the reason each heading of the entry form is no entry.
+
+    A live entry is a heading of DEC-473's grammar outside fenced code blocks and HTML comments, whose first line
+    that is not blank is a status line with a word in capitals (W2-L221, W2-M145, W2-M106). Its ``span`` is its own
+    text, from its heading to the line before the next heading, without the blank lines that end it; its
+    ``content_hash`` is the sha256 of the span (AR-1). An id under two headings is no entry, named with both lines.
+    The store and the decision-citations check count entries by this one rule.
+    """
+    lines = text.split("\n")
+    ends, heads = _headings(lines)
     ends.append(len(lines))
     found, refused = {}, []
     for number in heads:
@@ -698,8 +714,11 @@ def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict
     records, edges, invalid, headings, titles, links = _read_records(root)
     commits, trailers, paths = _read_commits(root)
     prints = of_commit(root, head)
+    from gov.util import archive
+
     rows = {"records": records, "edges": edges, "commits": commits, "trailers": trailers, "commit_paths": paths,
-            REGISTER_TABLE: headings, TITLES_TABLE: titles, LINKS_TABLE: links}  # by name, never by position
+            REGISTER_TABLE: headings, TITLES_TABLE: titles, LINKS_TABLE: links,
+            ARCHIVE_TABLE: list((archive.read(root) or {}).items())}  # by name, never by position
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     current = _current_or_new(root / STORE_REL)  # judged before this load rewrites the record tables (RV1-6)
     connection = sqlite3.connect(root / STORE_REL, isolation_level=None)

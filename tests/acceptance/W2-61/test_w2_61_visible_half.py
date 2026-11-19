@@ -24,14 +24,26 @@ floor of DEC-947 item 5) and repeats no Table 2 query; Table 2's Q16 is matched 
 unchanged in ``retired/q16-pre-dec1067.yaml``.
 Every source exists at this worktree's HEAD, every heading it gives is a line of that file there, and no source
 names lens B's report or ``fixtures/evaluation/**`` (failure KPI 4).
+A source whose path is the decision register (EMERGENCY-2 11.3, DEC-1214 G4; W2-203, 2026-11-19): the old register is
+archived whole at the path map's ``decision_register_archive`` and the register of HEAD holds the kept entries only,
+so such a source is resolved in the register of HEAD when its heading is a line there (the entry is kept, verbatim),
+else in the archive, where the old register's line n is line n plus the archive's header lines (checked against the
+commit that archived it). A source found in neither still fails by name. The fixtures are not changed: the gold that
+resolves only in the archive is history's, which memory does not index (the folder's README).
+Any other source whose file or heading is gone at HEAD (the CTO's ruling of 2026-11-19 on W2-200 and W2-205, which
+removed one source's file and re-worded another's heading): it is resolved at the question's own ``commit`` (the
+source's own where it names one, as the measure reads them); found there, it passes and is named in the case's notice
+list; found in neither, it still fails by name. The set is history's (DEC-1210: a fresh set for every measure).
 
 Red now: the folder does not exist.
 """
 
 from __future__ import annotations
 
+import functools
 import subprocess
 import sys
+import warnings
 from pathlib import Path
 
 import pytest
@@ -67,6 +79,9 @@ REWORDED_Q14 = "q14.yaml"
 RETIRED_Q14 = s.REAL_VISIBLE.parent / "retired" / "q14-pre-reword-2026-11-09.yaml"
 RETIRED_ORIGINALS = {REWRITTEN: RETIRED, RELABELLED: RETIRED_Q09, REWRITTEN_Q16: RETIRED_Q16,
                      REWORDED_Q07: RETIRED_Q07, REWORDED_Q14: RETIRED_Q14}
+# W2-203 (EMERGENCY-2 11.3, DEC-1214 G4): the commit that moved the register whole to the archive under a header line;
+# its parent holds the register the gold sources' headings and line spans were written against.
+ARCHIVED_AT = "58a2825a2dcf"
 
 
 def _files():
@@ -134,6 +149,65 @@ def _at_head(rel):
 def _heading_found(text, heading):
     """The measure's rule: a line of the file whose text, trailing whitespace removed, equals the heading."""
     return any(line.rstrip() == heading for line in text.splitlines())
+
+
+def _register_and_archive():
+    """The register in force and the archived register, by the path map's ``decision_register`` and
+    ``decision_register_archive`` (the path map, not this file, holds the paths; W2-203 S1)."""
+    document = yaml.safe_load(s.REAL_PATH_MAP.read_text(encoding="utf-8"))
+    return document.get("decision_register"), document.get("decision_register_archive")
+
+
+@functools.lru_cache(maxsize=None)
+def _archive():
+    """The archive's text at HEAD and the number of header lines it puts before the old register, or None when the
+    path map names no archive or HEAD holds no such file. Checked, not assumed: after its header the archive holds
+    the register as it stood before ``ARCHIVED_AT``, line for line (entries added to the archive later come after
+    it), so the old register's line n is the archive's line n + header."""
+    register, archive = _register_and_archive()
+    text = _at_head(archive) if isinstance(archive, str) else None
+    if text is None:
+        return None
+    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"{ARCHIVED_AT}^:{register}"], capture_output=True,
+                          timeout=s.TIMEOUT_S)
+    assert done.returncode == 0, f"the register before its archive is not found at {ARCHIVED_AT}^"
+    before, lines = done.stdout.decode("utf-8", "replace").splitlines(), text.splitlines()
+    header = next((i for i, line in enumerate(lines) if line == before[0]), None)
+    assert header is not None and lines[header:header + len(before)] == before, (
+        f"{archive} is not the register of {ARCHIVED_AT}^ after its header lines: an old line span is no span of it")
+    return text, header
+
+
+def _resolved(source):
+    """Where a gold source resolves at HEAD: ``(path, text, shift)``, the text None when it resolves nowhere.
+
+    Any path but the register: the file at HEAD. The register (W2-203): the register of HEAD when the source's
+    heading is a line of it (the entry is kept there) or, with no heading, when its lines are a span of it; else
+    the archive, when the heading is a line of it or, with no heading, its lines shifted by the archive's header are
+    a span of it. ``shift`` is what a stated line number takes in the text returned: the header's lines in the
+    archive, else 0. A register source that is in neither resolves nowhere."""
+    rel, heading, stated = source["path"], source.get("heading"), source.get("lines")
+    text = _at_head(rel)
+    if text is None or rel != _register_and_archive()[0]:
+        return rel, text, 0
+
+    def holds(body, shift):
+        if heading is not None:
+            return _heading_found(body, str(heading))
+        return _is_span(stated, body, shift)
+
+    if holds(text, 0):
+        return rel, text, 0
+    archived = _archive()
+    if archived is not None and holds(archived[0], archived[1]):
+        return _register_and_archive()[1], archived[0], archived[1]
+    return rel, None, 0
+
+
+def _is_span(stated, text, shift=0):
+    """``lines: [first, last]`` is a span of the text, each number taken ``shift`` lines further on."""
+    return (isinstance(stated, list) and len(stated) == 2 and all(isinstance(n, int) for n in stated)
+            and 1 <= stated[0] <= stated[1] <= len(text.splitlines()) - shift)
 
 
 def test_the_visible_half_holds_lens_b_s_twenty_questions_one_file_each():
@@ -226,12 +300,15 @@ def test_q03_is_relabelled_to_dec_1065_and_the_earlier_labels_are_kept_unchanged
 
 def _span_at_head(source):
     """A source's lines at HEAD by the measure's rule (a heading found governs: a ``#`` heading to the next of its
-    level or higher, any other as many lines as ``lines`` state; not found, ``lines``), or None when no file."""
-    text = _at_head(source["path"])
+    level or higher, any other as many lines as ``lines`` state; not found, ``lines``), or None when no file. A
+    register source is read where it resolves (``_resolved``): the register of HEAD, else the archive, where stated
+    lines are taken the header's lines further on."""
+    _, text, shift = _resolved(source)
     if text is None:
         return None
     lines = text.splitlines()
     heading, stated = source.get("heading"), source.get("lines")
+    stated = [stated[0] + shift, stated[1] + shift] if stated and shift else stated
     at = next((i for i, line in enumerate(lines) if heading is not None and line.rstrip() == str(heading).rstrip()),
               None)
     if at is not None and str(heading).startswith("#"):
@@ -282,7 +359,8 @@ def test_q16_is_relabelled_off_dec_798_and_the_original_is_kept_unchanged():
     ``retired/`` outside the visible half; the visible ``q16.yaml`` keeps the id Q16, no longer asks lens B's question,
     and no source is DEC-798's entry or its item 4 (superseded by DEC-1033): the rule's entry has DEC-961 item 1's
     span among its alternatives and another entry DEC-947 item 5's floor, each span (the measure's rule) found at
-    HEAD."""
+    HEAD: DEC-961 is a kept entry of the register of HEAD; DEC-947 is not kept, so its item is found in the archived
+    register (W2-203; EMERGENCY-2 11.3)."""
     rel = (s.REAL_VISIBLE / REWRITTEN_Q16).relative_to(s.REPO_ROOT).as_posix()
     done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"{RETIRED_FROM}:{rel}"], capture_output=True,
                           timeout=s.TIMEOUT_S)
@@ -310,23 +388,103 @@ def test_q16_is_relabelled_off_dec_798_and_the_original_is_kept_unchanged():
     assert not faults, "\n".join(faults)
 
 
+def _git(*args):
+    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), *args], capture_output=True, timeout=s.TIMEOUT_S)
+    return done.stdout.decode("utf-8", "replace") if done.returncode == 0 else None
+
+
+def _holds(source, text):
+    """The source is found in the text: its heading, when it gives one, is a line of it, and its lines, when it gives
+    them, are a span of it."""
+    heading, lines = source.get("heading"), source.get("lines")
+    return ((heading is None or _heading_found(text, str(heading)))
+            and (lines is None or _is_span(lines, text)))
+
+
+def _since(source, gone):
+    """The last commit that removed the file (``gone``) or took the heading out of it, as ``<sha> (<subject>)``, or
+    None when git does not name one: for the notice only, never for the verdict."""
+    how = ["--diff-filter=D"] if gone else ["-S" + str(source.get("heading"))]
+    found = _git("log", "-1", "--format=%h (%s)", *how, "HEAD", "--", source["path"]) or ""
+    return found.strip() or None
+
+
+def _at_its_commit(name, data, source):
+    """A source not found at HEAD, looked for at the question's own ``commit`` (the source's own where it names one,
+    as the measure reads them): the notice line when it is found there (what is gone at HEAD, the commit it is found
+    at and, where git names it, the commit that removed or re-worded it), else None."""
+    rel, heading = source["path"], source.get("heading")
+    commit = next((str(c).strip() for c in (source.get("commit"), data.get("commit")) if c and str(c).strip()), None)
+    then = _git("show", f"{commit}:{rel}") if commit else None
+    if then is None or not _holds(source, then):
+        return None
+    now = _at_head(rel)
+    if now is None:
+        what, by = f"{rel} is no file at HEAD", "removed"
+    elif heading is not None and not _heading_found(now, str(heading)):
+        what, by = f"heading {heading!r} is no line of {rel} at HEAD", "re-worded"
+    else:
+        what, by = f"lines {source.get('lines')!r} are no span of {rel} at HEAD", None
+    since = _since(source, now is None) if by else None
+    return f"{name}: {what}; found at its commit {commit}" + (f"; {by} by {since}" if since else "")
+
+
 def test_every_source_exists_at_head_and_every_heading_is_found_there():
-    faults = []
+    """Every source's file is at HEAD, its heading a line of it and its lines a span of it. A source whose path is
+    the decision register (W2-203; EMERGENCY-2 11.3, DEC-1214 G4) is found in the register of HEAD when its entry is
+    kept there, else in the archived register: its heading is a line of one of the two, and its lines, written
+    against the register before the archive, are a span of the register of HEAD or, taken the archive's header lines
+    further on, of the archive. A register source found in neither is a fault by name.
+
+    Any other source whose file or heading is gone at HEAD (the CTO's ruling of 2026-11-19; W2-200 removed q04's
+    last alternative's file, W2-205 re-worded q20's heading) is looked for at the question's own ``commit``: found
+    there (the heading a line, the lines a span), it passes and is named in the notice list, which the case prints
+    and gives as one warning; found in neither, it is a fault by name. No fixture is re-anchored: the set is
+    history's (DEC-1210, a fresh set for every measure)."""
+    register, archive = _register_and_archive()
+    assert register == "docs/DECISION_REGISTER.md", f"the path map's decision_register is {register!r}"
+    faults, notices = [], []
     for path in _files():
-        for source in _entries(_load(path)):
-            text = _at_head(source["path"])
-            if text is None:
-                faults.append(f"{path.name}: {source['path']} is not a file at HEAD")
+        data = _load(path)
+        for source in _entries(data):
+            rel = source["path"]
+            heading, lines = source.get("heading"), source.get("lines")
+            text = _at_head(rel)
+            if rel != register:
+                if text is not None and _holds(source, text):
+                    continue
+                notice = _at_its_commit(path.name, data, source)
+                if notice is not None:
+                    notices.append(notice)
+                elif text is None:
+                    faults.append(f"{path.name}: {rel} is not a file at HEAD, nor found at the question's commit "
+                                  f"{data.get('commit')!r}")
+                else:
+                    if heading is not None and not _heading_found(text, str(heading)):
+                        faults.append(f"{path.name}: heading {heading!r} is not a line of {rel} at HEAD, nor found "
+                                      f"at the question's commit {data.get('commit')!r}")
+                    if lines is not None and not _is_span(lines, text):
+                        faults.append(f"{path.name}: lines {lines!r} are not a span of {rel} at HEAD, nor found at "
+                                      f"the question's commit {data.get('commit')!r}")
                 continue
-            heading = source.get("heading")
-            if heading is not None and not _heading_found(text, str(heading)):
-                faults.append(f"{path.name}: heading {heading!r} is not a line of {source['path']}")
-            lines = source.get("lines")
-            if lines is not None:
-                ok = (isinstance(lines, list) and len(lines) == 2 and all(isinstance(n, int) for n in lines)
-                      and 1 <= lines[0] <= lines[1] <= len(text.splitlines()))
-                if not ok:
-                    faults.append(f"{path.name}: lines {lines!r} are not a span of {source['path']}")
+            if text is None:
+                faults.append(f"{path.name}: {rel} is not a file at HEAD")
+                continue
+            _, text, _ = _resolved(source)
+            if text is None:
+                what = f"heading {heading!r} is not a line" if heading is not None else f"lines {lines!r} are no span"
+                faults.append(f"{path.name}: {what} of {rel} at HEAD nor of its archive {archive}")
+                continue
+            archived = _archive()
+            spans = _is_span(lines, _at_head(rel)) or (archived is not None and _is_span(lines, *archived))
+            if lines is not None and not spans:
+                faults.append(f"{path.name}: lines {lines!r} are not a span of {rel} at HEAD nor, after its header, "
+                              f"of its archive {archive}")
+    if notices:
+        listed = "\n".join(notices)
+        print(f"NOTICE: {len(notices)} gold source(s) gone at HEAD, found at their question's commit:\n{listed}")
+        warnings.warn(f"{len(notices)} gold source(s) gone at HEAD, found at their question's commit "
+                      f"(the set is history's, DEC-1210):\n{listed}", stacklevel=1)
     assert not faults, "\n".join(faults)
 
 

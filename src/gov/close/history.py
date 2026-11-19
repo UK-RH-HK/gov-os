@@ -18,6 +18,7 @@ from gov.close.repo import git
 BASE_KEY = "trailers_base"  # DEC-482: a commit id, full or abbreviated; only the commits after it are judged
 ACCEPTED_KEY = "accepted_history"  # DEC-734: a list of {commit, decision}
 REGISTER_KEY = "decision_register"  # DEC-479
+ARCHIVE_KEY = "decision_register_archive"  # W2-203: the archived register, where an older owner decision lives
 MOVE_KEY = "trailers_base_move"
 MOVED_COUNT = "commits_out_of_judgement"  # W2-M266
 REFUSED = "ACCEPTED_HISTORY_REFUSED"
@@ -91,14 +92,32 @@ def differing(root: Path, older: str, newer: str) -> list[str]:
 
 
 def register_entries(root: Path, rel) -> dict[str, list[str]] | str:
-    """The entries of the register the path map names, by id, each its text from its heading to the next; the
-    reason as text where there is no register to read."""
+    """The entries of the register the path map names, by id, each its text from its heading to the next, and those
+    of the archived register for the ids the register does not hold; the reason as text where there is no register
+    to read."""
     if not isinstance(rel, str) or not rel:
         return f"the path map names no decision register ('{REGISTER_KEY}')"
     try:
         text = (root / rel).read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as e:
         return f"the decision register {rel} cannot be read ({e})"
+    entries = _entries_of(text)
+    # W2-203 (EMERGENCY-2 11.3): a decision the register no longer holds is read from the archived register the
+    # path map names, so an owner decision made before the archive still counts. No archive adds nothing.
+    try:
+        path_map = yaml.safe_load((root / PATH_MAP_REL).read_text(encoding="utf-8"))
+        archive = path_map.get(ARCHIVE_KEY) if isinstance(path_map, dict) else None
+        archived = _entries_of((root / archive).read_text(encoding="utf-8")) if isinstance(archive, str) and archive \
+            else {}
+    except (OSError, UnicodeDecodeError, yaml.YAMLError):
+        archived = {}
+    for key, texts in archived.items():
+        entries.setdefault(key, texts)
+    return entries
+
+
+def _entries_of(text: str) -> dict[str, list[str]]:
+    """The entries of a register's ``text``, by id, each its text from its heading to the next."""
     entries: dict[str, list[str]] = {}
     current = None
     for line in text.splitlines():

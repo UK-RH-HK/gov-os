@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Stop hook (W1-29, CAP-37.b).
+"""Stop hook (W1-29, CAP-37.b; W2-205, RT-2).
 
-Writes a checkpoint via gov.checkpoint.record.write with trigger "stop".
+Writes a checkpoint via gov.checkpoint.record.write with trigger "stop"
+(only with a ticket, GOV_TICKET). Then it runs the Stop check
+(gov.msg.stopcheck.check, the wake carrier) for the session's address
+(GOV_MSG_ADDRESS), with or without a ticket, and prints the check's
+block decision on stdout: a turn end is blocked only for an unread wake
+message, once per message. With no decision it prints nothing.
+
 When stop_hook_active is present and truthy, exits 0 immediately with no
-side effects to prevent re-entrancy loops.
+side effects to prevent re-entrancy loops: no checkpoint, no check.
 
 Always exits 0.
 """
@@ -32,6 +38,26 @@ def _no_gov(exc: BaseException, what: str) -> bool:
     return True
 
 
+def _add_src(project_root: str) -> None:
+    src_dir = os.path.join(project_root, "src")
+    if _gov_os_source_tree(project_root) and src_dir not in sys.path:
+        sys.path.insert(0, src_dir)
+
+
+def _stop_check(project_root: str) -> None:
+    """Print the Stop check's block decision, when it gives one (W2-205, RT-2). A check that cannot run lets the
+    turn end."""
+    try:
+        _add_src(project_root)
+        from gov.msg.stopcheck import check
+        decision = check()
+    except Exception as exc:
+        _no_gov(exc, "the stop check was not run")
+        return
+    if decision:
+        sys.stdout.write(json.dumps(decision))
+
+
 def main() -> None:
     data = json.loads(sys.stdin.read())
 
@@ -40,14 +66,16 @@ def main() -> None:
 
     root = Path(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
     ticket = os.environ.get("GOV_TICKET", "")
-    if not ticket:
-        return
+    said = False
+    if ticket:
+        try:
+            from gov.checkpoint.record import write
+            write(root, ticket, "stop", "Resume after stop", [], dest="automatic")
+        except Exception as exc:
+            said = _no_gov(exc, "the checkpoint record was not written; the stop check was not run")
 
-    try:
-        from gov.checkpoint.record import write
-        write(root, ticket, "stop", "Resume after stop", [], dest="automatic")
-    except Exception as exc:
-        _no_gov(exc, "the checkpoint record was not written")
+    if not said:  # no gov importable: said once (W2-18), and the check that needs gov is not tried
+        _stop_check(str(root))
 
 
 if __name__ == "__main__":

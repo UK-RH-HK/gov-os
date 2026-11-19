@@ -1,4 +1,7 @@
-"""Fixtures for the W2-54 acceptance tests (the dropped list's order, the context check's limit, audit-report)."""
+"""Fixtures for the W2-54 acceptance tests (audit-report, the check limits, the query vector and its cache).
+
+The fixtures of the context packet's projects (``indexed``, ``big_only``, ``unindexed``) are deleted with the context
+command (DEC-1214 M1, W2-200)."""
 
 from __future__ import annotations
 
@@ -47,28 +50,6 @@ def box(tmp_path_factory, code_under_test):
     assert where == str(support.SRC / "gov" / "__init__.py"), \
         f"under the retrieval stand-in gov is imported from {where}, not from {support.SRC}"
     return box
-
-
-@pytest.fixture(scope="session")
-def indexed(box):
-    """A project with its store and its lexical index: two tickets, one past the default ceiling."""
-    if not box.has_gitleaks():
-        pytest.fail("gitleaks is not on PATH: the lexical index of the fixture cannot be built", pytrace=False)
-    return support.context_project(box, box.workdir / "indexed")
-
-
-@pytest.fixture(scope="session")
-def big_only(box):
-    """A project whose one ticket has a mandatory input past the default ceiling (this repository's shape)."""
-    if not box.has_gitleaks():
-        pytest.fail("gitleaks is not on PATH: the lexical index of the fixture cannot be built", pytrace=False)
-    return support.context_project(box, box.workdir / "big-only", tickets=(support.TK_BIG,))
-
-
-@pytest.fixture(scope="session")
-def unindexed(box):
-    """A project with its record store and no lexical index."""
-    return support.context_project(box, box.workdir / "unindexed", index=False)
 
 
 @pytest.fixture(autouse=True)

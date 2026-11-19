@@ -149,11 +149,3 @@ def test_this_repositorys_semantic_answers_are_unchanged(repo_store, driver):
     warm = warm_answers(driver, repo_store, steps, REPO_WARM_UP, env=env)
     assert_same(steps, fresh, warm)
 
-
-def test_this_repositorys_context_packet_is_unchanged(repo_store, driver):
-    """The context packet of one ticket (``gov.context.context``), fresh or after many retrieval calls."""
-    step = S.call(S.CONTEXT, "context", "{root}", S.REPO_TICKET)
-    env = S.repo_env(driver)
-    fresh = fresh_answers(driver, repo_store, [step], env=env)
-    warm = warm_answers(driver, repo_store, [step], REPO_WARM_UP, env=env)
-    assert warm[0] == fresh[0], f"the context packet of {S.REPO_TICKET} differs after many retrieval calls"

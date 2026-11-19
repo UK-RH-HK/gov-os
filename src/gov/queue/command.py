@@ -1,25 +1,51 @@
-"""``gov queue <ticket>[=<branch>] ... [--onto <branch>]``: the product's deterministic landing (W2-115b).
+"""``gov queue <ticket>[=<branch>] ... [--onto <branch>]``: the product's deterministic landing (W2-115b), which
+is the close too (W2-202; L2 section 2).
 
 A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (b)):
 
+0. **The hold.** While ``gov pause`` froze the project nothing lands (``PROJECT_PAUSED``, exit 1, before anything
+   else is read or written).
 1. **Settings.** The integration branch is ``--onto``, else ``governance/project/queue.yaml``'s ``integration``,
    else the branch checked out at the root (``INTEGRATION_UNKNOWN``). A ticket's work branch is ``=<branch>``,
    else ``queue.yaml``'s ``work_branch`` form with ``{wbs}`` and ``{ticket}`` (``BRANCH_UNKNOWN``). The ticket is
    read at the integration head (``TICKET_UNKNOWN``, ``TICKET_CLOSED``). All exit 1, before anything is written.
+   A branch whose tip is already on the integration branch (merged by hand) is landed alone and without a merge:
+   its change is counted from the head before the merge that brought it.
 2. **Checks** on ``<head>..<tip>`` (``gov.queue.checks``): G-1 refuses a ticket (``TEST_AUTHOR_REFUSED``, out of
-   the batch before the run); a path outside ``allowed_paths`` is a notice.
+   the batch before the run); a path outside ``allowed_paths`` is a notice. A ticket judged on its tests whose
+   acceptance folder holds no test is refused (``NO_ACCEPTANCE_TESTS``), and one whose README the runner of
+   ``gov accept`` cannot judge by, with the runner's code. A ticket of a class judged on a record (research,
+   audit, coordination, specification) is judged by the close's own gate of that record, in the clone, and needs
+   no test folder; a record the gate refuses puts the ticket out of the batch with the gate's code.
 3. **The run.** The candidates left are merged onto the head in the warm clone; the union of their
-   ``select.scoped`` selections (each branch's changed paths counted in its change) is run once by
-   ``gov.close.batch.isolate``, which re-runs a red alone, finds the culprit and runs the rest again.
-4. **The land.** One close commit per landed ticket on the tested merge, in the clone (its close record, its
+   ``select.scoped`` selections (each branch's changed paths counted in its change), less their own acceptance
+   folders, is run once by ``gov.close.batch.isolate``, which also runs each ticket's acceptance folder through
+   the runner of ``gov accept`` (``gov.queue.acceptance``: no test of it runs twice), re-runs a red alone, finds
+   the culprit and runs the rest again. A red no candidate explains that is red at the base with the same failure
+   type is a known base red: named, not blocking.
+4. **The land.** One close commit per landed ticket on the tested commit, in the clone (its close record, its
    checkpoint, ``tk close``); then the integration branch moves from the head the run merged onto to the last
    close commit, only if it is still there (``HEAD_MOVED``); where it is checked out, its working tree follows.
+5. **After** (``gov.queue.after``; never refuses): the integration store's refresh where ``rebuild.yaml`` names
+   one, and the structural pass with the landing's base; both are notices under ``after``.
 
 The answer and ``.gov-runtime/queue/<stamp>/queue.json`` hold the same result, with the seconds of each step.
+
+The flags of W2-206 (L2 section 3, A6):
+
+- ``--dry-run [--out <dir>]``: steps 0 to 3 and nothing else. No close commit, no close record, no branch and no
+  ref moves; the warm clone is left at the base. The answer and the exit code are those the landing would have
+  given; ``<dir>`` gets ``select.json``, the run files, ``summary.txt`` and, last, ``verify.exit``
+  (``gov.queue.dry``), also when the dry run is refused as a whole.
+- ``--select``: the selection the run would make, as one JSON object on stdout, exit 0; nothing is run or
+  recorded. ``SELECTION_REFUSED`` goes to stderr with exit 2.
+- ``--full``: the run of step 3 is the whole ``tests/`` of the merged result (``gov.queue.full``), in a pool no
+  wider than its slot; a selection is not computed, so no path is ``SELECTION_REFUSED``.
 """
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
@@ -33,6 +59,8 @@ from gov.cli.errors import GovError
 HELP = "land tickets' branches: one run on the merged result, the close at the land"
 CLASS = "act"
 EXIT_RED = 3
+EXIT_SELECT_REFUSED = 2
+CHILD_EXIT_CODE = True  # --select prints the selection itself and ends with its own code, 0 or 2
 EXIT_CODES = {EXIT_RED: "a candidate did not land, or the run was refused as a whole (nothing of it landed)"}
 ACT_PATHS = (".gov-runtime/**", ".tickets/**", "docs/close/**", "docs/checkpoints/**")
 SETTINGS_REL = "governance/project/queue.yaml"
@@ -42,7 +70,7 @@ LAND_REF = "refs/gov-queue/land"
 DEFAULT_TIMEOUT = 3600
 DEFAULT_ROLE = "orchestrator"
 _TICKET = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
-STEPS = ("merge", "selection", "run", "close")
+STEPS = ("merge", "selection", "acceptance", "run", "close")
 
 
 def add_arguments(parser) -> None:
@@ -50,11 +78,30 @@ def add_arguments(parser) -> None:
     parser.add_argument("--onto", metavar="<branch>", help="the integration branch")
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT, metavar="<seconds>",
                         help="each test run's time limit")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", dest="dry_run", action="store_true",
+                      help="everything but the land: no close commit, no branch moved; the answer and exit code "
+                           "the landing would give, and select.json, the run files, summary.txt and verify.exit "
+                           "under --out")
+    mode.add_argument("--select", action="store_true",
+                      help="print the selection the run would make as one JSON object and run nothing "
+                           "(SELECTION_REFUSED: stderr, exit 2)")
+    parser.add_argument("--out", metavar="<dir>", default=None,
+                        help="--dry-run: the folder of its files (default .gov-runtime/queue/dry/<ticket>/, the "
+                             "tickets joined by +)")
+    parser.add_argument("--full", action="store_true",
+                        help="run the whole tests/ of the merged result instead of the selection, in a pool no "
+                             "wider than the run's slot")
 
 
 def run(root: Path, args, config: dict):
+    given, full = list(args.tickets), bool(getattr(args, "full", False))
     try:
-        return land(Path(root), list(args.tickets), args.onto, args.timeout)
+        if getattr(args, "select", False):
+            return select(Path(root), given, args.onto, full)
+        if getattr(args, "dry_run", False):
+            return dry_run(Path(root), given, args.onto, args.timeout, getattr(args, "out", None), full)
+        return land(Path(root), given, args.onto, args.timeout, full=full)
     except GovError as error:
         if getattr(args, "json", False):  # the envelope on stdout, the line on stderr too (without --json gov prints it)
             print(f"{error.code}: {error.message}", file=sys.stderr)
@@ -103,6 +150,37 @@ def _front_at(root: Path, rev: str, ticket: str) -> dict | None:
     return parse(text) if text is not None else None
 
 
+def _hold(root: Path) -> None:
+    """``PROJECT_PAUSED`` while ``gov pause``'s freeze flag is frozen at the root or at the main checkout of the
+    repository the root belongs to (as the launcher reads it; CAP-05, audit 7 C-1)."""
+    from gov.launch import record
+    from gov.util.freeze import FREEZE_FLAG, freeze_state
+
+    places = [root]
+    try:
+        main = record.main_checkout(root, "the freeze flag gov pause sets")
+        places += [main] if main != root else []
+    except GovError:
+        pass
+    for place in places:
+        if freeze_state(str(place)) == "frozen":
+            _refuse("PROJECT_PAUSED", f"the project is paused (gov pause set {place / FREEZE_FLAG}): nothing lands "
+                    "until the owner lifts it with gov pause --off", {"flag": str(place / FREEZE_FLAG)})
+
+
+def _before_merge(root: Path, base: str, tip: str) -> str | None:
+    """For a ``tip`` already on ``base``: the integration head before the merge that brought it (the first parent
+    of the oldest first-parent commit of ``base`` that holds ``tip``); None where no such head can be told (the
+    tip is the head, or it came by a fast-forward: the branch's own commits cannot be told from the base's)."""
+    line = _git(root, "rev-list", "--first-parent", f"{tip}..{base}").split()
+    holds = set(_git(root, "rev-list", "--ancestry-path", f"{tip}..{base}").split())
+    brought = next((commit for commit in reversed(line) if commit in holds), None)
+    before = _commit_of(root, f"{brought}^1") if brought else None
+    if not before or _git(root, "merge-base", "--is-ancestor", tip, before, ok=True) is not None:
+        return None
+    return before
+
+
 def _candidate(root: Path, base: str, given: str, settings: dict) -> dict:
     ticket, sep, branch = given.partition("=")
     front = _front_at(root, base, ticket) if _TICKET.fullmatch(ticket) else None
@@ -122,12 +200,23 @@ def _candidate(root: Path, base: str, given: str, settings: dict) -> dict:
     if not tip:
         _refuse("BRANCH_UNKNOWN", f"{ticket}: its work branch {branch!r} names no commit",
                 {"ticket": ticket, "branch": branch})
-    if _git(root, "merge-base", "--is-ancestor", tip, base, ok=True) is not None:
-        _refuse("CANDIDATE_NOT_ISOLATED", f"{ticket}: its work branch {branch} is already merged; nothing lands",
-                {"ticket": ticket, "branch": branch}, EXIT_RED)
+    since, merged = base, _git(root, "merge-base", "--is-ancestor", tip, base, ok=True) is not None
+    if merged:
+        since = _before_merge(root, base, tip)
+        if since is None:
+            _refuse("CANDIDATE_NOT_ISOLATED", f"{ticket}: its work branch {branch} is already merged and the head "
+                    "before its merge cannot be told (a fast-forward, or the branch is the head itself), so its "
+                    "change cannot be checked; nothing lands", {"ticket": ticket, "branch": branch}, EXIT_RED)
     at_tip = _front_at(root, tip, ticket)
-    return {"ticket": ticket, "branch": branch, "tip": tip, "front": front,
-            "at_tip": at_tip if isinstance(at_tip, dict) else front}
+    return {"ticket": ticket, "branch": branch, "tip": tip, "front": front, "merged": merged, "since": since,
+            "at_tip": at_tip if isinstance(at_tip, dict) else front, "folder": None, "record": None}
+
+
+def _on_record(front: dict) -> bool:
+    """A ticket of a class judged on a record (as the ticket's file at the integration head names its class)."""
+    from gov.close import gates
+
+    return gates.ticket_class(front) in (*gates.EVIDENCE_CLASSES, gates.SPECIFICATION_CLASS)
 
 
 def _acceptance(front: dict) -> str | None:
@@ -142,17 +231,17 @@ def _changed(root: Path, base: str, tip: str) -> list[str]:
 
 
 def _checks(root: Path, base: str, cand: dict, result: dict) -> bool:
-    """G-1 and the path notice of a candidate; False where G-1 refuses it."""
+    """G-1, the path notice and the acceptance folder of a candidate; False where a check refuses it."""
     from gov.queue import checks
 
-    ticket = cand["ticket"]
+    ticket, tip, base = cand["ticket"], cand["tip"], cand["since"]
     places = list(dict.fromkeys(p for p in (ACCEPTANCE, _acceptance(cand["front"]), _acceptance(cand["at_tip"])) if p))
     allowed = [p for p in cand["at_tip"].get("allowed_paths") or [] if isinstance(p, str)]
     try:
-        notices = checks.path_notices(root, base, cand["tip"], allowed,
+        notices = checks.path_notices(root, base, tip, allowed,
                                       checks.record_places(ticket, _acceptance(cand["at_tip"])))
         result["path_notices"] += [{"ticket": ticket, **n} for n in notices]
-        bad = checks.test_authors(root, base, cand["tip"], places)
+        bad = checks.test_authors(root, base, tip, places)
         reason = "; ".join(f"{b['commit'][:12]} (Role: {', '.join(b['roles']) or 'none'}) {b['subject']}"
                            for b in bad)
     except RuntimeError as e:  # fails closed: commits that cannot be read are not landed
@@ -162,7 +251,92 @@ def _checks(root: Path, base: str, cand: dict, result: dict) -> bool:
                                   "reason": f"acceptance tests changed without the test designer's or the owner's "
                                             f"role: {reason}"})
         return False
+    folder = _acceptance(cand["at_tip"]) or _acceptance(cand["front"])
+    try:
+        why = checks.acceptance_refusal(root, [tip, base], folder)
+    except RuntimeError as e:  # fails closed: a folder that cannot be read holds no test
+        why = checks.NO_ACCEPTANCE_TESTS, f"its acceptance folder cannot be read: {e}"
+    if why and not (why[0] == checks.NO_ACCEPTANCE_TESTS and _on_record(cand["front"])):
+        result["refused"].append({"ticket": ticket, "code": why[0], "reason": why[1]})
+        return False
+    cand["folder"] = folder if why is None else None
     return True
+
+
+def _judged_on_record(clone: Path, base: str, cand: dict, result: dict) -> bool:
+    """The record of a ticket of a class judged on one, by the close's own gate (``check_specification``,
+    ``check_evidence``) in the clone at the base with the branch merged; False where the gate refuses it."""
+    from gov.close import attribution, batch, gates
+    from gov.close.command import _Finding
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    ticket = cand["ticket"]
+    try:
+        if cand["merged"]:
+            attribution.checkout(clone, base)
+        elif batch._build(clone, base, [{"name": ticket, "commit": cand["tip"]}]) is None:
+            raise GovError("CANDIDATE_NOT_ISOLATED", "its branch does not merge onto the integration head")
+        if gates.ticket_class(cand["front"]) == gates.SPECIFICATION_CLASS:
+            gates.check_specification(clone, ticket)
+            cand["record"] = [gates.SPECIFICATION_CLASS]
+        else:
+            cand["record"] = gates.check_evidence(clone, ticket, frontmatter(clone / TICKETS_REL / f"{ticket}.md")
+                                                  or cand["front"])
+    except (GovError, _Finding) as refused:
+        result["refused"].append({"ticket": ticket, "code": refused.code, "reason": refused.message})
+        return False
+    return True
+
+
+def _run_on_head(clone: Path, cand: dict, base: str, chosen: dict, folder: Path, timeout: float, also,
+                 workers: int = 1) -> dict:
+    """The run of a branch already merged, on the integration head itself: ``batch.isolate``'s result keys. A red
+    is run again alone (green alone: flaky), then alone at the head before the branch's merge: red there with the
+    same failure type it is a known base red, else it is the ticket's, which is not closed."""
+    from gov.close import attribution
+    from gov.close.command import _phases
+
+    ticket, options = cand["ticket"], chosen["pytest_options"]
+    done = {"reds": [], "flaky": [], "culprits": [], "base_reds": [], "explains": {}, "landed": [],
+            "land_commit": None, "runs": [], "folder": str(folder)}
+    attribution.checkout(clone, base)
+    phases = _phases(clone, chosen, folder, timeout, workers)
+    done["runs"] = phases["runs"]
+    if not phases["complete"]:
+        _refuse("RUN_INCOMPLETE", f"the run on the head did not complete: {'; '.join(phases['incomplete'])}; "
+                "nothing lands", done, EXIT_RED)
+    more = also(base, [ticket])
+    done["runs"] = phases["runs"] + more["runs"]
+    kinds = {}
+    for test in dict.fromkeys(f["test"] for f in phases["failing"]):
+        alone = attribution.run_alone(clone, test, options, folder / "alone", timeout, "head")
+        if alone is None:
+            done["flaky"].append(test)
+        else:
+            kinds[test] = alone
+    named = []  # its own acceptance run failed without naming a test: the ticket's, with no run before the merge
+    for red in more["failing"]:
+        if red["test"] not in kinds and red.get("culprit") == ticket:
+            named.append(red["test"])
+        kinds.setdefault(red["test"], red["failure_type"])
+    done["reds"] = list(kinds)
+    done["explains"] = {test: [ticket] for test in named}
+    if len(kinds) > len(named):
+        attribution.checkout(clone, cand["since"])
+        for test, kind in kinds.items():
+            if test in named:
+                continue
+            there = attribution.run_alone(clone, test, options, folder / "alone", timeout, "before")
+            if there == kind and kind not in attribution.NEVER_MATCH:
+                done["base_reds"].append({"test": test, "failure_type": kind, "base": cand["since"]})
+            else:
+                done["explains"][test] = [ticket]
+        attribution.checkout(clone, base)
+    if done["explains"]:
+        done["culprits"] = [ticket]
+    else:
+        done.update(landed=[ticket], land_commit=base)
+    return done
 
 
 def _identity(root: Path) -> list[str]:
@@ -181,8 +355,9 @@ def _close_all(root: Path, clone: Path, cands: list[dict], record: dict, result:
     for cand in cands:
         ticket = cand["ticket"]
         own = {**record, "branch": {"name": cand["branch"], "tip": cand["tip"]},
+               "acceptance": cand["acceptance"],
                "path_notices": [n for n in result["path_notices"] if n["ticket"] == ticket]}
-        close_rel, _ = close._record_and_close(clone, ticket, own, _changed(root, result["base"], cand["tip"]))
+        close_rel, _ = close._record_and_close(clone, ticket, own, _changed(root, cand["since"], cand["tip"]))
         places = [p for p in (f".tickets/{ticket}.md", f"docs/close/{ticket}", f"docs/checkpoints/{ticket}")
                   if (clone / p).exists()]
         _git(clone, "add", "-A", "--", *places)
@@ -237,13 +412,9 @@ def _write(root: Path, result: dict, error: GovError | None = None) -> None:
     path.write_text(json.dumps(held, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
 
 
-def land(root: Path, given: list[str], onto: str | None = None,
-         timeout: float = DEFAULT_TIMEOUT) -> tuple[dict, int]:
-    """The landing: ``(result, exit code)``, or a ``GovError`` where nothing landed."""
-    from gov.close import attribution, batch, select
-
-    start = time.monotonic()
-    root = Path(root).resolve()
+def _start(root: Path, given: list[str], onto: str | None) -> tuple[str, str, list[dict], dict | None]:
+    """The settings and the candidates (step 1): ``(integration branch, base, candidates, the one already
+    merged)``; a refusal as a whole where one cannot be read."""
     settings = _settings(root)
     if not onto:
         onto = settings.get("integration") if isinstance(settings.get("integration"), str) else None
@@ -255,11 +426,136 @@ def land(root: Path, given: list[str], onto: str | None = None,
             "checked out at the root"
         _refuse("INTEGRATION_UNKNOWN", f"the integration branch is unknown: {why}", {"onto": onto})
     cands = [_candidate(root, base, g, settings) for g in given]
+    alone = next((c for c in cands if c["merged"]), None)
+    if alone and len(cands) > 1:  # no merged result can be built without it: it is not one of a batch
+        _refuse("CANDIDATE_NOT_ISOLATED", f"{alone['ticket']}: its work branch {alone['branch']} is already merged, "
+                f"so it is landed alone (gov queue {alone['ticket']}), apart from branches still to merge; nothing "
+                "lands", {"ticket": alone["ticket"], "branch": alone["branch"]}, EXIT_RED)
+    return onto, base, cands, alone
+
+
+def _merged(clone: Path, base: str, left: list[dict], alone: dict | None) -> str:
+    """The tested merge, checked out in the clone: the candidates merged onto the base (the base itself for a
+    branch already merged)."""
+    from gov.close import attribution, batch
+
+    if alone:
+        attribution.checkout(clone, base)
+        return base
+    merged = batch._build(clone, base, [{"name": c["ticket"], "commit": c["tip"]} for c in left])
+    if merged is None:
+        _refuse("CANDIDATE_NOT_ISOLATED", "the candidates do not merge together onto the integration head; "
+                "nothing lands", {"candidates": [c["ticket"] for c in left]}, EXIT_RED)
+    return merged
+
+
+def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lands") -> tuple[list[str], list[str]]:
+    """The union of the candidates' ``select.scoped`` selections in the clone at the tested merge, each branch's
+    changed paths counted in its change: ``(suites, pytest options)``; ``SELECTION_REFUSED`` for a path the test
+    map does not map."""
+    from gov.close import select
+
+    suites, options = [], None
+    for cand in left:
+        try:
+            chosen = select.scoped(clone, cand["ticket"], change=_changed(root, cand["since"], cand["tip"]))
+        except select.SelectionRefused as refused:
+            _refuse(select.SELECTION_REFUSED, f"{cand['ticket']}: {refused.reason}{said}",
+                    {"candidate": cand["ticket"]}, EXIT_RED)
+        suites += chosen["suites"]
+        options = chosen["pytest_options"]
+    return sorted(dict.fromkeys(suites)), options or []
+
+
+def select(root: Path, given: list[str], onto: str | None = None, full: bool = False) -> int:
+    """``gov queue <T>... --select`` (A6 S2): the selection the run would make, printed as one JSON object; 0.
+    Nothing is run, moved or recorded: the warm clone, where the merged result is read, is left at the base. A
+    selection refused is said on stderr: 2. Any other refusal is the landing's own (a ``GovError``)."""
+    from gov.close import attribution
+    from gov.close.select import SELECTION_REFUSED
+    from gov.queue import dry, full as whole
+
+    root = Path(root).resolve()
+    onto, base, cands, alone = _start(root, given, onto)
+    try:
+        clone = root / attribution.prepare(root, base)["path"]
+    except attribution.CloneError as e:
+        _refuse("CLOSE_CLONE_FAILED", f"the queue's clone cannot be made: {e}", {"base": base})
+    try:
+        _merged(clone, base, cands, alone)
+        if full:
+            chosen = whole.selection(clone, [f for f in (_acceptance(c["at_tip"]) or _acceptance(c["front"])
+                                                         for c in cands) if f])
+            suites, options = chosen["suites"], chosen["pytest_options"]
+        else:
+            suites, options = _union(root, clone, cands, "")
+    except GovError as refused:
+        if refused.code != SELECTION_REFUSED:
+            raise
+        print(f"{SELECTION_REFUSED}: {refused.message}", file=sys.stderr)
+        return EXIT_SELECT_REFUSED
+    finally:
+        _back_to(clone, base)
+    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options)))
+    return 0
+
+
+def _back_to(clone: Path, base: str) -> None:
+    """The warm clone left at the base, where it can be."""
+    from gov.close import attribution
+
+    try:
+        attribution.checkout(clone, base)
+    except attribution.CloneError:
+        pass
+
+
+def dry_run(root: Path, given: list[str], onto: str | None = None, timeout: float = DEFAULT_TIMEOUT,
+            out: str | None = None, full: bool = False) -> tuple[dict, int]:
+    """``gov queue <T>... --dry-run [--out <dir>]`` (A6 S1): the landing's answer and exit code with nothing
+    landed, and the out folder's files; ``verify.exit`` is written last, also where the dry run is refused as a
+    whole (its exit code is then the refusal's)."""
+    from gov.queue import dry
+
+    root = Path(root).resolve()
+    files = dry.Out(dry.out_dir(root, given, out))
+    said = f"queue --dry-run {' '.join(g.partition('=')[0] for g in given)}"
+    try:
+        result, code = land(root, given, onto, timeout, full=full, dry=files)
+    except GovError as error:
+        code = error.exit_code if error.exit_code in EXIT_CODES else 1
+        files.finish(f"{said}: exit {code}: {error.code}: {error.message}", code)
+        raise
+    except BaseException as error:  # the dry run itself failed: its exit file still says so, gov wait returns
+        files.finish(f"{said}: exit 1: {type(error).__name__}", 1)
+        raise
+    runs = "; ".join(f"{r['name']} {r['passed']} passed, {r['failed']} failed, {r['errors']} errors, "
+                     f"{r['skipped']} skipped" for r in result["runs"])
+    told = [f"would land {', '.join(result['landed'])}"] if result["landed"] else ["nothing would land"]
+    told += [f"culprits {', '.join(result['culprits'])}"] if result["culprits"] else []
+    told += [f"refused {', '.join(r['ticket'] + ' (' + r['code'] + ')' for r in result['refused'])}"] \
+        if result["refused"] else []
+    files.finish(f"{said}: exit {code}: {'; '.join(told)}" + (f"; {runs}" if runs else ""), code)
+    return result, code
+
+
+def land(root: Path, given: list[str], onto: str | None = None,
+         timeout: float = DEFAULT_TIMEOUT, *, full: bool = False, dry=None) -> tuple[dict, int]:
+    """The landing: ``(result, exit code)``, or a ``GovError`` where nothing landed. ``full``: the run is the
+    whole ``tests/`` of the merged result (``gov.queue.full``). ``dry`` (the out folder of a dry run,
+    ``gov.queue.dry.Out``): everything but the land; ``landed`` names the tickets that would land."""
+    from gov.close import attribution, batch
+    from gov.queue import acceptance, after, checks, dry as _dry, full as whole
+
+    start = time.monotonic()
+    root = Path(root).resolve()
+    _hold(root)
+    onto, base, cands, alone = _start(root, given, onto)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     seconds = dict.fromkeys(STEPS, 0.0)
     result = {"onto": onto, "base": base, "candidates": [c["ticket"] for c in cands], "landed": [], "culprits": [],
-              "refused": [], "reds": [], "flaky": [], "tested": None, "head": None, "closes": [],
-              "selection": {"suites": [], "pytest_options": []}, "runs": [], "path_notices": [],
+              "refused": [], "reds": [], "base_reds": [], "flaky": [], "tested": None, "head": None, "closes": [],
+              "selection": {"suites": [], "pytest_options": []}, "runs": [], "acceptance": [], "path_notices": [],
               "seconds": seconds, "record": f"{QUEUE_DIR}/{stamp}/queue.json"}
 
     def finish(code: int, error: GovError | None = None):
@@ -273,6 +569,29 @@ def land(root: Path, given: list[str], onto: str | None = None,
     def timed(step: str, began: float) -> None:
         seconds[step] = round(time.monotonic() - began, 3)
 
+    accepted: dict[str, dict] = {}
+
+    def acceptance_runs(commit: str, names: list[str]) -> dict:
+        """Each named ticket's acceptance folder, run in the clone as it stands at ``commit``."""
+        began, out = time.monotonic(), {"runs": [], "failing": []}
+        for cand in cands:
+            if cand["ticket"] in names and cand["folder"]:
+                junit = root / QUEUE_DIR / stamp / f"acceptance-{cand['ticket']}-{commit[:12]}.xml"
+                done = accepted[cand["ticket"]] = acceptance.run(clone, cand["ticket"], cand["folder"], timeout, junit)
+                out["runs"].append(done["run"])
+                out["failing"] += done["failing"]
+        seconds["acceptance"] = round(seconds["acceptance"] + time.monotonic() - began, 3)
+        return out
+
+    clone, limit = None, None
+    kept = _commit_of(root, batch.LAND_REF) if dry is not None else None  # the root's ref the batch's search moves
+
+    def run_files(done: dict) -> None:
+        """A dry run's run files: those of the run on the merged result."""
+        if dry is not None and done.get("folder"):
+            made = Path(done["folder"])
+            dry.runs(made if alone else made / "batch")
+
     try:
         left = [c for c in cands if _checks(root, base, c, result)]
         if not left:
@@ -282,49 +601,98 @@ def land(root: Path, given: list[str], onto: str | None = None,
             clone = root / attribution.prepare(root, base)["path"]
         except attribution.CloneError as e:
             _refuse("CLOSE_CLONE_FAILED", f"the queue's clone cannot be made: {e}", {"base": base})
-        merged = batch._build(clone, base, [{"name": c["ticket"], "commit": c["tip"]} for c in left])
+        left = [c for c in left if not _on_record(c["front"]) or _judged_on_record(clone, base, c, result)]
+        if not left:
+            attribution.checkout(clone, base)
+            return finish(EXIT_RED)
+        _merged(clone, base, left, alone)
         timed("merge", began)
-        if merged is None:
-            _refuse("CANDIDATE_NOT_ISOLATED", "the candidates do not merge together onto the integration head; "
-                    "nothing lands", {"candidates": [c["ticket"] for c in left]}, EXIT_RED)
         began = time.monotonic()
-        suites, options = [], None
-        for cand in left:
-            try:
-                chosen = select.scoped(clone, cand["ticket"], change=_changed(root, base, cand["tip"]))
-            except select.SelectionRefused as refused:
-                _refuse(select.SELECTION_REFUSED, f"{cand['ticket']}: {refused.reason}; nothing lands",
-                        {"candidate": cand["ticket"]}, EXIT_RED)
-            suites += chosen["suites"]
-            options = chosen["pytest_options"]
-        result["selection"] = {"suites": sorted(dict.fromkeys(suites)), "pytest_options": options or []}
+        own = [c["folder"] for c in left if c["folder"]]  # run by the runner of gov accept: no test runs twice
+        if full:  # the asked-for widening: the whole tests/, no selection computed, in a pool inside the slot
+            limit = whole.cap(root)
+            result["selection"] = whole.selection(clone, own)
+            result["full"] = {"runs": [], **limit}
+            union = result["selection"]["suites"]
+        else:
+            union, options = _union(root, clone, left)
+            result["selection"] = {"suites": [s for s in union if not checks._under(s, own)],
+                                   "pytest_options": options}
+        if dry is not None:
+            dry.selection(_dry.selection_object([c["ticket"] for c in left], union,
+                                                result["selection"]["pytest_options"]))
         timed("selection", began)
-        began = time.monotonic()
+        began, before = time.monotonic(), seconds["acceptance"]
+        workers = limit["workers"] if limit else 1
         try:
-            done, _ = batch.isolate(root, base, [f"{c['ticket']}={c['tip']}" for c in left],
-                                    targets=result["selection"]["suites"], onto=None, timeout=timeout)
+            with whole.capped(workers) if limit else contextlib.nullcontext():
+                if alone:
+                    done = _run_on_head(clone, alone, base, result["selection"], root / QUEUE_DIR / stamp / "head",
+                                        timeout, acceptance_runs, workers)
+                else:
+                    done, _ = batch.isolate(root, base, [f"{c['ticket']}={c['tip']}" for c in left],
+                                            targets=result["selection"]["suites"], onto=None, timeout=timeout,
+                                            also=acceptance_runs, workers=workers,
+                                            options=[f"--ignore={f.strip('/')}" for f in own] if full else None)
+        except GovError as refused:
+            run_files(refused.details)
+            if full:
+                result["full"]["runs"] = refused.details.get("runs") or []
+            raise
         finally:
-            timed("run", began)
-        result.update({k: done[k] for k in ("reds", "flaky", "culprits")}, tested=done["land_commit"])
+            seconds["run"] = round(time.monotonic() - began - (seconds["acceptance"] - before), 3)
+            result["acceptance"] = [{k: a[k] for k in ("ticket", "folder", "outcome", "error_kind", "lines")}
+                                    for a in accepted.values()]
+        run_files(done)
+        result.update({k: done[k] for k in ("reds", "flaky", "culprits")}, tested=done["land_commit"],
+                      base_reds=done.get("base_reds") or [])
         result["runs"] = done.get("runs", []) + [{**r, "name": f"rest:{r['name']}"} for r in done.get("rest_runs", [])]
+        if full:
+            result["full"]["runs"] = result["runs"]
         landed = [c for c in left if c["ticket"] in done["landed"]]
         if result["tested"] is None:
             return finish(EXIT_RED)
+        for cand in landed:  # never landed on an acceptance run that did not pass on the tested commit
+            ran = accepted.get(cand["ticket"])
+            if cand["folder"] and (ran is None or ran["outcome"] != "pass"):
+                _refuse("ACCEPTANCE_NOT_GREEN", f"{cand['ticket']}: its acceptance run on the tested commit did not "
+                        "pass; nothing lands", {"candidate": cand["ticket"]}, EXIT_RED)
+            cand["acceptance"] = {"folder": cand["folder"], "lines": ran["lines"]} if cand["folder"] else \
+                {"folder": None, "lines": [], "record": cand["record"]}
+        code = EXIT_RED if len(landed) < len(cands) else 0
+        if dry is not None:  # the answer the landing would give; nothing is closed and nothing moves
+            result.update(landed=[c["ticket"] for c in landed], dry_run=True)
+            return finish(code)
         began = time.monotonic()
         explains = done.get("explains") or {}
+        at_base = {r["test"]: r for r in result["base_reds"]}
         record = {"close": "queue", "commit": result["tested"], "selection": result["selection"],
                   "runs": result["runs"],
                   "reds": [{"test": t, "verdict": "flaky"} for t in result["flaky"]]
-                  + [{"test": t, "verdict": "culprit", "culprits": explains.get(t, [])} for t in result["reds"]],
-                  "culprits": result["culprits"], "base": base, "onto": onto, "queue": result["record"]}
+                  + [{**at_base[t], "verdict": "base"} if t in at_base else
+                     {"test": t, "verdict": "culprit", "culprits": explains.get(t, [])} for t in result["reds"]],
+                  "base_reds": list(at_base), "culprits": result["culprits"], "base": base, "onto": onto,
+                  "queue": result["record"]}
         last = _close_all(root, clone, landed, record, result)
         _move(root, clone, onto, base, last, result)
         timed("close", began)
         result.update(head=last, landed=[c["ticket"] for c in landed])
-        return finish(EXIT_RED if len(landed) < len(cands) else 0)
+        began = time.monotonic()  # the after-step: notices only, the landing stands whatever they say
+        try:  # where the branch is checked out, in its tree; else the rebuild from the root, the pass in the clone
+            tree = _checked_out(root, onto)
+            result["after"] = after.run(tree or root, onto, base, tree or clone)
+        except Exception as e:  # noqa: BLE001 - never refuses
+            result["after"] = {"ok": False, "reason": f"{type(e).__name__}: {e}"[:600]}
+        result["after"]["seconds"] = round(time.monotonic() - began, 3)
+        return finish(code)
     except RuntimeError as e:  # a git step that failed: nothing has moved
         return finish(1, GovError("GIT_FAILED", f"{e}; nothing lands", {"reds": result["reds"]}))
     except GovError as error:
         result["reds"] = error.details.get("reds", result["reds"])
         error.details["reds"] = result["reds"]
         return finish(EXIT_RED, error)
+    finally:
+        if dry is not None:  # the clone at the base; the root without the ref the batch's search fetched into it
+            if clone is not None:
+                _back_to(clone, base)
+            _git(root, "update-ref", *([batch.LAND_REF, kept] if kept else ["-d", batch.LAND_REF]), ok=True)

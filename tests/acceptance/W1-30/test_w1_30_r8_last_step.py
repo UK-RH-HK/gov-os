@@ -8,9 +8,9 @@ with status ACTIVE, no checkpoint of the ticket whose next action is "ticket clo
 
 **A stale record store.** "A record store older than the commit being closed refuses (the context would be
 built from superseded records); the answer names ``gov rebuild``." The store is loaded; then the owner's
-commit supersedes the decision the ticket names as its source; the close runs without a reload. The case holds
-afterwards, with the store loaded again, that ``gov context`` answers ``BLOCKED`` for the ticket: so the store
-the close read hid it. DEC-490: the case holds the behaviour only (refused, ``gov rebuild`` named, nothing
+commit supersedes the decision the ticket names as its source; the close runs without a reload. (The case used
+to read the ticket through the context command, retired by DEC-1214 M1; the reading is gone, the store gate
+stays.) DEC-490: the case holds the behaviour only (refused, ``gov rebuild`` named, nothing
 closed), and the refusal is "could not measure": exit code 1, not counted, no repair ticket. How the store's
 freshness is told is the engineer's (a mark the store or the runtime already keeps).
 
@@ -83,10 +83,13 @@ def test_a_close_record_that_cannot_be_written_leaves_nothing_that_says_the_tick
 
 
 def test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the_rebuild(project, sandbox, interface):
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): the case read the fixture through the retired context command (a context
+    built before the owner's commit, and refused for the superseded base decision after the store was loaded again).
+    Those two readings are deleted with the command; the owner's commit still makes the loaded store older than the
+    commit being closed, and what is asserted of the refusal (exit 1 naming gov rebuild, the ticket open, nothing
+    counted, no repair ticket) is unchanged."""
     support.build_ticket(project, TICKET, WBS)
     support.load_store(project, sandbox)
-    assert project.gov(sandbox, "context", TICKET, "--json").envelope()["ok"] is True, \
-        "the fixture is wrong: the ticket's context cannot be built before the owner's commit"
     project.add_decision(support.BASE_SOURCE, "SUPERSEDED", title="The base decision", superseded_by="DEC-90121")
     project.add_decision("DEC-90121", "ACTIVE", title="The decision that replaces it", supersedes=[support.BASE_SOURCE])
     project.commit("the owner supersedes the base decision", who=support.OWNER)
@@ -95,11 +98,6 @@ def test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the
 
     closed = support.ticket_status(project.root, TICKET)
     saying = support.records_saying_closed(project.root, TICKET)
-    support.load_store(project, sandbox)
-    error = support.context_error(project, sandbox, TICKET)
-    assert error["code"] == "BLOCKED" and support.BASE_SOURCE in support.error_text(error), \
-        f"the fixture is wrong: with the store loaded again gov context gives {error}"
-
     error = support.refused_without_a_finding(run, interface)   # "could not measure": exit code 1 (DEC-490)
     assert "gov rebuild" in support.error_text(error), f"the answer does not name gov rebuild\n{run.describe()}"
     assert closed == "in_progress" and not saying, f"status {closed!r}; saying closed: {saying}\n{run.describe()}"

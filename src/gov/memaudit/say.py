@@ -10,8 +10,16 @@ from __future__ import annotations
 import os
 import sys
 
+import re
+
 REFUSAL = "REFUSED: a line that names a sets-root folder was not printed"
 FOLDER_WORDS = ("fixtures/", "runs/", "indep-walls/", "hidden")
+# W2-204 I4: the two lines of ``fresh`` in which the word names the half that is judged, never a folder. Each is
+# matched whole: audit names, counts, a digest's 12 digits and fixed words, nothing else.
+HALF_LINES = (
+    re.compile(r"FRESH plan: visible memory-audit-[0-9]{8} hidden memory-audit-[0-9]{8} at [0-9a-f]{12}"),
+    re.compile(r"FRESH VERDICT hidden right [0-9]+ of [0-9]+ \([0-9]+\.[0-9] %\): (passes|misses)"),
+)
 
 
 def _roots(sets_root) -> list[str]:
@@ -23,6 +31,8 @@ def _roots(sets_root) -> list[str]:
 
 def refused(line: str, sets_root=None) -> bool:
     """Whether ``line`` names a sets-root folder."""
+    if any(rx.fullmatch(line) for rx in HALF_LINES):
+        return False
     if any(word in line for word in FOLDER_WORDS):
         return True
     return any(root.rstrip("/") + "/" in line for root in _roots(sets_root))

@@ -7,22 +7,28 @@
   trailer, each of them ``independent-test-designer`` or ``owner``.
 - **The path notice** (audit 7 C-6): every path a non-merge commit changes outside the ticket's ``allowed_paths``
   and its own record places is listed; it never refuses.
+- **The acceptance tests are there** (W2-202 A3): a ticket judged on its tests has an acceptance folder that holds a
+  test and a README whose KPI map the runner of ``gov accept`` reads; else it is refused before any run.
 """
 
 from __future__ import annotations
 
 import subprocess
+from fnmatch import fnmatch
 from pathlib import Path
 
 from gov.util.gitenv import git_env
 
 TEST_ROLES = ("independent-test-designer", "owner")
 ACCEPTANCE = "tests/acceptance/"
+NO_ACCEPTANCE_TESTS = "NO_ACCEPTANCE_TESTS"
 
 
-def _git(root: Path, *args: str) -> str:
+def _git(root: Path, *args: str, ok: bool = False) -> str | None:
     done = subprocess.run(["git", "-c", "core.quotePath=false", "-C", str(root), *args], capture_output=True,
                           text=True, env=git_env(root))
+    if done.returncode and ok:
+        return None
     if done.returncode:
         raise RuntimeError(f"git {' '.join(args[:2])} failed: {' '.join(done.stderr.split())[:200]}")
     return done.stdout
@@ -74,3 +80,32 @@ def path_notices(root: Path, base: str, tip: str, allowed: list[str], own: list[
                 continue
             notices.append({"commit": commit, "path": path})
     return notices
+
+
+def holds_tests(root: Path, rev: str, folder: str) -> bool:
+    """Whether ``folder`` holds a test file (``test_*.py``, at any depth) at ``rev``."""
+    names = _git(root, "ls-tree", "-r", "-z", "--name-only", rev, "--", folder.strip("/") + "/").split("\0")
+    return any(fnmatch(name.rsplit("/", 1)[-1], "test_*.py") for name in names if name)
+
+
+def acceptance_refusal(root: Path, revs: list[str], folder: str | None) -> tuple[str, str] | None:
+    """Why a ticket cannot be judged on its acceptance tests, as ``(code, reason)``; None where it can. ``folder``
+    is the path its ticket file declares; it is read at the first of ``revs`` (the branch tip, then the base) where
+    it holds a test. No test at any of them is ``NO_ACCEPTANCE_TESTS``; a README the runner of ``gov accept`` would
+    refuse is the runner's own code (``ACCEPT_NO_MAP``, ``ACCEPT_MAP_UNREADABLE``): fail closed, before any run."""
+    from gov.accept import runner
+
+    if not folder or not folder.strip("/"):
+        return NO_ACCEPTANCE_TESTS, "its ticket file declares no acceptance folder (acceptance_tests.path)"
+    folder = folder.strip("/")
+    held = next((rev for rev in revs if holds_tests(root, rev, folder)), None)
+    if held is None:
+        return NO_ACCEPTANCE_TESTS, f"its acceptance folder {folder}/ holds no test"
+    readme = _git(root, "show", f"{held}:{folder}/README.md", ok=True)
+    try:
+        mapping = runner.parse_map(readme) if readme is not None else {}
+    except runner.Unreadable:
+        return "ACCEPT_MAP_UNREADABLE", f"the README of {folder}/ has a KPI map the runner of gov accept cannot read"
+    if not mapping:
+        return "ACCEPT_NO_MAP", f"the README of {folder}/ maps no KPI line, so gov accept cannot judge its tests"
+    return None

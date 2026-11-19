@@ -53,6 +53,30 @@ def head_findings(head_tree, home) -> list:
 
 
 @pytest.fixture(scope="session")
+def whole_tree(head_tree, tmp_path_factory) -> Path:
+    """HEAD's files with the register whole again (EMERGENCY-2 11.3, DEC-1214 G4): since the old register moved to
+    ``support.OLD_REGISTER``, the entries the clean-up marked stand there, and HEAD's register keeps the decisions in force
+    only. A clone at HEAD whose register is ``support.whole_register`` (the archive's entries, then the later ones),
+    committed, so the cases about the marks read every entry, and ``gov links`` and the drift script judge them, as
+    before the move. Where HEAD holds no archive it is ``head_tree`` itself."""
+    text = support.whole_register(head_tree)
+    if text is None:
+        return head_tree
+    tree = support.make_clone(tmp_path_factory.mktemp("w2-130-whole") / "repo", support.head())
+    (tree / support.REGISTER).write_text(text, encoding="utf-8")
+    support.commit_all(tree, "the register whole: the archive's entries and the later ones")
+    return tree
+
+
+@pytest.fixture(scope="session")
+def whole_findings(whole_tree, head_tree, home, request) -> list:
+    """``gov links --all --json`` on ``whole_tree``: HEAD's findings where HEAD's register is whole."""
+    if whole_tree == head_tree:
+        return request.getfixturevalue("head_findings")
+    return support.links_json(whole_tree, home)
+
+
+@pytest.fixture(scope="session")
 def pinned_findings(clone_at, home):
     """``pinned_findings(rev)``: ``(tree, findings)`` of ``gov links --all --json`` on the clone at ``rev``, run by the
     clone's own ``src`` (``PYTHONPATH=<clone>/src``), made once. A case pinned to a commit reads its counts here, so

@@ -90,8 +90,10 @@ def test_one_check_id_declared_differently_in_the_two_layouts_is_refused(tmp_pat
 
 
 def test_the_read_commands_are_those_of_cap_27():
+    """Rewrite-Reason: DEC-1214 M1 (W2-200): CAP-27's read commands less the context command, which the owner retired
+    with its library and its check."""
     read = {command.name for command in COMMANDS if command.cls == "read"}
-    assert read == {"status", "check", "readiness", "doctor", "context", "closure", "retrieve"}
+    assert read == {"status", "check", "readiness", "doctor", "closure", "retrieve"}
     assert all(command.cls in ("read", "act") for command in COMMANDS)
     assert all(command.act_paths == () for command in COMMANDS)
 

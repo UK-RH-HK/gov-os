@@ -51,10 +51,12 @@ def test_the_limits_follow_their_rules_on_two_profiles(box):
     box.profile(32, 64, 24576)
     big = limits.detect()
     assert big["machine"]["cpus"] == 32 and big["machine"]["ram_bytes"] == 64 * GIB
-    assert big["limits"] == {"heavy_slots": 4, "workers_per_slot": 7, "sessions_max": 16, "gpu_budget_mib": 21504}
+    assert big["limits"] == {"heavy_slots": 3, "workers_per_slot": 4, "sessions_max": 16, "gpu_budget_mib": 21504,
+                             "start_below": 19.2, "load_limit": 32, "margin": 1.0}  # W2-199's formulas
     box.profile(8, 16, 8192)
     small = limits.detect()
-    assert small["limits"] == {"heavy_slots": 1, "workers_per_slot": 7, "sessions_max": 4, "gpu_budget_mib": 7168}
+    assert small["limits"] == {"heavy_slots": 1, "workers_per_slot": 3, "sessions_max": 4, "gpu_budget_mib": 7168,
+                               "start_below": 4.8, "load_limit": 8, "margin": 1.0}
 
 
 def test_a_measured_peak_binds_where_smaller(box):
@@ -62,7 +64,7 @@ def test_a_measured_peak_binds_where_smaller(box):
     box.gate(verification_peak_bytes=16 * GIB, working_size_bytes=8 * GIB)
     found = limits.detect()["limits"]
     assert found["heavy_slots"] == 2 and found["sessions_max"] == 4
-    assert found["workers_per_slot"] == 14
+    assert found["workers_per_slot"] == 6  # (32 - 19.2) / (1.0 x 2 slots)
 
 
 def test_no_gpu_budget_is_zero_and_not_a_problem(box):

@@ -65,7 +65,7 @@ from subprocess import SubprocessError
 import yaml
 
 from gov.cli.errors import GovError
-from gov.launch import criticality as crit, environ, record, role as roles, session_record
+from gov.launch import criticality as crit, environ, model_exceptions, record, role as roles, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
 from gov.spend import brake as spend_brake
@@ -114,6 +114,10 @@ RUNTIME, SCRATCH = ".gov-runtime", "scratch"
 # The no-prompt mode, accepted since Emergency 2 (0.1.2; DEC-313 superseded by EMERGENCY-2 2.2, 2.9).
 BYPASS_MODE = "bypassPermissions"
 WORKER_CACHE_TTL = "5m"  # a launched worker's prompt-cache lifetime (audit 09; the CTO's own session keeps 1 h)
+# W2-201 S8 (audit 09 item 3, DEC-1212 (4)): no inbox waiter and no idle-check wake-up; a hook of these events whose
+# command names one of these refuses a worker launch.
+WAKE_EVENTS = ("Stop", "SubagentStop", "UserPromptSubmit")
+WAKE_COMMANDS = ("stop_waiter_check", "stop_idle_check", "gov session-watch", "gov msg wait")
 # Names kept for the readers that import them (suites, fixtures); since Emergency 2 no launch decides by them.
 EXPERIMENTS_ROOT = "experiments"
 KERNEL_ALLOWLIST_REL = "template/governance/kernel/launch/research-allowlist.yaml"
@@ -267,6 +271,23 @@ def _check_repository_settings(root: Path, worker: bool = True) -> None:
             raise _refuse(f"{rel} is not a JSON object")
         if worker:
             _check_role_settings(data, rel)
+            _check_wake_hooks(data, rel)
+
+
+def _check_wake_hooks(data: dict, rel: str) -> None:
+    """W2-201 S8: a settings file with a hook, in a ``Stop``, ``SubagentStop`` or ``UserPromptSubmit`` entry, whose
+    command names an inbox waiter or an idle check refuses a worker launch, naming the file and the command."""
+    hooks = data.get("hooks")
+    for event in WAKE_EVENTS:
+        entries = hooks.get(event) if isinstance(hooks, dict) else None
+        for entry in entries if isinstance(entries, list) else []:
+            inner = entry.get("hooks") if isinstance(entry, dict) else None
+            for hook in inner if isinstance(inner, list) else []:
+                command = hook.get("command") if isinstance(hook, dict) else None
+                for name in WAKE_COMMANDS:
+                    if isinstance(command, str) and name in command:
+                        raise _refuse(f"{rel} holds a {event} hook whose command names '{name}': no inbox waiter "
+                                      f"and no idle-check wake-up hook wakes a worker session (DEC-1212 (4))")
 
 
 def _mode_args(cli_args: list[str]) -> list[str]:
@@ -648,11 +669,33 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         model, model_source, why = opus, "probe", f"the second review is the probe ({opus})"
     else:
         model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
+    exception = None
     if given["model"] is not None:
         if given["model"] != model:
-            raise _refuse(f"the CLI arguments carry --model {given['model']}, which is not the session's model "
-                          f"{model} ({why}) (DEC-839 item 1, DEC-1120 (3))")
-        if model_source == table_source:
+            # W2-201 S4 (DEC-1212 (2), DEC-1214 K1): another model only by an entry of the exceptions file, and only
+            # where the table decides: a promotion, a trial and the probe stay as they are
+            shown = ticket_class if ticket_class is not None else f"none (no {crit.REL})"
+            refusal = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
+                       f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3)); another model comes "
+                       f"only from an exception in {model_exceptions.REL} (DEC-1212 (2))")
+            substituted = roles.substitution_active(root)
+            if substituted and model_exceptions.names_opus(given["model"]):
+                # W2-201 S9 (DEC-1215): as the helper hook refuses an Opus spawn, whatever the exceptions file holds
+                raise _refuse(f"the CLI arguments carry --model {given['model']}: while the owner's temporary "
+                              f"substitution is active (DEC-1215, {roles.SUBSTITUTION_REL}) every Opus role runs "
+                              f"Claude Fable 5.2 instead; name no model, or 'fable' (claude-fable-5-2) where an "
+                              f"exception in {model_exceptions.REL} covers it")
+            if model_source != table_source:
+                raise _refuse(refusal)
+            try:
+                entry = model_exceptions.find(root, role, given["model"], ticket_class, substituted)
+            except GovError as error:
+                raise _refuse(f"{refusal}: {error.message}") from None
+            if entry is None:
+                raise _refuse(f"{refusal}: it holds none for '{role}' with that model"
+                              f"{' and class' if ticket_class is not None else ''}")
+            model, model_source, exception = given["model"], "exception", str(entry.get("decided"))
+        elif model_source == table_source:
             model_source = "after --"
 
     # the effort: trial, after --, probe, then the table's
@@ -691,7 +734,7 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         raise _refuse(f"the review of session {repeated['session_id']} ran on model {model}, effort {effort}, "
                       f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
     return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
-            "tier": model.split("-")[1], "criticality": ticket_class,
+            "tier": (model.split("-") + [model])[1], "criticality": ticket_class, "exception": exception,
             "rubric": crit.REL if crit.exists(root) else None,  # W2-121c RT-8: the file the choice came from
             "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
             "review_round": review_round}
@@ -753,6 +796,8 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "trial": chosen["trial"], "promotion": chosen["promotion"], "effort_reason": chosen["effort_reason"],
         "owner_named": chosen["owner_named"], "review_round": chosen["review_round"],
         "rubric": chosen.get("rubric"),  # W2-121c RT-8: the rubric file the choice came from, or null
+        "exception": chosen.get("exception"),  # W2-201 S4: the exceptions entry's decided text, or null
+        "cache_ttl": WORKER_CACHE_TTL,  # W2-201 S7: the worker's cache setting (CLAUDE_CODE_PROMPT_CACHE_TTL)
         "subagent_model": model, "compaction_threshold": "none",
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
@@ -760,6 +805,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
     if plan.get("projection_usd") is not None:  # W2-156: the runaway brake's projection; absent, the key is absent
         data["projection_usd"] = plan["projection_usd"]
     written = record.write(plan["records"], data)
+    plan["session_id"] = session_id  # W2-205 RT-5: the registry entry records it, for a relaunch
     head = [*OWN_SWITCHES, *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
@@ -772,8 +818,11 @@ def _end_message(entry: dict | None, code) -> None:
     if entry is None:
         return
     try:
-        from gov.dispatch import inbox, runtime
+        from gov.dispatch import ends, inbox, runtime
         role, ticket = entry.get("role"), entry.get("ticket")
+        # W2-205 RT-2: the end event first (a send that fails then shows as an unsent end), ended_at = now
+        ends.record(runtime.end_id(entry), "lead" if role == LEAD_GOV_ROLE else "worker", entry["notify"],
+                    ends.stamp(), ticket=ticket)
         inbox.send(entry["notify"], "wake", f"session {role} {ticket} ended with exit code {code}",
                    sender=entry["address"], message_id=runtime.end_id(entry),
                    data={"role": role, "ticket": ticket, "pid": entry.get("pid"), "exit_code": code,
@@ -781,6 +830,20 @@ def _end_message(entry: dict | None, code) -> None:
     except Exception as error:  # noqa: BLE001 - nothing here may end the launch
         _say(f"gov launch: the end message to {entry.get('notify')} could not be sent: "
              f"{' '.join(str(getattr(error, 'message', error)).split())}\n")
+
+
+def _session_key(worker: dict | None, cli_args: list[str]) -> dict:
+    """W2-205 RT-5: the session's id for its registry entry, so that a death can resume it: a worker's is the one its
+    plan gave (``--session-id``); a lead's is the one it was given (``--session-id``, else the one it resumes), or none."""
+    if worker is not None:
+        return {"session_id": worker["session_id"]} if worker.get("session_id") else {}
+    for index, arg in enumerate(cli_args):
+        for flag in ("--session-id", "--resume"):
+            found = cli_args[index + 1] if arg == flag and index + 1 < len(cli_args) else \
+                arg[len(flag) + 1:] if arg.startswith(flag + "=") else None
+            if found is not None and _UUID.fullmatch(found):  # a bare --resume is the CLI's picker: no id
+                return {"session_id": found}
+    return {}
 
 
 def _notify_address() -> str:
@@ -1094,7 +1157,9 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
                 try:
-                    state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address)
+                    state["entry"] = registry.register(pid, root, *entry, notify=_notify_address(), address=address,
+                                                       launcher_pid=os.getpid(),
+                                                       **_session_key(worker, cli_args))
                     state["registered"] = pid
                 except (OSError, GovError) as error:
                     raise _refuse(f"the session cannot be entered in the machine-wide registry "

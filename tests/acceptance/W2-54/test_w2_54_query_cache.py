@@ -5,7 +5,7 @@ sessions at once, bounded in size, and rebuildable from nothing [owner, 2026-10-
 And the determinism of success 4 seen outside the sandbox: where the cache cannot be written, the same text still
 gets the same vector. A cold, a warm, a full, a deleted and an unwritable cache all give one text one answer.
 
-Seen from outside, through public interfaces only: ``gov retrieve --json``, ``gov context --json``,
+Seen from outside, through public interfaces only: ``gov retrieve --json``,
 ``gov.retrieval.semantic.search(root, q, refresh=False)``, the project's file tree before and after, and the public
 setting that lowers the bound (README, "The bound"). No case names the cache file, its form or the code that writes
 it: the cache is "the one file under .gov-runtime/ a read wrote that is not the store".
@@ -92,18 +92,21 @@ def _first_answer(box, tmp_path, question, files=None, name="reference"):
 # ---- 1. the one file a read writes ---------------------------------------------------------------------------------
 
 @STAND_IN
-def test_gov_retrieve_and_gov_context_write_at_most_one_derived_file_under_the_runtime_folder(
-        box, embedder, tmp_path):
-    """After ``gov retrieve`` (two questions) and ``gov context`` (two tickets), the project's tree differs from
-    before in at most one file, always the same one: under ``.gov-runtime/``, not a file of the store, not tracked
-    by git. No record, no store file, no index, nothing outside ``.gov-runtime/`` changes. Passes today."""
+def test_gov_retrieve_writes_at_most_one_derived_file_under_the_runtime_folder(box, embedder, tmp_path):
+    """After ``gov retrieve`` (four questions), the project's tree differs from before in at most one file, always the
+    same one: under ``.gov-runtime/``, not a file of the store, not tracked by git. No record, no store file, no
+    index, nothing outside ``.gov-runtime/`` changes. Passes today.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): was ``test_gov_retrieve_and_gov_context_write_at_most_one_derived_file_under_
+    the_runtime_folder``; the context command is retired, so its two reads (two tickets) are two ``gov retrieve`` of
+    those tickets' questions. What is asserted of the tree is unchanged."""
     project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
     env = S.embed_env(box, embedder)
     before, tracked = S.project_tree(project), S.tracked(project)
     steps = [("retrieve", "--json", "--root", project, QUESTION),
              ("retrieve", "--json", "--root", project, "who reads the harbour tide tables"),
-             ("context", "--json", "--root", project, TICKET),
-             ("context", "--json", "--root", project, "TK-W254-BAKERY")]
+             ("retrieve", "--json", "--root", project, S.QUESTION_TICKETS[TICKET]),
+             ("retrieve", "--json", "--root", project, S.QUESTION_TICKETS["TK-W254-BAKERY"])]
     written = set()
     for step in steps:
         done = S.gov(box, *step, env=env)
@@ -121,8 +124,11 @@ def test_gov_retrieve_and_gov_context_write_at_most_one_derived_file_under_the_r
 
 @STAND_IN
 def test_in_a_project_without_an_index_a_read_creates_nothing(box, embedder, tmp_path):
-    """A committed project never indexed: ``gov retrieve`` and ``gov context`` create no ``.gov-runtime/`` and change
-    no file (as W1-21 holds for the retrieval). Passes today."""
+    """A committed project never indexed: ``gov retrieve`` creates no ``.gov-runtime/`` and changes no file (as W1-21
+    holds for the retrieval). Passes today.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): the context command is retired, so its read is a second ``gov retrieve``, of
+    the ticket's question; what is asserted of the tree is unchanged."""
     project = S.new_repo(tmp_path / "bare")
     S.adopt_embedded(project)
     for rel, text in S.ticket_files().items():
@@ -130,7 +136,8 @@ def test_in_a_project_without_an_index_a_read_creates_nothing(box, embedder, tmp
     S.commit_all(project)
     before = S.project_tree(project)
     env = S.embed_env(box, embedder)
-    for step in (("retrieve", "--json", "--root", project, QUESTION), ("context", "--json", "--root", project, TICKET)):
+    for step in (("retrieve", "--json", "--root", project, QUESTION),
+                 ("retrieve", "--json", "--root", project, S.QUESTION_TICKETS[TICKET])):
         done = S.gov(box, *step, env=env)
         assert "Traceback" not in done.stderr, done.describe()
     assert not (project / S.RUNTIME_REL).exists(), "a read in a project without an index made .gov-runtime/"
@@ -361,20 +368,20 @@ def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_
 
 
 @STAND_IN
-def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedder, tmp_path):
+def test_one_ticket_s_question_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path):
     """*Red.* For one ticket, each read in a process of its own, after other questions: cold, warm, the cache
     deleted, ``.gov-runtime/`` read-only, the cache's files read-only, and the cache full (bound lowered, 200 other
     texts): ``gov retrieve`` of the ticket's question gives the one answer it gets as the first question in a new
-    store built alike, and ``gov context --json`` gives the one packet and hash the ticket gets as the first context
-    in a new store built alike; ``gov context`` sends the embedder nothing. Every run ends with exit code 0 and no
+    store built alike, and the context command (``--json``) gives the one packet and hash the ticket gets as the first context
+    in a new store built alike; the context command sends the embedder nothing. Every run ends with exit code 0 and no
     traceback.
 
-    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. ``gov context`` sends nothing to an embedder
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. the context command sends nothing to an embedder
     (W2-04's addendum, S4 and S7), so it no longer makes or reads the cache: the cache's states are made by ``gov
     retrieve`` (the other tickets' titles in place of the other tickets' contexts), and "one question, one answer
-    whatever the cache's state" is held through ``gov retrieve``. The packet-hash part stays for ``gov context``. The
+    whatever the cache's state" is held through ``gov retrieve``. The packet-hash part stays for the context command. The
     premise that the context held a retrieval item moves to ``gov retrieve``'s answer: the context's evidence no
-    longer comes from the semantic route. Today ``gov context`` sends the embedder its question.
+    longer comes from the semantic route. Today the context command sends the embedder its question.
 
     Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
     own (``_reference_cache``), so "cold" is still cold in the case's cache; the assertions are unchanged.
@@ -395,7 +402,13 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     (``tmp_path / "p"``) differ by ``result.store.root`` by design. The two answers are compared without that one field
     (``_beside_its_folder``); ``result.store.commit`` stays in the comparison, equal by construction (both projects
     are committed with the same files, author, committer and dates, ``S.git``). The packet-hash assertions and every
-    other assertion are unchanged."""
+    other assertion are unchanged.
+
+    Rewrite-Reason: DEC-1214 M1 (W2-200): was ``test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state``. The
+    context command is retired, so the packet part is deleted (the reference packet, each state's packet and its
+    "sends the embedder nothing" guard); the case now asserts that the ticket's question, through ``gov retrieve``,
+    gets the one answer it gets first in a new store, in every one of the six states. The states and how they are
+    made are unchanged."""
     files = S.ticket_files()
     question = S.QUESTION_TICKETS[TICKET]
     others = iter([S.QUESTION_TICKETS["TK-W254-BAKERY"], S.QUESTION_TICKETS["TK-W254-ORCHARD"]] * 3)
@@ -406,9 +419,6 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
         first = S.gov(box, "retrieve", "--json", "--root", twin, question, env=twin_env)
         assert not S.clean(first) and first.envelope().get("ok") is True, first.describe()
         answer_reference = first.envelope()["result"]
-        reference = S.gov(box, "context", "--json", "--root", twin, TICKET, env=twin_env)
-        assert not S.clean(reference), reference.describe()
-        reference = reference.envelope()["result"]
     finally:
         fresh.close()
     assert answer_reference.get("evidence") and \
@@ -434,25 +444,12 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
         assert not S.clean(done) and done.envelope().get("ok") is True, f"{what}\n{done.describe()}"
         return done.envelope()["result"]
 
-    def context(what, env=env):
-        before = len(embedder.embedded())
-        done = S.gov(box, "context", "--json", "--root", project, TICKET, env=env)
-        assert not S.clean(done) and done.envelope().get("ok") is True, f"{what}\n{done.describe()}"
-        assert len(embedder.embedded()) == before, \
-            f"{what}: gov context sent the embedder {embedder.embedded()[before:][:2]}"
-        return done.envelope()["result"]
-
     def same(what, **kwargs):
         answer = retrieve(what, question, **kwargs)
         assert S.canonical(_beside_its_folder(answer)) == S.canonical(_beside_its_folder(answer_reference)), (
             f"{what}: one question, two answers (the first in a new store):\n"
             f"{[item.get('path') for item in answer.get('evidence') or []]}\n"
             f"{[item.get('path') for item in answer_reference.get('evidence') or []]}")
-        packet = context(what, **kwargs)
-        assert packet[S.K_HASH] == reference[S.K_HASH] and S.canonical(packet) == S.canonical(reference), (
-            f"{what}: one ticket, two packets: {packet[S.K_HASH]} != {reference[S.K_HASH]} (the first in a new store)"
-            f"\nsupplementary ids: {[item.get('id') for item in packet[S.K_SUPPLEMENTARY]]} / "
-            f"{[item.get('id') for item in reference[S.K_SUPPLEMENTARY]]}")
 
     retrieve("another question first", next(others))
     same("cold, after another question")

@@ -4,6 +4,11 @@
 placeholder (``{UNSET_<NAME>}``, which ``gov brief`` refuses by name) for a command with no gov form. The project's
 CTO fills those afterwards. ``ready.new_since`` is the adoption's UTC date, a quoted ISO string. A facts file that
 exists is never touched.
+
+``write_queue_settings`` (W2-202 A5; L2 section 2) writes ``governance/project/queue.yaml`` where the repository has
+none: the settings ``gov queue`` lands by (the integration branch, the form of a ticket's work branch). The landing
+is the close, so no ``close.yaml`` is written. ``gov adopt --facts`` calls it with the facts file it writes: a
+repository that has its own facts file is left wholly as it is (W2-174 S5).
 """
 
 from __future__ import annotations
@@ -42,7 +47,7 @@ COMMANDS = {
     "identity": None,
     "where": None,
     "retrieve": ('gov retrieve "<question>"', "gov retrieve --help"),
-    "context": ("gov context {ID} --role {WORKER_ROLE}", "gov context --help"),
+    "decisions": ("gov decisions in-force", "gov decisions --help"),  # the in-force list moved here from gov context (DEC-1214 M1)
     "links": ("gov links --since {BASE}", "gov links --help"),
     "accept": ("gov accept {ID} --root {WRITE_TREE}", "gov accept --help"),
     "pytest_folder": None,
@@ -57,7 +62,6 @@ COMMANDS = {
     "merge_tests": None,
     "tests_worktree_remove": None,
     "checkpoint": ('gov checkpoint --ticket {ID} --trigger ticket-transition --next "{NEXT}"', "gov checkpoint --help"),
-    "context_ceiling": ("gov context {ID} --json", "gov context --help"),
 }
 
 TAIL = """\
@@ -91,9 +95,9 @@ steps:
     line: 'Before every heavy run and at the end, give the scratch size and inode count in `evidence`.'
     match: 'du -s'
   context_ceiling:
-    "on": true
-    line: 'Before DONE, run {CMD:context_ceiling} once; on CONTEXT_OVER_CEILING return the figures and a package naming what to trim.'
-    match: 'gov(\\.cli\\.main)? context \\S+ --json'
+    "on": false
+    line: 'No size ceiling is checked before DONE: the close records the decisions the ticket cites.'
+    match: 'context_ceiling'
   checkpoint_record:
     "on": true
     line: 'At the end, before the final probe, record {CMD:checkpoint} with the next step.'
@@ -145,6 +149,28 @@ def write_default(root: Path, today: datetime.date) -> dict:
     try:
         with open(path, "x", encoding="utf-8") as handle:  # "x": a facts file that appeared meanwhile stays
             handle.write(text)
+    except FileExistsError:
+        return {"path": str(path), "written": False}
+    return {"path": str(path), "written": True}
+
+
+QUEUE_SETTINGS_REL = "governance/project/queue.yaml"
+QUEUE_SETTINGS = """\
+# The settings gov queue lands by. Written by `gov adopt --facts` from product defaults; the project's CTO changes them.
+# integration: the branch tickets land on. work_branch: the form of a ticket's work branch ({ticket}: the ticket's
+# id, {wbs}: its wbs_id); `gov queue <ticket>=<branch>` names another branch for one landing.
+integration: main
+work_branch: "{ticket}"
+"""
+
+
+def write_queue_settings(root: Path) -> dict:
+    """Write ``<root>/governance/project/queue.yaml`` unless it exists: ``{"path": ..., "written": true|false}``."""
+    path = Path(root) / QUEUE_SETTINGS_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(path, "x", encoding="utf-8") as handle:  # "x": a settings file that is there stays as it is
+            handle.write(QUEUE_SETTINGS)
     except FileExistsError:
         return {"path": str(path), "written": False}
     return {"path": str(path), "written": True}

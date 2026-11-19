@@ -22,7 +22,7 @@ from pathlib import Path
 
 from gov.checkpoint.record import CHECKPOINTS_REL, NAME, SCRATCH_CHECKPOINTS_REL, TICKET_ID
 from gov.cli.errors import GovError
-from gov.context import _tokens
+from gov.util.tokens import _tokens
 from gov.tasks.tickets import TICKETS_REL, frontmatter
 from gov.telemetry import sessionlog
 from gov.util.gitenv import git_env

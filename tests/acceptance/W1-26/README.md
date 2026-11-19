@@ -696,3 +696,14 @@ Cases: 75 in the full run, 212 in `breadth`, 132 in `lifted`.
 | F2: The scope of a check is a hand-maintained list [CAP-58.a] | `test_w1_26_command.py::test_gov_check_list_still_works`, `test_w1_26_dec436.py::test_unknown_family_declaration_in_check_list`, `test_w1_26_dec436.py::test_record_in_new_directory_discovered_by_schema_check` | the ticket's words |
 
 **D-10's red fix, the recorded commands (2026-11-10, W2-20 `DAEO-r30l`; DEC-753, DEC-1088, DEC-1074 (7), DEC-1109; a fresh test designer, Rewrite-Reason):** W1-07's lines record `brief`, `links` and `plan`, so `test_w1_26_recorded_commands.py` holds nine (20 cases). `test_w1_26_recorded_commands.py::test_a_recorded_command_without_its_module_is_a_finding_that_names_it` gains `[brief]`, `[links]`, `[plan]` (module `src/gov/<name>/command.py`); `test_w1_26_recorded_commands.py::test_a_skill_may_name_a_recorded_gov_command` gains the same three; `test_w1_26_recorded_commands.py::test_with_every_module_present_the_check_has_no_finding` holds the nine. On this branch alone the six new rows are red ("no finding of the check on the command list names 'brief'"; "unknown gov command 'brief'"): `src/gov/check/commands.py::RECORDED_GOV_COMMANDS` lacks the three until the engineer's line on `w2/W2-20-d10c`; green only with both branches merged.
+
+## W2-200 revision (DEC-1214 M1): sixteen families
+
+The context family's one check is retired with the context command (DEC-1214 M1, W2-200), and no family takes its
+place, so `gov check` names sixteen families. Revised: `w1_26_support.py` (`FAMILIES` sixteen, `NOT_YET_REGISTERED` six,
+`NOT_MEASURABLE_HERE` without the context check); `test_w1_26_registry.py::test_all_families_named_in_result` (was
+`test_all_17_families_named_in_result`) and `::test_exactly_the_sixteen_families` (was `test_exactly_17_families`);
+`test_w1_26_green_base.py::test_the_base_project_is_green_before_any_defect` (the context family no longer among those
+held not GREEN); the parametrised row `test_w1_26_registry.py` of the context family under `NOT_YET_REGISTERED` is gone;
+`test_w1_26_skill_validator.py`'s token-count docstring names `gov.util.tokens`. Each rewritten case carries its
+`Rewrite-Reason:`. These cases are red until W2-200's engineer takes the family out of `gov check`'s list.

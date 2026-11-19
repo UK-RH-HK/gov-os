@@ -38,6 +38,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 REGISTRY_REL = "governance/project/tool-registry.yaml"
 SCHEMA_REL = "template/governance/kernel/schemas/tool-registry.schema.json"
 REGISTER_REL = "docs/DECISION_REGISTER.md"
+# EMERGENCY-2 11.3, DEC-1214 G4: the old register, archived whole; the register keeps the decisions in force
+ARCHIVE_REL = "docs/archive/DECISION_REGISTER-2026-11-19.md"
 CONTRACT_REL = "docs/contract/contract.yaml"
 
 SHA256 = re.compile(r"[0-9a-fA-F]{64}")
@@ -178,19 +180,23 @@ class Decision:
 
 
 def load_decisions():
-    """Every ``### DEC-nnn — title`` entry of the register, by id."""
+    """Every ``### DEC-nnn — title`` entry the project records, by id: the register's entries, and from the archived
+    old register (``ARCHIVE_REL``, where the tree holds it) each entry the register no longer holds. An approval
+    recorded before the register's move is still a recorded owner decision; it is read where it now stands."""
     path = REPO_ROOT / REGISTER_REL
     if not path.is_file():
         raise Missing(f"{REGISTER_REL} does not exist")
-    text = path.read_text(encoding="utf-8")
-    heads = list(re.finditer(r"^### (DEC-\d+) — (.*)$", text, re.MULTILINE))
+    archive = REPO_ROOT / ARCHIVE_REL
     found = {}
-    for index, head in enumerate(heads):
-        end = heads[index + 1].start() if index + 1 < len(heads) else len(text)
-        body = text[head.end():end]
-        status = re.search(r"^- \*\*Status:\*\* (.*)$", body, re.MULTILINE)
-        found[head.group(1)] = Decision(id=head.group(1), title=head.group(2).strip(),
-                                        status=status.group(1).strip() if status else "", body=body)
+    for place in ([archive] if archive.is_file() else []) + [path]:  # the register last: its own entry is the one read
+        text = place.read_text(encoding="utf-8")
+        heads = list(re.finditer(r"^### (DEC-\d+) — (.*)$", text, re.MULTILINE))
+        for index, head in enumerate(heads):
+            end = heads[index + 1].start() if index + 1 < len(heads) else len(text)
+            body = text[head.end():end]
+            status = re.search(r"^- \*\*Status:\*\* (.*)$", body, re.MULTILINE)
+            found[head.group(1)] = Decision(id=head.group(1), title=head.group(2).strip(),
+                                            status=status.group(1).strip() if status else "", body=body)
     if not found:
         raise Missing(f"{REGISTER_REL} holds no `### DEC-nnn — …` entry the tests can read")
     return found

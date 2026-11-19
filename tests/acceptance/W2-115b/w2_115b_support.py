@@ -130,6 +130,13 @@ PATH_MAP = {
 }
 
 
+def readme_text(ticket):
+    """The acceptance folder's README: the KPI map ``gov accept`` reads (each of the ticket's two lines on its
+    suite's one test), as a real ticket's folder holds it."""
+    case = f"`test_{ticket.slug}.py::test_{ticket.slug}`"
+    return (f"# {ticket.wbs}\n\n| KPI | tests |\n|---|---|\n| success-1 | {case} |\n| failure-1 | {case} |\n")
+
+
 def ticket_text(ticket, status="open"):
     lines = [f"id: {ticket.id}", f"status: {status}", "deps: []", "links: []", "created: 2026-11-01T12:00:00Z",
              "type: task", "priority: 2", "assignee: engineer", f"external-ref: {ticket.wbs}",
@@ -278,7 +285,7 @@ class Planted:
         }
         for t in tickets:
             files[t.ticket_rel] = ticket_text(t)
-            files[t.acceptance + "README.md"] = f"# {t.wbs}\n"
+            files[t.acceptance + "README.md"] = readme_text(t)
             files[t.suite_file] = telling(t.suite_file, self.told, t.modules)
         if queue_yaml is not None:
             files[QUEUE_YAML_REL] = queue_yaml

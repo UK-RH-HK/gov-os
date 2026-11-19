@@ -118,10 +118,11 @@ def test_s6_linkreconciliation_names_the_sitting_file_and_dec_1098_3_and_carries
     assert not bad, f"{len(bad)} of 150 sitting rows: {bad[:5]}"
 
 
-def test_f2_the_drift_list_at_head_holds_no_sitting_id_that_dec_1098_3_did_not_rule_current(record, head_tree):
+def test_f2_the_drift_list_at_head_holds_no_sitting_id_that_dec_1098_3_did_not_rule_current(record, whole_tree):
     """DEC-1098 (3) accepted groups A to G as proposed: A and B (ACCEPTED) and F (in force) are current; C (SUPERSEDED,
-    WITHDRAWN, DEFERRED), D and E (DONE) are not, so none of their ids may be counted as drift."""
-    done = subprocess.run([sys.executable, "-"], input=record.block("drift", "python"), cwd=head_tree,
+    WITHDRAWN, DEFERRED), D and E (DONE) are not, so none of their ids may be counted as drift. The drift script
+    reads the register whole (``whole_tree``): the sitting's entries stand in the archive since the move."""
+    done = subprocess.run([sys.executable, "-"], input=record.block("drift", "python"), cwd=whole_tree,
                           capture_output=True, text=True, check=False, timeout=300)
     assert done.returncode == 0, f"the drift script failed: {done.stderr.strip()[-300:]}"
     drift = {s.pair(item)[0] for item in json.loads(done.stdout)["drift"]}

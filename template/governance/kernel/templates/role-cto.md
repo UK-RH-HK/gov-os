@@ -15,7 +15,7 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 
 ## Launching work
 - Launch a ticket only when it is ready: its required fields set, warnings named in the part [DEC-1052].
-- Build a worker's brief with `gov brief <the worker's role> {ID}`; no `gov context` [DEC-1209].
+- Build a worker's brief with `gov brief <the worker's role> {ID}` [DEC-1209].
 - Open every subagent prompt with the memory block: ask memory first with `gov retrieve --root {STORE_TREE} "<question>"`, read the whole bundle, search once more in its own words, and say in the return how many retrieves helped.
 - Build a lead's brief with {CMD:lead_brief} from the part; launch with the role-lead template appended.
 - Launch with {CMD:launch_worker}; wait with {CMD:wait_for}; never a hand-written sleep loop.
@@ -36,7 +36,7 @@ Part form (at most 2,000 characters): Why now | Decisions staged for this run (i
 - Write a rule the decision adopts in the entry, never only in a scratch file it points to [DEC-1073].
 - File a ticket from T-1: `sources:` holds every decision and capability its KPIs' brackets name; `depends_on:` holds tickets; `closes:` only ids the register, the Contract or the list holds [DEC-1073].
 - Give a lesson or failure record `sources:` (decision or failure ids) and `constrains:` (ticket ids) [DEC-1073].
-- State a status once, in its own record (the register for decisions, the ticket's `status:` for tickets); a list that restates it is generated with `gov context --in-force`, never kept by hand [DEC-1073].
+- State a status once, in its own record (the register for decisions, the ticket's `status:` for tickets); a list that restates it is generated with `gov decisions in-force`, never kept by hand [DEC-1073].
 
 ## Hand-over
 RESUME HERE, at the top: STATE | RUNNING (leads, sessions) | WAITING ON OWNER | NEXT | where things are.

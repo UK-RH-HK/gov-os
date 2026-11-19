@@ -167,18 +167,25 @@ def test_the_project_s_own_file_is_well_formed_and_places_this_ticket_at_c2():
 
 
 @pytest.mark.parametrize("paths, expected", (
-    (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
-    (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+    # W2-201 S2 (DEC-1214 K1): the list is audit 4's Table 3; the guard, hooks, settings, secrets, walls and held-out
+    # entries are retired, so those paths are no longer C3
+    (["src/gov/guard/decide.py"], "C2"), ([".claude/hooks/pretooluse.py"], "C2"),
+    (["governance/project/path-map.yaml"], "C3"),
+    (["src/gov/close/x.py"], "C3"), (["src/gov/accept/x.py"], "C3"), (["src/gov/queue/x.py"], "C3"),
+    (["src/gov/dispatch/landing.py"], "C3"), (["src/gov/tasks/queue.py"], "C3"),
+    (["governance/project/orchestration/tools/merge_queue.py"], "C3"),
+    (["governance/project/operator/landing_check.py"], "C3"), (["src/gov/memaudit/x.py"], "C3"),
+    (["src/gov/release/x.py"], "C3"), (["src/gov/update/x.py"], "C3"), (["src/gov/lock/x.py"], "C3"),
     (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
     (["docs/contract/x.md"], "C3"),
-    # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+    # the memory sets, hidden halves included
     (["fixtures/evaluation/examin/hidden/**"], "C3"),
     (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
     (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
-    ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
-    (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
-    (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
-    (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+    ([".claude/settings.json"], "C2"), ([".claude/settings.local.json"], "C2"),
+    (["governance/project/secrets.yaml"], "C2"), (["governance/project/held-out.yaml"], "C2"),
+    (["governance/project/indep-walls/**"], "C2"), (["governance/project/indep-walls/W2-1.yaml"], "C2"),
+    (["fixtures/evaluation/examin/visible/**"], "C3"),  # the sets whole are C3 (Table 3: the memory measure and sets)
     (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
     (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
 ))
@@ -187,8 +194,8 @@ def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
 
 
 @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
-@pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
-                                  ".claude/settings.local.json", "governance/project/indep-walls/**"))
-def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+@pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/path-map.yaml",
+                                  "src/gov/close/**", "template/governance/kernel/roles/*.md"))
+def test_a_c3_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8; W2-201's list
     ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
     assert criticality.ticket_criticality(REPO, ticket) == "C3"

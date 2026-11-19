@@ -1,6 +1,7 @@
 """Support code for W2-13's S5 cases: search respects role separation (DEC-1065 (2); not a test module).
 
-S5: ``gov retrieve``'s results (every route) and ``gov context``'s supplementary block are filtered by the caller's
+S5: ``gov retrieve``'s results (every route) are filtered by the caller's (the context command's supplementary block
+was too; its case and helpers are deleted with that command, DEC-1214 M1, W2-200)
 ``role_paths`` (``GOV_ROLE`` or ``--role``, and ``GOV_TICKET``), with the same path checks as the guard's: an engineer
 never receives its own ticket's acceptance tests, a test designer never the ticket's new code; what is filtered is
 named in the bundle (how many, by which rule), never dropped silently; no ``role_paths`` section means no filter.
@@ -45,7 +46,7 @@ RULE_WORDS = ("role_paths", "reads_denied")
 OWN_ID, OWN_WBS = "DAEO-s5own", "W9-01"  # the session's ticket (an implementation ticket)
 OTHER_ID, OTHER_WBS = "DAEO-s5other", "W9-02"  # another ticket
 COORD_ID, COORD_WBS = "DAEO-s5coord", "W9-00"  # a coordination ticket
-RECORD_ID, RECORD_REL = "DEC-0101", "docs/decisions/dec-0101.md"  # the tickets' source (gov context needs one)
+RECORD_ID, RECORD_REL = "DEC-0101", "docs/decisions/dec-0101.md"  # the tickets' source
 ALLOWED = ["src/harbour/**", "tests/unit/harbour/**", "docs/changes/W9-01-evidence.md"]
 
 # ---- the words: every planted file below holds all of them, so each one answers every question
@@ -212,11 +213,6 @@ def retrieve(box, how, root, question, **kwargs):
     return call(box, how, root, "retrieve", "--batch-size", str(support.BATCH_LARGE), question, **kwargs)
 
 
-def context(box, how, root, target, **kwargs):
-    """``gov context <target>``: the packet, its supplementary block within the default budget."""
-    return call(box, how, root, "context", target, **kwargs)
-
-
 # --------------------------------------------------------------------------
 # What came back
 # --------------------------------------------------------------------------
@@ -232,20 +228,6 @@ def bundle_paths(bundle):
 
 def evidence_paths(bundle):
     return {item.get("path") for item in bundle.get("evidence") or []}
-
-
-def supplementary_paths(packet):
-    """The paths ``gov context``'s supplementary block returns or offers: its items, its further batch and the items
-    its batches read."""
-    found = [item.get("path") for item in packet.get("supplementary") or []]
-    found += [item.get("path") for item in packet.get("further_batch") or []]
-    found += [item.get("path") for batch in packet.get("supplementary_batches") or []
-              for item in batch.get("items") or []]
-    return set(filter(None, found))
-
-
-def stacked_paths(packet):
-    return {item.get("path") for item in packet.get("supplementary") or []}
 
 
 def markers_in(result, files):

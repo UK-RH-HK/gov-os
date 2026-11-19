@@ -82,6 +82,26 @@ indexed, as lens B's report is. The cut names it, in the same direction only. Wi
 `VISIBLE.md` quotes the visible questions. The cut names it, in the same direction only. Without it the case was red on
 `363c1459`.
 
+## Case 3 after the archives (EMERGENCY-2 §11.3; DEC-1214 G4, W2-203)
+
+Revised 2026-11-19. `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base`
+(lines S4 and F2) has a second decided exception beside D-7's cut, written in the test (`ARCHIVED_NOT_EMBEDDED`) as the
+decisions word it, never read from the path map:
+
+- `docs/emergency-2/archive/**`, the archived start-up documents (path map `history-archive`; §11.1, §11.3);
+- `docs/archive/**`, the old decision register, archived read-only after audit 8 at
+  `docs/archive/DECISION_REGISTER-2026-11-19.md` (path map `archive`, not embedded and not indexed; W2-203 S1).
+
+The case holds, as for the cut, one direction only: every archived file is **not embedded** at the head. The register's
+archive must be a tracked file, so the exception is never vacuous, and the register in force,
+`docs/DECISION_REGISTER.md`, must be embedded at the head as at the base. Every other compared file keeps its base
+verdict in both directions, as before.
+
+Red before the revision on the tree W2-203 landed in: "1 files outside template/ and D-7's cut gained or lost their
+embedding, e.g. ['docs/archive/DECISION_REGISTER-2026-11-19.md']" (the base's path map has no `archive` namespace, so
+under it the file falls in `docs/**`, embedded). Still red when the path map takes anything else out, puts an
+archived file or a file of the cut back, or takes the register in force out of the vectors.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

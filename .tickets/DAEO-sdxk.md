@@ -1,6 +1,6 @@
 ---
 id: DAEO-sdxk
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-10-16T16:34:41Z
@@ -74,3 +74,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-00), as approved (DEC-729). The list row
   - Merges into `w2/integrate` keep the merged ticket's `Task:`. Delegated decisions keep `Task: decision-record`.
 - **Allowed paths:** `.tickets/**` (through `tk`), `governance/project/bootstrap.md`, `docs/plan/WAVE_2_LIST.md`, `docs/plan/WAVE_2_TRIAGE.md`, `docs/plan/WAVE_2_WBS.md` (status lines), `docs/DECISION_REGISTER.md` (delegated entries only), `.gov-runtime/scratch/orchestrator/**`.
 - **KPIs:** every main-session commit in Wave 2 that belongs to no ticket carries W2-00's id; `echo "$GOV_TICKET"` in the main session names W2-00; W2-00 closes last, with `gov close` as a coordination ticket after the owner's exit decision (its evidence is the exit report), and its close record is appended to the exit report.
+
+**Closed on its record, 2026-11-19 13:10 (the CTO, at the owner's word of 2026-11-19: "Close W2-00, W2-15b, W2-46, W2-47 and W2-82 on their records"; EMERGENCY-2 6.2, A-4):** W2-00, the coordination record, is retired: it has no role in the ticket model of EMERGENCY-2 §4 (a feature is a ticket, a known bug is a fix in its owning ticket's record, a chore is a direct commit listed in the digest). Nothing is built for it; the CTO's records it carried live in the register, the handover page and the digest.

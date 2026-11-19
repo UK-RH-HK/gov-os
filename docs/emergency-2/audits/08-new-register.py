@@ -1,30 +1,44 @@
 #!/usr/bin/env python3
-"""Build the proposed new register from the classed old one (EMERGENCY-2 §11.3; audit 8 "Archiving ..."; G4, DEC-1214).
+"""Build the register in force from the archived one, and check it (EMERGENCY-2 §11.3; audit 8; DEC-1214 G4; W2-203).
 
-    python3 docs/emergency-2/audits/08-new-register.py --out /tmp/NEW_DECISION_REGISTER.md [--check]
+    python3 docs/emergency-2/audits/08-new-register.py [--root <repo>] [--archive <file>] [--register <file>]
+                                                       (--out <file> | --check)
 
-It writes nothing into the tree unless told to: the new register holds, verbatim and in the old order, every entry whose
-`**Class:**` is `kept` (each already carries its changed-items note) and every entry of DEC-1211 and later (the
-decisions made since audit 8), under a new header. `--check` parses the result with the store's own loader and reports
-the entries it reads, the ids a kept entry cites that the new register does not hold (they are in the archive), and
-whether `gov close`'s `accepted_reds` ids resolve. The CTO moves the old file and puts the new one in its place (audit
-8's steps 1 to 7); this script is step 2.
+The archive is the file the path map of ``--root`` names under ``decision_register_archive`` (or ``--archive``); the
+register is the one it names under ``decision_register`` (or ``--register``). ``--root`` defaults to the repository
+this script is in.
+
+- ``--out <file>`` writes the register: a short head, then, verbatim and in the archive's order, every entry of the
+  archive whose first ``**Class:**`` is ``kept`` and every entry from DEC-1211 on, whatever the last id is. The same
+  archive gives the same bytes.
+- ``--check`` compares the register with what the archive requires, one line per failure: ``REGISTER_KEPT_MISSING
+  <id>`` for an entry the register must hold and does not, ``REGISTER_ENTRY_DIFFERS <id>`` for a kept entry (below DEC-1211; the later ones are live) both files
+  hold with different text. Exit 1 where there is one; otherwise a line starting ``ok`` and exit 0. An entry the
+  archive does not hold (a decision made since) is no failure.
+
+An entry runs from its ``### DEC-n`` heading to the line before the next such heading, a ``## `` heading or a ``---``
+line, its trailing blank lines dropped.
 """
-import argparse, re, sys
+import argparse
+import re
+import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-REG = ROOT / "docs/DECISION_REGISTER.md"
-HEAD = re.compile(r"### (DEC-\d+)")
-HEADER = """# Governance OS — Decision Register (in force)
+PATH_MAP_REL = "governance/project/path-map.yaml"
+ARCHIVE_KEY, REGISTER_KEY = "decision_register_archive", "decision_register"
+FIRST_SINCE = 1211  # the first decision made after audit 8's classes (DEC-001 to DEC-1210)
+HEADING = re.compile(r"### (DEC-\d+)")
+CLASS = re.compile(r"\*\*Class:\*\* (\w+)")
+HEAD = """# Governance OS — Decision Register (in force)
 
-**Register ID:** GOV-DR · **Built from:** the old register `docs/archive/DECISION_REGISTER-2026-11-17.md` (archived read-only,
+**Register ID:** GOV-DR · **Built from:** the archived register `{archive}` (archived read-only,
 EMERGENCY-2 §11.3), by `docs/emergency-2/audits/08-new-register.py`.
 
-Each entry below is copied verbatim from the old register. The entries are the decisions audit 8 classed **kept** (the
-owner approved the classes by group, DEC-1214 G4) and every decision since (DEC-1211 and later). The `**Class:**` field at
-the end of an entry's status line says which items of a kept entry no longer hold. A decision that is not here is in the
-archive; the archive is not in memory's index.
+This file is the decision register in force. The earlier decisions are in the archive, by id: `{archive}`.
+Each entry below is copied verbatim from it: the decisions audit 8 (`docs/emergency-2/audits/08-register.md`) classed
+**kept** (the owner approved the classes by group, DEC-1214 G4) and every decision since (DEC-1211 and later). The
+`**Class:**` field at the end of an entry's status line says which items of a kept entry no longer hold. A decision that
+is not here is in the archive; the archive is not in memory's index. New ids continue from the last entry's.
 
 ---
 
@@ -34,50 +48,107 @@ archive; the archive is not in memory's index.
 
 
 def entries(text):
+    """``[(id, text)]`` of a register's entries, in the file's order."""
     lines = text.split("\n")
-    heads = [i for i, l in enumerate(lines) if HEAD.match(l)]
+    heads = [i for i, line in enumerate(lines) if HEADING.match(line)]
     out = []
     for k, i in enumerate(heads):
         end = heads[k + 1] if k + 1 < len(heads) else len(lines)
         j = i + 1
         while j < end and not lines[j].startswith("## ") and lines[j] != "---":
             j += 1
-        body = "\n".join(lines[i:j]).rstrip("\n")
-        out.append((HEAD.match(lines[i]).group(1), body))
+        out.append((HEADING.match(lines[i]).group(1), "\n".join(lines[i:j]).rstrip("\n")))
     return out
 
 
-def keep(id, body):
-    n = int(id[4:])
-    if n >= 1211:
+def required(entry_id, text):
+    """Whether the register in force must hold this entry of the archive."""
+    if int(entry_id[4:]) >= FIRST_SINCE:
         return True
-    m = re.search(r"\*\*Class:\*\* (\w+)", body)
-    return bool(m) and m.group(1) == "kept"
+    found = CLASS.search(text)
+    return bool(found) and found.group(1) == "kept"
+
+
+def build(archive_text, archive_rel):
+    kept = [text for entry_id, text in entries(archive_text) if required(entry_id, text)]
+    return HEAD.format(archive=archive_rel) + "\n\n".join(kept) + "\n"
+
+
+def check(archive_text, register_text):
+    """The failure lines of a register against its archive."""
+    held = {}
+    for entry_id, text in entries(register_text):
+        held.setdefault(entry_id, text)
+    lines, seen = [], set()
+    for entry_id, text in entries(archive_text):
+        if entry_id in seen:
+            continue
+        seen.add(entry_id)
+        if entry_id not in held:
+            if required(entry_id, text):
+                lines.append(f"REGISTER_KEPT_MISSING {entry_id}")
+        elif held[entry_id] != text and _live(entry_id) is False:
+            lines.append(f"REGISTER_ENTRY_DIFFERS {entry_id}")
+    return lines
+
+
+def _live(entry_id):
+    """True for a decision made after audit 8's classes (DEC-1211 and later): the register in force is live there, an
+    entry is amended in place (DEC-1215's revert is recorded in its entry) and the frozen archive never follows; so
+    only the kept entries below it are held to the archive's text. None where the id carries no number."""
+    digits = "".join(ch for ch in entry_id.split("-")[-1] if ch.isdigit())
+    return int(digits) >= FIRST_SINCE if digits else None
+
+
+def _named(root, key, given=None):
+    """The path the path map of ``root`` names under ``key``; ``given`` where it names none and one was given."""
+    import yaml
+    try:
+        data = yaml.safe_load((root / PATH_MAP_REL).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError) as e:
+        if given:
+            return given
+        sys.exit(f"the path map {PATH_MAP_REL} of {root} cannot be read: {e}")
+    value = data.get(key) if isinstance(data, dict) else None
+    if not isinstance(value, str) or not value:
+        if given:
+            return given
+        sys.exit(f"the path map {PATH_MAP_REL} of {root} names no {key}")
+    return value
+
+
+def _read(path):
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        sys.exit(f"{path} cannot be read: {e}")
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--out", required=True)
-    ap.add_argument("--check", action="store_true")
-    a = ap.parse_args()
-    ents = entries(REG.read_text(encoding="utf-8"))
-    kept = [(i, b) for i, b in ents if keep(i, b)]
-    text = HEADER + "\n\n".join(b for _, b in kept) + "\n"
-    Path(a.out).write_text(text, encoding="utf-8")
-    print(f"old register {len(ents)} entries; new register {len(kept)} entries -> {a.out}")
-    if a.check:
-        sys.path.insert(0, str(ROOT / "src"))
-        from gov.store.loader import register_entries
-        live, refused = register_entries(text)[:2]
-        ids = {e["id"] for e in live}
-        print(f"the store's loader reads {len(live)} entries; refused: {refused if refused else 'none'}")
-        cited = {}
-        for i, b in kept:
-            for c in set(re.findall(r"(?<![A-Za-z0-9_])DEC-\d+(?![A-Za-z0-9_])", b)):
-                if c not in ids and c != i:
-                    cited.setdefault(c, set()).add(i)
-        print(f"ids cited by a kept entry that are in the archive only: {len(cited)} (by {len({x for s in cited.values() for x in s})} entries)")
-        print("DEC-1134 (accepted_reds) kept:", "DEC-1134" in ids)
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--root", default=str(Path(__file__).resolve().parents[3]))
+    parser.add_argument("--archive")
+    parser.add_argument("--register")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--out")
+    mode.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    root = Path(args.root)
+    archive_text = _read(args.archive or root / _named(root, ARCHIVE_KEY))
+    if args.out:
+        text = build(archive_text, _named(root, ARCHIVE_KEY, args.archive))  # the head names the archive by its path
+        Path(args.out).write_bytes(text.encode("utf-8"))
+        print(f"archive {len(entries(archive_text))} entries; register {len(entries(text))} entries -> {args.out}")
+        return 0
+    register_text = _read(args.register or root / _named(root, REGISTER_KEY))
+    lines = check(archive_text, register_text)
+    for line in lines:
+        print(line)
+    if lines:
+        return 1
+    print(f"ok: the register holds every entry the archive requires ({len(entries(register_text))} entries)")
+    return 0
 
 
-main()
+if __name__ == "__main__":
+    sys.exit(main())
