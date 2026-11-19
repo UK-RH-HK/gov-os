@@ -182,11 +182,11 @@ def _own_guard_calls(request, tmp_path_factory, monkeypatch):
 @pytest.fixture(scope="session", autouse=True)
 def _gov_os_memaudit_config():
     """Gov OS's own memory-audit configuration for every test (W2-204 I6): the planted repositories of the memory
-    audit's test folders hold no ``governance/project/memory-audit.yaml``, so ``GOV_MEMAUDIT_CONFIG`` names this
+    audit's test folders hold no ``governance/project/memory-audit.yaml``, so ``MEMAUDIT_CONFIG`` names this
     tree's file. Session-wide, so that a fixture of any scope sees it; a test of a repository's own file removes it
     (``monkeypatch.delenv``), as ``tests/acceptance/W2-204/`` does."""
     with pytest.MonkeyPatch.context() as patch:
-        patch.setenv("GOV_MEMAUDIT_CONFIG", str(Path(__file__).resolve().parent.parent / "governance" / "project"
+        patch.setenv("MEMAUDIT_CONFIG", str(Path(__file__).resolve().parent.parent / "governance" / "project"
                                                 / "memory-audit.yaml"))
         yield
 
