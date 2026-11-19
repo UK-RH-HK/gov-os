@@ -15,7 +15,7 @@ rule, memory first, the flow, trailers, models). This page adds tonight's rules;
   the landing and the merge queue; `src/gov/memaudit/**`, `fixtures/evaluation/**`; `src/gov/release/**`,
   `src/gov/update/**`, `src/gov/lock/**`; the path map): its independent test designer and engineer run **Claude Fable 5.2** (the owner's temporary substitution of Opus until
   the weekly reset, DEC-1215): pass `model: "fable"` to the Agent tool for those two helpers only (`opus` is refused while
-  the substitution is active). Everything else names no model. **Since W2-201 landed (02:20):** the prompt of such a helper must hold
+  the substitution is active). Everything else names no model. **Since W2-201 landed (02:15):** the prompt of such a helper must hold
   one line that is exactly `Task: <your ticket id>` (for example `Task: DAEO-r4xc`): the helper rule reads the ticket's
   class from it and refuses Fable without it.
 - **The machine.** Every test run through the heavy slot (LEAD-COMMON's command); the slot waits until the load is under
