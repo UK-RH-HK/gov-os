@@ -1,7 +1,7 @@
 ---
 id: CAP-44.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A5 independent review of the path map before any move (Independent Auditor)
 depends_on:

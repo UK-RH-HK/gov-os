@@ -1,7 +1,7 @@
 ---
 id: CAP-68
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The basis line
 depends_on:

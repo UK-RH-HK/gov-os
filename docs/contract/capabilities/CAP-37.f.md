@@ -1,7 +1,7 @@
 ---
 id: CAP-37.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Checkpoint discipline; resume after crash
 depends_on:

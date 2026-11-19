@@ -1,7 +1,7 @@
 ---
 id: CAP-25
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Tool registry and capability memory (lite)
 depends_on:

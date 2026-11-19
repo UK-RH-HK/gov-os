@@ -1,7 +1,7 @@
 ---
 id: CAP-18.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Multi-route router with fusion (RRF), dedup by chunk hash, one rerank
 depends_on:

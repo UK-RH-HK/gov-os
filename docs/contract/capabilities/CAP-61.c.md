@@ -1,7 +1,7 @@
 ---
 id: CAP-61.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the network profile per role, held by the sandbox and generated `Edit` deny rules: no sandbox, no allowlist'
 depends_on:

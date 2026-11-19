@@ -1,7 +1,7 @@
 ---
 id: CAP-46.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Clone + doctor + rebuild reproduces the environment
 depends_on:

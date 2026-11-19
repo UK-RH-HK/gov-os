@@ -1,7 +1,7 @@
 ---
 id: CAP-30.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Automatic generation of the gap tickets, inside `gov discover` (`gov readiness --generate` is folded into it, W2-36)
 depends_on:

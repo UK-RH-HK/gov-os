@@ -1,7 +1,7 @@
 ---
 id: CAP-38.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A case the orchestrator's review finds that the acceptance tests miss goes to the next test design batch as a described behaviour, never as code; the test designer decides from the specification whether it becomes an acceptance test and reports a specification gap
 depends_on:

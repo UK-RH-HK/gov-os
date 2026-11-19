@@ -1,7 +1,7 @@
 ---
 id: CAP-51.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Structured, versioned decisions with supersession; contradiction resolution
 depends_on:

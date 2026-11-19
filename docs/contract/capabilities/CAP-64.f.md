@@ -1,7 +1,7 @@
 ---
 id: CAP-64.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'RT-6: messages between CTOs, leads, workers and the operator go through per-session inbox files with a read mark; none passes through the owner (verify: a week of owner messages carries no relays)'
 depends_on:

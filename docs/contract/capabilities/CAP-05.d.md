@@ -1,7 +1,7 @@
 ---
 id: CAP-05.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Emergency commands deterministic and owner-gated; recovery auditable (recorded in the ticket)
 depends_on:

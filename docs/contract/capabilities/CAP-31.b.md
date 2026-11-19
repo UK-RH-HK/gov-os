@@ -1,7 +1,7 @@
 ---
 id: CAP-31.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'A known bug is a fix, not a ticket: a red landing generates no repair ticket; the fix is recorded in the owning ticket, the failing test first where no test caught it'
 depends_on:

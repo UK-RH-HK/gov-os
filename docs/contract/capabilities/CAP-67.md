@@ -1,7 +1,7 @@
 ---
 id: CAP-67
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Backups
 depends_on:

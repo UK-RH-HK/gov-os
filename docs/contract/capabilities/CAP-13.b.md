@@ -1,7 +1,7 @@
 ---
 id: CAP-13.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Episodic execution memory: checkpoints and close records per ticket'
 depends_on:

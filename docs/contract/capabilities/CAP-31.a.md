@@ -1,7 +1,7 @@
 ---
 id: CAP-31.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: One task DAG; task contract with class, role, inputs, allowed paths, KPIs, profile
 depends_on:

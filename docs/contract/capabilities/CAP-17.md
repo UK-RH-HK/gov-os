@@ -1,7 +1,7 @@
 ---
 id: CAP-17
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Incremental indexing and freshness
 depends_on:

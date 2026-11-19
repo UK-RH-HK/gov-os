@@ -1,7 +1,7 @@
 ---
 id: CAP-68.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A weekly basis review lists the rules added since the last review
 depends_on:

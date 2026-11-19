@@ -1,7 +1,7 @@
 ---
 id: CAP-54.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Governable from day one; A0–A11 remains the target for ADOPTED_HEALTHY
 depends_on:

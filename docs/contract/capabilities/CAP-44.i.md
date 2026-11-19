@@ -1,7 +1,7 @@
 ---
 id: CAP-44.i
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Interrupted-session recovery and freeze during adoption
 depends_on:

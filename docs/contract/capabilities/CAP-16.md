@@ -1,7 +1,7 @@
 ---
 id: CAP-16
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Multi-batch, multi-hop, paginated retrieval
 depends_on:

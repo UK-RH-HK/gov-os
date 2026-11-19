@@ -1,7 +1,7 @@
 ---
 id: CAP-64.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'RT-1: no ready ticket waits more than 10 minutes while the machine has room for it (verify: a week of the tool''s log)'
 depends_on:

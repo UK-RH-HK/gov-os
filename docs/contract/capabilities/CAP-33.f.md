@@ -1,7 +1,7 @@
 ---
 id: CAP-33.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that is an OpenSpec proposal plus `gov closure`
 depends_on:

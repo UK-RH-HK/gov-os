@@ -1,7 +1,7 @@
 ---
 id: CAP-31.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Parallel and serial execution by dependency
 depends_on:

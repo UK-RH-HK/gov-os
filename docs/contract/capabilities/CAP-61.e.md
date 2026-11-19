@@ -1,7 +1,7 @@
 ---
 id: CAP-61.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs is aligned with the VS Code extension's bundled version
 depends_on:

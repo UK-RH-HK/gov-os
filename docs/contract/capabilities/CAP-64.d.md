@@ -1,7 +1,7 @@
 ---
 id: CAP-64.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'RT-4: zero GPU spill events; embedders and rerankers stay on the GPU, even if that limits parallel leads (verify: the GPU log; DEC-1214 T3)'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-18.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Hierarchical retrieval: document→section→chunk, code file→module→function; child first; parent/neighbour expansion only as needed, named in the bundle'
 depends_on:

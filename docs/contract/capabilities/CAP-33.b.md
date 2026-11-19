@@ -1,7 +1,7 @@
 ---
 id: CAP-33.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Automatic impact simulation over record and code graphs; impact radius → profile
 depends_on:

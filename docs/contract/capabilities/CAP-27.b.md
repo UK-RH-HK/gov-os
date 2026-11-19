@@ -1,7 +1,7 @@
 ---
 id: CAP-27.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: separate A2A layer and three-layer knowledge fabric'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-45
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: gov update lifecycle
 depends_on:

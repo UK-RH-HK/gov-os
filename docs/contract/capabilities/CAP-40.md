@@ -1,7 +1,7 @@
 ---
 id: CAP-40
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Execution telemetry and organisational questions
 depends_on:

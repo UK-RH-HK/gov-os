@@ -1,7 +1,7 @@
 ---
 id: MR-2
 type: specification
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Closed specifications generate the work
 depends_on:

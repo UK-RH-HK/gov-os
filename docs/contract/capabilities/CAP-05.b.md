@@ -1,7 +1,7 @@
 ---
 id: CAP-05.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'CANCEL_AGENTS: stop running subagents and release their claims'
 depends_on:

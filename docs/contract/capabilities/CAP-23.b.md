@@ -1,7 +1,7 @@
 ---
 id: CAP-23.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The run-time tool dispatches ready tickets into slots from the CPU, RAM and GPU it detects (RT-1, RT-3); the claim lock (CAP-23.a) keeps two agents off one ticket
 depends_on:

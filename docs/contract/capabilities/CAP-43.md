@@ -1,7 +1,7 @@
 ---
 id: CAP-43
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Canonical OS repo separation and immutable releases
 depends_on:

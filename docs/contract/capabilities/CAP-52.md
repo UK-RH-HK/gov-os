@@ -1,7 +1,7 @@
 ---
 id: CAP-52
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Model-agnostic adapters (provider, IDE, CLI)
 depends_on:

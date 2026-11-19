@@ -1,7 +1,7 @@
 ---
 id: CAP-38.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Product test families
 depends_on:

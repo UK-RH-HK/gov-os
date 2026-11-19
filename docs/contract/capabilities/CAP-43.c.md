@@ -1,7 +1,7 @@
 ---
 id: CAP-43.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Release certification by the release acceptance (EMERGENCY-2 §8.2): the Contract''s checks, the proving run, EXAMIN''s copy adopted, one EXAMIN feature ticket through the flow'
 depends_on:

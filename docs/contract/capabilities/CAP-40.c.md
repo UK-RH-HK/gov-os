@@ -1,7 +1,7 @@
 ---
 id: CAP-40.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'The weekly measures with their baselines: product share of spend, governance share (≤ 15 %), owner messages per day, time and cost per ticket, landing time, memory use (EMERGENCY-2 §10.2)'
 depends_on:

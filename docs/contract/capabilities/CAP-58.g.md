@@ -1,7 +1,7 @@
 ---
 id: CAP-58.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the lessons inbox as a guard exception: there is no guard'
 depends_on:

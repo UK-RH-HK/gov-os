@@ -1,7 +1,7 @@
 ---
 id: CAP-53.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: a profile computed from impact (`gov impact`): the rubric replaces it'
 depends_on:

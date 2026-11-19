@@ -1,7 +1,7 @@
 ---
 id: CAP-37.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Worker return contract: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action'
 depends_on:

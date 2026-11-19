@@ -1,7 +1,7 @@
 ---
 id: CAP-33.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Changes to the Gov OS's own Charter and Contract pass evidence → a CIT-P with three costed options (DEC-105) → the owner's approval → a versioned promotion; kernel and instruction text follows CAP-24.c
 depends_on:

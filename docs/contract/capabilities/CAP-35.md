@@ -1,7 +1,7 @@
 ---
 id: CAP-35
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Model routing from the owner's rubric
 depends_on:

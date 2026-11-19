@@ -1,7 +1,7 @@
 ---
 id: CAP-25.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: automated install classification, argv analysis, authority envelopes'
 depends_on:

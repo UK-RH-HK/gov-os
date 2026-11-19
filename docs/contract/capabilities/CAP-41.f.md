@@ -1,7 +1,7 @@
 ---
 id: CAP-41.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical); both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration
 depends_on:

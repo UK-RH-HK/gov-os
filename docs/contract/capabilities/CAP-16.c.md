@@ -1,7 +1,7 @@
 ---
 id: CAP-16.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Radius-scaled rounds (placeholders tuned from telemetry)
 depends_on:

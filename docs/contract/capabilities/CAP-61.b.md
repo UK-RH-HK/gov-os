@@ -1,7 +1,7 @@
 ---
 id: CAP-61.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: '`gov launch` starts a worker in its worktree with its role file, `GOV_ROLE`, `GOV_TICKET` and the rubric''s model and effort; in-session subagents remain for read-only work (review, exploration, web research); no permission prompt, no per-role `--settings` sandbox block'
 depends_on:

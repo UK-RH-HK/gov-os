@@ -1,7 +1,7 @@
 ---
 id: CAP-02.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3)'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-40.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the sandbox''s instruction tokens as a separate line of the telemetry record: there is no sandbox'
 depends_on:

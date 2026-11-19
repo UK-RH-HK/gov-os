@@ -1,7 +1,7 @@
 ---
 id: CAP-35.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Effort is declared by the rubric and enforced by the launcher, not chosen by the session
 depends_on:

@@ -1,6 +1,6 @@
 ---
 id: CHARTER-v6
-status: PROPOSED
+status: ACCEPTED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
 decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173, DEC-848, DEC-1204, DEC-1211, DEC-1212, DEC-1214]
 type: specification

@@ -1,7 +1,7 @@
 ---
 id: CAP-25.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the guard''s install rule for `uv add`, `uv sync`, `uv run --with` and `uvx`: no guard'
 depends_on:

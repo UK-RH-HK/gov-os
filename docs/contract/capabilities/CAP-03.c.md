@@ -1,7 +1,7 @@
 ---
 id: CAP-03.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Each namespace declares sensitivity class, permitted roles, retention, export policy, embedding policy, provenance and deletion/rebuild behaviour (path-map namespace fields)
 depends_on:

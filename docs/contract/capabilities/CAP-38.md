@@ -1,7 +1,7 @@
 ---
 id: CAP-38
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Verification test families (product and governance)
 depends_on:

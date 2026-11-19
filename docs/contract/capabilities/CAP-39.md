@@ -1,7 +1,7 @@
 ---
 id: CAP-39
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Governance health tiers and the landing's checks (G1-G5)
 depends_on:

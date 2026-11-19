@@ -1,7 +1,7 @@
 ---
 id: CAP-54
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Progressive adoption (day-one to maturity)
 depends_on:

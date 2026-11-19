@@ -1,7 +1,7 @@
 ---
 id: CAP-65.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Every template and every skill says memory first; the brief template no longer says "No `gov retrieve` in the sandbox"
 depends_on:

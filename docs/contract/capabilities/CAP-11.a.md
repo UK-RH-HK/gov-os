@@ -1,7 +1,7 @@
 ---
 id: CAP-11.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Exact strings, identifiers and error messages with file and line
 depends_on:

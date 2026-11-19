@@ -1,7 +1,7 @@
 ---
 id: CAP-39.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'The proving run on the synthetic repositories (G6 qualification, EMERGENCY-2 §8.2 item 2): chaos, soak and hidden tests as the Contract''s checks need them'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-61.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the launcher refuses a worker unless the OS sandbox is on, strict and fail-closed: there is no sandbox'
 depends_on:

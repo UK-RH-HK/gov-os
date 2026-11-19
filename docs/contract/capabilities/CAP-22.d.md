@@ -1,7 +1,7 @@
 ---
 id: CAP-22.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research` in its own experiment folder or worktree, its ticket''s `allowed_paths` judged at the landing as a notice; no guard and no network allowlist; the full research lifecycle (CAP-32) stays W3'
 depends_on:

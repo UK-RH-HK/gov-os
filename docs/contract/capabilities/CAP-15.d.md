@@ -1,7 +1,7 @@
 ---
 id: CAP-15.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov context`'
 depends_on:

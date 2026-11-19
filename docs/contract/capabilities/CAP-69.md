@@ -1,7 +1,7 @@
 ---
 id: CAP-69
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Transcripts kept
 depends_on:

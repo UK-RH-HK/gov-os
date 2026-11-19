@@ -1,7 +1,7 @@
 ---
 id: CAP-24.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Skills versioned; versions recorded against the work
 depends_on:

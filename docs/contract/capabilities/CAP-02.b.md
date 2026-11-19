@@ -1,7 +1,7 @@
 ---
 id: CAP-02.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation, unprovisioned-machine trust anchors'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-22.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'A handoff is the worker''s return contract (CAP-37.d) plus the run-time tool''s per-session inbox files with a read mark (RT-6): a finished worker''s return reaches its lead''s inbox file and no owner message relays it'
 depends_on:

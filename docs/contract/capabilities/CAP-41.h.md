@@ -1,7 +1,7 @@
 ---
 id: CAP-41.h
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A high or critical lesson is raised to the owner immediately, as a decision package
 depends_on:

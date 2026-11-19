@@ -1,7 +1,7 @@
 ---
 id: CAP-22.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Distinct test execution and integration roles
 depends_on:

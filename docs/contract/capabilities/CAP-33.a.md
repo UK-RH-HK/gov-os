@@ -1,7 +1,7 @@
 ---
 id: CAP-33.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: CIT-P proposal and CIT-E apply/archive records
 depends_on:

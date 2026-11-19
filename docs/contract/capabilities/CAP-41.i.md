@@ -1,7 +1,7 @@
 ---
 id: CAP-41.i
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release's notes list the lessons fixed, with their severity
 depends_on:

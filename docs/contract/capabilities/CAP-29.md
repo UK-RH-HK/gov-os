@@ -1,7 +1,7 @@
 ---
 id: CAP-29
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Specification lineage (idea to live evidence)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-66.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The transcript scan reads every transcript written between the set's writing and the end of its measure, looking for the set's path and its question ids; a hit voids the measure
 depends_on:

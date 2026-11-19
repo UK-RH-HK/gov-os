@@ -1,7 +1,7 @@
 ---
 id: CAP-58.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the claim split by tool between the OS sandbox and the guard: neither exists'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-34.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Non-global blocking
 depends_on:

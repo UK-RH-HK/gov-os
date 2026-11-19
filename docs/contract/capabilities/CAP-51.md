@@ -1,7 +1,7 @@
 ---
 id: CAP-51
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Decisions register (structured, versioned, authoritative)
 depends_on:

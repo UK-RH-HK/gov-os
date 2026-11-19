@@ -1,7 +1,7 @@
 ---
 id: CAP-15.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: a file path plus a summary of at most ~2.5k tokens: packet mechanics, retired with `gov context`'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-69.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Transcripts are kept for 365 days
 depends_on:

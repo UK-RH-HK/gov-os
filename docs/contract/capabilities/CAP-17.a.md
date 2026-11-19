@@ -1,7 +1,7 @@
 ---
 id: CAP-17.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Changed content re-indexed before the next retrieval, or facet reported unavailable
 depends_on:

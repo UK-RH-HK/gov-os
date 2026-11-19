@@ -1,7 +1,7 @@
 ---
 id: CAP-44.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A0 safety baseline (clean tree, backup ref); A1 cold inventory; A2 classification; A3 target path map; A4 batched plan with rollback points
 depends_on:

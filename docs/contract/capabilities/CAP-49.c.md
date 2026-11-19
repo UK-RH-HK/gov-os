@@ -1,7 +1,7 @@
 ---
 id: CAP-49.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the oracle hidden from every session by a `Read` deny rule in the committed settings and the guard refusing any call that names its path: no guard; the transcript scan (CAP-66) detects a read instead'
 depends_on:

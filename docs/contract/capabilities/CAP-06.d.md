@@ -1,7 +1,7 @@
 ---
 id: CAP-06.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Imports/references/consumers represented; path-map compliance machine-checkable
 depends_on:

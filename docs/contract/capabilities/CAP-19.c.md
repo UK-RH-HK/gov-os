@@ -1,7 +1,7 @@
 ---
 id: CAP-19.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Retrieval learning loop: a miss is a memory-quality event → root cause → fix → judged by the next fresh 80 (no set is reused)'
 depends_on:

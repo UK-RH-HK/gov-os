@@ -1,7 +1,7 @@
 ---
 id: CAP-37.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Mandatory triggers incl. ticket transition, compaction, stop
 depends_on:

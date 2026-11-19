@@ -1,7 +1,7 @@
 ---
 id: CAP-41.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Phase-2 lessons carried (L-0074, anti-stall, no manufactured history, anti-snowball)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-64.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'RT-3: slots come from the CPU, RAM and GPU detected at start, with no machine-specific constant (verify: one configuration runs on two simulated machine profiles)'
 depends_on:

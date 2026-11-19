@@ -1,7 +1,7 @@
 ---
 id: CAP-61.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The launcher sets a per-session temp directory for each worker session; if the acceptance test shows it cannot be overridden, the shared `$TMPDIR` is recorded as a residual
 depends_on:

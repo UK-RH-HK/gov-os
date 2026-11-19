@@ -1,7 +1,7 @@
 ---
 id: MR-1
 type: specification
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Specification comes first
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-05.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'ROLLBACK_TRANSACTION: git revert of the ticket''s commits, recorded'
 depends_on:

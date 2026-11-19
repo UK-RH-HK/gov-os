@@ -1,7 +1,7 @@
 ---
 id: CAP-65.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Every brief carries the ticket's retrieval bundle, uncut (CAP-15)
 depends_on:

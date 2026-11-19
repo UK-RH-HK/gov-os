@@ -1,7 +1,7 @@
 ---
 id: CAP-17.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The landing rebuilds the store after each land, and `gov retrieve` reports a stale store
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-01.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Mandatory authoritative inputs outrank retrieval and are resolved deterministically
 depends_on:

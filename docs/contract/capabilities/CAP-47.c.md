@@ -1,7 +1,7 @@
 ---
 id: CAP-47.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Adoption evidence tree
 depends_on:

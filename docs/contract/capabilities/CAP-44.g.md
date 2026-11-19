@@ -1,7 +1,7 @@
 ---
 id: CAP-44.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Remediation, finding states, human gates during adoption
 depends_on:

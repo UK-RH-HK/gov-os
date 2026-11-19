@@ -1,7 +1,7 @@
 ---
 id: CAP-45.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update`
 depends_on:

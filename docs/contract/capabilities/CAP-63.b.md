@@ -1,7 +1,7 @@
 ---
 id: CAP-63.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The landing writes the ticket's close record and closes the ticket at the land; no separate close step carries weight of its own (DEC-1214 L2)
 depends_on:

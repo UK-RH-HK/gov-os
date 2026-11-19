@@ -1,7 +1,7 @@
 ---
 id: CAP-67.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: An hourly `git bundle` of each repository, kept outside the tree
 depends_on:

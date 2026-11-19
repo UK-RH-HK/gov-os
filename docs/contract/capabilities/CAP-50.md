@@ -1,7 +1,7 @@
 ---
 id: CAP-50
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Artifact flow, dependency consumption and end-to-end traceability
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-19
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Retrieval component separation and model selection
 depends_on:

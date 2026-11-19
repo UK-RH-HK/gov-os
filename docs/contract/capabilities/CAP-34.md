@@ -1,7 +1,7 @@
 ---
 id: CAP-34
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Human decision gates and contradiction resolution
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-25.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an install by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval; worker roles never install system-wide
 depends_on:

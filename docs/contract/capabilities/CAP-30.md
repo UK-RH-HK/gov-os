@@ -1,7 +1,7 @@
 ---
 id: CAP-30
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Feature readiness contract (26-dimension checklist)
 depends_on:

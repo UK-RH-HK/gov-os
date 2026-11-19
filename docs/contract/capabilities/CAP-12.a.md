@@ -1,7 +1,7 @@
 ---
 id: CAP-12.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Definitions, references, callers, impact, dead code across languages
 depends_on:

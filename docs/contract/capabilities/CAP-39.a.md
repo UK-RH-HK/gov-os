@@ -1,7 +1,7 @@
 ---
 id: CAP-39.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite on CI; there is no G0, since there is no guard
 depends_on:

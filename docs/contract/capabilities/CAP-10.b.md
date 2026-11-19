@@ -1,7 +1,7 @@
 ---
 id: CAP-10.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Embedder replaceable (provisional choice)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-66
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The hidden-set scan
 depends_on:

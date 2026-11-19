@@ -1,7 +1,7 @@
 ---
 id: CAP-21.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Approval facts only from the owner's git account; kernel and instruction text needs the CTO's approval, not the owner's (EMERGENCY-2 §3.5); decisions still need the owner's
 depends_on:

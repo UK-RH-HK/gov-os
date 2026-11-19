@@ -1,7 +1,7 @@
 ---
 id: CAP-37.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The run-time tool's one state file and one wake rule mark a stale session and wake it (RT-5, RT-7); nothing is blocked
 depends_on:
