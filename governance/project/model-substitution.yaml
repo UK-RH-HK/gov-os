@@ -6,7 +6,9 @@
 # REVERT: set `active: false` (or let `until` pass: the substitution then stops by itself); then the CTO and EXAMIN CTO
 # start scripts go back to claude-opus-5-5 (governance/project/orchestration/tools/start_cto.sh and the EXAMIN one), and
 # the CTO records the revert in the register under DEC-1215.
-active: true
+# REVERTED 2026-11-19 13:21 by the CTO (DEC-1215 (2)): the owner's two Fable resets are used (02:06 and between 13:09 and
+# 13:19 on 19 November: the plan's meter read Fable 30 % then 3 %, all models 100 % then 87 %), which ends item (1).
+active: false
 from: claude-opus-5-5
 to: claude-fable-5-2
 effort: high
