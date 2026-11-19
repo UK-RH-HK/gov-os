@@ -90,8 +90,19 @@ def test_s2_doctor_lists_the_archive_among_its_historical_paths():
     assert s.REGISTER_REL in command.HISTORICAL_PATHS
 
 
+def _w2_203_paths(head_clone) -> set[str]:
+    """The paths W2-203 moved: the register and the archive it moved into, as HEAD's path map names them."""
+    import yaml
+
+    names = yaml.safe_load((head_clone / s.PATH_MAP_REL).read_text(encoding="utf-8")) or {}
+    return {s.REGISTER_REL, s.ARCHIVE_REL} | {names[key] for key in ("decision_register", s.ARCHIVE_KEY)
+                                              if isinstance(names.get(key), str)}
+
+
 def test_s2_doctor_reports_no_more_problems_than_on_the_base(base_clone, head_clone, home, moved):
-    """Each part's outcome is the base's; no path is unclassified; no moved reference appears that the base lacked."""
+    """Each part's outcome is the base's; no path is unclassified; no moved reference of W2-203's own moves appears
+    that the base lacked. A rename since the base by another ticket (Contract v5 and Charter v6, DEC-1219, renamed two
+    documents that history records rightly cite) is not W2-203's change and is not judged here."""
     base, head = s.both(base_clone, head_clone, home, "-m", "gov.cli.main", "doctor", "--json", "--root", "{root}")
 
     def parts(answer):
@@ -110,5 +121,6 @@ def test_s2_doctor_reports_no_more_problems_than_on_the_base(base_clone, head_cl
         return {(ref["old_path"], ref["new_path"], ref["referenced_in"])
                 for ref in result["path_compliance"].get("moved_references") or []}
 
-    new = sorted(moved_references(head) - moved_references(base))
-    assert not new, f"{len(new)} moved references the base did not report: {new[:5]}"
+    own = _w2_203_paths(head_clone)
+    new = sorted(ref for ref in moved_references(head) - moved_references(base) if ref[0] in own or ref[1] in own)
+    assert not new, f"{len(new)} moved references to the register or the archive the base did not report: {new[:5]}"
