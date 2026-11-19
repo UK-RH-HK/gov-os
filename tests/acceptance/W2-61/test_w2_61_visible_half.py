@@ -130,6 +130,11 @@ def _entries(data):
     return found
 
 
+def _git(*args):
+    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), *args], capture_output=True, timeout=s.TIMEOUT_S)
+    return done.stdout.decode("utf-8", "replace") if done.returncode == 0 else None
+
+
 def _at_head(rel):
     done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"HEAD:{rel}"], capture_output=True,
                           timeout=s.TIMEOUT_S)
