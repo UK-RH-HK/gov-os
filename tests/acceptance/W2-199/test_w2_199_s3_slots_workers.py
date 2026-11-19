@@ -3,8 +3,10 @@
 - ``heavy_slots`` = max(1, min(floor(0.1 x CPUs), floor(0.5 x RAM / the measured verification peak) when gate.json has one))
 - ``workers_per_slot`` = max(1, floor((load_limit - start_below) / (margin x heavy_slots))), ``start_below`` = 0.6 x CPUs,
   ``load_limit`` = CPUs, ``margin`` 1.0 until measured
-- a run's workers default to ``workers_per_slot`` (``--workers`` wins); its slot count is ``GOV_HEAVY_SLOTS``, else the
-  configuration file's ``heavy_slots`` when it has one, else the derived count (a file with none no longer refuses).
+- a run's workers default to floor((load_limit - start_below) / (margin x the slot count in force)) (``--workers`` wins);
+  its slot count is ``GOV_HEAVY_SLOTS``, else the configuration file's ``heavy_slots`` when it has one, else the derived
+  count (a file with none no longer refuses): three slots on 20 CPUs give 2 workers each, one slot gives 8.
+  ``gov dispatch limits`` still shows the derived pair.
 
 The rules are computed here exactly (fractions); the invariant ``start_below + heavy_slots x workers_per_slot x margin
 <= load_limit`` (wherever ``workers_per_slot`` is above 1) is checked for every CPU count from 4 to 64 with margins 1.0, 1.5 and 2.0 by one process that calls gov's
@@ -118,7 +120,8 @@ def test_s3_the_configuration_files_heavy_slots_3_still_gives_three_slots(box):
     for job in jobs:
         job.must_start(6.0)
     workers = {job.env().get("PYTEST_XDIST_AUTO_NUM_WORKERS") for job in jobs}
-    assert workers == {"4"}, f"workers_per_slot (derived from the derived two slots, 4) is not each run's: {workers}"
+    assert workers == {"2"}, (f"a run's workers follow the slot count in force (floor((20 - 12) / (1.0 x 3 slots)) = 2), "
+                              f"not {workers}")
     fourth = box.start("d")
     assert fourth.held_for(1.5), "a fourth run starts although the file says three slots"
     for job in jobs + [fourth]:
@@ -131,6 +134,8 @@ def test_s3_gov_heavy_slots_1_gives_one_slot_even_against_the_file(box):
     env = {"GOV_HEAVY_SLOTS": "1"}
     first = box.start("a", extra_env=env)
     first.must_start(5.0)
+    assert first.env().get("PYTEST_XDIST_AUTO_NUM_WORKERS") == "8", (
+        f"one slot in force gives floor((20 - 12) / 1) = 8 workers: {first.env().get('PYTEST_XDIST_AUTO_NUM_WORKERS')}")
     second = box.start("b", extra_env=env)
     assert second.held_for(1.5), "a second run starts although GOV_HEAVY_SLOTS=1"
     first.release_and_finish()

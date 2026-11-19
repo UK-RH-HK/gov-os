@@ -67,8 +67,8 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_a_run_on_the_20_cpu_profile_with_a_file_with_no_heavy_slots_gets_4_workers_and_two_slots` | a file with no `heavy_slots` refuses the run (`RESOURCE_SLOT_REFUSED`) |
 | S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_workers_option_wins_over_the_derived_count` | the default workers are 1, not `workers_per_slot` 4 (the `--workers 2` half is already met on the base) |
 | S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_gov_heavy_workers_in_the_environment_sets_the_workers` | `GOV_HEAVY_WORKERS` is not read (1, not 3) |
-| S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_the_configuration_files_heavy_slots_3_still_gives_three_slots` | the runs get 1 worker, not `workers_per_slot` 4 (three slots from the file are already given on the base) |
-| S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_gov_heavy_slots_1_gives_one_slot_even_against_the_file` | `GOV_HEAVY_SLOTS` is not read: the second run starts |
+| S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_the_configuration_files_heavy_slots_3_still_gives_three_slots` | the runs get 1 worker, not 2 (three slots from the file are already given on the base) |
+| S3 (RT-3) | `test_w2_199_s3_slots_workers.py::test_s3_gov_heavy_slots_1_gives_one_slot_even_against_the_file` | `GOV_HEAVY_SLOTS` is not read: the first run gets 1 worker, not 8, and the second starts |
 | S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_a_job_raising_the_load_from_3_to_9_in_a_4_worker_run_leaves_the_measured_ended_event` | no runtime log: no `ready` event for the run |
 | S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_a_peak_over_the_limit_is_counted_in_over_limit_s_and_named_once_on_stderr` | no runtime log: no `ready` event for the run |
 | S4 (RT-3) | `test_w2_199_s4_margin.py::test_s4_five_ended_jobs_of_1_2_to_2_4_per_worker_give_the_rules_margin_and_fewer_workers` | no `margin` in `gov dispatch limits --json` (`<missing>`) |
@@ -149,9 +149,9 @@ given a second half that is new, so none is green on the base.
 - **`gov dispatch waits`.** Text output, one line per job holding its id and the two seconds (a number near the expected
   one, timestamps removed); a job not started whose pid is alive (the test's own) is waiting; the log's times are the real
   clock's.
-- **Workers with a file's slot count.** A run's default workers are `workers_per_slot` of the derived `heavy_slots` (4 on
-  20 CPUs), also when the file's `heavy_slots: 3` or `GOV_HEAVY_SLOTS` gives another slot count (the file or the variable
-  sets "its slot count" only).
+- **Workers with a file's or the variable's slot count** (ruling 6 as corrected, ticket `4c77368a3`). A run's default
+  workers are floor((load_limit - start_below) / (margin x the slot count in force)): the file's `heavy_slots: 3` on 20 CPUs
+  gives 2 workers each, `GOV_HEAVY_SLOTS=1` gives 8; `gov dispatch limits` still shows the derived pair (slots 2, workers 4).
 - **`prio-<pid>`.** The registration file is a file in `~/.gov-os/machine/slots/` whose name starts `prio-` and holds the
   pid (the ticket's F1 names the prefix). A capped priority run is read as no waiter: it has no registration file.
 - **No CPU-naming variable** (RT-4): no variable with `CPU` in its name other than `GOV_HEAVY_CPUS`, no value `cpu`, no
@@ -172,7 +172,7 @@ given a second half that is new, so none is green on the base.
    and pins reason `priority`, room true.
 3. The 90th percentile for fewer than 20 jobs is the nearest rank: 2.4 for the five planted jobs (the tests still accept 2.28).
 4. The key locations are the `limits` object, `jobs.running` / `jobs.waiting` lists and a `gpu` object in state.json.
-5. `GOV_HEAVY_CPUS` is exempt from "no CPU-naming variable". 6. Workers stay derived from the derived `heavy_slots`.
+5. `GOV_HEAVY_CPUS` is exempt from "no CPU-naming variable". 6. (Corrected, ticket `4c77368a3`) A run's default workers follow the slot count in force (`GOV_HEAVY_SLOTS`, else the file's `heavy_slots`, else derived): 3 file slots on 20 CPUs give 2 workers each, `GOV_HEAVY_SLOTS=1` gives 8; `gov dispatch limits` keeps showing the derived pair.
 (a) The invariant sweep checks `start_below + heavy_slots x workers_per_slot x margin <= load_limit` only where
 `workers_per_slot` is above 1 (the equality with the rule still holds everywhere).
 (b) The wrapper maps a caller's `PYTEST_XDIST_AUTO_NUM_WORKERS` to `--workers`: a case runs it with 1 (plain and `--held 1,2`)
