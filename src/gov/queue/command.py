@@ -9,6 +9,9 @@ A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (
    else the branch checked out at the root (``INTEGRATION_UNKNOWN``). A ticket's work branch is ``=<branch>``,
    else ``queue.yaml``'s ``work_branch`` form with ``{wbs}`` and ``{ticket}`` (``BRANCH_UNKNOWN``). The ticket is
    read at the integration head (``TICKET_UNKNOWN``, ``TICKET_CLOSED``). All exit 1, before anything is written.
+   A closed ticket's branch is a **fix landing** (W2-201 fix X6, DEC-1219 (5)) when one of its commits carries the
+   ticket's ``Task:`` and a ``Fix:`` trailer (``checks.fix_line``); any other branch of a closed ticket is
+   ``TICKET_CLOSED``. A fix landing is a candidate as any other, and lands with no second close (step 4).
    A branch whose tip is already on the integration branch (merged by hand) is landed alone and without a merge:
    its change is counted from the head before the merge that brought it.
 2. **Checks** on ``<head>..<tip>`` (``gov.queue.checks``): G-1 refuses a ticket (``TEST_AUTHOR_REFUSED``, out of
@@ -27,7 +30,9 @@ A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (
    the culprit and runs the rest again. A red no candidate explains that is red at the base with the same failure
    type is a known base red: named, not blocking.
 4. **The land.** One close commit per landed ticket on the tested commit, in the clone (its close record, its
-   checkpoint, ``tk close``); then the integration branch moves from the head the run merged onto to the last
+   checkpoint, ``tk close``); a fix landing's commit is ``fix: <ticket> ...`` instead and only appends the fix to
+   the ticket's close record (``gov.queue.fix``; ``tk close`` is not reached, the ticket stays closed), and its
+   ``closes`` entry adds ``fix: true`` and ``fix_line``; then the integration branch moves from the head the run merged onto to the last
    close commit, only if it is still there (``HEAD_MOVED``); where it is checked out, its working tree follows.
 5. **After** (``gov.queue.after``; never refuses): the integration store's refresh where ``rebuild.yaml`` names
    one, and the structural pass with the landing's base; both are notices under ``after``.
@@ -38,7 +43,8 @@ The flags of W2-206 (L2 section 3, A6):
 
 - ``--dry-run [--out <dir>]``: steps 0 to 3 and nothing else. No close commit, no close record, no branch and no
   ref moves; the warm clone is left at the base. The answer and the exit code are those the landing would have
-  given; ``<dir>`` gets ``select.json``, the run files, ``summary.txt`` and, last, ``verify.exit``
+  given (a fix landing that would land is named in ``closes`` with ``fix: true``, ``fix_line`` and a null
+  ``commit`` and ``close_record``); ``<dir>`` gets ``select.json``, the run files, ``summary.txt`` and, last, ``verify.exit``
   (``gov.queue.dry``), also when the dry run is refused as a whole.
 - ``--select``: the selection the run would make, as one JSON object on stdout, exit 0; nothing is run or
   recorded. ``SELECTION_REFUSED`` goes to stderr with exit 2.
@@ -190,29 +196,45 @@ def _candidate(root: Path, base: str, given: str, settings: dict) -> dict:
     if not isinstance(front, dict):
         _refuse("TICKET_UNKNOWN", f"{ticket} is not a ticket file .tickets/{ticket}.md at the integration head",
                 {"ticket": ticket})
-    if str(front.get("status")) == "closed":
-        _refuse("TICKET_CLOSED", f"{ticket} is closed at the integration head", {"ticket": ticket})
+    closed = str(front.get("status")) == "closed"
+
+    def refuse(code: str, message: str, details: dict, exit_code: int = 1):
+        """A closed ticket's branch that cannot be told a fix is refused as a closed ticket's (W2-201 X6)."""
+        if closed:
+            _refuse("TICKET_CLOSED", f"{ticket} is closed at the integration head (a fix lands from a branch with a "
+                    f"commit carrying Task: {ticket} and Fix: <line>)", {"ticket": ticket})
+        _refuse(code, message, details, exit_code)
+
     wbs = str(front.get("wbs_id") or front.get("external-ref") or ticket)
     if not sep:
         form = settings.get("work_branch")
         if not isinstance(form, str) or not form.strip():
-            _refuse("BRANCH_UNKNOWN", f"{ticket}: no branch given and {SETTINGS_REL} names no work_branch form",
-                    {"ticket": ticket})
+            refuse("BRANCH_UNKNOWN", f"{ticket}: no branch given and {SETTINGS_REL} names no work_branch form",
+                   {"ticket": ticket})
         branch = form.replace("{wbs}", wbs).replace("{ticket}", ticket)
     tip = _commit_of(root, f"refs/heads/{branch}") or _commit_of(root, branch) if branch else None
     if not tip:
-        _refuse("BRANCH_UNKNOWN", f"{ticket}: its work branch {branch!r} names no commit",
-                {"ticket": ticket, "branch": branch})
+        refuse("BRANCH_UNKNOWN", f"{ticket}: its work branch {branch!r} names no commit",
+               {"ticket": ticket, "branch": branch})
     since, merged = base, _git(root, "merge-base", "--is-ancestor", tip, base, ok=True) is not None
     if merged:
         since = _before_merge(root, base, tip)
         if since is None:
-            _refuse("CANDIDATE_NOT_ISOLATED", f"{ticket}: its work branch {branch} is already merged and the head "
-                    "before its merge cannot be told (a fast-forward, or the branch is the head itself), so its "
-                    "change cannot be checked; nothing lands", {"ticket": ticket, "branch": branch}, EXIT_RED)
+            refuse("CANDIDATE_NOT_ISOLATED", f"{ticket}: its work branch {branch} is already merged and the head "
+                   "before its merge cannot be told (a fast-forward, or the branch is the head itself), so its "
+                   "change cannot be checked; nothing lands", {"ticket": ticket, "branch": branch}, EXIT_RED)
+    fix = None
+    if closed:  # W2-201 X6: a fix landing, or refused as today
+        from gov.queue import checks
+        try:
+            fix = checks.fix_line(root, since, tip, ticket)
+        except RuntimeError:  # commits that cannot be read are no fix: fails closed
+            fix = None
+        if fix is None:
+            refuse("TICKET_CLOSED", "", {})
     at_tip = _front_at(root, tip, ticket)
     return {"ticket": ticket, "branch": branch, "tip": tip, "front": front, "merged": merged, "since": since,
-            "at_tip": at_tip if isinstance(at_tip, dict) else front, "folder": None, "record": None}
+            "at_tip": at_tip if isinstance(at_tip, dict) else front, "folder": None, "record": None, "fix": fix}
 
 
 def _on_record(front: dict) -> bool:
@@ -357,13 +379,24 @@ def _identity(root: Path) -> list[str]:
 
 
 def _close_all(root: Path, clone: Path, cands: list[dict], record: dict, result: dict) -> str:
-    """One close commit per landed candidate on the tested merge, in the clone; the last one."""
+    """One close commit per landed candidate on the tested merge, in the clone; the last one. A fix landing's
+    commit appends the fix to its ticket's close record and closes nothing (W2-201 X6)."""
     from gov.close import attribution, command as close
+    from gov.queue import fix
 
     attribution.checkout(clone, result["tested"])
     who, role = _identity(root), os.environ.get("GOV_ROLE") or DEFAULT_ROLE
     for cand in cands:
         ticket = cand["ticket"]
+        if cand.get("fix"):  # W2-201 X6: no second close: tk close and the first close's record are not reached
+            close_rel = fix.append(clone, ticket, cand["fix"], cand["branch"], cand["tip"], result["tested"])
+            _git(clone, "add", "-A", "--", close_rel)
+            _git(clone, *who, "commit", "-q", "--no-verify", "--no-gpg-sign", "-m",
+                 f"fix: {ticket} (gov queue landed at {result['tested'][:12]})\n\nTask: {ticket}\nRole: {role}\n")
+            result["closes"].append({"ticket": ticket, "close_record": close_rel,
+                                     "commit": _git(clone, "rev-parse", "HEAD").strip(), "fix": True,
+                                     "fix_line": cand["fix"]})
+            continue
         own = {**record, "branch": {"name": cand["branch"], "tip": cand["tip"]},
                "acceptance": cand["acceptance"],
                "path_notices": [n for n in result["path_notices"] if n["ticket"] == ticket],
@@ -673,6 +706,9 @@ def land(root: Path, given: list[str], onto: str | None = None,
         code = EXIT_RED if len(landed) < len(cands) else 0
         if dry is not None:  # the answer the landing would give; nothing is closed and nothing moves
             result.update(landed=[c["ticket"] for c in landed], dry_run=True)
+            # W2-201 X6: the entry a fix landing would get, with no commit and no record written
+            result["closes"] = [{"ticket": c["ticket"], "close_record": None, "commit": None, "fix": True,
+                                 "fix_line": c["fix"]} for c in landed if c.get("fix")]
             return finish(code)
         began = time.monotonic()
         explains = done.get("explains") or {}

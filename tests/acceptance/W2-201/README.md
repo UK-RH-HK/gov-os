@@ -189,6 +189,114 @@ green case is a guard: what holds today and must keep holding (named in the last
    tickets` section equals the kernel's. The whole-file copy checks are W1-28's, W1-33's and W2-153 S3's, in their own
    folders.
 
+## Fix, part 2: a fix under a closed ticket lands, relaunches and has a run folder (DEC-1219 (5)), lines X6 to X8
+
+Written by an independent test designer from the ticket's section `## Fix, part 2` (X6 to X8, each with its Verify;
+the first part's Interface paragraph and X1 to X5 for context), before the implementation (MR-3). Read besides: the
+base's `gov queue` (`gov.queue.command`, the close record writer of `gov.close.command`), `gov.dispatch.relaunch` and
+the watch pass that calls it, the launcher's registry entry and run folder code (`gov.util.runs`), for their seams
+only; W2-115b's, W2-202's, W2-205's, W2-121c's, W2-184's and W2-60a's support modules. Nothing of the engineer's work
+on part 2 was read (there was none on the branch beyond the spec commit a6f02ff7a). Three test files and two support
+modules beside the existing ones (none of which is changed): `w2_201_x6_support.py` (X6), `w2_201_x7_support.py` (X7);
+X8 uses `w2_201_x_support.py`. X6 is `success-15` (`S15`), X7 `success-16` (`S16`), X8 `success-17` (`S17`).
+
+**How the tests reach the product.**
+
+* **X6:** `gov queue <T>=<branch> ... [--dry-run] --json` on W2-115b's planted project (tickets with acceptance
+  suites, `.tickets/**` and `docs/close/**` record-only), each planted run built once per session under a lock, with
+  a plain-pytest check of its branches first. A closed ticket is W2-115b's ticket file with `status: closed`; a first
+  close's record is planted in the form `gov.close.command` writes one (its front matter, the queue's keys, the
+  heading, one line of prose). Commits carry `Task:`, `Fix:` and `Role: engineer` trailers (`git commit --trailer`).
+  The fix run: A (closed, with a record) on `topic/aa-fix1` (a commit with `Task: A` and no `Fix:`, then one with
+  `Task: A` and `Fix:`), C (closed, no record) on `topic/cc-fix`, B (open) on an ordinary `topic/bb`; a dry run of the
+  three, the landing of the three, then `topic/aa-fix2` from the new head and its landing. The refusal run: A (closed)
+  with `topic/aa-plain` (`Task: A`, no `Fix:`) and `topic/aa-other` (`Task: B` and `Fix:`), then B (in_progress) on
+  `topic/bb-fix` (`Task: B` and `Fix:`). The red run: C's fix breaks `mod_cc` (only C's acceptance suite guards it);
+  A's fix breaks the widget, and A's acceptance suite passes whatever the widget holds, so A's red is the selected
+  unit test `tests/unit/test_uses_widget.py` alone.
+* **X7:** W2-205's fixture machine (`gov dispatch watch` as the pass, `{"relaunch": true}`, a dead registry entry
+  planted in the launcher's form with a session id and the `kind` keys given). The relaunch's argv is read from a
+  stand-in `gov`: a package `gov` planted in the entry's repository (the pass starts `python3 -m gov.cli.main` in that
+  folder, which finds it first) and a `gov` on the pass's `PATH`; each records its argv and starts nothing. The
+  registry entry of a real launch is read through W2-121c's `LaunchKit` (its stand-in CLI captures the entry when the
+  session starts). The relaunched fix launch is W2-205's relaunch fixture: a real engineer session on an in_progress
+  ticket, the ticket then closed, its dead entry a fix's; the pass's relaunch is a real `gov launch` that runs to the
+  recording stand-in CLI, whose record is read.
+* **X8:** `gov launch` through the console script on W2-184's fixture project and W2-60a's stand-in CLI, HOME the
+  sandbox's, so the runs root is `<HOME>/gov-os-runs`; the folder's name is the ticket's `external-ref`
+  (`W2-184-<id>`). Each case first launches an in_progress ticket's engineer and sees its folder made, so a red is the
+  fix's missing folder, never a root that does not work in the sandbox.
+
+**Words pinned and left open.** X6: the refusal `TICKET_CLOSED` with exit 1 and nothing changed (refs, HEAD, status,
+tracked files); a fix landing's exit 0 and, for a red it causes, exit 3 with `culprits` the ticket and nothing landed
+(as any candidate); the close commit's subject `fix: <ticket> (gov queue landed at <tested12>)`, one `Task: <ticket>`
+trailer, its paths inside the ticket's own places (ticket file, `docs/close/<ticket>/`, `docs/checkpoints/<ticket>/`)
+and the close record among them; `fixes` a list whose entries hold exactly `{line, branch, tip, tested, landed}`
+(`line` the `Fix:` value, `branch` the name given to `gov queue`, `tip` the branch tip, `tested` the answer's `tested`,
+`landed` a UTC time within a day of the run: an ISO 8601 text ending `Z` or `+00:00`, or the time YAML reads from one,
+format otherwise open); the body line `- fix landed: <line> (<branch> @ <tip12>)` once per fix, the second after the
+first; the rest of the record's front matter equal as YAML reads it (key order and quoting open) and its other body
+lines kept in order (blank lines open); the `closes` entry's `fix: true` and `fix_line`, a feature's entry with neither
+key; `queue.json`'s `closes` equal to the answer's. The dry run's answer carries `fix: true` and `fix_line` for each
+fix (the lead's ruling, reading 7: in `closes`, the fixes' entries only); the case reads any map in its answer naming
+the `ticket` with `fix: true`. Open: what else the record written for a ticket with none holds beside
+`fixes` (the section says "with `fixes` only the way the landing writes a record, and nothing else of a first close":
+not tested beyond `fixes` and the body line); whether a fix's close commit touches the ticket file (its status is
+pinned `closed`, not its bytes). X7: in the spawned command, before `--`, the words less the option pairs are `launch
+<role> <ticket>` for a fix and `launch <role>` for a chore (the label passed nowhere), `--fix` / `--chore` followed by
+the line, `--root` followed by the entry's repository; after `--`, `--resume <session id>` and a text holding `Resume
+at the recorded next step`; the order of the options before `--` and the rest of the text are open. The registry
+entry's `kind` and `kind_line`; a feature's entry `feature` and null, or neither key. The relaunched record's `kind`
+`fix`, `kind_line`, `ticket` and `resumes`. X8: the folder `<HOME>/gov-os-runs/<external-ref>`, a folder not a link,
+its marker `.gov-os-repository` holding the real path of the project's git common directory and a newline; reuse with
+no second folder, the planted file and the marker unchanged. "Handed to the session as an in_progress worker's": the
+places (`--settings` env, other `--settings` keys, the CLI process's environment) whose value names the run folder are
+the same for the fix as for an in_progress launch, and `GOV_TICKET` is the ticket in both env forms. On the base an
+in_progress launch's settings and env name no run folder, so that comparison holds there; the case is red on the
+folder.
+
+The part's three files: 35 cases, 24 red and 11 green on the base (the tree of a6f02ff7a, through the heavy slot). A
+green case is a guard: what holds today and must keep holding (named in the last column).
+
+| KPI | tests | cases | expected red reason (on the base) |
+|---|---|---|---|
+| S15 (X6) | `test_w2_201_x6_fix_landing.py::test_x6_a_fix_branch_lands_with_exit_0_and_the_ticket_stays_closed`; `test_w2_201_x6_fix_landing.py::test_x6_a_fix_landing_runs_its_acceptance_folder_and_the_selected_tests`; `test_w2_201_x6_fix_landing.py::test_x6_the_fix_s_close_commit_is_named_fix_and_carries_task`; `test_w2_201_x6_fix_landing.py::test_x6_the_close_record_gains_one_fixes_entry_and_one_body_line_and_keeps_the_rest`; `test_w2_201_x6_fix_landing.py::test_x6_a_closed_ticket_with_no_close_record_gets_one_with_fixes`; `test_w2_201_x6_fix_landing.py::test_x6_the_answer_s_closes_entry_carries_fix_and_fix_line_and_a_feature_s_is_as_today`; `test_w2_201_x6_fix_landing.py::test_x6_queue_json_holds_the_answer_s_closes`; `test_w2_201_x6_fix_landing.py::test_x6_a_second_fix_on_the_same_ticket_appends_a_second_entry`; `test_w2_201_x6_fix_landing.py::test_x6_a_closed_ticket_s_branch_without_its_own_fix_trailer_is_refused_ticket_closed`; `test_w2_201_x6_fix_landing.py::test_x6_a_fix_that_breaks_a_test_is_not_landed`; `test_w2_201_x6_fix_landing.py::test_x6_the_dry_run_answers_the_same_and_changes_nothing`; `test_w2_201_x6_fix_landing.py::test_x6_a_fix_trailer_on_an_in_progress_ticket_closes_it_as_today` | 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 2 (plain, other) + 2 (acceptance-folder, selected-test) + 1 + 1 | `gov queue` refuses every branch of a closed ticket `TICKET_CLOSED` (exit 1, the batch refused as a whole), so no fix lands, no close commit, no `fixes` entry or body line, no `fix` / `fix_line`, the dry run is refused too, and a fix that breaks a test is refused before it runs instead of being its culprit (11 red; each case first asserts the answer is not `TICKET_CLOSED`, so the red names it). Guards (3): a closed ticket's branch with `Task:` and no `Fix:`, and one with `Fix:` under another ticket's `Task:`, are refused `TICKET_CLOSED`, exit 1, nothing changed; a `Fix:` branch on an in_progress ticket lands and closes it as today (`close:` commit, no `fixes`, no `fix` key) |
+| S16 (X7) | `test_w2_201_x7_relaunch_kind.py::test_x7_the_pass_relaunches_a_fix_or_chore_entry_as_the_same_kind`; `test_w2_201_x7_relaunch_kind.py::test_x7_a_feature_entry_or_one_from_before_the_change_is_relaunched_as_today`; `test_w2_201_x7_relaunch_kind.py::test_x7_a_fix_or_chore_launch_s_registry_entry_holds_its_kind_and_line`; `test_w2_201_x7_relaunch_kind.py::test_x7_a_feature_launch_s_registry_entry_holds_feature_or_neither_key`; `test_w2_201_x7_relaunch_kind.py::test_x7_a_relaunched_fix_launch_is_not_refused_and_records_kind_fix_and_the_same_line` | 4 (fix, chore x engineer, orchestrator) + 4 (feature, old-form x engineer, orchestrator) + 4 (fix, chore x engineer, orchestrator) + 1 + 1 | the pass spawns `launch <role> <entry's ticket> --root <repository> -- --resume ...` whatever the entry's kind: no `--fix` / `--chore`, and a chore's label passed as a ticket; the launcher's registry entry has no `kind` or `kind_line`; the relaunched fix is refused `ticket '...' is not in_progress (status: closed)`, so no session starts (9 red). Guards (5): a feature entry and an entry with neither key are relaunched as today, for a worker and a lead (4); a feature launch's registry entry holds neither key (1) |
+| S17 (X8) | `test_w2_201_x8_fix_run_folder.py::test_x8_a_fix_launch_gets_its_run_folder_with_the_marker`; `test_w2_201_x8_fix_run_folder.py::test_x8_the_same_fix_launch_repeated_reuses_the_folder_and_leaves_what_it_holds`; `test_w2_201_x8_fix_run_folder.py::test_x8_a_fix_reuses_the_folder_an_earlier_in_progress_launch_of_the_ticket_made`; `test_w2_201_x8_fix_run_folder.py::test_x8_the_fix_session_is_handed_its_folder_as_an_in_progress_worker_is`; `test_w2_201_x8_fix_run_folder.py::test_x8_a_feature_launch_on_a_closed_ticket_is_refused_and_gets_no_folder`; `test_w2_201_x8_fix_run_folder.py::test_x8_a_chore_makes_no_run_folder` | 2 (closed, open) + 1 + 1 + 1 + 1 + 1 | `runs.folder` gives no folder for a ticket that is not in_progress, so a fix launch on a closed or open ticket starts with no run folder under `<HOME>/gov-os-runs` (4 red; each case first sees an in_progress launch's folder made where it needs one). Guards (3): the folder an in_progress launch of the ticket made is there, untouched, after its fix (the launcher removes nothing); a feature launch on a closed ticket is refused `is not in_progress` and makes no folder; a chore makes none |
+
+**Readings (where the section is silent), and one package.**
+
+1. **X6, the fix line.** "The line is the first such commit's `Fix:` value": the planted branches have one commit with
+   `Fix:` each (A's first branch has an earlier commit with `Task:` alone, which shows "at least one commit"), so which
+   commit is "first" when two carry different lines (oldest or newest) is not tested.
+2. **X6, a mixed batch.** The fixes land in one batch beside B's feature; B's close is as today (a `close:` commit, a
+   closes entry with neither `fix` key, B closed). A second fix is landed from the head the first left.
+3. **X6, (c).** "Not landed" is the landing's own outcome for a red: exit 3, `landed` empty, `culprits` the ticket, the
+   broken test named (in `reds`, or the ticket's acceptance entry not `pass`), no ref moved, no tracked file changed,
+   the ticket closed and A's record as planted.
+4. **X7, the stand-in `gov`.** The base starts the relaunch as `python3 -m gov.cli.main` in the entry's repository;
+   the planted package and the `PATH` stand-in see that and a start through the console script. A start in another
+   folder, or one that does not take the working folder's package first (`-I`, `-P`), is seen by neither: the case
+   then fails with no spawn recorded.
+5. **X7, the lead.** A lead's registry entry has role `orchestrator` (the launcher's), so its relaunch is `gov launch
+   orchestrator ...`; a lead launched as `lead` is read the same.
+6. **X8, rules that stay** (the plain name, the root, the project not inside it, the name given once) are W2-50's and
+   W2-60a's cases, in their own folders.
+7. **Where the dry run says `fix: true`** (the lead's ruling on this designer's package). A dry run makes no close
+   commit, and its `closes` stays empty for ordinary tickets (W2-206 requires it); it lists in `closes` only the
+   entries the fixes would get, with `commit` and `close_record` null, each with `fix: true` and `fix_line`. The case
+   reads any map in the dry run's answer naming the ticket with `fix: true` and its `fix_line`; W2-206's own cases
+   hold the empty `closes` of a dry run with no fix.
+
+The part alone (about 30 s on the base; the X6 runs take longer once fixes land and their tests run):
+
+```
+T=$(mktemp -d); TMPDIR=$T PYTHONPATH=<tree>/src:<tree>/src/gov/close/pytest_plugin \
+  bash <main tree>/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest \
+  tests/acceptance/W2-201/test_w2_201_x6_fix_landing.py tests/acceptance/W2-201/test_w2_201_x7_relaunch_kind.py \
+  tests/acceptance/W2-201/test_w2_201_x8_fix_run_folder.py -q -p no:cacheprovider -n auto; chmod -R u+w $T; rm -rf $T
+```
+
 ## Run
 
 ```

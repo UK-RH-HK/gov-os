@@ -109,18 +109,19 @@ def make(own: str, project_root: str) -> None:
         return
 
 
-def own_folder(project_root: str, ticket_id: str | None, role: str | None) -> str | None:
+def own_folder(project_root: str, ticket_id: str | None, role: str | None, kind: str | None = None) -> str | None:
     """The session's own folder under the root, or ``None``: a folder that is not marked as made by this
-    repository's launch (DEC-751 1), or none of ``folder``'s."""
-    own = folder(project_root, ticket_id, role)
+    repository's launch (DEC-751 1), or none of ``folder``'s (``kind`` as there)."""
+    own = folder(project_root, ticket_id, role, kind)
     return own if own is not None and _marked(own, project_root) else None
 
 
-def folder(project_root: str, ticket_id: str | None, role: str | None) -> str | None:
+def folder(project_root: str, ticket_id: str | None, role: str | None, kind: str | None = None) -> str | None:
     """The path the session's own folder has under the root, or ``None``: an unknown role or ticket, a ticket that
     is not ``in_progress`` (DEC-743 6), a name that is not a plain folder name or that another ticket gives too, a
     folder that holds the project or lies in it, a project whose real root lies in the root (DEC-758 1), or a root
-    that is a link."""
+    that is a link. ``kind`` is the launch's (W2-201 fix X8, DEC-1219 (5)): a ``fix`` runs under its owning ticket
+    whatever its status, so its status is not judged; every other rule stays (a chore has no ticket, so none)."""
     base = root()
     if role not in ROLES or not ticket_id or base is None or os.path.islink(base):
         return None
@@ -130,7 +131,7 @@ def folder(project_root: str, ticket_id: str | None, role: str | None) -> str | 
         return None
     from gov.util.tickets import _load_ticket
     ticket = _load_ticket(project_root, ticket_id)
-    if not ticket or ticket.get("status") != "in_progress":
+    if not ticket or (kind != "fix" and ticket.get("status") != "in_progress"):
         return None
     name = _name(ticket)
     if not PLAIN_NAME.fullmatch(name):
