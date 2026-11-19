@@ -12,7 +12,8 @@ import json
 import os
 from pathlib import Path
 
-from gov.memaudit import fault, matcher, prompts, scores, tables
+from gov.memaudit import config as _config
+from gov.memaudit import fault, matcher, prompts, scores
 from gov.memaudit.common import write_whole
 
 CLASSES = ("gold_wrong", "question_ambiguous", "out_of_scope", "retrieval_miss", "answer_wrong")
@@ -73,9 +74,13 @@ def miss_outcome(row: dict, o2: dict) -> str:
     return "wrong"
 
 
-def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_folder, parsed: dict, control: dict,
-          spend: dict) -> tuple[dict, list[dict]]:
-    """``(FIGURES, misses)`` for ``questions`` (the kept set, in file-name order) and their ``rows``."""
+def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_folder, parsed: dict, control,
+          spend: dict, categories=None) -> tuple[dict, list[dict]]:
+    """``(FIGURES, misses)`` for ``questions`` (the kept set, in file-name order) and their ``rows``. ``categories`` are
+    the repository's own (absent: those of the repository the process stands in); ``control`` is the counting attempt's
+    control event, or None when the configuration names no control (``FIGURES.json`` then holds a null control)."""
+    if categories is None:
+        categories = _config.current().quotas
     by_line = {q["id"]: q for q in parsed["questions"]}
     where = starts(parsed)
     qids = [q["id"] for q in questions]
@@ -93,7 +98,7 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
                 == (r["grades"].get("check") or {}).get("grade"))
     misses, by_outcome = [], {k: 0 for k in OUTCOMES}
     by_rank, by_ns = {"rank_1_5": 0, "rank_6_20": 0, "not_in_20": 0}, {"embedded": 0, "keyword_only": 0}
-    by_cat, by_route = {c: 0 for c in tables.QUOTAS}, {k: 0 for k in ROUTES}
+    by_cat, by_route = {c: 0 for c in categories}, {k: 0 for k in ROUTES}
     for q in questions:
         i = q["id"]
         if o[2][i]["right"]:
@@ -126,7 +131,7 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
                    "search_failures": sum(r.get("search_failures", 0) for r in rows.values())},
         "misses": {"total": len(misses), "by_outcome": by_outcome, "by_rank": by_rank,
                    "by_namespace": by_ns, "by_category": by_cat, "by_route": by_route},
-        "control": {k: control.get(k) for k in ("hit5", "of", "last", "last_audit")},
+        "control": None if control is None else {k: control.get(k) for k in ("hit5", "of", "last", "last_audit")},
         "pool": None, "classes": None, "spend": spend,
     }
     return figures, misses

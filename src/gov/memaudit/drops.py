@@ -10,9 +10,12 @@ from __future__ import annotations
 import os
 import re
 
+from pathlib import Path
+
+from gov.memaudit import config as _config
 from gov.memaudit import layout, ledger, tables
-from gov.memaudit.common import set_digest, utc_iso, write_whole
-from gov.memaudit.preflight import MIN_FILES, _load, first_path
+from gov.memaudit.common import UsageError, read_json, set_digest, toplevel, utc_iso, write_whole
+from gov.memaudit.preflight import _load, first_path
 
 SECTION = "## Questions"
 HEADING = re.compile(r"#{1,6}(\s|$)")
@@ -61,10 +64,29 @@ def verdict(rows: list | None) -> tuple[bool, list[str]]:
     return False, _codes(f[2])
 
 
-def apply(sets_root, audit) -> tuple[str, dict]:
+def _repo(repo):
+    """``--repo``, else the top level the process stands in, else None (the configuration may still be named by
+    ``MEMAUDIT_CONFIG``)."""
+    if repo is not None:
+        return Path(repo)
+    try:
+        return toplevel()
+    except UsageError:
+        return None
+
+
+def apply(sets_root, audit, repo=None) -> tuple[str, dict]:
     """The rule for ``audit``. Returns the exit word (``ok``, ``void``, ``refused`` with ``DR-NOTES`` or ``DR-DONE``,
-    or ``used``) and the counts the subcommand prints."""
+    or ``used``) and the counts the subcommand prints. The tables are the configuration of ``repo`` at the audit commit
+    ``PREFLIGHT.json`` records (the working tree's file when it records none the repository holds); a record-key
+    subsystem is read from the question's first source file there."""
     p = layout.paths(sets_root, audit)
+    repo = _repo(repo)
+    if repo is not None and layout.inside(repo, p["root"]):
+        raise UsageError("flag inside the sets root")
+    pre = read_json(p["preflight"])
+    commit = _config.recorded(repo, pre.get("audit_commit") if isinstance(pre, dict) else None)
+    cfg = _config.load(repo, commit)
     if os.path.lexists(p["used"]):
         return "used", {"used": True}
     if os.path.lexists(p["drops"]):
@@ -95,13 +117,14 @@ def apply(sets_root, audit) -> tuple[str, dict]:
 
     kept_files, _ = layout.entries(p["hidden"])
     kept = len(kept_files)
-    domains, subsystems = tables.spread([first_path(_load(f)) for f in kept_files])
-    thin = tables.thin_domains(domains, kept)
-    over = tables.heavy_subsystems(subsystems, kept)
-    cause = "VOID-COUNT" if kept < MIN_FILES else ("VOID-DOMAIN" if thin else None)
+    at = tables.reader(repo, commit) if repo is not None else None
+    domains, subsystems = tables.spread([first_path(_load(f)) for f in kept_files], cfg, at)
+    thin = tables.thin_domains(domains, kept, cfg)
+    over = tables.heavy_subsystems(subsystems, kept, cfg)
+    cause = "VOID-COUNT" if kept < cfg.min_kept else ("VOID-DOMAIN" if thin else None)
     counts = {"kept": kept, "dropped": len(drop), "by_code": dict(sorted(by_code.items())), "domains": domains,
               "subsystems": subsystems, "subsystem_over": over, "void": cause, "set_digest": set_digest(p["hidden"]),
-              "notes_round": rnd, "domain_min": tables.domain_min(kept), "subsystem_max": tables.subsystem_max(kept),
+              "notes_round": rnd, "domain_min": cfg.domain_min(kept), "subsystem_max": cfg.subsystem_max(kept),
               "thin_domains": thin, "at": utc_iso()}
     run_dir = layout.make_run(p)
     write_whole(run_dir, "DROPS.json", counts)

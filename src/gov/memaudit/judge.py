@@ -20,6 +20,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from gov.memaudit import config as _config
 from gov.memaudit import declare, events, fault, figures, layout, ledger, matcher, prompts, runner
 from gov.memaudit.claude import Caller
 from gov.memaudit.common import UsageError, read_json, set_digest, toplevel, write_whole
@@ -189,6 +190,9 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
     if projection is not None and not projection > 0:
         raise UsageError("projection")
     run_dir, reader = p["run"], p["run"] / "reader"
+    # the repository's own configuration at the declared audit commit, before anything else (W2-204 S2)
+    recorded = read_json(p["declaration"])
+    cfg = _config.load(repo, _config.recorded(repo, recorded.get("audit_commit") if isinstance(recorded, dict) else None))
 
     # a verdict stands: never run again, never re-scored (exit 3, nothing written)
     stopped = run_dir / "STOPPED"
@@ -259,7 +263,8 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
     rows = rows_of(reader)
     attempt_n = int(counting.name.rsplit("-", 1)[1])
     spend = {"usd": round(caller.total, 6), "projection": proj, "brake": brake}
-    fig, misses = figures.build(audit, decl, qs, rows, counting, parsed, _control_of(run_dir, attempt_n), spend)
+    control = _control_of(run_dir, attempt_n) if cfg.control is not None else None
+    fig, misses = figures.build(audit, decl, qs, rows, counting, parsed, control, spend, cfg.quotas)
     if not week:  # a standing run's questions leave nothing behind but its rows in this run folder (S4)
         figures.write_misses(run_dir, misses)
     figures.write_figures(run_dir, fig)

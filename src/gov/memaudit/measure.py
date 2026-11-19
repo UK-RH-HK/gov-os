@@ -16,11 +16,12 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from gov.memaudit import declare, events, fault, layout, runner, scores, wrapper
-from gov.memaudit.common import UsageError, read_json, set_digest, sha256_file, toplevel, utc_iso
+from gov.memaudit import config as _config
+from gov.memaudit import declare, events, fault, layout, ledger, runner, scores, wrapper
+from gov.memaudit.common import UsageError, read_json, resolve_commit, set_digest, sha256_file, toplevel, utc_iso
 
-CONTROL_SET, CONTROL_PART, CONTROL_N = "memory-retrieval", "visible", 40
-CONTROL_FIRST, CONTROL_SPREAD = 34, 2  # E0's figure on the visible 40, and the spread allowed (DEC-1097 (1)(b))
+FIRST = "first"  # a baseline that is the first measure's own figure (W2-204 S6)
+_UNSET = object()
 CAUSES = ("control", "notready", "fault", "store", "brake")
 
 
@@ -42,10 +43,15 @@ def write_text(path: Path, text: str) -> None:
     os.replace(tmp, path)
 
 
-def last_control(p: dict) -> tuple[int, str | None]:
+def last_control(p: dict, control=_UNSET) -> tuple[int | None, str | None]:
     """``(last, last_audit)``: ``control.hit5`` of the ``FIGURES.json`` of the latest earlier ``memory-audit-<date>`` run
-    folder that has one; none: E0's 34. A standing run (``p["week"]``) looks at the set's earlier weeks first, then at
-    every fresh audit's."""
+    folder that has one; none: the baseline of the configuration's ``control`` (Gov OS's is E0's 34, DEC-1097 (1)(b);
+    ``None`` for the baseline ``first``). A standing run (``p["week"]``) looks at the set's earlier weeks first, then at
+    every fresh audit's. ``control`` absent: that of the repository the process stands in."""
+    if control is _UNSET:
+        control = _config.current().control
+    first = control is not None and control.baseline == FIRST
+    baseline = control.baseline if control is not None and not first else None
     runs = p["root"] / "runs"
     audit = "~" if p.get("week") else p["run"].name  # "~" sorts after every audit name: all fresh audits are earlier
     where = []
@@ -61,13 +67,19 @@ def last_control(p: dict) -> tuple[int, str | None]:
         control = doc.get("control") if isinstance(doc, dict) else None
         if isinstance(control, dict) and isinstance(control.get("hit5"), int):
             return control["hit5"], name
-    return CONTROL_FIRST, None
+    if first:  # the first measure's own figure, from the earliest audit whose ledger holds a control in range
+        for name, folder in sorted(where, key=lambda x: x[0]):
+            for e in ledger.read(folder):
+                if e.get("event") == "control" and e.get("ok") is True and isinstance(e.get("hit5"), int):
+                    return e["hit5"], name
+    return baseline, None
 
 
 class _Run:
     """What one ``measure`` call carries between its steps."""
 
-    def __init__(self, p, repo, store, gov, decl, emit):
+    def __init__(self, p, repo, store, gov, decl, emit, cfg):
+        self.cfg = cfg
         self.p, self.run, self.repo, self.store, self.gov = p, p["run"], repo, store, gov
         self.audit, self.decl, self.emit = p["run"].name, decl, emit
         self.wrapper = wrapper.install(self.run, gov)
@@ -84,11 +96,14 @@ class _Run:
         self.control(k)
 
     def control(self, k: int) -> None:
+        c = self.cfg.control
+        if c is None:  # ``control: none``: the probe search was the whole ready check; no control search is made
+            return
         try:
             folder = runner.start(self.run / f"control-{k}")
         except FileExistsError:
             raise Stop("fault") from None
-        rc = runner.measure(CONTROL_SET, CONTROL_PART, repo=self.repo, root=self.p["root"], folder=folder,
+        rc = runner.measure(c.set, c.part, repo=self.repo, root=self.p["root"], folder=folder,
                             wrapper=self.wrapper, run=self.run, phase="control", attempt=k)
         parsed = fault.read_parsed(folder)
         kept = fault.kept_files(folder)
@@ -100,8 +115,10 @@ class _Run:
         if of == 0:  # ruling 9: the control's set did not load (missing): the ready check ends, not a control figure
             self.emit(f"NOT READY: control-{k} measured no question (the control's set is missing)")
             raise Stop("notready")
-        last, last_audit = last_control(self.p)
-        ok = of == CONTROL_N and parsed["families"] is not None and abs(hit5 - last) <= CONTROL_SPREAD
+        last, last_audit = last_control(self.p, c)
+        if last is None:  # the baseline ``first`` with no earlier figure: this figure is the one recorded, never out of range
+            last = hit5
+        ok = of == c.size and parsed["families"] is not None and abs(hit5 - last) <= c.spread
         events.append(self.run, "control", k=k, hit5=hit5, of=of, last=last, last_audit=last_audit, ok=ok)
         self.emit(f"CONTROL control-{k}: hit@5 {hit5} of {of}; last {last}; "
                   + ("in range" if ok else "control out of range"))
@@ -165,6 +182,9 @@ def run(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=N
     """The exit word (``ok``, ``refused``, ``used`` or ``stopped``); every line goes to ``emit``. With ``week`` the run
     is a standing set's week: its folder is ``runs/<set>/<week>/`` and its questions are never printed."""
     p, repo, store, gov = _flags(sets_root, audit, repo, store, gov, week)
+    if layout.inside(repo, p["root"]):
+        raise UsageError("flag inside the sets root")
+    cfg = _config.load(repo, resolve_commit(repo, commit))
     word, counts = declare.declare(sets_root, audit, commit=commit, repo=repo, store=store, gov=gov, decision=decision,
                                    week=week)
     for line in declare.lines(word, counts):
@@ -175,7 +195,7 @@ def run(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=N
     if set_digest(p["hidden"]) != decl["set_digest"]:
         emit("MS-DIGEST")
         return "refused"
-    ctx = _Run(p, repo, store, gov, decl, emit)
+    ctx = _Run(p, repo, store, gov, decl, emit, cfg)
     try:
         n = 1
         while True:

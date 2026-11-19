@@ -87,6 +87,30 @@ def _used(step: str, code: int, gate: bool) -> bool:
     return ORDER.index(step) > ORDER.index("measure")
 
 
+def gate_open(gate, cwd, env) -> bool:
+    """Whether the gate's check (its words; none: always open) ends 0, polled until it does or the longest wait is
+    past. Shared with the fresh driver (W2-204)."""
+    if not gate:
+        return True
+    poll = float(os.environ.get("GOV_MEMAUDIT_GATE_POLL_S") or 60)
+    most = float(os.environ.get("GOV_MEMAUDIT_GATE_MAX_S") or 3600)
+    seam, waited, began = bool(os.environ.get("GOV_MEMAUDIT_NOW")), 0.0, time.monotonic()
+    while True:
+        try:
+            code = subprocess.run(gate, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
+        except OSError:
+            code = 1
+        if code == 0:
+            return True
+        if waited >= most or time.monotonic() - began >= most:
+            return False
+        nap = max(0.0, min(poll, most - waited))
+        if not seam:  # under the clock seam the wait is counted, not slept: time does not pass there
+            time.sleep(nap)
+        waited += nap if nap else most  # a zero poll still ends: never an unbounded wait
+
+
 class _Cycle:
     def __init__(self, st, a_dir, repo, env, emit, root, gate, launch_argv, link, week=None):
         self.st, self.a_dir, self.repo, self.env, self.emit, self.root = st, a_dir, repo, env, emit, root
@@ -99,25 +123,7 @@ class _Cycle:
                     | ({"week": self.week} if self.week else {}))
 
     def gate_open(self) -> bool:
-        if not self.gate:
-            return True
-        poll = float(os.environ.get("GOV_MEMAUDIT_GATE_POLL_S") or 60)
-        most = float(os.environ.get("GOV_MEMAUDIT_GATE_MAX_S") or 3600)
-        seam, waited, began = bool(os.environ.get("GOV_MEMAUDIT_NOW")), 0.0, time.monotonic()
-        while True:
-            try:
-                code = subprocess.run(self.gate, cwd=self.repo, env=self.env, stdin=subprocess.DEVNULL,
-                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
-            except OSError:
-                code = 1
-            if code == 0:
-                return True
-            if waited >= most or time.monotonic() - began >= most:
-                return False
-            nap = max(0.0, min(poll, most - waited))
-            if not seam:  # under the clock seam the wait is counted, not slept: time does not pass there
-                time.sleep(nap)
-            waited += nap if nap else most  # a zero poll still ends: never an unbounded wait
+        return gate_open(self.gate, self.repo, self.env)
 
     def stop(self, step: str, code: int, gate: bool = False):
         used = _used(step, code, gate)

@@ -15,6 +15,7 @@ import random
 from fnmatch import fnmatchcase
 from pathlib import Path
 
+from gov.memaudit import config as _config
 from gov.memaudit import layout, ledger, tables
 from gov.memaudit.common import (FILES_KEY, HEX40, blob_at, git, read_json, resolve_commit, set_digest, sha256_file,
                                  toplevel, utc_iso, write_whole, z_list, UsageError)
@@ -22,8 +23,7 @@ from gov.memaudit.common import (FILES_KEY, HEX40, blob_at, git, read_json, reso
 CODES = ("PF-COUNT", "PF-FORM", "PF-COMMIT", "PF-QUOTA", "PF-SPREAD", "PF-DRAWN", "PF-SOURCE", "PF-EVALNS",
          "PF-DUPPOOL", "PF-IDEXISTS")
 SET_LEVEL = ("PF-COUNT", "PF-QUOTA", "PF-SPREAD")
-MIN_FILES = 36
-FULL_SET = 40
+MIN_FILES = 36  # of 40: the configuration scales it to its half (``Config.min_kept``)
 SAMPLE_N = 300
 MAX_IDS = 40
 REQUIRED = {"id", "question", "gold_answer", "sources", "commit", "category", "drawn"}
@@ -72,8 +72,11 @@ def alternatives(entry) -> list[dict]:
     return entry if isinstance(entry, list) else [entry]
 
 
-def form_ok(data, stem: str) -> bool:
-    """The writer brief's form (section 7), as Interface section 3 row 2 states it."""
+def form_ok(data, stem: str, categories=None) -> bool:
+    """The writer brief's form (section 7), as Interface section 3 row 2 states it. ``categories`` are the names of the
+    repository's own configuration (absent: those of the repository the process stands in)."""
+    if categories is None:
+        categories = _config.current().quotas
     if not isinstance(data, dict) or not all(isinstance(k, str) for k in data):
         return False
     keys = set(data)
@@ -85,7 +88,7 @@ def form_ok(data, stem: str) -> bool:
         return False
     if data["id"] != stem or not all(_text(data[k]) for k in ("id", "question", "gold_answer")):
         return False
-    if data["category"] not in tables.QUOTAS or data["drawn"] not in DRAWN:
+    if data["category"] not in categories or data["drawn"] not in DRAWN:
         return False
     if not (isinstance(data["commit"], str) and HEX40.fullmatch(data["commit"])):
         return False
@@ -310,6 +313,7 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
             raise UsageError("runs-dir")
     runs_dir = Path(os.path.expanduser(str(runs_dir)))
     commit = resolve_commit(repo, commit)
+    cfg = _config.load(repo, commit)  # before anything is read or written: a repository without its file is refused
     if os.path.lexists(p["used"]):
         return "used", {"used": True}
 
@@ -320,28 +324,28 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
     good = []  # (id, data) of the files in form
     for f in files:
         data = _load(f)
-        if form_ok(data, f.stem):
+        if form_ok(data, f.stem, cfg.quotas):
             good.append((f.stem, data))
         else:
             found["PF-FORM"].append(f.stem)
 
     # 1 PF-COUNT: fewer than 36 files, or an entry that is not a question file
-    count_refused = (1 if n < MIN_FILES else 0) + strays
+    count_refused = (1 if n < cfg.min_kept else 0) + strays
 
     # 3 PF-COMMIT
     found["PF-COMMIT"] = [qid for qid, d in good if d["commit"] != commit]
 
     # 4 PF-QUOTA: at 40 files every count equals its quota; otherwise none exceeds it (section 10 item 3)
-    categories = {c: 0 for c in tables.QUOTAS}
+    categories = {c: 0 for c in cfg.quotas}
     for _, d in good:
         categories[d["category"]] += 1
-    off = [c for c, q in tables.QUOTAS.items()
-           if (categories[c] != q if n >= FULL_SET else categories[c] > q)]
+    off = [c for c, q in cfg.quotas.items()
+           if (categories[c] != q if n >= cfg.half_size else categories[c] > q)]
     detail["PF-QUOTA"] = [f"{c} {categories[c]}" for c in off]
 
     # 5 PF-SPREAD, scaled to n
-    domains, subsystems = tables.spread([first_path(d) for _, d in good])
-    thin, heavy = tables.thin_domains(domains, n), tables.heavy_subsystems(subsystems, n)
+    domains, subsystems = tables.spread([first_path(d) for _, d in good], cfg, tables.reader(repo, commit))
+    thin, heavy = tables.thin_domains(domains, n, cfg), tables.heavy_subsystems(subsystems, n, cfg)
     detail["PF-SPREAD"] = [f"domain {d} {domains[d]}" for d in thin] + [f"subsystem {s} {subsystems[s]}" for s in heavy]
 
     # 6 PF-DRAWN
@@ -362,7 +366,7 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
                 re_anchored += verdict == "re-anchored"
                 if verdict == "refused":
                     found["PF-SOURCE"].append(qid)
-                if evalns.match(a["path"]):
+                if evalns.match(a["path"]) or cfg.excluded(a["path"]):
                     found["PF-EVALNS"].append(qid)
 
     # 9 PF-DUPPOOL
@@ -394,7 +398,7 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
     counts = {
         "audit": audit, "audit_commit": commit, "at": utc_iso(), "ok": ok, "n": n, "strays": strays,
         "in_form": len(good), "codes": codes, "categories": categories, "domains": domains,
-        "subsystems": subsystems, "domain_min": tables.domain_min(n), "subsystem_max": tables.subsystem_max(n),
+        "subsystems": subsystems, "domain_min": cfg.domain_min(n), "subsystem_max": cfg.subsystem_max(n),
         "selection": lists_from, "re_anchored": re_anchored, "no_token": no_token, "pool": len(pool),
         "set_digest": set_digest(p["hidden"]),
         # every delivered file's sha256 by id, a refused one too: declare's DC-PREFLIGHT declares only these bytes

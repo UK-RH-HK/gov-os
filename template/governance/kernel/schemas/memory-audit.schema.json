@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "memory-audit",
+  "description": "A repository's memory-audit configuration, governance/project/memory-audit.yaml (W2-204): the categories and their quotas for one half, the governing domains, the subsystems, the spread rule, the paths no question may cite and the control set. A closed set of keys. Beyond this schema, gov memaudit check also asks that the quotas sum to half_size, that nonexistent-id is a category, that no name is written twice and that every domain matches a tracked file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "repository", "half_size", "categories", "domains", "subsystems", "control"],
+  "properties": {
+    "version": { "const": 1 },
+    "repository": { "type": "string", "minLength": 1, "description": "the display name the briefs use" },
+    "half_size": { "type": "integer", "minimum": 1, "description": "the questions of one half; the quotas sum to it" },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "description": "ordered: the table order breaks the writer's ties; nonexistent-id must be one of them",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "count"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "count": { "type": "integer", "minimum": 0 },
+          "about": { "type": "string" }
+        }
+      }
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "description": "the first row matching a question's first source path decides its governing domain",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "paths"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "paths": { "$ref": "#/$defs/patterns" }
+        }
+      }
+    },
+    "subsystems": {
+      "type": "array",
+      "description": "may be empty; a row counts by path or by a key of the first source file's front matter",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "paths"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "paths": { "$ref": "#/$defs/patterns" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "record_key", "values"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "record_key": { "type": "string", "minLength": 1 },
+              "values": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+            }
+          }
+        ]
+      }
+    },
+    "spread": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain_min", "subsystem_max"],
+      "description": "per half_size: a domain needs at least domain_min questions, a subsystem holds at most subsystem_max; absent, 4 and 10 of 40 scaled to half_size",
+      "properties": {
+        "domain_min": { "type": "integer", "minimum": 0 },
+        "subsystem_max": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "exclude": {
+      "type": "array",
+      "description": "paths a question's source may never be in, and the briefs name as left unread",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "control": {
+      "description": "the control set measured before each attempt, or the word none",
+      "oneOf": [
+        { "const": "none" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["set", "part", "size", "baseline", "spread"],
+          "properties": {
+            "set": { "type": "string", "minLength": 1 },
+            "part": { "type": "string", "minLength": 1 },
+            "size": { "type": "integer", "minimum": 1 },
+            "baseline": { "oneOf": [ { "type": "integer", "minimum": 0 }, { "const": "first" } ] },
+            "spread": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "patterns": {
+      "type": "array",
+      "minItems": 1,
+      "description": "a pattern ending /** matches anything below the folder, a * stays inside one name, a bare name is that file",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

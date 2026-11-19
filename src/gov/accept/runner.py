@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -509,8 +510,11 @@ def _left_out(path: Path) -> list[Case]:
 
 
 def _run(root: Path, folder: Path, timeout: float, optins: list[str] = (),
-         left_out: list | None = None) -> tuple[str | None, list[Case]]:
+         left_out: list | None = None, keep_report: Path | None = None) -> tuple[str | None, list[Case]]:
     """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after.
+
+    With ``keep_report``, the run's JUnit report is copied to that path before it is read (W2-206: the caller's
+    own evidence, in the caller's own place); a run that wrote none keeps none.
 
     With a ``left_out`` list, the cases the run leaves out (an opt-in list's, as ``pytest_deselected`` names them)
     are added to it by file and name, read like the cases themselves: never their content.
@@ -564,6 +568,8 @@ def _run(root: Path, folder: Path, timeout: float, optins: list[str] = (),
             return "collection", []
         if code not in (0, 1):  # 3, 4, killed by a signal, anything else
             return "crash", []
+        if keep_report is not None:
+            shutil.copyfile(report, keep_report)
         cases, collection = read_cases(report)
         if collection:
             return "collection", []
@@ -697,9 +703,10 @@ def _masked(cell: str) -> str:
     return cell if len(cell) <= CELL_MAX else cell[:CELL_MAX - 1] + "…"
 
 
-def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
+def accept(root: Path, ticket: str, timeout: float, keep_report: Path | None = None) -> tuple[dict, int]:
     """``gov accept``'s result and exit code; a refusal is a ``GovError`` naming only the ticket and its path (and,
-    for a map cell listing a line it cannot read, the README's line number and the cell, test names masked)."""
+    for a map cell listing a line it cannot read, the README's line number and the cell, test names masked).
+    ``keep_report``: a path the run's JUnit report is copied to before it is read; the answer is the same."""
     root = Path(root).resolve()
     ticket, front = _ticket(root, ticket)
     folder, declared = _folder(root, ticket, front)
@@ -729,7 +736,7 @@ def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
         report_only = [REPORT_ONLY] if REPORT_ONLY in needed else []
         error = _result(ticket, "error", "crash", [], _zero(), _zero(), optins, report_only), EXIT_ERROR  # F3
         left_out: list[Case] | None = [] if report_only else None
-        kind, cases = _run(root, folder, timeout, optins, left_out)
+        kind, cases = _run(root, folder, timeout, optins, left_out, keep_report)
         if kind is None:
             return _report(ticket, mapping, cases, optins, left_out or [], report_only)
         error = _result(ticket, "error", kind, [], _zero(), _zero(), optins, report_only), EXIT_ERROR

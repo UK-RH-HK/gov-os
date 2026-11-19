@@ -11,7 +11,15 @@ sys.path.insert(0, str(REPO / "tests/unit/store"))
 
 from gov import records, store  # noqa: E402
 from gov.store import loader  # noqa: E402
-from test_w2_203_archive import plant  # noqa: E402
+import importlib.util  # noqa: E402
+
+# The store folder's builder file by its path, under a name of its own: the acceptance folder of W2-203 holds a file
+# of the same base name, and in one collection of both (the full suite) a bare import finds that one.
+_spec = importlib.util.spec_from_file_location("w2_203_unit_store_archive",
+                                               REPO / "tests/unit/store/test_w2_203_archive.py")
+_store_archive = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_store_archive)
+plant = _store_archive.plant
 
 
 def _targets(root):
