@@ -114,9 +114,6 @@ RUNTIME, SCRATCH = ".gov-runtime", "scratch"
 # The no-prompt mode, accepted since Emergency 2 (0.1.2; DEC-313 superseded by EMERGENCY-2 2.2, 2.9).
 BYPASS_MODE = "bypassPermissions"
 WORKER_CACHE_TTL = "5m"  # a launched worker's prompt-cache lifetime (audit 09; the CTO's own session keeps 1 h)
-# W2-201 S7 (audit 09 item 8, DEC-1212 (4)): the variable that keeps a worker's cache writes in the 5-minute tier
-# (checked on CLI 2.1.327, the ticket's evidence); a lead waits on long runs and does not get it.
-CACHE_5M_ENV = "FORCE_PROMPT_CACHING_5M"
 # W2-201 S8 (audit 09 item 3, DEC-1212 (4)): no inbox waiter and no idle-check wake-up; a hook of these events whose
 # command names one of these refuses a worker launch.
 WAKE_EVENTS = ("Stop", "SubagentStop", "UserPromptSubmit")
@@ -191,8 +188,7 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
     deny rule of the launcher's own. ``root`` is a real path."""
     # the owner's audit 09 item (2026-11-18): workers write the 5-minute prompt cache (their calls come fast; checked:
     # CLAUDE_CODE_PROMPT_CACHE_TTL=5m sends the writes to the 5-minute tier); measured in the spend log
-    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, "CLAUDE_CODE_PROMPT_CACHE_TTL": WORKER_CACHE_TTL,
-           CACHE_5M_ENV: "1", **_store_env(root)}
+    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, "CLAUDE_CODE_PROMPT_CACHE_TTL": WORKER_CACHE_TTL, **_store_env(root)}
     return {"env": env, "permissions": {"deny": []}}
 
 
@@ -682,11 +678,17 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
             refusal = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
                        f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3)); another model comes "
                        f"only from an exception in {model_exceptions.REL} (DEC-1212 (2))")
+            substituted = roles.substitution_active(root)
+            if substituted and model_exceptions.names_opus(given["model"]):
+                # W2-201 S9 (DEC-1215): as the helper hook refuses an Opus spawn, whatever the exceptions file holds
+                raise _refuse(f"the CLI arguments carry --model {given['model']}: while the owner's temporary "
+                              f"substitution is active (DEC-1215, {roles.SUBSTITUTION_REL}) every Opus role runs "
+                              f"Claude Fable 5.2 instead; name no model, or 'fable' (claude-fable-5-2) where an "
+                              f"exception in {model_exceptions.REL} covers it")
             if model_source != table_source:
                 raise _refuse(refusal)
             try:
-                entry = model_exceptions.find(root, role, given["model"], ticket_class,
-                                              roles.substitution_active(root))
+                entry = model_exceptions.find(root, role, given["model"], ticket_class, substituted)
             except GovError as error:
                 raise _refuse(f"{refusal}: {error.message}") from None
             if entry is None:
@@ -795,7 +797,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "owner_named": chosen["owner_named"], "review_round": chosen["review_round"],
         "rubric": chosen.get("rubric"),  # W2-121c RT-8: the rubric file the choice came from, or null
         "exception": chosen.get("exception"),  # W2-201 S4: the exceptions entry's decided text, or null
-        "cache_ttl": WORKER_CACHE_TTL,  # W2-201 S7: the worker's cache setting (CACHE_5M_ENV in its env)
+        "cache_ttl": WORKER_CACHE_TTL,  # W2-201 S7: the worker's cache setting (CLAUDE_CODE_PROMPT_CACHE_TTL)
         "subagent_model": model, "compaction_threshold": "none",
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,

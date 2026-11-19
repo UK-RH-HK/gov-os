@@ -130,6 +130,31 @@ def test_with_the_substitution_inactive_past_or_absent_fable_is_refused(project,
     project.refused(FABLE, REL, args=["--model", FABLE])
 
 
+@pytest.mark.parametrize("entries", (None, [], [{"subagent_type": "engineer", "model": "opus", "decided": "K1"}],
+                                     [{"subagent_type": "engineer", "model": "opus", "class": "C3", "decided": "K1"}]))
+@pytest.mark.parametrize("allowed", (["src/guard/a.py"], ["src/x/a.py"], ["docs/a.md"]))
+@pytest.mark.parametrize("model", (OPUS, "claude-opus-9"))
+def test_while_the_substitution_is_active_a_caller_s_opus_is_refused_naming_dec_1215_and_fable(project, entries,
+                                                                                              allowed, model):
+    project.ticket(allowed=allowed)
+    substitution(project)
+    if entries is not None:
+        exceptions(project, entries)
+    project.refused("DEC-1215", "fable", args=["--model", model])
+
+
+@pytest.mark.parametrize("change", ({"active": False}, {"until": "2000-01-01T00:00:00+00:00"}, None))
+def test_with_the_substitution_inactive_past_or_absent_a_caller_s_opus_follows_s4(project, change):
+    project.ticket()
+    if change is not None:
+        substitution(project, **change)
+    exceptions(project, [])
+    project.refused(REL, args=["--model", OPUS])
+    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "K1"}])
+    project.launch(args=["--model", OPUS])
+    assert (project.last()["model"], project.last()["model_source"]) == (OPUS, "exception")
+
+
 def test_the_table_s_opus_is_the_substituted_model_in_the_record(project):
     project.ticket(allowed=["src/guard/a.py"])
     substitution(project)
@@ -154,13 +179,15 @@ def test_a_worker_launch_carries_the_cache_variable_in_its_settings_its_process_
     project.ticket()
     argv = project.launch()
     settings = json.loads(argv[argv.index("--settings") + 1])
-    assert settings["env"]["FORCE_PROMPT_CACHING_5M"] == "1"
-    assert project.envs[-1]["FORCE_PROMPT_CACHING_5M"] == "1"
+    assert settings["env"]["CLAUDE_CODE_PROMPT_CACHE_TTL"] == "5m"
+    assert project.envs[-1]["CLAUDE_CODE_PROMPT_CACHE_TTL"] == "5m"
+    assert "FORCE_PROMPT_CACHING_5M" not in settings["env"] and "FORCE_PROMPT_CACHING_5M" not in project.envs[-1]
     assert project.last()["cache_ttl"] == "5m"
 
 
 def test_a_lead_s_settings_carry_no_cache_variable(project):
-    assert "FORCE_PROMPT_CACHING_5M" not in launcher.build_lead_settings(project.root, "T-1")["env"]
+    env = launcher.build_lead_settings(project.root, "T-1")["env"]
+    assert "CLAUDE_CODE_PROMPT_CACHE_TTL" not in env and "FORCE_PROMPT_CACHING_5M" not in env
 
 
 # --- S8: no wake-up hook --------------------------------------------------------------------------------------------
