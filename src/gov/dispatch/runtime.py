@@ -9,7 +9,9 @@ non-blocking ``flock`` on the folder ``~/.gov-os/runtime/`` itself (held: exit 4
 2. takes the ``runtime`` inbox's new watch requests (the mark moves only once the state holding them is written);
 3. reads every ``~/.gov-os/machine/sessions/*.json`` directly (never ``registry.sessions()``, which removes entries):
    a session whose process is gone, or whose pid is another process's now, becomes one wake message to its entry's
-   ``notify`` (else ``cto``), and so does a session tracked by an earlier pass whose entry went with its process;
+   ``notify`` (else ``cto``), and so does a session tracked by an earlier pass whose entry went with its process
+   (slice 3, RT-5: with ``relaunch`` true in ``config.json``, a session that died without a return is relaunched once
+   instead, ``gov.dispatch.relaunch``; a second death in the boot is one ``died twice`` message);
 4. checks each watch: a pid gone or an exit file written is one wake message to the watch's ``to``; a transcript
    silent past its limit is one wake message (and, with ``push``, one detached run of that command) per incident;
 5. (slice 2) reads the heavy jobs from the log's run events (``jobs``: the running and the waiting, a live pid
@@ -18,6 +20,7 @@ non-blocking ``flock`` on the folder ``~/.gov-os/runtime/`` itself (held: exit 4
    ``budget_mib``, ``spill``); a load that cannot be read is named in ``problems`` and the pass still runs (F2);
 6. writes ``state.json`` whole (a temporary file and a rename) and appends its events to ``log.jsonl``.
 
+Every end the pass detects is also one ``end`` event in the log, ``estimated`` (slice 3, RT-2, ``gov.dispatch.ends``).
 Message ids make every send idempotent (F1): a session's end ``end:<boot>:<pid>:<start_ticks>`` (``end:<pid>:<started>``
 without the identity, as the launcher's), a watch's end ``watch:<request id>``, a stall
 ``stall:<request id>:<the transcript's mtime, whole seconds>``. A push runs only for a stall message actually appended.
