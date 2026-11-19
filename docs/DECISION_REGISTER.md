@@ -1949,6 +1949,17 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-19 (the answer line "L2-1 yes, L2-2 yes, L2-3 a, L2-4 yes once the base is green, L2-5 keep, L2-6 a, G1-X yes, R-1 a, G5-0 a, G4 confirm, T2-3 a, G1-2 yes, K1-1 Opus" and the paragraphs on T2-2, EXAMIN's decision 9 and the golden rules); the incidents behind the new rules: (2) the G1 landing of 2026-11-19 00:34 left two W1-01 cases red in two full suites; (5) the plan stood at 100 % from 05:47 to 13:09 on 2026-11-19 and the night rule held nothing back that mattered; (6) `gov update` 0.1.3 re-added three deny lines to EXAMIN's settings on 2026-11-18 (EXAMIN's report 28); (7) the kit's rules head for adopted repositories still described the guard and CIT-P (found 2026-11-19).
 - **Governing sources:** docs/emergency-2/MORNING-BRIEF-2026-11-19.md; docs/emergency-2/L2-COMMANDS.md; docs/emergency-2/T2-ESCALATION-RUBRIC.md; EMERGENCY-2 2.4, 3; DEC-1214; DEC-1216.
 
+### DEC-1218 — Full pace with the release path first; pushes at 95 % and 99 % of the plan, the owner adds usage credits; a fresh CTO now and fewer, batched reports; the read-only audit of the test folders; W2-42 closed
+- **Status:** ACCEPTED (owner, 2026-11-19 about 13:35, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1215, DEC-1216, DEC-1217 · **Changes:** DEC-1215 (3) (the push is at 95 % and at 99 %, and the owner adds usage credits); DEC-1216 (3) (short reports are batched)
+- **Decision:**
+  - (1) **The pace (U-1 (a)):** "full pace, the release path first: the green base, release 0.1.4, EXAMIN's fresh 80, the cut-over; then the rest. When the plan nears the limit, push me at 95 % and 99 %: I add usage credits, and no work stops."
+  - (2) **The CTO's own cost:** "hand over and start a fresh CTO session, as this morning, and wake less for short reports; batch them." The status block still ends every report (DEC-1216 (3)); a report is sent for a landing, a red, a decision or a push, not for a heartbeat.
+  - (3) **The tests (TI-8 yes):** a read-only audit of all 223 test folders, one line each (keep, thin, weekly tier, retire). The strict-close and secrets-scan tests retire with B1 once L2-1 and L2-2 land; anything else waits for the audit and the owner's yes.
+  - (4) **Wave 3:** W2-42 is closed with the guard.
+  - (5) **The revert of DEC-1215 was right:** the reset of 2026-11-19 about 13:15 was the owner's second Fable reset.
+- **Basis:** the owner's message of 2026-11-19 ("U-1: (a) full pace ... Cut your own cost now ... Tests: TI-8 yes ... Wave 3: close W2-42 with the guard. The revert was right: that was my second Fable reset."); the incidents behind the new rules: (1) the plan reached 100 % at 05:47 and every session stopped from 07:02 to 13:09 on 2026-11-19 with the brief undelivered; (2) the CTO's session read 167 million cached tokens overnight in 436 calls, about 380,000 a call, the largest single spend of the night.
+- **Governing sources:** docs/emergency-2/MORNING-BRIEF-2026-11-19.md; docs/emergency-2/TEST-INVENTORY-2026-11-19.md; DEC-1215; DEC-1216; DEC-1217.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
