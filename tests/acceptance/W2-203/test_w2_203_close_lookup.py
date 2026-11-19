@@ -120,7 +120,24 @@ _LISTS = ("import json, pathlib, yaml; from gov.close import gates, history, rat
           "print(json.dumps({'counted': [counted for counted, _ in lists], "
           "'refused': [sorted(f['test'] for f in findings) for _, findings in lists], "
           "'owner_listed': sorted(gates.owner_listed(root, path_map)), "
-          "'accepted_history': sorted(history.accepted_history(root, path_map)[0])}, sort_keys=True))")
+          "'accepted_history': sorted(history.accepted_history(root, path_map)[0]), "
+          "'listed': {key: [[str(entry.get('test') or entry.get('commit')), str(entry.get('decision'))] "
+          "for entry in path_map.get(key) or [] if isinstance(entry, dict)] for key in "
+          "('accepted_reds', 'load_sensitive', 'acceptance_exemptions', 'accepted_history')}}, sort_keys=True))")
+_RATCHET = ("accepted_reds", "load_sensitive")  # the order of ``counted`` and ``refused`` in the output above
+
+
+def _decision_of(listed: list, item: str):
+    """The decision the path map's list names for ``item`` (a test id, or a commit id full or abbreviated)."""
+    found = [decision for named, decision in listed if named == item or (len(named) >= 7 and item.startswith(named))
+             or (len(item) >= 7 and named.startswith(item))]
+    return found[0] if found else None
+
+
+def _late(decision) -> bool:
+    """A decision from DEC-1211 on: the live register's own, which the base's register could not hold yet."""
+    return isinstance(decision, str) and decision.startswith("DEC-") and decision[4:].isdigit() \
+        and s.number_of(decision) >= s.FIRST_LATE
 
 
 def test_s5_real_the_lists_count_what_the_base_counted(base_clone, head_clone, home, moved):
@@ -134,8 +151,25 @@ def test_s5_real_the_lists_count_what_the_base_counted(base_clone, head_clone, h
         f"gov close's register reader does not find {sample}, which the archive alone holds"
     base, head = s.both(base_clone, head_clone, home, "-c", _LISTS)
     assert all(base["counted"]) and base["owner_listed"], f"premise: the base counts entries of each list: {base}"
-    assert head == base, ("the counted and refused entries differ from the base's:\n"
-                          f"{json.dumps(base)[:1500]}\n{json.dumps(head)[:1500]}")
+    # S5 as amended on 2026-11-19 at 13:24 (W2-203's record): the register is live from DEC-1211 on, so the head may
+    # count more than the base did (an owner's entry backed by a decision from DEC-1211 on, as DEC-1217 (2) added),
+    # never less: an entry the base counted and the head's path map still names is counted, and none is refused.
+    lost, refused, unbacked = [], [], []
+    lists = [(key, [e["test"] for e in base["counted"][at]], [e["test"] for e in head["counted"][at]],
+              head["refused"][at]) for at, key in enumerate(_RATCHET)]
+    lists += [(key, base[field], head[field], []) for key, field in
+              (("acceptance_exemptions", "owner_listed"), ("accepted_history", "accepted_history"))]
+    for key, counted_then, counted_now, refused_now in lists:
+        listed = head["listed"][key]
+        lost += [f"{key}: {item}" for item in counted_then
+                 if item not in counted_now and _decision_of(listed, item) is not None]
+        refused += [f"{key}: {item}" for item in counted_then if item in refused_now]
+        unbacked += [f"{key}: {item} ({_decision_of(listed, item)})" for item in counted_now
+                     if item not in counted_then and not _late(_decision_of(listed, item))]
+    assert not refused, f"{len(refused)} entries the base counted are refused on this repository: {refused[:5]}"
+    assert not lost, f"{len(lost)} entries the base counted and the path map still names are not counted: {lost[:5]}"
+    assert not unbacked, ("the head counts entries the base did not that no decision from DEC-1211 on backs:"
+                          f" {unbacked[:5]}\n{json.dumps(base)[:1000]}\n{json.dumps(head)[:1000]}")
 
 
 def test_s5_real_no_closed_tickets_trailer_id_is_unresolved_that_the_base_resolved(base_clone, head_clone, home, moved):
