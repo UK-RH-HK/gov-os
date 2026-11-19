@@ -237,9 +237,9 @@ and the close record among them; `fixes` a list whose entries hold exactly `{lin
 format otherwise open); the body line `- fix landed: <line> (<branch> @ <tip12>)` once per fix, the second after the
 first; the rest of the record's front matter equal as YAML reads it (key order and quoting open) and its other body
 lines kept in order (blank lines open); the `closes` entry's `fix: true` and `fix_line`, a feature's entry with neither
-key; `queue.json`'s `closes` equal to the answer's. Open: where the dry run's answer carries `fix: true` and `fix_line`
-(the dry run has no close commits, so its `closes` is `[]` on the base): any map in its answer naming the `ticket`
-with `fix: true` is read (see the package below); what else the record written for a ticket with none holds beside
+key; `queue.json`'s `closes` equal to the answer's. The dry run's answer carries `fix: true` and `fix_line` for each
+fix (the lead's ruling, reading 7: in `closes`, the fixes' entries only); the case reads any map in its answer naming
+the `ticket` with `fix: true`. Open: what else the record written for a ticket with none holds beside
 `fixes` (the section says "with `fixes` only the way the landing writes a record, and nothing else of a first close":
 not tested beyond `fixes` and the body line); whether a fix's close commit touches the ticket file (its status is
 pinned `closed`, not its bytes). X7: in the spawned command, before `--`, the words less the option pairs are `launch
@@ -282,13 +282,11 @@ green case is a guard: what holds today and must keep holding (named in the last
    orchestrator ...`; a lead launched as `lead` is read the same.
 6. **X8, rules that stay** (the plain name, the root, the project not inside it, the name given once) are W2-50's and
    W2-60a's cases, in their own folders.
-7. **Package (proposed decision): where the dry run says `fix: true`.** The section says the dry run's answer "says
-   the same" as the answer's `closes` entry, but a dry run makes no close commit and answers `closes: []` today.
-   Options: (a) the dry run lists, in `closes`, the entry each landed ticket would get with `commit` and
-   `close_record` null, a fix's with `fix: true` and `fix_line`; (b) a key of its own (for instance `fixes: [{ticket,
-   fix_line}]`); (c) the dry run carries nothing of it. Recommendation (a), confidence medium: the same key and shape
-   as the landing, so a reader compares one with the other. The case reads any map in the answer naming the ticket
-   with `fix: true` and its `fix_line`, so (a) and (b) both pass and (c) fails.
+7. **Where the dry run says `fix: true`** (the lead's ruling on this designer's package). A dry run makes no close
+   commit, and its `closes` stays empty for ordinary tickets (W2-206 requires it); it lists in `closes` only the
+   entries the fixes would get, with `commit` and `close_record` null, each with `fix: true` and `fix_line`. The case
+   reads any map in the dry run's answer naming the ticket with `fix: true` and its `fix_line`; W2-206's own cases
+   hold the empty `closes` of a dry run with no fix.
 
 The part alone (about 30 s on the base; the X6 runs take longer once fixes land and their tests run):
 

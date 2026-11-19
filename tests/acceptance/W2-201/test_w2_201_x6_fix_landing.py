@@ -78,7 +78,8 @@ def _assert_entry(entry, want, where):
 def test_x6_a_fix_branch_lands_with_exit_0_and_the_ticket_stays_closed(fix):
     result = _first(fix)
     head = result["head"]
-    assert kit.rev(fix.root, "main") == head, f"main is not at the answer's head {head}"
+    after = kit.heads(fix.extra["first"]["after"]).get("refs/heads/main")  # main as the first landing left it
+    assert after == head, f"main was at {after} after the first landing, not at the answer's head {head}"
     for t in (A, C):
         assert kit.status_at(fix.root, head, t.id) == "closed", f"{t.id} is not closed at the head after its fix"
     assert kit.status_at(fix.root, head, B.id) == "closed", "B's feature did not close as today"
@@ -211,8 +212,9 @@ def test_x6_a_fix_that_breaks_a_test_is_not_landed(red, case, ticket, node):
         f"{result.get('acceptance')}")
     base.not_moved(red, done["before"], done["after"])
     assert done["after"]["files"] == done["before"]["files"], "a red fix changed a tracked file"
-    assert kit.status_at(red.root, "main", ticket.id) == "closed"
-    assert x6.record_text(red.root, "main", A.id) == red.extra["record_at_base"], "A's close record changed"
+    main = kit.heads(done["after"]).get("refs/heads/main")  # main as this run left it
+    assert kit.status_at(red.root, main, ticket.id) == "closed"
+    assert x6.record_text(red.root, main, A.id) == red.extra["record_at_base"], "A's close record changed"
 
 
 # -- (d) the dry run answers the same, changes nothing, appends nothing -----------------------------------------------
