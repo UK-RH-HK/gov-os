@@ -11,6 +11,9 @@
   path new at the tip, not an edit of one at the base) is a feature when it holds KPIs (a ``kpis.success`` line with
   its verify) and a spec (a body after its front matter); one that lacks either, or whose front matter cannot be
   read, is named in one ``NEW_TICKET_NOT_FEATURE`` notice; it never refuses.
+- **The fix signal** (W2-201 fix X6, DEC-1219 (5)): a branch for a ticket closed at the integration head is a fix
+  landing when one of its commits carries both the ticket's ``Task:`` trailer and a non-blank ``Fix:`` trailer; the
+  fix's line is the oldest such commit's ``Fix:`` value.
 - **The acceptance tests are there** (W2-202 A3): a ticket judged on its tests has an acceptance folder that holds a
   test and a README whose KPI map the runner of ``gov accept`` reads; else it is refused before any run.
 """
@@ -132,6 +135,21 @@ def ticket_notices(root: Path, base: str, tip: str) -> list[dict]:
             notices.append({"id": ticket, "code": NEW_TICKET_NOT_FEATURE,
                             "notice": f"{NEW_TICKET_NOT_FEATURE} {ticket}: {'; '.join(missing)}"})
     return notices
+
+
+def fix_line(root: Path, base: str, tip: str, ticket: str) -> str | None:
+    """The ``Fix:`` line of the oldest commit of ``base..tip`` that carries both ``Task: <ticket>`` and a non-blank
+    ``Fix:`` trailer, as one line; None where no commit does. ``RuntimeError`` where git cannot read them."""
+    form = ("%x1e%(trailers:key=Task,valueonly,unfold,separator=%x1f)%x00"
+            "%(trailers:key=Fix,valueonly,unfold,separator=%x1f)")
+    for held in _git(root, "log", "--reverse", f"--format={form}", f"{base}..{tip}").split("\x1e")[1:]:
+        tasks, _, fixes = held.partition("\x00")
+        if ticket not in (t.strip() for t in tasks.split("\x1f")):
+            continue
+        line = next((" ".join(f.split()) for f in fixes.split("\x1f") if f.strip()), None)
+        if line:
+            return line
+    return None
 
 
 def holds_tests(root: Path, rev: str, folder: str) -> bool:
