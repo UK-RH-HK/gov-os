@@ -1,6 +1,6 @@
 ---
 id: DAEO-r4xc
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-18T23:03:13Z
@@ -83,3 +83,5 @@ Created 2026-11-18 by the ticket lead from the CTO's brief (EMERGENCY-2 §4.3 st
 - **adopt:** `src/gov/adopt/facts.py`'s `COMMANDS` drops `context` and `context_ceiling`; its step `context_ceiling` is kept `"on": false` with a line that names no command.
 
 Existing tests of the retired behaviour (about 38 files across `tests/acceptance/W1-24`, `W1-30`, `W2-04`, `W2-13`, `W2-54`, `W2-55`, `W2-183` and the other folders `grep -rln "gov context\|gov\.context\|close_context_tokens\|context-reproducibility" tests` lists) are retired or rewritten by the test designer under S9, each rewrite with a `Rewrite-Reason:` naming DEC-1214 M1.
+
+**Closed at the land, 2026-11-19 05:59 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 661c2873d through the landing branch `e2/m1-land` (the lead's `e2/m1-context` at 41ea46789 merged with the integration branch, then fixed). The first broad check on the landing branch (11 unit folders 1,721 passed; 26 acceptance folders 2,116 passed, 55 skipped, 5 failed) found two things, both from this ticket landing beside W2-203 and W2-202: (1) the close refused `DECISION_NOT_FOUND` for any cited decision the register does not hold, which after W2-203 is most of them, and for W2-194's fixture ticket; fixed in two steps: an archived decision is not standing, `ARCHIVED` (f59534941, failing unit cases first), then S6 and F1 amended by the CTO (6a7918fa7: an id neither register holds is recorded unresolved, never refused), the test designer's revision first (3d1ac9587: 3 red in W2-200 and 1 in W1-30 before the change), then the code; (2) gov doctor flagged this ticket's own path `tests/optin-lifted-breadth.txt` as moved (fixed in doctor, 136080645, recorded in W2-203's ticket). The second check on the landing branch merged with the integration branch (W2-206, W2-204, the doctor fix): W1-30's two receipt cases with `--optin=lifted` 2 passed; the acceptance folders W2-200, W2-194, W2-193, W2-203, W2-202, W2-206, W2-115, W2-115b, W2-204 and the unit folders close, queue, accept, doctor, cli, check, optin: 1,269 passed; `gov accept`: W2-200 57 of 57, W2-203 61 of 61, W2-202 39 of 39, W2-206 45 of 45, W2-204 169 of 169. Kernel text the lead changed, accepted by the CTO (3.5): the audit and checkpoint skills, role-lead and role-cto, the facts file. Owed: the `context` key of the kernel's minimum policy (no check behind it); the leftover mentions of `gov context` the lead listed; a case for the scoped and batch closes' decision lists; L2's A2 can start.
