@@ -530,13 +530,19 @@ def _targets(clone: Path, candidates: list[dict], given: list[str] | None) -> di
 
 
 def isolate(root: Path, base: str, given: list[str], targets: list[str] | None = None, onto: str | None = None,
-            timeout: float = 3600, also=None) -> tuple[dict, int]:
+            timeout: float = 3600, also=None, workers: int = 1,
+            options: list[str] | None = None) -> tuple[dict, int]:
     """The batch (S6): ``(result, exit code)``; a ``GovError`` for a refusal (nothing landed).
 
     ``also(commit, names)`` is called after the selection's run on each merged result (the clone checked out at
     ``commit``, which holds the candidates ``names``) and answers ``{"runs": [...], "failing": [{"test",
     "failure_type"}]}``: runs of the caller's own, counted with the batch's. Their failing tests are reds as they
-    are (never flaky), and with ``also`` an empty ``targets`` is an empty selection, run as it is."""
+    are (never flaky), and with ``also`` an empty ``targets`` is an empty selection, run as it is. A failing entry
+    that carries ``culprit`` (a candidate's name: a run of that candidate's own that failed without naming a test,
+    W2-206) is explained by that candidate as it is: no search runs for it.
+
+    ``workers``: the parallel phase's xdist pool on each merged result (1: no pool, as before). ``options``:
+    pytest options added to the selection's own on every run (the queue's full run leaves folders out by them)."""
     from gov.close import attribution as _attribution
     from gov.close.command import _phases
 
@@ -563,7 +569,7 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
 
     def run_on(commit: str, chosen: dict, name: str) -> dict:
         _attribution.checkout(clone, commit)
-        phases = _phases(clone, chosen, folder / name, timeout, 1)
+        phases = _phases(clone, chosen, folder / name, timeout, workers)
         if not phases["complete"]:
             refuse("RUN_INCOMPLETE", f"the run on {name} did not complete: {'; '.join(phases['incomplete'])}")
         if also is not None:
@@ -589,6 +595,8 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
         chosen = {"suites": [], "pytest_options": _select.pytest_options(_select.load_map(clone)[0])}
     else:
         chosen = _targets(clone, candidates, targets)
+    if options:
+        chosen = {**chosen, "pytest_options": list(chosen["pytest_options"]) + list(options)}
     result["selection"] = chosen
     phases = run_on(whole, chosen, "batch")
     result["runs"] = phases["runs"]
@@ -600,21 +608,26 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
             result["flaky"].append(test)
         else:
             kinds[test] = alone
+    names = [c["name"] for c in candidates]
+    named: dict[str, str] = {}  # a red of a candidate's own run that names no test: that candidate's, unsearched
     for red in phases.get("also_failing") or []:
+        if red["test"] not in kinds and red.get("culprit") in names:
+            named[red["test"]] = red["culprit"]
         kinds.setdefault(red["test"], red["failure_type"])
     reds = result["reds"] = list(kinds)
+    searched = [r for r in reds if r not in named]
     land, landed = whole, candidates
     if reds:
-        explains: dict[str, list[str]] = {r: [] for r in reds}
+        explains: dict[str, list[str]] = {r: [named[r]] if r in named else [] for r in reds}
         absent: list[tuple[str, dict]] = []
         at_base: dict[str, str | None] = {}  # a red's alone run at the base, where a build without was the base
-        for cand in candidates:
+        for cand in candidates if searched else []:
             others = [c for c in candidates if c is not cand]
             without = _build(clone, base_sha, others)
             if without is None:
                 refuse(CANDIDATE_NOT_ISOLATED, f"the merged result without {cand['name']} cannot be built (the "
                        "others do not merge without it)", candidate=cand["name"])
-            for red in reds:
+            for red in searched:
                 seen = _attribution.run_alone(clone, red, options, folder / "alone", timeout,
                                               f"without-{cand['name']}")
                 if without == base_sha:
@@ -633,7 +646,7 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
             if seen is not None and seen not in _attribution.NEVER_MATCH:
                 explains[red].append(cand["name"])
         result["explains"] = explains
-        unexplained = [r for r, names in explains.items() if not names]
+        unexplained = [r for r, found in explains.items() if not found]
         # W2-202 A1 (Q-CLOSE): a red no candidate explains, run once alone at the base; red there with the same
         # failure type it is a known base red (named, not blocking), else it stays unexplained
         if any(r not in at_base for r in unexplained):
@@ -648,8 +661,7 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
         if unexplained:
             refuse(BATCH_UNEXPLAINED, f"{len(unexplained)} red(s) no single candidate explains, not red the same "
                    f"way at the base: {', '.join(unexplained)}", unexplained=unexplained)
-        culprits = sorted({n for names in explains.values() for n in names},
-                          key=[c["name"] for c in candidates].index)
+        culprits = sorted({n for found in explains.values() for n in found}, key=names.index)
         result["culprits"] = culprits
         landed = [c for c in candidates if c["name"] not in culprits]
         if not culprits:
