@@ -100,6 +100,95 @@ red and 1 green on the same base.
    (no class; `class: C3` on a C3 ticket), with no exceptions file, on a C2 and a C3 ticket, and for another
    `claude-opus-*` id (`claude-opus-4-7`). Without the substitution it is S4's, word for word.
 
+## Fix: what becomes a ticket (DEC-1219 (5)), lines X1 to X5
+
+Written by an independent test designer from the ticket's section `## Fix: what becomes a ticket (DEC-1219 (5))` (its
+Interface paragraph and X1 to X5, each with its Verify), before the implementation (MR-3). Read besides: the base's
+`gov launch` and `gov queue` code for their seams only (the stand-in CLI, the planted projects, the records, the
+answer), W2-184's, W2-60a's, W2-202's and W2-115b's support modules, the kernel role files and the orchestration skill.
+Nothing of the engineer's work on the fix was read. Five test files and two support modules beside the existing ones
+(none of which is changed): `w2_201_x_support.py` (X1 to X3), `w2_201_x4_support.py` (X4).
+
+**The map names X1 to X5 as `S10` to `S14`.** `gov accept` reads a KPI cell only as `success-N` / `failure-N`
+(`S`, `F` or `K` and a number); a cell `X1` would refuse the whole map. So X1 is `success-10`, X2 `success-11`, X3
+`success-12`, X4 `success-13` and X5 `success-14`, each row naming its X line in brackets.
+
+**How the tests reach the product.**
+
+* **X1 to X3:** `gov launch` through the console script on W2-184's fixture project and W2-60a's stand-in CLI (which
+  records its arguments, the CLI process's environment and `--settings`), the launch record folder, W2-60a's open gate.
+  The words of a launch are written as a caller writes them (the ticket optional, `--fix "<line>"` / `--chore
+  "<line>"` before `--`). W2-184's fixture role files give every worker role the default (Sonnet, medium) and the
+  engineer's table C3 (Opus, high), C2 (Sonnet, high): a fix's model and effort are told from its class, a chore's
+  effort (medium) from any class's (high). A closed, open or in_progress ticket is W2-184's fixture ticket with its
+  status line changed. The lead's plan is a committed ready list (S7's form) naming one in_progress ticket; the closed
+  ticket is outside it. `gov pause` is run as the owner; the gate is shut by its memory reading (1 GiB available
+  under the planted 3 GiB floor). A chore and a chore lead are launched with a caller's `GOV_TICKET` in `gov launch`'s
+  own environment (a lead launching has one), so "absent, not empty" is shown against a value that could leak.
+* **X4:** `gov queue <T>=<branch> ... [--dry-run] --json` on W2-115b's planted project (tickets with acceptance suites,
+  `.tickets/**` record-only in the test map), each planted run built once per session under a lock with the fixtures'
+  own check first (W2-206's way). The notices run lands A, B, C and E together, after a dry run of the same four: A
+  adds `PROJ-nnew` (no `kpis.success` line with a verify, a blank body); B adds `PROJ-good` (a `{line, verify}` line)
+  and `PROJ-strv` (a string line holding `Verify:`), each with a body; C edits D's existing ticket file into one with no
+  verify and no body; E adds `PROJ-nobd` (verify, empty body), `PROJ-novf` (body, no verify), `PROJ-blnk` (a mapping
+  line whose `verify` is blank) and `PROJ-unrd` (front matter that does not parse, a body). The plain run lands A with
+  a widget change and no ticket file.
+* **X5:** a repository-state case (it reads this repository's kernel files and copies, so it belongs to the
+  record-reading set and runs after a record change): the `Tools:` line of `orchestrator.md`, `senior-engineer.md` and
+  `ticket-lead.md` in `template/governance/kernel/roles/` and the `## Parallel tickets` section of
+  `template/governance/kernel/skills/orchestration/SKILL.md`, and their copies.
+
+**Words pinned and left open.** X1 to X3: the record's `kind` (`feature`, `fix`, `chore`), `kind_line` (the line as
+given, null for a feature) and the keys X2 lists as null; `GOV_LAUNCH_KIND` and `GOV_LAUNCH_LINE` values; a chore lead's
+`GOV_MSG_ADDRESS` `orchestrator:chore-<8 lower-case hex>` (today's address is `<GOV_ROLE>:<ticket>`, and X3 puts the
+label "where the ticket would be"). A usage error: exit 2, no session, no record, and not argparse's `unrecognized
+arguments` (on the base `--fix` and `--chore` are unknown options, which also end 2); no message words pinned. A
+refusal that stays: `LAUNCH_REFUSED` (exit 1) with the words today's refusal has (`unknown ticket`, `is not
+in_progress`, `another role`, the model and `governance/project/model-exceptions.yaml`); the pause names `paused`, the
+gate `memory`. X4: the notice text whole, `NEW_TICKET_NOT_FEATURE <id>: ` and the missing parts joined by `; ` in the
+ticket's order (`no kpis.success line with a verify` before `no spec (the ticket's body is empty)`); the entry's four
+keys (`ticket` the landed candidate, `id` the new ticket, `code`, `notice`), other keys left open; the stderr line holds
+the notice (any prefix). X5: `new ticket only for a new feature` in any letter case, `--fix` and `--chore` as written.
+
+The fix's five files: 90 cases, 78 red and 12 green on the base (the tree of 8f9a4081a, through the heavy slot). A
+green case is a guard: what holds today and must keep holding (named in the last column).
+
+| KPI | tests | cases | expected red reason (on the base) |
+|---|---|---|---|
+| S10 (X1) | `test_w2_201_x1_fix.py::test_x1_an_engineer_launches_with_fix_on_its_ticket_whatever_its_status`; `test_w2_201_x1_fix.py::test_x1_the_same_launch_without_fix_is_refused_as_today`; `test_w2_201_x1_fix.py::test_x1_plan_with_fix_prints_the_role_s_default_line`; `test_w2_201_x1_fix.py::test_x1_plan_without_fix_on_a_closed_ticket_is_refused_as_today`; `test_w2_201_x1_fix.py::test_x1_tests_worktree_with_fix_makes_the_closed_ticket_s_tests_worktree`; `test_w2_201_x1_fix.py::test_x1_tests_worktree_without_fix_on_a_closed_ticket_is_refused_as_today`; `test_w2_201_x1_fix.py::test_x1_a_fix_on_an_unknown_ticket_is_refused`; `test_w2_201_x1_fix.py::test_x1_a_fix_keeps_the_role_to_its_own_ticket`; `test_w2_201_x1_fix.py::test_x1_a_fix_still_refuses_a_caller_s_other_model`; `test_w2_201_x1_fix.py::test_x1_a_fix_is_stopped_by_gov_pause`; `test_w2_201_x1_fix.py::test_x1_an_ordinary_launch_records_kind_feature_and_kind_line_null`; `test_w2_201_x1_fix.py::test_x1_a_usage_error_ends_2_before_the_launcher` | 4 (closed C3, closed C2, open C2, in_progress C2) + 2 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 2 (engineer, test designer) + 16 (8 usage cases x engineer, orchestrator) | `gov launch` has no `--fix`: argparse ends 2 with `unrecognized arguments: --fix ...`, so no fix starts, `--plan --fix` and `--tests-worktree --fix` print nothing, and the refusals that stay are exit 2, not `LAUNCH_REFUSED`; the usage cases end 2 as argparse's unknown option, not the usage rule; an ordinary record has no `kind` or `kind_line` (26 red). Guards (6): without `--fix` the launch, `--plan` and `--tests-worktree` on a closed ticket are refused `is not in_progress` (4); no flag and no ticket already ends 2 (2) |
+| S11 (X2) | `test_w2_201_x2_chore.py::test_x2_a_chore_starts_with_no_ticket_on_the_role_default`; `test_w2_201_x2_chore.py::test_x2_another_ticket_s_record_in_the_folder_is_not_read_as_the_chore_s`; `test_w2_201_x2_chore.py::test_x2_an_exception_limited_to_c3_does_not_lift_a_chore_s_other_model`; `test_w2_201_x2_chore.py::test_x2_a_chore_asking_another_model_with_no_exceptions_file_is_refused`; `test_w2_201_x2_chore.py::test_x2_an_exception_with_no_class_lifts_a_chore_s_other_model`; `test_w2_201_x2_chore.py::test_x2_gov_pause_and_the_gate_stop_a_chore`; `test_w2_201_x2_chore.py::test_x2_the_planted_pause_and_gate_stop_an_ordinary_launch`; `test_w2_201_x2_chore.py::test_x2_plan_with_chore_prints_the_role_s_default_line`; `test_w2_201_x2_chore.py::test_x2_tests_worktree_does_not_take_chore` | 2 (engineer, test designer) + 1 + 1 + 1 + 1 + 2 (pause, gate) + 2 + 1 + 1 | `gov launch` has no `--chore` (argparse: `unrecognized arguments: --chore`): no chore starts, `--plan --chore` prints nothing, the S4 and stop refusals are exit 2 without `LAUNCH_REFUSED`, and `--tests-worktree --chore` is refused as an unknown option (10 red). Guards (2): the planted pause and gate stop an ordinary worker launch (the plants' own check) |
+| S12 (X3) | `test_w2_201_x3_lead.py::test_x3_a_lead_launches_with_fix_on_a_closed_ticket_outside_the_ready_list`; `test_w2_201_x3_lead.py::test_x3_the_same_lead_without_fix_is_refused_by_the_plan`; `test_w2_201_x3_lead.py::test_x3_a_lead_fix_on_an_unknown_ticket_is_refused`; `test_w2_201_x3_lead.py::test_x3_a_lead_launches_with_chore_and_no_ticket`; `test_w2_201_x3_lead.py::test_x3_a_lead_launch_without_the_flags_is_unchanged`; `test_w2_201_x3_lead.py::test_x3_a_lead_s_refused_options_stay_refused_with_fix_and_chore`; `test_w2_201_x3_lead.py::test_x3_the_planted_pause_and_gate_stop_a_planned_lead`; `test_w2_201_x3_lead.py::test_x3_gov_pause_and_the_gate_stop_a_lead_fix_and_chore` | 2 (orchestrator, lead) + 1 + 1 + 1 + 1 + 8 (`--reason`, `--trial`, `--owner-named`, `--projection-usd` x fix, chore) + 2 (pause, gate) + 4 (pause, gate x fix, chore) | `gov launch` has no `--fix` or `--chore`: no fix or chore lead starts (so no `GOV_LAUNCH_KIND`, `GOV_LAUNCH_LINE` or chore address), the unknown ticket and the stops are exit 2 without `LAUNCH_REFUSED`, the refused lead options end 2 as argparse's unknown option (16 red). Guards (4): without `--fix` the closed ticket outside the ready list is refused by the plan; a planned lead without the flags starts with its `GOV_TICKET` and no `GOV_LAUNCH_*` key; the planted pause and gate stop a planned lead |
+| S13 (X4) | `test_w2_201_x4_new_ticket_notice.py::test_x4_the_landing_lands_every_branch_and_answers_the_notices`; `test_w2_201_x4_new_ticket_notice.py::test_x4_a_new_feature_and_an_edited_existing_ticket_give_no_notice`; `test_w2_201_x4_new_ticket_notice.py::test_x4_queue_json_holds_the_answer_s_ticket_notices`; `test_w2_201_x4_new_ticket_notice.py::test_x4_the_dry_run_answers_the_same_notices_and_exit_code`; `test_w2_201_x4_new_ticket_notice.py::test_x4_the_landed_ticket_s_close_record_holds_its_notices`; `test_w2_201_x4_new_ticket_notice.py::test_x4_a_close_record_with_no_new_ticket_flagged_holds_no_notice`; `test_w2_201_x4_new_ticket_notice.py::test_x4_each_notice_is_one_line_on_stderr`; `test_w2_201_x4_new_ticket_notice.py::test_x4_a_branch_that_adds_no_ticket_file_answers_ticket_notices_empty` | 1 + 1 + 1 + 1 + 2 (A, E) + 2 (B, C) + 1 + 1 | the answer, `queue.json`, the dry run's answer and the close records have no key `ticket_notices`, and no notice is on stderr (10 red). Each case first asserts what holds on the base already (every branch landed, exit 0; the dry run moved nothing; the close records exist), so the red is the missing notice, never the plant |
+| S14 (X5) | `test_w2_201_x5_words.py::test_x5_the_kernel_role_file_s_tools_line_names_the_three_statements`; `test_w2_201_x5_words.py::test_x5_each_role_copy_holds_the_kernel_tools_line`; `test_w2_201_x5_words.py::test_x5_one_line_of_the_skill_s_parallel_tickets_names_the_three_statements`; `test_w2_201_x5_words.py::test_x5_each_skill_copy_holds_the_kernel_section` | 3 (orchestrator, senior-engineer, ticket-lead) + 9 (3 roles x 3 copy folders) + 1 + 3 (3 copies) | no `Tools:` line and no line of `## Parallel tickets` holds `new ticket only for a new feature`, `--fix` and `--chore`; the copies equal the kernel lines already, so they fail on the same words (16 red) |
+
+**Readings (where the section is silent).**
+
+1. **X1, the usage errors' second fence** (`LAUNCH_REFUSED` from the launcher) has no public interface but the CLI,
+   which stops first; it is not tested here. "Nothing read" is shown as nothing started and no record (and, for
+   `--tests-worktree`, no tree made).
+2. **X1, the statuses.** A fix on an `in_progress` ticket is a fix too (`kind` `fix`); `open` and `in_progress` run
+   at C2 only. The role rule is shown with the engineer on a closed product-spec ticket; S4's refusal with Opus asked on
+   a closed C2 ticket and no exceptions file; the gate and the one-writer check for a fix are left to X2 and X3's
+   cases and today's suites.
+3. **X2, "a second planted record of another ticket"** is a real earlier launch's record on a C3 ticket (Opus, by
+   criticality) in the same folder: the chore's own record (by its session id) still says `ticket` null, the role
+   default, `promotion` and `review_round` null, and the earlier record is unchanged.
+4. **X2, S4 with no class to lift it.** An entry with `class: C3` does not lift a chore's Opus; with no exceptions
+   file it is refused; an entry with no `class` (S4's unlimited entry) lifts it, recorded as `model_source`
+   `exception` (a reading: S4 lets such an entry through on any class).
+5. **X2, `--tests-worktree --chore`** is refused (non-zero, nothing made, nothing started); the exit code and words are
+   left open, the Interface naming it only "does not".
+6. **X2, the spend brake** ("no ticket-based spend brake") has no planted case: a chore has no ticket for the brake
+   to read; the chore launches above show it is not refused.
+7. **X3, the registry entry's label** is not read (the registry entry goes when the stand-in ends); the inbox address
+   in the CLI process's environment is.
+8. **X4, the unreadable front matter.** Its notice must start `NEW_TICKET_NOT_FEATURE PROJ-unrd: ` and hold
+   `front matter unreadable`; whether the other parts are named beside it is left open (the KPIs cannot be read from
+   it either). B's and C's close records may hold `ticket_notices` `[]` or no key.
+9. **X5, the copies.** A role copy's `Tools:` line equals the kernel file's, byte for byte; a skill copy's `## Parallel
+   tickets` section equals the kernel's. The whole-file copy checks are W1-28's, W1-33's and W2-153 S3's, in their own
+   folders.
+
 ## Run
 
 ```

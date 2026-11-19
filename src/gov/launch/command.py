@@ -1,6 +1,6 @@
-"""``gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [--reason <text>]
-[--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]`` as a command module (DEC-231, DEC-317; W2-20 S19,
-P-1, P-2; W2-184 interface 7.2a).
+"""``gov launch <role> [<ticket>] [--fix <line> | --chore <line>] [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N]
+[--reason <text>] [--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]`` as a command module (DEC-231, DEC-317;
+W2-20 S19, P-1, P-2; W2-184 interface 7.2a; W2-201 fix X1 to X3, DEC-1219 (5)).
 
 A start command, not one of the twelve governance operations. It ends with the
 exit code of the session it started. The convention is in ``gov.cli.main``.
@@ -14,6 +14,11 @@ and starts nothing: no session, no record, no gate; it refuses as a launch does 
 A lead (``orchestrator``, ``lead``) given any of them is refused here with exit 2, before the launcher (W2-184 R1).
 ``--projection-usd N`` (W2-156; a number above 0) goes to ``launcher.launch`` as ``projection_usd``, recorded on the launch
 record for ``gov spend``'s brake; a lead writes no launch record, so it is refused there likewise.
+``--fix "<line>"`` launches the role under its owning ticket, whatever the ticket's status; ``--chore "<line>"``
+launches it with no ticket (W2-201 fix X1 to X3, DEC-1219 (5)): ``<ticket>`` is optional on the command line, and
+these are usage errors, exit 2 before the launcher, as W2-184 R1's: both flags; ``--fix`` with no ticket; ``--chore``
+with a ticket; neither flag and no ticket; a blank line. They go to ``launcher.launch`` as ``fix`` and ``chore``; ``--plan`` takes
+either, ``--tests-worktree`` takes ``--fix`` only (a chore has no ticket to make a tests worktree of).
 """
 
 from __future__ import annotations
@@ -45,12 +50,19 @@ def _positive(text: str) -> float:
 
 
 def add_arguments(parser) -> None:
-    parser.usage = ("gov launch <role> <ticket> [--plan] [--tests-worktree] [--gate-override DEC-NNN] "
+    parser.usage = ("gov launch <role> <ticket> [--fix <line>] [--plan] [--tests-worktree] [--gate-override DEC-NNN] "
                     "[--gpu-need-mib N] [--reason <text>] [--trial <id>] [--owner-named <DEC-id>] "
-                    "[--projection-usd N] [-- <CLI arguments>]")
+                    "[--projection-usd N] [-- <CLI arguments>]\n"
+                    "       gov launch <role> --chore <line> [--plan] [the options above but --tests-worktree] "
+                    "[-- <CLI arguments>]")
     parser.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
                         "independent-auditor, research or product-spec")
-    parser.add_argument("ticket", metavar="<ticket>", help="an in_progress ticket")
+    parser.add_argument("ticket", metavar="<ticket>", nargs="?", default=None,
+                        help="an in_progress ticket; with --fix its owning ticket, whatever its status; none with "
+                        "--chore")
+    # W2-201 fix X1 to X3 (DEC-1219 (5)): a fix under its owning ticket, a chore with no ticket; the line is recorded
+    parser.add_argument("--fix", metavar="<line>", help="launch a fix under <ticket> (open or closed), in one line")
+    parser.add_argument("--chore", metavar="<line>", help="launch a chore with no ticket, in one line")
     parser.add_argument("--gate-override", metavar="DEC-NNN", help="start the session while the resource gate is "
                         "shut, on this decision (logged)")
     parser.add_argument("--gpu-need-mib", metavar="<MiB>", type=int, help="the session's declared GPU need")
@@ -74,12 +86,37 @@ OPTIONS = (("reason", "--reason"), ("trial", "--trial"), ("owner_named", "--owne
 EXIT_USAGE = 2  # the command line's own usage code (gov.cli.main), as argparse ends a usage error
 
 
+def _kind_error(ticket: str | None, fix: str | None, chore: str | None, tests_worktree: bool) -> str | None:
+    """W2-201 fix X1 to X3: why the ticket and the two flags do not go together, or None."""
+    if fix is not None and chore is not None:
+        return "--fix and --chore do not go together: a fix has its owning ticket, a chore has none"
+    for flag, line in (("--fix", fix), ("--chore", chore)):
+        if line is not None and not line.strip():
+            return f"{flag} takes one line saying what the work is, not a blank one"
+    if fix is not None and ticket is None:
+        return "--fix takes the owning ticket: gov launch <role> <ticket> --fix \"<line>\""
+    if chore is not None and ticket is not None:
+        return f"--chore takes no ticket (given: {ticket}): gov launch <role> --chore \"<line>\""
+    if chore is not None and tests_worktree:
+        return "--tests-worktree does not take --chore: a chore has no ticket to make a tests worktree of"
+    if fix is None and chore is None and ticket is None:
+        return "a launch names its ticket, or --chore \"<line>\" for work with no ticket"
+    return None
+
+
 def run(root: Path, args, config: dict) -> int:
     from gov.launch import launcher
+    ticket, fix, chore = getattr(args, "ticket", None), getattr(args, "fix", None), getattr(args, "chore", None)
+    why = _kind_error(ticket, fix, chore, bool(getattr(args, "tests_worktree", False)))
+    if why is not None:
+        # W2-201 fix X1 to X3: a usage error, before the launcher, as W2-184 R1's: nothing read, started or recorded
+        print(f"gov launch: error: {why}", file=sys.stderr)
+        return EXIT_USAGE
+    kind = {key: value for key, value in (("fix", fix), ("chore", chore)) if value is not None}
     if getattr(args, "plan", False):
-        return launcher.plan(root, args.worker_role, args.ticket)
+        return launcher.plan(root, args.worker_role, ticket, **kind)
     if getattr(args, "tests_worktree", False):
-        return launcher.tests_worktree(root, args.worker_role, args.ticket)
+        return launcher.tests_worktree(root, args.worker_role, ticket, **kind)
     # a given option only (an empty one too, for the launcher to refuse); absent, the launcher's default is None
     options = {key: value for key, _ in OPTIONS if (value := getattr(args, key, None)) is not None}
     if args.worker_role in launcher.LEAD_ROLES and options:
@@ -95,6 +132,6 @@ def run(root: Path, args, config: dict) -> int:
         print(f"gov launch: error: a lead launch ({args.worker_role}) takes no --projection-usd: it writes no "
               f"launch record to hold one", file=sys.stderr)
         return EXIT_USAGE
-    return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
+    return launcher.launch(root, args.worker_role, ticket, args.passthrough or [],
                   gate_override=getattr(args, "gate_override", None), gpu_need_mib=getattr(args, "gpu_need_mib", None),
-                  **options, **({} if projection is None else {"projection_usd": projection}))
+                  **options, **({} if projection is None else {"projection_usd": projection}), **kind)

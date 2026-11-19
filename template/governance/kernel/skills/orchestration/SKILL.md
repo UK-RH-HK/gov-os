@@ -17,6 +17,7 @@ A method for the orchestrator role and its ticket leads: the way a wave is run. 
 - No fixed number of tickets in flight: the resource gate and the owner's usage limits decide (DEC-847). A ticket idle on an owner answer frees its slot (DEC-235, DEC-363).
 - The resource gate is read before each start: free memory of at least `<free memory>` and a load average below the core count. Heavy tickets count double (DEC-235).
 - No worktree is left behind: one whose ticket is closed is removed (DEC-235).
+- A new ticket only for a new feature: a fix launches under its owning ticket with `gov launch <role> <ticket> --fix "<line>"`, a chore with `gov launch <role> --chore "<line>"` and no ticket (DEC-1219 (5), (6)).
 
 ## Integration order
 
