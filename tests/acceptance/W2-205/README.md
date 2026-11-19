@@ -11,7 +11,7 @@ slice 1's and slice 2's acceptance support), never this ticket's branch. Memory 
     TMPDIR=$(mktemp -d) PYTHONPATH=<worktree>/src bash <heavy_slot.sh> \
       python3 -m pytest tests/acceptance/W2-205 -q -p no:cacheprovider -n auto
 
-36 cases (30 functions). No model, no network, no real `claude`, never the real `~/.gov-os`: every `gov` child
+38 cases (30 functions). No model, no network, no real `claude`, never the real `~/.gov-os`: every `gov` child
 (`python3 -m gov.cli.main`) and every hook runs with a `HOME` under `tmp_path`. All are acceptance tests; none is
 `local_only`. No sleep is longer than 2 s and no wait longer than 15 s (the wait for a relaunch to reach the stand-in:
 on the base it runs to its end, so the six relaunch cases take about 16 to 22 s each there, a few seconds once built).
@@ -66,7 +66,7 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | S3 (RT-5) | `test_w2_205_s3_relaunch.py::test_s3_the_key_absent_false_or_unreadable_gives_the_slice_1_message_only_and_true_relaunches` | with the key true the death is not relaunched (the off rows are already met on the base, so the case holds the on row too) |
 | S4 (RT-5) | `test_w2_205_s4_hooks.py::test_s4_precompact_then_sessionstart_inject_the_recorded_next_step_first` | the injection begins `Checkpoint resume: ticket=...`, not `Resume at the recorded next step (...)` |
 | S4 (RT-5) | `test_w2_205_s4_hooks.py::test_s4_with_no_checkpoint_nothing_of_the_kind_is_injected_and_with_one_it_begins_with_its_next_step` | with a checkpoint the injection does not begin with the resume part (the no-checkpoint half is already met) |
-| S5 (RT-6) | `test_w2_205_s4_hooks.py::test_s5_the_precompact_and_sessionstart_outputs_name_gov_msg_read` | the PreCompact output does not name `gov msg read` |
+| S5 (RT-6) | `test_w2_205_s4_hooks.py::test_s5_the_sessionstart_output_names_gov_msg_read` | the SessionStart injection does not name `gov msg read` |
 | S5 (RT-6) | `test_w2_205_s5_messages.py::test_s5_messages_among_the_five_address_kinds_are_each_read_once_in_the_order_sent` | `gov msg send` refuses the kind `relay` (exit 2); the five addresses already send and read on the base |
 | S5 (RT-6) | `test_w2_205_s5_messages.py::test_s5_five_notices_give_one_digest_line_and_no_wake` | no `gov msg digest` (exit 2) |
 | S5 (RT-6) | `test_w2_205_s5_messages.py::test_s5_the_digest_is_one_line_a_day_for_notices_read_or_unread` | no `gov msg digest` (exit 2) |
@@ -78,11 +78,12 @@ item is a test function (a parametrised one covers all its rows). "Red on the ba
 | F1 | `test_w2_205_s3_relaunch.py::test_f1_a_session_that_dies_every_time_is_relaunched_once_and_its_checkpoint_is_not_rewritten` | the first death is not relaunched |
 | F2 | `test_w2_205_f2_stall.py::test_f2_guard_a_silent_transcript_still_messages_once_and_pushes_once` | none: a regression guard, green on the base and to stay green |
 
-Count per line: S1 4, S2 7, S3 6, S4 2 (6 cases), S5 8 (10 cases), F1 2, F2 1.
+Count per line: S1 4, S2 7, S3 6, S4 2 (6 cases), S5 8 (12 cases), F1 2, F2 1.
 
-Red run on the base (through the heavy slot, `-n auto`): `35 failed, 1 passed in 59.21s`; every failure for the reason
-above (the command, the kind, the event, the entry's key or the hook's part does not exist), no harness error. The one
-pass is F2's guard.
+Red run on the base (through the heavy slot, `-n auto`): `35 failed, 1 passed in 59.21s` at `73921e2d6` (36 cases);
+after the rewrite at `40005b23f` (the inbox line is SessionStart's alone, three cases for one) the S4 and S5 files
+alone: `18 failed in 1.94s`, so 37 red and 1 green of 38. Every failure is for the reason above (the command, the
+kind, the event, the entry's key or the hook's part does not exist), no harness error. The one pass is F2's guard.
 
 **F2's other half is the lead's**: that `tests/acceptance/W2-121c` stays green and that the branch's diff touches
 none of the cron line, the scratch dispatcher, `heavy_slot.sh` and the repository's own `.claude/settings.json` is
@@ -132,8 +133,9 @@ checked by the lead at the green step, not by a test here.
   alone). The `(checkpoint <path>)` may be the relative path or an absolute one ending in it.
 - **"Ahead of every other part"** is asserted for the roles engineer, independent-test-designer and orchestrator (the
   orchestrator's own parts come after it). Source `startup`, or no `GOV_TICKET`: no such part.
-- **The inbox line** `Read your inbox: gov msg read` is a whole line of the SessionStart injection; of the PreCompact
-  output only `gov msg read` is asserted.
+- **The inbox line** `Read your inbox: gov msg read` is a whole line of the SessionStart injection (source `compact`,
+  `clear` or `resume`, with a ticket and a checkpoint). `precompact.py` is not changed and its output is not asserted
+  (the lead's ruling at `40005b23f`).
 - **`gov msg digest`** prints exactly the lines `<day> <n> notices`, one a day in day order, the day being the
   message's `at` date; nothing else on stdout. `--day <d>` prints that day's line alone. A day with no notice is not
   tested.
@@ -144,9 +146,6 @@ checked by the lead at the green step, not by a test here.
 
 ## For the lead (found while writing)
 
-- The Interface gives `precompact.py`'s output the inbox line and S5 names the PreCompact injection, but
-  `template/governance/kernel/hooks/precompact.py` is not in the ticket's `allowed_paths` (only `stop.py` and
-  `sessionstart.py`): `test_s5_the_precompact_and_sessionstart_outputs_name_gov_msg_read` cannot go green without it.
 - After a real compaction the latest record is the PreCompact hook's own, whose next step is the fixed text
   `Resume after compaction`: the resumed session is told that, not the step recorded before. The ticket says "as it
   does now", so no test asks for more.

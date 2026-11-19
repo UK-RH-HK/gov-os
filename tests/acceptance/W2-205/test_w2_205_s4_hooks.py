@@ -4,7 +4,7 @@ at the recorded next step.
 ``precompact.py`` writes the automatic checkpoint record (as it does now); ``sessionstart.py``, for source ``compact``,
 ``clear`` or ``resume`` and any role with a ticket, injects as its first part ``Resume at the recorded next step
 (<ticket>): <next_action> (checkpoint <path>)`` and the line ``Read your inbox: gov msg read``; with no checkpoint it
-injects no such part and exits 0. The PreCompact output names ``gov msg read`` too.
+injects no such part and exits 0. The inbox line is SessionStart's alone: ``precompact.py`` is not changed.
 
 The hooks are the kernel's files under ``template/governance/kernel/hooks/``, run with the hook JSON on stdin, a fixture
 git project as ``CLAUDE_PROJECT_DIR``, ``GOV_TICKET`` and ``GOV_ROLE``. The next step and the path expected after the
@@ -64,9 +64,10 @@ def test_s4_with_no_checkpoint_nothing_of_the_kind_is_injected_and_with_one_it_b
     assert s.RESUME_PART not in _start(box, root, "compact", ticket=None), "a resume part with no ticket"
 
 
-def test_s5_the_precompact_and_sessionstart_outputs_name_gov_msg_read(box):
+@pytest.mark.parametrize("source", ["compact", "clear", "resume"])
+def test_s5_the_sessionstart_output_names_gov_msg_read(box, source):
     root = s.project(box.base / "project", TICKET)
     s.checkpoint(box, root, TICKET, STEP)
-    said = _compact(box, root).stdout
-    assert "gov msg read" in said, f"the PreCompact hook's output does not name `gov msg read`:\n{said[:600]}"
-    assert s.INBOX_LINE in _start(box, root, "compact").splitlines(), "the SessionStart injection has no inbox line"
+    text = _start(box, root, source)
+    assert "gov msg read" in text, f"the SessionStart injection (source {source}) does not name `gov msg read`:\n{text[:600]}"
+    assert s.INBOX_LINE in text.splitlines(), f"no line `{s.INBOX_LINE}` in the injection:\n{text[:600]}"
