@@ -126,7 +126,8 @@ def test_w2_96_d10r2_weekly_is_enabled_for_a_case_the_map_names(project, capsys)
     it gets the suite for its own folder (as ``breadth``), so ``gov accept`` still runs it."""
     root, temp = project
     readme = "| KPI | Test |\n|---|---|\n| S1 | `test_a.py::test_wide` |\n| S2 | `test_a.py::test_default` |\n"
-    _plant(root, readme, {"test_a.py": TESTS}, {"optin-weekly.txt": "tests/acceptance/T1/test_a.py::test_wide  # slow\n"})
+    passing = "def test_default():\n    assert True\n\ndef test_wide():\n    assert True\n"
+    _plant(root, readme, {"test_a.py": passing}, {"optin-weekly.txt": "tests/acceptance/T1/test_a.py::test_wide  # slow\n"})
     code, envelope, _ = _accept(root, capsys)
     result = envelope["result"]
     assert code == 0, envelope
