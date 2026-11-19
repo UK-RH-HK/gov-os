@@ -31,6 +31,14 @@ allowed_paths:
 - CLAUDE.md
 - AGENTS.md
 - pyproject.toml
+- src/gov/_shipped/**
+- .rulesync/skills/judging-work/**
+- .claude/skills/judging-work/**
+- tests/unit/brief/test_w2_195_inject.py
+- tests/unit/launch/**
+- tests/acceptance/W1-46/**
+- tests/acceptance/W2-88/**
+- tests/optin-lifted-breadth.txt
 - tests/acceptance/W2-208/**
 - tests/unit/adapters/**
 - tests/unit/update/**
@@ -79,6 +87,11 @@ Written 2026-11-19 by the kit lead from the CTO's brief `docs/emergency-2/briefs
 
 1. `gov update` 0.1.3 wrote three deny lines and one allow line into EXAMIN's `.claude/settings.json` (its report 28): `Edit(.tickets/**)`, `Read(//home/usain/gov-os-eval/**)`, `Read(//home/usain/gov-os-workbench/**)` and the allow `Bash(gov launch:*)`. Sources: `template/.rulesync/permissions.jsonc` (the `.tickets/**` edit deny and the `gov launch` allow), `template/governance/kernel/settings.json` (the allow) and `src/gov/util/heldout.py` `write_read_rules`, called by `src/gov/adapters/merge.py` (`generate_into`) and `src/gov/adapters/portability.py` (`_generated_findings`). EMERGENCY-2 2.4: two denies only, `git push` and `sudo`; 2.7: a hidden set is protected by the transcript scan, not by a deny. The kit has no `git push` deny today: it is added.
 2. The kit's rules head `template/.rulesync/rules/governance.md` says "Six roles operate under the guard", has a "Guard" section and the CIT-P workflow, and holds none of the golden rules.
+
+## Lead's rulings of 2026-11-19 (on the test designer's two proposals)
+
+- **The skill's version and this repository's copy:** the version is raised (K5) and the launcher requires the installed copy's version to equal the kernel's, so the shipped copy `src/gov/_shipped/template/governance/kernel/skills/judging-work/SKILL.md`, this repository's own `.rulesync/skills/judging-work/` and `.claude/skills/judging-work/` copies and the pins in `tests/unit/brief/test_w2_195_inject.py` (approved sha of sections 1 to 3: the CTO approves the new text by naming it in the brief) move with it.
+- **AGENTS.md's preamble:** rulesync writes its own preamble at the top of AGENTS.md; the head is compared from its first `# Governance` line on. The engineer does not strip it.
 
 ## Interface (so tests and code agree)
 
