@@ -1,4 +1,5 @@
-"""``gov decisions basis`` as a command module (W2-198 S4, S5; EMERGENCY-2 10.1, A-8; the convention is in ``gov.cli.main``).
+"""``gov decisions basis`` and ``gov decisions in-force`` as a command module (W2-198 S4, S5; EMERGENCY-2 10.1, A-8;
+W2-200 S2; the convention is in ``gov.cli.main``).
 
 - ``basis [--range <A>..<B>] [--register <path>]``: for each decision entry the range adds to the register, whether it
   adds a rule and, if so, whether its basis line names an incident (the logic is ``gov.decisions.basis``). Exit 0 when
@@ -6,6 +7,9 @@
 - ``basis --week [--since <YYYY-MM-DD>]``: the weekly review: every entry the register gained since the date (default 7
   days ago), each with its id, title, the date it was added, whether it adds a rule, its basis and its verdict. Exit 0
   whatever the verdicts.
+- ``in-force``: the digest of the decisions in force (``gov.util.register.in_force``; W2-200 S2, DEC-1214 M1): one line
+  ``DEC-n — title`` per register entry neither superseded nor tagged done, in the register's order, a changed entry
+  naming what changed it; then the left-out count and the register's path. Exit 0, also without a register.
 
 The register is read from git objects, never the working tree. It prints its own output (the envelope under ``--json``)
 and ends with its own code (``CHILD_EXIT_CODE``).
@@ -18,7 +22,8 @@ import json
 import sys
 from pathlib import Path
 
-HELP = "decision register checks: basis (a new rule needs a basis line that names an incident; --week for the review)"
+HELP = ("decision register: basis (a new rule needs a basis line that names an incident; --week for the review), "
+        "in-force (the digest of the decisions in force)")
 CLASS = "read"
 CHILD_EXIT_CODE = True
 EXIT_CODES = {}
@@ -32,8 +37,9 @@ def _common(sub) -> None:
 
 
 def add_arguments(parser) -> None:
-    parser.usage = "gov decisions basis [--range <A>..<B>] [--register <path>] | --week [--since <YYYY-MM-DD>]"
-    actions = parser.add_subparsers(dest="action", metavar="{basis}", required=True)
+    parser.usage = ("gov decisions basis [--range <A>..<B>] [--register <path>] | --week [--since <YYYY-MM-DD>]\n"
+                    "       gov decisions in-force")
+    actions = parser.add_subparsers(dest="action", metavar="{basis,in-force}", required=True)
     basis = actions.add_parser("basis", help="the new rule entries of a range and their basis lines")
     basis.add_argument("--range", dest="range_", metavar="<A>..<B>", help="the commits (default HEAD^..HEAD)")
     basis.add_argument("--register", default="docs/DECISION_REGISTER.md", metavar="<path>",
@@ -41,6 +47,8 @@ def add_arguments(parser) -> None:
     basis.add_argument("--week", action="store_true", help="the weekly review: the entries gained in the last 7 days")
     basis.add_argument("--since", metavar="<YYYY-MM-DD>", help="with --week: the date the week starts (default 7 days ago)")
     _common(basis)
+    in_force = actions.add_parser("in-force", help="the digest of the register's decisions in force, read from HEAD")
+    _common(in_force)
 
 
 def _emit(args, ok: bool, result: dict, lines: list[str], code: str | None = None, message: str = "") -> None:
@@ -67,7 +75,22 @@ def _week_line(entry: dict) -> str:
             f" | {entry['title']} | basis: {basis}")
 
 
+def _in_force(root: Path, args) -> int:
+    """``in-force``: the digest's lines, then what was left out and the register's path (W2-200 S2)."""
+    from gov.util.register import in_force
+
+    result = in_force(root)
+    left = result["left_out"]
+    _emit(args, True, result, result["lines"] + [
+        f"left out: {left['count']} (superseded: {', '.join(left['superseded']) or 'none'}; "
+        f"done: {', '.join(left['done']) or 'none'})",
+        f"register: {result['register'] or 'none'}"])
+    return 0
+
+
 def run(root: Path, args, config: dict) -> int:
+    if args.action == "in-force":
+        return _in_force(root, args)
     from gov.decisions import basis
 
     try:

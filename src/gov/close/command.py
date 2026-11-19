@@ -22,15 +22,15 @@ What a finding left unmeasurable is named in it as not measured.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import subprocess
 import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import (batch as _batch, evidence as _evidence, fingerprint as _fingerprint, gates as _gates,
-                       history as _history, ratchet as _ratchet, select as _select, state as _state, tool as _tool)
+from gov.close import (batch as _batch, decisions as _decisions, evidence as _evidence, fingerprint as _fingerprint,
+                       gates as _gates, history as _history, ratchet as _ratchet, select as _select, state as _state,
+                       tool as _tool)
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
@@ -182,6 +182,9 @@ def run(root: Path, args, config: dict):
     _check_tree(root, ticket)
     _check_store(root)
     _batch.check_red_run(root)  # W2-68: on the code of a red batch run, the close waits for a green run
+    # W2-200 (DEC-1214 M1): the decisions the ticket cites, resolved in HEAD's register by id; a cited decision the
+    # register lacks refuses here (DECISION_NOT_FOUND), before any gate runs and before anything is written
+    decided = _decisions.record_fields(root, ticket, front)
     if owner_decision:
         state = _state.lift_escalation(root, ticket, owner_decision, state, settings.get(REGISTER_KEY))
 
@@ -197,8 +200,6 @@ def run(root: Path, args, config: dict):
     others = _commits_since(root, commits)
     tickets = _tickets_of_head(root)  # a Task: that names none of them names no task (DEC-500)
     inside, own = _work_of(front, ticket, wbs)
-    ticket_input = {"id": ticket, "hash":
-                    "sha256:" + hashlib.sha256(ticket_path.read_bytes()).hexdigest()}
 
     # Every gate is asked, whatever an earlier one found (DEC-492)
     found: list[_Finding] = []
@@ -222,7 +223,7 @@ def run(root: Path, args, config: dict):
     for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE):
         gate(_gates.check_ratchet_lists, root, key)
     if found:
-        _refuse_for(root, ticket, found, disposition, None, [], report, counted=False)
+        _refuse_for(root, ticket, found, disposition, [], report, counted=False)
 
     # W2-66: what the regression run selects, and its evidence; W2-68: the run it reuses, decided before gov check
     scope = _scope(root, ticket, wbs, args)
@@ -235,7 +236,7 @@ def run(root: Path, args, config: dict):
         gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c, tickets)], every=True)
     gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
     if found:
-        _refuse_for(root, ticket, found, disposition, None, [], report, counted=False)
+        _refuse_for(root, ticket, found, disposition, [], report, counted=False)
     disk = _gates.check_disk(root, settings)  # DEC-898: before the regression
 
     gate(_check_containment, root, commits)
@@ -258,22 +259,16 @@ def run(root: Path, args, config: dict):
                            folder=folder)
     counts = gate(_check_tests, root, root / "tests", timeout, folder, test_runs, workers, told, scope)
     reds = gate(_check_reds, root, told, timeout) if told is not None else None
-    packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
     evidence = _scope_evidence(root, scope)
     if found:
-        _refuse_for(root, ticket, found, disposition, packet, test_runs, report, evidence)
+        _refuse_for(root, ticket, found, disposition, test_runs, report, evidence)
     test_counts = {key: test_counts[key] + counts[key] for key in test_counts}
 
-    mandatory = packet["mandatory"]
     commit_files = sorted({p for c in commits for p in c["paths"]})
     record = {
-        "packet_hash": packet["hash"],
-        "inputs": [ticket_input] + [{"id": item["id"], "hash": f"sha256:{item['sha256']}"}
-                                    for item in mandatory],
+        **decided,  # inputs and the decision lists, from the ticket's own sources (W2-200, DEC-1214 M1)
         "requirements_implemented": _collect_requirements(commits),
-        "decisions_applied": [item["id"] for item in mandatory
-                              if item["authority"] == "decision"],
         "tests_produced": _collect_test_paths(root, wbs, commit_files),
         "tests_run": test_counts,
         "test_runs": test_runs,
@@ -349,7 +344,7 @@ def _workers(settings: dict):
 
 
 def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
-                packet: dict | None, test_runs: list[dict] | None = None, report: dict | None = None,
+                test_runs: list[dict] | None = None, report: dict | None = None,
                 evidence: dict | None = None, counted: bool = True) -> None:
     """The one refusal of a run, for every finding of its gates (DEC-492): each named once, in the gates'
     order. One gate's refusal is that gate's, with its code; several are ``CHECK_FAILED`` with each gate's
@@ -372,18 +367,12 @@ def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str
         details[_evidence.KEY] = evidence
     if not_measured:
         details["not_measured"] = not_measured
-    context_reason = None
-    if disposition:  # DEC-454: a class is given with the whole-system context, or says that it had none
-        context_reason = next((f.message for f in found if f.code == "CONTEXT_FAILED"), None)
-        if context_reason:
-            details["context"] = context_reason
-    else:
+    if not disposition:
         message += "; findings are unclassed and await disposition"
         details["note"] = "findings await their class; use --disposition to classify"
     _refuse(root, ticket, codes[0] if len(codes) == 1 else "CHECK_FAILED", message, lines, details,
             exit_code=found[0].exit_code if len(found) == 1 else EXIT_CHECK_FAILED,
-            disposition=disposition, context_hash=packet["hash"] if packet and disposition else None,
-            context_reason=context_reason, not_measured=not_measured, counted=counted)
+            disposition=disposition, not_measured=not_measured, counted=counted)
 
 
 # ---------------------------------------------------------------------------
@@ -413,9 +402,8 @@ def _check_tree(root: Path, ticket: str) -> None:
 
 
 def _check_store(root: Path) -> None:
-    """``STORE_STALE`` when the record store was built from another commit than the one being closed: the
-    context would be built from superseded records. A project without a store is refused where its context
-    is built (DEC-470)."""
+    """``STORE_STALE`` when the record store was built from another commit than the one being closed. A project
+    without a store is not refused here."""
     if _store_is_of_head(root) is False:
         raise GovError("STORE_STALE",
                         "the record store is not of the commit being closed; run gov rebuild, then close again",
@@ -488,51 +476,6 @@ def _record_and_close(root: Path, ticket: str, record: dict, commit_files: list[
             failed.message += "; a record of the close could not be taken back: " + "; ".join(left)
         raise
     return close_rel, checkpoint_path
-
-
-# ---------------------------------------------------------------------------
-# Context (DEC-454, DEC-470)
-# ---------------------------------------------------------------------------
-
-_REGISTER_HAZARDS = ("ACTIVE_SUPERSEDED", "DUPLICATE_ID", "OVERLAPPING_ID")
-
-
-def _build_context(root: Path, ticket: str) -> dict:
-    """The ticket's context packet, built by ``gov.context`` from the store as it is.
-
-    A ``_Finding`` with the reason when the context gives an error (no store,
-    a missing or superseded input, a contradiction), when W1-11's checker
-    cannot run, or when it finds the register itself contradictory.
-    """
-    import sqlite3
-    from gov.context import close_budget, context as build_context
-    from gov.decisions import check as check_decisions
-
-    try:
-        packet = build_context(root, ticket, budget=close_budget(root))  # the project's setting (DEC-1165 (1))
-    except GovError as e:
-        raise _Finding("CONTEXT_FAILED",
-                       f"the context of {ticket} cannot be built: {e.code}: {e.message}",
-                       {"ticket": ticket, "context_error": e.code, **e.details})
-    except (sqlite3.Error, OSError) as e:
-        raise _Finding("CONTEXT_FAILED",
-                       f"the context of {ticket} cannot be built: the store cannot be read: {e}",
-                       {"ticket": ticket})
-    try:
-        hazards = [f for f in check_decisions(root)
-                   if f.get("code") in _REGISTER_HAZARDS]
-    except GovError as e:
-        raise _Finding("CONTEXT_FAILED",
-                       f"the context of {ticket} cannot be built: the decisions "
-                       f"could not be checked: {e.code}: {e.message}",
-                       {"ticket": ticket, "decisions_error": e.code, **e.details})
-    if hazards:
-        codes = sorted({f["code"] for f in hazards})
-        raise _Finding("CONTEXT_FAILED",
-                       f"the context of {ticket} cannot be built: the decision "
-                       f"register has findings ({', '.join(codes)})",
-                       {"ticket": ticket, "decision_findings": hazards})
-    return packet
 
 
 # ---------------------------------------------------------------------------
@@ -1242,8 +1185,7 @@ def _check_checkpoint(root: Path, ticket: str) -> None:
 def _refuse(root: Path, ticket: str, code: str, message: str,
             findings: list[str], details: dict | None = None, *,
             exit_code: int = EXIT_CHECK_FAILED,
-            disposition: str | None = None, context_hash: str | None = None,
-            context_reason: str | None = None, not_measured: list[str] | None = None, counted: bool = True):
+            disposition: str | None = None, not_measured: list[str] | None = None, counted: bool = True):
     """Count the refusal, open its repair ticket, write the escalation at the
     third, and raise the refusal. The next attempt after the third is blocked
     in ``run`` before anything runs. A refusal that is not ``counted`` (a gate before any test: an adoption gap,
@@ -1253,7 +1195,7 @@ def _refuse(root: Path, ticket: str, code: str, message: str,
     if not counted:
         details = {"findings": findings, **(details or {}), "counted": False}
         details["repair_ticket"] = _open_repair_ticket(
-            root, ticket, findings, disposition, context_hash, context_reason, not_measured)
+            root, ticket, findings, disposition, not_measured)
         raise GovError(code, message, details, exit_code=exit_code)
     state = _read_count(root, ticket)
     earlier = _state.read_escalation(root, ticket)
@@ -1279,7 +1221,7 @@ def _refuse(root: Path, ticket: str, code: str, message: str,
 
     details = {"findings": findings, **(details or {})}
     details["repair_ticket"] = _open_repair_ticket(
-        root, ticket, findings, disposition, context_hash, context_reason, not_measured)
+        root, ticket, findings, disposition, not_measured)
     cut = len(findings) - _tool.findings_held(findings)
     if cut and not details["repair_ticket"].startswith(_tool.NOT_OPENED):
         details["repair_ticket_findings_cut"] = cut  # what the ticket leaves out, said in it too
@@ -2026,6 +1968,7 @@ def _run_scoped(root: Path, args, config: dict):
     workers = _workers(settings)
     _gates.take_back_interrupted(root, ticket, _close_record_rel(ticket))
     _check_tree(root, ticket)
+    decided = _decisions.record_fields(root, ticket, front)  # W2-200: refuses (DECISION_NOT_FOUND) before any run
     commit = _git(root, "rev-parse", "HEAD").strip()
 
     chosen = _selection(root, ticket)
@@ -2121,6 +2064,7 @@ def _run_scoped(root: Path, args, config: dict):
         _ratchet.ACCEPTED_REDS: accepted,
         "accepted_red_findings": accepted_findings,
         "changed": chosen["changed"],
+        **decided,
     }
     commit_files = list(chosen.get("own", chosen["changed"]))
     close_record_path, checkpoint_path = _record_and_close(root, ticket, record, commit_files)

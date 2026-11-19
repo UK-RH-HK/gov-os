@@ -31,7 +31,6 @@ FAMILIES = (
     "authority/role limits",
     "mutation scope",
     "path-map compliance",
-    "context reproducibility",
     "concurrency/claims",
     "adapter/model portability",
     "skill regression",
