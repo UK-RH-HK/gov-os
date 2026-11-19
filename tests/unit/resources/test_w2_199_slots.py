@@ -71,3 +71,13 @@ def test_a_gpu_kind_without_its_need_is_invalid_and_with_no_gpu_refused_with_exi
         slots.run("embedder", PLAIN, gpu_need_mib=500)
     assert refused.value.exit_code == 3 and "memory is unavailable" in refused.value.message
     assert [e["event"] for e in events(planted)][-1] == "ended" and events(planted)[-1]["code"] == 3
+
+
+def test_workers_with_held_is_the_whole_count_and_without_it_the_derived_count_times_the_slots_held(planted, tmp_path):
+    out = tmp_path / "w"
+    command = ["sh", "-c", f"echo $PYTEST_XDIST_AUTO_NUM_WORKERS > {out}"]
+    planted.config(heavy_slots=3)
+    slots.run("test", command, held="1,2")
+    assert out.read_text().strip() == "8"  # 4 workers a slot x 2 held
+    slots.run("test", command, held="1,2", workers=1)
+    assert out.read_text().strip() == "1"  # the caller's own count

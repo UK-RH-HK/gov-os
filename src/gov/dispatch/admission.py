@@ -5,8 +5,11 @@ import ``gov.dispatch`` at load). A run starts only while the machine has room:
 
 - the 1-minute load (``gov.resources.machine.load``, ``GOV_RESOURCES_LOADAVG`` when planted) is under ``start_below``,
   ``START_RATIO`` x the detected CPUs (``GOV_HEAVY_START_BELOW`` sets an absolute load instead);
-- the load plus ``workers x margin`` stays within ``load_limit``, the CPUs (the resource gate's own limit); a run whose
-  ``workers x margin`` alone is the whole limit could never pass it, so only the start threshold holds that one;
+- the load plus ``workers x margin`` stays within ``load_limit``, the CPUs (the resource gate's own limit): a start
+  under ``start_below`` adds at most ``workers x margin``, and the slots and workers are sized so that
+  ``start_below + slots x workers x margin <= load_limit``. A run that can never fit (``workers x margin`` over
+  ``load_limit - start_below``) is held by the start threshold alone, so an idle machine always admits it; for any other
+  run the threshold already keeps the sum within the limit;
 - a GPU kind (``embedder``, ``reranker``) is also admitted by ``limits.gpu_answer`` only: never the CPU (RT-4).
 
 ``margin`` is what a started job adds to the load per worker, measured: the 90th percentile (nearest rank) of the last
@@ -210,18 +213,11 @@ def room(kind: str, workers: int, gpu_need: int | None = None) -> tuple[bool, st
         readings["problem"] = "; ".join(problems)
     reason, binding = None, "none"
     if not problems:
-        load, low, limit, m = loads[0], readings["start_below"], readings["load_limit"], readings["margin"]
+        load, low = loads[0], readings["start_below"]
         if load >= low:
             reason = "load"
             binding = f"load {_shown(load)} is at or over start_below {_shown(low)}"
             readings["line"] = f"load {_shown(load)}, at or over {_shown(low)}: waiting to start"
-        elif workers * m < limit and load + workers * m > limit:  # a run that cannot fit even an idle machine is held
-            # by the start threshold alone: held by the limit it could never start (a stall, not a protection)
-            reason = "load"
-            binding = (f"load {_shown(load)} plus {workers} workers x margin {_shown(m)} is over load_limit "
-                       f"{_shown(limit)}")
-            readings["line"] = (f"load {_shown(load)} plus {workers} workers x margin {_shown(m)} is over "
-                                f"{_shown(limit)}: waiting to start")
     if reason is None and kind in GPU_KINDS:
         if gpu_need is None:
             reason, binding = REFUSED, "a GPU kind needs --gpu-need-mib"
@@ -275,14 +271,14 @@ def wait_for_room(job: str, kind: str, workers: int, gpu_need: int | None, say, 
         held = gate() if gate else None
         fields = {"load_1m": readings["load_1m"], "start_below": readings["start_below"]}
         if held:
-            hold, text, has_room, nap = held[0], held[1], ok, SLOT_POLL_S
+            hold, text, has_room, nap = held[0], held[1], True, SLOT_POLL_S  # a priority waiter ahead: room
         elif not ok:
             hold, text, has_room, nap = reason, readings.get("line", reason), False, poll_s()
         else:
             taken = take() if take else True
             if taken:
                 return taken, readings, round(time.monotonic() - began, 3)
-            hold, text, has_room = "slots", slots_note, True
+            hold, text, has_room = "slots", slots_note, False  # the slot count is the machine's capacity
             nap = poll_s() if kind in GPU_KINDS else SLOT_POLL_S
         if hold not in said:
             said.add(hold)

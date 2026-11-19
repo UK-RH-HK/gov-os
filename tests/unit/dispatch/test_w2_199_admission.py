@@ -97,28 +97,48 @@ def test_the_log_line_is_one_whole_json_object_with_the_common_fields(box):
 
 
 @pytest.mark.parametrize("load,workers,ok,reason", [(11.9, 4, True, None), (12.0, 4, False, "load"),
-                                                    (13.0, 4, False, "load"), (11.0, 10, False, "load"),
+                                                    (13.0, 4, False, "load"), (11.0, 10, True, None),
                                                     (3.0, 4, True, None)])
-def test_room_holds_a_start_at_or_over_the_threshold_or_over_the_limit(box, load, workers, ok, reason):
+def test_room_holds_a_start_at_or_over_the_threshold_only(box, load, workers, ok, reason):
     box.load(load)
     found, why, readings = admission.room("test", workers)
     assert (found, why) == (ok, reason)
     assert readings["load_1m"] == load and readings["start_below"] == 12.0 and readings["load_limit"] == 20
 
 
-def test_room_counts_the_measured_margin(box):
+def test_room_reports_the_measured_margin_and_a_run_that_can_never_fit_is_held_by_the_threshold_alone(box):
     box.load(11.9)
-    assert admission.room("test", 4)[0] is True  # 11.9 + 4 x 1.0
     box.log(*[ended(2.4)] * 3)
-    found, why, readings = admission.room("test", 4)  # 11.9 + 4 x 2.4 = 21.5 is over 20
-    assert (found, why) == (False, "load") and readings["margin"] == 2.4
-
-
-def test_a_run_that_cannot_fit_even_an_idle_machine_is_held_by_the_threshold_alone(box):
-    box.load(3.0)
-    assert admission.room("test", 20)[0] is True  # 20 workers x 1.0 is the whole limit: the limit could never admit it
+    found, why, readings = admission.room("test", 4)  # 4 x 2.4 = 9.6 is over 20 - 12: it can never fit; 11.9 is under 12
+    assert (found, why) == (True, None) and readings["margin"] == 2.4
     box.load(12.0)
-    assert admission.room("test", 20)[:2] == (False, "load")  # the start threshold still holds
+    assert admission.room("test", 4)[:2] == (False, "load")
+    box.load(3.0)
+    assert admission.room("test", 20)[0] is True  # an idle machine always admits it
+
+
+def test_a_wait_has_room_only_for_a_priority_waiter_ahead(box):
+    box.load(13.0)
+    slept = []
+
+    def sleep(seconds):
+        slept.append(seconds)
+        if len(slept) == 1:
+            box.load(3.0)
+
+    def say(line):
+        pass
+
+    admission.wait_for_room("j1", "test", 4, None, say, sleep=sleep)
+    taken = iter([None, (1, 5)])
+    admission.wait_for_room("j2", "test", 4, None, say, take=lambda: next(taken), sleep=lambda s: None)
+    holds = iter([("priority", "a landing waits first"), None])
+    admission.wait_for_room("j3", "test", 4, None, say, gate=lambda: next(holds), take=lambda: (1, 5),
+                            sleep=lambda s: None)
+    waits = {e["job"]: (e["reason"], e["room"]) for e in
+             (json.loads(x) for x in (box.home / ".gov-os" / "runtime" / "log.jsonl").read_text().splitlines())
+             if e["event"] == "wait"}
+    assert waits == {"j1": ("load", False), "j2": ("slots", False), "j3": ("priority", True)}
 
 
 def test_an_unreadable_load_opens_and_says_why(box):

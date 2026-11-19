@@ -63,7 +63,8 @@ def add_arguments(parser) -> None:
     parser.add_argument("--gpu-kind", metavar="<kind>", choices=GPU_KINDS, default="other",
                         help="the GPU work's kind for its share (embedder, reranker, other; default other)")
     parser.add_argument("--held", metavar="<slots>", help="--slot: run with these slots' CPUs (e.g. 1,2) and their "
-                        "workers, taking no lock (a caller that holds the slots itself)")
+                        "workers (--workers is then the whole count), taking no lock (a caller that "
+                        "holds the slots itself)")
     parser.add_argument("--tree", metavar="<path>", help="a rebuild's tree (default: the root)")
     parser.add_argument("--workers", metavar="<n>", type=int, help="the heavy job's workers (its thread budget)")
     parser.add_argument("--ticket", metavar="<id>", help="the registered session's ticket")

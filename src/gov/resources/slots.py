@@ -468,7 +468,7 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
     named = _held_slots(held, count) if held is not None else None
     if held is not None and not named:
         say(f"--held {held!r} names no slot of {count}: one slot's workers, not confined to CPUs")
-    total = per_slot * len(named) if named else per_slot
+    total = per_slot * len(named) if named and workers is None else per_slot  # --workers is the run's whole count
     need = gpu_need_mib if kind in GPU_KINDS else None
 
     trip_off = tripwire_off(conf)
