@@ -99,6 +99,13 @@ D7_NOT_EMBEDDED = ("tests/**", "docs/close/**", "docs/checkpoints/**", "docs/pro
                    "governance/project/orchestration/closes/**", "governance/project/orchestration/nightly/**",
                    "governance/project/orchestration/sessions/**", "governance/project/orchestration/reviews/**")
 
+# EMERGENCY-2 11.3: what is archived leaves memory's index on purpose, and only towards not embedded. Written here as
+# the decisions word it, not read from the path map: the archived start-up documents (path map ``history-archive``),
+# and the old decision register, archived read-only after audit 8 (DEC-1214 G4, W2-203; path map ``archive``). The
+# register in force keeps its embedding: its kept entries are what memory answers from.
+ARCHIVED_NOT_EMBEDDED = ("docs/emergency-2/archive/**", "docs/archive/**")
+REGISTER, REGISTER_ARCHIVE = "docs/DECISION_REGISTER.md", "docs/archive/DECISION_REGISTER-2026-11-19.md"
+
 
 def test_guard_outside_template_every_verdict_as_at_the_base(tmp_path):
     base = tmp_path / "base"
@@ -114,8 +121,11 @@ def test_guard_outside_template_every_verdict_as_at_the_base(tmp_path):
     head, before = _selected(ROOT, outside, head_db), _selected(base, outside, base_db)
     still = sorted(head & cut)
     assert still == [], f"{len(still)} files of D-7's cut still embedded, e.g. {still[:5]}"
-    # EMERGENCY-2 11.3: the archived start-up documents leave memory's index on purpose (path-map history-archive)
-    archived = {rel for rel in outside if _matches(rel, "docs/emergency-2/archive/**")}
+    archived = {rel for rel in outside if any(_matches(rel, pattern) for pattern in ARCHIVED_NOT_EMBEDDED)}
+    assert REGISTER_ARCHIVE in archived, f"{REGISTER_ARCHIVE} is not a tracked file: the exception would be vacuous"
+    still = sorted(head & archived)
+    assert still == [], f"{len(still)} archived files still embedded, e.g. {still[:5]}"
+    assert REGISTER in head and REGISTER in before, "the decision register in force lost its embedding"
     moved = sorted((head ^ before) - cut - archived)
-    assert moved == [], f"{len(moved)} files outside template/ and D-7's cut gained or lost their embedding, " \
-                        f"e.g. {moved[:5]}"
+    assert moved == [], f"{len(moved)} files outside template/, D-7's cut and the archives gained or lost their " \
+                        f"embedding, e.g. {moved[:5]}"

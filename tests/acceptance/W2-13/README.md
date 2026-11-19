@@ -422,6 +422,17 @@ two repository cases red (D-7).
 - **G4 extended** (DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068; the CTO's `363c1459`).
   `KEPT_OUT_BY_DECISION` also names `docs/research/memory-measure-audit/**` (3 tracked files), whose `VISIBLE.md`
   quotes the visible questions. Without it the converse was red on `363c1459`, as it should be.
+- **The archives** (EMERGENCY-2 §11.1 and §11.3; revised 2026-11-19 for W2-203, DEC-1214 G4).
+  `tests/acceptance/W2-13/test_w2_13_lexical_policy.py::test_the_repository_keeps_nothing_else_out_of_the_keyword_index`
+  (line S6) now expects four namespaces to say `lexical_policy: not indexed`: `evaluation-sources`,
+  `evaluation-fixtures`, `history-archive` (`docs/emergency-2/archive/**`, the archived start-up documents) and
+  `archive` (`docs/archive/**`, the old decision register archived read-only after audit 8, W2-203 S1).
+  `KEPT_OUT_BY_DECISION` names `docs/archive/**` beside the earlier patterns. The case also holds that a tracked file
+  under `docs/archive/` is kept out and that the register in force, `docs/DECISION_REGISTER.md`, is not. Red before
+  the revision on the tree W2-203 landed in: "the namespaces that say lexical_policy: not indexed are ['archive',
+  'evaluation-fixtures', 'evaluation-sources', 'history-archive'], not [...]: extra ['archive']". Still red for any
+  fifth namespace marked `not indexed`, for a file kept out that none of the patterns names, and for the register in
+  force kept out.
 
 ## Rewrite after implementation (DEC-1000, P-W2-13-3 (b))
 
