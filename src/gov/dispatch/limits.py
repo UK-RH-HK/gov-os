@@ -82,6 +82,14 @@ def _exact(value) -> Fraction:
     return Fraction(str(value))
 
 
+def workers_for(load_limit, start_below, margin: float, slots: int) -> int:
+    """Workers per slot for ``slots`` slots: ``max(1, floor((load_limit - start_below) / (margin x slots)))``, in exact
+    fractions; 1 where the limit is unknown."""
+    if not load_limit or start_below is None or not slots:
+        return 1
+    return max(1, math.floor((_exact(load_limit) - _exact(start_below)) / (_exact(margin) * slots)))
+
+
 def derive(cpus: int | None, ram: int | None, gpu_total: int | None, sizes: dict, margin: float = 1.0,
            start_below: float | None = None) -> dict:
     """Each limit by its rule; None where its CPU reading is missing. ``start_below`` is the effective start
@@ -96,7 +104,7 @@ def derive(cpus: int | None, ram: int | None, gpu_total: int | None, sizes: dict
         heavy = max(1, heavy)
         low = round(START_RATIO * cpus, 6) if start_below is None else start_below
         limit = cpus
-        workers = max(1, math.floor((_exact(limit) - _exact(low)) / (_exact(margin) * heavy)))
+        workers = workers_for(limit, low, margin, heavy)
         sessions = math.floor(SESSIONS_CPU * cpus)
         if ram and sizes.get("working_size_bytes"):
             sessions = min(sessions, math.floor(SESSIONS_RAM * ram / sizes["working_size_bytes"]))

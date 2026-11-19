@@ -440,7 +440,7 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
     slot holds it. A nested run (``GOV_HEAVY_ADMITTED``) runs at once; ``held`` (``"1,2"``) runs with those slots'
     CPUs and takes no lock."""
     from gov.cli.errors import GovError
-    from gov.dispatch import admission
+    from gov.dispatch import admission, limits
     from gov.resources import config as configuration
 
     if kind not in KINDS:
@@ -463,7 +463,10 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
     per_slot = workers
     if per_slot is None:
         given = os.environ.get("GOV_HEAVY_WORKERS", "").strip()
-        per_slot = int(given) if given.isdigit() and int(given) >= 1 else (sized["workers_per_slot"] or 1)
+        if given.isdigit() and int(given) >= 1:
+            per_slot = int(given)
+        else:  # the workers that fit the gate for the slot count in force (a file's or variable's count too)
+            per_slot = limits.workers_for(sized["load_limit"], sized["start_below"], sized["margin"], count)
     tree = os.path.realpath(tree or os.getcwd())
     named = _held_slots(held, count) if held is not None else None
     if held is not None and not named:

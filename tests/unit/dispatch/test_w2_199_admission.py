@@ -168,6 +168,12 @@ def test_slots_and_workers_follow_the_gate(cpus, ram, slots, workers):
     assert found["start_below"] == pytest.approx(0.6 * cpus) and found["load_limit"] == cpus
 
 
+@pytest.mark.parametrize("slots,margin,expected", [(3, 1.0, 2), (1, 1.0, 8), (2, 1.0, 4), (2, 2.0, 2), (30, 1.0, 1)])
+def test_workers_for_the_slot_count_in_force(slots, margin, expected):
+    assert limits.workers_for(20, 12.0, margin, slots) == expected
+    assert limits.workers_for(None, None, 1.0, 2) == 1
+
+
 def test_the_ram_term_binds_the_slots(box):
     found = limits.derive(32, 64 * GIB, None, {"verification_peak_bytes": 16 * GIB})
     assert found["heavy_slots"] == 2 and found["workers_per_slot"] == 6

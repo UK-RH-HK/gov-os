@@ -78,6 +78,22 @@ def test_workers_with_held_is_the_whole_count_and_without_it_the_derived_count_t
     command = ["sh", "-c", f"echo $PYTEST_XDIST_AUTO_NUM_WORKERS > {out}"]
     planted.config(heavy_slots=3)
     slots.run("test", command, held="1,2")
-    assert out.read_text().strip() == "8"  # 4 workers a slot x 2 held
+    assert out.read_text().strip() == "4"  # 3 slots on 20 CPUs: 2 workers a slot x 2 held
     slots.run("test", command, held="1,2", workers=1)
     assert out.read_text().strip() == "1"  # the caller's own count
+
+
+def test_a_runs_default_workers_follow_the_slot_count_in_force(planted, tmp_path, monkeypatch):
+    out = tmp_path / "w"
+    command = ["sh", "-c", f"echo $PYTEST_XDIST_AUTO_NUM_WORKERS > {out}"]
+    planted.config(heavy_slots=3)
+    slots.run("test", command)
+    assert out.read_text().strip() == "2"  # floor((20 - 12) / (1.0 x 3))
+    monkeypatch.setenv("GOV_HEAVY_SLOTS", "1")
+    slots.run("test", command)
+    assert out.read_text().strip() == "8"
+    monkeypatch.setenv("GOV_HEAVY_WORKERS", "5")
+    slots.run("test", command)
+    assert out.read_text().strip() == "5"  # the variable still wins
+    slots.run("test", command, workers=3)
+    assert out.read_text().strip() == "3"  # and --workers wins over it
