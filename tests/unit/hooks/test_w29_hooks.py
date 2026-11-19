@@ -160,6 +160,7 @@ class TestStopHook:
              mock.patch.dict(os.environ, {"CLAUDE_PROJECT_DIR": "/tmp/x"}, clear=False):
             env = os.environ.copy()
             env.pop("GOV_TICKET", None)
+            env.pop("GOV_MSG_ADDRESS", None)  # W2-205: the stop check runs without a ticket; never on a real inbox
             with mock.patch.dict(os.environ, env, clear=True), \
                  mock.patch("gov.checkpoint.record.write") as write:
                 stop.main()

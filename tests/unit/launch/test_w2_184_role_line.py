@@ -130,9 +130,9 @@ def test_every_kernel_role_file_s_line_parses(path, tmp_path):
             assert model.startswith("claude-") and effort in role.EFFORTS
 
 
-def test_the_qa_engineer_s_c2_is_the_full_form():
+def test_the_qa_engineer_s_c2_is_sonnet_on_every_profile():  # W2-201 S1 (DEC-1214 K1): no Opus on FULL any more
     table = role.read_by_criticality(REPO, "qa-engineer")
-    assert table["C2"] == {"full": ("claude-opus-5-5", "high"), "other": ("claude-sonnet-5-5", "high")}
+    assert table["C2"] == {"full": ("claude-sonnet-5-5", "high"), "other": ("claude-sonnet-5-5", "high")}
 
 
 def test_the_engineer_s_table_is_the_kernel_s():

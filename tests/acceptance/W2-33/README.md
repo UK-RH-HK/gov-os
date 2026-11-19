@@ -94,14 +94,24 @@ rules and the roster of files (`role_faults`); the content statements of S1, S3,
    requires a well-formed `Launch default` line and does not assert its value (the lead's suggestion, Sonnet high, the
    C1 value, is not required). **C0.** S7 gives no C0 value (RUBRIC-2-APPLY.md:23: "Haiku or deterministic"); the case
    requires the `C0` entry to be present and of the form `C0 model <id>, effort <e>` and asserts no value.
-4. **S7, "absent".** For orchestrator, ticket-lead, senior-engineer, independent-auditor, product-spec and research a
-   `Launch by criticality` line is a failure (the Interface: "only where RUBRIC-2 varies").
+4. **S7, "absent".** For orchestrator, ticket-lead, senior-engineer, product-spec and research a `Launch by
+   criticality` line is a failure (the Interface: "only where RUBRIC-2 varies"; the independent auditor varies since
+   DEC-1214 K1, reading 5c).
 5. **S7, D-10.** A role file fails when one of its statements joins `D-10` to a model, Opus, Sonnet or a launch (the
    through-D-10 rule is the CTO's launch practice, in no role file). A bare mention of D-10 (a path map) passes.
 5b. **S7, the lead roles' model (rewritten 2026-11-18).** DEC-1212 (3) (the owner) put every lead on Sonnet: the table's
     rows for `orchestrator`, `ticket-lead` and `senior-engineer` are `claude-sonnet-5-5`, effort high (the role files say so
    since 24a384ae8; the line form was fixed in 76073838d), and S8's exact Launch default line for `senior-engineer` is the
    Sonnet form. `independent-auditor` stays on Opus, effort high.
+5c. **S7, the table as DEC-1214 K1 changes it (rewritten 2026-11-18 night, W2-201 S1; supersedes 5b and the QA part of
+    3).** Audit 4's Table 3 with audit 09's model changes: `orchestrator` (the CTO) and `senior-engineer` are
+    `claude-opus-5-5`, effort high, no table line (S8's exact line for `senior-engineer` is the Opus form); `ticket-lead`
+    stays Sonnet; `independent-auditor`'s default is Sonnet, effort high, and it carries a table line (C3 Opus, C2 and C1
+    Sonnet, C0 well formed); `qa-engineer`'s default is Sonnet, effort high (now asserted), and its C2 entry is plain
+    Sonnet, effort high (no Opus on FULL). F2's plants follow: `qa-c2-opus-on-full-again` writes the old FULL form back
+    (was `qa-c2-not-the-full-form`), and the "line where RUBRIC-2 does not vary" is planted in `orchestrator.md` (was
+    the auditor's). Red on W2-201's base: the role files still give the old values, so S7's four rows, S8's senior
+    engineer case and every F2 case (whose control is the real folder passing unplanted) fail until W2-201 lands.
 6. **One line.** The work order and one-writer sentences must be one physical line (the KPI says "in one line"; the
    launcher's reader needs one line for its own forms).
 7. **S4, denial of reads.** The `Allowed paths` item of each of the two files must hold one statement with "read", "work",
