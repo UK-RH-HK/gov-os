@@ -5,11 +5,14 @@ hook reads it there; a ticket in no worktree is still unreadable (Sonnet). Build
 from __future__ import annotations
 
 import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
-import test_w2_201_agent_model as base
-from test_w2_201_agent_model import FABLE, bed, passes, refuses, run, substitution, ticket  # noqa: F401
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # the sibling builder file, whatever folder pytest starts in
+import test_w2_201_agent_model as base  # noqa: E402
+from test_w2_201_agent_model import FABLE, bed, passes, refuses, run, substitution, ticket  # noqa: E402,F401
 
 GIT_ENV = {"PATH": "/usr/bin:/bin", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid",
            "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid", "HOME": "/nonexistent"}

@@ -1,6 +1,6 @@
 ---
 id: DAEO-k1us
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-5rgj, DAEO-lrre, DAEO-6f0s]
 created: 2026-11-18T23:30:00Z
@@ -86,3 +86,5 @@ This ticket is C3 itself, so its test designer and engineer run Opus.
 ephemeral_5m: 0}`. Both variables work on this CLI; the launcher keeps the first (already in the base).
 
 **Fix at the land, 2026-11-19 02:17 (the CTO; the merge was at 02:15; EMERGENCY-2 4.2):** the helper rule read a spawn's ticket only from the project's own `.tickets/`, but a lead writes its feature as a ticket on its own branch, so every running C3 lead's Fable helpers would have been refused from the moment this merged (five leads were running, their tickets W2-200, W2-203, W2-204, W2-205, W2-206 on their branches). The hook now reads a ticket the project does not hold from the repository's other worktrees (`git worktree list`); the project's own copy wins; a ticket in no worktree is still unreadable (Sonnet). The failing tests first: `tests/unit/hooks/test_w2_201_agent_model_worktree.py` (2 of 5 red before, 5 green after; the hook's 65 older unit cases green).
+
+**Closed at the land, 2026-11-19 02:28 (the CTO; EMERGENCY-2 4.3 step 5):** merged as bb3a7bb3e (branch `e2/k1-usage` at d5b7caaad), with the fix above (c3c5a836f). On the merged tree, through the slot with workers: `tests/acceptance/W2-201`, `W2-33`, `W2-184`, `W2-153`, `W2-60a`, `W2-60b`, `W2-195`, `W2-156`, `W1-33`, `tests/unit/launch`, `hooks`, `adapters`, `optin`: 2,724 passed, 24 skipped, and 1 collection error that was the CTO's own new unit file (it imported its sibling by bare name; fixed, `tests/unit/hooks` then 201 passed); `gov accept W2-201`: 240 passed, 0 failed. The CTO's rulings on the lead's lines: the QA engineer's C2 review on Sonnet stays (DEC-1214 K1, "C2 auditors included"); the auditor and the QA engineer stay in the exceptions file for C3 only; the senior engineer's model goes to the owner as one line (K1-1); a W2-184 promotion's Opus under DEC-1215's substitution is a fix still owed in this record. The usage logger's one-hour floor (a scratch tool, not held by this ticket's code) was applied by the CTO at 02:17.
