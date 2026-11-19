@@ -406,8 +406,13 @@ def input_hashes(record: dict) -> dict:
     return {item["id"]: item.get("hash") for item in inputs if isinstance(item, dict) and "id" in item}
 
 
-def ticket_hash(project: CloseProject, ticket: str = TICKET) -> str:
-    return "sha256:" + hashlib.sha256((project.root / f".tickets/{ticket}.md").read_bytes()).hexdigest()
+def ticket_hash(project: CloseProject, commit: str, ticket: str = TICKET) -> str:
+    """``sha256:<hex>`` of the ticket file as the commit the close measured holds it (the close's ``tk close`` rewrites
+    the file afterwards, ``status: closed``, so the working file is not what was measured)."""
+    done = subprocess.run([REAL_GIT, "show", f"{commit}:.tickets/{ticket}.md"], cwd=str(project.root),
+                          env=project.env, capture_output=True, timeout=60)
+    assert done.returncode == 0, f"git show {commit}:.tickets/{ticket}.md failed: {done.stderr!r}"
+    return "sha256:" + hashlib.sha256(done.stdout).hexdigest()
 
 
 # --------------------------------------------------------------------------

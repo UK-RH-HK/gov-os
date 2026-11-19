@@ -44,7 +44,8 @@ def s3_world(tmp_path_factory):
     base, project = _project(tmp_path_factory, "s3", s.S3_REGISTER, sources=s.S3_SOURCES, decisions=s.S3_DECISIONS,
                              success=s.S3_SUCCESS, failure=s.S3_FAILURE)
     twin = project.clone(base)
-    return SimpleNamespace(project=project, run=project.close(), twin=twin, twin_run=twin.close())
+    measured = project.head()   # the commit the close measures: HEAD before the close
+    return SimpleNamespace(project=project, measured=measured, run=project.close(), twin=twin, twin_run=twin.close())
 
 
 @pytest.fixture(scope="session")
@@ -99,7 +100,8 @@ def s6_no_register(tmp_path_factory):
 def s6_no_citation(tmp_path_factory):
     """S6, fourth fixture: a ticket that cites no decision at all."""
     _, project = _project(tmp_path_factory, "s6-none", s.PLAIN_REGISTER, sources=[])
-    return SimpleNamespace(project=project, run=project.close())
+    measured = project.head()   # the commit the close measures: HEAD before the close
+    return SimpleNamespace(project=project, measured=measured, run=project.close())
 
 
 @pytest.fixture(scope="session")

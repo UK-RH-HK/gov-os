@@ -27,7 +27,7 @@ def test_s3_inputs_hold_the_ticket_then_each_applied_decision_with_the_hash_of_i
     record = _record(s3_world)
     inputs = record.get("inputs")
     assert isinstance(inputs, list) and inputs, f"no inputs: {sorted(record)}"
-    assert inputs[0] == {"id": s.TICKET, "hash": s.ticket_hash(s3_world.project)}, f"the first input is {inputs[0]!r}"
+    assert inputs[0] == {"id": s.TICKET, "hash": s.ticket_hash(s3_world.project, s3_world.measured)}, f"the first input is {inputs[0]!r}"
     assert [item.get("id") for item in inputs[1:]] == s.S3_APPLIED, f"the decision inputs are {inputs[1:]!r}"
     expected = s.span_hashes(s.S3_REGISTER, s.S3_APPLIED)
     for item in inputs[1:]:

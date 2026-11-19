@@ -98,8 +98,12 @@ cases are green as well, and every other case is red for the reason in the map.
 - **S1's `gov check`**: `gov check` names every family of its own list whether or not a check is declared, so
   "names no `context-reproducibility` family" needs the family out of that list too (sixteen families, not CAP-38.b's
   seventeen). W1-26's family cases are rewritten to sixteen (below).
-- **The strict close.** The worlds run the strict close (the product default). Whether the scoped close
-  (`close: scoped`) records the decisions too is not stated by the ticket and not tested: returned as a package.
+- **The strict close.** The worlds run the strict close (the product default). The lead decided that every path that
+  writes a close record (plain, scoped/selected, batch) records the decision lists; no case here covers the scoped or
+  the batch path (each would be a slow run of its own): that is said in the designer's return, not tested.
+- **The ticket's own input** is the sha256 of the ticket file as the commit the close measured holds it (HEAD before the
+  close, read with `git show`): `tk close` rewrites the working file afterwards (`status: closed`). Revised after the
+  engineer's measurement (the two cases first hashed the working file after the close).
 - **S9's walk** reads every `*.py` under `tests/` but this folder and the Retired list, line by line, for the four
   patterns (`PATTERNS` in the S9 file: an import or mention of `gov.context`; the command line `gov context` or a call
   that hands `"context"` to `gov`; `context-reproducibility` in any spelling; `close_context_tokens`). One exemption: a

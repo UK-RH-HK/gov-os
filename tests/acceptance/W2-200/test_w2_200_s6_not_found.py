@@ -63,4 +63,4 @@ def test_s6_a_ticket_citing_no_decision_closes_with_empty_lists(s6_no_citation):
     record = s6_no_citation.project.record()
     for key in ("decisions_applied", "decisions_not_standing", "decisions_unresolved"):
         assert record.get(key) == [], f"{key} is {record.get(key)!r}, not []"
-    assert record.get("inputs") == [{"id": s.TICKET, "hash": s.ticket_hash(s6_no_citation.project)}], record.get("inputs")
+    assert record.get("inputs") == [{"id": s.TICKET, "hash": s.ticket_hash(s6_no_citation.project, s6_no_citation.measured)}], record.get("inputs")
