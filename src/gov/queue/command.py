@@ -12,8 +12,11 @@ A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (
    A branch whose tip is already on the integration branch (merged by hand) is landed alone and without a merge:
    its change is counted from the head before the merge that brought it.
 2. **Checks** on ``<head>..<tip>`` (``gov.queue.checks``): G-1 refuses a ticket (``TEST_AUTHOR_REFUSED``, out of
-   the batch before the run); a path outside ``allowed_paths`` is a notice. A ticket judged on its tests whose
-   acceptance folder holds no test is refused (``NO_ACCEPTANCE_TESTS``), and one whose README the runner of
+   the batch before the run); a path outside ``allowed_paths`` is a notice, and so is a ticket file the branch adds
+   that is not a feature (no ``kpis.success`` line with its verify, or no spec: ``NEW_TICKET_NOT_FEATURE``, W2-201
+   fix X4, DEC-1219 (5)), said as one line on stderr and kept under ``ticket_notices``, in the answer, ``queue.json``
+   and the landed ticket's close record; neither notice refuses or changes the exit code. A ticket judged on its
+   tests whose acceptance folder holds no test is refused (``NO_ACCEPTANCE_TESTS``), and one whose README the runner of
    ``gov accept`` cannot judge by, with the runner's code. A ticket of a class judged on a record (research,
    audit, coordination, specification) is judged by the close's own gate of that record, in the clone, and needs
    no test folder; a record the gate refuses puts the ticket out of the batch with the gate's code.
@@ -235,6 +238,13 @@ def _checks(root: Path, base: str, cand: dict, result: dict) -> bool:
     from gov.queue import checks
 
     ticket, tip, base = cand["ticket"], cand["tip"], cand["since"]
+    try:  # W2-201 X4: a new ticket that is not a feature is named, never refused (DEC-1219 (5))
+        for notice in checks.ticket_notices(root, base, tip):
+            result["ticket_notices"].append({"ticket": ticket, **notice})
+            print(notice["notice"], file=sys.stderr)
+    except (RuntimeError, ValueError) as e:  # a notice only: the landing goes on
+        print(f"gov queue: {ticket}: the ticket files its branch adds cannot be read: {' '.join(str(e).split())}",
+              file=sys.stderr)
     places = list(dict.fromkeys(p for p in (ACCEPTANCE, _acceptance(cand["front"]), _acceptance(cand["at_tip"])) if p))
     allowed = [p for p in cand["at_tip"].get("allowed_paths") or [] if isinstance(p, str)]
     try:
@@ -356,7 +366,8 @@ def _close_all(root: Path, clone: Path, cands: list[dict], record: dict, result:
         ticket = cand["ticket"]
         own = {**record, "branch": {"name": cand["branch"], "tip": cand["tip"]},
                "acceptance": cand["acceptance"],
-               "path_notices": [n for n in result["path_notices"] if n["ticket"] == ticket]}
+               "path_notices": [n for n in result["path_notices"] if n["ticket"] == ticket],
+               "ticket_notices": [n for n in result["ticket_notices"] if n["ticket"] == ticket]}
         close_rel, _ = close._record_and_close(clone, ticket, own, _changed(root, cand["since"], cand["tip"]))
         places = [p for p in (f".tickets/{ticket}.md", f"docs/close/{ticket}", f"docs/checkpoints/{ticket}")
                   if (clone / p).exists()]
@@ -556,7 +567,7 @@ def land(root: Path, given: list[str], onto: str | None = None,
     result = {"onto": onto, "base": base, "candidates": [c["ticket"] for c in cands], "landed": [], "culprits": [],
               "refused": [], "reds": [], "base_reds": [], "flaky": [], "tested": None, "head": None, "closes": [],
               "selection": {"suites": [], "pytest_options": []}, "runs": [], "acceptance": [], "path_notices": [],
-              "seconds": seconds, "record": f"{QUEUE_DIR}/{stamp}/queue.json"}
+              "ticket_notices": [], "seconds": seconds, "record": f"{QUEUE_DIR}/{stamp}/queue.json"}
 
     def finish(code: int, error: GovError | None = None):
         seconds["total"] = round(time.monotonic() - start, 3)
