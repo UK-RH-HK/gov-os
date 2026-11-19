@@ -11,7 +11,10 @@ register ``HEAD`` holds (``gov.util.register.read``). No store, no retrieval, no
 - ``not_standing``: ``{id, status}`` for each cited decision that no longer stands, sorted by number; never applied.
 - ``unresolved``: the ids the register does not hold that the ticket names only in a KPI line, and every cited id
   where the project's path map names no register.
-- An id named in ``sources`` or ``decisions`` that the register does not hold refuses: ``DECISION_NOT_FOUND``, naming
+- An id only the archived register holds (the path map's ``decision_register_archive``) is ``not_standing`` with the
+  state ``ARCHIVED``: history, never applied, never a refusal.
+- An id named in ``sources`` or ``decisions`` that neither the register nor the archive holds refuses:
+  ``DECISION_NOT_FOUND``, naming
   the ticket and every such id. The caller asks before any gate runs, so nothing is written.
 
 Ids of other forms (CAP-, W2-, MR-, paths, document names) are not decisions and are left alone.
@@ -25,6 +28,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 
 NOT_FOUND = "DECISION_NOT_FOUND"
+ARCHIVED = "ARCHIVED"  # the state of a decision only the archived register holds
 NO_LONGER_STANDS = ("SUPERSEDED", "RETIRED", "REJECTED")
 TICKETS_REL = ".tickets"
 
@@ -74,7 +78,11 @@ def decisions_of(root: Path, ticket: str, front: dict) -> dict:
     entries: dict[str, dict] = {}
     for entry in register["entries"]:
         entries.setdefault(entry["id"], entry)
-    missing = sorted((found for found in declared if found not in entries), key=_number)
+    # A decision the register no longer holds because it is in the archive (EMERGENCY-2 11.3; W2-203) is history: it
+    # is no missing decision. It is listed as no longer standing (ARCHIVED) and never applied.
+    from gov.util import archive as _archive
+    archived = _archive.read(Path(root)) or {}
+    missing = sorted((found for found in declared if found not in entries and found not in archived), key=_number)
     if missing:
         raise GovError(NOT_FOUND, f"{ticket} names {', '.join(missing)} in its sources or decisions, and the decision "
                                   f"register {register['path']} of HEAD does not hold "
@@ -82,7 +90,9 @@ def decisions_of(root: Path, ticket: str, front: dict) -> dict:
                        {"ticket": ticket, "missing": missing, "register": register["path"]})
     for found in every:
         entry = entries.get(found)
-        if entry is None:
+        if entry is None and found in archived:
+            result["not_standing"].append({"id": found, "status": ARCHIVED})
+        elif entry is None:
             result["unresolved"].append(found)
         elif entry["status"] in NO_LONGER_STANDS or found in register["superseded"]:
             status = entry["status"] if entry["status"] in NO_LONGER_STANDS else "SUPERSEDED"
