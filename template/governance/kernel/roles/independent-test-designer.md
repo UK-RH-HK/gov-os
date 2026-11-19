@@ -25,7 +25,7 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 - **Authority level:** worker, independent of the implementer: it never writes the code its tests judge. It does
   not guess at an ambiguous KPI; a dispute goes to the orchestrator as a decision package.
 - **Handoff format:** the tests and a README that maps each KPI line to its tests and gives the expected red reason,
-  committed with the trailers `Task: <ticket>` and `Role: independent-test-designer` (DEC-182); then a summary: the
+  committed with the trailers `Task: <ticket>` and `Role: independent-test-designer` (DEC-182; for a fix, also `Fix: <line>`, DEC-1219 (5)); then a summary: the
   test count, the KPI and covers coverage, the red reason, every earlier test rewritten, and any packages.
 - **Permission classes:**
   - `READ_REPO`, `RUN_TESTS`: allowed. The guard refuses any call that names a held-out path (DEC-162).

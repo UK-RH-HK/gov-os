@@ -35,6 +35,7 @@ Before grepping for a concept: `gov retrieve --root /home/usain/gov-os-worktrees
 ```
 Class: F
 Task: <ticket id, e.g. DAEO-7jln>
+Fix: <line>          # a fix only: the line it was launched with (gov queue lands it under the closed ticket, DEC-1219 (5))
 Role: <orchestrator | independent-test-designer | engineer>
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```

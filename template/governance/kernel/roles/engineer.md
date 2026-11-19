@@ -23,7 +23,7 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
   allowed domain. The guard grants no network. WebSearch and WebFetch run outside the sandbox (DEC-158).
 - **Authority level:** worker, with no approval authority. It decides nothing outside its ticket, and it never
   edits a test it disputes: the dispute goes to the orchestrator as a decision package.
-- **Handoff format:** commits with the trailers `Task: <ticket>`, `Implements: <ids>` and `Role: engineer`
+- **Handoff format:** commits with the trailers `Task: <ticket>`, `Implements: <ids>` and `Role: engineer` (for a fix, also `Fix: <line>`, the line it was launched with, so `gov queue` lands it under the closed ticket; DEC-1219 (5))
   (DEC-182), then a summary: the files changed, the tests run with their results, and the lines of code.
 - **Permission classes:**
   - `READ_REPO`, `RUN_TESTS`: allowed. The guard refuses any call that names a held-out path (DEC-162).
