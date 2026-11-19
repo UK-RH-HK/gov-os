@@ -72,7 +72,7 @@ non_goals:
 - 'Releasing 0.1.4 and EXAMIN''s update to it (the owner''s); this repository''s own `.claude/settings.json` and `.rulesync/` (not the kit''s)'
 - 'Changing `held-out.yaml`, `load_held_out` or the transcript scan'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [EMERGENCY-2 2.2, 2.4, 2.7, 3.7, DEC-1217 (6), DEC-1217 (7), DEC-1204, DAEO-sdhj, docs/emergency-2/briefs/LEAD-kit-e2.md]
+sources: ["EMERGENCY-2 2.2", "EMERGENCY-2 2.4", "EMERGENCY-2 2.7", "EMERGENCY-2 3.7", "DEC-1217 (6)", "DEC-1217 (7)", DEC-1204, DAEO-sdhj, docs/emergency-2/briefs/LEAD-kit-e2.md]
 acceptance_tests:
   path: tests/acceptance/W2-208/
   author: independent-test-designer (MR-3); written before implementation

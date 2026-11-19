@@ -8,7 +8,7 @@ description: "Method for running a wave: parallel tickets under ticket leads, in
 
 # Orchestration
 
-A method for the orchestrator role and its ticket leads: the way a wave is run. The guard, the launcher and the role file decide what a session does; this skill is the method only and grants nothing (CAP-24.b). Each rule names its decision; a rule only an orchestrator's prompt held is cited with DEC-537, which ordered it stated here. A project's own values (branches, folders, thresholds, the model) stand as `<placeholders>` (DEC-539). Tests are named in the project's terms: the project's test command, the ticket's acceptance tests, the builder tests (DEC-534). Detail: `briefs-and-returns.md`.
+A method for the orchestrator role and its ticket leads: the way a wave is run. The launcher and the role file decide what a session does; this skill is the method only and grants nothing (CAP-24.b). Each rule names its decision; a rule only an orchestrator's prompt held is cited with DEC-537, which ordered it stated here. A project's own values (branches, folders, thresholds, the model) stand as `<placeholders>` (DEC-539). Tests are named in the project's terms: the project's test command, the ticket's acceptance tests, the builder tests (DEC-534). Detail: `briefs-and-returns.md`.
 
 ## Parallel tickets
 
@@ -17,15 +17,14 @@ A method for the orchestrator role and its ticket leads: the way a wave is run. 
 - No fixed number of tickets in flight: the resource gate and the owner's usage limits decide (DEC-847). A ticket idle on an owner answer frees its slot (DEC-235, DEC-363).
 - The resource gate is read before each start: free memory of at least `<free memory>` and a load average below the core count. Heavy tickets count double (DEC-235).
 - No worktree is left behind: one whose ticket is closed is removed (DEC-235).
-- A new ticket only for a new feature: a fix launches under its owning ticket with `gov launch <role> <ticket> --fix "<line>"`, a chore with `gov launch <role> --chore "<line>"` and no ticket (DEC-1219 (5), (6)); every commit of a fix carries `Task: <owning ticket>` and `Fix: <line>`, or `gov queue` refuses the branch as a closed ticket's.
+- A new ticket only for a new feature: a fix launches under its owning ticket with --fix "<line>" and its commits carry Fix: <line>; a chore launches with --chore "<line>" and no ticket (DEC-1219 (5), (6)).
 
 ## Integration order
 
 1. The lead returns DONE. The orchestrator verifies the return itself, by its own runs: it reads every KPI clause against the tests and the code, and the governance checks of `gov check` against the last known state (DEC-236, DEC-449).
-2. For a FULL ticket a fresh reviewer probes the final code before the merge, and nothing is committed after the probed head (DEC-498) but its passing probe record (DEC-733).
-3. Only the orchestrator merges into the integration branch, and never into the main branch (DEC-235, DEC-416).
-4. Then the close: `gov close` runs the ticket's tests and the regression on the merge commit. Where the close does not follow the merge directly, a full regression runs (DEC-536), since DEC-968 the next nightly's; a close runs the scoped set.
-5. Residuals are recorded, and the worktree and the branch are removed (DEC-135, DEC-235).
+2. Only the orchestrator merges into the integration branch, and never into the main branch (DEC-235, DEC-416).
+3. Then the close: `gov close` runs the ticket's tests and the regression on the merge commit. Where the close does not follow the merge directly, a full regression runs (DEC-536), since DEC-968 the next nightly's; a close runs the scoped set.
+4. Residuals are recorded, and the worktree and the branch are removed (DEC-135, DEC-235).
 
 Merge queue: `integration-queue.md`; red nightly: `nightly-sheriff.md`; Emergency: `incident-response.md`.
 
@@ -40,7 +39,7 @@ The lead runs the loop from the lead template `role-lead.md` (DEC-1050, DEC-1052
 
 ## Decisions
 
-- Delegation: the orchestrator decides a package itself when all of these hold: it is P2 or P3; it is reversible; its recommendation and the proposer's agree; confidence is medium or higher (medium-low too for a P2, DEC-416); it changes nothing of the charter, the master rules or the contract's scope; it weakens neither the guard nor containment; it touches neither the held-out path, installs, merges into the main branch nor releases (MR-6, DEC-220, DEC-416).
+- Delegation: the orchestrator decides a package itself when all of these hold: it is P2 or P3; it is reversible; its recommendation and the proposer's agree; confidence is medium or higher (medium-low too for a P2, DEC-416); it changes nothing of the charter, the master rules or the contract's scope; it touches neither merges into the main branch nor releases (MR-6, DEC-220, DEC-416).
 - A stricter-only decision (the option refuses more, denies more or fails closed, and hinders no action of the owner) is delegated too, where every other condition holds (MR-6, DEC-537; so delegated in DEC-508 and DEC-525).
 - A decision is recorded as accepted before the change it authorises, then applied, and a delegated one is listed in the digest of delegated decisions at the next stop; the owner overturns any (DEC-220, DEC-463).
 - Everything else goes to the owner as a package from `decision-package.md`, in six parts (DEC-818): at most five packages with the owner at a time, and a P1 may bypass the cap (DEC-220).
