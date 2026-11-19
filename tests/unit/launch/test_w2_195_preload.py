@@ -70,12 +70,11 @@ def test_the_rulesync_mirror_preloads_judging_work_and_is_still_the_composition(
     assert mirror.read_text(encoding="utf-8") == portability.compose(REPO / "template", name)
 
 
-# The base these files are compared with: w2/integrate's head as last merged into this branch, i.e. the merge-base of
-# HEAD and w2/integrate, which holds none of W2-195's kernel changes, so the lines other tickets merged in (the owner's
-# launch defaults, DEC-1209's line in the orchestrator mirror) are not counted as W2-195's. A clone without the ref
-# falls back to PINNED, a commit that was integrate's head once (it can lag behind later merges). Once W2-195 has
-# landed, HEAD is integrate itself, the base holds the change already and the case skips.
+# The pre-W2-195 text these files are compared with: PINNED, the commit before W2-195, a fixed point (a moving base,
+# such as the merge-base with w2/integrate, would pin every later kernel-text edit). Only the Skills lines are read,
+# never the other lines of a file, which later tickets change. A clone without that commit checks the appending alone.
 PINNED = "9ef5cba29"
+SKILLS_LINE_START = re.compile(r"^(- \*\*Skills:\*\* |\s*skills: \[)")
 
 
 def _git(*args: str) -> str:
@@ -84,14 +83,30 @@ def _git(*args: str) -> str:
     return done.stdout if done.returncode == 0 else ""
 
 
-def _base() -> str:
-    return _git("merge-base", "HEAD", "w2/integrate").strip() or PINNED
+def _skill_names(line: str) -> list[str]:
+    """The skills a Skills line names: ``- **Skills:** a, b``, ``skills: [a, b]`` or ``skills: ["a", "b"]``."""
+    body = line.split("[", 1)[1].rstrip("]") if "[" in line else line.split("**Skills:**", 1)[1]
+    return [name.strip().strip('"') for name in body.split(",") if name.strip()]
 
 
-def _at_base(rel: str) -> list[str]:
-    text = _git("cat-file", "blob", f"{_base()}:{rel}")
-    assert text, rel
-    return text.split("\n")
+def _skills_lines(text: str) -> list[list[str]]:
+    return [_skill_names(line) for line in text.split("\n") if SKILLS_LINE_START.match(line)]
+
+
+@pytest.mark.parametrize("rel", [f"{role.ROLES_REL}/{name}.md" for name in FOUR]
+                         + [f"template/.rulesync/subagents/{name}.md" for name in FOUR]
+                         + ["template/governance/kernel/templates/role-reviewer.md"])
+def test_each_skills_line_ends_with_judging_work_and_lost_no_skill_since_pinned(rel):
+    now = _skills_lines((REPO / rel).read_text(encoding="utf-8"))
+    assert now, rel
+    assert all(names[-1] == "judging-work" and names.count("judging-work") == 1 for names in now), now
+    before = _git("cat-file", "blob", f"{PINNED}:{rel}")
+    if not before:
+        pytest.skip(f"{PINNED} is not in this clone: the appending alone was checked")
+    old = _skills_lines(before)
+    assert len(old) == len(now), (old, now)
+    for was, is_ in zip(old, now):
+        assert set(was) <= set(is_), (rel, was, is_)
 
 
 def _appended(line: str) -> str:
@@ -100,24 +115,6 @@ def _appended(line: str) -> str:
     if not line.endswith("]"):
         return line + ", judging-work"
     return line[:-1] + (', "judging-work"]' if '"' in line else ", judging-work]")
-
-
-@pytest.mark.parametrize("rel", [f"{role.ROLES_REL}/{name}.md" for name in FOUR]
-                         + [f"template/.rulesync/subagents/{name}.md" for name in FOUR]
-                         + ["template/governance/kernel/templates/role-reviewer.md"])
-def test_each_file_changes_only_its_skills_lines_by_appending_judging_work(rel):
-    old, new = _at_base(rel), (REPO / rel).read_text(encoding="utf-8").split("\n")
-    # W2-201 S1 changes the launch lines of these files (and adds the auditor's table line); they are no part of
-    # W2-195's change, so both sides are compared without them
-    old, new = ([line for line in side if not line.startswith(("- **Launch default:**", "- **Launch by criticality:**"))]
-                for side in (old, new))
-    if old == new:
-        pytest.skip("the base already holds W2-195's change (HEAD is integrate after the landing)")
-    assert len(old) == len(new)
-    changed = [(a, b) for a, b in zip(old, new) if a != b]
-    assert changed, rel
-    for a, b in changed:
-        assert re.match(r"^(- \*\*Skills:\*\* |  skills: \[|skills: \[)", a) and b == _appended(a), (a, b)
 
 
 PRELOADED_COPY = REPO / role.SKILLS_REL / "judging-work/SKILL.md"  # Gov OS's own copy, in rulesync's form

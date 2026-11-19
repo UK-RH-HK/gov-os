@@ -1,9 +1,10 @@
-# Contract v4 — machine-readable. Same content as CONTRACT_v4.md.
-id: CONTRACT-v4
+# Contract v5 — machine-readable. Same content as CONTRACT_v5.md.
+id: CONTRACT-v5
 status: ACCEPTED
-version: '4.4'
+version: '5.0'
 date: '2026-09-30'
 revised: '2026-11-18'
+charter: '6'
 change_log:
 - version: '4.0'
   date: '2026-09-30'
@@ -14,38 +15,65 @@ change_log:
     the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
     MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
     the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
-    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48, same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability). Owner decision during Wave 1, same version: new `CAP-37.g` on the new ticket W1-49 (DEC-248: light auto-resume hooks, a light form of CAP-37). Owner decision during Wave 1, same version: new `CAP-58.h` on the new ticket W1-50 (DEC-255: containment attribution by commit trailers).'
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after
+    the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58;
+    CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass
+    of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04;
+    CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no
+    install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e,
+    49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new
+    `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48,
+    same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under
+    DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on
+    W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability). Owner decision during
+    Wave 1, same version: new `CAP-37.g` on the new ticket W1-49 (DEC-248: light auto-resume hooks, a light form of CAP-37).
+    Owner decision during Wave 1, same version: new `CAP-58.h` on the new ticket W1-50 (DEC-255: containment attribution by
+    commit trailers).'
 - version: '4.2'
   date: '2026-10-17'
-  change: 'W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741).
-    Carries DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release
-    contents of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers
-    items: CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions)
+  change: 'W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741). Carries
+    DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release contents
+    of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers items:
+    CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions)
     and CAP-43.d (the rest of the release contents). CAP-44.h lists the ten ADOPTED_HEALTHY conditions of Adoption Protocol
     v3.0 §20, each marked W2 or W3, from the named read of Adoption Protocol v3.0 §20 and Distribution Protocol v1.2 §18 the
-    owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the
-    release''s manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release
-    tags) and CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343;
-    DEC-741). No capability changes wave; 62 capabilities; 211 → 214 covers items.'
+    owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the release''s
+    manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release tags) and
+    CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343; DEC-741).
+    No capability changes wave; 62 capabilities; 211 → 214 covers items.'
 - version: '4.3'
   date: '2026-11-09'
-  change: 'W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093).
-    Carries DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and
-    CAP-45 with it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated
-    source is the release''s manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part
-    of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers
-    items (W2 20 → 19, W3 38 → 39).'
+  change: 'W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093). Carries
+    DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and CAP-45 with
+    it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated source is the release''s
+    manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part of the authenticated source,
+    beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers items (W2 20 → 19, W3 38 → 39).'
 - version: '4.4'
   date: '2026-11-18'
   change: 'W2-192 specification change (docs/changes/W2-192-CIT-P.md), approved by the owner (DEC-1213). Carries DEC-1200
-    (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3.
-    62 capabilities; 215 covers items (W2 19 → 20).'
+    (4): the spec audit is a standard adoption stage, AS, after A2 and before A3, lite (CAP-44.m, W2). CAP-44 stays W3. 62
+    capabilities; 215 covers items (W2 19 → 20).'
+- version: '5.0'
+  date: '2026-11-18'
+  change: 'Re-baseline to EMERGENCY-2 (docs/emergency-2/audits/07-contract-rebaseline.md; owner decisions DEC-1214 G5, G6,
+    L3, M1, G7), proposed by group in docs/emergency-2/G5-APPROVAL.md and approved by the owner on 2026-11-19, DEC-1219 (G5-1 to G5-13 yes, G5-7 worded: the scan runs once before a repository goes public or is shared with a third party; CAP-63 to CAP-69 each yes). No guard, no sandbox,
+    no box (CAP-58, CAP-61, CAP-62 and their clauses dropped; §2 Boundary rewritten); pause carried by the launch, the dispatcher
+    and the landing (CAP-05); memory in the brief and a fresh 80 at 95 % end to end, `gov context` retired, hit@k a diagnostic
+    (CAP-01, CAP-10, CAP-15, CAP-17.b, CAP-19.c, CAP-48.a, §2 Token budget); the landing and the flow, no repair ticket, two
+    rounds (MR-1 to MR-3, CAP-23.c, CAP-31, CAP-38, CAP-39, CAP-53, CAP-59, §2 Loop budget); a fresh audit only at the release
+    acceptance and at adoption stages A5, AS, A7 and A10 (MR-4, CAP-47.d, CAP-38.f, CAP-24.c, CAP-33.d); the lean release
+    pinned and hash-verified, no signing, `gov update` in the release (CAP-02, CAP-43, CAP-45, CAP-44.f/.h, CAP-49); gitleaks
+    runs once before a repository goes public or is shared with a third party, never while it is private (CAP-03, CAP-41.g); the run-time tool and the rubric (CAP-04, CAP-22.b, CAP-23.b,
+    CAP-35, CAP-37, CAP-40); the CTO approves every install (§2 Tool installs, CAP-25); Wave 3 is friction. New CAP-63 to
+    CAP-69 (the landing, the run-time tool, memory by construction, the hidden-set scan, backups, the basis line, transcripts
+    kept). Status ACCEPTED. CAP-44.m''s leftovers settled: the records'' version, DEC-1200 in the
+    decisions list, the source map. 69 capabilities; 239 covers items.'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
-precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
+precedence: Charter v6 → Contract v5 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
   W1: Integrate
-  W2: Strengthen
-  W3: Complete
+  W2: 'Strengthen: everything the lean release must have (EMERGENCY-2 §8.1, §8.2)'
+  W3: 'Friction: built only when an adopted repository needs it, never before (EMERGENCY-2 §8.4)'
   NONE: dropped (non-goal)
 dispositions:
   KEPT: delivered in full
@@ -58,58 +86,71 @@ envelope:
       are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder
       gets its own index.
   ram_budget:
-    decision: DEC-078
+    decision:
+    - DEC-078
+    - DEC-1065
+    - DEC-1211
     statement: Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare;
       incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker,
-      VRAM peak ≈ 5.2 of 16 GiB.
+      VRAM peak ≈ 5.2 of 16 GiB. Embedders and rerankers stay resident on the GPU and never spill to the CPU (RT-4); there
+      is no CPU fallback (DEC-1065). Slots come from the CPU, RAM and GPU the run-time tool detects at start, with no machine-specific
+      constant (RT-3).
   token_budget:
     decision:
     - DEC-004
     - DEC-086
-    statement: Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance
-      tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance
-      MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads
-      are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md
-      ≤ ~1.5k tokens. A breach is a health finding, never a silent cost.
+    - DEC-1211
+    - DEC-1214
+    statement: 'Governance tokens ≤ 15 % of a ticket''s fresh input + output tokens, reported weekly with its baseline (56
+      % before EMERGENCY-2) by P1''s method until `gov telemetry` measures it (EMERGENCY-2 §10.2, A-7). Governance tokens
+      = text the Gov OS injects or returns (instruction files, the brief, hook output, `gov` output, governance MCP tool definitions,
+      checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately.
+      AGENTS.md ≤ ~1.5k tokens. There is no context packet and no packet ceiling anywhere: `gov context` is retired (DEC-1214
+      M1), and the brief carries the ticket''s retrieval uncut. A breach is a health finding, never a silent cost.'
   boundary:
     decision:
     - DEC-039
     - DEC-075
     - DEC-087
-    - DEC-152
-    - DEC-156
-    - DEC-161
-    statement: 'Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner''s machine,
-      GitHub Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at
-      G3 and leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and
-      only on green. `main` is not protected; enabling protection later changes no other decision. Containment has two guardrail
-      layers, neither of them a security boundary: in a worker session started by the launcher the OS sandbox is the outer
-      wall for everything a Bash command does (writes outside the repository, installs, network, reads of hidden paths), and
-      the guard with the permission rules is the wall for the file tools (Read, Edit, Write), which run outside the sandbox;
-      the orchestrator''s own session is not sandboxed and runs under the guard alone (DEC-152, DEC-156, DEC-161).'
+    - DEC-848
+    - DEC-1211
+    statement: No guard, no sandbox, no box and no permission prompts (EMERGENCY-2 §2). Agents have full permission in the
+      repository, the worktree and the run folder they work in; sessions stay apart by where each starts, the folders it is
+      given and its brief, and nothing enforces it. Mistakes are caught and corrected at the landing and by the transcript
+      scan, not prevented. The hard boundary is git history; the owner's own `git push` and release from his own terminal;
+      two settings deny lines, `git push` and `sudo`, which hold in every permission mode; and an hourly `git bundle` of each
+      repository, kept outside the tree. The landing merges into integration and only the owner pushes. The lefthook pre-push
+      gate G3 on the owner's machine and GitHub Actions CI G4–G5 stay as an advisory result on every push (deterministic checks
+      only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks). `main`
+      is not protected; enabling protection later changes no other decision.
   loop_budget:
     decision:
     - DEC-044
     - DEC-096
-    statement: 'Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) continues until
-      it converges or until three consecutive iterations fail to converge; the third failure produces an escalation package
-      for the owner (each iteration''s outcome, why it is not converging, options: fix differently, narrow, split, defer,
-      delete, continue), and the owner decides. The iteration count and budget are held by the orchestrator or gov and never
-      disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).'
+    - DEC-1204
+    - DEC-1211
+    statement: 'Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) runs at most two
+      rounds; if the second does not converge there is one escalation package for the owner (each round''s outcome, why it
+      is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides once. READY
+      is computed by code from the reviewers'' verdict blocks. The round count and budget are held by the orchestrator or
+      gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).'
   tool_installs:
     decision:
     - DEC-083
     - DEC-157
     - DEC-163
-    statement: 'The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
-      source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are
-      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside its own experiment folder, within its ticket''s `allowed_paths`, and the sandbox''s write fence enforces this (DEC-157, DEC-158, DEC-163).'
+    - DEC-1214
+    statement: The CTO approves and records every install in the tool registry (tool, exact version, source and checksum,
+      need, disk and RAM, uninstall command), so that nothing out of the work's scope or beyond the machine's capacity is
+      installed; there is no permission prompt, and `sudo` stays with the owner (DEC-1214 G7 (c)). Worker roles never install
+      system-wide.
 master_rules:
 - id: MR-1
   title: Specification comes first
-  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
-  acceptance: 'A production ticket whose specification has a required readiness cell open for its profile (FULL for a spine)
-    cannot reach READY: `tk ready` does not list it and `gov readiness` names the open cells; an N/A without a reason is rejected.'
+  text_source: architecture v0.3 §1A (Charter v6 §4)
+  acceptance: 'A feature ticket whose specification has a required readiness cell open for its profile (FULL for a spine)
+    cannot reach READY: `tk ready` does not list it and `gov readiness` names the open cells; an N/A without a reason is rejected.
+    READY is computed by code from the template; a fix or a chore has no ticket.'
   provider:
   - W1-12
   - W1-13
@@ -122,19 +163,22 @@ master_rules:
   sources:
   - DEC-065
   - DEC-085
+  - DEC-1052
+  - DEC-1116
+  - DEC-1211
 - id: MR-2
   title: Closed specifications generate the work
-  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
-  acceptance: A closed specification produces tickets with class, role, depends_on, allowed_paths, KPIs and profile, and `gov
-    check` fails a ticket missing any of them; every required open readiness cell has a linked gap ticket (discovery, data,
-    research or test-design) and `gov check` fails an unlinked one — created by the planning skill in W1, generated by `gov
-    readiness --generate` from W2.
+  text_source: architecture v0.3 §1A (Charter v6 §4)
+  acceptance: A closed specification produces feature tickets with class, role, depends_on, allowed_paths, KPIs and profile,
+    and `gov check` fails a ticket missing any of them; every required open readiness cell has a linked gap ticket (discovery,
+    data, research or test-design) and `gov check` fails an unlinked one — created by the planning skill, generated by `gov
+    discover` (`gov readiness --generate` is folded into it, W2-36).
   provider:
   - W1-14
   - W1-35
   - W1-13
   - W1-26
-  - 'W2: gov readiness --generate'
+  - W2-36 (gov discover)
   - W1-09
   - W1-42
   scenarios:
@@ -146,16 +190,15 @@ master_rules:
   sources:
   - DEC-065
   - DEC-089
+  - DEC-1211
 - id: MR-3
   title: KPIs; the builder never writes its own acceptance tests
-  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
-  acceptance: An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment
-    check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome.
-    The orchestrator may write anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it as to
-    every role but the Independent Test Designer (DEC-156).
+  text_source: architecture v0.3 §1A (Charter v6 §4)
+  acceptance: 'The landing refuses a commit that changes `tests/acceptance/` without `Role: independent-test-designer` (or
+    the owner''s `Role: owner`), naming the commit, in the Gov OS repository and in an adopted repository (`gov queue`); a
+    feature ticket is not READY until `tests/acceptance/<ticket-id>/` exists and its tests are red on the base; a breach is
+    a forbidden outcome.'
   provider:
-  - W1-02
-  - W1-03
   - W1-09
   - W1-30
   - W1-33
@@ -163,7 +206,7 @@ master_rules:
   - W1-26
   - W1-35
   - W1-42
-  - W1-45
+  - W2-115b
   scenarios:
     dev:
     - MR-A-01
@@ -171,17 +214,16 @@ master_rules:
   sources:
   - DEC-065
   - DEC-069
-  - DEC-076
-  - DEC-084
-  - DEC-150
-  - DEC-156
+  - DEC-906
+  - DEC-1211
 - id: MR-4
   title: Audit, discovery and impact are distinct functions
-  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
-  acceptance: Each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or skill and record; closing a spine,
-    STANDARD or FULL feature specification, an accepted CIT-E that changes a closed spine, and every wave or release exit
-    each create an audit ticket for a fresh auditor that authored none of the audited files; its report names the milestone,
-    and contested or owner-level findings appear in chat as decision packages.
+  text_source: architecture v0.3 §1A (Charter v6 §4)
+  acceptance: 'The functions stay distinct: each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or
+    skill and record. A fresh auditor that authored none of the audited files runs at the release acceptance and at adoption
+    stages A5, AS, A7 and A10; otherwise a review happens only for a red test, a failed landing or merge, or a feature that
+    does not work as intended, batched when several come together; the audit report names its milestone, and contested or
+    owner-level findings appear in chat as decision packages.'
   provider:
   - W1-27
   - W1-13
@@ -200,10 +242,11 @@ master_rules:
   - DEC-065
   - DEC-066
   - DEC-070
-  - DEC-088
+  - DEC-1204
+  - DEC-1214
 - id: MR-5
   title: The Gov OS works as a software company
-  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  text_source: architecture v0.3 §1A (Charter v6 §4)
   acceptance: Each Wave 1 role exists as a generated subagent definition with purpose, allowed-path pattern, tools, model
     tier, authority level and handoff format, and a ticket's role field names one of them.
   provider:
@@ -217,7 +260,7 @@ master_rules:
   - DEC-066
 - id: MR-6
   title: The human is the customer and final authority
-  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  text_source: architecture v0.3 §1A (Charter v6 §4)
   acceptance: Every owner question appears in the active chat as a package with all eight MR-6 fields (the template carries
     ten), ranked P1–P3 and batched at most five at a time, P1 allowed to bypass; the dependent branch waits while an independent
     branch proceeds; each answer is committed as a decision record.
@@ -237,8 +280,8 @@ capabilities:
   title: Authority precedence and hard invariants
   outcome: An agent can tell which of two conflicting records governs, by a deterministic precedence (Charter → Contract →
     ADRs → specifications → tasks → retrieval → inference) and by supersession status.
-  acceptance: Given two conflicting records at different precedence levels, `gov context` puts only the higher one in the
-    authority block and marks the lower one superseded.
+  acceptance: Given two conflicting records at different precedence levels, `gov retrieve` returns the higher one as in force
+    and marks the lower one superseded.
   wave: W1
   provider:
   - MADR + check-jsonschema 0.38.2
@@ -253,6 +296,7 @@ capabilities:
   - DEC-012
   - DEC-046
   - DEC-083
+  - EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
   scenarios:
     dev:
     - MR-A-06
@@ -301,15 +345,15 @@ capabilities:
     provider:
     - W1-24
 - id: CAP-02
-  title: 'Release authenticity (lite: signed git tags)'
+  title: 'Release authenticity (lite: pinned and hash-verified)'
   outcome: The owner can confirm that an installed kernel matches a released version.
-  acceptance: '`gov doctor` reports MATCH for the pinned `framework.lock` manifest, and DRIFT naming the edited file after
-    a one-byte edit; at Release 1, `git tag -v` verifies the release tag (CAP-02.c, W3).'
+  acceptance: '`gov doctor` reports MATCH for the pinned `framework.lock` manifest against the release''s own manifest and
+    file hashes, and DRIFT naming the edited file after a one-byte edit; a release is pinned and hash-verified, and no tag
+    signature is required.'
   wave: W1
-  wave_note: manifest check in W1; the signed v1.0.0 tag is made at Release 1
+  wave_note: manifest check in W1; releases are pinned and hash-verified; a signed tag waits for friction (DEC-1214 L3)
   provider:
   - Copier 9.18.2
-  - git SSH-signed tags
   - W1-39
   - W1-27
   sources:
@@ -322,6 +366,7 @@ capabilities:
   - DEC-027
   - DEC-074
   - DEC-083
+  - DEC-1214 L3
   scenarios:
     dev:
     - CHAOS-X-01
@@ -329,8 +374,9 @@ capabilities:
     - CHAOS-X-Q01
   disposition:
     class: LITE
-    lite_form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key
-      rotation, offline envelopes or bootstrap separation.
+    lite_form: A file-hash manifest in `framework.lock` and the release's own manifest and file hashes, verified by `gov doctor`;
+      releases pinned and hash-verified; no signing until friction asks for it (DEC-1214 L3); no TUF, key rotation, offline
+      envelopes or bootstrap separation.
   covers:
   - id: CAP-02.a
     item: File-hash manifest in framework.lock; gov doctor MATCH/DRIFT
@@ -345,15 +391,16 @@ capabilities:
     source: DEC-027, DEC-039, OWNER-DECISION-P2-0002
     wave: NONE
   - id: CAP-02.c
-    item: SSH-signed release tag, verified by `git tag -v`
-    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027
+    item: 'SSH-signed release tag, verified by `git tag -v`: built only if friction asks for it (DEC-1214 L3)'
+    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027; DEC-1214 L3; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-03
   title: Security and sensitivity classification
-  outcome: 'An agent can rely on secrets never reaching an index, a packet or an export: a content-based filter runs before
-    every indexer, and harness deny rules cover secret files.'
-  acceptance: After indexing a tree with planted secrets (including a token-shaped canary gitleaks defaults miss), no canary
-    string appears in any `.gov-runtime/` store, codebase-memory index, context packet or evidence bundle.
+  outcome: 'An agent can rely on secrets never reaching an index, a brief or an export: the path map''s sensitivity classes
+    keep secret-class files out of every index, and one full gitleaks scan runs once before a repository goes public or is shared with a third party; no scan runs while it is private.'
+  acceptance: After `gov rebuild` on a tree with planted secret-class files (including a token-shaped canary), no planted
+    string appears in any `.gov-runtime/` store, codebase-memory index, brief or evidence bundle; the release steps include
+    one full gitleaks scan, run once before the repository goes public or is shared with a third party, and no gitleaks scan runs while it is private.
   wave: W1
   provider:
   - gitleaks 8.30.1
@@ -368,6 +415,7 @@ capabilities:
   - Distribution Protocol v1.2 §14, §17
   - DEC-074
   - DEC-076
+  - EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
   scenarios:
     dev:
     - CHAOS-A-14
@@ -396,9 +444,9 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-03.a
-    item: Sensitivity class per path/dataset/namespace before read, index or export; secrets excluded by default-deny content
-      filter
-    source: Contract v3 A3; Framework v4.1.2 §16, §72
+    item: Sensitivity class per path/dataset/namespace before read, index or export; secret-class paths excluded from every
+      index by default-deny; one full gitleaks scan runs once before a repository goes public or is shared with a third party, and no scan runs while it is private
+    source: Contract v3 A3; Framework v4.1.2 §16, §72; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
     wave: W1
     provider:
     - W1-15
@@ -424,24 +472,25 @@ capabilities:
     provider:
     - W1-17
   - id: CAP-03.e
-    item: Secret exclusion holds on every retrieval route, including the code route
-    source: OWNER-DIRECTION-BR-0003; DEC-076
+    item: Secret exclusion by sensitivity class holds on every retrieval route, including the code route
+    source: OWNER-DIRECTION-BR-0003; DEC-076; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182
     wave: W1
     provider:
     - W1-16
     - W1-15
 - id: CAP-04
   title: Budget and resource governance
-  outcome: The owner can set token and cost budgets per task; crossing one raises a decision package instead of continuing
-    silently.
-  acceptance: A task configured with a token budget that its run exceeds stops at the next `gov close` or hook boundary and
-    surfaces a decision package; the breach is recorded in the ticket.
+  outcome: The owner can see what a ticket costs against its projection, and a ticket that runs away is held once instead
+    of continuing silently.
+  acceptance: A ticket whose measured cost passes twice its projection holds its next launch and goes to the inbox once; usage
+    is recorded and reported weekly and never holds, refuses or stops a lead or a worker (W2-156, DEC-1149 (3)).
   wave: W2
-  wave_note: W1 measures the governance share (W1-31); the halting budget gate is W2
+  wave_note: W1 measures the governance share (W1-31); the runaway brake is W2 (W2-156); budgets per task wait for friction
+    (EMERGENCY-2 §6.2 A-1)
   provider:
   - ccusage (pinned, DEC-086)
   - W1-31
-  - 'W2: budget gate in gov close/status'
+  - W2-156 (the runaway brake)
   - W1-21
   sources:
   - Contract v3 Gate A4
@@ -450,6 +499,7 @@ capabilities:
   - DEC-004, DEC-031
   - DEC-083
   - DEC-086
+  - DEC-1149; EMERGENCY-2 §6.2 A-1, §10.2 (DEC-1211)
   scenarios:
     dev:
     - SOAK-X-01
@@ -459,38 +509,45 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-04.a
-    item: Token/cost budgets per task with executable thresholds
-    source: Contract v3 A4; Framework v4.1.2 §73
-    wave: W2
+    item: Token/cost budgets per task with executable thresholds (built only if friction asks; until then the run-time tool's
+      spend brake covers it, EMERGENCY-2 §6.2 A-1)
+    source: Contract v3 A4; Framework v4.1.2 §73; EMERGENCY-2 §6.2 A-1 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
   - id: CAP-04.b
-    item: Governance share ≤ 10–15 % measured per ticket (DEC-086)
-    source: OWNER-DIRECTION-P2-0009 §11; DEC-004
+    item: Governance share ≤ 15 %, reported weekly with its baseline (56 %), by P1's method until `gov telemetry` measures
+      it (DEC-086; EMERGENCY-2 §10.2, A-7)
+    source: OWNER-DIRECTION-P2-0009 §11; DEC-004; EMERGENCY-2 §10.2 (DEC-1211)
     wave: W1
     provider:
     - W1-31
   - id: CAP-04.c
-    item: 'Two budgets: retrieval spend vs final packet; hitting the spend budget is a governed event'
-    source: DEC-031
+    item: Retrieval spend budget scaled by impact radius; hitting it is a governed event, never silent truncation; there is
+      no packet ceiling (the final-packet budget of DEC-031 is superseded by EMERGENCY-2 §5.5)
+    source: DEC-031; EMERGENCY-2 §5.5 (DEC-1211)
     wave: W1
     provider:
     - W1-21
   - id: CAP-04.d
-    item: Exceeding a delegated limit raises a decision package
-    source: Contract v3 A4
-    wave: W2
+    item: Exceeding a delegated limit raises a decision package (built only if friction asks; until then the run-time tool's
+      spend brake covers it, EMERGENCY-2 §6.2 A-1)
+    source: Contract v3 A4; EMERGENCY-2 §6.2 A-1 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
 - id: CAP-05
   title: Emergency controls (pause/freeze/cancel/rollback)
-  outcome: The owner can freeze all agent writes with one command and resume them, and roll back by `git revert`.
-  acceptance: After `gov pause`, the next Edit/Write/Bash write by any role is denied by the guard, and `git status --porcelain`
-    is unchanged; `gov pause --off` restores writes.
+  outcome: The owner can stop the work with one command and resume it, and roll back by `git revert`.
+  acceptance: After `gov pause`, `gov launch` and the dispatcher start no session, the landing lands nothing, and every running
+    session gets a stop message in its inbox; `gov pause --off` restores all three and `git status --porcelain` is unchanged.
   wave: W1
   provider:
   - W1-28
-  - W1-02
+  - 'the flag''s readers in `gov launch`, the dispatcher and the landing: a fix to W1-28''s feature (EMERGENCY-2 §4.2; audit
+    7 C-1)'
   sources:
   - Contract v3 Gate A5
   - Framework v4.1.2 §74
   - DEC-025
+  - EMERGENCY-2 §9.2 (DEC-1211)
+  - DEC-409
   scenarios:
     dev:
     - CHAOS-A-10
@@ -501,8 +558,9 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-05.a
-    item: PAUSE and FREEZE_WRITES (gov pause)
-    source: Contract v3 A5; Framework v4.1.2 §74
+    item: 'PAUSE and FREEZE (`gov pause`): the freeze flag stops launches, dispatcher ticks and landings and sends a stop
+      message to every running session; `--off` lifts all three, and only the owner in person lifts (DEC-409)'
+    source: Contract v3 A5; Framework v4.1.2 §74; EMERGENCY-2 §9.2 (DEC-1211)
     wave: W1
     provider:
     - W1-28
@@ -524,6 +582,7 @@ capabilities:
     wave: W1
     provider:
     - W1-28
+  wave_note: the freeze flag and `gov pause` are W1; its readers (launch, dispatch, landing) are a fix recorded in W1-28
 - id: CAP-06
   title: Repository contract and path map
   outcome: An agent can find where every kind of artefact lives from the committed path map, and nothing material is unclassified.
@@ -743,8 +802,10 @@ capabilities:
 - id: CAP-10
   title: Semantic memory (vector/embedding retrieval)
   outcome: An agent can find a record from a paraphrased question.
-  acceptance: On the dev query set, paraphrased questions reach the gold record in the top 5 at least as often as the S0b2
-    R1 baseline (mean hit@5 85).
+  acceptance: 'A fresh 80 (40 visible questions, 40 hidden), written and measured at once on a pinned snapshot, is judged
+    end to end at 95 % or more: the reader reads the whole ranked bundle and searches once more in its own words, and both
+    the answer and its citation must be right; the hidden half''s figure is the verdict. hit@k is a diagnostic only, never
+    a target or a floor.'
   wave: W1
   wave_note: moved from W2 by DEC-074 R1/Q3 and DEC-080
   provider:
@@ -760,6 +821,8 @@ capabilities:
   - DEC-017
   - DEC-074
   - DEC-080
+  - DEC-1210
+  - EMERGENCY-2 §5.2, §5.3 (DEC-1211)
   scenarios:
     dev:
     - RETR-A-01
@@ -973,19 +1036,18 @@ capabilities:
     provider:
     - W1-21
 - id: CAP-15
-  title: Context packet compilation
-  outcome: 'An agent starts every task with a compiled context packet: mandatory inputs by id and hash, an authority block
-    first, under a ceiling.'
-  acceptance: '`gov context <ticket>` writes a packet that contains every mandatory input by id and sha256, stays under the
-    configured ceiling (default ~6k tokens), carries its own hash, and is delivered as a file path plus a summary of at most
-    ~2.5k tokens; when the ticket''s evidence exceeds the ceiling, the packet carries synthesis notes that cite source ids
-    and sha256, pass the validator, disclose unresolved evidence and are invalidated when a cited source changes.'
-  wave: W1
-  wave_note: DEC-080
+  title: The brief carries the ticket's retrieval
+  outcome: An agent starts every task with a brief that carries the ticket's whole retrieval bundle, uncut, with its mandatory
+    inputs by id and hash and the authority record first.
+  acceptance: '`gov brief <role> <ticket>` writes a brief that holds the ticket''s whole retrieval bundle, uncut, every mandatory
+    input by id and sha256 and no unfilled placeholder (no `{QUESTION}`), refuses when a mandatory input is missing or the
+    ticket is not READY, and the memory-use log has a line for it; `gov context` is retired and no packet ceiling exists.'
+  wave: W2
+  wave_note: the Wave 1 packet (`gov context`) is retired (DEC-1214 M1); the brief carries the retrieval (W2-197, EMERGENCY-2
+    §5.4)
   provider:
-  - W1-24
-  - W1-29
   - W1-23
+  - W2-197
   sources:
   - Contract v3 Gate C9
   - Framework v4.1.2 §15
@@ -997,6 +1059,7 @@ capabilities:
   - DEC-004
   - DEC-036
   - DEC-080
+  - EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
   scenarios:
     dev:
     - CHAOS-A-11
@@ -1009,49 +1072,48 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-15.a
-    item: 'Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate'
-    source: Contract v3 C9, W3, W4, W10; Framework v4.1.2 §15
-    wave: W1
+    item: 'Brief: mandatory inputs by id, version and sha256; the authority record first; the supplementary block separate;
+      all carried in the brief'
+    source: Contract v3 C9, W3, W4, W10; Framework v4.1.2 §15; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+    wave: W2
     provider:
-    - W1-24
+    - W2-197
   - id: CAP-15.b
-    item: 'Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency'
-    source: Contract v3 W3
-    wave: W1
+    item: 'Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency; carried in the
+      brief'
+    source: Contract v3 W3; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+    wave: W2
     provider:
-    - W1-24
+    - W2-197
   - id: CAP-15.c
-    item: Missing mandatory input → refusal or explicit BLOCKED; superseded input cannot satisfy a current requirement; conflicting
-      inputs → contradiction handling
-    source: Contract v3 W3, W4
-    wave: W1
+    item: Missing mandatory input → `gov brief` refuses or reports BLOCKED; a superseded input cannot satisfy a current requirement;
+      conflicting inputs → contradiction handling
+    source: Contract v3 W3, W4; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+    wave: W2
     provider:
-    - W1-24
+    - W2-197
   - id: CAP-15.d
-    item: Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
-    source: Contract v3 W10
-    wave: W1
-    provider:
-    - W1-24
+    item: 'Non-goal: token pressure drops supplementary context before mandatory inputs: packet mechanics, retired with `gov
+      context`'
+    source: EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+    wave: NONE
   - id: CAP-15.e
-    item: Packet hash/provenance proves what the worker received
-    source: Contract v3 W4
-    wave: W1
+    item: The brief's hash and provenance prove what the worker received
+    source: Contract v3 W4; EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+    wave: W2
     provider:
-    - W1-24
+    - W2-197
   - id: CAP-15.f
-    item: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable'
-    source: DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4
-    wave: W1
+    item: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable (built only
+      if friction asks; off with `gov context`)'
+    source: DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4; EMERGENCY-2 §9.2 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
     provider:
     - W1-23
   - id: CAP-15.g
-    item: File path + summary ≤ ~2.5k tokens (harness output caps)
-    source: DEC-025; architecture v0.3 §2.3
-    wave: W1
-    provider:
-    - W1-24
-    - W1-29
+    item: 'Non-goal: a file path plus a summary of at most ~2.5k tokens: packet mechanics, retired with `gov context`'
+    source: EMERGENCY-2 §5.4, §5.5 (DEC-1211); DEC-1214 M1
+    wave: NONE
 - id: CAP-16
   title: Multi-batch, multi-hop, paginated retrieval
   outcome: An agent can gather evidence that spans many locations and hops, in batches, until a stated stopping reason.
@@ -1107,11 +1169,11 @@ capabilities:
   acceptance: After one decision file is edited, the next `gov retrieve` returns the edited content, or reports the facet
     FACET_UNAVAILABLE; it never returns the old text as current.
   wave: W1
-  wave_note: commit-time re-index hook (G-23) is W2
+  wave_note: the landing refreshes the store after each land (replaces the commit-time hook G-23, W2)
   provider:
   - W1-17
   - W1-22
-  - 'W2: G-23 re-index hook'
+  - 'W2: the landing''s store refresh (W2-115b)'
   sources:
   - Contract v3 Gate D1
   - Framework v4.1.2 §13
@@ -1141,8 +1203,8 @@ capabilities:
     provider:
     - W1-17
   - id: CAP-17.b
-    item: Commit-time re-index hook
-    source: G-23
+    item: The landing rebuilds the store after each land, and `gov retrieve` reports a stale store
+    source: G-23; EMERGENCY-2 §4.4 (DEC-1211)
     wave: W2
   - id: CAP-17.c
     item: Zero-result canaries after reindex
@@ -1226,11 +1288,12 @@ capabilities:
     wave: W2
   - id: CAP-19.b
     item: Evidence-driven model selection (bake-off, per-repository benchmark)
-    source: Contract v3 D5; Framework v4.1.2 §14.3
+    source: Contract v3 D5; Framework v4.1.2 §14.3; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-19.c
-    item: 'Retrieval learning loop: a miss is a memory-quality event → root cause → repair → held-out regression test'
-    source: Framework v4.1.2 §18
+    item: 'Retrieval learning loop: a miss is a memory-quality event → root cause → fix → judged by the next fresh 80 (no
+      set is reused)'
+    source: Framework v4.1.2 §18; DEC-1207 (3); DEC-1210
     wave: W2
 - id: CAP-20
   title: Rebuild guarantee (delete derived, rebuild from git)
@@ -1310,7 +1373,8 @@ capabilities:
       no in-process L0–L5 machinery.
   covers:
   - id: CAP-21.a
-    item: Approval facts only from the owner's git account
+    item: Approval facts only from the owner's git account; kernel and instruction text needs the CTO's approval, not the
+      owner's (EMERGENCY-2 §3.5); decisions still need the owner's
     source: Contract v3 E1 (LITE); Framework v4.1.2 §23
     wave: W1
     provider:
@@ -1329,7 +1393,7 @@ capabilities:
     (DEC-094), are W2
   provider:
   - W1-25
-  - 'W2: typed handoff records'
+  - W2-121c (inbox files)
   - W1-33
   - W1-05
   - W1-46
@@ -1358,16 +1422,21 @@ capabilities:
     - W1-05
     - W1-33
   - id: CAP-22.b
-    item: Typed handoff records readable by a fresh agent
-    source: Contract v3 E3; Framework v4.1.2 §25
+    item: 'A handoff is the worker''s return contract (CAP-37.d) plus the run-time tool''s per-session inbox files with a
+      read mark (RT-6): a finished worker''s return reaches its lead''s inbox file and no owner message relays it'
+    source: Contract v3 E3; Framework v4.1.2 §25; EMERGENCY-2 §6.3 (DEC-1211)
     wave: W2
+    provider:
+    - W2-121c
   - id: CAP-22.c
     item: Distinct test execution and integration roles
-    source: MR-5; DEC-094
-    wave: W2
+    source: MR-5; DEC-094; EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
   - id: CAP-22.d
-    item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research`, the guard knows the role, its writes are held to its ticket''s `allowed_paths` (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32) stays W3'
-    source: 'DEC-163; DEC-158'
+    item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment
+      session runs as `GOV_ROLE=research` in its own experiment folder or worktree, its ticket''s `allowed_paths` judged at
+      the landing as a notice; no guard and no network allowlist; the full research lifecycle (CAP-32) stays W3'
+    source: DEC-163; DEC-158; EMERGENCY-2 §2.2 (DEC-1211)
     wave: W1
     provider:
     - W1-46
@@ -1376,14 +1445,14 @@ capabilities:
   outcome: Two agents cannot both take the same task.
   acceptance: A second agent claiming a ticket already claimed by another gets a collision error naming the holder, and the
     ticket is absent from its ready queue.
-  wave: W3
+  wave: W2
   wave_note: the exclusive claim lock (G-03) is delivered in W1-09; a light form of parallel tickets runs in Wave 1 (DEC-235);
-    parallel-agent concurrency and the claims role are W3
+    the run-time tool dispatches ready tickets into slots from the machine it detects (RT-1, RT-3, W2-121c)
   provider:
   - ticket v0.3.2
   - W1-09
   - W1-42
-  - 'W3: gov claim + claims/concurrency role'
+  - W2-121c, W2-121d (the run-time tool)
   sources:
   - Contract v3 Gate E4
   - Framework v4.1.2 §44
@@ -1391,6 +1460,7 @@ capabilities:
   - DEC-074
   - DEC-076
   - DEC-235
+  - EMERGENCY-2 §6.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-X-03
@@ -1406,20 +1476,26 @@ capabilities:
     provider:
     - W1-09
   - id: CAP-23.b
-    item: Parallel-agent concurrency and the claims role
-    source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
-    wave: W3
+    item: The run-time tool dispatches ready tickets into slots from the CPU, RAM and GPU it detects (RT-1, RT-3); the claim
+      lock (CAP-23.a) keeps two agents off one ticket
+    source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066; EMERGENCY-2 §6.3 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+    - W2-121d
   - id: CAP-23.c
-    item: 'Parallel tickets in Wave 1, a light form: up to 6 tickets in flight, each in its own short-lived worktree with a ticket lead, gated by available memory and load; the main orchestrator merges each into the integration branch after green and re-runs every suite after each merge; no worktree is left behind'
-    source: DEC-235; DEC-236
-    wave: W1
+    item: 'Parallel tickets: each ticket in its own worktree with a ticket lead; the landing merges it into the integration
+      branch, runs the impact-selected tests and checks paths and test authorship (NEW-1); the number in flight comes from
+      the machine''s slots, not from a constant'
+    source: DEC-235; DEC-236; EMERGENCY-2 §4 (DEC-1211)
+    wave: W2
     provider:
     - W1-42
 - id: CAP-24
   title: Skill lifecycle and versioning
   outcome: An agent can tell which version of each skill produced a piece of work.
-  acceptance: Every skill file carries a version in frontmatter, and the `gov close` record of a ticket lists the skill ids
-    and versions used.
+  acceptance: Every skill file carries a version in frontmatter, and the land record of a ticket lists the skill ids and versions
+    used.
   wave: W1
   provider:
   - W1-35
@@ -1455,17 +1531,20 @@ capabilities:
     - W1-35
     - W1-36
   - id: CAP-24.c
-    item: Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
-    source: Framework v4.1.2 §5, §27
+    item: Kernel and instruction text (role files, brief and role templates, skills, CLAUDE.md and AGENTS.md) changes only
+      by the CTO's decision, approval and own commit; the landing checks kernel bytes against the CTO-approved list
+    source: Framework v4.1.2 §5, §27; EMERGENCY-2 §3.5 (DEC-1211)
     wave: W1
     provider:
     - W1-35
     - W1-26
 - id: CAP-25
   title: Tool registry and capability memory (lite)
-  outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
-  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; an install command from
-    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied, except a research session''s install inside its own experiment folder (DEC-163).'
+  outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and trust that the CTO approved and
+    recorded each install.
+  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; every install is recorded
+    in the tool registry with the CTO''s approval, its scope and its machine cost; `sudo` stays the owner''s (the deny line
+    refuses it in every permission mode).'
   wave: W1
   provider:
   - W1-04
@@ -1488,6 +1567,7 @@ capabilities:
   - DEC-163
   - DEC-172
   - DEC-174
+  - DEC-1214 G7 (c)
   scenarios:
     dev:
     - CHAOS-A-05
@@ -1500,9 +1580,9 @@ capabilities:
     - CHAOS-X-Q05
   disposition:
     class: LITE
-    lite_form: Tool registry with pins; the orchestrator installs a tool only after the owner approves a decision package
-      in chat, and records version, sha256, install and uninstall commands, date and approving decision; `gov doctor` checks
-      the pins. No automated install classification (DEC-083).
+    lite_form: Tool registry with pins; the CTO approves and records every install (version, sha256, install and uninstall
+      commands, date, approving decision, scope and machine cost), so that nothing out of the work's scope or beyond the machine's
+      capacity is installed; `gov doctor` checks the pins; `sudo` stays the owner's. No automated install classification (DEC-083).
   covers:
   - id: CAP-25.a
     item: Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks
@@ -1513,9 +1593,8 @@ capabilities:
     - W1-06
     - W1-27
   - id: CAP-25.b
-    item: Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the
-      owner
-    source: Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083
+    item: The CTO approves and records every install; no permission prompt; `sudo` stays with the owner
+    source: Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083; DEC-1214 G7 (c)
     wave: W1
     provider:
     - W1-04
@@ -1524,30 +1603,26 @@ capabilities:
     source: DEC-083; OWNER-DECISION-P2-0003
     wave: NONE
   - id: CAP-25.d
-    item: Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an install by the owner, or by
-      the orchestrator under DEC-083, in both cases recorded with its owner approval; worker roles never install system-wide
+    item: Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an install by the owner, or
+      by the orchestrator under DEC-083, in both cases recorded with its owner approval; worker roles never install system-wide
     source: DEC-153; DEC-157; DEC-209
     wave: W1
     provider:
     - W1-48
   - id: CAP-25.e
-    item: 'The research role may install only inside its own experiment folder (a venv or local prefix within its ticket''s `allowed_paths`); a system-wide install is denied to it; the sandbox''s write fence enforces this: the sandbox stops a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one to a path that existed at launch elsewhere inside it; a path created later is covered by the guard''s per-ticket allow-list. It is the one exception to the denial in CAP-25.b'
-    source: 'DEC-163; DEC-157'
-    wave: W1
-    provider:
-    - W1-46
+    item: 'Non-goal: the research role''s install fence (the sandbox write fence and the generated `Edit` deny rules): an
+      install by the research role is free inside its repository, worktree or venv (CAP-25.b)'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-25.f
-    item: 'The committed `.claude/settings.json` carries no install or download ask rule; the guard''s install rule decides install commands alone, and in a launched worker session the sandbox backs it'
-    source: DEC-172
-    wave: W1
-    provider:
-    - W1-47
+    item: 'Non-goal: the committed settings carry no install ask rule so that the guard''s install rule decides alone: no
+      guard, no install rule'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-25.g
-    item: 'The guard''s install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs: `ask` for the orchestrator, denied for engineer, independent test designer and independent auditor, and let through for the research role inside its experiment folder (`CAP-25.e`)'
-    source: DEC-174; DEC-083; DEC-163
-    wave: W1
-    provider:
-    - W1-47
+    item: 'Non-goal: the guard''s install rule for `uv add`, `uv sync`, `uv run --with` and `uvx`: no guard'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
 - id: CAP-26
   title: Plugin trust boundary (hash-binding, descriptor security)
   outcome: (none — non-goal)
@@ -1597,7 +1672,8 @@ capabilities:
     - MR-X-Q01
   disposition:
     class: LITE
-    lite_form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric.
+    lite_form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric; the minimal per-session
+      inbox files inside the run-time tool are in scope (RT-6) and are not an A2A layer.
   covers:
   - id: CAP-27.a
     item: Read commands never mutate
@@ -1676,17 +1752,17 @@ capabilities:
   - id: CAP-29.a
     item: Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions →
       algorithms → architecture → interfaces → security/performance/operations → WBS → tests → live evidence
-    source: Contract v3 H1; Framework v4.1.2 §36
+    source: Contract v3 H1; Framework v4.1.2 §36; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-29.b
     item: Forward and reverse lineage; missing and stale links detected
-    source: Contract v3 W8
+    source: Contract v3 W8; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-30
   title: Feature readiness contract (26-dimension checklist)
   outcome: An agent can see, per feature, which of the 26 readiness rows are open for its profile, and each gap becomes work.
   acceptance: A specification with a row its profile requires MISSING (for example test data at FULL) keeps its production
-    tickets out of READY, and `gov readiness --generate` creates one linked ticket per required open row with its dependencies.
+    tickets out of READY, and `gov discover` opens one linked gap ticket per required open row with its dependencies.
   wave: W2
   wave_note: schema, checker, the READY gate and linked gap tickets (planning skill + gov check, DEC-089) are W1; automatic
     generation is W2
@@ -1694,7 +1770,7 @@ capabilities:
   - OpenSpec custom schema
   - W1-12
   - W1-13
-  - 'W2: gov readiness --generate'
+  - W2-36 (gov discover)
   - W1-26
   - W1-35
   sources:
@@ -1744,12 +1820,14 @@ capabilities:
     - W1-26
     - W1-35
   - id: CAP-30.c
-    item: Automatic generation (gov readiness --generate)
-    source: Contract v3 H3; DEC-089
+    item: Automatic generation of the gap tickets, inside `gov discover` (`gov readiness --generate` is folded into it, W2-36)
+    source: Contract v3 H3; DEC-089; EMERGENCY-2 §6.2 A-4 (DEC-1211)
     wave: W2
+    provider:
+    - W2-36
   - id: CAP-30.d
     item: Scenarios drive data and tests; data provenance recorded; data author independent where practical
-    source: Contract v3 H4; Framework v4.1.2 §39
+    source: Contract v3 H4; Framework v4.1.2 §39; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-30.e
     item: Capability taxonomy for STANDARD rows; extended only through a governed change
@@ -1769,13 +1847,14 @@ capabilities:
     item: For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner
       has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs);
       owned by the UX role
-    source: DEC-104
-    wave: W2
+    source: DEC-104; EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
 - id: CAP-31
-  title: Unified task DAG with dynamic generation
-  outcome: An agent works from one task DAG in git, and failures generate their own repair tasks.
-  acceptance: A failed `gov close` creates a repair ticket that depends on the failed one, and `tk ready` shows it only after
-    its dependencies are closed.
+  title: Unified task DAG
+  outcome: An agent works from one task DAG in git, and a red landing names its own cause.
+  acceptance: A landing that turns red names its cause in the land record; the fix lands without a new ticket and is recorded
+    in the owning ticket, and where no test caught the bug the failing test is committed first; `tk ready` lists a ticket
+    only after its dependencies are closed.
   wave: W1
   provider:
   - ticket v0.3.2
@@ -1787,6 +1866,7 @@ capabilities:
   - Contract v3 Gate I1, I2, I3, I4
   - Framework v4.1.2 §41-44
   - DEC-074
+  - EMERGENCY-2 §4.2 (DEC-1211)
   scenarios:
     dev:
     - MR-A-02
@@ -1827,8 +1907,9 @@ capabilities:
     - W1-08
     - W1-14
   - id: CAP-31.b
-    item: Dynamic generation of repair/revalidation tasks
-    source: Contract v3 I3; Framework v4.1.2 §43
+    item: 'A known bug is a fix, not a ticket: a red landing generates no repair ticket; the fix is recorded in the owning
+      ticket, the failing test first where no test caught it'
+    source: Contract v3 I3; Framework v4.1.2 §43; EMERGENCY-2 §4.2 (DEC-1211)
     wave: W1
     provider:
     - W1-30
@@ -1851,13 +1932,14 @@ capabilities:
   acceptance: A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes
     it.
   wave: W3
-  wave_note: 'experiments as part of discovery, with an evidence record, are W1 (DEC-102); a minimal research role is W1 (DEC-163, CAP-22.d); `gov discover` is W2 (DEC-166); the full research lifecycle is W3'
+  wave_note: experiments as part of discovery, with an evidence record, are W1 (DEC-102); a minimal research role is W1 (DEC-163,
+    CAP-22.d); `gov discover` is W2 (DEC-166); the full research lifecycle is W3
   provider:
   - Docling (pinned)
   - MarkItDown
   - 'W3: gov research sync + research records'
   - W1-35
-  - 'W2: gov discover'
+  - W2-36 (gov discover)
   sources:
   - Contract v3 Gate J1, J2
   - Framework v4.1.2 §45, §46
@@ -1884,31 +1966,37 @@ capabilities:
   covers:
   - id: CAP-32.a
     item: Research becomes evidence records separate from authority
-    source: Contract v3 J1; Framework v4.1.2 §45
+    source: Contract v3 J1; Framework v4.1.2 §45; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-32.b
     item: Experiment lifecycle; discovery flow
-    source: Contract v3 J2; Framework v4.1.2 §46
+    source: Contract v3 J2; Framework v4.1.2 §46; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-32.c
     item: Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point;
-      they run in sandboxes outside production paths and leave an evidence record (what was tested, how, results, verdict);
-      their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P
-    source: DEC-102
+      they run in their own experiment folder or worktree, outside production paths, and leave an evidence record (what was
+      tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed
+      specification only through CIT-P
+    source: DEC-102; EMERGENCY-2 §2.2 (DEC-1211)
     wave: W1
     provider:
     - W1-35
   - id: CAP-32.d
-    item: '`gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way'
-    source: 'DEC-166'
+    item: '`gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery
+      skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured
+      numbers, back the answer; the same request in plain language works the same way'
+    source: DEC-166
     wave: W2
+    provider:
+    - W2-36
 - id: CAP-33
   title: Change-impact transactions (CIT-P simulation, CIT-E execution)
   outcome: An agent can simulate a change before making it (CIT-P) and record what it changed (CIT-E).
   acceptance: A decision change raises a CIT-P listing the affected specs, decisions, tickets, tests and code from both graphs,
     with a radius; after apply/archive the CIT-E record matches the proposal or lists the differences.
   wave: W2
-  wave_note: 'OpenSpec proposal and apply/archive in W1, where a plain-language impact question runs an OpenSpec proposal plus `gov closure` (DEC-167); computed impact W2'
+  wave_note: OpenSpec proposal and apply/archive in W1, where a plain-language impact question runs an OpenSpec proposal plus
+    `gov closure` (DEC-167); computed impact W2
   provider:
   - OpenSpec 1.13.2
   - W1-35
@@ -1957,12 +2045,12 @@ capabilities:
     wave: W2
   - id: CAP-33.c
     item: Upstream change propagates staleness and generates revalidation tasks
-    source: Contract v3 W6
+    source: Contract v3 W6; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-33.d
-    item: Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned
-      promotion
-    source: Framework v4.1.2 §5
+    item: Changes to the Gov OS's own Charter and Contract pass evidence → a CIT-P with three costed options (DEC-105) → the
+      owner's approval → a versioned promotion; kernel and instruction text follows CAP-24.c
+    source: Framework v4.1.2 §5; EMERGENCY-2 §3.5 (DEC-1211)
     wave: W1
     provider:
     - W1-35
@@ -1975,14 +2063,15 @@ capabilities:
     provider:
     - W1-35
   - id: CAP-33.f
-    item: 'The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that is an OpenSpec proposal plus `gov closure`'
-    source: 'DEC-167'
+    item: The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that
+      is an OpenSpec proposal plus `gov closure`
+    source: DEC-167
     wave: W1
     provider:
     - W1-35
   - id: CAP-33.g
-    item: 'From Wave 2 the same plain-language question runs `gov impact`'
-    source: 'DEC-167'
+    item: From Wave 2 the same plain-language question runs `gov impact`
+    source: DEC-167
     wave: W2
 - id: CAP-34
   title: Human decision gates and contradiction resolution
@@ -2068,19 +2157,21 @@ capabilities:
     provider:
     - W1-09
 - id: CAP-35
-  title: Model routing (T0-T3 tiers, reasoning levels)
-  outcome: The owner can route each role and task class to a model tier.
-  acceptance: With the routing configuration set, an orchestration task runs on the T3 tier and a documentation task on T1,
-    as recorded in telemetry.
-  wave: W3
+  title: Model routing from the owner's rubric
+  outcome: The owner can route each role and task class to a model and effort through his rubric, and no session chooses its
+    own.
+  acceptance: Every launch takes its model and effort from the owner's rubric (DEC-1120, DEC-1212) and states them in the
+    launch log (RT-8); a launch that names another model is refused.
+  wave: W2
   provider:
-  - 'W3: role model tiers + routing config'
+  - W2-121c (the launcher states the rubric's model and effort)
   sources:
   - Contract v3 Gate M1, M2, M3
   - Framework v4.1.2 §55-57
   - DEC-010
   - DEC-018
   - DEC-083
+  - DEC-1120; DEC-1212; DEC-1214 K1; EMERGENCY-2 §6.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-A-04
@@ -2091,17 +2182,23 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-35.a
-    item: Capability tiers T0–T3
-    source: Contract v3 M1; Framework v4.1.2 §55
-    wave: W3
+    item: The rubric names the model and effort for each role and work class (capability tiers T0–T3 are its coarse form)
+    source: Contract v3 M1; Framework v4.1.2 §55; DEC-1120
+    wave: W2
+    provider:
+    - W2-121c
   - id: CAP-35.b
-    item: Task reasoning requirement low/medium/high/extra-high declared and enforced
-    source: Contract v3 M2; Framework v4.1.2 §56
-    wave: W3
+    item: Effort is declared by the rubric and enforced by the launcher, not chosen by the session
+    source: Contract v3 M2; Framework v4.1.2 §56; DEC-1120
+    wave: W2
+    provider:
+    - W2-121c
   - id: CAP-35.c
-    item: 'Role defaults: minimum tier and default reasoning per role'
-    source: Contract v3 M3; Framework v4.1.2 §57
-    wave: W3
+    item: 'Role defaults: the rubric''s model and effort per role'
+    source: Contract v3 M3; Framework v4.1.2 §57; DEC-1120
+    wave: W2
+    provider:
+    - W2-121c
 - id: CAP-36
   title: Empirical model routing telemetry
   outcome: The owner can compare cost and pass/fail per model per task class from real runs.
@@ -2123,16 +2220,16 @@ capabilities:
   covers:
   - id: CAP-36.a
     item: 'Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings'
-    source: Contract v3 M4; Framework v4.1.2 §58
+    source: Contract v3 M4; Framework v4.1.2 §58; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-37
   title: Structured checkpoints and mandatory triggers
   outcome: An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
-  acceptance: After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes
-    the ticket at the recorded next step.
+  acceptance: After every ticket transition a checkpoint file exists; after a forced compaction and after a killed session,
+    a session resumes at the checkpoint's recorded next step without the owner restating it (RT-5).
   wave: W1
-  wave_note: model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in
-    `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156)
+  wave_note: model-switch continuity waits for friction (CAP-37.e); until W1-25's `gov checkpoint`, the orchestrator's checkpoint
+    lives in `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156)
   provider:
   - W1-25
   - W1-29
@@ -2146,6 +2243,7 @@ capabilities:
   - DEC-150
   - DEC-156
   - DEC-248
+  - EMERGENCY-2 §6.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-A-01
@@ -2184,9 +2282,8 @@ capabilities:
     - W1-25
     - W1-29
   - id: CAP-37.c
-    item: 'Provider-independent watchdog: not only proprietary hooks; marks stale; checkpoints on context utilisation; blocks
-      handoff/close when freshness violates policy'
-    source: Contract v3 N3; Framework v4.1.2 §60
+    item: The run-time tool's one state file and one wake rule mark a stale session and wake it (RT-5, RT-7); nothing is blocked
+    source: Contract v3 N3; Framework v4.1.2 §60; EMERGENCY-2 §6.3 (DEC-1211)
     wave: W1
     provider:
     - W1-25
@@ -2200,8 +2297,8 @@ capabilities:
     - W1-29
   - id: CAP-37.e
     item: Model/provider switch reconstructs the same inputs
-    source: Contract v3 W9
-    wave: W2
+    source: Contract v3 W9; EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
   - id: CAP-37.f
     item: Checkpoint discipline; resume after crash
     source: OWNER-DIRECTION-BR-0004; OWNER-DIRECTION-BR-0006 §7, §8
@@ -2209,8 +2306,11 @@ capabilities:
     provider:
     - W1-25
   - id: CAP-37.g
-    item: "Light auto-resume hooks, a light form brought forward into Wave 1: a PreCompact hook ensures the checkpoint is current (the orchestrator's, and in a worktree the lead's); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint's RESUME HERE section within the hook's size cap; after a forced compaction the session knows the active tickets, the open owner decisions and the loop counts without the owner restating them; W1-29 upgrades the injection to the full context packet"
-    source: DEC-248; DEC-208
+    item: 'Auto-resume hooks: a PreCompact hook ensures the checkpoint is current (the orchestrator''s, and in a worktree
+      the lead''s); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint''s RESUME
+      HERE section; after a forced compaction the session knows the active tickets, the open owner decisions and the round
+      counts without the owner restating them; there is no context packet (EMERGENCY-2 §5.5)'
+    source: DEC-248; DEC-208; EMERGENCY-2 §5.5, §6.1 (DEC-1211); DEC-837
     wave: W1
     provider:
     - W1-49
@@ -2218,8 +2318,9 @@ capabilities:
   title: Verification test families (product and governance)
   outcome: The owner can see product and governance verification results, with builder tests counted as regression evidence
     only.
-  acceptance: '`gov check` reports each governance test family RED/YELLOW/GREEN, and `gov close` runs the independent acceptance
-    tests separately from builder tests.'
+  acceptance: '`gov check` reports each governance test family RED/YELLOW/GREEN; `gov accept` runs only the independent acceptance
+    tests and reports pass or fail per KPI line; the landing runs the impact-selected tests; builder tests count as regression
+    evidence only.'
   wave: W1
   provider:
   - W1-26
@@ -2243,6 +2344,7 @@ capabilities:
   - DEC-083
   - DEC-136
   - DEC-137
+  - EMERGENCY-2 §4 (DEC-1211)
   scenarios:
     dev:
     - MR-A-06
@@ -2270,11 +2372,11 @@ capabilities:
     provider:
     - W1-30
   - id: CAP-38.b
-    item: 'Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role
-      limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability,
-      skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product
-      traceability, audit reproducibility'
-    source: Contract v3 O2; Framework v4.1.2 §63
+    item: 'Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, path-map compliance,
+      context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency,
+      secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility; authority/role
+      limits and mutation scope are landing checks (CAP-58.h, MR-3), not test families'
+    source: Contract v3 O2; Framework v4.1.2 §63; EMERGENCY-2 §2.2 (DEC-1211)
     wave: W1
     provider:
     - W1-26
@@ -2311,24 +2413,22 @@ capabilities:
     provider:
     - W1-35
   - id: CAP-38.f
-    item: For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the
-      orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
-    source: DEC-137
-    wave: W1
-    provider:
-    - W1-30
+    item: 'Non-goal: a fresh reviewer''s adversarial probe after green for a FULL ticket, with the close needing the probe
+      record: work that went through green gets no review'
+    source: EMERGENCY-2 §3.4, §3.6 (DEC-1211); DEC-1214 G6
+    wave: NONE
 - id: CAP-39
-  title: Governance health scheduler (G0-G6 tiers)
-  outcome: Governance checks run at the right tier automatically, and a stale required index blocks close.
-  acceptance: '`gov close` fails when a required index is stale; the scheduler runs the configured tiers on schedule and records
-    results.'
-  wave: W3
-  wave_note: G0–G5 tiers in W1 (W1-40); the health scheduler and G6 (in qualification) are W3
+  title: Governance health tiers and the landing's checks (G1-G5)
+  outcome: Governance checks run at the right tier automatically, and a stale required index fails the landing.
+  acceptance: The landing fails when a required index is stale, and records each check it ran with its tier and its RED, YELLOW
+    or GREEN result; `gov ci` runs the CI tiers.
+  wave: W2
+  wave_note: tiers G1–G5 in W1 (W1-40); the landing's impact selection is the release (W2); a scheduler beyond it is friction
   provider:
   - lefthook 2.1.15
   - GitHub Actions
   - W1-40
-  - 'W3: health scheduler'
+  - W2-115b (the landing)
   - W1-02
   - W1-26
   sources:
@@ -2337,6 +2437,7 @@ capabilities:
   - DEC-007
   - DEC-075
   - DEC-087
+  - EMERGENCY-2 §4.3, §4.4 (DEC-1211)
   scenarios:
     dev:
     - ISO-X-02
@@ -2350,27 +2451,37 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-39.a
-    item: Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite
-    source: Contract v3 O5
+    item: Tiers G1 commit, G2 landing (the task's close), G3 pre-push (checkpoint and handoff), G4 milestone and G5 full suite
+      on CI; there is no G0, since there is no guard
+    source: Contract v3 O5; EMERGENCY-2 §2.2 (DEC-1211)
     wave: W1
     provider:
     - W1-40
     - W1-02
   - id: CAP-39.b
-    item: G6 qualification (synthetic repos, chaos, soak, hidden tests)
-    source: Contract v3 O5; DEC-067
-    wave: W3
+    item: 'The proving run on the synthetic repositories (G6 qualification, EMERGENCY-2 §8.2 item 2): chaos, soak and hidden
+      tests as the Contract''s checks need them'
+    source: Contract v3 O5; DEC-067; EMERGENCY-2 §8.2 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-81
   - id: CAP-39.c
-    item: 'Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes;
-      cache keyed by content/policy/framework hashes'
-    source: Contract v3 O5
-    wave: W3
+    item: 'Impact-selected tests at the landing: the landing runs the tests the change''s impact selects (`gov impact`)'
+    source: Contract v3 O5; EMERGENCY-2 §4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-115b
   - id: CAP-39.d
     item: RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded
     source: Contract v3 O5
     wave: W1
     provider:
     - W1-26
+  - id: CAP-39.e
+    item: 'Scheduler beyond the landing''s selection: parallel independent checks, isolated worktrees and processes, a cache
+      keyed by content, policy and framework hashes (built only if friction asks)'
+    source: Contract v3 O5; EMERGENCY-2 §8.4 (DEC-1211)
+    wave: W3
 - id: CAP-40
   title: Execution telemetry and organisational questions
   outcome: The owner can see tokens, model, cost and outcome per ticket.
@@ -2404,7 +2515,7 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-40.a
-    item: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens
+    item: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, brief id, retrieval queries/hits, tokens
       in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions'
     source: Contract v3 P1; Framework v4.1.2 §65
     wave: W1
@@ -2413,30 +2524,28 @@ capabilities:
   - id: CAP-40.b
     item: 'Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate,
       human-gate concentration, retrieval misses, cost by task/feature, first-pass completion'
-    source: Contract v3 P2; Framework v4.1.2 §66
+    source: Contract v3 P2; Framework v4.1.2 §66; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-40.c
-    item: 'Wave 1 learning metrics per ticket: KPI disputes raised by the test designer, acceptance tests rewritten after
-      implementation began (with the reason), and governance share; all three reported at the Wave 1 exit; only governance
-      share has a threshold (≤ 15 %)'
-    source: DEC-106; DEC-086
+    item: 'The weekly measures with their baselines: product share of spend, governance share (≤ 15 %), owner messages per
+      day, time and cost per ticket, landing time, memory use (EMERGENCY-2 §10.2)'
+    source: DEC-106; DEC-086; EMERGENCY-2 §10.2 (DEC-1211)
     wave: W1
     provider:
     - W1-31
     - W1-42
   - id: CAP-40.d
-    item: 'For a launched worker session the sandbox''s instruction tokens in the system prompt are reported as a separate line of the ticket''s telemetry record, not inside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures'
-    source: DEC-170; DEC-086; EXP-001 §3.6
-    wave: W1
-    provider:
-    - W1-31
+    item: 'Non-goal: the sandbox''s instruction tokens as a separate line of the telemetry record: there is no sandbox'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
 - id: CAP-41
   title: Lesson records with scope
   outcome: An agent receives the lessons that apply to its task, scoped, and lessons stay in the repository.
   acceptance: A committed lesson whose scope matches a ticket is returned by `gov retrieve` for that ticket and not for an
     out-of-scope ticket.
   wave: W1
-  wave_note: 'upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165); scope and severity are in the W1 lesson schema (DEC-168)'
+  wave_note: upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165);
+    scope and severity are in the W1 lesson schema (DEC-168)
   provider:
   - W1-08
   - W1-21
@@ -2488,30 +2597,35 @@ capabilities:
     provider:
     - W1-44
   - id: CAP-41.e
-    item: 'Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j)'
+    item: 'Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons
+      is built (CAP-41.f to CAP-41.j)'
     source: Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7; DEC-165
     wave: NONE
   - id: CAP-41.f
-    item: 'Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical); both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration'
-    source: 'DEC-165; DEC-168'
+    item: Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical);
+      both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration
+    source: DEC-165; DEC-168
     wave: W1
     provider:
     - W1-08
   - id: CAP-41.g
-    item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets, scanned by gitleaks; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`'
-    source: 'DEC-165'
+    item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code,
+      data or secrets; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`; no gitleaks scan
+      runs while the inbox is private, one full scan runs once before it is shared with a third party'
+    source: DEC-165; EMERGENCY-2 §2.11 (DEC-1211); DEC-1182; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.h
-    item: 'A high or critical lesson is raised to the owner immediately, as a decision package'
-    source: 'DEC-165'
+    item: A high or critical lesson is raised to the owner immediately, as a decision package
+    source: DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.i
-    item: 'The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release''s notes list the lessons fixed, with their severity'
-    source: 'DEC-165'
+    item: The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each
+      release's notes list the lessons fixed, with their severity
+    source: DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-41.j
-    item: 'Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox'
-    source: 'DEC-165'
+    item: Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox
+    source: DEC-165; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-42
   title: Legacy governance retirement and archive policy
@@ -2565,8 +2679,8 @@ capabilities:
   acceptance: '`framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of
     them disagrees with the installed kernel.'
   wave: W1
-  wave_note: 'Release 1 tag at the end of qualification; the manifest and file hashes of a release are W2 (CAP-43.b, lite,
-    DEC-722); release contents of CAP-43.d built before W3 are delivered ahead of that item''s wave'
+  wave_note: the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); the release is cut and re-pinned
+    by the owner once the release acceptance passes (EMERGENCY-2 §8.3); release contents of CAP-43.d are friction
   provider:
   - Copier 9.18.2
   - W1-39
@@ -2578,6 +2692,8 @@ capabilities:
   - DEC-027
   - DEC-064
   - DEC-722
+  - EMERGENCY-2 §6.1, §8 (DEC-1211)
+  - DEC-1214 L3
   scenarios:
     dev:
     - CHAOS-X-01
@@ -2595,17 +2711,20 @@ capabilities:
   - id: CAP-43.b
     item: 'Release contents, lite: the release''s own manifest and file hashes, built with the release (the lock on the install
       side is CAP-02.a, W1); a release is pinned and hash-verified, not signed'
-    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722
+    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722; DEC-1214 L3
     wave: W2
   - id: CAP-43.c
-    item: Release certification by qualification
-    source: Framework v4.1.2 §75C; DEC-067
-    wave: W3
+    item: 'Release certification by the release acceptance (EMERGENCY-2 §8.2): the Contract''s checks, the proving run, EXAMIN''s
+      copy adopted, one EXAMIN feature ticket through the flow'
+    source: Framework v4.1.2 §75C; DEC-067; EMERGENCY-2 §8.2 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-81
   - id: CAP-43.d
-    item: 'Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations, schema
-      versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions,
-      rollback procedure'
-    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722
+    item: 'Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations,
+      schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human
+      decisions, rollback procedure'
+    source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-44
   title: gov init and gov adopt lifecycle
@@ -2617,8 +2736,8 @@ capabilities:
   wave: W3
   wave_note: W1 delivers gov init (copier copy) and adoption stages A0-A6 and A8 with baseline, rollback points and the A5
     independent path-map review (W1-39, W1-41); the lite A7 and A10 gates and the lite verdict are W2 (CAP-44.f, CAP-44.h;
-    DEC-722); stage AS, the lite spec audit, is W2 (CAP-44.m; DEC-1200); A9, A11, the full A7 and A10 gates and the verdict with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47
-    (CAP-44.k, CAP-44.l; DEC-090)
+    DEC-722); stage AS, the lite spec audit, is W2 (CAP-44.m; DEC-1200); A9, A11, the full A7 and A10 gates and the verdict
+    with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47 (CAP-44.k, CAP-44.l; DEC-090)
   provider:
   - Copier 9.18.2
   - W1-39
@@ -2680,41 +2799,41 @@ capabilities:
     - W1-41
   - id: CAP-44.f
     item: 'A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent
-      Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan
-      reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and
-      the canary of each index (CAP-55)'
-    source: Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722
+      Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed
+      at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary
+      of each index (CAP-55); the fresh auditor runs at A5, AS, A7 and A10 (DEC-1214 G6)'
+    source: Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722; DEC-1214 G6
     wave: W2
   - id: CAP-44.g
     item: Remediation, finding states, human gates during adoption
-    source: Adoption Protocol v3.0 §17–§19
+    source: Adoption Protocol v3.0 §17–§19; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.h
-    item: 'Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh
-      Independent Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native
-      layout kept, the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor
-      green (exit 0), gov check with no RED family, and one ticket closed by gov close at exit 0 with the repository''s own
-      test command; of the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those
-      marked W2 and the lite part named for those marked W3: (1) certified kernel pinned: W3 (the certification by
-      qualification is CAP-43.c), its lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay
-      separate: W3, no lite part, (3) path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5
-      review and the native layout kept, CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a
-      separate verifier role, CAP-47.a), its lite part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no
-      accidental legacy authority, CAP-48.b), its lite part A8''s retirement of legacy memory (CAP-44.e), (6) memory
-      independently verified: W3 (over the A9 knowledge fabric and by a separate role, CAP-44.k, CAP-47.a), its lite part
-      the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit completed: W3 (A11, CAP-44.k), no lite part, (8)
-      critical/high unaccepted findings resolved: W3 (finding states and remediation, CAP-44.g, and the A11 audit), no lite
-      part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b), its lite part the derived state rebuilt
-      from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction demonstrated: W3 (CAP-48.b), no
-      lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS when each lite condition
-      not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY; only the owner accepts
-      an exception; the auditor accepts none; the verdict record names itself lite and names the conditions it does not
-      check'
-    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
+    item: 'Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent
+      Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native layout kept,
+      the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor green (exit 0), gov
+      check with no RED family, and one ticket closed by gov close at exit 0 with the repository''s own test command; of the
+      ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those marked W2 and the lite
+      part named for those marked W3: (1) certified kernel pinned: W3 (the certification by qualification is CAP-43.c), its
+      lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay separate: W3, no lite part, (3)
+      path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5 review and the native layout kept,
+      CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a separate verifier role, CAP-47.a), its lite
+      part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no accidental legacy authority, CAP-48.b), its lite
+      part A8''s retirement of legacy memory (CAP-44.e), (6) memory independently verified: W3 (over the A9 knowledge fabric
+      and by a separate role, CAP-44.k, CAP-47.a), its lite part the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit
+      completed: W3 (A11, CAP-44.k), no lite part, (8) critical/high unaccepted findings resolved: W3 (finding states and
+      remediation, CAP-44.g, and the A11 audit), no lite part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b),
+      its lite part the derived state rebuilt from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction
+      demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS
+      when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY;
+      only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions
+      it does not check; at the release, EXAMIN''s copy gets its verdict with memory at 95 % or more end to end on a fresh
+      80 (EMERGENCY-2 §8.2 item 3)'
+    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.2 (DEC-1211)
     wave: W2
   - id: CAP-44.i
     item: Interrupted-session recovery and freeze during adoption
-    source: Adoption Protocol v3.0 §4
+    source: Adoption Protocol v3.0 §4; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.j
     item: The path map keeps a healthy native framework/package layout unless the target structure is materially better and
@@ -2726,37 +2845,39 @@ capabilities:
   - id: CAP-44.k
     item: A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles,
       A10 over the A9 knowledge fabric)
-    source: Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722
+    source: Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.l
     item: Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY
       conditions, after A0–A11
-    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
+    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-44.m
     item: 'AS spec audit, lite: after A2 and before A3, `gov adopt --lite --stage AS` records every spec found (path, title,
-      its stated wave or status), each built, partly built or not built with evidence (code paths, tests, commits), the
-      tickets found done or not by wave, the specs with no code, the code with no spec (top-level code modules no spec
-      names), and each gap as one question to the owner with a place for the answer; the lite checks (every spec and every
-      top-level code module the inventory holds named, every gap with a question) refuse a record that fails either; A3
-      refuses to run before AS is recorded; built or not is judged from code paths, tests and commits, never by a model;
-      the path map''s reviewer at A5 reads the record'
+      its stated wave or status), each built, partly built or not built with evidence (code paths, tests, commits), the tickets
+      found done or not by wave, the specs with no code, the code with no spec (top-level code modules no spec names), and
+      each gap as one question to the owner with a place for the answer; the lite checks (every spec and every top-level code
+      module the inventory holds named, every gap with a question) refuse a record that fails either; A3 refuses to run before
+      AS is recorded; built or not is judged from code paths, tests and commits, never by a model; the path map''s reviewer
+      at A5 reads the record'
     source: DEC-1200; P-ADOPT-SPEC-AUDIT-1
     wave: W2
     provider:
     - W2-192
 - id: CAP-45
   title: gov update lifecycle
-  outcome: The owner can update the Gov OS in a repository without losing overlay configuration.
-  acceptance: '`gov update --check` reports the version change and migrations; `copier update` applies them with the overlay
-    files unchanged and `gov doctor` green.'
-  wave: W3
-  wave_note: 'gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of
-    `gov doctor` is W3 (DEC-165)'
+  outcome: The owner can update the Gov OS in a repository without losing his overlay or his own edits, and without re-adopting.
+  acceptance: '`gov update --check` reports the version change and migrations; `gov update` installs the pinned, hash-verified
+    release and applies it with a three-way merge that keeps the owner''s own edits and the overlay files, and `gov doctor`
+    is green, with no re-adopt.'
+  wave: W2
+  wave_note: '`gov update` is built in the release (EMERGENCY-2 §6.1, §7.6), which brings it back from Wave 3, where DEC-1089
+    and DEC-1090 had put it'
   provider:
   - Copier 9.18.2
-  - 'W3: gov update --check'
-  - 'W3: gov doctor pending-update report'
+  - W2-17
+  - W2-18 (pinned install)
+  - 'W2-17: gov doctor pending-update report'
   sources:
   - Contract v3 Gate S5
   - Framework v4.1.2 §82
@@ -2764,6 +2885,9 @@ capabilities:
   - DEC-023
   - DEC-165
   - DEC-1090
+  - EMERGENCY-2 §6.1, §8 (DEC-1211)
+  - DEC-1214 Q-UPD
+  - DEC-1214 L3
   scenarios:
     dev:
     - CHAOS-A-10
@@ -2774,15 +2898,22 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-45.a
-    item: 'gov update: check/impact, authenticated source (the signed tag, CAP-02.c, and the release''s manifest and file
-      hashes, CAP-43.b), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify,
-      rollback, ledger/provenance'
-    source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090
-    wave: W3
+    item: 'gov update: check/impact, authenticated source (the release''s manifest and file hashes, CAP-43.b; no signature,
+      DEC-1214 L3), compatibility/migration, a three-way merge that keeps the owner''s own edits and the overlay, adapters
+      regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance'
+    source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090; EMERGENCY-2 §6.1 (DEC-1211);
+      DEC-1214 Q-UPD
+    wave: W2
+    provider:
+    - W2-17
+    - W2-18
   - id: CAP-45.b
-    item: 'In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update`'
-    source: 'DEC-165'
-    wave: W3
+    item: In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and
+      their highest lesson severity at session start; the owner decides when to run `gov update`
+    source: DEC-165
+    wave: W2
+    provider:
+    - W2-17
 - id: CAP-46
   title: Cross-machine sync via git
   outcome: The owner can move to another machine with git alone.
@@ -2819,8 +2950,8 @@ capabilities:
     contains no builder chat.
   wave: W3
   wave_note: Independent Test Designer and Independent Auditor roles in W1 (W1-33), including the A5 path-map review (DEC-090);
-    the lite A7 and A10 gates W2 by that Independent Auditor role (CAP-44.f, DEC-722); full independent adoption/audit roles
-    and the full A7, A10 and A11 gates W3
+    the lite A7 and A10 gates and the AS spec audit W2 by that Independent Auditor role (CAP-44.f, DEC-722); full independent
+    adoption/audit roles and the full A7, A10 and A11 gates W3
   provider:
   - W1-33
   - 'W3: independent adoption/audit roles'
@@ -2836,6 +2967,7 @@ capabilities:
   - DEC-070
   - DEC-088
   - DEC-090
+  - DEC-1214 G6
   scenarios:
     dev:
     - AUDIT-X-01
@@ -2846,7 +2978,7 @@ capabilities:
   covers:
   - id: CAP-47.a
     item: Role separation for adoption and audit
-    source: Contract v3 T1; Adoption Protocol v3.0 §3
+    source: Contract v3 T1; Adoption Protocol v3.0 §3; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-47.b
     item: Fresh-session independence with a bounded context pack
@@ -2856,11 +2988,12 @@ capabilities:
     - W1-36
   - id: CAP-47.c
     item: Adoption evidence tree
-    source: Contract v3 T3; Adoption Protocol v3.0 §5
+    source: Contract v3 T3; Adoption Protocol v3.0 §5; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-47.d
-    item: 'Audit triggers: spine, STANDARD/FULL feature closure, CIT-E on a closed spine, wave and release exits'
-    source: MR-4; DEC-088
+    item: 'Audit triggers: the release acceptance and adoption stages A5, AS, A7 and A10; otherwise only a red test, a failed
+      landing or merge, or a feature that does not work as intended'
+    source: MR-4; DEC-1214 G6 (a); EMERGENCY-2 §3.4, §3.6 (DEC-1211)
     wave: W1
     provider:
     - W1-13
@@ -2888,42 +3021,37 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-48.a
-    item: 'SLOs tracked with thresholds: suite freshness, product-test health, retrieval Recall@K, stale-index count, orphan-graph
-      count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens
-      per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success'
-    source: Contract v3 U; Framework v4.1.2 §75
+    item: 'SLOs tracked with thresholds: suite freshness, product-test health, the end-to-end judged memory figure (not Recall@K),
+      stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness
+      coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent
+      reconstruction success'
+    source: Contract v3 U; Framework v4.1.2 §75; EMERGENCY-2 §5.2 (DEC-1211); EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-48.b
     item: 'HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness
       passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability
       satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived
       memory rebuildable'
-    source: Contract v3 U; Framework v4.1.2 §76
+    source: Contract v3 U; Framework v4.1.2 §76; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-49
   title: Qualification oracle (synthetic repos, fault injection, hidden tests)
-  outcome: The owner can qualify the Gov OS on two synthetic programmes against a held-out oracle before Release 1.
-  acceptance: A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any
-    forbidden outcome fails; the builder sessions had no read access to the oracle. The oracle is hidden from a launched worker's
-    Bash by the sandbox, and from every session started in the repository root by a `Read` deny rule and by the guard refusing
-    any tool call that names its path.
-  wave: W3
-  wave_note: the pack exists (S0b1); executed as qualification after W3 (DEC-067); the hiding of the oracle is W1 (DEC-152,
-    DEC-162)
+  outcome: The owner can prove the Gov OS on synthetic repositories against a held-out oracle before the release.
+  acceptance: 'A fresh executor runs the proving run on W2-81''s synthetic repositories and produces a scorecard in SCORECARD_FORMAT;
+    any forbidden outcome fails; the hidden sets are protected by the transcript scan (CAP-66): the transcripts written between
+    a set''s writing and the end of its measure contain neither its path nor its question ids, or the measure is void.'
+  wave: W2
+  wave_note: the pack exists (S0b1); it runs as the release proving run (EMERGENCY-2 §8.2 item 2)
   provider:
   - synthetic Programmes A and B
   - held-out oracle
   - qualification executor
-  - W1-46
-  - W1-47
+  - W2-81 (the six synthetic repositories)
   sources:
   - Contract v3 Gate V1, V2, V3, V4
   - DEC-067
   - DEC-071
-  - DEC-152
-  - DEC-161
-  - DEC-162
-  - EXP-001 (spike-sandbox/EVIDENCE.md §3.3, §5.4)
+  - EMERGENCY-2 §2.7, §8.2 (DEC-1211)
   scenarios:
     dev: []
     qual: []
@@ -2932,22 +3060,22 @@ capabilities:
     note: DROP in S0a; KEPT as qualification by DEC-067
   covers:
   - id: CAP-49.a
-    item: Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail
-    source: Contract v3 V1–V4; DEC-067
-    wave: W3
+    item: Fault manifest; hidden path-map and memory oracles, protected by the transcript scan (CAP-66); quantitative scoring;
+      forbidden outcomes fail
+    source: Contract v3 V1–V4; DEC-067; EMERGENCY-2 §2.7, §8.2 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-81
   - id: CAP-49.b
-    item: 'In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher
-      passes; hiding is silent: the directory looks empty'
-    source: DEC-152; DEC-161; EXP-001 §3.3, §5.4
-    wave: W1
-    provider:
-    - W1-46
+    item: 'Non-goal: the oracle hidden from a launched worker''s Bash by the sandbox and a `Read` deny rule: no sandbox; the
+      transcript scan (CAP-66) detects a read instead'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-49.c
-    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s own session is an accepted residual; the oracle path is held in `governance/project/held-out.yaml` and in the committed deny rule built from it; register entry DEC-067 names the directory historically; the guard and the launcher take the path from `held-out.yaml`, and no acceptance test names it'
-    source: 'DEC-162'
-    wave: W1
-    provider:
-    - W1-47
+    item: 'Non-goal: the oracle hidden from every session by a `Read` deny rule in the committed settings and the guard refusing
+      any call that names its path: no guard; the transcript scan (CAP-66) detects a read instead'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
 - id: CAP-50
   title: Artifact flow, dependency consumption and end-to-end traceability
   outcome: An agent can tell which evidence becomes stale when a requirement changes.
@@ -2982,7 +3110,7 @@ capabilities:
     - W1-08
   - id: CAP-50.b
     item: Typed output→input contracts with required/optional dependencies and output schemas
-    source: Contract v3 W2
+    source: Contract v3 W2; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.c
     item: Consumption receipt and implementation traceability
@@ -2992,26 +3120,27 @@ capabilities:
     - W1-30
   - id: CAP-50.d
     item: Upstream-change staleness propagation; COMPLETE is not permanently valid
-    source: Contract v3 W6
+    source: Contract v3 W6; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.e
     item: Orphan/dead-output detection with governed remediation
-    source: Contract v3 W7
+    source: Contract v3 W7; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.f
     item: 'Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection,
       staleness accuracy, requirement→code and →test coverage, orphan recall, reconstruction correctness'
-    source: Contract v3 W11
+    source: Contract v3 W11; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
   - id: CAP-50.g
     item: Health-scheduler integration
-    source: Contract v3 W12
+    source: Contract v3 W12; EMERGENCY-2 §8.4 (DEC-1211)
     wave: W3
 - id: CAP-51
   title: Decisions register (structured, versioned, authoritative)
   outcome: An agent can rely on one structured, versioned register of decisions with supersession.
   acceptance: Superseding a decision updates both records' status and links, and the checker flags an ACTIVE record that is
-    superseded, a duplicate id or a cycle.
+    superseded, a duplicate id or a cycle. The checker also runs on the register that replaces the archived one, and an id
+    cited from the archive is a finding that points to it.
   wave: W1
   provider:
   - MADR + check-jsonschema 0.38.2
@@ -3024,6 +3153,7 @@ capabilities:
   - DEC-030 (authority/current/superseded filtering)
   - DEC-012
   - DEC-074
+  - EMERGENCY-2 §11.3 (DEC-1211)
   scenarios:
     dev:
     - CHAOS-B-08
@@ -3066,7 +3196,7 @@ capabilities:
   title: Model-agnostic adapters (provider, IDE, CLI)
   outcome: The owner can use Claude Code or an AGENTS.md-reading harness with the same rules, generated from one source.
   acceptance: '`rulesync generate` produces CLAUDE.md, AGENTS.md and `.claude/`; CI fails when a generated file differs from
-    its source; the Claude Code adapter carries every hook and deny rule.'
+    its source; the Claude Code adapter carries the checkpoint hooks and the two deny lines (`git push`, `sudo`).'
   wave: W1
   provider:
   - rulesync 24.0.0
@@ -3077,6 +3207,7 @@ capabilities:
   - OWNER-LAUNCHER-BR-0001 (Claude Code first, others later)
   - DEC-022
   - DEC-074
+  - EMERGENCY-2 §2.2, §2.4 (DEC-1211)
   scenarios:
     dev:
     - ISO-X-03
@@ -3099,23 +3230,26 @@ capabilities:
     - W1-38
 - id: CAP-53
   title: Proportionality profiles (LITE/STANDARD/FULL)
-  outcome: 'The owner gets ceremony in proportion to impact: LITE, STANDARD or FULL.'
-  acceptance: An R0 change runs only the LITE checks and an R3 change raises the FULL gate and readiness rows, with the profile
-    computed by `gov impact`.
+  outcome: 'The owner gets ceremony in proportion to the work: a feature, a fix or a chore, with model, effort and checks
+    from the owner''s rubric.'
+  acceptance: A feature ticket carries its profile (LITE, STANDARD or FULL) and the model, effort and checks follow from its
+    class in the rubric; a fix is recorded in its owning ticket and a chore is a direct commit listed in the digest, neither
+    with a ticket of its own; the profiles stay until the measured rubric replaces them (DEC-1208, DEC-1120).
   wave: W2
-  wave_note: declared per ticket in W1 (W1-09); computed from impact in W2
+  wave_note: profiles declared per ticket in W1 (W1-09); the rubric replaces computing the profile from impact
   provider:
   - W1-09
-  - 'W2: gov impact profile'
   - W1-08
   - W1-13
   - W1-31
+  - W2-121c (the launcher states the rubric's model and effort)
   sources:
   - DEC-005 (proportionality profiles)
   - DEC-035 (radius-scaled budgets/facets)
   - DEC-004 (governance overhead budget 10-15%)
   - OWNER-DIRECTION-P2-0009 §11
   - DEC-085
+  - DEC-1120; DEC-1208; EMERGENCY-2 §4.1, §4.5, §4.6 (DEC-1211)
   scenarios:
     dev:
     - MR-X-02
@@ -3125,16 +3259,17 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-53.a
-    item: Profiles LITE/STANDARD/FULL by radius; readiness rows per profile
-    source: DEC-005; DEC-085
+    item: Work is a feature, a fix or a chore; model, effort and checks come from the measured rubric; the profiles LITE/STANDARD/FULL
+      by radius, with readiness rows per profile, stay until the rubric replaces them
+    source: DEC-005; DEC-085; EMERGENCY-2 §4.5 (DEC-1211)
     wave: W1
     provider:
     - W1-13
     - W1-08
   - id: CAP-53.b
-    item: Profile computed from impact
-    source: DEC-035; architecture v0.3 §2.3
-    wave: W2
+    item: 'Non-goal: a profile computed from impact (`gov impact`): the rubric replaces it'
+    source: EMERGENCY-2 §4.5 (DEC-1211)
+    wave: NONE
   - id: CAP-53.c
     item: Governance budget within profile
     source: DEC-004; OWNER-DIRECTION-P2-0009 §11
@@ -3268,24 +3403,17 @@ capabilities:
     - W1-20
     - W1-22
 - id: CAP-58
-  title: Path guards as default-deny allow-lists
-  outcome: 'An agent can write only inside its task''s declared paths; everything else is denied. The orchestrator is the
-    one exception: it may write anywhere in the repository except `tests/acceptance/**`.'
-  acceptance: An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard, and a Bash form the
-    guard cannot parse is caught by the post-command containment check; in a launched worker session a Bash write outside
-    the repository is stopped by the OS sandbox, and a file-tool write outside it by the permission rules and the guard.
+  title: Containment judged at the landing
+  outcome: An agent works inside its task's declared paths. A change outside them is a notice in the landing's record; only
+    a change that breaks test authorship is refused (MR-3).
+  acceptance: 'At the landing, each commit''s paths are judged against the allowed paths of its `Role` and `Task` trailers:
+    a path outside them is a notice in the land record and never a refusal; a commit that changes `tests/acceptance/` without
+    `Role: independent-test-designer` (or the owner''s `Role: owner`) is refused, naming the commit. Nothing is refused at
+    write time.'
   wave: W1
   provider:
-  - W1-02
-  - W1-03
-  - W1-01
-  - W1-26
-  - W1-33
-  - W1-45
-  - W1-46
-  - W1-47
   - W1-50
-  - 'W3: lessons-inbox guard exception'
+  - W2-115b
   sources:
   - DEC-041 (default-deny allow-lists, derived not enumerated)
   - DEC-076
@@ -3297,6 +3425,7 @@ capabilities:
   - DEC-165
   - DEC-171
   - DEC-255
+  - EMERGENCY-2 §2.1, §2.2, §4.3, §4.4 (DEC-1211)
   scenarios:
     dev:
     - MR-A-01
@@ -3318,64 +3447,52 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-58.a
-    item: 'Default-deny write allow-lists per role and ticket, except the orchestrator (`CAP-58.e`); checks derived, not enumerated'
-    source: 'DEC-041; DEC-076; DEC-156'
-    wave: W1
-    provider:
-    - W1-02
-    - W1-03
-    - W1-26
+    item: 'Non-goal: default-deny write allow-lists per role and ticket: the guard is retired'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.b
-    item: 'Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them; a launched worker session''s network grant comes from the launcher''s network profile (`CAP-61.c`), which the role definition names'
-    source: 'Framework v4.1.2 §32; DEC-158; DEC-163'
-    wave: W1
-    provider:
-    - W1-33
+    item: 'Non-goal: permission classes enforced as role permissions by the guard: no guard, no permission editing'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.c
-    item: A session with no or an unknown role has no write privilege
-    source: OWNER-DECISION-P2-0001 BC-P2-08
-    wave: W1
-    provider:
-    - W1-02
+    item: 'Non-goal: a session with no or an unknown role has no write privilege: nothing refuses a write; the landing judges
+      the commit'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.d
-    item: 'Claim split by tool: in a launched worker session the OS sandbox stops a Bash write outside the repository without
-      parsing the command; the file tools (Read, Edit, Write) run outside the sandbox and are held by the permission rules
-      and the guard; `Edit(...)` and `Read(...)` deny rules bind both layers'
-    source: DEC-152; DEC-161; EXP-001 §5.4
-    wave: W1
-    provider:
-    - W1-46
+    item: 'Non-goal: the claim split by tool between the OS sandbox and the guard: neither exists'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.e
-    item: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket''s `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding (DEC-171)'
-    source: 'DEC-150; DEC-156; DEC-171'
-    wave: W1
-    provider:
-    - W1-45
+    item: 'Non-goal: the orchestrator''s write scope under the guard: there is no guard to except it from'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.f
-    item: The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written
-      files before failing; a call refused by a deny rule reaches no hook
-    source: DEC-153; EXP-001 §5.4
-    wave: W1
-    provider:
-    - W1-47
+    item: 'Non-goal: the containment check on `PostToolUseFailure`: a hook-time check; the landing judges commits instead'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.g
-    item: 'The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write, as a guard exception'
-    source: 'DEC-165'
-    wave: W3
+    item: 'Non-goal: the lessons inbox as a guard exception: there is no guard'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-58.h
-    item: "Containment attribution by commit trailers: a forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit, each commit's paths against the allowed paths of its own `Role` and `Task` trailers and not against the caller; a merge commit is not a finding when every commit it brings passes; a commit with no `Role` or `Task` trailer is judged against the caller"
-    source: DEC-255; DEC-182
+    item: 'Containment judged at the landing by commit trailers: a forward HEAD move, including an integration merge, is judged
+      commit by commit, each commit''s paths against the allowed paths of its own `Role` and `Task` trailers; a path outside
+      them is a notice, never a refusal; only a test-authorship breach (MR-3) is refused; a merge commit is not a finding
+      when every commit it brings passes; a commit with no `Role` or `Task` trailer is judged against the caller'
+    source: DEC-255; DEC-182; EMERGENCY-2 §4.3 (DEC-1211)
     wave: W1
     provider:
     - W1-50
+    - W2-115b
+  wave_note: the guard and its allow-lists are retired (EMERGENCY-2 §2.2); containment is a landing check (NEW-1, CAP-63)
 - id: CAP-59
   title: Review-repair loop budget
-  outcome: 'The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop continues
-    until it converges, or until three consecutive iterations fail to converge, and then the owner decides from an escalation
-    package.'
-  acceptance: 'After three consecutive non-converging iterations on the same surface, `gov close` stops the loop and puts
-    an escalation package in chat (each iteration''s outcome, why it is not converging, options: fix differently, narrow,
-    split, defer, delete, continue); the iteration count never appears in the output seen by the looping session.'
+  outcome: 'The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop runs at most
+    two rounds, and then the owner decides once, from an escalation package with options.'
+  acceptance: 'After two rounds on the same surface the review tool refuses a third and puts one escalation package in chat
+    (each round''s outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue); READY
+    is computed from the reviewers'' verdict blocks; the round count never appears in the output seen by the looping session.'
   wave: W1
   provider:
   - W1-30
@@ -3384,6 +3501,7 @@ capabilities:
   sources:
   - DEC-044 as amended by DEC-096 (loop policy)
   - OWNER-DIRECTION-P2-0009 §2 (simplification principle)
+  - DEC-1204; EMERGENCY-2 §3.3 (DEC-1211)
   scenarios:
     dev:
     - MR-X-03
@@ -3393,10 +3511,10 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-59.a
-    item: Loops (review→repair, audit→repair, test→fix, verification) run to convergence or to three consecutive non-converging
-      iterations, then an escalation package with each iteration's outcome, the reason it is not converging and the options
-      fix differently / narrow / split / defer / delete / continue; the owner decides
-    source: DEC-044 as amended by DEC-096; OWNER-DIRECTIVE-0003; OWNER-AUTHORISATION-P2-0006
+    item: Loops (review→repair, audit→repair, test→fix, verification) run at most two rounds; then one escalation package
+      with each round's outcome, the reason it is not converging and the options fix differently / narrow / split / defer
+      / delete / continue; the owner decides once; READY is computed by code
+    source: DEC-044 as amended by DEC-096; OWNER-DIRECTIVE-0003; OWNER-AUTHORISATION-P2-0006; DEC-1204
     wave: W1
     provider:
     - W1-30
@@ -3442,14 +3560,14 @@ capabilities:
     source: OWNER-DECISION-0006; OWNER-DECISION-0007; DEC-039
     wave: NONE
 - id: CAP-61
-  title: Worker session launcher and OS sandbox
+  title: Worker session launcher
   outcome: The orchestrator can start a worker session (engineer, independent test designer, independent auditor, research
-    or experiment) that runs inside the OS sandbox with its role's network profile, and cannot start one without it.
-  acceptance: '`gov launch` refuses to start a worker session unless the sandbox is enabled, strict (`allowUnsandboxedCommands:
-    false`, network `strictAllowlist`) and fail-closed (`failIfUnavailable: true`); a launched worker''s Bash command cannot
-    write outside the repository, its network profile applies, and its `GOV_ROLE` and `GOV_TICKET` reach the guard.'
+    or experiment) in its own worktree with its role file and the model and effort the owner's rubric gives it, and with no
+    permission prompt.
+  acceptance: '`gov launch` starts a worker in its worktree with its role file, `GOV_ROLE`, `GOV_TICKET`, its own temp folder
+    and the rubric''s model and effort, with no permission prompt; it refuses a launch whose model or effort the rubric does
+    not give for that role.'
   wave: W1
-  wave_note: 'the untested sandbox cases are a W2 experiment, EXP-002 (DEC-160, DEC-164)'
   provider:
   - Claude Code sandbox (bubblewrap 0.9.0, socat 1.8.0.0)
   - W1-46
@@ -3466,6 +3584,7 @@ capabilities:
   - EXP-001 (spike-sandbox/EVIDENCE.md §5.2–5.5)
   - DEC-163
   - DEC-164
+  - EMERGENCY-2 §2.2, §2.3, §6.1 (DEC-1211)
   scenarios:
     dev: []
     qual: []
@@ -3473,27 +3592,21 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-61.a
-    item: 'The launcher refuses to start a worker session unless the sandbox is on, strict and fail-closed: enabled, `failIfUnavailable:
-      true`, `allowUnsandboxedCommands: false`, network `strictAllowlist`; the configuration is passed through `--settings`,
-      never read from the repository, whose settings carry no sandbox block; the launcher sets no `excludedCommands`'
-    source: DEC-152; DEC-153; DEC-161; DEC-164; EXP-001 §5.2
-    wave: W1
-    provider:
-    - W1-46
+    item: 'Non-goal: the launcher refuses a worker unless the OS sandbox is on, strict and fail-closed: there is no sandbox'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-61.b
-    item: 'Per-role `--settings`: the sandbox block plus the role''s `Edit` deny rules; the launcher sets `GOV_ROLE` and `GOV_TICKET`,
-      and both reach the guard; a launched worker is shown to be sandboxed. The sandbox applies to launched worker sessions
-      only; in-session subagents remain for read-only work (review, exploration, web research)'
-    source: DEC-153; DEC-161; EXP-001 §5.3
+    item: '`gov launch` starts a worker in its worktree with its role file, `GOV_ROLE`, `GOV_TICKET` and the rubric''s model
+      and effort; in-session subagents remain for read-only work (review, exploration, web research); no permission prompt,
+      no per-role `--settings` sandbox block'
+    source: DEC-153; DEC-161; EXP-001 §5.3; EMERGENCY-2 §2.2 (DEC-1211)
     wave: W1
     provider:
     - W1-46
   - id: CAP-61.c
-    item: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard''s per-ticket allow-list, not by the list; the list''s exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox'
-    source: 'DEC-158; DEC-161; DEC-163; EXP-001 §1, §3.4, §5.3'
-    wave: W1
-    provider:
-    - W1-46
+    item: 'Non-goal: the network profile per role, held by the sandbox and generated `Edit` deny rules: no sandbox, no allowlist'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
   - id: CAP-61.d
     item: The launcher sets a per-session temp directory for each worker session; if the acceptance test shows it cannot be
       overridden, the shared `$TMPDIR` is recorded as a residual
@@ -3509,30 +3622,305 @@ capabilities:
     provider:
     - W1-48
   - id: CAP-61.f
-    item: 'The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals'
-    source: DEC-160; DEC-164; EXP-001 §4
-    wave: W2
+    item: 'Non-goal: the untested sandbox cases of EXP-002: there is no sandbox to test'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
 - id: CAP-62
   title: Sandbox escape hatch denied
-  outcome: A session cannot run a Bash command outside the sandbox by asking for it.
-  acceptance: 'A Bash call carrying `dangerouslyDisableSandbox: true` is denied by the guard''s PreToolUse hook, whatever
-    the role.'
-  wave: W1
-  provider:
-  - W1-47
+  outcome: (none — non-goal)
+  acceptance: No file of the kernel implements a sandbox or the denial of its escape hatch; the release acceptance finds none
+    (EMERGENCY-2 §2.2).
+  wave: NONE
+  provider: []
   sources:
   - DEC-152
   - DEC-153
   - EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
+  - EMERGENCY-2 §2.2 (DEC-1211)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: DROP
+    non_goal: 'Non-goal: the sandbox escape hatch is moot where there is no sandbox (EMERGENCY-2 §2.2).'
+    decisions:
+    - DEC-1211
+  covers:
+  - id: CAP-62.a
+    item: 'Non-goal: the guard denies a Bash call carrying `dangerouslyDisableSandbox: true`: no sandbox, no guard'
+    source: EMERGENCY-2 §2.2 (DEC-1211)
+    wave: NONE
+- id: CAP-63
+  title: The landing
+  outcome: 'A ticket lands by one deterministic action, in minutes, in Gov OS and in an adopted repository: the merge, the
+    impact-selected tests, the path and authorship checks and the close record are one step.'
+  acceptance: '`gov queue` merges a ticket''s branch into integration, runs the impact-selected tests on the merged result,
+    checks trailers, paths, test authorship, a committed tree, store freshness and disk, writes the ticket''s close record
+    itself and closes the ticket at the land; the merge, tests and checks of one EXAMIN feature ticket finish in minutes;
+    a red landing names its cause.'
+  wave: W2
+  provider:
+  - W2-115b (gov queue)
+  - W2-193
+  - W2-194
+  sources:
+  - EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+  - DEC-1214 L1, L2, Q-CLOSE
+  - DEC-906
+  - DEC-1052
+  - DEC-1116
   scenarios:
     dev: []
     qual: []
   disposition:
     class: KEPT
   covers:
-  - id: CAP-62.a
-    item: 'The guard denies any Bash call carrying `dangerouslyDisableSandbox: true`, as defence in depth behind strict mode'
-    source: DEC-153; EXP-001 §5.4
-    wave: W1
+  - id: CAP-63.a
+    item: The landing merges, runs the impact-selected tests on the merged result and checks trailers, containment (a notice),
+      test authorship, a committed tree, store freshness and disk
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
     provider:
-    - W1-47
+    - W2-115b
+  - id: CAP-63.b
+    item: The landing writes the ticket's close record and closes the ticket at the land; no separate close step carries weight
+      of its own (DEC-1214 L2)
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-115b
+  - id: CAP-63.c
+    item: A red landing is fixed by finding and removing its cause; the fix lands without a new ticket; a red already on the
+      base is recorded as a known base red (DEC-1214 Q-CLOSE)
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-193
+    - W2-194
+  - id: CAP-63.d
+    item: The landing exists in an adopted repository (`gov queue`), not only among Gov OS's own tools
+    source: EMERGENCY-2 §4.3, §4.4 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-115b
+- id: CAP-64
+  title: The run-time tool
+  outcome: 'The work keeps going without the owner as the relay: ready tickets start in the slots the machine has, a finished
+    session is told to its lead, and a stalled session is woken.'
+  acceptance: 'RT-1 to RT-8 each pass their own verify (EMERGENCY-2 §6.3): no ready ticket waits more than 10 minutes while
+    the machine has room for it; the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing;
+    slots come from the CPU, RAM and GPU detected at start; zero GPU spill events; a session resumes after a compaction, restart
+    or crash at its recorded next step; messages go through per-session inbox files and none passes through the owner; one
+    watcher process; the launcher states the rubric''s model and effort.'
+  wave: W2
+  provider:
+  - W2-121c
+  - W2-121d
+  - W2-156
+  sources:
+  - EMERGENCY-2 §6.3, A-5 (DEC-1211)
+  - DEC-1007
+  - DEC-1030
+  - DEC-1214 T1, T2, T3
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-64.a
+    item: 'RT-1: no ready ticket waits more than 10 minutes while the machine has room for it (verify: a week of the tool''s
+      log)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.b
+    item: 'RT-2: the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing (verify: finish
+      times against message times)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+    - W2-121d
+  - id: CAP-64.c
+    item: 'RT-3: slots come from the CPU, RAM and GPU detected at start, with no machine-specific constant (verify: one configuration
+      runs on two simulated machine profiles)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.d
+    item: 'RT-4: zero GPU spill events; embedders and rerankers stay on the GPU, even if that limits parallel leads (verify:
+      the GPU log; DEC-1214 T3)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.e
+    item: 'RT-5: after a compaction, restart or crash a session resumes at the recorded next step without the owner restating
+      it (CAP-37; verify: a forced compaction and a killed session)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.f
+    item: 'RT-6: messages between CTOs, leads, workers and the operator go through per-session inbox files with a read mark;
+      none passes through the owner (verify: a week of owner messages carries no relays)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.g
+    item: 'RT-7: one state file and one wake rule replace today''s watcher layers (verify: one watcher process)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+    - W2-121d
+  - id: CAP-64.h
+    item: 'RT-8: the launcher picks the model and effort from the rubric and states them (verify: the launch log)'
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.i
+    item: A stalled session is detected by the dispatcher's cron pass, a shell script that costs no model (DEC-1214 T1)
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+  - id: CAP-64.j
+    item: The owner is pushed to his phone when the CTO needs his decision (features, specs, KPIs, data and measurement, P1
+      decisions touching the core or the kernel) (DEC-1214 T2)
+    source: EMERGENCY-2 §6.3, A-5 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-121c
+- id: CAP-65
+  title: Memory by construction
+  outcome: Every agent uses memory because its brief carries it, not because it remembers to ask.
+  acceptance: Every brief `gov brief` writes holds the ticket's whole retrieval bundle and no unfilled `{…}` placeholder;
+    every role template and every skill says memory first and none forbids `gov retrieve`; the memory-use log has a line for
+    each retrieve.
+  wave: W2
+  provider:
+  - W2-197
+  sources:
+  - EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+  - DEC-836
+  - DEC-1210
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-65.a
+    item: Every brief carries the ticket's retrieval bundle, uncut (CAP-15)
+    source: EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-197
+  - id: CAP-65.b
+    item: Every template and every skill says memory first; the brief template no longer says "No `gov retrieve` in the sandbox"
+    source: EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-197
+  - id: CAP-65.c
+    item: 'A memory-use log records each retrieve: who asked, when, the question and what came back'
+    source: EMERGENCY-2 §5.4, §5.6, §5.7 (DEC-1211)
+    wave: W2
+    provider:
+    - W2-197
+- id: CAP-66
+  title: The hidden-set scan
+  outcome: A hidden question set that an agent has read is detected, and its measure is void.
+  acceptance: The transcripts written between a set's writing and the end of its measure contain neither its path nor its
+    question ids, or the measure is void; the memory reader runs with only the memory tool and the gold sits outside the index.
+  wave: W2
+  provider:
+  - 'W2: the transcript scan (A-12)'
+  sources:
+  - EMERGENCY-2 §2.7, A-12 (DEC-1211)
+  - DEC-1214 E3
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-66.a
+    item: The transcript scan reads every transcript written between the set's writing and the end of its measure, looking
+      for the set's path and its question ids; a hit voids the measure
+    source: EMERGENCY-2 §2.7, A-12 (DEC-1211)
+    wave: W2
+  - id: CAP-66.b
+    item: The memory reader runs with only the memory tool, and the gold sits outside the index and outside the clone
+    source: EMERGENCY-2 §2.7, A-12 (DEC-1211)
+    wave: W2
+- id: CAP-67
+  title: Backups
+  outcome: The owner can recover any repository from a bundle less than an hour old.
+  acceptance: Each repository has a `git bundle` kept outside its tree that is less than an hour old.
+  wave: W2
+  provider:
+  - 'W2: the hourly bundle job'
+  sources:
+  - EMERGENCY-2 §2.8 (DEC-1211)
+  - DEC-848
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-67.a
+    item: An hourly `git bundle` of each repository, kept outside the tree
+    source: EMERGENCY-2 §2.8 (DEC-1211)
+    wave: W2
+- id: CAP-68
+  title: The basis line
+  outcome: No new rule arrives without the incident behind it.
+  acceptance: A decision record that adds a rule names its incident in a basis line, `gov check` fails a decision-record commit
+    without one, and a weekly basis review lists the rules added since the last.
+  wave: W2
+  provider:
+  - 'W2: the basis-line check (A-8)'
+  sources:
+  - EMERGENCY-2 §10.1, A-8 (DEC-1211)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-68.a
+    item: A new rule's decision record names its incident, checked by code at the decision-record commit
+    source: EMERGENCY-2 §10.1, A-8 (DEC-1211)
+    wave: W2
+  - id: CAP-68.b
+    item: A weekly basis review lists the rules added since the last review
+    source: EMERGENCY-2 §10.1, A-8 (DEC-1211)
+    wave: W2
+- id: CAP-69
+  title: Transcripts kept
+  outcome: The owner can see what any session did for a year.
+  acceptance: The harness setting `cleanupPeriodDays` is 365 in the owner's settings.
+  wave: W1
+  wave_note: 'built: the owner''s setting'
+  provider:
+  - the owner's `~/.claude/settings.json`
+  sources:
+  - EMERGENCY-2 §10.3 (DEC-1211)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-69.a
+    item: Transcripts are kept for 365 days
+    source: EMERGENCY-2 §10.3 (DEC-1211)
+    wave: W1

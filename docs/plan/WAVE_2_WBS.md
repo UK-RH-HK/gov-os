@@ -270,6 +270,20 @@ Two of the 17 (CAP-17.b, CAP-45.a) sit in Track A because the adoption-readiness
 
 **Contract v4.2 adds, lite (DEC-722):** CAP-44.h with the A7 and A10 gates of CAP-44.f (W2-49, W2-02, W2-27 to W2-30), and CAP-43.b (W2-49, W2-16). CAP-02.c stays in Wave 3.
 
+**Contract v5 re-baseline moves to Wave 2 (DEC-1214, DEC-1219):** the 36 items audit 7 moved into Wave 2 (`docs/emergency-2/audits/07-contract-rebaseline.md`, `docs/emergency-2/G5-APPROVAL.md`), each under the existing ticket whose `closes:` line carries it. No CIT-P line is written per move; the plan validator reads this list as the re-baseline's source.
+- CAP-15.a, CAP-15.b, CAP-15.c, CAP-15.e, CAP-65.a, CAP-65.b and CAP-65.c → W2-197.
+- CAP-64.f, CAP-64.g, CAP-64.h, CAP-64.i and CAP-64.j → W2-121c.
+- CAP-64.c and CAP-64.d → W2-199.
+- CAP-64.b and CAP-64.e → W2-205.
+- CAP-23.b and CAP-64.a → W2-207.
+- CAP-35.a, CAP-35.b and CAP-35.c → W2-201.
+- CAP-23.c, CAP-39.c, CAP-63.a, CAP-63.b and CAP-63.d → W2-115b.
+- CAP-63.c → W2-194.
+- CAP-39.b, CAP-43.c and CAP-49.a → W2-81.
+- CAP-66.a, CAP-67.a, CAP-68.a and CAP-68.b → W2-198.
+- CAP-66.b → W2-171.
+- CAP-45.b → no ticket delivers it yet (the CTO decides whether it is friction or a later feature).
+
 **The 53 high rows.** 47 are in Wave 2 tickets. 6 go to Wave 3 with reasons:
 - H004, H016, H017 and H030: held-out and oracle hardening before qualification.
 - H003 and H005: opaque Bash in the unsandboxed orchestrator session.

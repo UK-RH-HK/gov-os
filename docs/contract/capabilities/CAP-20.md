@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Rebuild guarantee (delete derived, rebuild from git)
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-20: Rebuild guarantee (delete derived, rebuild from git)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** A fresh agent on a fresh clone can rebuild all derived state from git and continue.
 - **Acceptance:** `gov rebuild` twice from the same commit yields the same chunk-SHA-256 digest, and a fresh agent resumes the active ticket from the rebuilt state and the latest checkpoint.

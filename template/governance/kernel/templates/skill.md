@@ -96,7 +96,7 @@ Detail that does not fit here: [<reference file>](<reference-file>.md).
 
 ## Escalation
 
-- <what this skill's user cannot settle>, ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-957), goes
+- <what this skill's user cannot settle>, ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-1219 (2)), goes
   to <whoever started the session>, never to the owner directly.
 - An Emergency (a secret exposed, a risk of losing data, the disk below its floor, the guard failing open) stops
   the affected work at once, then goes up as a P1.

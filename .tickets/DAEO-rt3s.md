@@ -17,6 +17,9 @@ role: engineer
 profile: FULL
 depends_on: [DAEO-rt2s]
 waits_on: []
+closes:
+- CAP-64.b
+- CAP-64.e
 allowed_paths:
 - src/gov/dispatch/**
 - src/gov/msg/**

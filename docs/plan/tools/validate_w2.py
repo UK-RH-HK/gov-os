@@ -120,6 +120,17 @@ def wbs():
             baseline |= set(CAP.findall(line))
         else:
             inside = False
+    # DEC-1219: the Contract v5 re-baseline (audit 7) is a second source for a move to Wave 2; a CIT-P line per move
+    # is the ceremony EMERGENCY-2 retires. Its bullets follow the header line, each naming items and their ticket.
+    if baseline is not None:
+        inside = False
+        for line in body:
+            if line.startswith("**Contract v5 re-baseline moves to Wave 2"):
+                inside = True
+            elif inside and line.startswith("- "):
+                baseline |= set(CAP.findall(line))
+            else:
+                inside = False
     return ids, baseline
 
 

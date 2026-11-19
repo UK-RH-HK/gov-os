@@ -77,7 +77,7 @@ If any is false: fix the spec, then check again.
 
 ## Escalation
 
-Ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-957), to whoever started the session, never to the owner
+Ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-1219 (2)), to whoever started the session, never to the owner
 directly.
 
 - P3: a wording or ordering choice that changes no KPI; note it in `discoveries`.

@@ -119,8 +119,8 @@ The method is the test-driven-development skill's; this is only where security t
 
 ## Escalation
 
-**When to escalate:** ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-957), to whoever started the
-session, never to the owner directly. Secrets and security are P1 (DEC-957).
+**When to escalate:** ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-1219 (2)), to whoever started the
+session, never to the owner directly. Secrets and security are P1 (DEC-1219 (2)).
 
 - P3: a naming or layout choice inside the ticket that touches no security control; decide, log it in `discoveries`
   and go on.

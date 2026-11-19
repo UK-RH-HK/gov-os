@@ -73,17 +73,18 @@ def test_cap_45a_record_carries_contract_v4_2_item_text(contract):
 
 
 @pytest.mark.parametrize("cap_id", ["CAP-45", "CAP-45.a"])
-def test_cap_45_and_cap_45a_records_state_wave_w3_as_contract_yaml(contract, cap_id):
-    """DEC-1093 (1), W2-27-CIT-P §5.3: CAP-45.md and CAP-45.a.md each state `- **Wave:** W3`, once, and that is
-    contract.yaml's wave for the id (the records are DERIVED, DEC-614)."""
-    # Added-For: DEC-1093 (1) — A (i), the two derived records at W3, matching contract.yaml (the note's §5.3).
+def test_cap_45_and_cap_45a_are_wave_2_in_contract_yaml_and_their_records_agree(contract, cap_id):
+    """Contract v5 (CAP-45 is Wave 2: `gov update` is in the release): contract.yaml has CAP-45 and CAP-45.a at W2, and
+    CAP-45.md and CAP-45.a.md each state `- **Wave:** W2`, once (the records are DERIVED, DEC-614)."""
+    # Rewrite-Reason: DEC-1219 (the owner's approval of Contract v5 on 2026-11-19): replaces
+    # test_cap_45_and_cap_45a_records_state_wave_w3_as_contract_yaml, which asserted DEC-1093's move to W3; EMERGENCY-2 reverses
+    # it, so the yaml and the records say W2. The test reads the yaml's wave and the record, as the retired one did.
     model, caps = contract
-    require_v42(model)
     wave = caps["CAP-45"].get("wave") if cap_id == "CAP-45" else model.by_id()[cap_id].wave
-    assert str(wave) == "W3", f"contract.yaml has {cap_id} at {wave}, not W3 (DEC-1093 moves it)"
+    assert str(wave) == "W2", f"contract.yaml has {cap_id} at {wave}, not W2 (Contract v5)"
     _, body = read_record(cap_id)
     lines = re.findall(r"^- \*\*Wave:\*\* (\S+)$", body, re.MULTILINE)
-    assert lines == ["W3"], f"{cap_id}.md states Wave {lines}, not one W3 as contract.yaml"
+    assert lines == ["W2"], f"{cap_id}.md states Wave {lines}, not one W2 as contract.yaml"
 
 
 def test_every_capability_record_states_the_contracts_status():

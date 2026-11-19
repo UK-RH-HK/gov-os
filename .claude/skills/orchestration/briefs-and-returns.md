@@ -101,22 +101,34 @@ They changed DEC-724, under which the owner committed the owner's entries with `
   merged result; the full suite runs only in the nightly. A close is refused only by a failure its change caused
   (DEC-968 item 2); no load-sensitive case is retried to let it through (DEC-780).
 
-## The escalation rubric (DEC-957)
+## The escalation rubric (DEC-1219 (2), `docs/emergency-2/T2-ESCALATION-RUBRIC.md` §2)
 
-- **P3, the stream's Senior Engineer decides and logs it** (the orchestrator, where there are no streams):
-  reversible; inside one ticket's scope and paths; no change to the spec, the KPIs or any standing decision; no
-  effect on other streams; a delay under `<the project's P3 delay limit>`.
-- **P2, the Senior Engineer decides, the orchestrator approves:** touches another stream or shared code; changes a
-  ticket's scope or KPIs within the approved spec; changes the plan's order; delays a milestone by up to
-  `<the project's P2 delay limit>`; revises older tests under an existing decision.
-- **P1, the lead and the Senior Engineer recommend, the orchestrator amends or escalates, the owner decides:**
-  changes the spec, the Contract, the Charter or a standing decision; weakens any guard rule or anything that fails
-  open; irreversible or destructive; secrets or security; cost, installs or paid services; `<the project's own P1
-  items>`; a milestone slipping more than `<the project's P2 delay limit>`.
-- **Emergency:** a secret exposed, a risk of losing data, the disk below its floor, or the guard failing open: stop
-  the affected work at once, then P1.
-- Installs: only the orchestrator's own session asks the owner; every other session, leads included, raises an
-  install as a P1 in its return.
+- **P3, the lead decides and records it in the ticket.** Reversible; inside the ticket's scope and paths; no change to
+  the spec, the KPIs or a standing decision. A fix for a known bug, with the failing test first when no test caught it.
+- **P2, the CTO decides** (a Senior Engineer for its own stream, the CTO approving what crosses streams). Shared code or
+  another stream; the order of work inside a planned wave; a red landing or a failed merge, and whether a review is
+  called; review findings, in two rounds at most; kernel and instruction text; an install inside the work's scope and
+  the machine's capacity, recorded; chores.
+- **P1, the owner decides; the CTO brings options and one recommendation.**
+  1. A feature, a spec or a KPI line added, removed or changed.
+  2. A ticket added to or removed from a planned wave.
+  3. The Contract, the Charter or a standing decision.
+  4. Data and measurement: memory's standard, how a measure is taken, a measure that came out void or under its bar.
+  5. A P1 that touches the core or the kernel: a change to how every agent works that the CTO is not sure is its own
+     to make.
+  6. Anything irreversible outside a worktree: deleting history, data or a branch others read.
+  7. A secret or a security exposure; a paid service.
+  8. A model exception; a role going back from Sonnet.
+  9. A review not converged after two rounds.
+  10. What is the owner's own hand: a release, a re-pin, a push, sudo, the machine's settings, going public.
+  11. `<the project's own P1 items>`.
+- **Emergency: stop the affected work at once, then push.** A secret exposed outside the machine; a risk of losing data
+  or work; the disk below its floor; the machine over its gate and not coming back.
+- **When the owner is pushed.** A decision that stops work always pushes the owner, at any hour: there is no day or
+  night rule, and every push also appears in the morning brief. A decision that stops nothing goes in the morning brief
+  only. An Emergency, the plan at 99 % and a stalled CTO push at once (DEC-1217 (5)).
+- Installs: the CTO approves and records every install; a lead or a Senior Engineer raises the one it needs to the CTO
+  in its return, as a P2 (DEC-1214 G7). `sudo` stays the owner's.
 - A package has six parts (DEC-818): the context; what happened, with the evidence; why it matters; the options,
   each with its consequence, cost and risk; the recommendation and confidence, with the classification of any
   findings (DEC-809); what it blocks and what waiting costs.

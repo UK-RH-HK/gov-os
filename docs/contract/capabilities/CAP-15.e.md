@@ -3,14 +3,14 @@ id: CAP-15.e
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: Packet hash/provenance proves what the worker received
+title: The brief's hash and provenance prove what the worker received
 depends_on:
 - CAP-15
 ---
 
-# CAP-15.e: Packet hash/provenance proves what the worker received
+# CAP-15.e: The brief's hash and provenance prove what the worker received
 
-A covers item of CAP-15 (Context packet compilation). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority (DEC-614).
+A covers item of CAP-15 (The brief carries the ticket's retrieval). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Packet hash/provenance proves what the worker received
-- **Wave:** W1
+- **Item:** The brief's hash and provenance prove what the worker received
+- **Wave:** W2

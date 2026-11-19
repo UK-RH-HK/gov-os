@@ -992,7 +992,6 @@ rep: tests/acceptance/W2-16/test_w2_16_owner_terminal.py  # one row per parametr
 tests/acceptance/W2-49/test_w2_49_contract.py::test_cap_44f_gate_stays_in_wave_3  # cap
 tests/acceptance/W2-49/test_w2_49_contract.py::test_rest_of_cap_43b_stays_in_wave_3  # cap
 tests/acceptance/W2-49/test_w2_49_contract.py::test_cap_02c_signed_release_tag_stays_in_wave_3  # cap
-rep: tests/acceptance/W2-49/test_w2_49_contract.py::test_qualification_certificate_cap_43c_stays_in_wave_3  # one row (round 2: the function is a KPI line's case)
 tests/acceptance/W2-49/test_w2_49_contract.py::test_no_other_covers_item_changes_wave  # cap
 tests/acceptance/W2-49/test_w2_49_contract.py::test_no_covers_item_is_removed  # cap
 tests/acceptance/W2-49/test_w2_49_contract.py::test_new_covers_items_are_only_splits_of_cap_43_and_cap_44  # cap

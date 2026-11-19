@@ -1,6 +1,6 @@
 # T2: the escalation rubric against Emergency 2, the CTO's proposal
 
-`docs/emergency-2/T2-ESCALATION-RUBRIC.md` · the CTO, 2026-11-19 · for the owner's answer by code
+`docs/emergency-2/T2-ESCALATION-RUBRIC.md` · the CTO, 2026-11-19 · **approved, DEC-1219 (2)** (T2-1 yes; §3 as the owner changed it in DEC-1217 (5))
 
 **What you asked (DEC-1214 T2):** a phone push also when the CTO needs your decision (features, specs, KPIs, data and
 measurement, P1 decisions touching the core or kernel); the CTO reviews the escalation rubric against the changes and
@@ -48,23 +48,25 @@ machinery Emergency 2 retired or moved, and three things you decided since are m
 
 ## 3. When your phone is pushed
 
+As the owner changed it (DEC-1217 (5): "a decision that stops work always pushes me, at any hour; no day or night rule.
+Every push also appears in the morning brief"), approved with the rubric in DEC-1219 (2):
+
 | Case | Push |
 |---|---|
 | An Emergency; the plan at 99 %; the CTO stalled (60 min by day, 2 h at night, from the dispatcher's pass) | at once, any hour |
-| A P1 that stops work: nothing else on the list can go on without it | at once by day; at night it waits for the morning brief (T2-2) |
-| A P1 that stops nothing | no push: the morning brief, one message, answered by code (T2-3) |
+| A decision that stops work: nothing else on the list can go on without it (a P1, or a P2 the CTO brings) | at once, at any hour; no day or night rule |
+| A decision that stops nothing | no push: the morning brief only, one message, answered by code |
+| Every push above | also appears in the morning brief |
 
-## 4. Your answers
+## 4. The owner's answers
 
-| Code | Question | Options | Recommendation |
-|---|---|---|---|
-| **T2-1** | The rubric of §2 replaces DEC-957's | yes / no / yes with changes | **yes** |
-| **T2-2** | A P1 that stops work, at night (23:00 to 08:00) | (a) it waits for the morning brief; only an Emergency, the 99 % and a CTO stall push at night; (b) it pushes at any hour | **(a)**: it is what you set for tonight, and the build list is long enough that work moves to the next item |
-| **T2-3** | A P1 that stops nothing | (a) the morning brief only; (b) a push as well | **(a)** |
+| Code | Question | Answer |
+|---|---|---|
+| **T2-1** | The rubric of §2 replaces DEC-957's | **yes** (DEC-1219 (2)) |
+| **T2-2** | A P1 that stops work, at night | **changed by the owner, DEC-1217 (5):** it pushes at any hour; no day or night rule (§3 above) |
+| **T2-3** | A P1 that stops nothing | **(a)** the morning brief only (DEC-1217 (5)) |
 
-Answer form: "T2-1 yes, T2-2 a, T2-3 a".
-
-**On your yes** the CTO changes the text that carries the rubric (the orchestration skill's briefs-and-returns page, the
-role files and the domain skills' escalation sections: 23 kernel files and their generated copies), as one change under
-3.5, with the tests that pin that text revised by a test designer; DEC-957's rubric is marked superseded in the
-register.
+**Done on the yes** (EMERGENCY-2 3.5, the CTO's change, branch `e2/g4-g5`): the text that carries the rubric is the
+orchestration skill's `briefs-and-returns.md` and `incident-response.md`, the Senior Engineer, ticket lead and
+orchestrator role files, and the domain skills' "When to escalate" sections, with their generated copies; DEC-957's
+rubric is replaced by §2 above, cited as DEC-1219 (2).

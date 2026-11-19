@@ -17,6 +17,11 @@ role: engineer
 profile: STANDARD
 depends_on: []
 waits_on: []
+closes:
+- CAP-66.a
+- CAP-67.a
+- CAP-68.a
+- CAP-68.b
 allowed_paths:
 - src/gov/backup/**
 - src/gov/memaudit/command.py

@@ -70,14 +70,14 @@ files must agree on the moved and the kept parts.
 |---|---|---|
 | `test_yaml_version_is_4_2_or_later_with_the_4_2_entry_citing_dec_722_unchanged` (was `test_yaml_version_is_4_2_with_a_change_log_entry_citing_dec_722`; W2-140, §2c) | version 4.2 or later; one change-log entry 4.2 citing DEC-722, as at W2-49's apply | DEC-722, DEC-1093 |
 | `test_yaml_change_log_keeps_every_earlier_version_unchanged` | the 4.0 and 4.1 entries as at the base; 4.0 to 4.2 as at W2-49's apply (W2-140, §2c) | CAP-33.e, DEC-105 |
-| `test_markdown_version_is_4_2_with_a_change_row_citing_dec_722` | frontmatter `version: "4.2"`; a `\| 4.2 \|` row citing DEC-722; earlier rows unchanged | DEC-722 |
+| `test_markdown_v5_keeps_the_4_0_and_4_1_change_rows_and_the_4_2_row_citing_dec_722` (was `test_markdown_version_is_4_2_with_a_change_row_citing_dec_722`; DEC-1219, §2d) | `CONTRACT_v5.md`'s change-log table keeps a `\| 4.2 \|` row citing DEC-722 and the 4.0 and 4.1 rows as at the base; it no longer asserts the document's own version | DEC-722, DEC-1219 |
 | `test_cap_44h_verdict_moves_to_wave_2_lite[yaml, markdown]` | the verdict placed in W2, on a covers item that says "lite" and cites DEC-722 | CAP-44.h, DEC-722 |
 | `test_cap_44f_gate_moves_to_wave_2_lite[A7, A10 × yaml, markdown]` | each gate placed in W2, lite, citing DEC-722 | CAP-44.f, DEC-722 |
 | `test_cap_43b_manifest_and_file_hashes_move_to_wave_2_lite[yaml, markdown]` | manifest and hashes placed in W2, lite, citing DEC-722 | CAP-43.b, DEC-722 |
 | `test_cap_44f_gate_stays_in_wave_3[A9, A11 × yaml, markdown]` | each still placed in W3 | CAP-44.f, DEC-090 |
 | `test_rest_of_cap_43b_stays_in_wave_3[9 contents × yaml, markdown]` | semantic version, supported migrations, schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure: each still placed in W3 | CAP-43.b |
 | `test_cap_02c_signed_release_tag_stays_in_wave_3[yaml, markdown]` | CAP-02.c present, `[W3]`, still the signed tag | CAP-02.c, DEC-722 |
-| `test_qualification_certificate_cap_43c_stays_in_wave_3[yaml, markdown]` | CAP-43.c present, `[W3]`, still the certification | the W2-49 card |
+| ~~`test_qualification_certificate_cap_43c_stays_in_wave_3[yaml, markdown]`~~ | retired (DEC-1219, §2d): CAP-43.c is Wave 2 in Contract v5 | the W2-49 card |
 | `test_no_other_covers_item_changes_wave` | against the base: only CAP-44.f, CAP-44.h, CAP-43.b may change wave in place, and only to W2; and CAP-45.a must move W2 → W3 (DEC-1093; W2-140, §2c) | "exactly" |
 | `test_no_covers_item_is_removed` | every base covers id is still there | "exactly" |
 | `test_new_covers_items_are_only_splits_of_cap_43_and_cap_44` | a new covers id is in CAP-43 or CAP-44, in W2 or W3 | "exactly" |
@@ -232,11 +232,11 @@ token in the reason.
 
 | Test | What it checks |
 |---|---|
-| `test_validator_passes_both_cit_p_checks_on_this_tree` | line 3: on this tree, both checks PASS |
+| `test_validator_passes_both_cit_p_checks_on_this_tree` | line 3: on this tree, both checks PASS (unchanged; DEC-1219, §2d: it passes once the WBS carries the re-baseline line and the validator reads it) |
 | `test_a_tree_of_the_validators_inputs_alone_passes_both_cit_p_checks` | the control: a temporary tree of the single files the two checks read (`docs/plan/WAVE_2_WBS.md`, `contract.yaml`, every `docs/changes/*-CIT-P.md`), copied as they are, passes both |
 | `test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it[CAP-44.f, CAP-44.h, CAP-43.b]` | failure (i): the control with that item's `wave:` removed from its CIT-P entry: `cit-p-moved-items` FAIL naming it and neither of the other two; `cit-p-lines-applied` still PASS |
 | `test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it[CAP-43.b, CAP-43.d, CAP-44.f, CAP-44.h, CAP-44.k, CAP-44.l]` | failure (ii): the control with that line's change taken out of `contract.yaml` (a moved item put back in W3, its 4.1 wave; a W3 split item removed, as 4.1 has none): `cit-p-lines-applied` FAIL naming it and none of the other five; `cit-p-moved-items` still PASS |
-| `test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it` | failure (ii), edge: one extra CIT-P line (`CAP-61.f`, `wave: W3`; the Contract has it in W2, checked first; was `CAP-45.a` before W2-140, §2c): `cit-p-lines-applied` FAIL naming it |
+| `test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it` | failure (ii), edge: one extra CIT-P line (`CAP-10.b`, `wave: W3`; the Contract has it in W2 and the WBS's baseline list names it, checked first; was `CAP-61.f` before DEC-1219 and `CAP-45.a` before W2-140): `cit-p-lines-applied` FAIL naming it |
 
 **The accounting.** The PASS lines alone give only counts, in wording the tests do not fix. That the passing checks
 cover the three moved items (CAP-43.b, CAP-44.f, CAP-44.h) and the six CIT-P lines (those three and the split's
@@ -251,6 +251,45 @@ not by accident: each failing case flips exactly the named check on exactly the 
 cases differ from a passing tree by that one change. Checked against stand-ins: a validator that always prints PASS
 fails the 10 failure cases; one whose FAIL reasons name no id fails the same 10; a CIT-P without CAP-44.h's line fails
 line 3, the control and the cases (`moved to Wave 2 with no CIT-P line: CAP-44.h`).
+
+### Contract v5 and the re-baseline line (DEC-1219) — §2d
+
+The owner approved Contract v5 on 2026-11-19 (DEC-1219; `docs/emergency-2/G5-APPROVAL.md`, "Tests v5 turns red, and why"). A CIT-P line
+per move is the ceremony EMERGENCY-2 retires, and the 36 items the re-baseline moved to Wave 2 have no CIT-P line (evidence:
+`docs/emergency-2/audits/07-contract-rebaseline.md`). The validator takes the re-baseline as a second baseline: the WBS carries, in
+§1 beside "The Contract's N Wave 2 items, by ticket.", a line `**Contract v5 re-baseline moves to Wave 2 (DEC-1214, DEC-1219):**`
+and `- CAP-x.y, CAP-z.w → W2-nnn.` bullets; an item named there is not "moved". The cases below build a temporary tree from the
+validator's input files and put that block in themselves (replacing any block the real WBS has), so they judge the validator's reading
+and not the real WBS's wording.
+
+| Test (`test_w2_49_validator_lines.py`) | What it checks | KPI line |
+|---|---|---|
+| `test_a_rebaseline_line_naming_the_items_contract_v5_moved_to_wave_2_passes_both_checks` | the tree with the block naming every W2 item outside the old baseline and the CIT-P lines: both checks PASS | S3, F1 |
+| `test_an_item_the_rebaseline_line_omits_is_reported_and_the_ones_it_names_are_not` | the block without CAP-15.a: `cit-p-moved-items` FAIL naming CAP-15.a and none of the items the block names | F1 |
+| `test_an_item_moved_to_wave_2_in_no_baseline_and_no_cit_p_line_fails_naming_it` | block complete, `contract.yaml` moves CAP-02.c (W3, no CIT-P line) to W2: FAIL naming CAP-02.c alone (replaces the CAP-43.b removal case, which the re-baseline line may now cover) | F1 |
+| the failure tests above (`test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it`, `test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it`, `test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it`) | the tree carries the block too (built by the test, as the tree's own), so each judges one thing; otherwise unchanged | F1 |
+
+**Red on the base, on purpose.** The validator does not yet read the block, and the real WBS does not yet carry it. Intentionally red
+until then: `test_a_rebaseline_line_naming_the_items_contract_v5_moved_to_wave_2_passes_both_checks`,
+`test_an_item_the_rebaseline_line_omits_is_reported_and_the_ones_it_names_are_not`,
+`test_an_item_moved_to_wave_2_in_no_baseline_and_no_cit_p_line_fails_naming_it`,
+`test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it` (3 rows: it names the item alone only once the 36 are
+accounted for by the block), `test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it` (CAP-43.b; its other five rows are
+`breadth`), `test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it`. The red reason of each: `cit-p-moved-items`
+reports the 36 items the block names (the validator ignores the block). The two real-tree tests
+(`test_validator_passes_both_cit_p_checks_on_this_tree`, `test_a_tree_of_the_validators_inputs_alone_passes_both_cit_p_checks`)
+stay as they were and pass after the WBS edit and the validator change.
+
+**Other changes of DEC-1219 in this suite.** Retired: `test_w2_49_contract.py::test_qualification_certificate_cap_43c_stays_in_wave_3`
+(both forms; CAP-43.c is W2, EMERGENCY-2 §8.2), `test_w2_49_owner_answers.py::test_cap_45_moves_to_w3_with_its_wave_note_provider_and_sources`
+(both forms; `gov update` is in the release, CAP-45 is W2), `test_w2_49_records_v4_2.py::test_cap_45_and_cap_45a_records_state_wave_w3_as_contract_yaml`
+(replaced by `test_cap_45_and_cap_45a_are_wave_2_in_contract_yaml_and_their_records_agree[CAP-45, CAP-45.a]`: the yaml and the
+record say W2). Rewritten to read `CONTRACT_v5.md`: the two `test_markdown_*` tests of `test_w2_49_contract.py` (now
+`test_markdown_v5_keeps_the_4_0_and_4_1_change_rows_and_the_4_2_row_citing_dec_722` and
+`test_markdown_v5_keeps_the_4_3_change_row_after_the_4_2_row_citing_w2_27_cit_p_dec_1093_dec_1089_dec_1090`; the 4.3 case no longer
+asserts the title and version line of version 4.3). The rows of §2c and the round logs below that name a retired or renamed test
+are history. The `breadth` and `lifted` tiers hold more W2-49 cases that read `CONTRACT_v4.md` or the v4.3 waves; they are
+report-only and not changed here.
 
 ### DEC-745 item 2: the source map's eight rows — `test_w2_49_source_map.py` (11 tests)
 
@@ -438,7 +477,7 @@ Cases: 39 in the full run, 115 in `breadth`, 0 in `lifted`.
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
 | S1: The CIT-P names each change, its source (DEC-722) and its impact (W2-02, W2-16, W2-18, W2-27 to W2-30, exit criteria 6 and 7): CAP-44.h, lite: ... | `test_w2_49_cit_p.py::test_cit_p_states_the_conditions_a_lite_verdict_checks`, `test_w2_49_cit_p.py::test_cit_p_names_each_lite_gate_of_cap_44f_with_what_it_checks` (2 of 2), `test_w2_49_cit_p.py::test_cit_p_names_cap_44h_lite_with_the_three_verdicts` | the ticket's words |
-| S2: Contract v4.2 moves exactly those parts to Wave 2. CAP-02.c, A9, A11, the qualification certificate and the rest of CAP-43.b stay in Wave 3. | `test_w2_49_cit_p.py::test_cit_p_keeps_the_qualification_certificate_in_wave_3`, `test_w2_49_contract.py::test_qualification_certificate_cap_43c_stays_in_wave_3` (1 of 2) | the ticket's words |
-| S3: The plan validator's two-way check covers the moved parts. | `test_w2_49_validator_lines.py::test_validator_passes_both_cit_p_checks_on_this_tree`, `test_w2_49_validator_lines.py::test_a_tree_of_the_validators_inputs_alone_passes_both_cit_p_checks` | the ticket's words |
+| S2: Contract v4.2 moves exactly those parts to Wave 2. CAP-02.c, A9, A11, the qualification certificate and the rest of CAP-43.b stay in Wave 3. | `test_w2_49_cit_p.py::test_cit_p_keeps_the_qualification_certificate_in_wave_3`, (`test_qualification_certificate_cap_43c_stays_in_wave_3` retired, DEC-1219) | the ticket's words |
+| S3: The plan validator's two-way check covers the moved parts. | `test_w2_49_validator_lines.py::test_validator_passes_both_cit_p_checks_on_this_tree`, `test_w2_49_validator_lines.py::test_a_tree_of_the_validators_inputs_alone_passes_both_cit_p_checks`, `test_w2_49_validator_lines.py::test_a_rebaseline_line_naming_the_items_contract_v5_moved_to_wave_2_passes_both_checks` (DEC-1219) | the ticket's words |
 | S4: The CIT-E record matches the CIT-P, or lists the differences. | `test_w2_49_cit_e.py::test_cit_e_records_each_change_the_cit_p_names` (1 of 5), `test_w2_49_cit_e.py::test_cit_e_states_its_differences_from_the_cit_p`, `test_w2_49_cit_e.py::test_cit_e_records_every_covers_item_the_contract_changed` | the ticket's words |
-| F1: A Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator. | `test_w2_49_validator_lines.py::test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it` (3 of 3), `test_w2_49_validator_lines.py::test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it` (1 of 6), `test_w2_49_validator_lines.py::test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it` | the ticket's words |
+| F1: A Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator. | `test_w2_49_validator_lines.py::test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it` (3 of 3), `test_w2_49_validator_lines.py::test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it` (1 of 6), `test_w2_49_validator_lines.py::test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it`, `test_w2_49_validator_lines.py::test_an_item_the_rebaseline_line_omits_is_reported_and_the_ones_it_names_are_not`, `test_w2_49_validator_lines.py::test_an_item_moved_to_wave_2_in_no_baseline_and_no_cit_p_line_fails_naming_it` (DEC-1219) | the ticket's words |

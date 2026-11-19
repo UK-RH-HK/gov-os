@@ -17,6 +17,12 @@ role: engineer
 profile: FULL
 depends_on: [DAEO-emq1]
 waits_on: []
+closes:
+- CAP-23.c
+- CAP-39.c
+- CAP-63.a
+- CAP-63.b
+- CAP-63.d
 allowed_paths:
 - src/gov/queue/**
 - src/gov/close/select.py

@@ -16,6 +16,8 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - DAEO-61vm
+closes:
+- CAP-66.b
 allowed_paths:
 - src/gov/memaudit/**
 - tests/unit/memaudit/**

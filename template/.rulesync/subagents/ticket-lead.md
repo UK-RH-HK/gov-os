@@ -37,7 +37,7 @@ Made from the section that the orchestrator role file held until then (DEC-236, 
 - **Permission classes:**
   - `READ_REPO`, `RUN_TESTS`: allowed. Reads are open but for the four refusals above (DEC-820).
   - `WRITE_REPO_SCOPED`: the Writes item above, inside the ticket's worktree (DEC-156).
-  - `PACKAGE_INSTALL`: refused to a lead; only the CTO's own session is asked, and a lead raises an install it needs as a P1 escalation in its return (DEC-957, DEC-971 item 4).
+  - `PACKAGE_INSTALL`: refused to a lead; only the CTO's own session is asked, and a lead raises an install it needs to the CTO in its return, who approves and records it (a P2 of the rubric; DEC-1219 (2), DEC-971 item 4).
   - `SYSTEM_INSTALL`: denied where it needs `sudo`, which the guard refuses to every role (DEC-083).
   - `SECRET_READ`: denied (DEC-074 Q9).
   - `NETWORK_*`: allowed, the session being unsandboxed (DEC-158).

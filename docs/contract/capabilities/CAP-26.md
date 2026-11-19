@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Plugin trust boundary (hash-binding, descriptor security)
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-26: Plugin trust boundary (hash-binding, descriptor security)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** (none — non-goal)
 - **Acceptance:** No kernel file implements plugin hash-binding or descriptor trust; the wave-exit audit finds none (DEC-070).

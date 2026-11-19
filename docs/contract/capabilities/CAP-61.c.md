@@ -3,14 +3,14 @@ id: CAP-61.c
 type: capability
 status: ACCEPTED
 state_class: DERIVED
-title: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard''s per-ticket allow-list, not by the list; the list''s exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox'
+title: 'Non-goal: the network profile per role, held by the sandbox and generated `Edit` deny rules: no sandbox, no allowlist'
 depends_on:
 - CAP-61
 ---
 
-# CAP-61.c: Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard's per-ticket allow-list, not by the list; the list's exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox
+# CAP-61.c: Non-goal: the network profile per role, held by the sandbox and generated `Edit` deny rules: no sandbox, no allowlist
 
-A covers item of CAP-61 (Worker session launcher and OS sandbox). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority (DEC-614).
+A covers item of CAP-61 (Worker session launcher). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
 
-- **Item:** Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard's per-ticket allow-list, not by the list; the list's exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox
-- **Wave:** W1
+- **Item:** Non-goal: the network profile per role, held by the sandbox and generated `Edit` deny rules: no sandbox, no allowlist
+- **Wave:** NONE

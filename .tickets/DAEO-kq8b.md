@@ -15,6 +15,8 @@ class: implementation
 role: engineer
 profile: STANDARD
 state_class: AUTHORITATIVE
+closes:
+- CAP-63.c
 allowed_paths:
 - src/gov/close/command.py
 - src/gov/close/ratchet.py

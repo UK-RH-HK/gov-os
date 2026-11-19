@@ -108,7 +108,7 @@ The method is the test-driven-development skill's; this is only where a backend'
 
 ## Escalation
 
-**When to escalate:** ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-957), to whoever started the
+**When to escalate:** ranked by the escalation rubric (P3, P2, P1, Emergency; DEC-1219 (2)), to whoever started the
 session, never to the owner directly.
 
 - P3: a choice that is reversible, inside the ticket and changes no KPI (a name, a module split, a timeout value);

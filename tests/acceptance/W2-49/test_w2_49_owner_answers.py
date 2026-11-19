@@ -253,45 +253,9 @@ def test_cap_45a_names_no_signed_tag_as_a_wave_2_requirement(model):
     )
 
 
-def _cap_45_fields(source: str) -> tuple[str, list[str], list[str]]:
-    """CAP-45's wave note, provider entries and sources, as each file states them."""
-    if source == "yaml":
-        caps = {c["id"]: c for c in load_yaml_text(read_doc(CONTRACT_YAML)).get("capabilities", [])}
-        cap = caps.get("CAP-45") or {}
-        return _flatten(cap.get("wave_note")), [str(p) for p in cap.get("provider") or []], [str(s) for s in cap.get("sources") or []]
-    lines, inside = {}, False
-    for line in read_doc(CONTRACT_MD).splitlines():
-        if line.startswith("### "):
-            inside = line.startswith("### CAP-45 ")
-            continue
-        m = re.match(r"^- \*\*(Wave|Provider|Sources):\*\*\s*(.*)$", line)
-        if inside and m and m.group(1) not in lines:
-            lines[m.group(1)] = m.group(2)
-    split = lambda text, sep: [s.strip() for s in text.split(sep) if s.strip()]  # noqa: E731
-    return lines.get("Wave", ""), split(lines.get("Provider", ""), ","), split(lines.get("Sources", ""), ";")
-
-
-def test_cap_45_moves_to_w3_with_its_wave_note_provider_and_sources(model):
-    """A (i) (W2-27-CIT-P §5.1, §5.2): CAP-45 is W3 in both files; its wave note puts gov update and the first real
-    `copier update` in W3 (DEC-1089, DEC-1090) beside the pending-update report (DEC-165), with no W2 left; its
-    provider reads `W3: gov update --check` and names nothing W2; its sources keep the five and add DEC-1090;
-    CAP-45.b stays W3."""
-    # Added-For: DEC-1093 (1) — A (i), CAP-45's wave, wave note, provider and sources in both forms (the note's §5).
-    require_v42(model)
-    assert model.cap_waves.get("CAP-45") == "W3", f"{model.source}: CAP-45 is {model.cap_waves.get('CAP-45')}, not W3"
-    note, provider, sources = _cap_45_fields(model.source)
-    assert not W2.search(note), f"{model.source}: CAP-45's wave note still names W2: {note}"
-    for what, pattern in (("gov update", r"gov update"), ("copier update", r"copier update"), ("DEC-1089", r"DEC-1089(?!\d)"),
-                          ("DEC-1090", r"DEC-1090(?!\d)"), ("DEC-165", r"DEC-165(?!\d)"), ("W3", W3.pattern)):
-        assert has(pattern, note), f"{model.source}: CAP-45's wave note does not name {what}: {note}"
-    assert any(re.fullmatch(r"W3:\s*gov update --check", p) for p in provider), (
-        f"{model.source}: CAP-45's provider has no 'W3: gov update --check': {provider}"
-    )
-    assert not [p for p in provider if W2.search(p)], f"{model.source}: CAP-45's provider still names W2: {provider}"
-    kept = ["Contract v3 Gate S5", "Framework v4.1.2 §82", "Distribution Protocol v1.2 §12", "DEC-023", "DEC-165", "DEC-1090"]
-    missing = [s for s in kept if s not in sources]
-    assert not missing, f"{model.source}: CAP-45's sources lack {missing}: {sources}"
-    assert _item(model, "CAP-45.b").wave == "W3", f"{model.source}: CAP-45.b is no longer W3"
+# Retired (DEC-1219): test_cap_45_moves_to_w3_with_its_wave_note_provider_and_sources, both forms. It asserted DEC-1093's move of
+# CAP-45 to Wave 3; EMERGENCY-2 reverses it (`gov update` is in the release), and Contract v5 has CAP-45 in Wave 2. The W2 side is
+# held by test_w2_49_records_v4_2.py::test_cap_45_and_cap_45a_are_wave_2_in_contract_yaml_and_their_records_agree.
 
 
 # --------------------------------------------------------------------------

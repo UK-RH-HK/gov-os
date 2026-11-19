@@ -5,12 +5,12 @@ status: ACCEPTED
 state_class: DERIVED
 title: Temporal and episodic memory
 depends_on:
-- CONTRACT-v4
+- CONTRACT-v5
 ---
 
 # CAP-13: Temporal and episodic memory
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.3), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can see how a file or decision changed over time and which decision or task caused each change.
 - **Acceptance:** For a changed file, the graph returns its commits with their `Implements:` and `Task:` trailers resolved to the decision and ticket records.
