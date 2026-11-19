@@ -17,7 +17,7 @@ import ``gov.dispatch`` at load). A run starts only while the machine has room:
 (it cannot be judged), is said, and is a ``problem`` event: the golden rule's fail-open, named.
 
 The runtime log (``~/.gov-os/runtime/log.jsonl``, one JSON object a line, appended whole with ``O_APPEND``): ``ready``,
-``wait``, ``admitted``, ``started``, ``ended``, ``nested``, ``problem`` from a run; ``gpu`` from the watch pass. Every
+``wait``, ``admitted``, ``started``, ``ended``, ``nested``, ``problem`` from a run; ``gpu`` from the watch pass; ``end`` (``gov.dispatch.ends``) from a job's wake. Every
 event carries ``at``, ``event``, ``job``, ``kind`` and ``pid``. A run writes only to this log; only the watch pass writes
 ``state.json``.
 """
@@ -338,9 +338,10 @@ def wake(job: str, kind: str, code: int, ran_s: float) -> None:
     address = os.environ.get("GOV_MSG_ADDRESS")
     if not address:
         return
-    from gov.dispatch import inbox
+    from gov.dispatch import ends, inbox
     text = f"heavy job {kind} ended with exit code {code} after {ran_s:g} s"
     try:
+        ends.record(f"job:{job}", "job", address, ends.stamp(), job=job)  # RT-2: the end event, before the message
         inbox.send(address, "wake", text, sender="runtime", message_id=f"job:{job}",
                    data={"job": job, "kind": kind, "exit_code": code, "ran_s": ran_s})
     except (OSError, inbox.InboxError) as error:
