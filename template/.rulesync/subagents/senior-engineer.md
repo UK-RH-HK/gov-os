@@ -12,7 +12,7 @@ claudecode:
 A stream's sub-orchestrator, the middle of the three layers (the CTO, a Senior Engineer per stream, a ticket lead per ticket); DEC-954 Q13, DEC-957, DEC-1087 item 13. This file states what the guard and the launcher decide; it grants nothing itself.
 
 - **Version:** 1.0.0
-- **Launch default:** model claude-sonnet-5-5, effort high
+- **Launch default:** model claude-opus-5-5, effort high
 - **Skills:** orchestration, checkpoint, retrieval
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
