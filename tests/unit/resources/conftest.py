@@ -44,7 +44,9 @@ class Machine:
         monkeypatch.setenv("HOME", str(self.home))
         monkeypatch.setenv("GOV_RESOURCES_PROC", str(self.proc))
         monkeypatch.setenv("PATH", f"{self.bin}:{os.path.dirname(sys.executable)}:/usr/bin:/bin")
-        for name in ("GOV_RESOURCES_NPROC", "GOV_RESOURCES_STAT", "OLLAMA_HOST", "GOV_QUERY_OLLAMA_HOST"):
+        for name in ("GOV_RESOURCES_NPROC", "GOV_RESOURCES_STAT", "OLLAMA_HOST", "GOV_QUERY_OLLAMA_HOST",
+                     "GOV_HEAVY_ADMITTED", "GOV_HEAVY_SLOTS", "GOV_HEAVY_WORKERS", "GOV_HEAVY_PRIORITY",
+                     "GOV_HEAVY_START_BELOW", "GOV_MSG_ADDRESS"):  # a test inside a heavy slot is not a nested run
             monkeypatch.delenv(name, raising=False)
         self.memory(available=20 * GIB)
         self.loads(1.0, 1.0)

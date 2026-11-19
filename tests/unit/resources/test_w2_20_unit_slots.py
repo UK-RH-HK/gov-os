@@ -190,11 +190,11 @@ def test_a_rebuild_excludes_only_another_rebuild_of_the_same_tree(planted, tmp_p
             runner.wait(timeout=20)
 
 
-def test_a_missing_slot_count_refuses_the_job_naming_it(planted, job):
+def test_a_missing_slot_count_is_derived_from_the_machine_not_refused(planted, job):
+    command, runs = job
     planted.config(heavy_slots=None)
-    with pytest.raises(GovError) as refused:
-        slots.run("test", job[0])
-    assert "heavy_slots" in refused.value.message
+    assert slots.run("test", command) == 7 and runs()  # W2-199: 20 CPUs give 2 slots, so the run takes one
+    assert slots.slot_count(configuration.load(), lambda line: None) == 2
 
 
 def test_only_a_test_run_or_a_rebuild_takes_a_slot(planted, job):

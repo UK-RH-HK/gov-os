@@ -7,7 +7,9 @@ Nothing here names a project's branches, paths or tickets: they come from ``gove
 The files: ``config`` (the configuration), ``state`` (the state folder, the lock, the ready list), ``shell`` (every
 external command, limited by ``command_timeout_s``), ``procs`` (the running sessions, from the processes), ``readiness``
 (an entry's checks), ``peaks`` (history, peaks, room), ``returns`` (the inbox items and escalations), ``status`` (the
-status files), ``run`` (the pass) and ``command`` (``gov dispatch``).
+status files), ``run`` (the pass) and ``command`` (``gov dispatch``). The run-time tool's files: ``inbox``, ``runtime``
+(the watch pass), ``limits`` (the machine's limits), ``admission`` (the load admission of heavy jobs and the runtime log)
+and ``waits`` (``gov dispatch waits``).
 
 KPI lines and what implements them
 ----------------------------------
