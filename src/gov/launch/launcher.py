@@ -42,6 +42,15 @@ started and replaced whole after it ends, whatever its ending; a record that can
 it is, with one line on stderr. ``tests_worktree`` makes a ticket's tests worktree, ``<tree>-tests`` on
 ``<branch>-tests`` at the tree's HEAD.
 
+W2-201 fix X1 to X3 (DEC-1219 (5)): what becomes a ticket. ``launch(..., fix="<line>")`` starts a worker or a lead
+under its owning ticket whatever the ticket's status (an unknown ticket still refuses; a worker keeps to its own ticket
+where its role file says so; a lead's fix skips the plan's check, since a fix is not planned). ``launch(role, None, ...,
+chore="<line>")`` starts it with no ticket: no ticket file is read, ``GOV_TICKET`` is absent, the model and effort are
+the role file's default line, and there is no run folder, ticket-based spend brake, plan check, promotion or review
+count. A worker's launch record holds ``kind`` (``feature``, ``fix`` or ``chore``) and ``kind_line``; a lead, which
+writes no record, gets ``GOV_LAUNCH_KIND`` and ``GOV_LAUNCH_LINE`` in its env for a fix or a chore only, and a chore
+lead's registry entry and inbox address carry the label ``chore-<8 hex>`` where the ticket would be.
+
 No message of this module carries a held-out path.
 """
 
@@ -51,6 +60,7 @@ import io
 import json
 import os
 import re
+import secrets
 import select
 import shutil
 import signal
@@ -166,6 +176,9 @@ TRIAL_KEYS = frozenset({"role", "criticality", "model", "effort", "tickets", "re
 FLOOR = "high"  # DEC-1120 (3): when the table's effort is high or above, the launch's own choice is not below it
 BELOW_FLOOR = ("low", "medium")
 AUDITOR = "independent-auditor"
+# W2-201 fix X1 to X3 (DEC-1219 (5)): the kinds of launched work, and a lead's env names for a fix or a chore
+FEATURE, FIX, CHORE = "feature", "fix", "chore"
+KIND_ENV, KIND_LINE_ENV = "GOV_LAUNCH_KIND", "GOV_LAUNCH_LINE"
 
 
 def __getattr__(name: str):
@@ -182,14 +195,21 @@ def _refuse(reason: str) -> GovError:
     return GovError("LAUNCH_REFUSED", reason)
 
 
-def build_settings(root: Path, role: str, ticket_id: str) -> dict:
+def build_settings(root: Path, role: str, ticket_id: str | None) -> dict:
     """The ``--settings`` value of a worker session: its env (``GOV_ROLE``, ``GOV_TICKET``, ``GOV_STORE``) and an empty
     deny list, to which ``_worker_plan`` adds the user's deny rules. Emergency 2 (2.2, 2.4): no sandbox block and no
-    deny rule of the launcher's own. ``root`` is a real path."""
+    deny rule of the launcher's own. ``root`` is a real path. A chore (``ticket_id`` None, W2-201 X2) has no
+    ``GOV_TICKET`` at all: unset, not empty."""
     # the owner's audit 09 item (2026-11-18): workers write the 5-minute prompt cache (their calls come fast; checked:
     # CLAUDE_CODE_PROMPT_CACHE_TTL=5m sends the writes to the 5-minute tier); measured in the spend log
-    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, "CLAUDE_CODE_PROMPT_CACHE_TTL": WORKER_CACHE_TTL, **_store_env(root)}
+    env = {"GOV_ROLE": role, **_ticket_env(ticket_id), "CLAUDE_CODE_PROMPT_CACHE_TTL": WORKER_CACHE_TTL,
+           **_store_env(root)}
     return {"env": env, "permissions": {"deny": []}}
+
+
+def _ticket_env(ticket_id: str | None) -> dict:
+    """``GOV_TICKET`` for a session with a ticket; nothing for a chore (W2-201 X2, X3)."""
+    return {} if ticket_id is None else {"GOV_TICKET": ticket_id}
 
 
 def _store_env(root: Path) -> dict:
@@ -205,18 +225,47 @@ def _store_env(root: Path) -> dict:
     return {} if store is None else {STORE_ENV: store}
 
 
-def build_lead_settings(root: Path, ticket_id: str) -> dict:
+def build_lead_settings(root: Path, ticket_id: str | None, kind: str = FEATURE, line: str | None = None) -> dict:
     """The ``--settings`` value of a lead session (W2-136 S9): ``GOV_ROLE=orchestrator``, its ``GOV_TICKET`` and the
     launcher's own ``GOV_STORE`` as a worker's (W2-56 R5, ``_store_env``), as the dispatcher starts a lead. ``root``
-    is a real path."""
-    return {"env": {"GOV_ROLE": LEAD_GOV_ROLE, "GOV_TICKET": ticket_id, **_store_env(root)}}
+    is a real path. W2-201 X3: a fix or a chore adds ``GOV_LAUNCH_KIND`` and ``GOV_LAUNCH_LINE`` (a lead writes no
+    launch record to hold them), and a chore has no ``GOV_TICKET``; a lead launched as before has the same env."""
+    env = {"GOV_ROLE": LEAD_GOV_ROLE, **_ticket_env(ticket_id), **_store_env(root)}
+    if kind != FEATURE:
+        env.update({KIND_ENV: kind, KIND_LINE_ENV: line})
+    return {"env": env}
 
 
-def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
+def _kind(ticket_id: str | None, fix: str | None, chore: str | None) -> tuple[str, str | None]:
+    """W2-201 fix X1 to X3: the launch's ``(kind, line)``, ``feature`` and None for a launch on its ticket as before.
+    The second fence behind the command line's exit 2: the same forms refuse here, before anything is read."""
+    if fix is not None and chore is not None:
+        raise _refuse("--fix and --chore do not go together: a fix has its owning ticket, a chore has none")
+    for flag, line in (("--fix", fix), ("--chore", chore)):
+        if line is not None and (not isinstance(line, str) or not line.strip()):
+            raise _refuse(f"{flag} takes one line saying what the work is, not a blank one")
+    if fix is not None and ticket_id is None:
+        raise _refuse("--fix takes the owning ticket: gov launch <role> <ticket> --fix \"<line>\"")
+    if chore is not None and ticket_id is not None:
+        raise _refuse(f"--chore takes no ticket (given: {ticket_id}): gov launch <role> --chore \"<line>\"")
+    if fix is None and chore is None and ticket_id is None:
+        raise _refuse("a launch names its ticket, or --chore \"<line>\" for work with no ticket")
+    return (FIX, fix) if fix is not None else (CHORE, chore) if chore is not None else (FEATURE, None)
+
+
+def _label(ticket_id: str | None) -> str:
+    """The name a session goes by in the registry and in its inbox address: its ticket, or ``chore-<8 hex>`` for a
+    chore (W2-201 X3)."""
+    return ticket_id if ticket_id is not None else f"{CHORE}-{secrets.token_hex(4)}"
+
+
+def _check_ticket(root: Path, role: str, ticket_id: str, fix: bool = False) -> None:
+    """The ticket exists, is ``in_progress`` (not judged for a fix, W2-201 X1: a fix runs under its owning ticket,
+    closed or not) and, where the role keeps to its own ticket, is the role's."""
     ticket = _load_ticket(str(root), ticket_id)
     if ticket is None:
         raise _refuse(f"unknown ticket '{ticket_id}'")
-    if ticket.get("status") != "in_progress":
+    if not fix and ticket.get("status") != "in_progress":
         raise _refuse(f"ticket '{ticket_id}' is not in_progress (status: {ticket.get('status')})")
     # W2-60b: whether the role keeps to its own ticket is read from its role file, only when the ticket is another's
     if ticket.get("role") != role and _role_kind(root, role)["own_ticket"]:
@@ -625,14 +674,21 @@ def _trial(root: Path, trial_id: str, role: str, ticket_class: str, names: list[
     return {"model": data["model"], "effort": data["effort"]}
 
 
-def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, given: dict, reason: str | None,
-            trial_id: str | None, owner_named: str | None) -> dict:
+def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: dict, given: dict, reason: str | None,
+            trial_id: str | None, owner_named: str | None, chore: bool = False) -> dict:
     """W2-184, RUBRIC-2 at launch (DEC-1120): the session's model and effort and where each came from, the ticket's
     criticality, the promotion, the review round and the other record keys. Every refusal comes here, before the gate
-    and before any record or session is made."""
+    and before any record or session is made. A chore (W2-201 X2) has no ticket, so no class: the role file's default
+    line, no promotion, no review count, no trial, and an exception only where the entry names no class."""
     table, profile = loaded["by_criticality"], ticket.get("profile")
-    names = _ticket_names(ticket_id, ticket)
-    if not crit.exists(root):
+    names = _ticket_names(ticket_id, ticket) if ticket_id is not None else []
+    if chore:
+        if trial_id is not None:
+            raise _refuse(f"--trial {trial_id} is refused: a trial needs the ticket's criticality, and a chore has no "
+                          f"ticket")
+        counted, review_round, probe, promotion, opus, ticket_class = [], None, False, None, None, None
+        table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    elif not crit.exists(root):
         # 1.4 (amended 2026-11-14): no criticality.yaml, the launch as before W2-184 (DEC-1167 (2)): the role's default
         # line for every class; no promotion, no review count, no probe, no same-setting refusal; a trial needs the file
         if trial_id is not None:
@@ -674,7 +730,8 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         if given["model"] != model:
             # W2-201 S4 (DEC-1212 (2), DEC-1214 K1): another model only by an entry of the exceptions file, and only
             # where the table decides: a promotion, a trial and the probe stay as they are
-            shown = ticket_class if ticket_class is not None else f"none (no {crit.REL})"
+            shown = ticket_class if ticket_class is not None else \
+                "none (a chore has no ticket)" if chore else f"none (no {crit.REL})"
             refusal = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
                        f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3)); another model comes "
                        f"only from an exception in {model_exceptions.REL} (DEC-1212 (2))")
@@ -735,20 +792,24 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
                       f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
     return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
             "tier": (model.split("-") + [model])[1], "criticality": ticket_class, "exception": exception,
-            "rubric": crit.REL if crit.exists(root) else None,  # W2-121c RT-8: the file the choice came from
+            # W2-121c RT-8: the file the choice came from; a chore's came from none (W2-201 X2)
+            "rubric": crit.REL if not chore and crit.exists(root) else None,
             "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
             "review_round": review_round}
 
 
-def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: list[str], settings: dict,
-                 options: tuple = (None, None, None), projection_usd: float | None = None) -> dict:
+def _worker_plan(root: Path, role: str, ticket_id: str | None, given: dict, template: list[str], settings: dict,
+                 options: tuple = (None, None, None), projection_usd: float | None = None,
+                 kind: tuple[str, str | None] = (FEATURE, None)) -> dict:
     """W2-60a, before the gate: the role read once, its model and effort, the resumed session's record, and the
     settings a worker session gets on top of ``build_settings`` (the record folder's deny rules, the user's ask and
     deny rules, no model-side memory, the subagent model in its env). What ``_launch_line`` needs once the session's
-    temp folder exists is returned; any refusal comes here, before anything but the record folder is made."""
+    temp folder exists is returned; any refusal comes here, before anything but the record folder is made. ``kind`` is
+    W2-201's ``(kind, line)``: a chore's ``ticket_id`` is None and no ticket file is read."""
     loaded = roles.read_role(root, role)
-    ticket = _load_ticket(str(root), ticket_id) or {}
-    chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+    ticket = (_load_ticket(str(root), ticket_id) or {}) if ticket_id is not None else {}
+    # W2-184: every launch-setting refusal
+    chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options, chore=kind[0] == CHORE)
     model, effort = chosen["model"], chosen["effort"]
     template_path = Path(template[1])
     try:
@@ -775,7 +836,7 @@ def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: l
                          "appended_sha256": roles.sha256(composed), "template": template_entry}
     return {"role": role, "ticket": ticket_id, "root": root, "given": given, "model": model, "effort": effort,
             "ticket_class": ticket_class, "chosen": chosen, "records": records, "resumed": resumed is not None, "origin": origin,
-            "composed": composed, "projection_usd": projection_usd}
+            "composed": composed, "projection_usd": projection_usd, "kind": kind}
 
 
 def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
@@ -791,6 +852,8 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "record": "gov-launch", "format": record.FORMAT, "session_id": session_id,
         "resumes": given["resume"], "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "root": str(plan["root"]), "role": plan["role"], "ticket": plan["ticket"], "ticket_class": plan["ticket_class"],
+        # W2-201 fix X1, X2 (DEC-1219 (5)): feature (a launch on its ticket, as before), fix or chore, and the line
+        "kind": plan.get("kind", (FEATURE, None))[0], "kind_line": plan.get("kind", (FEATURE, None))[1],
         "model": model, "model_source": chosen["model_source"], "tier": chosen["tier"],
         "effort": effort, "effort_source": chosen["effort_source"], "criticality": chosen["criticality"],
         "trial": chosen["trial"], "promotion": chosen["promotion"], "effort_reason": chosen["effort_reason"],
@@ -944,19 +1007,21 @@ def _check_worker_role(role: str) -> None:
                       f"and '-'), and a lead role is {' or '.join(LEAD_ROLES)}")
 
 
-def tests_worktree(root: Path, role: str, ticket_id: str) -> int:
+def tests_worktree(root: Path, role: str, ticket_id: str, *, fix: str | None = None) -> int:
     """W2-60b S10 (DEC-847, DEC-963, DEC-982): ``gov launch independent-test-designer <ticket> --tests-worktree``, run
     in the ticket's worktree, makes the tests worktree ``<tree>-tests`` on a new branch ``<tree's branch>-tests`` at the
     tree's ``HEAD``, prints its path and returns 0. No session starts, nothing is recorded or gated. An existing path or
-    branch, a tree on no branch, or a ticket that is unknown or not ``in_progress`` refuses."""
+    branch, a tree on no branch, or a ticket that is unknown or not ``in_progress`` refuses; with ``fix`` (W2-201 X1:
+    a fix's failing test is written first, in a tests worktree of its closed ticket) the status is not judged."""
     root = Path(os.path.realpath(root))
+    _kind(ticket_id, fix, None)
     if role != "independent-test-designer":
         raise _refuse(f"--tests-worktree makes the independent test designer's own tree, not one for '{role}' "
                       f"(DEC-963)")
     ticket = _load_ticket(str(root), ticket_id)
     if ticket is None:
         raise _refuse(f"unknown ticket '{ticket_id}'")
-    if ticket.get("status") != "in_progress":
+    if fix is None and ticket.get("status") != "in_progress":
         raise _refuse(f"ticket '{ticket_id}' is not in_progress (status: {ticket.get('status')})")
     git, env = git_binary() or "git", git_env(root)
 
@@ -979,23 +1044,27 @@ def tests_worktree(root: Path, role: str, ticket_id: str) -> int:
     return 0
 
 
-def plan(root: Path, role: str, ticket_id: str) -> int:
+def plan(root: Path, role: str, ticket_id: str | None, *, fix: str | None = None, chore: str | None = None) -> int:
     """``gov launch --plan <role> <ticket>`` (W2-60a, routed from W2-33 S2; DEC-1167 (2)): print the one line
     ``model <id>, effort <e>`` of the role file's default line and return 0. A worker's role and ticket are checked as a
-    launch checks them; nothing is started, made or gated. A lead reads no role file, so it has no plan here."""
+    launch checks them; nothing is started, made or gated. A lead reads no role file, so it has no plan here. W2-201:
+    with ``fix`` the ticket's status is not judged; with ``chore`` there is no ticket to check."""
     root = Path(os.path.realpath(root))
+    kind, _ = _kind(ticket_id, fix, chore)
     if role in LEAD_ROLES:
         raise _refuse(f"a '{role}' session is started without a role file's default line, so it has no plan")
     _role_kind(root, role)
-    _check_ticket(root, role, ticket_id)
+    if kind != CHORE:
+        _check_ticket(root, role, ticket_id, fix=kind == FIX)
     model, effort = roles.launch_default(root, role)
     print(f"model {model}, effort {effort}")
     return 0
 
 
-def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
+def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], gate_override: str | None = None,
            gpu_need_mib: int | None = None, *, reason: str | None = None, trial: str | None = None,
-           owner_named: str | None = None, projection_usd: float | None = None) -> int:
+           owner_named: str | None = None, projection_usd: float | None = None, fix: str | None = None,
+           chore: str | None = None) -> int:
     """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
 
     A worker's ``projection_usd`` (``--projection-usd``, W2-156) is recorded on its launch record: the runaway brake's
@@ -1010,10 +1079,16 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     The machine-wide start lock is held from the gate's check until the session is registered (review F1): launches
     that start together are judged one after another, each with the sessions started before it counted, and one that
     ends before registering leaves no entry.
+
+    W2-201 fix X1 to X3 (DEC-1219 (5)): ``fix`` (a line) starts the session under ``ticket_id`` whatever its status;
+    ``chore`` (a line) starts it with ``ticket_id`` None and no ticket. A lead's fix or chore is not checked against
+    the plan; a worker's chore has no run folder and no ticket-based spend brake.
     """
     from gov.launch.gate import StartLock
 
     root = Path(os.path.realpath(root))
+    kind, line = _kind(ticket_id, fix, chore)
+    label = _label(ticket_id)
     if role in LEAD_ROLES:
         # W2-184 R1 (interface 10.1): the second fence behind the CLI's exit 2, before anything is read or started
         given = [flag for flag, value in (("--reason", reason), ("--trial", trial), ("--owner-named", owner_named))
@@ -1024,19 +1099,25 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         if projection_usd is not None:  # W2-156: a lead writes no launch record, so it has nowhere to keep one
             raise _refuse(f"a lead launch ({role}) takes no --projection-usd: it writes no launch record to hold one")
         _check_not_paused(root)
-        plan_override = _admit_lead(root, ticket_id)
+        plan_override = None
+        if kind == FEATURE:
+            plan_override = _admit_lead(root, ticket_id)
+        elif kind == FIX and _load_ticket(str(root), ticket_id) is None:
+            # W2-201 X3: a fix is not planned, so the plan is not asked; its owning ticket must exist, whatever status
+            raise _refuse(f"unknown ticket '{ticket_id}'")
         _check_cli_args(cli_args)
         _check_repository_settings(root, False)
         template = template_args(root, role)
         cli = _cli()
-        settings = build_lead_settings(root, ticket_id)  # an unusable store setting refuses here, before the gate
+        # an unusable store setting refuses here, before the gate
+        settings = build_lead_settings(root, ticket_id, kind, line)
         lock = StartLock()
         try:
-            _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
+            _admit_start(root, role, label, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
             return _run(root, cli, settings, [*_mode_args(cli_args), *cli_args, *template],
-                        entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
+                        entry=(label, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
     _check_worker_role(role)
@@ -1044,7 +1125,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     given = _check_own_args(cli_args)
     _check_options(reason, trial, owner_named)
     _check_projection(projection_usd)
-    _check_ticket(root, role, ticket_id)
+    if kind != CHORE:  # W2-201 X2: a chore reads no ticket file
+        _check_ticket(root, role, ticket_id, kind == FIX)
     _check_not_paused(root)
     _check_repository_settings(root)
     if role not in ROLE_TEMPLATES:  # W2-60b S8: a new role's file before its template is looked for
@@ -1059,7 +1141,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     session_record.make_folder(root)  # before the settings, so every launch's runtime rules are the same (W2-56 S3)
     settings = build_settings(root, role, ticket_id)
     # W2-60a: the role read once; W2-184: the session's model and effort are RUBRIC-2's for its role and criticality.
-    plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd)
+    plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd,
+                        (kind, line))
     plan["mode"] = _mode_args(cli_args)
     lock = StartLock()
     try:
@@ -1068,8 +1151,9 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         # it live; two launches that start together, or wait together on a lock a third party holds, are judged one
         # after the other. A refusal here starts no CLI and writes no record of its own.
         session_record.check_one_writer(root, str(root), role)
-        _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
-        braked = spend_brake.refusal(root, ticket_id)  # W2-156 (DEC-1091 (2)): after the gate, before anything starts
+        _admit_start(root, role, label, gate_override, gpu_need_mib)
+        # W2-156 (DEC-1091 (2)): after the gate, before anything starts; a chore has no ticket to brake (W2-201 X2)
+        braked = spend_brake.refusal(root, ticket_id) if ticket_id is not None else None
         if braked is not None:
             raise GovError("SPEND_BRAKED", braked)
         # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
@@ -1081,7 +1165,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
             runs.make(name, str(root))
         own = runs.own_folder(str(root), ticket_id, role)
         # W2-60a: the appended file (the role's text, then the template) and the record are made in _run
-        return _run(root, cli, settings, cli_args, temp_prefix=TEMP_PREFIX, own=own, entry=(ticket_id, role),
+        return _run(root, cli, settings, cli_args, temp_prefix=TEMP_PREFIX, own=own, entry=(label, role),
                     lock=lock, worker=plan)
     finally:
         lock.release()
