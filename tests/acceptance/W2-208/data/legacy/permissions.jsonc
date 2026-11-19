@@ -1,0 +1,11 @@
+{
+  "permission": {
+    "edit": {
+      ".tickets/**": "deny"
+    },
+    "bash": {
+      "gov launch:*": "allow",
+      "sudo *": "deny"
+    }
+  }
+}

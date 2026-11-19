@@ -1,30 +1,24 @@
-"""W1-38, the round of DEC-635 (DEC-641): the held-out step after generation.
+"""W1-38, the round of DEC-635 (DEC-641), revised by DEC-1217 (6): no held-out step after generation.
 
-A project's settings hold one ``Read`` deny rule per held-out path (DEC-162).
-No rulesync source names a held-out path: the rules are written into the
-settings after generation, by the existing generator
-``python3 -m gov.util.heldout`` run in the project, from the project's
-held-out file (DEC-218). The owner's apply procedure is therefore "rulesync
-generate, then the generator", and the adapter/model-portability check holds
-the project's settings to exactly that: inside its temporary generation it
-applies the same step before it compares, when and only when the project has a
-held-out file.
+Rewrite-Reason: DEC-1217 (6), EMERGENCY-2 2.7; W2-208 K3: the kit writes no ``Read`` deny for a held-out path. The
+round of DEC-635 held a project's settings to "rulesync generate, then the held-out step" (one ``Read`` deny rule per
+held-out path, written by ``python3 -m gov.util.heldout``) and the adapter/model-portability check applied the same
+step inside its temporary generation. Under EMERGENCY-2 2.7 a hidden set is protected by the transcript scan, not by a
+deny: the step retires (``write_read_rules`` is no longer defined, nor called by ``gov adapters generate`` or the check),
+while ``held-out.yaml`` and ``load_held_out`` stay. The cases are turned to the decided state and keep what still
+holds: a project with a held-out file is compared as rulesync alone generates it (green), a ``Read`` deny rule of the
+old step has no source (red on the settings), a broken held-out file is no finding of the check, the old generator
+writes nothing, and no output carries a held-out path (DEC-635, DEC-641). The old cases that pinned the step
+(``TestSettingsAfterTheHeldOutStep``, ``TestStepRepeated``, the step's half of ``TestHeldOutStepThroughGovCheck``, and
+``HELD_OUT_STEP_FAILED`` in ``TestBrokenHeldOutFile``) are replaced by the cases below.
 
-Every case builds a stand-in project under pytest's ``tmp_path`` as the
-suite's other cases do (the template's sources, the kernel, the tool registry,
-the check's declaration), runs the real rulesync there (found as the suite
-finds it: ``support.RULESYNC_BIN``, skipped when it is not installed) and,
-where the case needs the "generated, then the step" state, runs the real
-generator for that stand-in project. The held-out file is a stand-in written
-by the case; the paths it names are invented under the case's temporary
-folder. The two locations and the key are read from the generator's own
-constants, never retyped here.
+Every case builds a stand-in project under pytest's ``tmp_path`` as the suite's other cases do (the template's
+sources, the kernel, the tool registry, the check's declaration) and runs the real rulesync there (found as the suite
+finds it: ``support.RULESYNC_BIN``, skipped when it is not installed). The held-out file is a stand-in written by the
+case; the paths it names are invented under the case's temporary folder. The file's location and key are read from
+``gov.util.heldout``'s own constants, never retyped here.
 
-Behaviour is asserted through the declared command's exit code and what it
-prints, and through ``gov check --json``. No function name or module layout is
-asserted. One finding code is: the held-out step's own, for a broken held-out
-file, because a check that could not compare at all (a rulesync call that gave
-no answer in time) is also not green with a finding (DEC-892 item 2).
+Behaviour is asserted through the declared command's exit code and what it prints, and through ``gov check --json``.
 """
 
 from __future__ import annotations
@@ -43,9 +37,8 @@ import w1_38_support as support
 
 needs_rulesync = pytest.mark.needs_rulesync
 
-GENERATOR = ("python3", "-m", "gov.util.heldout")   # the owner's apply procedure, second step
+GENERATOR = ("python3", "-m", "gov.util.heldout")   # the retired step's old entry point: it writes nothing now
 SRC = support.REPO_ROOT / "src"
-HELD_OUT_STEP_FAILED = "HELD_OUT_STEP_FAILED"   # the check's finding: the held-out step could not be applied
 
 
 # ---------------------------------------------------------------------------
@@ -54,13 +47,12 @@ HELD_OUT_STEP_FAILED = "HELD_OUT_STEP_FAILED"   # the check's finding: the held-
 
 @functools.lru_cache(maxsize=1)
 def _names() -> dict:
-    """The generator's own constants: where a project holds its held-out file,
-    the key in it, and the settings file it writes. Read in a fresh interpreter
-    with this worktree's ``src`` first, so no other tree's code answers."""
+    """``gov.util.heldout``'s own constants: where a project holds its held-out
+    file and the key in it. Read in a fresh interpreter with this worktree's
+    ``src`` first, so no other tree's code answers."""
     code = (
         "import json, gov, gov.util.heldout as h\n"
-        "print(json.dumps({'config': h.CONFIG_REL, 'key': h.CONFIG_KEY, "
-        "'settings': h.SETTINGS_REL, 'code': gov.__file__}))"
+        "print(json.dumps({'config': h.CONFIG_REL, 'key': h.CONFIG_KEY, 'code': gov.__file__}))"
     )
     done = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True, timeout=60,
@@ -70,9 +62,6 @@ def _names() -> dict:
     names = json.loads(done.stdout)
     assert Path(names["code"]).resolve().is_relative_to(SRC.resolve()), (
         f"the generator ran from {names['code']}, not from this worktree's src"
-    )
-    assert names["settings"] == support.SETTINGS_REL, (
-        "the generator writes another settings file than the one the suite compares"
     )
     return names
 
@@ -101,24 +90,9 @@ def _write_held_out_file(project: Path, paths: list[str]) -> Path:
 
 def _environment(project: Path) -> dict[str, str]:
     """A session's ``CLAUDE_PROJECT_DIR`` names the repository the session
-    works in; here the project is the stand-in, for the generator (which reads
-    the variable) and for the check alike."""
+    works in; here the project is the stand-in, for the check and the old
+    generator's entry point alike."""
     return {"CLAUDE_PROJECT_DIR": str(project)}
-
-
-def _run_step(project: Path) -> subprocess.CompletedProcess:
-    """``python3 -m gov.util.heldout`` in the stand-in project, with this
-    worktree's code: the second step of the owner's apply procedure."""
-    _assert_stand_in(project)
-    done = subprocess.run(
-        list(GENERATOR), capture_output=True, text=True, timeout=60, cwd=str(project),
-        env={**os.environ, "PYTHONPATH": str(SRC), **_environment(project)},
-        stdin=subprocess.DEVNULL,
-    )
-    assert done.returncode == 0, (
-        f"the generator failed in the stand-in project (exit {done.returncode}): {done.stderr[-500:]}"
-    )
-    return done
 
 
 def _settings_bytes(project: Path) -> bytes:
@@ -130,21 +104,19 @@ def _deny_rules(project: Path) -> list[str]:
     return list(support.load_settings(project).get("permissions", {}).get("deny", []))
 
 
-def _apply_step(project: Path, paths: list[str]) -> list[str]:
-    """Write the stand-in held-out file, run the generator, and return the
-    deny rules the step added (one for each stand-in path, asserted)."""
-    before = _deny_rules(project)
-    _write_held_out_file(project, paths)
-    _run_step(project)
-    added = [rule for rule in _deny_rules(project) if rule not in before]
-    assert len(added) == len(paths) and all(
-        sum(path in rule for rule in added) == 1 for path in paths
-    ), (
-        f"the generator added {len(added)} deny rule(s) for {len(paths)} stand-in path(s); "
-        "one rule for each path is expected"
-    )
-    assert all(rule.startswith("Read(") for rule in added), "the generator's rules are not Read rules"
-    return added
+def _old_step_rules(paths: list[str]) -> list[str]:
+    """The ``Read`` deny rules the retired step wrote, in its form ``Read(/<path>/**)``."""
+    return [f"Read(/{path}/**)" for path in paths]
+
+
+def _plant_old_step_rules(project: Path, paths: list[str]) -> list[str]:
+    rules = _old_step_rules(paths)
+
+    def add(settings):
+        settings.setdefault("permissions", {}).setdefault("deny", []).extend(rules)
+
+    support.edit_settings(project, add)
+    return rules
 
 
 def _check(project: Path) -> subprocess.CompletedProcess:
@@ -191,7 +163,7 @@ def _assert_green(project: Path, paths: list[str], what: str) -> None:
     named = _named(project, result)
     assert support.SETTINGS_REL not in named, (
         f"{what}: the findings name the project's settings file although it is what "
-        f"\"rulesync generate, then the held-out step\" gives; they name {sorted(named)}"
+        f"rulesync generates; they name {sorted(named)}"
     )
     assert result.returncode == 0 and not _findings(result), (
         f"{what}: nothing differs, but the check is not green (exit {result.returncode}): {output}"
@@ -229,74 +201,36 @@ def stand_in_paths(tmp_path):
 
 
 # ===================================================================
-# A project with a held-out file: its settings are "generated, then the step"
+# A project with a held-out file: its settings are what rulesync generates
 # ===================================================================
 
-class TestSettingsAfterTheHeldOutStep:
-    """DEC-635, DEC-641: the check holds the project's settings to exactly
-    what rulesync generates followed by the generator's step."""
+class TestNoHeldOutStep:
+    """DEC-1217 (6), EMERGENCY-2 2.7 (W2-208 K3): the check holds a project's settings to what rulesync alone generates,
+    whether or not the project has a held-out file."""
 
     @needs_rulesync
-    def test_generated_then_the_step_is_green(self, generated_project, stand_in_paths):
-        _apply_step(generated_project, stand_in_paths)
-        _assert_green(generated_project, stand_in_paths,
-                      "the project's settings are generated, then the held-out step")
-
-    @needs_rulesync
-    def test_step_never_run_is_red_on_the_settings(self, generated_project, stand_in_paths):
-        """The project has a held-out file and its settings are what rulesync
-        alone generates: every Read deny rule of the step is missing."""
+    def test_generated_settings_beside_a_held_out_file_are_green(self, generated_project, stand_in_paths):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: the held-out file adds no rule (was
+        ``test_step_never_run_is_red_on_the_settings``)."""
         _write_held_out_file(generated_project, stand_in_paths)
+        _assert_green(generated_project, stand_in_paths,
+                      "the project has a held-out file and its settings are what rulesync generates")
+        assert not [rule for rule in _deny_rules(generated_project) if rule.startswith("Read(")], (
+            "the settings rulesync generates hold a Read deny rule")
+
+    @needs_rulesync
+    def test_read_deny_rules_of_the_old_step_are_red_on_the_settings(self, generated_project, stand_in_paths):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: a Read deny rule the old step wrote has no source now (was
+        ``test_generated_then_the_step_is_green``)."""
+        _write_held_out_file(generated_project, stand_in_paths)
+        _plant_old_step_rules(generated_project, stand_in_paths)
         _assert_red_on_the_settings(
             generated_project, stand_in_paths,
-            "the project has a held-out file and its settings hold none of its Read deny rules",
+            "the project's settings carry the old held-out step's Read deny rules",
         )
 
     @needs_rulesync
-    def test_one_rule_lost_is_red_on_the_settings(self, generated_project, stand_in_paths):
-        """One of the two rules the step wrote is taken out again by hand."""
-        added = _apply_step(generated_project, stand_in_paths)
-
-        def lose_one(settings):
-            settings["permissions"]["deny"].remove(added[-1])
-
-        support.edit_settings(generated_project, lose_one)
-        _assert_red_on_the_settings(
-            generated_project, stand_in_paths,
-            "one Read deny rule of the held-out file was removed from the project's settings",
-        )
-
-    @needs_rulesync
-    def test_rule_the_held_out_file_does_not_give_is_red_on_the_settings(
-        self, generated_project, stand_in_paths, tmp_path,
-    ):
-        """A Read deny rule in the generator's own form, for a path the
-        held-out file does not name, beside the two it does name."""
-        added = _apply_step(generated_project, stand_in_paths)
-        other = str(tmp_path / "stand-in-held-out" / "not-in-the-file")
-        stray = added[0].replace(stand_in_paths[0], other)
-        assert stray != added[0] and stray not in _deny_rules(generated_project)
-
-        def add_stray(settings):
-            settings["permissions"]["deny"].append(stray)
-
-        support.edit_settings(generated_project, add_stray)
-        _assert_red_on_the_settings(
-            generated_project, stand_in_paths,
-            "the project's settings hold a Read deny rule the held-out file does not give",
-        )
-
-
-# ===================================================================
-# A project without a held-out file is compared as before
-# ===================================================================
-
-class TestProjectWithoutAHeldOutFile:
-    """DEC-641: the step is applied when and only when the project has a
-    held-out file. Without one the settings are what rulesync generates."""
-
-    @needs_rulesync
-    def test_generated_settings_are_green(self, generated_project):
+    def test_without_a_held_out_file_generated_settings_are_green(self, generated_project):
         assert not os.path.lexists(_held_out_file(generated_project)), (
             "the stand-in project as built holds a held-out file; the case needs one without"
         )
@@ -307,19 +241,24 @@ class TestProjectWithoutAHeldOutFile:
         )
 
     @needs_rulesync
-    def test_stray_read_deny_rule_is_red_on_the_settings(self, generated_project, stand_in_paths):
-        """The settings carry the step's rules and the project has no held-out
-        file (the file was taken away after the step): the rules have no source."""
-        _apply_step(generated_project, stand_in_paths)
-        _held_out_file(generated_project).unlink()
-        _assert_red_on_the_settings(
-            generated_project, stand_in_paths,
-            "the project has no held-out file and its settings carry Read deny rules of one",
+    def test_the_old_generator_writes_no_rule(self, generated_project, stand_in_paths):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: ``python3 -m gov.util.heldout`` no longer writes Read deny rules
+        (was ``TestStepRepeated``)."""
+        _write_held_out_file(generated_project, stand_in_paths)
+        before = _settings_bytes(generated_project)
+        done = subprocess.run(
+            list(GENERATOR), capture_output=True, text=True, timeout=60, cwd=str(generated_project),
+            env={**os.environ, "PYTHONPATH": str(SRC), **_environment(generated_project)},
+            stdin=subprocess.DEVNULL,
+        )
+        _assert_no_stand_in_path(done.stdout + done.stderr, stand_in_paths, "the old generator's output")
+        assert _settings_bytes(generated_project) == before, (
+            "python3 -m gov.util.heldout still writes into the project's settings"
         )
 
 
 # ===================================================================
-# A broken held-out file is not green, and prints no path
+# A broken held-out file is no finding of the check, and prints no path
 # ===================================================================
 
 def _unparsable(key, paths):
@@ -359,16 +298,16 @@ BROKEN = {
 
 
 class TestBrokenHeldOutFile:
-    """DEC-218, DEC-641: a held-out file that cannot be read, or is not of its
-    stated shape, makes the check not green. The project's settings are what
-    rulesync alone generates, so a check that fell back to the comparison
-    without the step would be green here."""
+    """DEC-218: the held-out file's shape is ``load_held_out``'s to refuse (``gov memaudit`` reads it); the check
+    applies no step to it, so a broken file is no finding of the check, and no output carries a stand-in path."""
 
     @needs_rulesync
     @pytest.mark.parametrize("form", sorted(BROKEN))
-    def test_broken_file_is_not_green_and_no_path_is_printed(
+    def test_broken_file_is_no_finding_and_no_path_is_printed(
         self, generated_project, stand_in_paths, form,
     ):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: the check no longer applies the held-out step, so a broken file
+        no longer gives ``HELD_OUT_STEP_FAILED`` (was ``test_broken_file_is_not_green_and_no_path_is_printed``)."""
         path = _held_out_file(generated_project)
         path.parent.mkdir(parents=True, exist_ok=True)
         if BROKEN[form] is None:
@@ -382,93 +321,45 @@ class TestBrokenHeldOutFile:
         result = _check(generated_project)
         _assert_no_stand_in_path(support.output_of(result), stand_in_paths,
                                  f"the check's output (held-out file broken: {form})")
-        assert result.returncode != 0, (
-            f"the held-out file is broken ({form}) and the check is green: it compared without the step"
-        )
-        assert _findings(result), (
-            f"the held-out file is broken ({form}): the check is not green but reports no finding"
-        )
-        # Rewrite-Reason (DEC-892 item 2): a check whose rulesync call gave no answer in time is not green with
-        # a finding too, without comparing; the red is held to its reason, the held-out step's own finding.
         codes = [finding.get("code") for finding in _findings(result) if isinstance(finding, dict)]
-        assert HELD_OUT_STEP_FAILED in codes, (
-            f"the held-out file is broken ({form}), but no finding says the held-out step could not be applied; "
-            f"the findings are {codes}"
+        assert not [code for code in codes if str(code).startswith("HELD_OUT")], (
+            f"the held-out file is broken ({form}) and the check applies a held-out step: {codes}"
         )
-
-
-# ===================================================================
-# The apply procedure may be repeated
-# ===================================================================
-
-class TestStepRepeated:
-
-    @needs_rulesync
-    def test_second_run_of_the_step_leaves_the_settings_as_they_are(
-        self, generated_project, stand_in_paths,
-    ):
-        _apply_step(generated_project, stand_in_paths)
-        once = _settings_bytes(generated_project)
-        _run_step(generated_project)
-        assert _settings_bytes(generated_project) == once, (
-            "a second run of the generator changed the project's settings"
+        assert result.returncode == 0 and not codes, (
+            f"the held-out file is broken ({form}) and the check, which reads no held-out file, is not green: {codes}"
         )
-
-    @needs_rulesync
-    def test_project_is_still_green_after_the_second_run(self, generated_project, stand_in_paths):
-        _apply_step(generated_project, stand_in_paths)
-        _run_step(generated_project)
-        _assert_green(generated_project, stand_in_paths,
-                      "the held-out step was run twice on the generated settings")
-
-    @needs_rulesync
-    def test_whole_procedure_repeated_is_still_green(self, generated_project, stand_in_paths):
-        """rulesync generate, the step, and both once more, as an owner who
-        applies the adapters again does it."""
-        _apply_step(generated_project, stand_in_paths)
-        once = _settings_bytes(generated_project)
-        again = support.run_rulesync_generate(generated_project)
-        assert again.returncode == 0, f"rulesync generate failed: {again.stderr}"
-        _run_step(generated_project)
-        assert _settings_bytes(generated_project) == once, (
-            "the apply procedure run a second time gave other settings than the first time"
-        )
-        _assert_green(generated_project, stand_in_paths, "the apply procedure was run twice")
 
 
 # ===================================================================
 # The same through gov check
 # ===================================================================
 
-class TestHeldOutStepThroughGovCheck:
+class TestHeldOutFileThroughGovCheck:
     """``gov check --json`` shows what the declared command gave."""
 
     @needs_rulesync
-    def test_gov_check_is_green_after_the_apply_procedure(
-        self, generated_project, sandbox, stand_in_paths,
-    ):
-        _apply_step(generated_project, stand_in_paths)
+    def test_gov_check_is_green_beside_a_held_out_file(self, generated_project, sandbox, stand_in_paths):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: green with the settings rulesync generates (was
+        ``test_gov_check_is_green_after_the_apply_procedure``)."""
+        _write_held_out_file(generated_project, stand_in_paths)
         entry, family, run = _gov_check(generated_project, sandbox)
         _assert_no_stand_in_path(run.describe(), stand_in_paths, "gov check's output")
         assert (entry.get("status"), family.get("status")) == (support.GREEN, support.GREEN), (
-            f"the settings are generated, then the held-out step, but gov check shows the check as "
+            f"the settings are what rulesync generates beside a held-out file, but gov check shows the check as "
             f"{entry.get('status')!r} and the family as {family.get('status')!r}\n{run.describe()}"
         )
 
     @needs_rulesync
-    def test_gov_check_is_red_when_a_rule_is_lost(self, generated_project, sandbox, stand_in_paths):
-        added = _apply_step(generated_project, stand_in_paths)
-
-        def lose_one(settings):
-            settings["permissions"]["deny"].remove(added[0])
-
-        support.edit_settings(generated_project, lose_one)
+    def test_gov_check_is_red_when_the_old_steps_rules_are_there(self, generated_project, sandbox, stand_in_paths):
+        """Rewrite-Reason: DEC-1217 (6), W2-208 K3: a Read deny rule of the old step is a rule with no source (was
+        ``test_gov_check_is_red_when_a_rule_is_lost``)."""
+        _write_held_out_file(generated_project, stand_in_paths)
+        _plant_old_step_rules(generated_project, stand_in_paths)
         entry, family, run = _gov_check(generated_project, sandbox)
         _assert_no_stand_in_path(run.describe(), stand_in_paths, "gov check's output")
         assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
-            f"a Read deny rule of the held-out file is missing from the settings, but gov check shows "
-            f"the check as {entry.get('status')!r} and the family as {family.get('status')!r}\n"
-            f"{run.describe()}"
+            f"the settings carry the old held-out step's Read deny rules, but gov check shows the check as "
+            f"{entry.get('status')!r} and the family as {family.get('status')!r}\n{run.describe()}"
         )
         named = support.named_files(generated_project, json.dumps(entry.get("findings")))
         assert named == {support.SETTINGS_REL}, (

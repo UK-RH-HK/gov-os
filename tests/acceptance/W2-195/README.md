@@ -72,6 +72,14 @@ skipped, as W2-88's is.
 | success-4 | `test_w2_195_s4_shipped.py::test_s4_the_kit_delivers_the_skill_and_adapters_generate_preloads_it` | `copier copy of the kit installed no governance/kernel/skills/judging-work/SKILL.md` |
 | failure-1 | `test_w2_195_f1_text.py::test_f1_the_sections_a_brief_carries_hash_as_the_installed_files_sections` (6: three judging briefs, each with the approved 1.1.0 text and with a 1.1.1 copy whose section 2 has one word changed) | auditor and lead: `the brief carries no section 1 heading of judging-work`; qa-engineer: `gov brief did not succeed: exit 2` (argparse) |
 
+**Revised for W2-208** (DAEO-kt8e; `Rewrite-Reason: DEC-1217 (7), W2-208 K5`): the skill's text is revised to agree
+with the kit's new head and its version raised, so the S4 cases no longer pin the approved 1.1.0 bytes:
+`test_s4_the_kernel_skill_and_its_mirror_are_the_approved_bytes` holds the kernel file and its mirror byte-equal with a
+version above 1.1.0; the wheel and the kit cases compare with the kernel file at HEAD (and the generated copy's version
+with the kernel's). The fixture copy `data/judging-work.kernel.SKILL.md` (1.1.0) of the other cases is unchanged. Red
+on the base (`8e72e0228`): the first case (the version is 1.1.0); the wheel and kit cases stay green.
+
+
 **Red run on the base** (`heavy_slot.sh`, the sandbox's TMPDIR, an empty HOME, 2026-11-16): `tests/acceptance/W2-195`
 **45 cases, 45 failed, each for the reason in the table, 0 passed, 0 skipped**; none is red by an import, a fixture
 error or a missing data file. With `tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py` beside it: 46 failed, 12
