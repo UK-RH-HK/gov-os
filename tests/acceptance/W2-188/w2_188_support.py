@@ -162,6 +162,21 @@ def kernel_hunks():
     return parse_hunks(done.stdout.decode("utf-8", "replace"))
 
 
+def kernel_hunk_bodies():
+    """``[((old_start, old_len, new_start, new_len), [body lines])]`` of the same diff, each hunk with its ``-``/``+``
+    lines (for a case that must tell one hunk from another by what it changes, not only by where it stands)."""
+    done = git("diff", "--unified=0", BASE, "--", KERNEL_REL)
+    out, current = [], None
+    for line in done.stdout.decode("utf-8", "replace").splitlines():
+        found = HUNK.match(line)
+        if found:
+            current = (parse_hunks(line)[0], [])
+            out.append(current)
+        elif current is not None and line[:1] in "+-" and not line.startswith(("+++", "---")):
+            current[1].append(line)
+    return out
+
+
 # --------------------------------------------------------------------------
 # The commit the record's after-hash is judged against
 # --------------------------------------------------------------------------

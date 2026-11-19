@@ -82,8 +82,11 @@ still name `docs/DECISION_REGISTER.md` with the headings and line spans of the r
 | Success 1 | `test_w2_61_visible_half.py::test_q16_is_relabelled_off_dec_798_and_the_original_is_kept_unchanged` | as before; the span of each source is read where the source resolves, so the floor's entry (DEC-947, not kept) is read in the archive | "no source of q16 is DEC-947 item 5, the floor" |
 
 - **The rule.** A source whose path is the path map's `decision_register` resolves in the register of HEAD when its
-  heading is a line there (with no heading: when its lines are a span of it); else in the archive. The q03 and q09
-  cases read their spans through the same rule and are unchanged in what they assert.
+  heading is a line there (with no heading: when its lines are a span of it); else in the archive. The q03 case
+  reads its spans through the same rule and is unchanged in what it asserts. The q09 case (revised 2026-11-19, Charter v6 /
+  Contract v5, DEC-1219) holds that each alternative's span states the ~6k-token ceiling at HEAD or, where HEAD no longer
+  does (G5-0 renamed `CONTRACT_v4.md`; G5-3 and DEC-1214 retired the context packet and its ceiling), at the question's
+  own `commit` `68ce354a74c7`: the gold is history's, as for the other moved sources; the fixture is not changed.
 - **Checked, not assumed.** After its header the archive is the register of `58a2825a2dcf^` (the commit before the
   archiving) line for line, so the old register's line n is the archive's line n + 1. The cases compare the two at
   every run and fail naming the archive if that stops holding; entries appended to the archive later do not move it.

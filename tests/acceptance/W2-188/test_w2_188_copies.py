@@ -53,14 +53,31 @@ def test_s4_the_version_is_1_1_0_in_the_front_matter_of_each_copy():
 
 # Rewrite-Reason: W2-192 (commit e64430373, DAEO-mpq2) changed the same skill after W2-188: stage AS, a 10-line
 # insertion after base line 29, and step 6's 2-line insertion after base line 60 are W2-192's; the four hunks of
-# W2-188 keep their positions; DEC-1210 (8).
+# W2-188 keep their positions; DEC-1210 (8). Then Charter v6 / Contract v5 (DEC-1219, commit d515d0430) re-worded one
+# sentence of the "Independent gates" section ("Contract v4.2 brings A7 and A10 into Wave 2 in a lite form" became
+# "Contract v5 has A7 and A10 in Wave 2 in a lite form"), a one-line replacement at base line 41: a sixth hunk the
+# case now names and sets aside by what it changes, as it holds the four places W2-188 changed, not the skill's byte
+# count or hunk count.
+DEC_1219_OLD, DEC_1219_NEW = "Contract v4.2 brings A7 and A10 into Wave 2", "Contract v5 has A7 and A10 in Wave 2"
+
+
 def test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_places():
-    """The case keeps its W2-188 id. Against W2-188's base, the diff has five hunks now: W2-188's four (line 4 the
-    version, line 58 step 6, an insertion after base line 59 or 60 the paragraph, line 74 the sources line) and
-    W2-192's stage AS insertion between them (a pure insertion after base line 29, 10 lines). The version and step 6
-    hunks keep W2-188's positions; a sixth hunk, or a moved one, is red."""
-    hunks = support.kernel_hunks()
-    assert len(hunks) == 5, f"`git diff --unified=0 <base>` of the kernel skill has {len(hunks)} hunks, not 5: {hunks}"
+    """The case keeps its W2-188 id. Against W2-188's base, the diff has five hunks of the ticket's and the later
+    tickets' work: W2-188's four (line 4 the version, line 58 step 6, an insertion after base line 59 or 60 the
+    paragraph, line 74 the sources line) and W2-192's stage AS insertion between them (a pure insertion after base
+    line 29, 10 lines). Besides them, exactly one hunk is DEC-1219's re-wording of the Contract's name in the
+    "Independent gates" sentence (base line 41, one line replaced by one line, `Contract v4.2` out, `Contract v5`
+    in); it is set aside and counted nowhere else. Any other extra hunk, or a moved one, is red."""
+    bodies = support.kernel_hunk_bodies()
+    renames = [(hunk, body) for hunk, body in bodies
+               if hunk[:2] == (41, 1) and hunk[3] == 1 and len(body) == 2
+               and DEC_1219_OLD in body[0] and body[0].startswith("-")
+               and DEC_1219_NEW in body[1] and body[1].startswith("+")]
+    assert len(renames) == 1, (
+        f"the diff has no one-line hunk at base line 41 re-wording `{DEC_1219_OLD}` to `{DEC_1219_NEW}` (DEC-1219): "
+        f"{[hunk for hunk, _ in bodies]}")
+    hunks = [hunk for hunk, _ in bodies if hunk != renames[0][0]]
+    assert len(hunks) == 5, f"`git diff --unified=0 <base>` of the kernel skill has {len(hunks)} hunks besides DEC-1219's, not 5: {hunks}"
     (v_old, v_len, _, _), (as_old, as_len, _, as_new), (s_old, s_len, _, _), (p_old, p_len, _, p_new), (g_old, g_len, _, _) = hunks
     assert (v_old, v_len) == (4, 1), f"hunk 1 is not the version line (base line 4): base lines {v_old}+{v_len}"
     assert (as_old, as_len, as_new) == (29, 0, 10), (
@@ -130,19 +147,34 @@ ACT_SUBJECT_MARK = "ACT-CLAUDE-COPIES-"
 ACT_CLAUDE_COPY_SHA256_W2_192 = "93b04fc62be1fe6d0e125ff47a2d890367284f1970b7d34dfd0f4366c987dc5d"
 
 
+# Rewrite-Reason: Charter v6 / Contract v5 (DEC-1219, commit d515d0430) re-worded one sentence in the `.claude` copy
+# as in the kernel skill, so its bytes are W2-192's after-bytes (commit e64430373) with that one sentence changed; the
+# case holds that, derived from the pinned commit, not a third byte hash.
+W2_192_COMMIT = "e64430373"
+DEC_1219_SENTENCE = (b"Contract v4.2 brings A7 and A10 into Wave 2 in a lite form",
+                     b"Contract v5 has A7 and A10 in Wave 2 in a lite form")
+
+
 def test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_after_bytes():
     """Guard (holds on the base): the `.claude` copy is the base's bytes, or exactly the copies ACT's after-bytes
     (sha256 `65d6abd9...dbc`, the ACT's regeneration after the owner's approval), or exactly the later copies ACT's
-    after-bytes (sha256 `93b04fc6...c5d`, commit e64430373, W2-192's stage AS); any other bytes mean the ticket
-    wrote it."""
+    after-bytes (sha256 `93b04fc6...c5d`, commit e64430373, W2-192's stage AS), or those bytes with the one sentence
+    DEC-1219 re-worded (`Contract v4.2 brings A7 and A10 into Wave 2 in a lite form` to `Contract v5 has A7 and A10
+    in Wave 2 in a lite form`, commit d515d0430); any other bytes mean the ticket wrote it."""
     now = support.read_bytes(support.CLAUDE_COPY_REL)
     then = support.base_blob(support.CLAUDE_COPY_REL)
     if now == then:
         return
     found = support.sha256_of(now)
-    assert found in (ACT_CLAUDE_COPY_SHA256, ACT_CLAUDE_COPY_SHA256_W2_192), (
+    if found in (ACT_CLAUDE_COPY_SHA256, ACT_CLAUDE_COPY_SHA256_W2_192):
+        return
+    w2_192 = support.git("show", f"{W2_192_COMMIT}:{support.CLAUDE_COPY_REL}").stdout
+    assert support.sha256_of(w2_192) == ACT_CLAUDE_COPY_SHA256_W2_192, f"{W2_192_COMMIT}'s copy is not W2-192's bytes"
+    assert w2_192.count(DEC_1219_SENTENCE[0]) == 1
+    assert now == w2_192.replace(*DEC_1219_SENTENCE), (
         f"{support.CLAUDE_COPY_REL} has sha256 {found}: neither the base's ({support.sha256_of(then)}) "
-        f"nor a copies ACT's after-bytes ({ACT_CLAUDE_COPY_SHA256}, {ACT_CLAUDE_COPY_SHA256_W2_192})")
+        f"nor a copies ACT's after-bytes ({ACT_CLAUDE_COPY_SHA256}, {ACT_CLAUDE_COPY_SHA256_W2_192}) "
+        f"nor W2-192's with DEC-1219's one sentence")
 
 
 def test_f2_no_commit_of_the_ticket_outside_the_test_designer_or_the_copies_act_touches_claude_or_tests():

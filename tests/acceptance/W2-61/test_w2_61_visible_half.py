@@ -304,6 +304,11 @@ def _span_at_head(source):
     register source is read where it resolves (``_resolved``): the register of HEAD, else the archive, where stated
     lines are taken the header's lines further on."""
     _, text, shift = _resolved(source)
+    return _span_in(text, source, shift)
+
+
+def _span_in(text, source, shift=0):
+    """A source's lines in ``text`` by the measure's rule (see ``_span_at_head``), or None when ``text`` is None."""
     if text is None:
         return None
     lines = text.splitlines()
@@ -344,14 +349,28 @@ def test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged():
     paths = [source["path"] for source in alternatives]
     assert any(path.startswith("docs/contract/") for path in paths), "no source of q09 is the Contract"
     assert any(source in alternatives for source in _entries(original)), "q09 no longer keeps the ticket's KPI lines"
-    faults = []
+    # Rewrite-Reason: Charter v6 / Contract v5 (DEC-1219; G5-0 renamed CONTRACT_v4.md to CONTRACT_v5.md, G5-3 retired
+    # the context packet and its ceiling, DEC-1214) moved the Contract's statements the gold names: at HEAD the
+    # Contract has no packet ceiling and one alternative's file is gone. The set is history's (DEC-1210: a fresh set
+    # for every measure; the README's rule for sources gone at HEAD): an alternative's span states ~6k tokens at HEAD
+    # or, where HEAD no longer does, at the question's own commit, as the visible-half case resolves a moved source.
+    # Every alternative must state it in one of the two; at least one still does at the commit.
+    commit, faults, at_commit = str(data.get("commit") or "").strip(), [], 0
     for source in alternatives:
         span = _span_at_head(source)
+        if span is not None and "6k tokens" in "\n".join(span):
+            continue
+        then = _git("show", f"{commit}:{source['path']}") if commit else None
+        span = _span_in(then, source)
         if span is None:
-            faults.append(f"{source['path']} is not a file at HEAD")
+            faults.append(f"{source['path']} is not a file at HEAD nor at the question's commit {commit!r}")
         elif "6k tokens" not in "\n".join(span):
-            faults.append(f"{source['path']} ({source.get('heading')!r}): its span does not state ~6k tokens")
+            faults.append(f"{source['path']} ({source.get('heading')!r}): its span states no ~6k tokens at HEAD nor "
+                          f"at the question's commit {commit}")
+        else:
+            at_commit += 1
     assert not faults, "\n".join(faults)
+    assert at_commit or all(_span_at_head(source) for source in alternatives), "no alternative states ~6k tokens"
 
 
 def test_q16_is_relabelled_off_dec_798_and_the_original_is_kept_unchanged():
