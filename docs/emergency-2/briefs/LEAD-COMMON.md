@@ -7,7 +7,8 @@ Written by the CTO for the ticket leads of the build list (EMERGENCY-2 §6.1, §
 - **Never commit to `w2/integrate`** and never touch the main tree `/home/usain/Dynamic-Agentic-Engineering-OS`: the CTO works there and lands your branch.
 - Never `git push`, never `sudo`. Full permission otherwise in your worktree, its `-tests` worktree and `~/gov-os-runs/`.
 - **The machine rule.** Every test run goes through the machine-wide heavy slot (two slots today), one run at a time:
-  `TMPDIR=$(mktemp -d) PYTHONPATH=<worktree>/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest <paths> -q -p no:cacheprovider -n auto`
+  `T=$(mktemp -d); TMPDIR=$T PYTHONPATH=<worktree>/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest <paths> -q -p no:cacheprovider -n auto; chmod -R u+w $T; rm -rf $T`
+  - Remove the run's temp folder when the run ends, as the command does (the CTO, 2026-11-19: 1,050 leftover `/tmp/tmp.*` folders took the free inodes under the resource gate's floor twice in one night, which shuts the gate and turns every close test red).
   - Add `-n auto` to a pytest run of more than one file (the CTO, 2026-11-19: without it the run is one process; the slot caps `-n auto` at its workers, three today). Never `-n` with a number. `PYTHONPATH` absolute (tests start `gov` in subprocesses). The slot waits while taken; never bypass it.
   - The slot also waits until the machine's 1-minute load is under 12, so the load stays inside the resource gate of 20 (the owner, 2026-11-18). A wait is the rule working: let it wait. Never run pytest outside the slot, and never with a number after `-n`.
   - The smallest set that proves your change; no full suites (the CTO runs those); no rebuild and no memory measure without asking the CTO.
