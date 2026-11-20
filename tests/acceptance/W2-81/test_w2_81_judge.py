@@ -637,3 +637,72 @@ def test_the_judge_never_writes_the_value_even_when_an_output_is_named_by_it(gro
     out, err = capfd.readouterr()
     for text, where in ((json.dumps(result), "the result"), (out, "standard output"), (err, "standard error")):
         assert_absent(held, text, where)
+
+
+# --------------------------------------------------------------------------
+# Fix T2 (W2-81's proving run on 0.1.4): stage AS, the spec audit (CAP-44.m), is a required stage of the judge
+# --------------------------------------------------------------------------
+
+AS_RECORD = "governance/adoption/AS-spec-audit.md"  # the name `gov adopt --lite --stage AS` commits its record under
+AS_DATA = {"stands_on": "0" * 64, "specs": [], "modules": [], "tickets": [], "gaps": []}
+
+
+def _with_as(model):
+    model["records"]["AS"] = dict(AS_DATA)
+    return model
+
+
+def test_stage_as_is_in_the_stage_list_between_a2_and_a3_and_in_the_capability_table():
+    from gov.adopt import spec_audit
+
+    assert spec_audit.RECORD == AS_RECORD, "today's code names the record as this suite does"
+    assert "AS" in judge.STAGES and "AS" in judge.BUILT_STAGES
+    stages = judge.STAGES
+    assert stages.index("A2") + 1 == stages.index("AS") and stages.index("AS") + 1 == stages.index("A3"), stages
+    assert judge.record_name("AS") == AS_RECORD
+    contract, built, why = judge.CAPABILITIES["AS"]
+    assert contract == "CAP-44.m" and built is True and why
+    assert "AS" in judge.built_today()
+
+
+def test_a_present_as_record_is_present_and_gives_no_reason(ground, tmp_path):
+    built_repo = ground["python-app"]
+    judgement = _judge(built_repo, _with_as(standin.perfect(built_repo)), tmp_path)
+    assert judgement["stages"]["AS"] == {"status": "PRESENT", "record": AS_RECORD}
+    result = _reasons(judgement, built_repo.name)
+    assert result["verdict"] == judge.READY, result["reasons"]
+    assert not any("stage AS" in r for r in result["reasons"]), result["reasons"]
+
+
+@pytest.mark.parametrize("built", [ALL, None], ids=["all-built", "todays-code"])
+@pytest.mark.parametrize("how, status", [("absent", "ABSENT"), ("no-front-matter", "UNREADABLE"),
+                                         ("front-matter-not-a-mapping", "UNREADABLE"), ("bad-yaml", "UNREADABLE")])
+def test_an_as_record_that_is_absent_or_unreadable_is_named_and_the_run_is_not_ready(ground, tmp_path, how, status,
+                                                                                    built):
+    """The missed form of a stage the judge builds (its record's own state: ABSENT, UNREADABLE or MALFORMED), never
+    NOT_BUILT and never PRESENT: ``stage AS is <state>`` in the reasons, NOT_READY, and no other stage touched."""
+    built_repo = ground["python-app-clean"]
+    model = standin.perfect(built_repo)
+    model["records"]["AS"] = None
+    model["raw"] = {} if how == "absent" else {AS_RECORD: {
+        "no-front-matter": b"# the spec audit, with no front matter\n",
+        "front-matter-not-a-mapping": b"---\n- one\n- two\n---\n",
+        "bad-yaml": b"---\nspecs: [unclosed\n---\n"}[how]}
+    judgement = _judge(built_repo, model, tmp_path, built=built)
+    assert judgement["stages"]["AS"]["status"] == status and status in MISSED_FORMS
+    assert judgement["stages"]["AS"]["record"] == AS_RECORD
+    assert all(v["status"] == "PRESENT" for s, v in judgement["stages"].items() if s in ("A0", "A1", "A2", "A3", "A7"))
+    result = _reasons(judgement, built_repo.name)
+    assert result["verdict"] == judge.NOT_READY
+    assert f"{built_repo.name}: stage AS is {status}" in result["reasons"], result["reasons"]
+    if built is ALL:
+        assert result["reasons"] == [f"{built_repo.name}: stage AS is {status}"], "AS alone is what is named"
+
+
+def test_an_adoption_that_ran_nothing_names_stage_as_absent(ground, tmp_path):
+    built_repo = ground["python-app-clean"]
+    empty = {"files": [], "records": {}, "findings": [], "path_map": None, "index": None, "extra": {},
+             "removed": [], "beside": {}, "raw": {}}
+    judgement = _judge(built_repo, empty, tmp_path, built=None)
+    assert judgement["stages"]["AS"]["status"] == "ABSENT" and "AS" not in judgement["not_built"]
+    assert f"{built_repo.name}: stage AS is ABSENT" in _reasons(judgement, built_repo.name)["reasons"]
