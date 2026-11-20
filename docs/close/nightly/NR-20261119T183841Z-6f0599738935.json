@@ -1,0 +1,314 @@
+{
+  "branch": "w2/integrate",
+  "head": "6f05997389357708474ef25acfe42eead9866ebd",
+  "tree": "39f2af9e324de39fda8d7fbce0e444db12831584",
+  "base": null,
+  "scope": "full",
+  "verdict": "red",
+  "secrets_full_scan": true,
+  "junit_xml": [
+    ".gov-runtime/nightly/20261119T183841Z-6f0599738935/01-acceptance-parallel.xml",
+    ".gov-runtime/nightly/20261119T183841Z-6f0599738935/02-acceptance-serial-afterwards.xml"
+  ],
+  "failures": [
+    {
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "text": "E   NameError: name '_git' is not defined",
+      "alone": "failed",
+      "class": "red"
+    }
+  ],
+  "packages": [
+    {
+      "priority": "P1",
+      "kind": "bisect",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "range": null,
+      "first_bad": null
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-2azm/CL-DAEO-2azm.md",
+      "ticket": "DAEO-2azm",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-c1uz.md",
+              ".tickets/DAEO-e82f.md",
+              ".tickets/DAEO-kh9l.md",
+              ".tickets/DAEO-qty6.md",
+              ".tickets/DAEO-ye2a.md",
+              "docs/checkpoints/DAEO-2azm/CP-DAEO-2azm-0003.md",
+              "docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0019.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0010.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0011.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0018.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0019.md",
+              "docs/checkpoints/DAEO-qty6/CP-DAEO-qty6-0003.md",
+              "docs/checkpoints/DAEO-qty6/CP-DAEO-qty6-0004.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0011.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0012.md",
+              "docs/close/DAEO-c1uz/CL-DAEO-c1uz.md",
+              "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+              "docs/close/DAEO-kh9l/CL-DAEO-kh9l.md",
+              "docs/close/DAEO-qty6/CL-DAEO-qty6.md",
+              "docs/close/DAEO-ye2a/CL-DAEO-ye2a.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-2azm/CL-DAEO-2azm.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-5j8b/CL-DAEO-5j8b.md",
+      "ticket": "DAEO-5j8b",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-2gc7.md",
+              "docs/checkpoints/DAEO-2gc7/CP-DAEO-2gc7-0014.md",
+              "docs/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0021.md",
+              "docs/close/DAEO-2gc7/CL-DAEO-2gc7.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-5j8b/CL-DAEO-5j8b.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+      "ticket": "DAEO-e82f",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-c1uz.md",
+              ".tickets/DAEO-kh9l.md",
+              ".tickets/DAEO-ye2a.md",
+              "docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0019.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0010.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0018.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0019.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0011.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0012.md",
+              "docs/close/DAEO-c1uz/CL-DAEO-c1uz.md",
+              "docs/close/DAEO-kh9l/CL-DAEO-kh9l.md",
+              "docs/close/DAEO-ye2a/CL-DAEO-ye2a.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-e82f/CL-DAEO-e82f.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-kh9l/CL-DAEO-kh9l.md",
+      "ticket": "DAEO-kh9l",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-c1uz.md",
+              ".tickets/DAEO-ye2a.md",
+              "docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0019.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0018.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0011.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0012.md",
+              "docs/close/DAEO-c1uz/CL-DAEO-c1uz.md",
+              "docs/close/DAEO-ye2a/CL-DAEO-ye2a.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-kh9l/CL-DAEO-kh9l.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-pl6k/CL-DAEO-pl6k.md",
+      "ticket": "DAEO-pl6k",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-ebmh.md",
+              "docs/checkpoints/DAEO-ebmh/CP-DAEO-ebmh-0004.md",
+              "docs/checkpoints/DAEO-pl6k/CP-DAEO-pl6k-0004.md",
+              "docs/close/DAEO-ebmh/CL-DAEO-ebmh.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-pl6k/CL-DAEO-pl6k.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-qty6/CL-DAEO-qty6.md",
+      "ticket": "DAEO-qty6",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-c1uz.md",
+              ".tickets/DAEO-e82f.md",
+              ".tickets/DAEO-kh9l.md",
+              ".tickets/DAEO-ye2a.md",
+              "docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0019.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0010.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0011.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0018.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0019.md",
+              "docs/checkpoints/DAEO-qty6/CP-DAEO-qty6-0003.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0011.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0012.md",
+              "docs/close/DAEO-c1uz/CL-DAEO-c1uz.md",
+              "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+              "docs/close/DAEO-kh9l/CL-DAEO-kh9l.md",
+              "docs/close/DAEO-ye2a/CL-DAEO-ye2a.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-qty6/CL-DAEO-qty6.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-r9ss/CL-DAEO-r9ss.md",
+      "ticket": "DAEO-r9ss",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-ebmh.md",
+              ".tickets/DAEO-pl6k.md",
+              "docs/checkpoints/DAEO-ebmh/CP-DAEO-ebmh-0004.md",
+              "docs/checkpoints/DAEO-pl6k/CP-DAEO-pl6k-0004.md",
+              "docs/checkpoints/DAEO-pl6k/CP-DAEO-pl6k-0005.md",
+              "docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0018.md",
+              "docs/close/DAEO-ebmh/CL-DAEO-ebmh.md",
+              "docs/close/DAEO-pl6k/CL-DAEO-pl6k.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-r9ss/CL-DAEO-r9ss.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-rmbe/CL-DAEO-rmbe.md",
+      "ticket": "DAEO-rmbe",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-2azm.md",
+              ".tickets/DAEO-c1uz.md",
+              ".tickets/DAEO-e82f.md",
+              ".tickets/DAEO-kh9l.md",
+              ".tickets/DAEO-qty6.md",
+              ".tickets/DAEO-ye2a.md",
+              "docs/checkpoints/DAEO-2azm/CP-DAEO-2azm-0003.md",
+              "docs/checkpoints/DAEO-2azm/CP-DAEO-2azm-0004.md",
+              "docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0019.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0010.md",
+              "docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0011.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0018.md",
+              "docs/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0019.md",
+              "docs/checkpoints/DAEO-qty6/CP-DAEO-qty6-0003.md",
+              "docs/checkpoints/DAEO-qty6/CP-DAEO-qty6-0004.md",
+              "docs/checkpoints/DAEO-rmbe/CP-DAEO-rmbe-0009.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0011.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0012.md",
+              "docs/close/DAEO-2azm/CL-DAEO-2azm.md",
+              "docs/close/DAEO-c1uz/CL-DAEO-c1uz.md",
+              "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+              "docs/close/DAEO-kh9l/CL-DAEO-kh9l.md",
+              "docs/close/DAEO-qty6/CL-DAEO-qty6.md",
+              "docs/close/DAEO-ye2a/CL-DAEO-ye2a.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-rmbe/CL-DAEO-rmbe.md selected it not or saw it pass"
+          }
+        ]
+      }
+    },
+    {
+      "priority": "P1",
+      "kind": "selection_miss",
+      "test": "tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged",
+      "close": "docs/close/DAEO-ye2a/CL-DAEO-ye2a.md",
+      "ticket": "DAEO-ye2a",
+      "test_map_correction": {
+        "couplings": [
+          {
+            "paths": [
+              ".tickets/DAEO-c1uz.md",
+              "docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0019.md",
+              "docs/checkpoints/DAEO-ye2a/CP-DAEO-ye2a-0011.md",
+              "docs/close/DAEO-c1uz/CL-DAEO-c1uz.md"
+            ],
+            "suites": [
+              "tests/acceptance/W2-61/"
+            ],
+            "why": "the nightly of 6f0599738935 found tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged red after the scoped close docs/close/DAEO-ye2a/CL-DAEO-ye2a.md selected it not or saw it pass"
+          }
+        ]
+      }
+    }
+  ],
+  "tests_run": {
+    "passed": 18085,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 81
+  },
+  "findings": [
+    "FAILED tests/acceptance/W2-61/test_w2_61_visible_half.py::test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged"
+  ],
+  "per_test_timeout": 900,
+  "distribution": "load",
+  "tmp_path_retention_policy": "failed",
+  "created": "2026-11-19T20:10:38Z"
+}

@@ -58,6 +58,7 @@ namespaces:
       - "docs/emergency-2/*"
       - "docs/emergency-2/audits/**"
       - "docs/emergency-2/briefs/**"
+      - "docs/emergency-2/proposals/**"
       - "docs/emergency-2/release-*/**"
       - "docs/imported/**"
       - "docs/interfaces/**"

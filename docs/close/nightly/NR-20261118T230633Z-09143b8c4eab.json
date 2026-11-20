@@ -1,0 +1,42 @@
+{
+  "branch": "w2/integrate",
+  "head": "09143b8c4eabf6e5844550412cd3edd54d0bd55f",
+  "tree": "c54ca03e591a8178bae45fc33e7db11b6b22bf9a",
+  "base": null,
+  "scope": "full",
+  "verdict": "red",
+  "secrets_full_scan": true,
+  "junit_xml": [
+    ".gov-runtime/nightly/20261118T230633Z-09143b8c4eab/01-acceptance-parallel.xml",
+    ".gov-runtime/nightly/20261118T230633Z-09143b8c4eab/02-acceptance-serial-afterwards.xml"
+  ],
+  "failures": [
+    {
+      "test": "tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s8_f5_a_delivery_refusal_is_20_and_leaves_every_set_file_unchanged[q02.yaml a folder]",
+      "text": "E   AssertionError: ({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', '...03aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 14, ...}, 'indep_launch: refused 14 commit\n      ')\n    assert 14 == 20",
+      "alone": "passed",
+      "class": "flaky_candidate"
+    },
+    {
+      "test": "tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s9_a_result_of_a_wrong_form_is_20_nothing_delivered_and_the_action_null[by_area empty]",
+      "text": "E   AssertionError: ({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', '...03aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 14, ...}, 'indep_launch: refused 14 commit\n      ')\n    assert 14 == 20",
+      "alone": "passed",
+      "class": "flaky_candidate"
+    }
+  ],
+  "packages": [],
+  "tests_run": {
+    "passed": 18233,
+    "failed": 2,
+    "errors": 0,
+    "skipped": 112
+  },
+  "findings": [
+    "FAILED tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s8_f5_a_delivery_refusal_is_20_and_leaves_every_set_file_unchanged[q02.yaml a folder]",
+    "FAILED tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s9_a_result_of_a_wrong_form_is_20_nothing_delivered_and_the_action_null[by_area empty]"
+  ],
+  "per_test_timeout": 900,
+  "distribution": "load",
+  "tmp_path_retention_policy": "failed",
+  "created": "2026-11-19T00:28:07Z"
+}
