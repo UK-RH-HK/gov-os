@@ -594,6 +594,10 @@ def pytest_runtest_protocol(item, nextitem):
 def pytest_configure(config):
     global _rebuild_lock, _cbm_base
     _refuse_basetemp(config)
+    # A launch inside a test messages its end to $GOV_MSG_ADDRESS, else to `cto` in the real ~/.gov-os/inbox: the
+    # suites' launches woke the live CTO and leads (2026-11-19, 2026-11-20). Every test process sends to a sink; a test
+    # that needs another address sets or removes the variable itself.
+    os.environ["GOV_MSG_ADDRESS"] = "pytest-sink"
     if _rebuild_lock is None:
         _rebuild_lock = _own_rebuild_lock()
     if _cbm_base is None and not _is_worker(config):
