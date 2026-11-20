@@ -78,6 +78,13 @@ def _fixes(src: Path, held: str, newest: str) -> int:
     return sum(1 for message in done.stdout.split("\0") if re.search(r"^Fix:", message, re.M))
 
 
+def _burned() -> set[str]:
+    """The releases marked burned in ``~/.local/share/gov-os/burned`` (W2-209): never a candidate."""
+    from gov.release import repin
+
+    return set(repin.burned(Path.home()))
+
+
 def _none(held: str | None, reason: str) -> dict:
     summary = f"no update pending: {reason}"
     return {"status": "report", "held": held, "newest": None, "pending": False, "kind": None, "fixes": 0,
@@ -100,7 +107,14 @@ def pending(project, source=None) -> dict:
         if not found:
             return {**_none(held, f"no verified release newer than {held} in {src}"),
                     "summary": f"up to date ({held})"}
-        newest = found[-1]
+        burned = _burned()
+        offered = [version for version in found if version not in burned]
+        if not offered:  # W2-209 S9: a release whose post-pin check failed is never offered
+            newest = found[-1]
+            reason = f"release {newest} is burned (its post-pin check failed on this machine): never offered"
+            return {**_none(held, reason), "pending": False, "burned": True, "newest": newest,
+                    "summary": f"no update pending: {reason}"}
+        newest = offered[-1]
         kind = _kind(src, newest)
         fixes = _fixes(src, held, newest)
         base = {"status": "report", "held": held, "newest": newest, "kind": kind, "fixes": fixes}
