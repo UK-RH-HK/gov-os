@@ -132,10 +132,18 @@ def _show(repo: Path, tag: str, rel: str) -> str | None:
     return done.stdout if done.returncode == 0 else None
 
 
+def _clean_env() -> dict:
+    """The caller's environment without what makes a pin's ``gov`` import another ``gov``: the pin runs as it does
+    from a plain terminal, from its own site-packages (``PYTHONPATH`` and ``PYTHONHOME`` out)."""
+    return {key: value for key, value in os.environ.items() if key not in ("PYTHONPATH", "PYTHONHOME")}
+
+
 def _run(argv, cwd, timeout=300, env=None, stdin=None) -> subprocess.CompletedProcess:
+    env = _clean_env() if env is None else env
+    feed = {"input": stdin} if stdin is not None else {"stdin": subprocess.DEVNULL}
     try:
         return subprocess.run([str(a) for a in argv], cwd=str(cwd), capture_output=True, text=True, timeout=timeout,
-                              env=env, input=stdin if stdin is not None else "", stdin=None if stdin is not None else subprocess.DEVNULL)
+                              env=env, **feed)
     except (OSError, subprocess.TimeoutExpired) as exc:
         return subprocess.CompletedProcess(argv, 124, "", f"{type(exc).__name__}: {exc}")
 
@@ -188,7 +196,7 @@ def _decision(repo: Path) -> str:
 
 def _hooks(pin: Path, repo: Path) -> str | None:
     """Run the repository's five hook programs with an empty event through the pin's interpreter; the failing one or None."""
-    env = {key: value for key, value in os.environ.items() if key not in ("GOV_ROLE", "GOV_TICKET")}
+    env = {key: value for key, value in _clean_env().items() if key not in ("GOV_ROLE", "GOV_TICKET")}
     env["CLAUDE_PROJECT_DIR"] = str(repo)
     for hook in HOOKS:
         program = repo / HOOKS_REL / f"{hook}.py"
@@ -353,8 +361,9 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
             return stop("exists", f"{pin} already exists (an earlier run): remove it first if it is not live")
         wheels = share / "wheels" / c12
         wheel_file = wheels / built[1].name
-        if not wheels.exists():
-            made.append(wheels)
+        for folder in (share / "wheels", wheels):  # made now, so removed on a stop; never one that was there
+            if not folder.exists():
+                made.append(folder)
         wheels.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(built[1], wheel_file)
         made.append(pin)
