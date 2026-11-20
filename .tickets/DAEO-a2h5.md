@@ -22,10 +22,12 @@ waits_on: []
 allowed_paths:
 - src/gov/release/**
 - src/gov/close/nightly.py
+- src/gov/update/pending.py
 - governance/project/release-authority.yaml
 - docs/plan/wave-2/w2-209-rehearsal/**
 - tests/unit/release/**
 - tests/unit/close/**
+- tests/unit/update/**
 - tests/acceptance/W2-209/**
 est_loc: 600
 kpis:
