@@ -83,6 +83,7 @@ def perfect(built):
                    "tree": "clean"},
             "A1": {"commit": data["head"], "artefacts": [{"path": p} for p in files]},
             "A2": {"artefacts": a2, "unknown": [], "packages": []},
+            "AS": {"stands_on": "0" * 64, "specs": [], "modules": [], "tickets": [], "gaps": []},
             "A3": {"artefacts": [{"path": p, "action": "KEEP"} for p in files]},
             "A4": {"batches": [], "dependents": [], "retirements": []},
             "A5": {"verdict": "governance/adoption/review/verdict.md"},
@@ -128,7 +129,7 @@ def render(model, built, dest, beside):
     for rel in model["removed"]:
         (dest / rel).unlink()
     a3_raw = None
-    for stage in ("A0", "A1", "A2", "A3", "A4", "A6", "A8", "A7", "A10", "VERDICT", "A5"):
+    for stage in ("A0", "A1", "A2", "AS", "A3", "A4", "A6", "A8", "A7", "A10", "VERDICT", "A5"):
         if model["records"].get(stage) is None:
             continue
         data = dict(model["records"][stage])

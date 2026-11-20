@@ -656,7 +656,7 @@ def test_stage_as_is_in_the_stage_list_between_a2_and_a3_and_in_the_capability_t
     from gov.adopt import spec_audit
 
     assert spec_audit.RECORD == AS_RECORD, "today's code names the record as this suite does"
-    assert "AS" in judge.STAGES and "AS" in judge.BUILT_STAGES
+    assert "AS" in judge.STAGES
     stages = judge.STAGES
     assert stages.index("A2") + 1 == stages.index("AS") and stages.index("AS") + 1 == stages.index("A3"), stages
     assert judge.record_name("AS") == AS_RECORD

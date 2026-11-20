@@ -69,8 +69,11 @@ from w2_81_score import E2E_BAR  # noqa: E402 - the one bar: memory judged end t
 PROVISIONAL = {"A7": f"{FOLDER}/A7-independent-migration-verification.md",
                "A10": f"{FOLDER}/A10-independent-memory-verification.md",
                "VERDICT": f"{FOLDER}/VERDICT-lite.md"}
-BUILT_STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
-STAGES = (*BUILT_STAGES, "A7", "A10", "VERDICT")
+# AS, the spec audit (CAP-44.m, W2: ``gov adopt --lite --stage AS``, between A2 and A3), commits its record under the
+# name ``gov.adopt.spec_audit.RECORD`` gives; ``project.record_path`` does not name it (AS is in no ``TITLES``).
+AS_RECORD = f"{FOLDER}/AS-spec-audit.md"
+BUILT_STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")  # the stages ``project.record_path`` names
+STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A8", "A7", "A10", "VERDICT")  # every stage the judge reads
 
 # What each handling needs. ``built`` is today's state of the code, as read in src/gov/adopt/ on 2026-10-31.
 CAPABILITIES = {
@@ -85,6 +88,8 @@ CAPABILITIES = {
                      "(legacy.KINDS); it extracts or retires no legacy document"),
     "index": ("CAP-44.d", True, "gov rebuild after A6 and A8 recreates .gov-runtime/store.db; the semantic "
               "vectors hold only namespaces whose embedding_policy is `embedded`"),
+    "AS": ("CAP-44.m", True, "AS records the spec audit between A2 and A3 (gov.adopt.spec_audit): the specs, what is "
+                             "built of each, the tickets and each gap as a question to the owner"),
     "A3": ("CAP-44.b", True, "A3 records the path map from the caller's proposal"),
     "A5": ("CAP-44.c", True, "A5 records the independent review of the path map"),
     "A6": ("CAP-44.d", True, "A6 executes the batches"),
@@ -152,6 +157,8 @@ def built_today():
 
 
 def record_name(stage):
+    if stage == "AS":
+        return AS_RECORD
     if stage in BUILT_STAGES:
         from gov.adopt import project
 
