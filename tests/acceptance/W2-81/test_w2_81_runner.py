@@ -1101,6 +1101,8 @@ def test_every_judge_reason_named_in_the_owners_file_is_ready_with_exceptions_na
     report = _todays(ready_run, exceptions=path)
     assert report["verdict"] == judge.READY_WITH_EXCEPTIONS == "READY_WITH_EXCEPTIONS", report["reasons"]
     assert report["reasons"] == first["reasons"], "the reasons stay reasons"
+    assert report["reason_ids"] == ids and json.loads(
+        (ready_run["folder"] / "report.json").read_text())["reason_ids"] == ids, "the owner reads the ids here"
     assert report["exceptions"]["decision"] == DECISION_ID
     assert sorted(report["exceptions"]["named"]) == sorted(ids)
     assert report["exceptions"]["unused"] == ["python-app:STAGE:A9"], "an unused id is reported, never an error"
