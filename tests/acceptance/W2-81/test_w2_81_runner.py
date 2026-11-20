@@ -833,3 +833,33 @@ def test_a_sets_root_whose_variants_file_cannot_be_read_is_refused_naming_the_fi
     out, err = capfd.readouterr()
     assert code == 2 and err.startswith("refused: the hidden file variants.yaml cannot be read"), (code, out, err)
     assert "Zephyr" not in out + err
+
+
+# --------------------------------------------------------------------------
+# Fixes of W2-81's proving run on 0.1.4 (the test designer's own test code; the failing test first)
+# --------------------------------------------------------------------------
+
+def _calls(gov, sub):
+    """The environments (name -> value) a stand-in gov ran its calls of one subcommand in."""
+    return [env for name, env in standin.env_of(gov) if name == sub]
+
+
+def test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_before(ready_run, tmp_path, monkeypatch):
+    """Fix T1: the landing's ``gov queue`` is started with the ``HOME`` of the runner's own process (pytest lives in
+    the operator's user site); ``gov retrieve`` keeps the run's scrubbed ``HOME``, and no other variable differs."""
+    operator = tmp_path / "operator-home"
+    operator.mkdir()
+    monkeypatch.setenv("HOME", str(operator))
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1")
+    folder = ready_run["folder"]
+    queues, retrieves = _calls(gov, "queue"), _calls(gov, "retrieve")
+    assert len(queues) == len(runner.EXPECTED) and retrieves
+    assert all(env.get("HOME") == str(operator) for env in queues), [env.get("HOME") for env in queues]
+    assert all(Path(env["HOME"]).resolve() == (folder / ".home").resolve() for env in retrieves), \
+        "gov retrieve keeps the run's scrubbed HOME"
+    assert all(Path(env["TMPDIR"]).resolve() == (folder / ".tmp").resolve() for env in queues + retrieves)
+    as_before = {k: v for k, v in retrieves[0].items() if k != "HOME"}
+    for env in queues:
+        assert {k: v for k, v in env.items() if k != "HOME"} == as_before, "a variable other than HOME differs"
+    assert os.environ["HOME"] == str(operator), "the runner's own process keeps its HOME"

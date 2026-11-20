@@ -934,3 +934,17 @@ folder.
 | **S4, S5, S6, S7, S10, F2, F3, F4, F5** Round 2b (DEC-997), items 1 to 7 of "The third review's findings": 1 (S10, F5: no flaky case), 2 (S4, F3), 3 (S6, S7, F2), 4 and 5 (S7, F4), 6 (S5, S6), 7 (S7, F4) | `test_w2_81_runner.py` (the cases named there), `test_w2_81_round2.py` (the store and template cases) |
 | **S3, S5, S6, S7, S9, S10, F1, F4, F5** Round 2 (DEC-993), items 1 to 7 above: 1 and 2 (S3, S6, F1), 3 (S3, F1), 4 (S10, F5), 5 (S3, S9), 6 (S7, F4), 7 (S5) | `test_w2_81_round2.py` (all), and in `test_w2_81_runner.py` the `_removed_after` fixture, `test_the_markdown_report_says_what_the_json_says_is_not_measured` and `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` |
 | **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |
+
+## Fix: W2-81's test code, six defects (W2-81's proving run on 0.1.4)
+
+The proving run on 0.1.4 (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, "Class 2: test-code defects") and the
+run of 2026-11-20 found defects in this folder's own support code. They are fixes under `DAEO-l78m`, not new
+tickets: each one has its red tests first (a commit of its own, the red run recorded below), then the change to the
+support module that turns them green. The cases are mapped to the ticket's KPI lines they serve (the form above, which
+`gov accept W2-81` reads); a case listed as a **guard** is green on the base by design (it holds today's behaviour that
+the fix must not change), and every other case is red on the base for the reason in its row. The fixes are named by
+the analysis's ids (T1, T2, T3, T5, T6) and the CTO's (T10).
+
+| KPI line | Tests | Expected red reason (on the base) |
+|---|---|---|
+| **S9, S11** Fix T1: the runner starts the pinned `gov queue` with the operator's own `HOME`, every other variable as before; `gov retrieve` keeps the run's scrubbed one | `test_w2_81_runner.py::test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_before` | the stand-in `gov queue` records `HOME=<run>/.home`, not the operator's |

@@ -171,6 +171,8 @@ _GOV = """#!/bin/sh
 # A stand-in gov for the W2-81 runner's self-tests: it writes nothing but its call log and prints no question.
 d="$0.d"
 echo "$1" >> "$d/calls"
+blk=$(echo "@@@ $1"; env | sort)  # the environment this call ran in, one write (calls run in threads too)
+printf '%s\n' "$blk" >> "$d/env"
 case "$1" in
   --version) echo "gov $(cat "$d/version") (commit 0123456789ab)" ;;
   retrieve)
@@ -211,12 +213,27 @@ def write_gov(folder, name="gov", ranking=None, queue_exit=0, adopt_exit=0, vers
     (answers / "adopt_exit").write_text(str(adopt_exit), encoding="utf-8")
     (answers / "version").write_text(version, encoding="utf-8")
     (answers / "calls").write_text("", encoding="utf-8")
+    (answers / "env").write_text("", encoding="utf-8")
     return exe
 
 
 def calls_of(gov):
     """The subcommands a stand-in ``gov`` was called with so far, in order."""
     return (Path(f"{gov}.d") / "calls").read_text(encoding="utf-8").split()
+
+
+_SHELL_ADDED = ("PWD", "OLDPWD", "SHLVL", "_")  # variables the stand-in's own shell adds: not the caller's
+
+
+def env_of(gov):
+    """Each call a stand-in ``gov`` was given, with the environment it ran in, in order: ``[(subcommand, {name:
+    value})]`` (what the process that started it handed down; the shell's own PWD, OLDPWD, SHLVL and _ left out)."""
+    calls = []
+    for block in (Path(f"{gov}.d") / "env").read_text(encoding="utf-8").split("@@@ ")[1:]:
+        head, _, body = block.partition("\n")
+        pairs = (line.split("=", 1) for line in body.splitlines() if "=" in line)
+        calls.append((head.strip(), {k: v for k, v in pairs if k not in _SHELL_ADDED}))
+    return calls
 
 
 def ranking_for(repository, asked, order="gold"):
