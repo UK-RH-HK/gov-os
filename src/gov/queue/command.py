@@ -658,7 +658,7 @@ def land(root: Path, given: list[str], onto: str | None = None,
             limit = whole.cap(root)
             result["selection"] = whole.selection(clone, own)
             result["full"] = {"runs": [], **limit}
-            union = result["selection"]["suites"]
+            union, unplaced = result["selection"]["suites"], None  # no selection is computed: no unplaced_base
         else:
             union, options, unplaced = _union(root, clone, left)
             result["selection"] = {"suites": [s for s in union if not checks._under(s, own)],
