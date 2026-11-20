@@ -211,3 +211,5 @@ question text has no key and is not a problem.
   typed: `gov memaudit scan` finds that one line (kind `path`) and no other, exit 1 (the path is still evidence); the same
   window without the path line: exit 0. Verify: both runs through `gov memaudit scan --set <dummy> --since <ISO>
   --projects <planted>`; the `fresh` close (`SCAN <audit> clean`) agrees on the second.
+
+**Landed:** merged into `w2/integrate` at `cc857b977` on 2026-11-20 by hand (the CTO); on the merged tree W2-204, W2-198, W2-208 and the memaudit and opt-in units: 653 passed. EXAMIN's reproduction on the real transcripts: VOID with 1,025 findings on the base, clean on the fix. For release 0.1.5.
