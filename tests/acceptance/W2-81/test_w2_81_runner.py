@@ -1048,3 +1048,184 @@ def test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_ro
                 assert sentence not in text, f"{q.id}'s row holds a sentence of the question or its answer"
             hidden += q.part == "hidden"
     assert hidden == 10 * len(runner.EXPECTED), "the hidden half's rows were read"
+
+
+# --------------------------------------------------------------------------
+# Fix T3 (W2-81's proving run on 0.1.4): --exceptions <file>, an owner's exceptions read by the judge's overall
+# --------------------------------------------------------------------------
+
+DECISION_ID = "DEC-2001"
+
+
+def _judge_ids(report):
+    """The ids of the judge's reasons, <repository>:<CODE>:<subject>, as a report's judgements give them: what an
+    owner names in an exceptions file (a FOUND problem or a PRESENT stage is never one of them)."""
+    ids = []
+    for name in runner.EXPECTED:
+        repo = report["repositories"][name]
+        j = repo["judgement"] or {}
+        ids += [f"{name}:PLANTED:{p['id']}" for p in j.get("planted", []) if p["status"] != judge.FOUND]
+        ids += [f"{name}:CONTROL:{c['id']}" for c in j.get("controls", []) if c["status"] != judge.CLEAN]
+        ids += [f"{name}:STAGE:{s}" for s, v in j.get("stages", {}).items() if v["status"] != "PRESENT"]
+        value = (repo["figures"] or {}).get("end_to_end")
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 95.0:
+            ids.append(f"{name}:FIGURE:end_to_end")
+    return ids
+
+
+def _owner_file(folder, ids, name="owner-exceptions.json", decision=DECISION_ID):
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / name
+    data = {"decision": decision, "reasons": list(ids)}
+    path.write_text(json.dumps(data) if name.endswith(".json") else yaml.safe_dump(data), encoding="utf-8")
+    return path
+
+
+def _todays(ready_run, **more):
+    """A read on today's code (``built=None``): every handling not built is a reason, the landing and the hidden half
+    are as they should be, so the judge's reasons are all there is."""
+    govs = ready_run["govs"]
+    more.setdefault("gov", govs["good"])
+    more.setdefault("pinned_gov", govs["good"])
+    more.setdefault("queue_ticket", "PG-1")
+    return _read(ready_run, built=None, **more)
+
+
+@pytest.mark.parametrize("name", ["owner-exceptions.json", "owner-exceptions.yaml"])
+def test_every_judge_reason_named_in_the_owners_file_is_ready_with_exceptions_naming_the_decision(ready_run, tmp_path,
+                                                                                                  name):
+    first = _todays(ready_run)
+    ids = _judge_ids(first)
+    assert first["verdict"] == judge.NOT_READY and len(ids) > 10
+    path = _owner_file(tmp_path / "owner", [*ids, "python-app:STAGE:A9"], name)
+    report = _todays(ready_run, exceptions=path)
+    assert report["verdict"] == judge.READY_WITH_EXCEPTIONS == "READY_WITH_EXCEPTIONS", report["reasons"]
+    assert report["reasons"] == first["reasons"], "the reasons stay reasons"
+    assert report["exceptions"]["decision"] == DECISION_ID
+    assert sorted(report["exceptions"]["named"]) == sorted(ids)
+    assert report["exceptions"]["unused"] == ["python-app:STAGE:A9"], "an unused id is reported, never an error"
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert saved["verdict"] == judge.READY_WITH_EXCEPTIONS and saved["exceptions"] == report["exceptions"]
+    markdown = (ready_run["folder"] / "report.md").read_text()
+    assert markdown.startswith("# W2-81 proving ground: READY_WITH_EXCEPTIONS")
+    assert DECISION_ID in markdown and all(i in markdown for i in ids), "the decision and each excepted id"
+
+
+def test_one_reason_the_owners_file_does_not_name_keeps_the_run_not_ready_and_is_named(ready_run, tmp_path):
+    ids = _judge_ids(_todays(ready_run))
+    path = _owner_file(tmp_path / "owner", ids[:-1])
+    report = _todays(ready_run, exceptions=path)
+    assert report["verdict"] == judge.NOT_READY
+    assert report["exceptions"]["unnamed"] == [ids[-1]] and sorted(report["exceptions"]["named"]) == sorted(ids[:-1])
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert saved["verdict"] == judge.NOT_READY and saved["exceptions"]["unnamed"] == [ids[-1]]
+    assert (ready_run["folder"] / "report.md").read_text().startswith("# W2-81 proving ground: NOT_READY")
+
+
+@pytest.mark.parametrize("extra, said", [
+    ("queue-fails", "gov queue PG-1 ended with exit 3"),
+    ("queue-not-run", "gov queue was not run"),
+    ("hidden-half-absent", "the measurement (hidden) half is not present and asked: 9 hidden questions asked"),
+])
+def test_the_runners_own_reasons_are_never_excusable_by_the_owners_file(ready_run, tmp_path, extra, said):
+    """A queue that did not land (not run, or not exit 0) and a hidden half that is absent are reasons no exceptions
+    file takes away, whatever it names."""
+    more = {}
+    if extra == "queue-fails":
+        more["pinned_gov"] = ready_run["govs"]["queue-fails"]
+    elif extra == "queue-not-run":
+        more["queue_ticket"] = []  # no ticket given: the landing is not run
+    else:
+        hidden = tmp_path / "hidden"
+        shutil.copytree(ready_run["hidden"], hidden)
+        data = yaml.safe_load((hidden / "rust-workspace.yaml").read_text())
+        data["questions"] = data["questions"][:9]
+        (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
+        more["hidden"] = hidden
+    ids = _judge_ids(_todays(ready_run, **more))
+    path = _owner_file(tmp_path / "owner", [*ids, "python-app:RUNNER:queue", "python-app:NOTJUDGED:-"])
+    report = _todays(ready_run, exceptions=path, **more)
+    assert report["verdict"] == judge.NOT_READY, "every judge reason is named, the runner's own is not excusable"
+    assert any(said in reason for reason in report["reasons"]), report["reasons"]
+
+
+def test_a_failing_adoption_stage_is_never_excusable_by_the_owners_file(tmp_path):
+    gov = standin.write_gov(tmp_path / "tools", "gov-adopt-fails", {}, adopt_exit=5)
+    common = {"seed": 11, "gov": gov, "pinned_gov": gov, "adopter_model": SONNET}
+    first = runner.run(_options(tmp_path / "run-a", "run", **common), session=standin.Sessions())
+    ids = _judge_ids(first)
+    assert ids and "python-app: gov adopt --lite --stage A0 ended with exit 5" in first["reasons"]
+    path = _owner_file(tmp_path / "owner", ids)
+    report = runner.run(_options(tmp_path / "run-b", "run", exceptions=path, **common), session=standin.Sessions())
+    assert report["verdict"] == judge.NOT_READY
+    assert "python-app: gov adopt --lite --stage A0 ended with exit 5" in report["reasons"]
+
+
+def test_exceptions_where_there_is_no_reason_leave_a_ready_run_ready(ready_run, tmp_path):
+    govs = ready_run["govs"]
+    path = _owner_file(tmp_path / "owner", ["python-app:STAGE:A7"])
+    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1", exceptions=path)
+    assert report["verdict"] == judge.READY and report["reasons"] == [], report["reasons"]
+    assert report["exceptions"]["named"] == [] and report["exceptions"]["unused"] == ["python-app:STAGE:A7"]
+
+
+def test_the_command_exits_0_for_ready_with_exceptions_and_1_for_not_ready(ready_run, tmp_path, capfd):
+    govs = ready_run["govs"]
+    ids = _judge_ids(_todays(ready_run))
+    base = ["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(ready_run["hidden"]),
+            "--gov", str(govs["good"]), "--queue-ticket", "PG-1", *_flags(ready_run)]
+    whole = _owner_file(tmp_path / "owner", ids)
+    code = runner.main([*base, "--exceptions", str(whole)])
+    out, err = capfd.readouterr()
+    assert code == 0 and out.startswith("READY_WITH_EXCEPTIONS (seed "), (code, out, err)
+    short = _owner_file(tmp_path / "owner", ids[:-1], "short.json")
+    code = runner.main([*base, "--exceptions", str(short)])
+    out, err = capfd.readouterr()
+    assert code == 1 and out.startswith("NOT_READY (seed "), (code, out, err)
+    code = runner.main(base)  # no exceptions: as before
+    out, _ = capfd.readouterr()
+    assert code == 1 and out.startswith("NOT_READY (seed ")
+
+
+FAULTS = {  # a name -> (the file's text, or None for no file, a word the refusal says)
+    "no-such-file": (None, "read"),
+    "not-json-or-yaml": ('{"decision": "DEC-1", "reasons": [', "read"),
+    "a-list-not-a-mapping": ('["DEC-1", "r:STAGE:A7"]', "mapping"),
+    "no-decision": ('{"reasons": ["r:STAGE:A7"]}', "decision"),
+    "decision-not-a-string": ('{"decision": 12, "reasons": []}', "decision"),
+    "decision-not-dec-digits": ('{"decision": "DEC-12x", "reasons": []}', "decision"),
+    "decision-lower-case": ('{"decision": "dec-12", "reasons": []}', "decision"),
+    "decision-without-digits": ('{"decision": "DEC-", "reasons": []}', "decision"),
+    "decision-with-a-prefix": ('{"decision": "see DEC-12", "reasons": []}', "decision"),
+    "decision-empty": ('{"decision": "", "reasons": []}', "decision"),
+    "no-reasons": ('{"decision": "DEC-12"}', "reasons"),
+    "reasons-a-string": ('{"decision": "DEC-12", "reasons": "r:STAGE:A7"}', "reasons"),
+    "reasons-a-number": ('{"decision": "DEC-12", "reasons": [7]}', "reasons"),
+    "reasons-an-empty-string": ('{"decision": "DEC-12", "reasons": ["r:STAGE:A7", ""]}', "reasons"),
+    "reasons-null": ('{"decision": "DEC-12", "reasons": [null]}', "reasons"),
+    "a-duplicate-id": ('{"decision": "DEC-12", "reasons": ["r:STAGE:A7", "r:STAGE:A7"]}', "duplicate"),
+}
+
+
+@pytest.mark.parametrize("fault", sorted(FAULTS))
+def test_a_faulty_exceptions_file_is_refused_before_any_work_naming_the_file_and_the_fault(tmp_path, capfd, fault):
+    text, word = FAULTS[fault]
+    path = tmp_path / "owner" / "faulty-owner-file.json"
+    if text is not None:
+        path.parent.mkdir()
+        path.write_text(text, encoding="utf-8")
+    gov = standin.write_gov(tmp_path / "tools", "gov", {})
+    folder = tmp_path / "run"
+    code = runner.main(["--folder", str(folder), "--mode", "run", "--large-size", str(SMALL), "--seed", "11",
+                        "--hidden", str(_EMPTY_HIDDEN[0]), "--gov", str(gov), "--pinned-gov", str(gov),
+                        "--adopter-model", SONNET, "--claude", NO_CLAUDE, "--exceptions", str(path)])
+    out, err = capfd.readouterr()
+    assert code == 2 and not out, (code, out, err)
+    assert err.startswith("refused: ") and path.name in err and word in err.lower(), err
+    assert not folder.exists(), "something was built before the refusal"
+    assert standin.calls_of(gov) == [], "a gov was started before the refusal"
+
+
+def test_exceptions_is_an_option_of_the_command_and_has_no_default():
+    assert runner.parse(["--folder", "x"]).exceptions is None
+    assert runner.parse(["--folder", "x", "--exceptions", "owner.json"]).exceptions == "owner.json"
