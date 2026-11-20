@@ -20,8 +20,9 @@ import yaml
 
 import w2_81_git as gitlib
 from w2_81_judge import NOT_EMBEDDED, PATH_MAP, STORE, FINDINGS, record_name
+from w2_81_score import E2E_BAR
 
-PERFECT_FIGURES = {"hit_at_5": 85.0, "stacked_share": 99.0}  # exactly at the floors: the edge passes
+PERFECT_FIGURES = {"end_to_end": E2E_BAR}  # exactly at the bar: the edge passes (hit@5 and the stacked share are diagnostics)
 
 
 def _namespace(paths, policy):
@@ -167,13 +168,15 @@ def render(model, built, dest, beside):
 
 
 _GOV = """#!/bin/sh
-# A stand-in gov for the W2-81 runner's self-tests: it writes nothing and prints no question.
+# A stand-in gov for the W2-81 runner's self-tests: it writes nothing but its call log and prints no question.
 d="$0.d"
+echo "$1" >> "$d/calls"
 case "$1" in
+  --version) echo "gov $(cat "$d/version") (commit 0123456789ab)" ;;
   retrieve)
     h=$(printf '%s\n%s' "${PWD##*/}" "$2" | sha256sum | cut -c1-64)  # its repository (the folder it runs in)
     if [ -f "$d/$h.json" ]; then cat "$d/$h.json"; else cat "$d/none.json"; fi ;;
-  close) exit "$(cat "$d/close_exit")" ;;
+  queue) exit "$(cat "$d/queue_exit")" ;;
   adopt) exit "$(cat "$d/adopt_exit")" ;;
   *) exit 64 ;;
 esac
@@ -186,9 +189,10 @@ def question_key(repository, text):
     return hashlib.sha256(f"{repository}\n{text}".encode()).hexdigest()
 
 
-def write_gov(folder, name="gov", ranking=None, close_exit=0, adopt_exit=0):
+def write_gov(folder, name="gov", ranking=None, queue_exit=0, adopt_exit=0, version="0.1.4"):
     """A stand-in ``gov`` executable in ``folder`` (a POSIX shell script, quick to start): ``retrieve`` answers from
-    ``ranking`` (question hash -> items), one answer file per question; ``close`` and ``adopt`` exit as given."""
+    ``ranking`` (question hash -> items), one answer file per question; ``queue`` and ``adopt`` exit as given;
+    ``--version`` names ``version``; ``<gov>.d/calls`` lists the subcommands it was called with, one a line."""
     import json
 
     folder = gitlib.outside_this_repository(folder)
@@ -203,19 +207,29 @@ def write_gov(folder, name="gov", ranking=None, close_exit=0, adopt_exit=0):
     for key, items in (ranking or {}).items():
         (answers / f"{key}.json").write_text(bundle(items), encoding="utf-8")
     (answers / "none.json").write_text(bundle([]), encoding="utf-8")
-    (answers / "close_exit").write_text(str(close_exit), encoding="utf-8")
+    (answers / "queue_exit").write_text(str(queue_exit), encoding="utf-8")
     (answers / "adopt_exit").write_text(str(adopt_exit), encoding="utf-8")
+    (answers / "version").write_text(version, encoding="utf-8")
+    (answers / "calls").write_text("", encoding="utf-8")
     return exe
+
+
+def calls_of(gov):
+    """The subcommands a stand-in ``gov`` was called with so far, in order."""
+    return (Path(f"{gov}.d") / "calls").read_text(encoding="utf-8").split()
 
 
 def ranking_for(repository, asked, order="gold"):
     """A known ranking for one repository's resolved questions: ``gold`` puts each gold source first; ``forbidden``
-    puts a forbidden citation first (where the question has one), then the gold; ``none`` returns nothing useful."""
+    puts a forbidden citation first (where the question has one), then the gold; ``late`` puts five filler items
+    before the gold (hit@5 is 0, the gold is in the context); ``none`` returns nothing useful."""
     out = {}
     for q in asked:
         gold = [{"path": p, "start_line": line, "end_line": line, "text": "evidence"} for p, line, _ in q.sources]
         bad = [{"path": p, "start_line": 1, "end_line": 1, "text": "planted"} for p in q.forbidden[:1]]
-        out[question_key(repository, q.question)] = {"gold": gold, "forbidden": bad + gold, "none": []}[order]
+        filler = [{"path": f"filler/f{n}.md", "start_line": 1, "end_line": 1, "text": "filler"} for n in range(5)]
+        out[question_key(repository, q.question)] = {"gold": gold, "forbidden": bad + gold, "none": [],
+                                                     "late": filler + gold}[order]
     return out
 
 
@@ -283,3 +297,98 @@ def flag(model, control):
     a2_entry(m, control["paths"][0])["class"] = "historical" if control["kind"] == "current-spec-looks-old" \
         else "legacy"
     return m
+
+
+# --------------------------------------------------------------------------
+# A stand-in model CLI (the reader's and the grader's sessions): no model runs
+# --------------------------------------------------------------------------
+
+def _argv_value(argv, flag):
+    return argv[argv.index(flag) + 1]
+
+
+class Sessions:
+    """A stand-in session starter: ``start(argv, prompt, cwd)`` answers the way the product's ``claude -p`` prints.
+
+    It records every call (``calls``: ``(role, argv)``, the role told by the argv's system prompt). The reader cites
+    the first item of the last bundle it is shown (so a ranking that puts a gold source first is cited right, and one
+    that puts a forbidden citation first is cited wrong). The grader says ``correct``. Knobs, each keyed by a
+    question's text (the prompt carries it): ``forbid`` maps a text to a forbidden path the reader also cites;
+    ``grade`` maps a text to the grade the grader gives it; ``reader`` is ``cite-first`` (answers at once),
+    ``search-first`` (asks for one more search in the question's own words, then answers), ``search-twice``
+    (asks for a second search too), ``error`` (answers nothing), ``not-found``, or ``cite-gold`` (cites the gold
+    source ``gold`` maps the question's text to, wherever it ranks). ``grade`` may hold ``"*"`` for every other text."""
+
+    def __init__(self, reader="cite-first", forbid=None, grade=None, gold=None):
+        self.reader, self.forbid, self.grade, self.gold = reader, dict(forbid or {}), dict(grade or {}), dict(gold or {})
+        self.calls = []
+
+    def roles(self):
+        return [role for role, _ in self.calls]
+
+    def argvs(self, role):
+        return [argv for r, argv in self.calls if r == role]
+
+    def __call__(self, argv, prompt, cwd):
+        import json
+
+        from gov.memaudit import prompts
+
+        system = _argv_value(argv, "--system-prompt")
+        role = "reader" if system == prompts.READER_SYS else "grader" if system == prompts.GRADER_SYS else "other"
+        self.calls.append((role, list(argv)))
+        if role == "reader":
+            out = self._reader(prompt)
+        elif role == "grader":
+            text = next((t for t in self.grade if f"Question: {t}\n\nGold answer:" in prompt), None)
+            out = {"grade": self.grade.get(text, self.grade.get("*", "correct")),
+                   "reason": "the stand-in grader's reason"}
+        else:
+            return ""
+        return "" if out is None else json.dumps({"structured_output": out, "total_cost_usd": 0.0,
+                                                  "usage": {"input_tokens": 1, "output_tokens": 1}})
+
+    def _reader(self, prompt):
+        import re
+
+        text = prompt[len("Question: "):prompt.index("\n\n=== Bundle 1 ===")]
+        bundles = prompt.split("=== Bundle ")[1:]
+        items = [(m.group(1), int(m.group(2)), int(m.group(3))) for m in
+                 re.finditer(r"^--- (\S+) lines (\d+)-(\d+)$", bundles[-1] if bundles else "", re.M)]
+        if self.reader == "error":
+            return None
+        if self.reader == "not-found" or not items and self.reader == "cite-first":
+            return {"verdict": "not_found", "answer": "Not in the bundles.", "citations": [], "search": ""}
+        if self.reader == "search-twice" or (self.reader == "search-first" and len(bundles) < 2):
+            return {"verdict": "search_again", "answer": "", "citations": [], "search": text}
+        cites = [{"path": p, "start_line": a, "end_line": z} for p, a, z in items[:1]]
+        if self.reader == "cite-gold":
+            cites = [{"path": p, "start_line": line, "end_line": line} for p, line in self.gold[text]]
+        if text in self.forbid:
+            cites.append({"path": self.forbid[text], "start_line": 1, "end_line": 1})
+        return {"verdict": "answer", "answer": "STAND-IN ANSWER: see " + (items[0][0] if items else "nothing"),
+                "citations": cites, "search": ""}
+
+
+def write_claude(folder, name="claude"):
+    """A stand-in ``claude`` executable for the command run as a process (a small script, quick to start): the reader
+    cites the first item of the last bundle it is shown and the grader says ``correct``. No model runs."""
+    import sys
+
+    exe = gitlib.outside_this_repository(folder) / name
+    exe.parent.mkdir(parents=True, exist_ok=True)
+    exe.write_text(f"""#!{sys.executable}
+import json, re, sys
+argv, prompt = sys.argv, sys.stdin.read()
+system = argv[argv.index("--system-prompt") + 1]
+if system.startswith("You answer one question"):
+    last = prompt.split("=== Bundle ")[-1]
+    items = re.findall(r"^--- (\\S+) lines (\\d+)-(\\d+)$", last, re.M)
+    out = {{"verdict": "answer", "answer": "STAND-IN ANSWER", "search": "", "citations": [
+        {{"path": p, "start_line": int(a), "end_line": int(z)}} for p, a, z in items[:1]]}}
+else:
+    out = {{"grade": "correct", "reason": "the stand-in grader's reason"}}
+print(json.dumps({{"structured_output": out, "total_cost_usd": 0.0}}))
+""", encoding="utf-8")
+    exe.chmod(0o755)
+    return exe

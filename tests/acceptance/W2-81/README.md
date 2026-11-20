@@ -25,7 +25,8 @@ PYTHONPATH=<this worktree>/src python3 -m pytest tests/acceptance/W2-81 -q -p no
 - **What is collected.** Only `test_w2_81_*.py` files are collected. The support modules carry the `w2_81_` prefix
   so that no module name clashes with another suite's in one pytest process: `w2_81_git.py`, `w2_81_words.py`,
   `w2_81_secret.py`, `w2_81_manifest.py`, `w2_81_build.py`, `w2_81_judge.py`, `w2_81_standin.py`,
-  `w2_81_questions.py`, `w2_81_score.py` and the runner `w2_81_run.py`. `conftest.py` puts this folder on
+  `w2_81_questions.py`, `w2_81_score.py`, `w2_81_e2e.py` (the reader's and grader's sessions) and the runner
+  `w2_81_run.py`. `conftest.py` puts this folder on
   `sys.path`, as W1-41's does.
 - **Speed.** The built repositories are shared: the self-tests' ground is built once per process, and the runner's
   run folder once per module. The large files are 300,000 bytes in the ground and 4,096 in the runner's cases.
@@ -41,6 +42,7 @@ Measured on 2026-10-31, on a machine shared with other leads:
 | batch 5 | 218 | 39 s | 16 s |
 | batch 6 | 271 | 36 s | 10 s |
 | batch 7 | 276 | 33 s | 9 s |
+| DEC-1221 (1) (end to end) | 377 | not measured serially (the machine's rule runs the folder with `-n auto`) | 34 to 38 s |
 
 Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
@@ -194,7 +196,10 @@ duplicate id, a secret without its rule) is refused. It is an error, never a pas
 
 ## Hermetic and bounded
 
-No network, no model, no adoption. Git runs with no system or global configuration. Every case writes only in its
+No network, no model, no adoption. The reader and grader sessions of the runner are a stand-in starter (an injected
+function that records each argv and answers as `claude -p` prints) or a small stand-in executable named by `--claude`;
+a case that forgets one names a path that does not exist, so a real `claude` is never started. Git runs with no system
+or global configuration. Every case writes only in its
 temporary folders and removes the repositories it built; pytest keeps its own retention (no `--basetemp`). No case
 is skipped. A missing `git` or `gitleaks` fails naming the tool (DEC-899 item 7). Nothing reads the workbench or
 uses the dev-tier variable.
@@ -244,11 +249,16 @@ an output is MISHANDLED even if its stage is not built.
 - every planted problem is FOUND_AND_HANDLED;
 - no control is FLAGGED;
 - every stage is PRESENT, so none is unmeasured and none is NOT_BUILT;
-- both figures of every repository meet their floors: `hit_at_5` at least 85 (CAP-10) and `stacked_share` at
-  least 99 (DEC-833).
+- the end-to-end figure of every repository is at least 95 (`E2E_BAR`; DEC-1221 (1), EMERGENCY-2 5.3): the share of
+  its questions judged right, answer and citation both (see "The scorer"). `figures` maps a repository to
+  `{"end_to_end": f}`. A missing figure, a non-number, a boolean or NaN is not met, and a figure under 95 is
+  NOT_READY naming the repository (`<repo>: the end-to-end figure is 94, below its bar of 95`; missing:
+  `<repo>: the end-to-end figure is missing (its bar is 95)`).
 
-Until the scorer exists (batch 3) the figures are an input. A missing figure, a non-number or a boolean is not met.
-Anything else is NOT_READY, naming each reason.
+hit@5 and the stacked share may sit beside the figure as diagnostics (EMERGENCY-2 5.2): the judge never reads them,
+so low or absent they make nothing NOT_READY, and there is no floor constant for either (`FLOORS`, `HIT_AT_5_FLOOR`
+and `STACKED_SHARE_TARGET` are removed). The old text of KPI line 6 ("every question figure meets its floor") is
+checked by the end-to-end bar in its place. Anything else is NOT_READY, naming each reason.
 
 **It fails closed:**
 
@@ -416,7 +426,7 @@ real forms when those land:
 ## The mutation self-tests (`test_w2_81_judge.py`)
 
 `w2_81_standin.perfect(built)` is a model of an adoption that handles every planted problem and flags no control,
-with both figures exactly at their floors. `render` writes it into a temporary copy of the built repository's
+with the end-to-end figure exactly at the bar. `render` writes it into a temporary copy of the built repository's
 working tree (no `.git`) and a folder beside it. On it, with every capability counted as built, the judge says
 READY. On today's code it says NOT_BUILT for each handling not built, and FOUND_AND_HANDLED for the large files;
 the stages A7 and A10 are PRESENT (built today, from `gov.adopt.command.STAGES`), the verdict and the findings
@@ -471,8 +481,14 @@ finding, is FLAGGED too.
 - A missing manifest, a malformed one, or an exception: each is ERROR.
 - A repository not judged is NOT_READY.
 
-**Figures:** 84 on `hit_at_5`, 98.9 on `stacked_share`, either figure missing, a boolean, or none: each is NOT_READY.
-Exactly at the floors is READY.
+**Figures (DEC-1221 (1)):** an end-to-end figure of 94, 94.9 or 0, missing, a boolean, NaN, a string, or none: each is
+NOT_READY naming the repository (`test_a_figure_below_its_bar_or_missing_is_not_ready`, 10). Exactly at 95 is READY;
+95 in every repository with everything else clean is READY, and one repository at 94 gives exactly one reason naming
+it (`test_a_repository_at_94_is_not_ready_naming_it_and_at_95_in_every_repository_it_is_ready`). hit@5 of 0 or a low
+stacked share beside a figure at the bar is still READY
+(`test_hit_at_5_and_the_stacked_share_are_diagnostics_and_never_make_anything_not_ready`, 6). The old mutation line's
+"a scorer stand-in at 84 on hit@5, or one reporting a single figure" is checked by these cases in its place (84 on
+hit@5 is a diagnostic; one figure is now the only figure, and its absence is NOT_READY).
 
 **Never the value:** every mishandling judgement and the READY judgement are checked in memory for the value. So is
 the judge's captured output when an output's own name holds the value.
@@ -509,7 +525,7 @@ now. Each is NOT_READY, or the judgement's status, as stated:
 
 | # | Behaviour | Cases |
 |---|---|---|
-| 1 | The runner's READY case no longer depends on its fresh seed: the stand-in `gov` answers each repository from its own answers | the runner module at 50 seeds in a row (1000 to 1049, through a probe plugin outside the suite that fixes the seed the module draws), all 36 cases passing at each; 17 of those seeds made the two Python repositories ask a question of the same text, and at seed 1001 the head's READY case failed (`python-app: the figure stacked_share is 90.9, below its floor of 99`). No other case draws a fresh seed |
+| 1 | The runner's READY case no longer depends on its fresh seed: the stand-in `gov` answers each repository from its own answers (since DEC-1221 (1) the READY case's figure is the end-to-end one; the figure named below is the old stacked share) | the runner module at 50 seeds in a row (1000 to 1049, through a probe plugin outside the suite that fixes the seed the module draws), all 36 cases passing at each; 17 of those seeds made the two Python repositories ask a question of the same text, and at seed 1001 the head's READY case failed (`python-app: the figure stacked_share is 90.9, below its floor of 99`). No other case draws a fresh seed |
 | 2 | A secret's value anywhere in the run folder is MISHANDLED, named by its place | `test_a_secret_written_anywhere_in_the_run_folder_is_mishandled`: `outputs/summary.md`, `outputs/secret-history.log`, `session-notes.md`, `run.json`, another repository's working tree (5) |
 | 3 | The measurement half is required | `test_a_hidden_folder_that_does_not_exist_is_refused` (build and read mode); `test_a_repository_without_its_measurement_half_is_not_ready_naming_it`: no hidden questions, another extension, nine questions (3), each named in the reasons, both reports and the command line; the READY case checks the hidden half's line |
 | 4 | A visible entry's evidence names a hidden variant's file by number and id | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`: a hidden orphaned test beside the visible one, deleted by the adoption |
@@ -532,7 +548,7 @@ against these self-tests in one process. Five were killed:
 | any FOUND wins | 12 |
 | no output scan | 5 |
 | controls always CLEAN | 14 |
-| floors ignored | 6 |
+| the figure floors of hit@5 and the stacked share ignored (2026-10-31; both floors retired by DEC-1221 (1), see the end-to-end mutants below) | 6 |
 | everything counted as built | 2 |
 
 The sixth, a missing record read as present, behaves the same as the real judge: with no record there is still no
@@ -540,33 +556,90 @@ evidence of handling, so the problem stays MISSED.
 
 ## The scorer (`w2_81_score.py`)
 
-**The two figures.** For each repository the scorer reports both figures, always together. A result with one
-figure alone counts as no figure.
+**The rule (DEC-1221 (1), DEC-1210 (1), EMERGENCY-2 5.3).** Memory is judged **end to end**, per repository, on its
+question set (the visible half, plus the hidden half when present). A reader reads the whole ranked `gov retrieve`
+bundle and may search once more in its own words, then answers with a citation; a grader judges the answer; **both the
+answer and its citation must be right**. A forbidden citation (the stale spec, the superseded plan) is wrong, so an
+answer that is right with a forbidden citation is wrong. The repository's figure is the share of its questions
+judged right, **95 % or more per repository** (`E2E_BAR`).
 
-| Figure | What it counts | Threshold | Constant |
-|---|---|---|---|
-| hit@5 | the questions with a gold source matched by one of the first five items of the stacked context | 85, CAP-10's floor | `HIT_AT_5_FLOOR` |
-| stacked share | the questions whose stacked context holds every gold source | 99, the owner's target (DEC-833) | `STACKED_SHARE_TARGET` |
+| Part | What it is | Constant |
+|---|---|---|
+| **The end-to-end figure** (the pass line) | `100 * right / asked`, never rounded (189 of 199 is 94.97: not met); met at 95 or more | `E2E_BAR = 95.0` |
+| hit@5 (diagnostic) | the questions with a gold source matched by one of the first five items of the stacked context | none: no floor, no target |
+| stacked share (diagnostic) | the questions whose stacked context holds every gold source | none: no floor, no target |
+| The model of every session | the adopter, the reader and the grader: `claude-sonnet-5-5` | `E2E_MODEL` |
 
-DEC-957 sets memory's target at 95 %, with 85 % the floor. The owner may later change `STACKED_SHARE_TARGET`; this
-suite does not decide that. The judge reads the same constants (`judge.FLOORS is score.FLOORS`).
+**One question, judged (`judge_question(question, reader, grader)`).** A pure function of the reader's verdict
+(`answer`, `not_found` or `error`, its cited `(path, start, end)` list and its attempt count) and the grader's grade.
+It is right only when all hold:
 
-**What counts as a match.**
+- the reader answered (`answer`), by the second attempt (the first, or the one more search: the product's cut 2);
+- the grader's grade is exactly `correct` (`wrong`, `incorrect`, `not_found`, none or anything else is not);
+- a cited place holds a gold source's line (the cited path is the source's, its lines hold the source's line);
+- no cited path is a forbidden one (`Question.forbidden`).
 
-- The stacked context is what `gov retrieve` returned, stacked as `gov.retrieval.measure` stacks it: items in order,
-  each taken once, batch size 10, bundle budget 6,000, stack budget 24,000 tokens, continued while a continuation
-  comes back (DEC-860).
-- An item matches a gold source when its path is the source's and its lines hold the source's line.
-- **A forbidden citation in the top five is a miss** for that question, in both figures. A forbidden citation lower
-  down is not.
-- An unanswered question (a retrieval that failed) is a miss.
-- A repository with no question has no figure.
+A question with no verdict (no reader entry, or no verdict word) is **wrong, never dropped**: it counts in the
+denominator. `not_found` and `error` are wrong: every question of this ground is answerable. A repository with no
+question has no figure, so its bar is not met. The result names the question by id and gives booleans and a fixed
+reason word (`right`, `no verdict`, `reader error`, `reader not found`, `answered after the one more search`,
+`the grade is not correct`, `forbidden citation`, `citation misses the gold sources`): never the question's text or
+an answer.
 
-**What it shows.** Question ids, booleans, a rank and the two percentages: never a question's text or its answer,
-visible or hidden. A `Question`'s `repr` is its id.
+**What reuses the product, and what is W2-81's own.**
 
-**Its result feeds the judge.** `figures()` gives the judge `{repository: {hit_at_5, stacked_share}}`, and either one
-missing is not met. A scorer stand-in at 84 on hit@5 is NOT_READY, and so is one figure alone (KPI line 8).
+| Part | Source | Why |
+|---|---|---|
+| "right end to end": `gov.memaudit.prompts.outcome(row, 2)` | the product | one definition of the measure (EMERGENCY-2 5.3); this module builds the row that function reads and calls it, so the two agree on every verdict, attempt count and grade (`test_the_judgement_is_the_products_rule_on_every_combination`) |
+| the reader's and grader's instructions, schemas, prompt forms, the argv of a `claude -p` call (`prompts.READER_SYS`, `READER_SCHEMA`, `GRADER_SYS`, `GRADER_SCHEMA`, `GRADER_PROMPT`, `prompt_of`, `claude.argv_of`, `claude.run_claude`) | the product | the same reader and grader as the product's judged run, with the model forced to `E2E_MODEL` (`w2_81_e2e.py`) |
+| the citation check and the forbidden-citation rule | W2-81's own | `gov.memaudit.matcher` takes the product's question form (a measure's loaded question); this proving ground's `Question` is another form, with `forbidden` paths and source lines; the rule is the same one in effect (a cited place holds a gold line) with the forbidden path added |
+| the grader | one session on Sonnet | the product's measure grades on Opus with a Sonnet check; this ground runs every session on Sonnet (DEC-1221 (1)) and keeps one grade |
+
+**The diagnostics.** hit@5 and the stacked share are computed from the stacked context `gov retrieve` returned, stacked
+as `gov.retrieval.measure` stacks it (items in order, each taken once, batch size 10, bundle budget 6,000, stack
+budget 24,000 tokens, continued while a continuation comes back, DEC-860). An item matches a gold source when its path
+is the source's and its lines hold the source's line; a forbidden citation in the top five is a miss for them. They
+are in the result under `diagnostic`, and in the report beside the figure, labelled so; they are no pass line, no floor
+and no part of the verdict (EMERGENCY-2 5.2: "hit@5 I DON'T CARE if it's even 10%").
+
+**The model line (`check_models(record)`).** A run record states the model of every session: its `models` block holds
+`adopter`, `reader` and `grader`, each `claude-sonnet-5-5`, and its `release` holds the version read from the pinned
+install. A record without the block, with a role missing, with any of the three on another model, or without a release
+is refused (see "The runner"): **the runner refuses with exit 2**, before any stage, search or session runs.
+
+**What it shows.** Question ids, booleans, fixed reason words and the percentages: never a question's text or its
+answer, visible or hidden. A `Question`'s `repr` is its id.
+
+**Its result feeds the judge.** `figures()` gives the judge `{repository: {"end_to_end": f}}` (plus the diagnostics
+when the result has them). A result with the diagnostics alone, or a figure that is not a number, has no entry: the
+judge then says the figure is missing.
+
+**The scorer's own mutants (scratch run, 2026-11-19, not committed).** Each rule above has a mutant that the
+self-tests kill (the whole folder run with the mutant in place; "failed" is the number of self-tests that failed):
+
+| # | Rule | Mutant | Self-tests failed | Killed by (first) |
+|---|---|---|---|---|
+| M1 | a forbidden citation is wrong | a cited forbidden path ignored | 2 | `test_a_right_answer_citing_the_forbidden_stale_spec_is_wrong_and_the_figure_drops_by_that_question`, `test_a_forbidden_citation_drops_exactly_one_question_of_its_repository` |
+| M2 | the grader must say `correct` | the grade ignored | 12 | `test_a_right_citation_with_a_grade_that_is_not_correct_is_wrong`, the runner's `wrong-grade` case |
+| M3 | a question with no verdict is wrong | a question with no verdict dropped from the count | 2 | `test_a_missing_verdict_is_wrong_and_never_dropped` |
+| M4 | the bar is 95 | the bar at 94 | 12 | `test_a_figure_below_its_bar_or_missing_is_not_ready` |
+| M5 | the figure is never rounded | the figure rounded to a whole number | 3 | `test_the_figure_is_right_over_asked_and_never_rounded_into_the_bar` |
+| M6 | hit@5 is no floor | a floor of 85 on hit@5 revived in the judge | 56 | `test_a_stand_in_that_handles_everything_is_ready`, the figure cases |
+| M7 | the stacked share is no floor | a floor of 99 on the stacked share revived | 55 | `test_a_stand_in_that_handles_everything_is_ready`, the figure cases |
+| M8 | a figure that is not a number is missing | NaN read as a figure | 1 | `test_a_figure_below_its_bar_or_missing_is_not_ready` (NaN) |
+| M9 | the run record states the Sonnet model line | the model line unchecked | 21 | `test_a_run_record_without_the_sonnet_model_line_is_refused`, the runner's refusal cases |
+| M10 | the adopter's model is checked | the adopter left out of the check | 9 | `test_a_run_record_naming_another_model_for_any_session_is_refused[adopter]`, the runner's refusal cases |
+| M11 | the release version is required | no release needed | 2 | `test_a_run_record_without_the_sonnet_model_line_is_refused` |
+| M12 | the grader runs on Sonnet | the grader started on `claude-opus-5-5` | 1 | `test_the_reader_and_the_grader_are_started_on_sonnet_with_the_products_flags` |
+| M13 | the reader runs on Sonnet | the reader started on `claude-haiku-5-5` | 1 | the same case |
+| M14 | the ticket cycle ends at `gov queue` | `gov close` run in its place | 17 | `test_all_handled_and_every_end_to_end_figure_at_the_bar_is_ready`, the runner's `queue-*` cases |
+| M15 | one more search, no second | a third attempt allowed | 1 | `test_the_reader_searches_once_more_and_a_second_search_is_not_an_answer` |
+| M16 | an answer after the one more search is not right | the product's cut moved to 3 | 2 | `test_an_answer_that_comes_after_the_one_more_search_is_not_right`, `test_the_judgement_is_the_products_rule_on_every_combination` |
+| M17 | the diagnostics are no figure | hit@5 read as the end-to-end figure | 7 | the runner's `wrong-grade`, `reader-error` and `second-search-asked` cases |
+| M18 | no answer text in the report | a row's answer written in `report.json` | 1 | `test_the_report_log_and_output_hold_no_question_answer_or_secret_text` |
+
+All eighteen mutants are killed (a mutant was applied in place, the whole folder run with `-n auto`, the file
+restored). The mutants are not committed.
 
 ## The visible question half (`questions/`)
 
@@ -683,12 +756,28 @@ no report, log, file of the run folder, or output.
 ## The runner: one command (`w2_81_run.py`, not collected)
 
 ```
-PYTHONPATH=<the tree or release>/src python3 tests/acceptance/W2-81/w2_81_run.py \
+PYTHONPATH=<the release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py \
     --folder ~/gov-os-runs/W2-81/<run> --mode build|run|read [--seed N] \
-    [--gov <gov to adopt and retrieve with>] [--pinned-gov <W2-16's pinned gov>] \
-    [--close-ticket [<repository>=]<id>]... [--hidden <dir>] [--manifests <dir>] \
+    [--gov <gov to adopt and retrieve with>] [--pinned-gov <the pinned install's gov>] \
+    [--adopter-model <id>] [--claude <the model CLI, default claude>] \
+    [--queue-ticket [<repository>=]<id>]... [--hidden <dir> | --sets-root <root>] [--manifests <dir>] \
     [--large-size <bytes>] [--stages A0,A1,A2]
 ```
+
+**The real run (S-RERUN, DEC-1221 (1)), the CTO's, on the release candidate.** The adopting sessions run first (each
+repository adopted by a launched session on Sonnet, with the adopter brief current on the release candidate), then:
+
+```
+PYTHONPATH=<release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py \
+    --folder ~/gov-os-runs/W2-81/<run> --mode read \
+    --gov <release candidate gov> --pinned-gov <release candidate gov> \
+    --adopter-model claude-sonnet-5-5 --claude claude \
+    --queue-ticket PG-1 --sets-root <evaluation sets root>
+```
+
+(`--mode build` comes first, with `--seed` if wanted, to build the repositories the adopting sessions adopt.) Its
+verdict line is `READY (seed N; hidden half: ...)` and exit 0, or `NOT_READY` and exit 1 with every reason in
+`report.json` and `report.md`; a refusal is exit 2.
 
 **The run folder.** `--folder` is given by literal path: a temporary folder, or `~/gov-os-runs/W2-81/<run>`
 (DEC-728). The runner refuses:
@@ -703,23 +792,44 @@ PYTHONPATH=<the tree or release>/src python3 tests/acceptance/W2-81/w2_81_run.py
   under `<manifests or folder>/manifests/`, and the hidden variants when the hidden half is present. It records the
   seed in `<folder>/run.json`, drawing a fresh one when none is given. A launched session then adopts each
   repository in place, leaving its logs and reports in `<folder>/outputs/<repository>/`.
-- **`read`.** It only reads what that adoption left. It asks each question set of `gov retrieve` (`--gov`), runs
-  `<pinned gov> close <ticket>` in each repository (DEC-953, DEC-954 Q8c), judges, and writes the report.
+- **`read`.** It reads what that adoption left. It asks each question set of `gov retrieve` (`--gov`); **starts a
+  reader session and a grader session per question on `claude-sonnet-5-5`** (`--claude`; the product's prompts, schemas
+  and `claude -p` flags, the model forced; four questions at a time), writes each question's verdict row under
+  `<folder>/e2e/<repository>/<id>.json` (the ids, verdicts, citations as paths and lines, and the answer text: the
+  rows are the one place an answer is written), and computes each repository's end-to-end figure; runs
+  `<pinned gov> queue <ticket>` in each repository, the landing that ends the LITE ticket cycle in place of
+  `gov close` (`--queue-ticket`; EMERGENCY-2 4.3; `gov queue`'s exit 0 is every ticket landed, 3 some not landed, 1
+  refused as a whole); judges, and writes the report.
 - **`run`.** It does `build`, then runs the adoption stages that need no session (`--stages`, by default A0, A1 and
   A2) with `--gov` in each repository, stopping a repository at its first non-zero exit, then reads as `read` does.
 
+**The model line of the run record (`run.json`).** In `read` and `run` mode, before any stage, search or session, the
+runner writes the record's `models` block: `adopter` (as `--adopter-model` says, else as the record already says),
+`reader` and `grader` (as the record already says, else `claude-sonnet-5-5`, which this runner starts them on), and
+`release`, the version read from the pinned install (`<pinned gov> --version`: `gov <version> (commit ...)`; never a
+fixed number). It then **refuses** (`refused: the run record's model line: ...`, exit 2, nothing else run, no model
+line written) a record without the block, with a role missing, with any of the three not `claude-sonnet-5-5`, or
+without a release version (no `--pinned-gov`, or one that prints none). In `run` mode the refusal comes before
+anything is built. The same model line is in the report (`models`, `release`).
+
 **The report.** `<folder>/report.json` and `<folder>/report.md`, with a log of steps in `<folder>/run.log`. Per
 repository it holds the judge's result (each planted problem with its evidence, the controls, the stages,
-NOT_BUILT), both figures with the per-question ids and booleans, the `gov close` result, and the stages run. It also
-holds the seed, the hidden half's presence, and the verdict with every reason. The markdown report carries the judgement's `not_measured` items word for word under each repository, as the JSON does (the large files' budget clause).
+NOT_BUILT), the **end-to-end figure** (`end_to_end`, `right` of `questions`, the bar, whether met, the per-question
+ids, verdicts and reasons: first and decisive), the `diagnostic` hit@5 and stacked share beside it, the `gov queue`
+result (`queue`), and the stages run. It also holds the seed, the models and release, the hidden half's presence,
+and the verdict with every reason. The markdown report puts the figure before the diagnostics, labelled "diagnostic,
+never a bar", and carries the judgement's `not_measured` items word for word under each repository, as the JSON does
+(the large files' budget clause). It holds no question's or answer's text.
 
 **The verdict.** READY needs everything the judge's READY needs, and in every repository:
 
-- `gov close` was run and exited 0;
+- `gov queue` was run and exited 0 (the landing; `gov close` is never run);
+- every repository's end-to-end figure is 95 or more (the judge's reading);
 - no stage the runner ran failed;
 - the measurement (hidden) half is present and asked (see "What the runner shows of it").
 
-A close not run, a non-zero close, or a failed stage is NOT_READY naming it.
+A landing not run, a non-zero `gov queue` (3: some ticket not landed; 1: refused), a figure under 95 or missing, or a
+failed stage is NOT_READY naming it.
 
 **What it never does.**
 
@@ -731,16 +841,30 @@ A close not run, a non-zero close, or a failed stage is NOT_READY naming it.
 - **The capabilities.** It counts as built only what today's code builds. The judge's `built` override is the
   self-tests' alone.
 
-**The `gov close` step.** Its real run is the orchestrator's, once W2-16's numbered, frozen release is closed. The
-self-tests use a stand-in `gov` that exits 0, or 3.
+**The landing step.** Its real run is the CTO's, on the release candidate (S-RERUN, replacing DEC-1197 (3)'s run on
+0.1.1 and `gov close`). The self-tests use a stand-in `gov` that exits 0, 3 or 1 for `queue`, and that records the
+subcommands it is called with (`gov close` is never among them).
+
+**The sessions.** The reader and grader sessions are started by an injectable function, `start(argv, prompt, cwd) ->
+standard output` (`run(options, session=...)`; the command's default is the product's `claude.run_claude`). The
+self-tests pass a stand-in starter that records every argv, answers as `claude -p` prints, and runs no model.
 
 **Its self-tests** (`test_w2_81_runner.py`) use stand-ins: the perfect adoption model written in place, and a
 POSIX-shell `gov` that answers `retrieve` from a known ranking keyed by **the repository and** the question's hash
 (the repository is the folder it runs in), so two repositories asking a question of the same text are answered
-apart and the result does not depend on the seed, and its files never hold a question's text, and exits as told for `close` and `adopt`. They check:
+apart and the result does not depend on the seed, and its files never hold a question's text, and exits as told for `queue` and `adopt`. They check:
 
-- READY with everything handled and both figures met;
-- NOT_READY for a failing close, a close not run, a forbidden citation first, no retrieval, and today's code;
+- READY with everything handled and every end-to-end figure at the bar, with the diagnostics beside it;
+- NOT_READY for a failing `gov queue` (3 and 1), a landing not run, a forbidden citation first, no retrieval, a
+  grade of wrong, a reader that errors, a second search asked for, and today's code;
+- hit@5 of 0 beside a figure at the bar, and a retrieval that gives no gold source, are still READY (diagnostics);
+- one forbidden citation drops exactly one question of its repository;
+- the reader and the grader started with `--model claude-sonnet-5-5` and the product's flags (the recorded argv), the
+  reader's one more search and no second one;
+- the model line: the models block and a release read from the pinned install, and the refusals (no adopter model, an
+  adopter on another model, no pinned gov, an unreadable version, a record naming another model for the reader or the
+  grader, a `models` that is no mapping), before any session;
+- no question, gold answer or answer text, and no secret, in the report, the log or the command's output;
 - the report's fields;
 - nothing written outside the run folder (the folder's parent and this tree's status compared around a run);
 - the refusals;
@@ -788,20 +912,21 @@ folder.
 | KPI line (`DAEO-l78m`) | Tests |
 |---|---|
 | **S1** Five shapes built at test time, file by file and commit by commit, each a repository of its own; nothing cloned; none committed; the large files generated, never tracked | `test_w2_81_builders.py` (all), `test_the_large_files_are_at_the_size_asked_in_the_built_repository_only`, `test_no_built_repository_or_large_file_is_tracked_in_this_repository` |
-| **S2** Planted problems, each kind in at least two shapes; seeded per run; the seed in the report; the manifest outside the repository | `test_every_kind_is_planted_in_two_repositories_two_shapes_and_two_variants`, the instance checks of `test_w2_81_planted.py`, `test_w2_81_seed.py` (all), `test_w2_81_manifest.py` (all), `test_a_build_records_a_fresh_seed_and_keeps_the_manifests_outside_the_repositories`, `test_all_handled_and_both_figures_met_is_ready` (the seed in report.json and report.md) |
+| **S2** Planted problems, each kind in at least two shapes; seeded per run; the seed in the report; the manifest outside the repository | `test_every_kind_is_planted_in_two_repositories_two_shapes_and_two_variants`, the instance checks of `test_w2_81_planted.py`, `test_w2_81_seed.py` (all), `test_w2_81_manifest.py` (all), `test_a_build_records_a_fresh_seed_and_keeps_the_manifests_outside_the_repositories`, `test_all_handled_and_every_end_to_end_figure_at_the_bar_is_ready` (the seed in report.json and report.md) |
 | **S3** Each kind's correct handling and its record in the README, against the stages as built | this README ("The judge", "What the judge reads, per kind", "NOT_BUILT versus MISSED"); `test_todays_built_capabilities_follow_the_code`, `test_on_todays_code_the_handlings_not_built_are_named_and_never_passed` |
 | **S4** The secret: from parts, in history only, never whole in a tracked file; reported by path, 12-digit commit and rule; its value in no record, store, log, proposal, report or output; the human gate; no ADOPTED_HEALTHY while open | `test_w2_81_secret.py` (all); the secret mishandling cases of `test_w2_81_judge.py`; `test_the_judge_never_writes_the_value_even_when_an_output_is_named_by_it`; `test_the_command_prints_the_verdict_and_never_a_secret`; `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` (a variant's secret) |
 | **S5** Controls in each repository and a clean variant; flagging a control is mishandling | `test_the_clean_variant_has_controls_only`, `test_w2_81_planted.py::test_every_repository_has_its_two_controls_and_each_says_what_flagging_it_looks_like`, `test_the_old_looking_spec_is_current`, `test_the_live_file_in_a_legacy_folder_is_live`, `test_a_stand_in_that_flags_a_control_is_not_ready_naming_it` (12), `test_a_control_proposed_for_retirement_or_named_by_a_finding_is_flagged` |
-| **S6** The judge: statuses with evidence; READY only when all handled, no control flagged and every figure met; fails closed; NOT_BUILT named | `test_a_stand_in_that_handles_everything_is_ready`, `test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`, the fail-closed cases (`test_a_missing_unreadable_or_malformed_record_is_missed_never_handled` ×7 and the rest), `test_a_figure_below_its_floor_or_missing_is_not_ready` (6) |
-| **S7** A question set per repository: the visible half (at least 10, gold sources, forbidden citations); the hidden half's form; both figures, never one alone; a forbidden citation in the top five a miss; scores and ids only | `test_w2_81_questions.py` (all), `test_w2_81_score.py` (all), `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`; this README ("The hidden half's form") |
-| **S8** Mutation testing: READY on a full stand-in; one killed mutant per planted problem; the mishandling stand-ins; a flagged control; a scorer at 84 or with one figure | `test_a_stand_in_that_misses_exactly_one_planted_problem_is_not_ready_naming_it` (21, listed above), the mishandling cases, the control cases, `test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready`, `test_the_mutant_lists_are_the_manifests` |
-| **S9** One command for the real run, not collected; builds under a literal folder; runs the stages and `gov retrieve`, or reads a session's outputs; the report as JSON and markdown; nothing in this repository | `test_w2_81_runner.py` (all) |
+| **S6** The judge: statuses with evidence; READY only when all handled, no control flagged and every question figure meets its bar (text of 2026-10-29 says "floor"; since DEC-1221 (1) the bar is the end-to-end 95); fails closed; NOT_BUILT named | `test_a_stand_in_that_handles_everything_is_ready`, `test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`, the fail-closed cases (`test_a_missing_unreadable_or_malformed_record_is_missed_never_handled` ×7 and the rest), `test_a_figure_below_its_bar_or_missing_is_not_ready` (10), `test_a_repository_at_94_is_not_ready_naming_it_and_at_95_in_every_repository_it_is_ready`, `test_hit_at_5_and_the_stacked_share_are_diagnostics_and_never_make_anything_not_ready` (6) |
+| **S7** A question set per repository: the visible half (at least 10, gold sources, forbidden citations); the hidden half's form; the scorer judges memory end to end, per repository, 95 % or more, a forbidden citation wrong, hit@k and the stacked share diagnostics only, every session on Sonnet and the run record saying so; scores and ids only (DEC-1221 (1)) | `test_w2_81_questions.py` (all), `test_w2_81_score.py` (all: 40 cases, the end-to-end judgement, the figure, the diagnostics and the model line), `test_w2_81_runner.py::test_all_handled_and_every_end_to_end_figure_at_the_bar_is_ready`, `test_w2_81_runner.py::test_a_forbidden_citation_drops_exactly_one_question_of_its_repository`, `test_w2_81_runner.py::test_the_reader_and_the_grader_are_started_on_sonnet_with_the_products_flags`, `test_w2_81_runner.py::test_the_models_block_and_the_release_version_are_in_the_run_record`, `test_w2_81_runner.py::test_a_run_record_without_the_sonnet_model_line_is_refused_before_any_session`, `test_w2_81_runner.py::test_the_report_log_and_output_hold_no_question_answer_or_secret_text`, `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`; this README ("The scorer", "The hidden half's form") |
+| **S8** Mutation testing: READY on a full stand-in; one killed mutant per planted problem; the mishandling stand-ins; a flagged control; a scorer at 84 or with one figure (text of 2026-10-29; since DEC-1221 (1) a repository at 94 end to end, a right answer with the forbidden stale spec, a run record without the Sonnet model line) | `test_a_stand_in_that_misses_exactly_one_planted_problem_is_not_ready_naming_it` (21, listed above), the mishandling cases, the control cases, `test_w2_81_score.py::test_a_repository_at_94_percent_is_not_ready_naming_it_and_at_95_percent_it_is_met`, `test_w2_81_score.py::test_a_right_answer_citing_the_forbidden_stale_spec_is_wrong_and_the_figure_drops_by_that_question`, `test_w2_81_score.py::test_a_run_record_without_the_sonnet_model_line_is_refused`, `test_the_mutant_lists_are_the_manifests`; the scorer's own mutants ("The scorer") |
+| **S9** One command for the real run, not collected; builds under a literal folder; runs the stages and `gov retrieve`, or reads a session's outputs; starts the reader and grader sessions on Sonnet and writes the end-to-end figure; the report as JSON and markdown; nothing in this repository | `test_w2_81_runner.py` (all) |
 | **S10** Hermetic and bounded: stand-ins, no network, no model, no adoption; temporary folders only, removed; under 120 s alone and in parallel; none skipped; a missing tool fails naming it; no workbench, no dev tiers | `test_w2_81_hermetic.py` (all), the `this_repository_unchanged` tripwire, `_removed_after` in `test_w2_81_judge.py`; the timings in the return |
-| **S11** In each repository, a ticket closes with `gov close` at exit 0 on a pinned release | the runner's close step: `test_all_handled_and_both_figures_met_is_ready` (exit 0 recorded), `test_w2_81_runner.py::test_each_failure_is_not_ready_naming_it[close-fails-gov close PG-1 ended with exit 3]` and `[close-not-run]`. The real run is the orchestrator's, on W2-16's release |
+| **S11** In each repository, a ticket closes with `gov close` at exit 0 on a pinned release (text of 2026-10-29; replaced by S-RERUN's landing, `gov queue`, DEC-1221 (1): the ticket cycle now ends at the landing) | the runner's landing step: `test_all_handled_and_every_end_to_end_figure_at_the_bar_is_ready` (exit 0 recorded, `gov close` never run), `test_w2_81_runner.py::test_each_failure_is_not_ready_naming_it[queue-fails-gov queue PG-1 ended with exit 3]`, `[queue-refused-gov queue PG-1 ended with exit 1]` and `[queue-not-run-gov queue was not run]`. The real run is the CTO's, on the release candidate |
 | **S12** The builders and question sets serve W2-88 read-only; the hidden half is W2-93's | this README ("What W2-88 and W2-93 may read"); `test_the_questions_resolve_at_another_seed` (the interface W2-88 calls) |
 | **S13** S-STAGES: the judge counts A7 and A10 as built from `gov.adopt.command.STAGES`, never from `gov.adopt.project.STAGES`; its self-test and "Today's list" say so; a lite record absent or malformed is missed and named, never NOT_BUILT, never passed | `test_w2_81_judge.py::test_todays_built_capabilities_follow_the_code`, `test_w2_81_judge.py::test_a7_and_a10_count_as_built_from_the_commands_stage_list_never_the_projects`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built` (8: A7 and A10, each absent, without front matter, front matter not a mapping, bad YAML), `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it` (2), `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named` (6: A7 and A10, each `result: fail`, `result` removed, `result: met`: MALFORMED, a failed gate never found), `test_w2_81_judge.py::test_on_todays_code_both_lite_records_in_the_stages_front_matter_are_present`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`; this README ("Today's list", the capability row `A7`, `A10`: built, from `command.STAGES`) |
+| **S14** S-RERUN (DEC-1221 (1)): the full run on the release candidate (version read from the pinned install), the adopter brief current on it, a LITE ticket cycle per repository that ends at the landing `gov queue`, memory judged end to end at 95 % or more per repository, the adopter, reader and grader sessions all on `claude-sonnet-5-5`, the run record stating it. Verify: the CTO's real run (the self-tests prove the runner's side: the figure, the model line, the sessions and the landing) | `test_w2_81_runner.py::test_the_models_block_and_the_release_version_are_in_the_run_record`, `test_w2_81_runner.py::test_the_reader_and_the_grader_are_started_on_sonnet_with_the_products_flags`, `test_w2_81_runner.py::test_the_reader_searches_once_more_and_a_second_search_is_not_an_answer`, `test_w2_81_runner.py::test_a_run_record_without_the_sonnet_model_line_is_refused_before_any_session`, `test_w2_81_runner.py::test_the_run_mode_refuses_before_it_builds_when_the_model_line_is_missing`, `test_w2_81_runner.py::test_all_handled_and_every_end_to_end_figure_at_the_bar_is_ready`, `test_w2_81_runner.py::test_hit_at_5_of_zero_beside_a_figure_at_the_bar_is_ready`, `test_w2_81_runner.py::test_a_retrieval_that_gives_no_gold_source_does_not_by_itself_make_the_run_not_ready`, `test_w2_81_runner.py::test_each_failure_is_not_ready_naming_it[queue-fails-gov queue PG-1 ended with exit 3]` |
 | **F1** A planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_or_malformed_is_missed_and_named_never_not_built`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named` |
-| **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named`, the figure cases, `test_w2_81_score.py::test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready` |
+| **F2** READY with a control flagged, a stage unmeasured, or a repository's end-to-end figure under 95 % (DEC-1221 (1)) | the control cases, `test_an_absent_stage_is_named`, `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_absent_alone_is_not_ready_naming_it`, `test_w2_81_judge.py::test_on_todays_code_a_lite_record_whose_gate_result_is_not_pass_is_malformed_and_named`, `test_w2_81_judge.py::test_a_figure_below_its_bar_or_missing_is_not_ready` (10), `test_w2_81_judge.py::test_a_repository_at_94_is_not_ready_naming_it_and_at_95_in_every_repository_it_is_ready`, `test_w2_81_score.py::test_a_repository_at_94_percent_is_not_ready_naming_it_and_at_95_percent_it_is_met`, `test_w2_81_score.py::test_a_right_answer_citing_the_forbidden_stale_spec_is_wrong_and_the_figure_drops_by_that_question`, `test_w2_81_score.py::test_a_run_record_without_the_sonnet_model_line_is_refused`, `test_w2_81_score.py::test_a_run_record_naming_another_model_for_any_session_is_refused` (18), `test_w2_81_runner.py::test_a_run_record_without_the_sonnet_model_line_is_refused_before_any_session`, `test_w2_81_runner.py::test_each_failure_is_not_ready_naming_it[forbidden-first-below its bar of 95]` |
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
 | **S3, S4, S5, S6, S7, S9, F1, F2, F3, F4** Review batch 4, items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |
