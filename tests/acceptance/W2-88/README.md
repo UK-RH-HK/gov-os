@@ -753,3 +753,44 @@ lead's run 10 interface (items 1 to 3), before the fix. Nothing of the engineer'
 
 **Not tested here.** S29's verify also names a unit test that lists every constant passed to `fabric.shipped` and finds each in `pyproject.toml`'s package
 data. That test is the engineer's. The wheel half of it is held here by the cases above, which build the wheel in the release form and read it installed.
+
+## Fix: `FABRIC_INCOMPLETE` names each file in neither list (a fix under W2-88, `DAEO-2bdu`; no new ticket)
+
+`Fix: FABRIC_INCOMPLETE names each file in neither list`. W2-81's proving run on release 0.1.4: A9 stopped with `FABRIC_INCOMPLETE`
+"vectors: 2 file(s) judged and in neither list" and named no file (W2-88 S1: "every tracked file is either indexed or named with its reason").
+The cause there was two namespaces of the adopter's path map matching the same files. Written from the lead's KPI line and interface (below)
+and the analysis (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, row P3); the implementation of the fix was not read. Nothing of an earlier
+case is edited.
+
+KPI line (fix-2): "`FABRIC_INCOMPLETE` names each file that a store judged and holds in neither list (the vectors store and the code graph, as well
+as the keyword store) and each file it holds in both lists: the refusal's message lists the paths, and `details` carries them (`details['missing']`
+the sorted paths in neither list, over every store, `details['both']` the sorted paths in two lists), so no refusal says only a count."
+
+**The interface (the lead's; the cases build to it).** A store's block in the A9 record's `stores` carries `judged_files`, the sorted list of the
+files the store judged. `fabric.check_coverage(record, tracked)` names every judged file in neither `indexed` nor `refused`, and every file in both,
+and raises `FABRIC_INCOMPLETE` for either. A block with no `judged_files` (an older record) keeps the count message and still raises as today. The
+keyword store judges every tracked file and needs no `judged_files`. The cases read `GovError.code`, `GovError.details` and the message text; a
+file in both lists of two stores is given once per store in different files, so `details['both']` is never ambiguous about duplicates.
+
+**The end-to-end case.** It can be produced, and the base reproduces the adopter's refusal word for word. `overlapping` (a module fixture) plants
+the usual harbour adoption, adds a second namespace `docs-private` (`docs/**`, `not embedded`) after the embedded `harbour` namespace (which also
+holds `docs/**`), commits, and runs A0 to A8 and A9. On the base A9 refuses `FABRIC_INCOMPLETE` "vectors: 2 file(s) judged and in neither list"
+with `details['missing'] == []` (the keyword store has no gap; the gap is the vectors store's count). The two namespaces disagree about those files, so
+the vectors store ends with files in neither of its lists. The case then holds that the refusal names each such file in its message and in `details` (every one under `docs/`, `missing` sorted).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| fix-2 (vectors store, neither list) | `test_w2_88_fix_fabric_names_files.py::test_a_vectors_file_judged_and_in_neither_list_is_named_in_the_message_and_in_details`; `test_w2_88_fix_fabric_names_files.py::test_two_files_in_neither_list_are_both_named_sorted` | red: `details['missing']` is `[]` and the message holds a count only |
+| fix-2 (code graph, neither list) | `test_w2_88_fix_fabric_names_files.py::test_a_code_graph_file_judged_and_in_neither_list_is_named` | red: `details['missing']` is `[]`, the message a count |
+| fix-2 (over every store, sorted) | `test_w2_88_fix_fabric_names_files.py::test_the_missing_paths_are_collected_over_every_store_and_sorted` | red: `details['missing']` holds the keyword store's file only |
+| fix-2 (keyword store as before) | `test_w2_88_fix_fabric_names_files.py::test_a_file_the_keyword_store_leaves_in_neither_list_is_named_as_before` | red: `details['missing']` is right, but the message names no file |
+| fix-2 (both lists) | `test_w2_88_fix_fabric_names_files.py::test_a_file_in_both_lists_of_the_code_graph_is_named_in_both_and_in_the_message`; `test_w2_88_fix_fabric_names_files.py::test_files_in_both_lists_of_two_stores_are_collected_sorted`; `test_w2_88_fix_fabric_names_files.py::test_a_missing_file_and_a_file_in_both_lists_are_each_named_under_its_own_key` | red: a file in both lists raises nothing (`DID NOT RAISE`) or `details` has no `both` |
+| fix-2 (the record a good run writes) | `test_w2_88_fix_fabric_names_files.py::test_a_good_run_records_the_judged_files_of_the_vectors_store_and_the_code_graph` | red: `stores.vectors` has no list `judged_files` |
+| fix-2 (end to end, the adopter's case) | `test_w2_88_fix_fabric_names_files.py::test_a9_over_a_path_map_with_overlapping_namespaces_names_the_files_it_stops_on` | red: A9 refuses `FABRIC_INCOMPLETE` with `details['missing']` empty and no file named: "vectors: 2 file(s) judged and in neither list" |
+| fix-2 (complete record, no refusal) | `test_w2_88_fix_fabric_names_files.py::test_a_complete_record_that_names_its_judged_files_raises_nothing` | GUARD, green on the base: a record in which every judged file is in exactly one list raises nothing |
+| fix-2 (older record keeps the count) | `test_w2_88_fix_fabric_names_files.py::test_a_record_without_judged_files_keeps_the_count_message_and_still_raises` | GUARD, green on the base: no `judged_files`, the count message, still `FABRIC_INCOMPLETE` |
+
+**Red run on the base** (`w2/integrate` at `844723c60`, this worktree's `src/`, through the heavy slot): **12 cases, 10 red and 2 green** (the two guards). The
+red reasons are as in the table; the end-to-end case is red for the adopter's own refusal, so the plant is sound.
+**Not turned into a test:** nothing of the KPI wording. Open reading: the code graph's `judged_files` is asserted for a good run of the default world,
+where the path map does not call for the code graph (its block has `judged` 0 and so `judged_files` `[]`); the lead's interface says both stores carry it.
