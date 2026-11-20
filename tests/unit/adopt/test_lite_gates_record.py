@@ -1,5 +1,5 @@
 """Builder tests for the fix under W2-52 (DAEO-siiz): a verdict the A5, A7 or A10 gate accepts is a record the store reads.
-Regression evidence only (MR-3). The helper is ``project.require_record``; the gates are held through W2-52's own builder
+Regression evidence only (MR-3). The helper is ``lite_gates.require_record``; the gates are held through W2-52's own builder
 projects (``test_lite_gates``)."""
 from __future__ import annotations
 
@@ -16,11 +16,11 @@ __all__ = ["root"]
 
 
 def test_a_head_with_id_type_and_status_is_a_record():
-    project.require_record({"id": "AV-1", "type": "evidence", "status": "ACTIVE"}, "v.md")
+    lite_gates.require_record({"id": "AV-1", "type": "evidence", "status": "ACTIVE"}, "v.md")
 
 
 def test_a_head_with_no_id_is_no_record_and_so_not_refused():
-    project.require_record({"stage": "A5", "verdict": "pass"}, "v.md")
+    lite_gates.require_record({"stage": "A5", "verdict": "pass"}, "v.md")
 
 
 @pytest.mark.parametrize("head, keys", [
@@ -33,7 +33,7 @@ def test_a_head_with_no_id_is_no_record_and_so_not_refused():
 ])
 def test_an_id_without_a_string_type_or_status_is_refused_naming_the_file_and_keys(head, keys):
     with pytest.raises(GovError) as caught:
-        project.require_record(head, "audit/v.md")
+        lite_gates.require_record(head, "audit/v.md")
     assert caught.value.code == "ADOPT_VERDICT_NOT_A_RECORD"
     assert "audit/v.md" in caught.value.message and all(key in caught.value.message for key in keys)
     missing = ("type", "status")
