@@ -863,3 +863,94 @@ def test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_befo
     for env in queues:
         assert {k: v for k, v in env.items() if k != "HOME"} == as_before, "a variable other than HOME differs"
     assert os.environ["HOME"] == str(operator), "the runner's own process keeps its HOME"
+
+
+ADDRESS = "lead:E2-w2-81-fixes"  # the starter's address, as a ticket lead's launched sessions carry it
+UNSET = object()
+
+
+class _Watching(standin.Sessions):
+    """The stand-in session starter, recording the ``GOV_MSG_ADDRESS`` of the process it runs in (the product's
+    ``run_claude`` inherits the runner's own environment, so that is what a launched session would see)."""
+
+    def __init__(self, *args, fail=False, **more):
+        super().__init__(*args, **more)
+        self.addresses, self.fail = [], fail
+
+    def __call__(self, argv, prompt, cwd):
+        self.addresses.append(os.environ.get("GOV_MSG_ADDRESS", UNSET))
+        if self.fail:
+            raise RuntimeError("a session that falls over")
+        return super().__call__(argv, prompt, cwd)
+
+
+def _addresses(gov, *subs):
+    return [env.get("GOV_MSG_ADDRESS", UNSET) for name, env in standin.env_of(gov) if name in subs]
+
+
+@pytest.mark.parametrize("how", ["from-the-environment", "notify-wins", "neither"])
+def test_every_process_the_run_starts_carries_the_address_of_whoever_started_it(ready_run, tmp_path, monkeypatch, how):
+    """Fix T10: ``gov retrieve``, ``gov queue`` and the reader's and grader's sessions all carry the starter's
+    ``$GOV_MSG_ADDRESS`` (``--notify`` wins over it); started with neither, nothing is set (today's behaviour: the
+    product's launcher then defaults the address to the live CTO's inbox, which is the defect)."""
+    more = {}
+    if how == "neither":
+        monkeypatch.delenv("GOV_MSG_ADDRESS", raising=False)
+        wanted = UNSET
+    elif how == "from-the-environment":
+        monkeypatch.setenv("GOV_MSG_ADDRESS", ADDRESS)
+        wanted = ADDRESS
+    else:
+        monkeypatch.setenv("GOV_MSG_ADDRESS", "lead:another-starter")
+        more["notify"], wanted = ADDRESS, ADDRESS
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    session = _Watching("search-first")
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=session, **more)
+    seen = _addresses(gov, "retrieve", "queue")
+    assert "queue" in [n for n, _ in standin.env_of(gov)] and "retrieve" in [n for n, _ in standin.env_of(gov)]
+    assert seen and all(a == wanted for a in seen), set(map(str, seen))
+    assert session.addresses and all(a == wanted for a in session.addresses), set(map(str, session.addresses))
+    # restored afterwards: the process is left as the run found it
+    found = {"neither": UNSET, "from-the-environment": ADDRESS, "notify-wins": "lead:another-starter"}[how]
+    assert os.environ.get("GOV_MSG_ADDRESS", UNSET) == found
+
+
+@pytest.mark.parametrize("before", [ADDRESS, None])
+def test_the_address_is_restored_after_the_run_even_when_a_session_falls_over(ready_run, tmp_path, monkeypatch, before):
+    """Fix T10: ``--notify`` is set in the runner's own process for the duration of the run only, and put back (or
+    removed) when the run ends, whether it ends in a report or in an error."""
+    if before is None:
+        monkeypatch.delenv("GOV_MSG_ADDRESS", raising=False)
+    else:
+        monkeypatch.setenv("GOV_MSG_ADDRESS", before)
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    session = _Watching(fail=True)
+    with pytest.raises(RuntimeError):
+        _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=session, notify="lead:during-the-run")
+    assert session.addresses and set(session.addresses) == {"lead:during-the-run"}, "set while the sessions ran"
+    assert os.environ.get("GOV_MSG_ADDRESS") == before, "restored (or removed) afterwards"
+
+
+def test_the_adoption_stages_carry_the_address_too_and_keep_the_runs_own_home(tmp_path, monkeypatch):
+    """Fix T10 for ``gov adopt`` (run mode), and a guard for Fix T1: ``gov adopt`` keeps the scrubbed ``HOME`` while
+    ``gov queue`` is given the operator's."""
+    operator = tmp_path / "operator-home"
+    operator.mkdir()
+    monkeypatch.setenv("HOME", str(operator))
+    monkeypatch.setenv("GOV_MSG_ADDRESS", ADDRESS)
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    session = _Watching()
+    runner.run(_options(tmp_path / "run", "run", seed=11, gov=gov, pinned_gov=gov, adopter_model=SONNET,
+                        queue_ticket="PG-1"), session=session)
+    adopts = _calls(gov, "adopt")
+    assert len(adopts) == len(runner.EXPECTED) * len(runner.DEFAULT_STAGES)
+    assert all(env.get("GOV_MSG_ADDRESS") == ADDRESS for env in adopts)
+    assert all(Path(env["HOME"]).resolve() == (tmp_path / "run" / ".home").resolve() for env in adopts)
+    assert all(env.get("GOV_MSG_ADDRESS") == ADDRESS and env.get("HOME") == str(operator)
+               for env in _calls(gov, "queue"))
+    assert all(a == ADDRESS for a in session.addresses)
+
+
+def test_notify_is_an_option_of_the_command_and_names_no_default():
+    assert runner.parse(["--folder", "x"]).notify is None
+    assert runner.parse(["--folder", "x", "--notify", ADDRESS]).notify == ADDRESS
