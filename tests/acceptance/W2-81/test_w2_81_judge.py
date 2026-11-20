@@ -753,8 +753,9 @@ def test_every_reason_has_a_stable_id_in_step_with_its_text_and_the_texts_are_un
 
 def test_each_kind_of_reason_has_its_code_and_subject():
     missing = judge.overall([_made()], {}, ["r", "s"])
-    assert missing["reason_ids"] == MADE_IDS[:-1] + ["r:FIGURE:end_to_end", "s:NOTJUDGED:-"]
-    assert missing["reasons"][-2:] == ["r: the end-to-end figure is missing (its bar is 95)", "s: not judged"]
+    assert missing["reason_ids"] == ["s:NOTJUDGED:-", *MADE_IDS], "a repository not judged comes first, as its text did"
+    assert missing["reasons"][0] == "s: not judged"
+    assert missing["reasons"][-1] == "r: the end-to-end figure is missing (its bar is 95)"
     hidden = {"repository": "r", "controls": [], "stages": {}, "planted": [
         {"id": "hidden variant #3 (o1)", "kind": "hidden", "status": judge.MISSED}]}
     result = judge.overall([hidden], {"r": {"end_to_end": 100.0}}, ["r"])
@@ -769,8 +770,8 @@ def test_with_no_exceptions_ready_and_not_ready_are_as_before_and_ready_needs_no
         result = judge.overall([clean], {"r": {"end_to_end": 95.0}}, ["r"], exceptions=exceptions)
         assert result["verdict"] == judge.READY and result["reasons"] == [] and result["reason_ids"] == []
     named = judge.overall([clean], {"r": {"end_to_end": 95.0}}, ["r"], exceptions=_owner(["r:STAGE:A7"]))
-    assert named["exceptions"] == {"decision": DECISION, "named": [], "unused": ["r:STAGE:A7"]}, \
-        "no reason, so READY and the id is reported unused"
+    assert named["exceptions"]["decision"] == DECISION and named["exceptions"]["named"] == [], named["exceptions"]
+    assert named["exceptions"]["unused"] == ["r:STAGE:A7"], "no reason, so READY and the id is reported unused"
 
 
 def test_every_reason_named_is_ready_with_exceptions_and_the_reasons_stay_reasons():

@@ -103,6 +103,19 @@ def _env(folder, notify=None):
     return env
 
 
+def _owner_exceptions(options):
+    """The owner's exceptions (``--exceptions <file>``), checked, or None: a file that cannot be read, with no decision
+    of the form DEC-<digits>, whose reasons are not a list of non-empty strings, or with a duplicate id is refused
+    (``refused: <file>: <fault>``, exit 2), before anything is built, started or asked."""
+    given = getattr(options, "exceptions", None)
+    if not given:
+        return None
+    try:
+        return judge.load_exceptions(Path(given).expanduser())
+    except judge.ExceptionsError as refused:
+        raise RunnerError(str(refused)) from None
+
+
 def _queue_env(env):
     """The landing's environment: the run's own (``_env``) with the operator's ``HOME``, the runner process's own. The
     pinned ``gov queue`` runs the repository's tests, and the tools they need (pytest) live in the operator's user
@@ -366,6 +379,7 @@ def _run(options, built, session, notify):
     judge's ``built``); the command leaves it to today's code, and only the self-tests pass it. ``session``: the
     function that starts a reader or grader session, ``start(argv, prompt, cwd) -> standard output``; the command
     leaves it to the product's ``run_claude``, and only the self-tests pass a stand-in (no model runs)."""
+    exceptions = _owner_exceptions(options)  # a faulty exceptions file is refused before any work
     _hidden_folder(options)  # a wrong --sets-root or --hidden is refused first, before anything is built or written
     folder = _refuse_place(options.folder)
     if options.mode == "run":
@@ -429,23 +443,27 @@ def _run(options, built, session, notify):
         lands[name] = {"run": True, "ticket": tickets[name], "exit": done.returncode}
         log(f"queue {name} {tickets[name]}: exit {done.returncode}")
     cases = [(repo.manifest, repo.root, folder / "outputs" / name, repo.secrets) for name, repo in repos.items()]
-    judged = judge.judge(cases, score.figures(scores), EXPECTED, built, run_folder=folder)
-    reasons = list(judged["reasons"])
+    judged = judge.judge(cases, score.figures(scores), EXPECTED, built, run_folder=folder, exceptions=exceptions)
+    own = []  # the runner's own reasons: no exceptions file excuses them (the landing, the hidden half, the stages)
     for name in EXPECTED:
         if not hidden[name]["present"]:
-            reasons.append(f"{name}: the measurement (hidden) half is not present and asked: {hidden[name]['asked']} "
-                           f"hidden questions asked, at least {HIDDEN_NEEDED} needed")
+            own.append(f"{name}: the measurement (hidden) half is not present and asked: {hidden[name]['asked']} "
+                       f"hidden questions asked, at least {HIDDEN_NEEDED} needed")
         land = lands[name]
         if not land["run"]:
-            reasons.append(f"{name}: gov queue was not run")
+            own.append(f"{name}: gov queue was not run")
         elif land["exit"] != 0:
-            reasons.append(f"{name}: gov queue {land['ticket']} ended with exit {land['exit']}")
+            own.append(f"{name}: gov queue {land['ticket']} ended with exit {land['exit']}")
         failed = [s for s in stage_runs.get(name, []) if s.get("run") and s["exit"] != 0]
-        reasons += [f"{name}: gov adopt --lite --stage {s['stage']} ended with exit {s['exit']}" for s in failed]
-    verdict = judged["verdict"] if judged["verdict"] == judge.ERROR else (judge.NOT_READY if reasons else judge.READY)
+        own += [f"{name}: gov adopt --lite --stage {s['stage']} ended with exit {s['exit']}" for s in failed]
+    reasons = list(judged["reasons"]) + own
+    # in step with the reasons: the judge's ids, and none (null) for the runner's own, which no file can name
+    reason_ids = list(judged.get("reason_ids") or []) + [None] * len(own)
+    verdict = judged["verdict"] if judged["verdict"] == judge.ERROR else (
+        judge.NOT_READY if own else judged["verdict"])  # READY, READY_WITH_EXCEPTIONS or NOT_READY, as the judge says
     by_name = {j["repository"]: j for j in judged.get("repositories", [])}
     report = {"form": "w2-81-report/1", "mode": options.mode, "seed": record["seed"], "verdict": verdict,
-              "reasons": reasons, "hidden_half": _hidden_summary(hidden),
+              "reasons": reasons, "reason_ids": reason_ids, "hidden_half": _hidden_summary(hidden),
               "gov": options.gov, "pinned_gov": options.pinned_gov,
               "models": record.get("models"), "release": record.get("release"), "bar": score.E2E_BAR,
               "repositories": {name: {"judgement": by_name.get(name), "figures": next(
@@ -454,6 +472,8 @@ def _run(options, built, session, notify):
                   "not_built": (by_name.get(name) or {}).get("not_built"), "queue": lands[name],
                   "hidden_half": hidden[name],
                   "stages_run": stage_runs.get(name, [])} for name in EXPECTED}}
+    if exceptions is not None and judged.get("exceptions"):
+        report["exceptions"] = judged["exceptions"]  # the decision and the ids named, unnamed and unused
     text = json.dumps(report, indent=2, sort_keys=True)
     markdown = _markdown(report)
     if any(h.found_in(t) for h in held for t in (text, markdown, "\n".join(log.lines))):
@@ -488,6 +508,12 @@ def _markdown(report):
     rows += [f"- {reason}" for reason in report["reasons"]] or ["- every planted problem handled, no control "
                                                                  "flagged, every repository's end-to-end figure at "
                                                                  f"{score.E2E_BAR:g} or more, every landing at exit 0"]
+    owner = report.get("exceptions")
+    if owner:
+        rows += ["", f"Exceptions named in {owner['decision']} (an owner's decision, one id each):"]
+        rows += [f"- excepted: `{i}`" for i in owner["named"]] or ["- none of the reasons"]
+        rows += [f"- not named, so still a reason: `{i}`" for i in owner.get("unnamed", [])]
+        rows += [f"- named, matching no reason: `{i}`" for i in owner["unused"]]
     for name, repo in report["repositories"].items():
         j, f = repo["judgement"] or {}, repo["figures"] or {}
         diagnostic = f.get("diagnostic") or {}
@@ -527,6 +553,7 @@ def parse(argv):
     parser.add_argument("--large-size", dest="large_size", type=int, default=build.REAL_RUN_LARGE)
     parser.add_argument("--stages", default=None)
     parser.add_argument("--notify", default=None)
+    parser.add_argument("--exceptions", default=None)
     return parser.parse_args(argv)
 
 
@@ -539,8 +566,9 @@ def main(argv=None):
     if "verdict" not in report:
         print(f"BUILT (seed {report['seed']})")
         return 0
-    print(f"{report['verdict']} (seed {report['seed']}; hidden half: {report.get('hidden_half', 'not read')})")
-    return 0 if report.get("verdict", judge.READY) == judge.READY else 1
+    excepted = f"; exceptions named in {report['exceptions']['decision']}" if report.get("exceptions") else ""
+    print(f"{report['verdict']} (seed {report['seed']}; hidden half: {report.get('hidden_half', 'not read')}{excepted})")
+    return 0 if report.get("verdict", judge.READY) in judge.READY_VERDICTS else 1
 
 
 if __name__ == "__main__":
