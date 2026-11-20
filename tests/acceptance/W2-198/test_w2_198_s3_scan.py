@@ -1,4 +1,7 @@
-"""S3: `gov memaudit scan` reports every transcript written in the window that names the set's path or a question id."""
+"""S3: `gov memaudit scan` reports every transcript written in the window that names the set's path or a question id.
+
+Rewritten for the fix under W2-204 (EXAMIN's F-033, S13 M1): a question id is a finding only on a line that also names
+the set by its audit name (`memory-audit-20261101`) or its tag (`20261101`); the id lines here carry one of them."""
 
 from __future__ import annotations
 
@@ -25,13 +28,13 @@ def _world(tmp_path, home):
         s.bash("2026-11-10T09:02:00Z", "sess-main", f"du -sh {forms['tilde']}"),
         s.user("2026-11-10T09:03:00Z", "sess-main", f"look in {forms['dollar']} later"),
         s.say("2026-11-10T09:04:00Z", "sess-main", f"the set lives under {forms['segment']} in the eval root"),
-        s.say("2026-11-10T09:05:00Z", "sess-main", "Notes so far:\nq02 looks like the hardest one"),
+        s.say("2026-11-10T09:05:00Z", "sess-main", f"Notes so far:\nq02 of {s.SET_NAME} looks like the hardest one"),
         s.say("2026-11-10T09:06:00Z", "sess-main", "compare q020 with xq02 in the old run"),
-        '{"type": "assistant", "sessionId": "sess-main", "message": {"content": "partial write of q01 an',
+        '{"type": "assistant", "sessionId": "sess-main", "message": {"content": "partial write of 20261101 q01 an',
     ], IN)
     agent = s.transcript(proj / "sess-main" / "subagents" / "agent-a1b2.jsonl", [
         s.user("2026-11-10T10:00:00Z", "sess-main", "audit the change"),
-        s.bash("2026-11-10T10:01:00Z", "sess-main", "grep -n q03 notes.md"),
+        s.bash("2026-11-10T10:01:00Z", "sess-main", "grep -n q03 audits/20261101/notes.md"),
     ], IN)
     s.write(proj / "sess-main" / "subagents" / "agent-a1b2.meta.json", '{"agentType": "independent-auditor"}\n')
     expected = {
@@ -125,7 +128,7 @@ def test_s3_id_option_replaces_the_sets_ids_and_until_defaults_to_now(tmp_path, 
     stamp = lambda days: (now - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")  # noqa: E731
     path = s.transcript(proj / "sess-ids.jsonl", [
         s.say(stamp(3), "sess-ids", "q02 again"),
-        s.say(stamp(1), "sess-ids", "now h7 instead"),
+        s.say(stamp(1), "sess-ids", "now h7 of 20261101 instead"),
     ], stamp(1))
     args = ["memaudit", "scan", "--set", set_root, "--since", stamp(4), "--projects", projects, "--id", "h7", "--json"]
     run = s.gov(args, env=env, cwd=tmp_path)
@@ -135,13 +138,13 @@ def test_s3_id_option_replaces_the_sets_ids_and_until_defaults_to_now(tmp_path, 
 
 
 @pytest.mark.skipif(os.geteuid() == 0, reason="root reads a mode 000 file")
-def test_s3_question_ids_come_from_file_names_without_opening_the_files(tmp_path, home, env):
+def test_s3_question_ids_come_from_file_names_even_when_the_files_cannot_be_read(tmp_path, home, env):
     set_root = s.make_set(home)
     for item in (set_root / "hidden").iterdir():
         item.chmod(0)
     projects = home / ".claude" / "projects"
-    path = s.transcript(projects / "-p" / "sess-ids.jsonl", [s.say("2026-11-10T09:00:00Z", "sess-ids", "q02 again")],
-                        IN)
+    path = s.transcript(projects / "-p" / "sess-ids.jsonl",
+                        [s.say("2026-11-10T09:00:00Z", "sess-ids", f"{s.SET_NAME} q02 again")], IN)
     run = _scan(set_root, projects, env, tmp_path)
     assert run.code == 1, f"exit {run.code}, not 1: {run.both[-600:]}"
     found = {s.finding_key(item, projects) for item in run.envelope()["result"]["findings"]}

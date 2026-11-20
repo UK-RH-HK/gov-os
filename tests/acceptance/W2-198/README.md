@@ -39,7 +39,7 @@ real `~/.gov-os`, `~/.claude/projects` or eval root: `--projects`, `--set` and `
 |---|---|---|
 | S1 | `test_w2_198_s1_backup.py::test_s1_default_dest_holds_one_verified_bundle_of_every_ref`, `test_w2_198_s1_backup.py::test_s1_text_form_is_one_line_naming_file_refs_verified_and_counts`, `test_w2_198_s1_backup.py::test_s1_backup_root_dest_and_name_place_the_file`, `test_w2_198_s1_backup.py::test_s1_run_from_the_linked_worktree_bundles_the_same_refs` | `gov backup` does not exist: exit 2, "invalid choice: 'backup'", no bundle |
 | S2 | `test_w2_198_s2_retention.py::test_s2_defaults_keep_the_newest_48_and_one_a_day_for_30_days`, `test_w2_198_s2_retention.py::test_s2_keep_5_days_3_applies_the_same_rule_at_those_numbers` | `gov backup` does not exist: exit 2, not 0 |
-| S3 | `test_w2_198_s3_scan.py::test_s3_each_naming_line_in_the_window_is_one_finding_with_its_fields`, `test_w2_198_s3_scan.py::test_s3_text_form_says_the_measure_is_void_then_one_line_a_finding`, `test_w2_198_s3_scan.py::test_s3_names_outside_the_window_in_longer_tokens_or_allowed_give_none`, `test_w2_198_s3_scan.py::test_s3_id_option_replaces_the_sets_ids_and_until_defaults_to_now`, `test_w2_198_s3_scan.py::test_s3_question_ids_come_from_file_names_without_opening_the_files` | `gov memaudit` does not exist: exit 2 ("invalid choice: 'memaudit'"), not 1 or 0 |
+| S3 | `test_w2_198_s3_scan.py::test_s3_each_naming_line_in_the_window_is_one_finding_with_its_fields`, `test_w2_198_s3_scan.py::test_s3_text_form_says_the_measure_is_void_then_one_line_a_finding`, `test_w2_198_s3_scan.py::test_s3_names_outside_the_window_in_longer_tokens_or_allowed_give_none`, `test_w2_198_s3_scan.py::test_s3_id_option_replaces_the_sets_ids_and_until_defaults_to_now`, `test_w2_198_s3_scan.py::test_s3_question_ids_come_from_file_names_even_when_the_files_cannot_be_read` | `gov memaudit` does not exist: exit 2 ("invalid choice: 'memaudit'"), not 1 or 0 |
 | S4 | `test_w2_198_s4_basis.py::test_s4_the_range_names_exactly_the_new_rule_entries_without_an_incident`, `test_w2_198_s4_basis.py::test_s4_text_form_is_one_line_an_entry_naming_each_failure_and_its_reason`, `test_w2_198_s4_basis.py::test_s4_a_range_of_passing_entries_exits_0_and_the_default_is_head`, `test_w2_198_s4_basis.py::test_s4_an_uncommitted_edit_to_the_register_changes_no_answer`, `test_w2_198_s4_basis.py::test_s4_register_option_reads_another_file` | `gov decisions` does not exist: exit 2 ("invalid choice: 'decisions'"), not 1 or 0 |
 | S5 | `test_w2_198_s5_week.py::test_s5_week_lists_only_the_entries_of_the_last_7_days_with_their_fields`, `test_w2_198_s5_week.py::test_s5_week_text_form_lists_the_same_and_exits_0_with_a_failing_entry`, `test_w2_198_s5_week.py::test_s5_since_a_date_before_both_lists_all_the_entries_since` | `gov decisions` does not exist: exit 2, not 0 |
 | F1 | `test_w2_198_f1_backup_failures.py::test_f1_a_bundle_failing_verify_exits_1_and_the_dest_is_unchanged`, `test_w2_198_f1_backup_failures.py::test_f1_a_repository_with_no_commit_exits_1_and_deletes_nothing`, `test_w2_198_f1_backup_failures.py::test_f1_a_dest_inside_the_repository_or_a_worktree_exits_1_and_writes_nothing` | `gov backup` does not exist: exit 2, not 1 with `BACKUP_VERIFY_FAILED`, `BACKUP_FAILED` or `BACKUP_DEST_INSIDE` |
@@ -51,6 +51,16 @@ names-only case and F2's two unreadable-file cases) are skipped when run as root
 Red run on the base (`-n 4`): `33 failed in 20.14s`, every case at its first `gov` call with exit 2 and argparse's
 "invalid choice" for `backup`, `memaudit` or `decisions`; no fixture or collection error. `gov accept DAEO-o5wi --root .`:
 outcome fail, 33 failed, 0 unmapped, every line 0 passed.
+
+## Rewritten for the fix under W2-204 (EXAMIN's F-033, 2026-11-20)
+
+W2-204's S13 (M1) makes a bare question id no evidence: an id is a finding only on a line that also names the set by its
+audit name or its tag; S14 (M2) makes a question's text read a finding of kind `text` and has the scan read the set's
+`question` fields. The S3 and F2 cases that planted a bare id as the evidence now plant the tag (`20261101`) or the
+audit name beside it (each finding's line, kind and match unchanged); F2's no-finding case drops `--id zz9` and plants a
+bare id and the gold answer without the question's text; S3's names-only case, renamed `..._even_when_the_files_cannot_be_read`,
+keeps its claim that the ids come from the file names (the files are now read for their question text, M2). Every other
+assertion stands. The new rule's own cases are in `tests/acceptance/W2-204/` (S13 to S16).
 
 ## The test designer's readings where the ticket is open
 

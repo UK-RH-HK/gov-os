@@ -9,10 +9,14 @@ The adopter's order (the README's reading of S8): ``fresh`` first, with nothing 
 waits for ``writer-1``); then ``brief`` for each half (the ``brief`` event opens the scan's window, S12); then the
 halves are delivered into the sets root (planted as files, as a delivery leaves them); then ``fresh`` again.
 
-- ``right``: both halves clean and accepted; every answer right; a transcript that names ``q07`` is allowed with
+- ``right``: both halves clean and accepted; every answer right; a transcript that names ``q07`` beside the hidden
+  half's audit name (a bare id is no finding, S13) is allowed with
   ``--allow-session``. Three ``fresh`` calls: ``plan``, ``delivered`` (no notes yet), ``final``.
 - ``misses``: the same, three hidden answers wrong; a transcript that names no id. Calls: ``plan``, ``final``.
 - ``void``: the same as ``right``, the transcript that names ``q07`` not allowed. Calls: ``plan``, ``final``.
+- ``busy``: the same as ``misses`` with every answer right, its window also holding busy transcripts (bare ids
+  ``q01``..``q40``, numbered lists, another set's work; S16) and no line of either half's name, tag, path or question
+  text. Calls: ``plan``, ``final``.
 - ``round2``: the visible half clean and accepted; the hidden half's round 1 has a thin domain, its round 2 is
   repaired and its second notes reject ``q05``. Calls: ``plan``, ``r1``, ``notes1``, ``r2``, ``final``.
 - ``stopped-thin`` / ``stopped-heavy``: both halves thin (a domain under its minimum) or heavy (a subsystem over its
@@ -57,7 +61,23 @@ def _deliver(world: K.World, specs, *, notes: bool, audits=(VISIBLE, HIDDEN)) ->
 def _transcripts(world: K.World, *, leak: bool) -> None:
     world.plant_transcript(PLAIN_SESSION, "nothing of the set here: q070 and xq07 are other words")
     if leak:
-        world.plant_transcript(LEAK_SESSION, "the session opened q07 and read it")
+        world.plant_transcript(LEAK_SESSION, f"the session opened {HIDDEN} q07 and read it")  # S13 M1: name and id
+
+
+BUSY = {
+    "sess-busy-a": [f"Step q{k:02d}: checked, next one" for k in range(1, 41)],
+    "sess-busy-b": ["Plan:\n1. q01 the config\n2. q02 the tests\n3. q03 the docs\nq40 is last; q07, q12 and q33 wait",
+                    "grep -n 'q07\\|q21' notes/checklist.md", "notes/checklist.md:4: q07 done\nnotes/checklist.md:9: q21 open",
+                    "Answered 38 of 40; q05 and q19 were wrong in the last run"],
+    "sess-busy-c": ["ls /tmp/other-work/sets/memory-audit-20250101/hidden",
+                    "memory-audit-20250101 q07 was the hard one in that old set", "(q08) and [q09] and q10: then q11."],
+}
+
+
+def _busy(world: K.World) -> None:
+    for session, texts in BUSY.items():
+        for text in texts:
+            world.plant_transcript(session, text)
 
 
 def _figures(world: K.World, calls: dict) -> None:
@@ -80,12 +100,14 @@ def _right(folder: Path) -> dict:
     return {"calls": calls, "before": before, "after": world.repo_state()}
 
 
-def _judged(folder: Path, *, wrong=(), leak: bool) -> dict:
+def _judged(folder: Path, *, wrong=(), leak: bool, busy: bool = False) -> dict:
     world = K.build(folder / "w")
     calls = _start(world)
     _deliver(world, K.clean_specs(), notes=True)
     world.install_plans(control_hits=17, wrong=wrong)
     _transcripts(world, leak=leak)
+    if busy:
+        _busy(world)
     calls["final"] = world.fresh()
     return {"calls": calls}
 
@@ -161,6 +183,7 @@ BUILDS = {
     "right": _right,
     "misses": lambda folder: _judged(folder, wrong=WRONG, leak=False),
     "void": lambda folder: _judged(folder, leak=True),
+    "busy": lambda folder: _judged(folder, leak=False, busy=True),
     "round2": _round2,
     "stopped-thin": lambda folder: _stopped(folder, K.thin_specs()),
     "stopped-heavy": lambda folder: _stopped(folder, K.heavy_specs()),

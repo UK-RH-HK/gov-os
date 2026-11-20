@@ -164,3 +164,50 @@ hidden ...`); every other use of `hidden` is still refused. The configuration's 
 (no `GOV_` prefix: the planted worlds of W2-171, W2-172 and W2-187 strip `GOV_` variables from their children).
 
 **Closed at the land, 2026-11-19 06:04 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 7c4d9f3ab (branch `e2/memaudit-adopted` at a65783b0d). On the merged tree, through the slot with workers: `tests/unit/memaudit`, `tests/unit/optin` and the acceptance folders W2-204, W1-32, W2-61h, W2-81, W2-88, W2-94, W2-170, W2-171, W2-172, W2-187, W2-188, W2-198: 2,690 passed, 13 skipped; `gov accept W2-204`: 169 passed, 0 failed (again 169 of 169 on W2-200's landing branch). `gov memaudit check` on this repository: `CONFIG ok half 40 categories 12 domains 5 subsystems 7 control memory-retrieval`. `prompts.py` and `claude.py` unchanged by the merge (DEC-1098). The CTO's rulings on the lead's lines: `say.py`'s two `FRESH` lines and the variable name `MEMAUDIT_CONFIG` stand; `fresh` keeps its plain rebuild of the snapshot. Owed (the CTO's): the adopt skill's step 6 and the practice record's text (the evidence record §4); the choice of briefs for Gov OS's own first fresh 80. For the owner: release 0.1.4, so EXAMIN gets these commands by `gov update` (R-1).
+
+## Fix: the transcript scan's id match (EXAMIN's F-033)
+
+Found 2026-11-20 by EXAMIN's CTO on release 0.1.4 (`REQUESTS.md`, "2026-11-20 15:1x"): `gov.memaudit.scan` matched a set's
+question ids (`q01`..`q40`, the stems of its files) as bare whole tokens in every transcript of the window. Such tokens are
+in any session that numbers things, so a dummy set of 40 empty files nobody read gave `MEASURE VOID: 20 finding(s), 27
+transcripts read`, and every fresh 80 ended void after the writers, checkers and the measure had run. Ordinary work lost.
+The rule the scan serves is unchanged (EMERGENCY-2 2.7, A-12): the scan reads **every** transcript written in the window
+(none is left out by session or folder), looking for the set's path and its question ids; a set that was read voids the
+measure. The fix changes what counts as having read the set, not which transcripts are read. Kind: a fix, no new ticket;
+the ticket stays closed. The failing tests come first (`tests/acceptance/W2-204/`, S13 to S16). Code is C3
+(`src/gov/memaudit/**`): test designer Opus, engineer Sonnet (the C3 trial).
+
+Terms. *The set's names*: the components of the set's real path that read `memory-audit-<8 digits>` or
+`memory-standing-<8 digits>` (the audit name), and the eight digits of each (the tag). A set whose path holds none uses
+its own folder's name (the parent's when the folder is `hidden`) when that name is at least 8 characters, and has no tag.
+A name or tag counts as a whole token (not inside a longer letter, digit or underscore run), as ids do today. *A
+question's key*: the question's own text (its `question` field, read from the set's `*.yaml` files by the scan's code,
+never printed or kept in a result), normalised (all whitespace runs one space, trimmed, lower case) and cut to its first
+48 characters; a question whose normalised text is under 24 characters has no key (too short to be specific: 24
+characters is about four words; 48 is long enough that two different questions do not share a prefix, short enough to
+survive a line that cuts the text). A file that cannot be read is a problem (the scan's exit 3 rule); one that holds no
+question text has no key and is not a problem.
+
+- **S13 (M1) A bare id is not evidence.** A question id (`q07`) counts as a finding only when the same transcript line
+  also names the set by its audit name or its tag. A line with the id and no such name is no finding. Verify: a planted
+  projects folder whose transcript holds a line for each of `q01`..`q40` (as a chat) and a dummy set of 40 files
+  nobody read: `gov memaudit scan` exits 0, `no transcript in the window names the set`; the same folder plus one line
+  `<tag> q07` (and one with the audit name and `q07` in another transcript): exit 1, `MEASURE VOID`, each finding
+  naming that line's transcript, `kind=id`, `match=q07`.
+- **S14 (M2) A question's text read is evidence.** A transcript line whose decoded text values hold a question's key
+  (compared normalised the same way) is a finding of kind `text`, whose `match` is the question's **id**, so a session
+  that read the file's contents is caught without the path. Verify: a planted transcript holding one question's text
+  (spread across a different whitespace, or in another case, or after other text): exit 1, `MEASURE VOID` naming the id
+  and the transcript, the text printed nowhere (stdout, stderr, `--json`); a transcript holding text that is no
+  question's: clean; a question under 24 normalised characters gives no text finding.
+- **S15 (M3) The path counts as today; nothing printed holds a question's or answer's text.** Every path form the scan
+  knows (absolute, `~/`, `$HOME/`, the `fixtures/evaluation/` part) is a finding of kind `path` as before, and so is a
+  question id file path; the scan's output and result hold ids, kinds and transcript paths only. Verify: the existing path
+  cases of `tests/acceptance/W2-198` and `tests/unit/memaudit/test_w2_198_scan.py` stay green (those that planted a bare
+  id as the evidence are rewritten to M1's rule, a `Rewrite-Reason` each); a case with a question's text and gold
+  answer in files and in a transcript: no output holds either.
+- **S16 (M4) EXAMIN's case, end to end.** A dummy set of 40 empty `q<nn>.yaml` files; a window of busy transcripts (bare
+  ids, numbered lists, other sessions' work) and one line, in a session outside the measure, where the dummy's path is
+  typed: `gov memaudit scan` finds that one line (kind `path`) and no other, exit 1 (the path is still evidence); the same
+  window without the path line: exit 0. Verify: both runs through `gov memaudit scan --set <dummy> --since <ISO>
+  --projects <planted>`; the `fresh` close (`SCAN <audit> clean`) agrees on the second.

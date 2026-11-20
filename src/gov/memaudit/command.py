@@ -1,8 +1,9 @@
 """``gov memaudit scan`` as a command module (W2-198 S3, F2; EMERGENCY-2 2.7, A-12; the convention is in ``gov.cli.main``).
 
 ``gov memaudit scan --set <path> --since <ISO> [--until <ISO>] [--id <id>]... [--allow-session <id>]... [--projects <dir>]``:
-every transcript written in the window that names the set's path or one of its question ids (the logic is
-``gov.memaudit.scan``). Exit 0 when none; 1 when any (``MEASURE_VOID``: the measure is void); 3 when none is found but
+every transcript written in the window that names the set's path, holds a question's text, or names one of its question
+ids beside the set's audit name or tag (the logic is ``gov.memaudit.scan``; every transcript of the window is read, a bare
+id is no finding, F-033). Exit 0 when none; 1 when any (``MEASURE_VOID``: the measure is void); 3 when none is found but
 a transcript could not be read (``SCAN_INCOMPLETE``). It prints its own output (the envelope under ``--json``), never a
 transcript line's text and never a set file's contents.
 
@@ -20,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HELP = ("memory audit tools: the measure's steps (preflight, void, declare, measure, judge, figures, brief, deliver, "
-        "check, fresh) and the transcript scan for a hidden set's path or question ids")
+        "check, fresh) and the transcript scan for a hidden set's path, question text or ids")
 STEPS = {
     "preflight": "the checks of a delivered half before any search",
     "void": "the drop and void rule after the checker's last pass",
@@ -62,12 +63,13 @@ def add_arguments(parser) -> None:
     for name, line in STEPS.items():  # the step's own flags are parsed by ``python3 -m gov.memaudit``'s parser
         step = actions.add_parser(name, help=line, add_help=False, prefix_chars="\x00")
         step.add_argument("rest", nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
-    scan = actions.add_parser("scan", help="the transcripts of a window that name a set's path or ids")
+    scan = actions.add_parser("scan", help="the transcripts of a window that name a set's path, hold a question's text or name its ids")
     scan.add_argument("--set", required=True, metavar="<path>", help="the set's folder (its *.yaml names are the ids)")
     scan.add_argument("--since", required=True, type=_moment, metavar="<ISO>", help="the window's start")
     scan.add_argument("--until", type=_moment, metavar="<ISO>", help="the window's end (default now)")
     scan.add_argument("--id", action="append", default=[], dest="ids", metavar="<id>",
-                      help="a question id; given, these are the ids, not the set's")
+                      help="a question id (counts beside the set's name or tag); given, these are the ids, not the set's; "
+                           "the questions' text is still read")
     scan.add_argument("--allow-session", action="append", default=[], dest="allow", metavar="<id>",
                       help="a session allowed to name the set (the writer's, the checker's)")
     scan.add_argument("--projects", metavar="<dir>", help="the transcripts' root (default ~/.claude/projects)")

@@ -1,4 +1,8 @@
-"""``gov memaudit scan``'s matcher, ids and window (W2-198 S3, F2; regression evidence only, DEC-136)."""
+"""``gov memaudit scan``'s matcher, ids and window (W2-198 S3, F2; regression evidence only, DEC-136).
+
+Rewritten for the fix under W2-204 (EXAMIN's F-033): a question id counts only on a line that also names the set by its
+audit name or its tag (S13 M1), and the scan reads the set's question text (S14 M2); the id cases go through ``scan.scan``
+with the tag beside the id."""
 from __future__ import annotations
 
 import json
@@ -47,12 +51,23 @@ def test_a_set_outside_home_and_without_the_segment_has_the_absolute_form_only(t
     assert scan.path_forms(other, str(tmp_path / "elsewhere")) == [os.path.realpath(other)]
 
 
+def _one_line(tmp_path, raw: bytes, ids=None):
+    """The findings of a scan of one transcript holding the one line ``raw``, as ``(kind, match)``."""
+    root, projects = _set(tmp_path), tmp_path / "projects"
+    path = projects / "p" / "one.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(raw + b"\n")
+    os.utime(path, (SINCE.timestamp() + 5, SINCE.timestamp() + 5))
+    found = scan.scan(root, SINCE, UNTIL, ids, [], projects, home=str(tmp_path))["findings"]
+    return [(f["kind"], f["match"]) for f in found]
+
+
 @pytest.mark.parametrize("text, hit", [
     ("see q01 now", "q01"), ("q01", "q01"), ("(q01)", "q01"), ("a:q01.", "q01"),
     ("q010", None), ("aq01", None), ("xq01y", None), ("q01_x", None), ("Q01", None)])
-def test_an_id_is_a_whole_token(text, hit):
-    found = scan.Matcher([], ["q01"]).find([text])
-    assert (found[1] if found else None) == hit
+def test_an_id_is_a_whole_token(tmp_path, text, hit):
+    found = _one_line(tmp_path, json.dumps({"t": f"20261101 {text}"}).encode())
+    assert found == ([("id", hit)] if hit else [])
 
 
 def test_the_most_specific_path_form_wins_and_a_line_gives_one_hit(tmp_path):
@@ -64,17 +79,15 @@ def test_the_most_specific_path_form_wins_and_a_line_gives_one_hit(tmp_path):
     assert matcher.find(["cat $HOME/eval/fixtures/evaluation/memory-audit-20261101"])[1].startswith("$HOME/")
     assert matcher.find(["fixtures/evaluation/memory-audit-20261101/hidden"]) == (
         "path", "fixtures/evaluation/memory-audit-20261101")
-    assert matcher.find(["no path, q01"]) == ("id", "q01")
 
 
-def test_json_escaping_hides_nothing_and_a_non_json_line_is_read_as_text():
-    matcher = scan.Matcher([], ["q02"])
-    line = json.dumps({"message": {"content": [{"text": "see:\nq02 here"}]}}).encode()
+def test_json_escaping_hides_nothing_and_a_non_json_line_is_read_as_text(tmp_path):
+    line = json.dumps({"message": {"content": [{"text": "see 20261101:\nq02 here"}]}}).encode()
     assert b"\\n" in line
-    assert matcher.find(scan.texts_of(line)[0]) == ("id", "q02")
-    hidden = b'{"t": "\\u0071\\u0030\\u0032"}'
-    assert matcher.find(scan.texts_of(hidden)[0]) == ("id", "q02")
-    assert matcher.find(scan.texts_of(b'{"cut": "q02 and')[0]) == ("id", "q02")
+    assert _one_line(tmp_path / "a", line) == [("id", "q02")]
+    hidden = b'{"t": "\\u0032\\u0030\\u0032\\u0036\\u0031\\u0031\\u0030\\u0031 \\u0071\\u0030\\u0032"}'
+    assert _one_line(tmp_path / "b", hidden) == [("id", "q02")]
+    assert _one_line(tmp_path / "c", b'{"cut": "20261101 q02 and') == [("id", "q02")]
 
 
 def test_the_window_is_the_lines_timestamp_and_a_line_without_one_counts():
@@ -98,7 +111,7 @@ def test_scan_finds_one_per_naming_line_and_ignores_files_before_since(tmp_path)
     fresh = SINCE.timestamp() + 3600
     _write(projects / "p" / "sess-a.jsonl", [
         json.dumps({"sessionId": "sess-a", "timestamp": "2026-11-06T10:00:00Z", "text": "nothing"}),
-        json.dumps({"sessionId": "sess-a", "timestamp": "2026-11-06T10:00:01Z", "text": "ask q02 please"}),
+        json.dumps({"sessionId": "sess-a", "timestamp": "2026-11-06T10:00:01Z", "text": "ask 20261101 q02 please"}),
         json.dumps({"sessionId": "sess-a", "timestamp": "2026-11-01T10:00:01Z", "text": "q02 before"}),
     ], fresh)
     _write(projects / "p" / "sess-old.jsonl", [json.dumps({"timestamp": "2026-11-06T10:00:01Z", "t": "q01"})],
@@ -113,7 +126,7 @@ def test_scan_reads_the_role_from_the_sibling_meta_and_allows_a_session(tmp_path
     root, projects = _set(tmp_path), tmp_path / "projects"
     fresh = SINCE.timestamp() + 3600
     sub = projects / "p" / "sess-main" / "subagents"
-    _write(sub / "agent-a1b2.jsonl", [json.dumps({"sessionId": "sess-main", "t": "q03"})], fresh)
+    _write(sub / "agent-a1b2.jsonl", [json.dumps({"sessionId": "sess-main", "t": "memory-audit-20261101 q03"})], fresh)
     (sub / "agent-a1b2.meta.json").write_text(json.dumps({"agentType": "independent-auditor"}))
     found = scan.scan(root, SINCE, UNTIL, None, [], projects, home=str(tmp_path))["findings"]
     assert [(f["session"], f["role"], f["file"]) for f in found] == [
@@ -124,7 +137,7 @@ def test_scan_reads_the_role_from_the_sibling_meta_and_allows_a_session(tmp_path
 
 def test_an_id_option_replaces_the_sets_ids(tmp_path):
     root, projects = _set(tmp_path), tmp_path / "projects"
-    _write(projects / "s.jsonl", [json.dumps({"t": "h7 and q02"})], SINCE.timestamp() + 5)
+    _write(projects / "s.jsonl", [json.dumps({"t": "20261101: h7 and q02"})], SINCE.timestamp() + 5)
     result = scan.scan(root, SINCE, UNTIL, ["h7"], [], projects, home=str(tmp_path))
     assert [f["match"] for f in result["findings"]] == ["h7"] and result["ids_count"] == 1
 
@@ -149,16 +162,15 @@ def test_a_missing_projects_root_is_a_problem_not_a_clean_scan(tmp_path):
     assert result["findings"] == [] and len(result["problems"]) == 1
 
 
-def test_the_set_files_are_never_opened(tmp_path, monkeypatch):
-    root = _set(tmp_path)
-    opened = []
-    real_open = open
-
-    def watch(file, *a, **k):
-        opened.append(str(file))
-        return real_open(file, *a, **k)
-
-    monkeypatch.setattr("builtins.open", watch)
-    scan.set_ids(root)
-    scan.scan(root, SINCE, UNTIL, None, [], tmp_path / "projects", home=str(tmp_path))
-    assert not [o for o in opened if o.endswith(".yaml")]
+def test_the_set_files_are_never_changed_and_their_text_is_never_in_the_result(tmp_path):
+    """The scan now reads each file's question (S14 M2): it never writes one and never returns its text."""
+    root, projects = _set(tmp_path), tmp_path / "projects"
+    question = "Which amber clause of the Ollivane harbour charter fixes the night toll for skiffs?"
+    (root / "hidden" / "q02.yaml").write_text(f"id: q02\nquestion: {question}\ngold_answer: the Pennifold rule\n")
+    _write(projects / "p" / "sess-r.jsonl", [json.dumps({"sessionId": "sess-r", "t": f"{question} the Pennifold rule"})],
+           SINCE.timestamp() + 5)
+    before = {p.name: (p.read_bytes(), p.stat().st_mtime_ns) for p in (root / "hidden").iterdir()}
+    result = scan.scan(root, SINCE, UNTIL, None, [], projects, home=str(tmp_path))
+    assert {p.name: (p.read_bytes(), p.stat().st_mtime_ns) for p in (root / "hidden").iterdir()} == before
+    dumped = json.dumps(result)
+    assert "Ollivane" not in dumped and "Pennifold" not in dumped and "SECRET QUESTION TEXT" not in dumped
