@@ -89,7 +89,7 @@ def _refuse_place(folder):
     return folder
 
 
-def _env(folder):
+def _env(folder, notify=None):
     home, tmp = folder / ".home", folder / ".tmp"
     home.mkdir(exist_ok=True)
     tmp.mkdir(exist_ok=True)
@@ -98,6 +98,8 @@ def _env(folder):
            "GIT_AUTHOR_NAME": "W2-81 runner", "GIT_AUTHOR_EMAIL": "w2-81-runner@example.invalid",
            "GIT_COMMITTER_NAME": "W2-81 runner", "GIT_COMMITTER_EMAIL": "w2-81-runner@example.invalid"}
     env.update({k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"})
+    if notify:  # the starter's inbox address: without it the product's launcher defaults to the live CTO's (T10)
+        env["GOV_MSG_ADDRESS"] = notify
     return env
 
 
@@ -341,6 +343,25 @@ def follow_moves(asked, moves):
 
 
 def run(options, built=None, session=None):
+    """The run, with the starter's address in the environment of every process it starts. The address is
+    ``--notify`` (``options.notify``), else the runner process's own ``$GOV_MSG_ADDRESS``, else none (then nothing is
+    set: today's behaviour). The reader's and grader's sessions are started by the product's ``run_claude``, which
+    inherits this process's environment, so the address is set here for the duration of the run and put back (or
+    removed) when it ends, whether in a report or an error. See ``_run`` for the rest."""
+    notify = getattr(options, "notify", None) or os.environ.get("GOV_MSG_ADDRESS") or None
+    before = os.environ.get("GOV_MSG_ADDRESS")
+    if notify:
+        os.environ["GOV_MSG_ADDRESS"] = notify
+    try:
+        return _run(options, built, session, notify)
+    finally:
+        if before is None:
+            os.environ.pop("GOV_MSG_ADDRESS", None)
+        else:
+            os.environ["GOV_MSG_ADDRESS"] = before
+
+
+def _run(options, built, session, notify):
     """The run; returns the report (also written in the folder). ``built``: the capabilities counted as built (the
     judge's ``built``); the command leaves it to today's code, and only the self-tests pass it. ``session``: the
     function that starts a reader or grader session, ``start(argv, prompt, cwd) -> standard output``; the command
@@ -359,7 +380,7 @@ def run(options, built=None, session=None):
     if options.mode in ("read", "run"):  # before any stage, search or session: the model line, or a refusal
         record = _model_line(options, record)
         (folder / "run.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-    env = _env(folder)
+    env = _env(folder, notify)
     held = [h for r in repos.values() for h in r.secrets]
     stage_runs = {}
     if options.mode == "run":
@@ -505,6 +526,7 @@ def parse(argv):
     parser.add_argument("--manifests", default=None)
     parser.add_argument("--large-size", dest="large_size", type=int, default=build.REAL_RUN_LARGE)
     parser.add_argument("--stages", default=None)
+    parser.add_argument("--notify", default=None)
     return parser.parse_args(argv)
 
 
