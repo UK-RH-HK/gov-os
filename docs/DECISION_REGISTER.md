@@ -1997,6 +1997,21 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-19 ("IM-0 yes, IM-1 b, IM-2 a, IM-5 a+c. IM-3 b ... IM-4 b ... C3, a trial ..."); the incident behind (2): the C3 helpers' Opus runs were the largest lead costs of 18 to 19 November (M1 $69, the memory measure $65), and the Sonnet leads' work landed green.
 - **Governing sources:** docs/emergency-2/proposals/IMPORTS-ADOPTION-SPEC.md; docs/emergency-2/C3-TRIAL.md; DEC-1098; DEC-1214 K1; DEC-1221.
 
+### DEC-1223 — Releasing on the owner's behalf approved (RB-1 to RB-7); the study ceiling confirmed; the order after release 0.1.4
+- **Status:** ACCEPTED (owner, 2026-11-20 about 13:50, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`, after the owner said "released" (release 0.1.4, tag `v0.1.4` on `c3c743b76`, C `961db6546`), as he ordered no commit to `w2/integrate` while he cut 0.1.4; standing) · **Under:** DEC-1220 (3), DEC-1221, DEC-1222 · **Changes:** EMERGENCY-2 2.5 and 8.3 and DEC-772, for patch releases only (RB-1 (a)); the imports spec's study ceiling (DEC-1222 (1), confirmed)
+- **Decision** (`docs/emergency-2/proposals/RELEASE-ON-BEHALF.md`):
+  - (1) **RB-1 (a):** the CTO may cut patch releases by code, standing, with `governance/project/release-authority.yaml` as the off-switch and one rehearsal on a scratch clone and a scratch `$HOME` first; "tell me when the authority file is on". Bigger releases (Contract or Charter changes, new features, a new command or record kind) and every push to GitHub stay the owner's.
+  - (2) **RB-2 (a):** a patch release is gated by the update rehearsal on W2-81's six kept repositories, by code, no model time; the full proving run with Sonnet adopter sessions stays for bigger releases (EMERGENCY-2 8.2).
+  - (3) **RB-3 (b):** adopted repositories wait 4 hours after a pin before they update (`bake_hours: 4`).
+  - (4) **RB-4 (b):** an automatic update pushes the owner only when it is held or rolled back; a success is a line with its rollback command in the morning brief.
+  - (5) **RB-5 (a):** the update is a step of the run-time tool's pass after W2-207's cut-over, run by hand until then.
+  - (6) **RB-6 (a):** one new feature ticket in two slices (patch release; automatic update), and CAP-45.b's `gov doctor` part and `gov update --rollback` as two fixes under W2-17.
+  - (7) **RB-7: keep both** of the design's additions to the patch rule: P2 also reads EMERGENCY-2 itself; P5, no kit schema added or removed.
+  - (8) **The study ceiling** for imports (DEC-1222 (1)): 2,000 chunks per import, 5,000 per repository: confirmed.
+  - (9) **After release 0.1.4, the order stands:** the EXAMIN CTO restarted on Opus, `gov update` to 0.1.4, its fresh 80, then one feature ticket; W2-81's proving run on Sonnet; Gov OS's landing onto `gov queue`; the imports spec.
+- **Basis:** the owner's message of 2026-11-20 ("I am cutting release 0.1.4 now ... RB-1 a, RB-2 a, RB-3 b, RB-4 b, RB-5 a, RB-6 a, RB-7 keep both ... The study ceiling ... confirmed. After the release, your order stands ..."); the incident behind (1): every release so far waited on the owner's hand (0.1.2, 0.1.3), and the green base of 0.1.4 waited from 21:41 for his cut.
+- **Governing sources:** docs/emergency-2/proposals/RELEASE-ON-BEHALF.md; docs/emergency-2/proposals/IMPORTS-ADOPTION-SPEC.md; EMERGENCY-2 2.5, 8.2, 8.3; DEC-772; DEC-1220 (3); DEC-1222.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |

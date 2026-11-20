@@ -1,26 +1,106 @@
-"""The scorer of the W2-81 proving ground: both figures per repository, never one without the other (DEC-833).
+"""The scorer of the W2-81 proving ground: memory judged end to end, per repository (DEC-1221 (1), DEC-1210 (1)).
 
-A question's answer is its stacked context: the evidence items ``gov retrieve`` returned, in order, each taken once
-within the stack budget (as ``gov.retrieval.measure`` stacks them, DEC-860). An item matches a gold source when its
-path is the source's and its lines (``start`` to ``end``) hold the source's line.
+The rule (EMERGENCY-2 5.3): a reader reads the whole ranked ``gov retrieve`` bundle and searches once more in its own
+words, then answers with a citation; a grader judges the answer; the question is right only when BOTH the answer and
+its citation are right. A citation is right when a cited place holds a gold source's line and no cited path is a
+forbidden one (the stale spec, the superseded plan): an answer that is right with a forbidden citation is wrong.
 
-- **hit@5:** a gold source is matched by one of the first five items.
-- **The stacked share:** every gold source is matched by the stacked context.
-- **A forbidden citation** (a planted stale or superseded source) among the first five items is a miss in both.
+- **The figure** of a repository is the share of its questions judged right: ``100 * right / asked``, never rounded.
+  The bar is ``E2E_BAR`` (95): met at 95 or more. A question with no verdict is wrong, never dropped; a repository
+  with no question has no figure, so its bar is not met.
+- **What reuses the product:** the rule "right end to end" is ``gov.memaudit.prompts.outcome(row, 2)``, the product's
+  own cut (the answer given by the second attempt, the one more search): this module builds the row that function
+  reads and calls it. **What is W2-81's own:** the citation check (``gov.memaudit.matcher`` takes the product's
+  question form, not this proving ground's ``Question``) and the forbidden-citation rule.
+- **hit@5 and the stacked share** (``DIAGNOSTIC``) are computed from the stacked context ``gov retrieve`` returned and
+  printed beside the figure, labelled diagnostic: they carry no floor, no target and no pass line (EMERGENCY-2 5.2).
+- **Every session** (the adopter, the reader, the grader) runs ``E2E_MODEL``; ``check_models`` refuses a run record
+  that does not say so.
 
-The result names questions by id only, with booleans and a rank: never a question's text or its answer.
+The results name questions by id only, with booleans, fixed reason words and a rank: never a question's text or an
+answer.
 """
 
 from __future__ import annotations
 
-HIT_AT_5_FLOOR = 85.0        # CAP-10's floor for hit@5
-STACKED_SHARE_TARGET = 99.0  # DEC-833: the owner's 99 % goal, the target W2-61 measures (DEC-957 sets memory's
-#                              target at 95 % with 85 % the floor; the owner may change this constant, not this suite)
-FLOORS = {"hit_at_5": HIT_AT_5_FLOOR, "stacked_share": STACKED_SHARE_TARGET}
+import math
+
+from gov.memaudit import prompts
+
+E2E_BAR = 95.0                     # the share of questions judged right, per repository (EMERGENCY-2 5.3, DEC-1221 (1))
+E2E_MODEL = "claude-sonnet-5-5"    # the model of every session of a run: adopter, reader and grader (DEC-1221 (1))
+ROLES = ("adopter", "reader", "grader")
+CUT = 2                            # the product's A2 cut: the answer comes by the second attempt (one more search)
+DIAGNOSTIC = ("hit_at_5", "stacked_share")
+GRADES = ("correct", "wrong", "not_found")  # the product's grader vocabulary (``prompts.GRADER_SCHEMA``)
+
+
+def _citations(citations):
+    """The well-formed (path, start, end) items of what a reader cited; anything else cites nothing."""
+    out = []
+    for item in citations or []:
+        try:
+            path, start, end = item
+            if isinstance(path, str) and not isinstance(start, bool) and not isinstance(end, bool):
+                out.append((path, int(start), int(end)))
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+def cited(question, citations):
+    """``(holds a gold line, cites a forbidden path)`` for the citations of one answer."""
+    items = _citations(citations)
+    holds = any(c[0] == s[0] and c[1] <= s[1] <= c[2] for c in items for s in question.sources)
+    return holds, any(c[0] in question.forbidden for c in items)
+
+
+def judge_question(question, reader, grader):
+    """One question judged end to end.
+
+    ``reader``: None (no verdict) or ``{"verdict": "answer"|"not_found"|"error", "citations": [(path, start, end)],
+    "attempts": n}`` (``attempts`` defaults to 1). ``grader``: None, a grade (``correct``, ``wrong`` or ``not_found``;
+    ``incorrect`` and anything else is not correct) or ``{"grade": ...}``. Returns the question id, ``right`` and a
+    fixed-word ``reason``: never text from the question or the answer."""
+    grade = grader.get("grade") if isinstance(grader, dict) else grader
+    reader = reader if isinstance(reader, dict) else {}
+    verdict, attempts = reader.get("verdict"), reader.get("attempts", 1)
+    holds, forbidden = cited(question, reader.get("citations"))
+    result = {"id": question.id, "right": False, "reason": "", "citation_right": holds and not forbidden,
+              "forbidden_cited": forbidden, "grade": grade if grade in GRADES else None,
+              "reader": verdict if verdict in ("answer", "not_found", "error") else None}
+    if verdict not in ("answer", "not_found", "error"):
+        result["reason"] = "no verdict"
+        return result
+    if not isinstance(attempts, int) or isinstance(attempts, bool) or attempts < 1:
+        attempts = 1
+    row = {"final_verdict": verdict, "attempts": [None] * attempts,
+           "answered_at": attempts if verdict == "answer" else None, "apart": False,
+           "citation_right": result["citation_right"], "grades": {"grader": {"grade": grade}}}
+    result["right"] = bool(prompts.outcome(row, CUT)["right"])
+    result["reason"] = ("right" if result["right"] else "reader error" if verdict == "error"
+                        else "reader not found" if verdict == "not_found"
+                        else "answered after the one more search" if attempts > CUT
+                        else "the grade is not correct" if grade != "correct"
+                        else "forbidden citation" if forbidden else "citation misses the gold sources")
+    return result
+
+
+def end_to_end(name, questions, verdicts):
+    """A repository's end-to-end figure. ``verdicts`` maps a question id to ``{"reader": ..., "grader": ...}``
+    (see ``judge_question``); a question with no entry has no verdict and is wrong."""
+    results = []
+    for q in questions:
+        given = (verdicts or {}).get(q.id) or {}
+        results.append({**judge_question(q, given.get("reader"), given.get("grader")), "part": q.part})
+    n, right = len(results), sum(r["right"] for r in results)
+    figure = 100.0 * right / n if n else None  # one division of an exact product: never rounded into the bar
+    return {"repository": name, "questions": n, "right": right, "end_to_end": figure, "bar": E2E_BAR,
+            "met": figure is not None and figure >= E2E_BAR, "per_question": results}
 
 
 def score_question(question, stacked):
-    """One question's result: ``stacked`` is a list of (path, start_line, end_line), or None when unanswered."""
+    """One question's diagnostics: ``stacked`` is a list of (path, start_line, end_line), or None when unanswered."""
     items = list(stacked or [])
 
     def hits(item, source):
@@ -34,22 +114,56 @@ def score_question(question, stacked):
             "full_evidence": full and not forbidden, "forbidden_in_top_5": forbidden, "first_gold_rank": rank}
 
 
-def score_repository(name, questions, answers):
-    """Both figures for one repository: ``answers`` maps a question id to its stacked context."""
-    results = [score_question(q, answers.get(q.id)) for q in questions]
-    n = len(results)
-    if not n:  # no question: no figure, so neither is met
-        return {"repository": name, "questions": 0, "hit_at_5": None, "stacked_share": None, "per_question": []}
-    return {"repository": name, "questions": n,
-            "hit_at_5": round(100.0 * sum(r["hit_at_5"] for r in results) / n, 1),
-            "stacked_share": round(100.0 * sum(r["full_evidence"] for r in results) / n, 1),
-            "per_question": results}
+def score_repository(name, questions, answers, verdicts=None):
+    """One repository: the end-to-end figure from ``verdicts`` (None: not measured, so no figure) and, labelled
+    ``diagnostic``, hit@5 and the stacked share from ``answers`` (question id -> stacked context)."""
+    n = len(questions)
+    measured = end_to_end(name, questions, verdicts) if verdicts is not None else {
+        "right": None, "end_to_end": None, "met": False, "per_question": [
+            {"id": q.id, "part": q.part, "right": False, "reason": "no verdict"} for q in questions]}
+    diag = [score_question(q, answers.get(q.id)) for q in questions]
+    hit = round(100.0 * sum(d["hit_at_5"] for d in diag) / n, 1) if n else None
+    stacked = round(100.0 * sum(d["full_evidence"] for d in diag) / n, 1) if n else None
+    per_question = [{**m, "diagnostic": {k: v for k, v in d.items() if k not in ("id", "part")}}
+                    for m, d in zip(measured["per_question"], diag)]
+    return {"repository": name, "questions": n, "right": measured["right"], "end_to_end": measured["end_to_end"],
+            "bar": E2E_BAR, "met": measured["met"], "diagnostic": {"hit_at_5": hit, "stacked_share": stacked},
+            "per_question": per_question}
+
+
+def _number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and not math.isnan(value)
 
 
 def figures(scores):
-    """Repository -> both figures, as the judge reads them; a repository without both has neither."""
+    """Repository -> its figure, as the judge reads it: ``{"end_to_end": f}``, plus the diagnostics when given. A
+    repository with diagnostics alone, or whose figure is not a number, has no entry: it has no figure."""
     out = {}
     for score in scores:
-        if isinstance(score.get("hit_at_5"), (int, float)) and isinstance(score.get("stacked_share"), (int, float)):
-            out[score["repository"]] = {"hit_at_5": score["hit_at_5"], "stacked_share": score["stacked_share"]}
+        if not _number(score.get("end_to_end")):
+            continue
+        out[score["repository"]] = {"end_to_end": score["end_to_end"]}
+        diagnostic = score.get("diagnostic") if isinstance(score.get("diagnostic"), dict) else {}
+        out[score["repository"]].update({k: diagnostic[k] for k in DIAGNOSTIC if _number(diagnostic.get(k))})
     return out
+
+
+def check_models(record):
+    """The reasons a run record is refused: its ``models`` block must name the adopter, the reader and the grader,
+    each ``E2E_MODEL``, and the record must hold the ``release`` version read from the pinned install. No reason: the
+    record passes."""
+    models = record.get("models") if isinstance(record, dict) else None
+    if not isinstance(models, dict):
+        return ["the run record has no model line"]
+    reasons = []
+    for role in ROLES:
+        model = models.get(role)
+        if model is None:
+            reasons.append(f"the model line has no {role}")
+        elif model != E2E_MODEL:
+            reasons.append(f"the {role} session ran {model if isinstance(model, str) else 'no model id'}, "
+                           f"not {E2E_MODEL}")
+    release = record.get("release")
+    if not isinstance(release, str) or not release.strip():
+        reasons.append("the run record has no release version")
+    return reasons

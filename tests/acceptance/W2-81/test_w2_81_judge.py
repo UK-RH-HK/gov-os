@@ -564,21 +564,64 @@ def test_a_repository_not_judged_is_not_ready(ground, tmp_path):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("figures, said", [
-    ({"hit_at_5": 84.0, "stacked_share": 99.0}, "hit_at_5 is 84, below its floor of 85"),
-    ({"hit_at_5": 85.0, "stacked_share": 98.9}, "stacked_share is 98.9, below its floor of 99"),
-    ({"hit_at_5": 92.0}, "stacked_share is missing"),
-    ({"stacked_share": 99.5}, "hit_at_5 is missing"),
-    ({"hit_at_5": True, "stacked_share": 99.5}, "hit_at_5 is missing"),
-    (None, "hit_at_5 is missing"),
+    ({"end_to_end": 94.0}, "the end-to-end figure is 94, below its bar of 95"),
+    ({"end_to_end": 94.9}, "the end-to-end figure is 94.9, below its bar of 95"),
+    ({"end_to_end": 0.0}, "the end-to-end figure is 0, below its bar of 95"),
+    ({"end_to_end": 94.0, "hit_at_5": 100.0, "stacked_share": 100.0}, "the end-to-end figure is 94, below its bar"),
+    ({"hit_at_5": 100.0, "stacked_share": 100.0}, "the end-to-end figure is missing"),
+    ({"end_to_end": True}, "the end-to-end figure is missing"),
+    ({"end_to_end": float("nan")}, "the end-to-end figure is missing"),
+    ({"end_to_end": "99"}, "the end-to-end figure is missing"),
+    ({}, "the end-to-end figure is missing"),
+    (None, "the end-to-end figure is missing"),
 ])
-def test_a_figure_below_its_floor_or_missing_is_not_ready(ground, tmp_path, figures, said):
+def test_a_figure_below_its_bar_or_missing_is_not_ready(ground, tmp_path, figures, said):
+    """DEC-1221 (1): a repository's end-to-end figure under 95, or missing, is NOT_READY naming the repository."""
     built_repo = ground["python-app-clean"]
     judgement = _judge(built_repo, standin.perfect(built_repo), tmp_path)
     result = judge.overall([judgement], {built_repo.name: figures}, [built_repo.name])
     assert result["verdict"] == judge.NOT_READY
-    assert any(said in reason for reason in result["reasons"]), result["reasons"]
-    at_floor = judge.overall([judgement], {built_repo.name: standin.PERFECT_FIGURES}, [built_repo.name])
-    assert at_floor["verdict"] == judge.READY, at_floor["reasons"]
+    assert any(reason.startswith(f"{built_repo.name}: ") and said in reason for reason in result["reasons"]), \
+        result["reasons"]
+    at_bar = judge.overall([judgement], {built_repo.name: standin.PERFECT_FIGURES}, [built_repo.name])
+    assert at_bar["verdict"] == judge.READY, at_bar["reasons"]
+
+
+@pytest.mark.parametrize("figures", [
+    {"end_to_end": 95.0}, {"end_to_end": 100.0},
+    {"end_to_end": 95.0, "hit_at_5": 0.0, "stacked_share": 0.0},
+    {"end_to_end": 100.0, "hit_at_5": 0.0},
+    {"end_to_end": 100.0, "hit_at_5": None, "stacked_share": None},
+    {"end_to_end": 96.0, "stacked_share": 3.0},
+])
+def test_hit_at_5_and_the_stacked_share_are_diagnostics_and_never_make_anything_not_ready(ground, tmp_path, figures):
+    """EMERGENCY-2 5.2: hit@k is not a floor anywhere: low or absent beside a figure at the bar, READY stands."""
+    built_repo = ground["python-app-clean"]
+    judgement = _judge(built_repo, standin.perfect(built_repo), tmp_path)
+    result = judge.overall([judgement], {built_repo.name: figures}, [built_repo.name])
+    assert result["verdict"] == judge.READY, result["reasons"]
+    assert not hasattr(judge, "FLOORS")
+
+
+def test_a_repository_at_94_is_not_ready_naming_it_and_at_95_in_every_repository_it_is_ready(ground, tmp_path):
+    """The whole judge over six repositories: 95 each is READY; one at 94 is NOT_READY naming that one alone."""
+    cases = []
+    for name, built_repo in ground.items():
+        root, beside = standin.render(standin.perfect(built_repo), built_repo, tmp_path / name / "adopted",
+                                      tmp_path / name / "beside")
+        cases.append((built_repo.manifest, root, beside, built_repo.secrets))
+    at_95 = {name: {"end_to_end": 95.0} for name in EXPECTED}
+    ready = judge.judge(cases, at_95, EXPECTED, built=ALL)
+    assert ready["verdict"] == judge.READY, ready["reasons"]
+    judgements = ready["repositories"]  # the same judgements, read again against other figures
+    for name in EXPECTED:
+        one_low = {**at_95, name: {"end_to_end": 94.0}}
+        result = judge.overall(judgements, one_low, EXPECTED)
+        assert result["verdict"] == judge.NOT_READY
+        assert result["reasons"] == [f"{name}: the end-to-end figure is 94, below its bar of 95"], result["reasons"]
+    missing = {k: v for k, v in at_95.items() if k != "rust-workspace"}
+    assert judge.overall(judgements, missing, EXPECTED)["reasons"] == [
+        "rust-workspace: the end-to-end figure is missing (its bar is 95)"]
 
 
 def test_the_judge_never_writes_the_value_even_when_an_output_is_named_by_it(ground, tmp_path, capfd):

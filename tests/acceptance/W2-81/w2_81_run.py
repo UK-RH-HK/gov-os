@@ -1,20 +1,29 @@
-"""The real run of the W2-81 proving ground: one command, not collected as a test (DEC-728, DEC-941, DEC-953).
+"""The real run of the W2-81 proving ground: one command, not collected as a test (DEC-728, DEC-941, DEC-1221 (1)).
 
-    PYTHONPATH=<a tree>/src python3 tests/acceptance/W2-81/w2_81_run.py --folder <path> --mode build|run|read
-        [--seed N] [--gov <exe>] [--pinned-gov <exe>] [--close-ticket [<repository>=]<id>]...
-        [--hidden <dir> | --sets-root <root>] [--manifests <dir>] [--large-size <bytes>] [--stages A0,A1,A2]
+    PYTHONPATH=<the release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py --folder <path> \
+        --mode build|run|read [--seed N] [--gov <exe>] [--pinned-gov <exe>] [--adopter-model <id>] [--claude <exe>] \
+        [--queue-ticket [<repository>=]<id>]... [--hidden <dir> | --sets-root <root>] [--manifests <dir>] \
+        [--large-size <bytes>] [--stages A0,A1,A2]
 
 - ``--folder``: the run folder, by literal path: a temporary folder, or ``~/gov-os-runs/W2-81/<run>`` (DEC-728).
   It is refused inside this repository or inside any git work tree the runner did not build.
 - ``build``: build the five repositories and the clean variant under ``<folder>/repos/``, with their manifests under
   ``<manifests or folder>/manifests/``, and record the seed in ``<folder>/run.json``. Without ``--seed``, a fresh
-  seed is drawn. A launched session then adopts each repository, leaving its logs and reports in
+  seed is drawn. A launched session then adopts each repository (on Sonnet), leaving its logs and reports in
   ``<folder>/outputs/<repository>/``.
-- ``read``: read what that adoption left, ask the question sets of ``gov retrieve`` (``--gov``), close a ticket in
-  each repository (``--pinned-gov``), judge, and write the report. It only reads the adoption's outputs.
+- ``read``: read what that adoption left; ask each question set of ``gov retrieve`` (``--gov``); start a reader and a
+  grader session per question (``--claude``, both on ``claude-sonnet-5-5``) and judge memory end to end; land a
+  ticket in each repository with ``<pinned gov> queue <ticket>`` (``--pinned-gov``, ``--queue-ticket``); judge; write
+  the report. Only the sessions and the landing run: it never adopts.
 - ``run``: ``build``, then the adoption stages that need no session (``--stages``, by default A0, A1 and A2) run
   with ``--gov`` in each repository, then as ``read``.
-- The report: ``<folder>/report.json`` and ``<folder>/report.md``; a log of steps, ``<folder>/run.log``.
+- ``--adopter-model <id>``: the model the adopting sessions ran; recorded in ``run.json``'s ``models`` block beside
+  the reader's and the grader's, with the release version read from ``<pinned gov> --version`` (the pinned install,
+  never a fixed number). A run record without that model line, or with any of the three not ``claude-sonnet-5-5``, is
+  refused: ``refused: ...`` on standard error, exit 2, before any stage, search or session runs.
+- The report: ``<folder>/report.json`` and ``<folder>/report.md`` (the end-to-end figure per repository first and
+  decisive; hit@5 and the stacked share beside it, diagnostic); a log of steps, ``<folder>/run.log``; each question's
+  verdict row (its answer text included) under ``<folder>/e2e/<repository>/``.
 
 The hidden half is read only from ``--hidden``, or from the default hidden folder when that exists; a ``--hidden``
 that names no existing folder is refused. ``--sets-root <root>`` (W2-93, DEC-1144 (6)) names the evaluation sets' root
@@ -23,9 +32,9 @@ is refused (``--sets-root holds no hidden half: <that relative path>``, exit 2, 
 built), and ``--sets-root`` with ``--hidden`` is refused, so neither a person nor a session names the hidden folder on
 a command line. READY needs it present and asked in every repository: at least
 ``HIDDEN_NEEDED`` (10) hidden questions each. Its questions are named by id only, and its variants by number and id;
-its texts and answers are in no report, log or output. The secrets' values are drawn from the
-seed in memory and are in no report, log or output either (checked before anything is written). The runner writes
-nothing in this repository, never reads the workbench and never uses the dev-tier variable.
+its texts and answers are in no report, log or output (only the verdict rows hold an answer). The secrets' values are
+drawn from the seed in memory and are in no report, log or output either (checked before anything is written). The
+runner writes nothing in this repository, never reads the workbench and never uses the dev-tier variable.
 """
 
 from __future__ import annotations
@@ -33,14 +42,17 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import secrets as random_source
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import w2_81_build as build  # noqa: E402
+import w2_81_e2e as e2e  # noqa: E402
 import w2_81_git as gitlib  # noqa: E402
 import w2_81_judge as judge  # noqa: E402
 import w2_81_manifest as manifest_form  # noqa: E402
@@ -149,8 +161,9 @@ def _hidden(options):
     return folder, variants, sets
 
 
-def _ask(gov, root, question, env, log):
-    """The stacked context of one question, as gov.retrieval.measure stacks it: (path, start, end) items."""
+def _retrieve(gov, root, question, env, log):
+    """The stacked context of one question, as gov.retrieval.measure stacks it: (path, start, end, text) items, in
+    order, each taken once; None when ``gov retrieve`` failed. ``question`` holds ``id`` and ``question``."""
     stacked, seen, used, token = [], set(), 0, None
     for _ in range(50):
         done = subprocess.run([gov, "retrieve", question.question, "--json", "--batch-size", str(BATCH_SIZE),
@@ -175,13 +188,85 @@ def _ask(gov, root, question, env, log):
                 full = True
                 break
             seen.add(item[:3])
-            stacked.append(item[:3])
+            stacked.append(item)
             used += size
         token = bundle.get("continuation")
         if full or not token:
             break
     log(f"retrieve {question.id}: {len(stacked)} items")
     return stacked
+
+
+def _ask(gov, root, question, env, log):
+    """The stacked context of one question: (path, start, end) items, or None when the retrieval failed."""
+    items = _retrieve(gov, root, question, env, log)
+    return None if items is None else [item[:3] for item in items]
+
+
+def _search(gov, root, words, env):
+    """The reader's one more search, in its own words: one ``gov retrieve`` bundle as (path, start, end, text)."""
+    done = subprocess.run([gov, "retrieve", words, "--json"], cwd=root, env=env, capture_output=True, text=True,
+                          stdin=subprocess.DEVNULL)
+    try:
+        doc = json.loads(done.stdout)
+        bundle = doc["result"] if isinstance(doc.get("result"), dict) else doc
+        return [(str(i["path"]), int(i["start_line"]), int(i["end_line"]), str(i.get("text", "")))
+                for i in bundle["evidence"]] if done.returncode == 0 and doc.get("ok") is not False else []
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return []
+
+
+def _judge_end_to_end(options, name, repo, asked, stacks, env, log, folder, session):
+    """The reader and the grader on each question whose retrieval answered: ``{question id: verdicts}``. Each
+    question's row (its answers included) is written under ``<folder>/e2e/<repository>/``, and nowhere else."""
+    where = folder / "e2e"
+    (where / name).mkdir(parents=True, exist_ok=True)
+    caller = e2e.Caller(options.claude, session, where)
+    todo = [q for q in asked if stacks.get(q.id) is not None]
+
+    def one(question):
+        return e2e.ask(question, stacks[question.id], lambda words: _search(options.gov, repo.root, words, env),
+                       caller)
+    with ThreadPoolExecutor(e2e.WORKERS) as pool:
+        done = list(pool.map(one, todo))
+    verdicts = {}
+    for question, result in zip(todo, done):
+        verdicts[question.id] = {"reader": result["reader"], "grader": result["grader"]}
+        (where / name / f"{question.id}.json").write_text(json.dumps(result["row"], indent=2) + "\n",
+                                                          encoding="utf-8")
+        log(f"judge {question.id}: reader {result['reader']['verdict']}, grade {result['grader']}")
+    return verdicts
+
+
+_VERSION = re.compile(r"^gov (\d[0-9A-Za-z.+-]*)(?: |$)")
+
+
+def _release(pinned_gov):
+    """The release version read from the pinned install (``<pinned gov> --version``), or None."""
+    if not pinned_gov:
+        return None
+    try:
+        done = subprocess.run([pinned_gov, "--version"], capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                              env={"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "LC_ALL": "C.UTF-8"})
+    except OSError:
+        return None
+    found = _VERSION.match(done.stdout.strip()) if done.returncode == 0 else None
+    return found.group(1) if found else None
+
+
+def _model_line(options, record):
+    """The run record with its model line: the adopter as ``--adopter-model`` says (else as the record says), the
+    reader and the grader as the record says (else ``E2E_MODEL``, which this runner starts them on), and the release
+    read from the pinned install. Refused unless every session is ``E2E_MODEL`` and a release is read."""
+    given = record.get("models") if record.get("models") is not None else {}
+    models = {"adopter": options.adopter_model or given.get("adopter"),
+              "reader": given.get("reader", score.E2E_MODEL), "grader": given.get("grader", score.E2E_MODEL)
+              } if isinstance(given, dict) else given  # a record's models that is no mapping is refused as it stands
+    record = {**record, "models": models, "release": _release(options.pinned_gov)}
+    reasons = score.check_models(record)
+    if reasons:
+        raise RunnerError("the run record's model line: " + "; ".join(reasons))
+    return record
 
 
 def _tickets(values):
@@ -245,11 +330,15 @@ def follow_moves(asked, moves):
     return asked
 
 
-def run(options, built=None):
+def run(options, built=None, session=None):
     """The run; returns the report (also written in the folder). ``built``: the capabilities counted as built (the
-    judge's ``built``); the command leaves it to today's code, and only the self-tests pass it."""
+    judge's ``built``); the command leaves it to today's code, and only the self-tests pass it. ``session``: the
+    function that starts a reader or grader session, ``start(argv, prompt, cwd) -> standard output``; the command
+    leaves it to the product's ``run_claude``, and only the self-tests pass a stand-in (no model runs)."""
     _hidden_folder(options)  # a wrong --sets-root or --hidden is refused first, before anything is built or written
     folder = _refuse_place(options.folder)
+    if options.mode == "run":
+        _model_line(options, {})  # a refused model line builds nothing
     log = _Log()
     if options.mode in ("build", "run"):
         _build(options, folder, log)
@@ -257,6 +346,9 @@ def run(options, built=None):
         _write_log(folder, log, [])
         return {"mode": "build", "seed": json.loads((folder / "run.json").read_text())["seed"]}
     record, repos = _read_back(folder)
+    if options.mode in ("read", "run"):  # before any stage, search or session: the model line, or a refusal
+        record = _model_line(options, record)
+        (folder / "run.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     env = _env(folder)
     held = [h for r in repos.values() for h in r.secrets]
     stage_runs = {}
@@ -285,20 +377,26 @@ def run(options, built=None):
         hidden[name] = {"questions": count, "asked": count if options.gov else 0, "needed": HIDDEN_NEEDED,
                         "present": bool(options.gov) and count >= HIDDEN_NEEDED}
         follow_moves(asked, judge.reviewed_moves(repo.root))
-        answers = {q.id: _ask(options.gov, repo.root, q, env, log) for q in asked} if options.gov else {}
-        scores.append(score.score_repository(name, asked, answers) if options.gov
-                      else {"repository": name, "questions": len(asked), "hit_at_5": None, "stacked_share": None,
-                            "per_question": []})
-    tickets = _tickets(options.close_ticket)
-    closes = {}
+        if options.gov:
+            stacks = {q.id: _retrieve(options.gov, repo.root, q, env, log) for q in asked}
+            answers = {qid: None if items is None else [i[:3] for i in items] for qid, items in stacks.items()}
+            verdicts = _judge_end_to_end(options, name, repo, asked, stacks, env, log, folder,
+                                         session or e2e.run_claude)
+            scores.append(score.score_repository(name, asked, answers, verdicts))
+        else:  # no retrieval, no session: nothing measured, so no figure
+            scores.append({"repository": name, "questions": len(asked), "end_to_end": None, "right": None,
+                           "bar": score.E2E_BAR, "met": False, "per_question": [],
+                           "diagnostic": {"hit_at_5": None, "stacked_share": None}})
+    tickets = _tickets(options.queue_ticket)
+    lands = {}  # the LITE ticket cycle ends at the landing, gov queue (EMERGENCY-2 4.3), never gov close
     for name, repo in repos.items():
         if not options.pinned_gov or not tickets.get(name):
-            closes[name] = {"run": False}
+            lands[name] = {"run": False}
             continue
-        done = subprocess.run([options.pinned_gov, "close", tickets[name]], cwd=repo.root, env=env,
+        done = subprocess.run([options.pinned_gov, "queue", tickets[name]], cwd=repo.root, env=env,
                               capture_output=True, text=True)
-        closes[name] = {"run": True, "ticket": tickets[name], "exit": done.returncode}
-        log(f"close {name} {tickets[name]}: exit {done.returncode}")
+        lands[name] = {"run": True, "ticket": tickets[name], "exit": done.returncode}
+        log(f"queue {name} {tickets[name]}: exit {done.returncode}")
     cases = [(repo.manifest, repo.root, folder / "outputs" / name, repo.secrets) for name, repo in repos.items()]
     judged = judge.judge(cases, score.figures(scores), EXPECTED, built, run_folder=folder)
     reasons = list(judged["reasons"])
@@ -306,11 +404,11 @@ def run(options, built=None):
         if not hidden[name]["present"]:
             reasons.append(f"{name}: the measurement (hidden) half is not present and asked: {hidden[name]['asked']} "
                            f"hidden questions asked, at least {HIDDEN_NEEDED} needed")
-        close = closes[name]
-        if not close["run"]:
-            reasons.append(f"{name}: gov close was not run")
-        elif close["exit"] != 0:
-            reasons.append(f"{name}: gov close {close['ticket']} ended with exit {close['exit']}")
+        land = lands[name]
+        if not land["run"]:
+            reasons.append(f"{name}: gov queue was not run")
+        elif land["exit"] != 0:
+            reasons.append(f"{name}: gov queue {land['ticket']} ended with exit {land['exit']}")
         failed = [s for s in stage_runs.get(name, []) if s.get("run") and s["exit"] != 0]
         reasons += [f"{name}: gov adopt --lite --stage {s['stage']} ended with exit {s['exit']}" for s in failed]
     verdict = judged["verdict"] if judged["verdict"] == judge.ERROR else (judge.NOT_READY if reasons else judge.READY)
@@ -318,10 +416,11 @@ def run(options, built=None):
     report = {"form": "w2-81-report/1", "mode": options.mode, "seed": record["seed"], "verdict": verdict,
               "reasons": reasons, "hidden_half": _hidden_summary(hidden),
               "gov": options.gov, "pinned_gov": options.pinned_gov,
+              "models": record.get("models"), "release": record.get("release"), "bar": score.E2E_BAR,
               "repositories": {name: {"judgement": by_name.get(name), "figures": next(
-                  ({k: s[k] for k in ("questions", "hit_at_5", "stacked_share", "per_question")}
-                   for s in scores if s["repository"] == name), None),
-                  "not_built": (by_name.get(name) or {}).get("not_built"), "close": closes[name],
+                  ({k: s[k] for k in ("questions", "right", "end_to_end", "bar", "met", "diagnostic",
+                                      "per_question")} for s in scores if s["repository"] == name), None),
+                  "not_built": (by_name.get(name) or {}).get("not_built"), "queue": lands[name],
                   "hidden_half": hidden[name],
                   "stages_run": stage_runs.get(name, [])} for name in EXPECTED}}
     text = json.dumps(report, indent=2, sort_keys=True)
@@ -350,15 +449,21 @@ def _write_log(folder, log, reasons):
 
 
 def _markdown(report):
+    models = report.get("models") or {}
     rows = [f"# W2-81 proving ground: {report['verdict']}", "", f"Seed {report['seed']}; mode {report['mode']}; "
-            f"hidden half {report['hidden_half']}.", ""]
+            f"hidden half {report['hidden_half']}.",
+            f"Release {report.get('release')}; sessions: adopter {models.get('adopter')}, reader "
+            f"{models.get('reader')}, grader {models.get('grader')}.", ""]
     rows += [f"- {reason}" for reason in report["reasons"]] or ["- every planted problem handled, no control "
-                                                                 "flagged, both figures met, every close at exit 0"]
+                                                                 "flagged, every repository's end-to-end figure at "
+                                                                 f"{score.E2E_BAR:g} or more, every landing at exit 0"]
     for name, repo in report["repositories"].items():
         j, f = repo["judgement"] or {}, repo["figures"] or {}
-        rows += ["", f"## {name}", "", f"hit@5 {f.get('hit_at_5')} (floor {score.HIT_AT_5_FLOOR:g}); stacked share "
-                 f"{f.get('stacked_share')} (target {score.STACKED_SHARE_TARGET:g}); {f.get('questions')} questions; "
-                 f"gov close: {repo['close']}; not built: {', '.join(repo['not_built'] or []) or 'none'}; "
+        diagnostic = f.get("diagnostic") or {}
+        rows += ["", f"## {name}", "", f"End-to-end figure {f.get('end_to_end')} (bar {score.E2E_BAR:g}; "
+                 f"{f.get('right')} of {f.get('questions')} questions judged right); diagnostic, never a bar: "
+                 f"hit@5 {diagnostic.get('hit_at_5')}, stacked share {diagnostic.get('stacked_share')}; "
+                 f"gov queue: {repo['queue']}; not built: {', '.join(repo['not_built'] or []) or 'none'}; "
                  f"hidden half: {_hidden_line(repo.get('hidden_half'))}", "",
                  "| Planted problem | Status | Evidence |", "|---|---|---|"]
         rows += [f"| `{p['id']}` | {p['status']} | {p['evidence'][0]['said']} |" for p in j.get("planted", [])]
@@ -382,7 +487,9 @@ def parse(argv):
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--gov", default=None)
     parser.add_argument("--pinned-gov", dest="pinned_gov", default=None)
-    parser.add_argument("--close-ticket", dest="close_ticket", action="append", default=[])
+    parser.add_argument("--queue-ticket", dest="queue_ticket", action="append", default=[])
+    parser.add_argument("--adopter-model", dest="adopter_model", default=None)
+    parser.add_argument("--claude", default="claude")
     parser.add_argument("--hidden", default=None)
     parser.add_argument("--sets-root", dest="sets_root", default=None)
     parser.add_argument("--manifests", default=None)

@@ -1,9 +1,10 @@
-"""The runner: one command, stand-ins for the adoption, ``gov retrieve`` and the pinned ``gov close`` (DEC-728, DEC-953).
+"""The runner: one command, stand-ins for the adoption, ``gov retrieve``, the pinned ``gov queue`` and the reader and
+grader sessions (DEC-728, DEC-1221 (1)).
 
 The run folder is built once per module (and per worker) and read again by each case. The stand-in adoption is the
 judge's perfect model, written in place in each built repository; the stand-in ``gov`` answers from a known ranking
-and exits as told. The hidden half is a stand-in written in the case's own temporary folder: the real hidden folder
-is never read.
+and exits as told; the stand-in session starter answers as a model would, and no model runs. The hidden half is a
+stand-in written in the case's own temporary folder: the real hidden folder is never read.
 """
 
 from __future__ import annotations
@@ -23,12 +24,17 @@ import w2_81_git as gitlib
 import w2_81_judge as judge
 import w2_81_questions as questions
 import w2_81_run as runner
+import w2_81_score as score
 import w2_81_standin as standin
+from gov.memaudit import claude as product_claude
+from gov.memaudit import prompts
 from w2_81_secret import assert_absent
 
 ALL = set(judge.CAPABILITIES)
 RUNNER = Path(runner.__file__)
 SMALL = 4096  # the large files' size in these cases
+SONNET = "claude-sonnet-5-5"
+NO_CLAUDE = "/nonexistent/claude-is-not-installed"  # a session a case forgot to stand in fails loudly, never runs
 
 
 _EMPTY_HIDDEN = []  # this module's empty hidden folder, made by pytest's own temporary-folder factory
@@ -47,6 +53,7 @@ def _no_hidden_questions(tmp_path_factory):
 def _options(folder, mode="read", **more):
     if "hidden" not in more:
         more["hidden"] = _EMPTY_HIDDEN[0]
+    more.setdefault("claude", NO_CLAUDE)
     argv = ["--folder", str(folder), "--mode", mode, "--large-size", str(SMALL)]
     for key, value in more.items():
         for one in value if isinstance(value, list) else [value]:
@@ -76,24 +83,47 @@ def ready_run(tmp_path_factory):
     sets = questions.sets_in(hidden)
     runner.run(_options(folder, "build", hidden=hidden))
     _, repos = runner._read_back(folder)
-    good, bad = {}, {}
+    good, bad, late, golds = {}, {}, {}, {}
     for name, repo in repos.items():
         standin.render(standin.perfect(repo), repo, repo.root, folder / "outputs" / name)
         asked = questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
                                   "visible") + questions.resolve(sets[name], repo.manifest, repo.root, "hidden")
         good.update(standin.ranking_for(name, asked, "gold"))
         bad.update(standin.ranking_for(name, asked, "forbidden"))
+        late.update(standin.ranking_for(name, asked, "late"))
+        for q in asked:  # two repositories may ask one text: the reader cites every gold source of that text
+            golds.setdefault(q.question, [])
+            golds[q.question] += [(p, line) for p, line, _ in q.sources if (p, line) not in golds[q.question]]
     govs = {"good": standin.write_gov(tools, "gov-good", good),
             "forbidden": standin.write_gov(tools, "gov-forbidden", bad),
-            "close-fails": standin.write_gov(tools, "gov-close-fails", good, close_exit=3)}
-    yield {"folder": folder, "repos": repos, "govs": govs, "base": base, "hidden": hidden}
+            "late": standin.write_gov(tools, "gov-late", late),
+            "queue-fails": standin.write_gov(tools, "gov-queue-fails", good, queue_exit=3),
+            "queue-refused": standin.write_gov(tools, "gov-queue-refused", good, queue_exit=1)}
+    yield {"folder": folder, "repos": repos, "govs": govs, "base": base, "hidden": hidden, "golds": golds,
+           "claude": standin.write_claude(tools)}
     shutil.rmtree(gitlib.outside_this_repository(base))
 
 
-def _read(ready_run, built=ALL, **more):
+def _read(ready_run, built=ALL, session=None, **more):
+    """A read of the ready run folder with the model line of a good run (Sonnet adopter, the pinned stand-in gov) and
+    a stand-in session starter: the reader cites the first item of the last bundle, the grader says correct."""
     more.setdefault("hidden", ready_run["hidden"])
-    options = _options(ready_run["folder"], "read", **more)
-    return runner.run(options, built=built)
+    more.setdefault("adopter_model", SONNET)
+    more.setdefault("pinned_gov", ready_run["govs"]["good"])
+    return runner.run(_options(ready_run["folder"], "read", **more), built=built,
+                      session=session or standin.Sessions())
+
+
+def _worked(gov):
+    """How many times a stand-in gov was asked for anything but its version."""
+    return len([c for c in standin.calls_of(gov) if c != "--version"])
+
+
+def _flags(ready_run, **more):
+    """The command line's flags for a read that gets as far as the sessions: the stand-in model CLI, the model line."""
+    flags = {"--adopter-model": SONNET, "--pinned-gov": str(ready_run["govs"]["good"]),
+             "--claude": str(ready_run["claude"]), **{k: str(v) for k, v in more.items()}}
+    return [x for pair in flags.items() for x in pair]
 
 
 def test_a_build_records_a_fresh_seed_and_keeps_the_manifests_outside_the_repositories(ready_run):
@@ -105,49 +135,267 @@ def test_a_build_records_a_fresh_seed_and_keeps_the_manifests_outside_the_reposi
         assert repo.root == ready_run["folder"] / "repos" / name
 
 
-def test_all_handled_and_both_figures_met_is_ready(ready_run):
+def test_all_handled_and_every_end_to_end_figure_at_the_bar_is_ready(ready_run):
+    """DEC-1221 (1): READY with everything handled, each repository's questions judged right end to end at 95 or
+    more, the model line stated, and each ticket landed with ``gov queue`` at exit 0."""
     govs = ready_run["govs"]
-    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1")
+    calls = len(standin.calls_of(govs["good"]))
+    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1")
     assert report["verdict"] == judge.READY, report["reasons"]
     saved = json.loads((ready_run["folder"] / "report.json").read_text())
     assert saved["verdict"] == judge.READY and saved["seed"] == report["seed"]
     assert saved["hidden_half"] == "present and asked in 6 of 6 repositories"
+    assert saved["bar"] == 95.0 and "floor" not in json.dumps(saved)
+    assert saved["models"] == {"adopter": SONNET, "reader": SONNET, "grader": SONNET} and saved["release"] == "0.1.4"
     assert all(saved["repositories"][n]["hidden_half"] == {"questions": 10, "asked": 10, "needed": 10,
                                                            "present": True} for n in runner.EXPECTED)
     for name in runner.EXPECTED:
         repo = saved["repositories"][name]
-        assert repo["figures"]["hit_at_5"] == 100.0 and repo["figures"]["stacked_share"] == 100.0, name
-        assert repo["figures"]["questions"] >= 10
-        assert repo["close"] == {"run": True, "ticket": "PG-1", "exit": 0}
+        figures = repo["figures"]
+        assert figures["end_to_end"] == 100.0 and figures["right"] == figures["questions"] >= 10, name
+        assert figures["bar"] == 95.0 and figures["met"] is True
+        assert figures["diagnostic"] == {"hit_at_5": 100.0, "stacked_share": 100.0}, "diagnostic, beside the figure"
+        assert "hit_at_5" not in figures and "stacked_share" not in figures
+        assert all(q["right"] for q in figures["per_question"]) and all(q["id"] for q in figures["per_question"])
+        assert repo["queue"] == {"run": True, "ticket": "PG-1", "exit": 0} and "close" not in repo
         assert all(p["status"] == judge.FOUND and p["evidence"] for p in repo["judgement"]["planted"]), name
         assert all(c["status"] == judge.CLEAN for c in repo["judgement"]["controls"]), name
         assert repo["not_built"] == []
     markdown = (ready_run["folder"] / "report.md").read_text()
     assert markdown.startswith("# W2-81 proving ground: READY") and f"Seed {report['seed']}" in markdown
+    assert f"adopter {SONNET}, reader {SONNET}, grader {SONNET}" in markdown and "Release 0.1.4" in markdown
+    section = markdown.split("## python-app")[1].split("\n## ")[0]
+    assert "End-to-end figure 100.0 (bar 95" in section and "diagnostic, never a bar" in section
+    assert section.index("End-to-end figure") < section.index("hit@5"), "the figure first, the diagnostics beside it"
+    assert "gov close" not in markdown and "gov queue:" in section
+    seen = standin.calls_of(govs["good"])[calls:]
+    assert "queue" in seen and "close" not in seen, "the landing is gov queue; gov close is never run"
+
+
+def test_the_models_block_and_the_release_version_are_in_the_run_record(ready_run, tmp_path):
+    """S-RERUN's record: the adopter, reader and grader model ids, and the release read from the pinned install."""
+    pinned = standin.write_gov(tmp_path / "tools", "gov-pinned", {}, version="0.2.7")
+    _read(ready_run, gov=ready_run["govs"]["good"], pinned_gov=pinned)
+    record = json.loads((ready_run["folder"] / "run.json").read_text())
+    assert record["models"] == {"adopter": SONNET, "reader": SONNET, "grader": SONNET}
+    assert record["release"] == "0.2.7", "read from the pinned install, never a fixed number"
+    assert score.check_models(record) == []
+    assert isinstance(record["seed"], int) and record["heads"], "the build's own record is kept"
+    report = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert report["release"] == "0.2.7"
+    other = _read(ready_run, gov=ready_run["govs"]["good"], adopter_model=SONNET,
+                  pinned_gov=standin.write_gov(tmp_path / "tools", "gov-pinned-b", {}, version="0.1.9"))
+    assert other["release"] == "0.1.9"
 
 
 @pytest.mark.parametrize("failure, said", [
-    ("close-fails", "gov close PG-1 ended with exit 3"),
-    ("close-not-run", "gov close was not run"),
-    ("forbidden-first", "below its floor of 85"),
-    ("no-retrieval", "the figure hit_at_5 is missing"),
+    ("queue-fails", "gov queue PG-1 ended with exit 3"),
+    ("queue-refused", "gov queue PG-1 ended with exit 1"),
+    ("queue-not-run", "gov queue was not run"),
+    ("forbidden-first", "below its bar of 95"),
+    ("no-retrieval", "the end-to-end figure is missing"),
+    ("wrong-grade", "below its bar of 95"),
+    ("reader-error", "below its bar of 95"),
+    ("second-search-asked", "below its bar of 95"),
     ("todays-code", "is NOT_BUILT"),
 ])
 def test_each_failure_is_not_ready_naming_it(ready_run, failure, said):
     govs = ready_run["govs"]
-    more = {"pinned_gov": govs["good"], "close_ticket": "PG-1"}  # retrieval only where the case is about it
-    built = ALL
-    if failure == "close-fails":
-        more["pinned_gov"] = govs["close-fails"]
-    elif failure == "close-not-run":
-        del more["close_ticket"]
+    more = {"pinned_gov": govs["good"], "queue_ticket": "PG-1"}  # retrieval only where the case is about it
+    built, session = ALL, standin.Sessions()
+    if failure == "queue-fails":
+        more["pinned_gov"] = govs["queue-fails"]
+    elif failure == "queue-refused":
+        more["pinned_gov"] = govs["queue-refused"]
+    elif failure == "queue-not-run":
+        del more["queue_ticket"]
     elif failure == "forbidden-first":
         more["gov"] = govs["forbidden"]
     elif failure == "todays-code":
         built = None
-    report = _read(ready_run, built=built, **more)
+    if failure in ("wrong-grade", "reader-error", "second-search-asked"):
+        more["gov"] = govs["good"]
+        session = {"wrong-grade": standin.Sessions(grade={"*": "wrong"}), "reader-error": standin.Sessions("error"),
+                   "second-search-asked": standin.Sessions("search-twice")}[failure]
+    elif failure in ("queue-fails", "queue-refused", "queue-not-run", "todays-code"):
+        more["gov"] = govs["good"]
+    report = _read(ready_run, built=built, session=session, **more)
     assert report["verdict"] == judge.NOT_READY
     assert any(said in reason for reason in report["reasons"]), report["reasons"]
+
+
+def test_hit_at_5_of_zero_beside_a_figure_at_the_bar_is_ready(ready_run):
+    """EMERGENCY-2 5.2: five fillers rank before every gold source (hit@5 is 0); the reader cites the gold source it
+    finds in the whole bundle, the grader says correct: the end-to-end figure is 100 and READY stands."""
+    govs = ready_run["govs"]
+    session = standin.Sessions("cite-gold", gold=ready_run["golds"])
+    report = _read(ready_run, gov=govs["late"], pinned_gov=govs["late"], queue_ticket="PG-1", session=session)
+    assert report["verdict"] == judge.READY, report["reasons"]
+    for name in runner.EXPECTED:
+        figures = report["repositories"][name]["figures"]
+        assert figures["diagnostic"]["hit_at_5"] == 0.0 and figures["diagnostic"]["stacked_share"] == 100.0, name
+        assert figures["end_to_end"] == 100.0
+
+
+def test_a_retrieval_that_gives_no_gold_source_does_not_by_itself_make_the_run_not_ready(ready_run, tmp_path):
+    """hit@5 and the stacked share are both 0 (retrieval answers nothing), the reader's answer still cites the gold
+    source right and the grader says correct: judged right end to end, so READY: the diagnostics carry no line."""
+    none = standin.write_gov(tmp_path / "tools", "gov-none", {})
+    session = standin.Sessions("cite-gold", gold=ready_run["golds"])
+    report = _read(ready_run, gov=none, pinned_gov=none, queue_ticket="PG-1", session=session)
+    assert report["verdict"] == judge.READY, report["reasons"]
+    for name in runner.EXPECTED:
+        figures = report["repositories"][name]["figures"]
+        assert figures["diagnostic"] == {"hit_at_5": 0.0, "stacked_share": 0.0} and figures["end_to_end"] == 100.0
+
+
+def test_a_forbidden_citation_drops_exactly_one_question_of_its_repository(ready_run):
+    """The reader answers right (the grader says correct) but also cites the planted stale spec: that question is
+    wrong, the repository's figure drops by exactly it, and the other repositories are untouched."""
+    govs = ready_run["govs"]
+    repo = ready_run["repos"]["python-app"]
+    asked = questions.resolve(questions.load_set(questions.VISIBLE / "python-app.yaml"), repo.manifest, repo.root,
+                              "visible") + questions.resolve(questions.sets_in(ready_run["hidden"])["python-app"],
+                                                             repo.manifest, repo.root, "hidden")
+    target = next(q for q in asked if q.forbidden)
+    session = standin.Sessions(forbid={target.question: target.forbidden[0]})
+    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1", session=session)
+    figures = report["repositories"]["python-app"]["figures"]
+    n = len(asked)
+    assert figures["questions"] == n and figures["right"] == n - 1
+    assert figures["end_to_end"] == 100.0 * (n - 1) / n
+    wrong = [q for q in figures["per_question"] if not q["right"]]
+    assert [q["id"] for q in wrong] == [target.id] and wrong[0]["reason"] == "forbidden citation"
+    assert all(report["repositories"][o]["figures"]["end_to_end"] == 100.0 for o in runner.EXPECTED if o != "python-app")
+    assert (report["verdict"] == judge.READY) == (figures["end_to_end"] >= 95.0), report["reasons"]
+    if figures["end_to_end"] < 95.0:
+        assert f"python-app: the end-to-end figure is {figures['end_to_end']:g}, below its bar of 95" in report["reasons"]
+
+
+def test_the_reader_and_the_grader_are_started_on_sonnet_with_the_products_flags(ready_run):
+    """Every session of the run is claude-sonnet-5-5: the argv of each reader and grader session names the model,
+    and is the product's ``claude -p`` argv with the model forced."""
+    session = standin.Sessions()
+    gov = ready_run["govs"]["good"]
+    report = _read(ready_run, gov=gov, claude="/some/where/claude", session=session)
+    asked = sum(r["figures"]["questions"] for r in report["repositories"].values())
+    assert session.roles().count("reader") == asked and session.roles().count("grader") == asked
+    assert "other" not in session.roles()
+    for role, system, schema in (("reader", prompts.READER_SYS, prompts.READER_SCHEMA),
+                                 ("grader", prompts.GRADER_SYS, prompts.GRADER_SCHEMA)):
+        for argv in session.argvs(role):
+            assert argv[argv.index("--model") + 1] == "claude-sonnet-5-5", argv[:8]
+            budget = float(argv[argv.index("--max-budget-usd") + 1])
+            assert argv == product_claude.argv_of("/some/where/claude", "claude-sonnet-5-5", system, schema, budget)
+    every = [a for _, argv in session.calls for a in argv]
+    assert not [a for a in every if a.startswith("claude-") and a != "claude-sonnet-5-5"]
+    assert "opus" not in " ".join(every).lower().replace(prompts.READER_SYS.lower(), "").replace(
+        prompts.GRADER_SYS.lower(), "")
+
+
+def test_the_reader_searches_once_more_and_a_second_search_is_not_an_answer(ready_run):
+    """The reader may ask for one more search in its own words (a second ``gov retrieve``), then must answer."""
+    gov = ready_run["govs"]["good"]
+    once = standin.Sessions("search-first")
+    before = standin.calls_of(gov).count("retrieve")
+    report = _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=once)
+    asked = sum(r["figures"]["questions"] for r in report["repositories"].values())
+    assert report["verdict"] == judge.READY, report["reasons"]
+    assert once.roles().count("reader") == 2 * asked and once.roles().count("grader") == asked
+    assert standin.calls_of(gov).count("retrieve") - before == 2 * asked, "one more search a question, no more"
+    twice = standin.Sessions("search-twice")
+    report = _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=twice)
+    assert twice.roles().count("reader") == 2 * asked, "a second search is never run: the reader's cap is two attempts"
+    assert all(r["figures"]["end_to_end"] == 0.0 for r in report["repositories"].values())
+
+
+def test_a_run_record_without_the_sonnet_model_line_is_refused_before_any_session(ready_run, tmp_path, capfd):
+    """No model line, an adopter or another session on another model, or no release read: refused (exit 2) before
+    any stage, search or session runs; the run record keeps no model line it was refused on."""
+    gov, folder = ready_run["govs"]["good"], ready_run["folder"]
+    record = (folder / "run.json").read_text()
+    bare = {k: v for k, v in json.loads(record).items() if k not in ("models", "release")}  # as a build leaves it
+    garbled = standin.write_gov(tmp_path / "tools", "gov-garbled", {}, version="unknown")
+    for how in ("no-adopter-model", "adopter-opus", "adopter-haiku", "no-pinned-gov", "version-unreadable",
+                "record-reader-opus", "record-grader-opus", "record-models-not-a-mapping"):
+        session = standin.Sessions()
+        calls = _worked(gov)
+        more = {"gov": gov, "pinned_gov": gov, "adopter_model": SONNET}
+        (folder / "run.json").write_text(json.dumps(bare))
+        if how == "no-adopter-model":
+            del more["adopter_model"]
+        elif how.startswith("adopter"):
+            more["adopter_model"] = "claude-" + how.split("-")[1] + "-5-5"
+        elif how == "no-pinned-gov":
+            del more["pinned_gov"]
+        elif how == "version-unreadable":
+            more["pinned_gov"] = garbled
+        else:
+            data = dict(bare)
+            data["models"] = ["claude-sonnet-5-5"] if how.endswith("mapping") else {
+                "adopter": SONNET, "reader": SONNET, "grader": SONNET, how.split("-")[1]: "claude-opus-5-5"}
+            (folder / "run.json").write_text(json.dumps(data))
+        try:
+            with pytest.raises(runner.RunnerError) as refused:
+                runner.run(_options(folder, "read", hidden=ready_run["hidden"], **more), built=ALL, session=session)
+            assert str(refused.value).startswith("the run record's model line: "), (how, str(refused.value))
+            assert not session.calls and _worked(gov) == calls, f"{how}: a session or a search ran"
+        finally:
+            (folder / "run.json").write_text(record)
+    # through the command: refused, exit 2, on standard error alone; the model CLI named is never started
+    (folder / "run.json").write_text(json.dumps(bare))
+    try:
+        code = runner.main(["--folder", str(folder), "--mode", "read", "--hidden", str(ready_run["hidden"]),
+                            "--gov", str(gov), "--pinned-gov", str(gov), "--claude", NO_CLAUDE])
+        out, err = capfd.readouterr()
+        assert code == 2 and not out and err.startswith("refused: the run record's model line: the model line has "
+                                                        "no adopter"), (code, err)
+        assert json.loads((folder / "run.json").read_text()) == bare, "a refused run writes no model line"
+    finally:
+        (folder / "run.json").write_text(record)
+
+
+def test_the_run_mode_refuses_before_it_builds_when_the_model_line_is_missing(tmp_path):
+    gov = standin.write_gov(tmp_path / "tools", "gov", {})
+    session = standin.Sessions()
+    with pytest.raises(runner.RunnerError) as refused:
+        runner.run(_options(tmp_path / "run", "run", seed=11, gov=gov, pinned_gov=gov, adopter_model="claude-opus-5-5"),
+                   session=session)
+    assert "adopter" in str(refused.value) and not session.calls
+    assert not (tmp_path / "run" / "repos").exists(), "nothing was built on a refused model line"
+    assert _worked(gov) == 0, "only the version was asked of the pinned gov"
+
+
+def test_the_report_log_and_output_hold_no_question_answer_or_secret_text(ready_run, capfd):
+    """The answer text is in the verdict rows of the run folder alone; the reports, the log and the output hold ids,
+    verdicts and the figures."""
+    gov = ready_run["govs"]["good"]
+    session = standin.Sessions("search-first")
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=session)
+    code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(ready_run["hidden"]),
+                        "--gov", str(gov), *_flags(ready_run)])
+    out, err = capfd.readouterr()
+    assert code == 1  # today's code: handlings not built
+    texts = {name: (ready_run["folder"] / name).read_text() for name in ("report.json", "report.md", "run.log")}
+    texts["stdout"], texts["stderr"] = out, err
+    asked = []
+    for name, repo in ready_run["repos"].items():
+        asked += questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
+                                   "visible") + questions.resolve(questions.sets_in(ready_run["hidden"])[name],
+                                                                  repo.manifest, repo.root, "hidden")
+    for where, text in texts.items():
+        for q in asked:
+            assert q.question not in text and q.gold_answer not in text, f"{where} shows a question or its answer"
+        assert "STAND-IN ANSWER" not in text and "the stand-in grader's reason" not in text, where
+    rows = sorted((ready_run["folder"] / "e2e").rglob("*.json"))
+    assert len(rows) == len(asked) and {r.stem for r in rows} == {q.id for q in asked}
+    row = json.loads(rows[0].read_text())
+    assert row["id"] == rows[0].stem and row["grade"] == "correct" and row["reader"]["verdict"] == "answer"
+    assert all(isinstance(c, list) and len(c) == 3 for c in row["reader"]["citations"])
+    for repo in ready_run["repos"].values():
+        for held in repo.secrets:
+            for where, text in texts.items():
+                assert_absent(held, text, f"the runner's {where}")
 
 
 def test_the_run_writes_only_in_its_folder(ready_run):
@@ -161,7 +409,7 @@ def test_the_run_writes_only_in_its_folder(ready_run):
     assert gitlib.porcelain_here(str(RUNNER.parent)) == suite
     assert gitlib.w2_81_artefacts(gitlib.porcelain_here()) == artefacts
     assert {p.name for p in folder.iterdir()} <= {"repos", "manifests", "outputs", "run.json", "run.log",
-                                                   "report.json", "report.md", ".home", ".tmp"}
+                                                   "report.json", "report.md", ".home", ".tmp", "e2e"}
 
 
 def test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused(tmp_path):
@@ -186,8 +434,8 @@ def test_the_command_prints_the_verdict_and_never_a_secret(ready_run):
     env = {**os.environ, "PYTHONPATH": str(gitlib.REPO_ROOT / "src")}
     env.pop("GOV_DEV" + "_TIERS", None)
     done = subprocess.run([sys.executable, str(RUNNER), "--folder", str(ready_run["folder"]), "--mode", "read",
-                           "--gov", str(ready_run["govs"]["good"]), "--hidden", str(ready_run["hidden"])],
-                          capture_output=True, text=True, env=env)
+                           "--gov", str(ready_run["govs"]["good"]), "--hidden", str(ready_run["hidden"]),
+                           *_flags(ready_run)], capture_output=True, text=True, env=env)
     assert done.returncode == 1 and done.stdout.startswith("NOT_READY (seed "), (done.returncode, done.stdout)
     refused = subprocess.run([sys.executable, str(RUNNER), "--folder", str(RUNNER.parent / "w2-81-run"),
                               "--mode", "build"], capture_output=True, text=True, env=env)
@@ -204,7 +452,8 @@ def test_the_command_prints_the_verdict_and_never_a_secret(ready_run):
 
 def test_run_mode_runs_the_stages_and_names_a_failing_one(tmp_path):
     gov = standin.write_gov(tmp_path / "tools", "gov-adopt-fails", {}, adopt_exit=5)
-    report = runner.run(_options(tmp_path / "run", "run", seed=11, gov=gov))
+    report = runner.run(_options(tmp_path / "run", "run", seed=11, gov=gov, pinned_gov=gov, adopter_model=SONNET),
+                        session=standin.Sessions())
     assert report["verdict"] == judge.NOT_READY
     assert all(r["stages_run"] == [{"stage": "A0", "run": True, "exit": 5}] for r in report["repositories"].values())
     assert "python-app: gov adopt --lite --stage A0 ended with exit 5" in report["reasons"]
@@ -267,7 +516,8 @@ def test_the_hidden_half_is_read_from_the_folder_given_and_never_shown(tmp_path,
     assert repos["legacy-docs"].secrets, "the variant's secret is held in memory"
     gov = standin.write_gov(tmp_path / "tools", "gov", {})
     (folder / "repos" / "python-app" / "tests" / "test_quarry_rates.py").unlink()  # an adoption deleted it
-    report = runner.run(_options(folder, "read", gov=gov, hidden=hidden))
+    report = runner.run(_options(folder, "read", gov=gov, hidden=hidden, pinned_gov=gov, adopter_model=SONNET),
+                        session=standin.Sessions())
     ids = [q["id"] for q in report["repositories"]["rust-workspace"]["figures"]["per_question"]]
     assert "rust-workspace-h01" in ids
     out, err = capfd.readouterr()
@@ -307,7 +557,7 @@ def test_the_hidden_half_is_read_from_the_folder_given_and_never_shown(tmp_path,
 def test_the_markdown_report_says_what_the_json_says_is_not_measured(ready_run):
     """Round 2, item 5: the budget clause of the large files, in the markdown report too, in the JSON's words."""
     govs = ready_run["govs"]
-    _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1")
+    _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1")
     saved = json.loads((ready_run["folder"] / "report.json").read_text())
     markdown = (ready_run["folder"] / "report.md").read_text()
     said = [item for repo in saved["repositories"].values() for item in (repo["judgement"] or {}).get("not_measured")]
@@ -340,7 +590,7 @@ def test_a_secret_written_anywhere_in_the_run_folder_is_mishandled(ready_run, pl
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(held.line("summary of the adoption: found {value}\n"))
-        report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1")
+        report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1")
     finally:
         if before is None:
             target.unlink()
@@ -383,7 +633,7 @@ def test_a_repository_without_its_measurement_half_is_not_ready_naming_it(ready_
         data = yaml.safe_load((hidden / "rust-workspace.yaml").read_text())
         data["questions"] = data["questions"][:9]
         (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
-    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1", hidden=hidden)
+    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1", hidden=hidden)
     asked = 9 if how == "nine-questions" else 0
     wanted = [f"{n}: the measurement (hidden) half is not present and asked: {asked} hidden questions asked, at "
               f"least 10 needed" for n in names]
@@ -394,7 +644,7 @@ def test_a_repository_without_its_measurement_half_is_not_ready_naming_it(ready_
     markdown = (ready_run["folder"] / "report.md").read_text()
     assert all(reason in markdown for reason in wanted) and f"hidden half absent in {len(names)} of 6" in markdown
     code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden),
-                        "--gov", str(govs["good"])])
+                        "--gov", str(govs["good"]), *_flags(ready_run)])
     out, _ = capfd.readouterr()
     assert code == 1 and f"hidden half: absent in {len(names)} of 6 repositories" in out, out
 
@@ -417,7 +667,8 @@ def test_a_hidden_template_with_an_error_is_refused_naming_its_id(ready_run, tmp
     else:
         data["questions"][0]["forbidden"] = [f"docs/quartzite/{template}.md"]
     (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
-    code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden)])
+    code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden),
+                        *_flags(ready_run)])
     out, err = capfd.readouterr()
     assert code == 2, (code, out, err)
     assert err.startswith(f"refused: {data['questions'][0]['id']}: "), err
@@ -436,7 +687,7 @@ def test_a_hidden_forbidden_citation_with_a_mistyped_fact_is_refused(ready_run, 
     data["questions"][2]["forbidden"] = ["{stael}"]
     (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
     code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden),
-                        "--gov", str(ready_run["govs"]["good"])])
+                        "--gov", str(ready_run["govs"]["good"]), *_flags(ready_run)])
     out, err = capfd.readouterr()
     assert code == 2, (code, out, err)
     assert err.startswith(f"refused: {data['questions'][2]['id']}: "), err
@@ -472,7 +723,8 @@ def test_a_sets_root_is_found_and_its_hidden_half_read_with_only_the_sets_root_g
     """The hidden half sits under the root; no --hidden is named; the verdict line says it is present and asked."""
     root = _sets_root(tmp_path, ready_run["hidden"])
     govs = ready_run["govs"]
-    code = runner.main(_with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"])))
+    code = runner.main(_with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"]),
+                                       *_flags(ready_run)))
     out, err = capfd.readouterr()
     assert code == 1 and "hidden half: present and asked in 6 of 6 repositories" in out, (code, out, err)
     saved = json.loads((ready_run["folder"] / "report.json").read_text())
@@ -486,11 +738,11 @@ def test_a_sets_root_is_read_exactly_as_the_hidden_folder_is(ready_run, tmp_path
     """Same folder, same report: --sets-root and --hidden give one verdict, one list of reasons, one hidden half."""
     govs = ready_run["govs"]
     root = _sets_root(tmp_path, ready_run["hidden"])
-    more = {"gov": govs["good"], "pinned_gov": govs["good"], "close_ticket": "PG-1"}
+    more = {"gov": govs["good"], "pinned_gov": govs["good"], "queue_ticket": "PG-1"}
     direct = _read(ready_run, **more)
     argv = _with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"]), "--pinned-gov",
-                           str(govs["good"]), "--close-ticket", "PG-1")
-    through = runner.run(runner.parse(argv), built=ALL)
+                           str(govs["good"]), "--queue-ticket", "PG-1", "--adopter-model", SONNET, "--claude", NO_CLAUDE)
+    through = runner.run(runner.parse(argv), built=ALL, session=standin.Sessions())
     assert through["verdict"] == direct["verdict"] == judge.READY, (through["reasons"], direct["reasons"])
     assert through["reasons"] == direct["reasons"] and through["hidden_half"] == direct["hidden_half"]
     assert {n: r["hidden_half"] for n, r in through["repositories"].items()} == \
@@ -505,8 +757,9 @@ def test_a_sets_root_with_nine_questions_in_one_repository_is_not_ready_naming_i
     (root / REL / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
     govs = ready_run["govs"]
     report = runner.run(runner.parse(_with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"]),
-                                                     "--pinned-gov", str(govs["good"]), "--close-ticket", "PG-1")),
-                        built=ALL)
+                                                     "--pinned-gov", str(govs["good"]), "--queue-ticket", "PG-1",
+                                                     "--adopter-model", SONNET, "--claude", NO_CLAUDE)),
+                        built=ALL, session=standin.Sessions())
     assert report["verdict"] == judge.NOT_READY
     assert report["reasons"] == ["rust-workspace: the measurement (hidden) half is not present and asked: 9 hidden "
                                  "questions asked, at least 10 needed"], report["reasons"]
