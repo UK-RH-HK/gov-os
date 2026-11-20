@@ -56,6 +56,7 @@ How the numbers are counted (the script does the same): an acceptance run is a `
 ## The trial tickets
 | Ticket | Engineer model | Test designer model | Runs to green | Send-backs | Landing reds | After-landing fixes | Cost | Minutes |
 |---|---|---|---|---|---|---|---|---|
+| (beside, a fix) W2-17 U1-U3: pending-update report and rollback (lead `w2-17-fixes`) | Sonnet | Opus | 1 | 0 (1 send-back to the designer after the spec settled) | 0 at the landing (519 passed on the merged tree) | (7-day window open) | $7.68 | about 10 (engineer) |
 
 ## C3 text checks by the CTO
 | Date | Change | Written by | CTO's check |

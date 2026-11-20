@@ -157,3 +157,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
 - **Order:** this section (`Role: orchestrator`); the test designer (Opus, the C3 trial of DEC-1222 (2); `src/gov/update/**`
   is C3); the engineer (Sonnet) until `gov accept W2-17` is green. Every commit carries `Task: DAEO-sdhj` and a `Fix:`
   trailer with the line's summary. The ticket stays closed.
+
+**Landed:** merged into `w2/integrate` at `d2c920b9a` on 2026-11-20 by hand (the CTO; `gov queue` refused the selection: the docs committed since the last green base map to no suite, see L2-4); on the merged tree W2-17, W2-208, W2-18 and the update, doctor, hooks, install and opt-in units: 519 passed.
