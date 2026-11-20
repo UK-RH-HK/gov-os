@@ -236,7 +236,7 @@ repository. `judge_repository` judges one repository. The judge writes and print
 - each planted problem is **FOUND_AND_HANDLED**, **MISSED**, **MISHANDLED** or **NOT_BUILT**, with the evidence it read
   (`record`, `field`, `said`);
 - each control is **CLEAN** or **FLAGGED**;
-- each stage (A0 to A2, AS, A3 to A6, A8, A7, A10, the lite verdict, and the findings) is **PRESENT**, **ABSENT**, **UNREADABLE**,
+- each stage (A0 to A6, AS, A8, A7, A10, the lite verdict, and the findings) is **PRESENT**, **ABSENT**, **UNREADABLE**,
   **MALFORMED** or **NOT_BUILT**. A lite A7 or A10 record is PRESENT only when its front matter's `result` is exactly
   `pass` (the gate's own word); one that says otherwise (`fail`, no `result`, any other value) is MALFORMED.
 
@@ -258,20 +258,8 @@ an output is MISHANDLED even if its stage is not built.
 hit@5 and the stacked share may sit beside the figure as diagnostics (EMERGENCY-2 5.2): the judge never reads them,
 so low or absent they make nothing NOT_READY, and there is no floor constant for either (`FLOORS`, `HIT_AT_5_FLOOR`
 and `STACKED_SHARE_TARGET` are removed). The old text of KPI line 6 ("every question figure meets its floor") is
-checked by the end-to-end bar in its place. Anything else is NOT_READY, naming each reason.
-
-**Reason ids and an owner's exceptions (Fix T3, W2-81's proving run on 0.1.4).** Every reason `overall` gives has a
-stable id `<repository>:<CODE>:<subject>` in `reason_ids`, in step with the unchanged texts in `reasons`: CODE is
-PLANTED (the planted problem's id; a hidden variant by its number and id), CONTROL (the control's id), STAGE (the
-stage's name, `findings` included), FIGURE (`end_to_end`, for a figure missing or under its bar) or NOTJUDGED (`-`).
-`overall(judgements, figures, expected, exceptions=None)` also reads an owner's exceptions: a mapping, or the path of
-a JSON or YAML file, `{"decision": "DEC-<n>", "reasons": ["<reason id>", ...]}`. With none the result is as before.
-With them, a run without reasons is READY whatever they say, a run whose every reason's id is named is
-**READY_WITH_EXCEPTIONS** (`judge.READY_WITH_EXCEPTIONS`), and a run with one reason not named stays NOT_READY; the
-result's `exceptions` holds the `decision`, the ids `named` (those that matched a reason), `unnamed` (reasons the file
-does not name) and `unused` (named ids that matched no reason: reported, never an error). A FOUND problem or a PRESENT
-stage is no reason, so it is never named. The file is checked by `load_exceptions` (a fault is an `ExceptionsError`
-naming the file); the runner refuses a faulty one before any work (see "The runner").
+checked by the end-to-end bar in its place. Anything else is NOT_READY, naming each reason. Every reason has a stable
+id, and an owner's exceptions that name every reason give READY_WITH_EXCEPTIONS (`FIXES-0.1.4.md`, Fix T3).
 
 **It fails closed:**
 
@@ -291,8 +279,7 @@ its Contract id. It is never passed. A handling whose capability is built, but w
 MISSED.
 
 **Today's list.** I read it myself in `src/gov/adopt/` (`command.py`, `project.py`, `stages.py`, `legacy.py`; the same
-on `w2/integrate`) on 2026-10-31, A7 and A10 again on 2026-11-16 (`lite_gates.py`; S-STAGES, DEC-1197 (2)), and the whole table on
-2026-11-20 (AS, `spec_audit.py`, CAP-44.m; the lite verdict is still built by no stage or command).
+on `w2/integrate`) on 2026-10-31, A7 and A10 again on 2026-11-16 (`lite_gates.py`; S-STAGES, DEC-1197 (2)), the table on 2026-11-20 (AS).
 `w2_81_judge.CAPABILITIES` holds it. **`built_today()` counts A7 and A10 as built from the adoption command's own stage
 list, `gov.adopt.command.STAGES`** (the list `gov adopt --lite --stage` accepts: A0 to A10 and MA), **never from
 `gov.adopt.project.STAGES`** (A0 to A6, A8, A9: the stages whose records `project.record_path` names). Each is built
@@ -319,7 +306,7 @@ never reaches READY on a failed A7 or A10 gate. The judge holds A7's and A10's o
 | `findings` | CAP-44.g | **no** | no stage scans the history for secrets or records a finding with a state and a human gate (Contract: W3) |
 | `A8-documents` | CAP-44.e | **no** | A8 retires `rule-file`, `memory-store` and `chat-database` only (`legacy.KINDS`, `stages.KINDS`); it extracts or retires no legacy document, and A4 refuses EXTRACT as a content change |
 | `index` | CAP-44.d | yes | `gov rebuild` after A6 and A8 recreates `.gov-runtime/store.db`: `lexical_chunk.path`, and `semantic_vector.chunk_id` only for namespaces whose `embedding_policy` is `embedded` |
-| `AS` | CAP-44.m | yes | the spec audit (`gov.adopt.spec_audit`): `gov adopt --lite --stage AS` runs between A2 and A3 and commits `governance/adoption/AS-spec-audit.md`; the judge requires that record (stage AS: PRESENT, or ABSENT, UNREADABLE) |
+| `AS` | CAP-44.m | yes | the spec audit (`gov.adopt.spec_audit`): `gov adopt --lite --stage AS`, between A2 and A3, commits `governance/adoption/AS-spec-audit.md`; the judge requires it (stage AS) |
 | `A3`, `A5`, `A6` | CAP-44.b, .c, .d | yes | the A3 path map, the A5 review (`path_map_hash` = the sha256 of A3's record), the A6 batches |
 | `A7`, `A10` | CAP-44.f | **yes**, built, from `command.STAGES` | the lite gates (W2-52, `gov.adopt.lite_gates`): `gov.adopt.command.STAGES` lists A7 and A10, and `built_today()` reads that list (not `project.STAGES`) |
 | `VERDICT` | CAP-44.h | **no** | no stage or command gives the lite verdict yet (CAP-44.h, W2); W2-52 built A7 and A10 only |
@@ -792,33 +779,8 @@ PYTHONPATH=<release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py \
 
 (`--mode build` comes first, with `--seed` if wanted, to build the repositories the adopting sessions adopt.) Its
 verdict line is `READY (seed N; hidden half: ...)` and exit 0, or `NOT_READY` and exit 1 with every reason in
-`report.json` and `report.md`; a refusal is exit 2.
-
-**What the fixes of the run on 0.1.4 added to the command** (each with its cases in the table "Fix: W2-81's test code,
-six defects" at the end):
-
-- **The landing's `HOME` (T1).** `gov adopt` and `gov retrieve` run in the run's scrubbed environment (`HOME` is
-  `<folder>/.home`, so retrieval reads nothing of the operator's); the landing's `gov queue` is given the operator's
-  own `HOME` (the runner process's), every other variable as the run's, because the repository's tests need the
-  tools in the operator's user site (pytest).
-- **The starter's address (T10).** `--notify <address>`, else the runner's own `$GOV_MSG_ADDRESS`, is set as
-  `GOV_MSG_ADDRESS` in the environment of every process the runner starts and, for the run's duration, in the
-  runner's own process (the product's `run_claude` inherits it, so the reader's and grader's sessions carry it); it is
-  restored when the run ends, also after an error. With neither, nothing is set (the product's launcher then defaults
-  the address to the live CTO's inbox: give one).
-- **The report's ranks (T6).** Each `per_question` row holds `bundle` (every item the retrieval gave, `[path, start,
-  end]` in rank order; `null` when it gave none), `forbidden_rank` and `gold_rank` (1-based rank of the first item
-  whose path is a forbidden source, or a gold source; `null` when none), beside `first_gold_rank`. Paths, line numbers
-  and ranks only, the hidden rows too.
-- **`--exceptions <file>` (T3).** An owner's exceptions (JSON or YAML, `decision` and `reasons`, see "The judge") are
-  passed on to `overall`. The verdict is then READY_WITH_EXCEPTIONS when every judge reason is named (the command
-  prints it and exits 0, as for READY), and the report names the decision and each id: `report.json` holds `reason_ids`
-  (in step with `reasons`; `null` for the runner's own) and `exceptions` (`decision`, `named`, `unnamed`, `unused`),
-  `report.md` lists them under "Exceptions named in DEC-n". **The runner's own reasons are never excusable:** the
-  landing not run or not exit 0, the hidden half absent, a `gov adopt` stage that ended with an exit other than 0 stay
-  reasons and keep the run NOT_READY whatever the file names. A file that cannot be read, is no mapping, has no
-  `decision` of the form `DEC-<digits>`, whose `reasons` are not a list of non-empty strings, or that names an id twice
-  is refused before any work: `refused: <file name>: <fault>` on standard error, exit 2.
+`report.json` and `report.md`; a refusal is exit 2. `--notify`, `--exceptions`, the landing's `HOME` and the report's
+ranks (the fixes of the run on 0.1.4) are in `FIXES-0.1.4.md`.
 
 **The run folder.** `--folder` is given by literal path: a temporary folder, or `~/gov-os-runs/W2-81/<run>`
 (DEC-728). The runner refuses:
@@ -978,39 +940,15 @@ folder.
 
 ## Fix: W2-81's test code, six defects (W2-81's proving run on 0.1.4)
 
-The proving run on 0.1.4 (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, "Class 2: test-code defects") and the
-run of 2026-11-20 found defects in this folder's own support code. They are fixes under `DAEO-l78m`, not new
-tickets: each one has its red tests first (a commit of its own, the red run recorded below), then the change to the
-support module that turns them green. The cases are mapped to the ticket's KPI lines they serve (the form above, which
-`gov accept W2-81` reads); a case listed as a **guard** is green on the base by design (it holds today's behaviour that
-the fix must not change), and every other case is red on the base for the reason in its row. The fixes are named by
-the analysis's ids (T1, T2, T3, T5, T6) and the CTO's (T10).
+Fixes under `DAEO-l78m`, each with its red tests first and the support change after (`FIXES-0.1.4.md`: the red runs,
+the KPI wording, the case rewritten, what the wording left open). A **guard** is green on the base by design.
 
-| KPI line | Tests | Expected red reason (on the base) |
+| KPI line | Tests | Expected red reason |
 |---|---|---|
-| **S9, S11** Fix T1: the runner starts the pinned `gov queue` with the operator's own `HOME`, every other variable as before; `gov retrieve` keeps the run's scrubbed one | `test_w2_81_runner.py::test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_before` | the stand-in `gov queue` records `HOME=<run>/.home`, not the operator's |
-| **S9** Fix T10: every process the run starts carries the address of whoever started it: the runner reads `$GOV_MSG_ADDRESS` (or `--notify <address>`, which wins) and sets it for `gov adopt`, `gov retrieve`, `gov queue` and, in its own process for the run, the reader's and grader's sessions, restoring it afterwards; started with neither, nothing is set | `test_w2_81_runner.py::test_every_process_the_run_starts_carries_the_address_of_whoever_started_it` (3: from the environment, --notify wins, neither: a **guard**, green on the base), `test_w2_81_runner.py::test_the_address_is_restored_after_the_run_even_when_a_session_falls_over` (2), `test_w2_81_runner.py::test_the_adoption_stages_carry_the_address_too_and_keep_the_runs_own_home`, `test_w2_81_runner.py::test_notify_is_an_option_of_the_command_and_names_no_default` | the stand-in `gov` and the session starter see no `GOV_MSG_ADDRESS` (the runner's scrubbed environment drops it); --notify is an unknown option (argparse exits 2; the parsed options have no `notify`) |
-| **S7, S9, F4** Fix T6: each row of a repository's `per_question` holds `bundle` (the ranked `[path, start, end]` of every item the retrieval gave, `null` when it gave none), `forbidden_rank` and `gold_rank` (1-based, `null` when none or no bundle) beside `first_gold_rank`; paths, line numbers and ranks only: no question, answer, gold or item text, in the hidden rows too | `test_w2_81_score.py::test_a_row_holds_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source`, `test_w2_81_score.py::test_a_row_names_no_rank_where_the_bundle_holds_no_such_item_and_no_bundle_where_none_was_given`, `test_w2_81_score.py::test_the_forbidden_rank_is_by_path_over_any_forbidden_source_and_ranks_start_at_1`, `test_w2_81_score.py::test_the_gold_rank_is_by_the_gold_sources_path_where_the_first_gold_rank_is_by_its_line`, `test_w2_81_score.py::test_the_new_fields_hold_paths_line_numbers_and_ranks_only`, `test_w2_81_runner.py::test_the_report_records_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source` (2: a forbidden source first, five fillers before the gold), `test_w2_81_runner.py::test_a_question_whose_retrieval_failed_has_no_bundle_and_no_rank`, `test_w2_81_runner.py::test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_rows_included` | a row has no `bundle`, `forbidden_rank` or `gold_rank` (`KeyError`); the scorer keeps only `first_gold_rank` and `forbidden_in_top_5` |
-| **S6, S13, F2** Fix T2: stage AS (the spec audit, CAP-44.m, built) is a required stage of the judge, between A2 and A3, and a row of the capability table; its record `governance/adoption/AS-spec-audit.md` absent or unreadable is named (`stage AS is ABSENT` or `UNREADABLE`, the judge's own words for a built stage that shows nothing) and the run is NOT_READY; a present one is PRESENT and gives no reason | `test_w2_81_judge.py::test_stage_as_is_in_the_stage_list_between_a2_and_a3_and_in_the_capability_table`, `test_w2_81_judge.py::test_a_present_as_record_is_present_and_gives_no_reason`, `test_w2_81_judge.py::test_an_as_record_that_is_absent_or_unreadable_is_named_and_the_run_is_not_ready` (8: absent, no front matter, front matter not a mapping, bad YAML, each on all-built and on today's code), `test_w2_81_judge.py::test_an_adoption_that_ran_nothing_names_stage_as_absent` | the judge's stage list has no `AS` (`KeyError: 'AS'`; no `AS` in `STAGES`, `BUILT_STAGES` or `CAPABILITIES`) |
-| **S6, S14, F2** Fix T3, the judge: every reason `overall` gives has a stable id `<repository>:<CODE>:<subject>` (PLANTED the planted problem's id, CONTROL the control's, STAGE the stage's name, FIGURE `end_to_end`, NOTJUDGED `-`), in `reason_ids`, in step with the unchanged `reasons`; `overall(judgements, figures, expected, exceptions=None)` reads an owner's exceptions (a mapping, or a JSON or YAML file: `decision` and `reasons`): READY only with no reason, the new READY_WITH_EXCEPTIONS only when every reason's id is named, one unnamed stays NOT_READY and is named (`exceptions.unnamed`), `exceptions` holds the decision, the ids `named` and the ids `unused` (never an error); a FOUND problem or PRESENT stage is never a reason | `test_w2_81_judge.py::test_every_reason_has_a_stable_id_in_step_with_its_text_and_the_texts_are_unchanged`, `test_w2_81_judge.py::test_each_kind_of_reason_has_its_code_and_subject`, `test_w2_81_judge.py::test_with_no_exceptions_ready_and_not_ready_are_as_before_and_ready_needs_no_reason`, `test_w2_81_judge.py::test_every_reason_named_is_ready_with_exceptions_and_the_reasons_stay_reasons`, `test_w2_81_judge.py::test_one_reason_not_named_keeps_not_ready_and_the_result_names_it` (7, each reason left out in turn), `test_w2_81_judge.py::test_an_id_that_matches_no_reason_is_reported_as_unused_and_is_never_an_error`, `test_w2_81_judge.py::test_a_reasons_text_or_another_repositorys_id_names_nothing`, `test_w2_81_judge.py::test_overall_reads_the_exceptions_from_a_json_or_yaml_file` (2), `test_w2_81_judge.py::test_the_reasons_of_a_real_judgement_carry_ids_and_are_named_one_by_one` | `overall` takes no `exceptions` (`TypeError`), gives no `reason_ids` (`KeyError`) and the judge has no `READY_WITH_EXCEPTIONS` |
-| **S9, S14** Fix T3, the runner: `--exceptions <file>` (JSON or YAML) is passed on to `overall`; READY_WITH_EXCEPTIONS when every judge reason is named, and the report (JSON and markdown) names the decision and each excepted id; one unnamed id stays NOT_READY; the runner's own reasons (the landing not run or not exit 0, the hidden half absent, a failing `gov adopt` stage) are never excusable; a file with no decision, a decision not `DEC-<digits>`, `reasons` not a list of non-empty strings, a duplicate id, or unreadable, is refused before any work (exit 2, naming the file and the fault); the command exits 0 for READY_WITH_EXCEPTIONS | `test_w2_81_runner.py::test_every_judge_reason_named_in_the_owners_file_is_ready_with_exceptions_naming_the_decision` (2: JSON, YAML), `test_w2_81_runner.py::test_one_reason_the_owners_file_does_not_name_keeps_the_run_not_ready_and_is_named`, `test_w2_81_runner.py::test_the_runners_own_reasons_are_never_excusable_by_the_owners_file` (3: queue fails, queue not run, hidden half absent), `test_w2_81_runner.py::test_a_failing_adoption_stage_is_never_excusable_by_the_owners_file`, `test_w2_81_runner.py::test_exceptions_where_there_is_no_reason_leave_a_ready_run_ready`, `test_w2_81_runner.py::test_the_command_exits_0_for_ready_with_exceptions_and_1_for_not_ready`, `test_w2_81_runner.py::test_a_faulty_exceptions_file_is_refused_before_any_work_naming_the_file_and_the_fault` (16 faults), `test_w2_81_runner.py::test_exceptions_is_an_option_of_the_command_and_has_no_default` | `--exceptions` is an unknown option (argparse exits 2; the parsed options have no `exceptions`) |
-| **S3, S13** Fix T5: the capability table (`CAPABILITIES`) is dated 2026-11-20, the README's row for VERDICT says no stage or command gives the lite verdict yet (CAP-44.h, W2) and that W2-52 built A7 and A10 only (it no longer calls W2-52 unmerged), and AS is in the README's capability table (a text test) | `test_w2_81_judge.py::test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_verdict_stage_is` | `CAPABILITIES`' comment says 2026-10-31; the README's VERDICT row calls W2-52 unmerged; the README's table has no AS row |
-
-**The red runs, on the base** (each run through the heavy slot, before the support change): T1 1 failed; T10 6 failed
-and 1 passed (the guard "started with neither, nothing is set"); T6 9 failed (5 scorer, 4 runner ids: `KeyError:
-'bundle'`); T2 11 failed (`KeyError: 'AS'`); T3 42 failed (an unknown `--exceptions`, `overall()` with no `exceptions`,
-no `reason_ids`, no `READY_WITH_EXCEPTIONS`); T5 1 failed (the comment's date). After each support change the same
-cases and the files they live in were run green.
-
-**An existing case rewritten (one).** `test_w2_81_runner.py::test_the_report_log_and_output_hold_no_question_answer_or_secret_text`
-compared every gold answer with `report.json`; with T6 the rows' `bundle` records a file's path, and a gold answer can
-be that path (`pyproject.toml`), so it now leaves the rows' `bundle` out of `report.json` before that comparison. Every
-other comparison, the markdown, the log and the command's output included, is unchanged (commit trailer
-`Rewrite-Reason`).
-
-**What the KPI wording left open, and what the cases hold.** (T1) The model sessions never had the scrubbed `HOME`: the
-product's `run_claude` inherits the runner process's own environment, so the case holds that the runner leaves its own
-`HOME` alone. (T3) `overall` also takes the path of the file (the item's title says so); the result's `exceptions` also
-carries `unnamed`; the command exits 0 for READY_WITH_EXCEPTIONS; a stage's missed word is the judge's own (`ABSENT`,
-`UNREADABLE`), not `MISSED`, which is the planted problems'. (T6) `gold_rank` is by path ("likewise" the forbidden
-rank), `first_gold_rank` stays by line.
+| **S9, S11** Fix T1: `gov queue` runs with the operator's HOME | `test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_before` | queue sees the run's scrubbed HOME |
+| **S9** Fix T10: every process the run starts carries the starter's address (`GOV_MSG_ADDRESS`, or --notify) | `test_every_process_the_run_starts_carries_the_address_of_whoever_started_it` (3; "neither" is a guard), `test_the_address_is_restored_after_the_run_even_when_a_session_falls_over` (2), `test_the_adoption_stages_carry_the_address_too_and_keep_the_runs_own_home`, `test_notify_is_an_option_of_the_command_and_names_no_default` | no address set; --notify unknown |
+| **S7, S9, F4** Fix T6: each report row holds the ranked bundle and the forbidden and gold ranks, no text | `test_a_row_holds_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source`, `test_a_row_names_no_rank_where_the_bundle_holds_no_such_item_and_no_bundle_where_none_was_given`, `test_the_forbidden_rank_is_by_path_over_any_forbidden_source_and_ranks_start_at_1`, `test_the_gold_rank_is_by_the_gold_sources_path_where_the_first_gold_rank_is_by_its_line`, `test_the_new_fields_hold_paths_line_numbers_and_ranks_only`, `test_the_report_records_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source` (2), `test_a_question_whose_retrieval_failed_has_no_bundle_and_no_rank`, `test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_rows_included` | no `bundle` in a row (`KeyError`) |
+| **S6, S13, F2** Fix T2: stage AS is a required stage of the judge | `test_stage_as_is_in_the_stage_list_between_a2_and_a3_and_in_the_capability_table`, `test_a_present_as_record_is_present_and_gives_no_reason`, `test_an_as_record_that_is_absent_or_unreadable_is_named_and_the_run_is_not_ready` (8), `test_an_adoption_that_ran_nothing_names_stage_as_absent` | no AS in the stages (`KeyError`) |
+| **S6, S14, F2** Fix T3: reason ids and an owner's exceptions in `overall`; READY_WITH_EXCEPTIONS | `test_every_reason_has_a_stable_id_in_step_with_its_text_and_the_texts_are_unchanged`, `test_each_kind_of_reason_has_its_code_and_subject`, `test_with_no_exceptions_ready_and_not_ready_are_as_before_and_ready_needs_no_reason`, `test_every_reason_named_is_ready_with_exceptions_and_the_reasons_stay_reasons`, `test_one_reason_not_named_keeps_not_ready_and_the_result_names_it` (7), `test_an_id_that_matches_no_reason_is_reported_as_unused_and_is_never_an_error`, `test_a_reasons_text_or_another_repositorys_id_names_nothing`, `test_overall_reads_the_exceptions_from_a_json_or_yaml_file` (2), `test_the_reasons_of_a_real_judgement_carry_ids_and_are_named_one_by_one` | `overall` takes no `exceptions`; no `reason_ids` |
+| **S9, S14** Fix T3: `--exceptions <file>` in the runner; its own reasons never excusable; faults refused | `test_every_judge_reason_named_in_the_owners_file_is_ready_with_exceptions_naming_the_decision` (2), `test_one_reason_the_owners_file_does_not_name_keeps_the_run_not_ready_and_is_named`, `test_the_runners_own_reasons_are_never_excusable_by_the_owners_file` (3), `test_a_failing_adoption_stage_is_never_excusable_by_the_owners_file`, `test_exceptions_where_there_is_no_reason_leave_a_ready_run_ready`, `test_the_command_exits_0_for_ready_with_exceptions_and_1_for_not_ready`, `test_a_faulty_exceptions_file_is_refused_before_any_work_naming_the_file_and_the_fault` (16), `test_exceptions_is_an_option_of_the_command_and_has_no_default` | --exceptions unknown |
+| **S3, S13** Fix T5: CAPABILITIES and the README's VERDICT and AS rows are current | `test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_verdict_stage_is` | the comment says 2026-10-31 |
