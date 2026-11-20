@@ -9,7 +9,8 @@ The adopter's order (the README's reading of S8): ``fresh`` first, with nothing 
 waits for ``writer-1``); then ``brief`` for each half (the ``brief`` event opens the scan's window, S12); then the
 halves are delivered into the sets root (planted as files, as a delivery leaves them); then ``fresh`` again.
 
-- ``right``: both halves clean and accepted; every answer right; a transcript that names ``q07`` is allowed with
+- ``right``: both halves clean and accepted; every answer right; a transcript that names ``q07`` beside the hidden
+  half's audit name (a bare id is no finding, S13) is allowed with
   ``--allow-session``. Three ``fresh`` calls: ``plan``, ``delivered`` (no notes yet), ``final``.
 - ``misses``: the same, three hidden answers wrong; a transcript that names no id. Calls: ``plan``, ``final``.
 - ``void``: the same as ``right``, the transcript that names ``q07`` not allowed. Calls: ``plan``, ``final``.
@@ -60,7 +61,7 @@ def _deliver(world: K.World, specs, *, notes: bool, audits=(VISIBLE, HIDDEN)) ->
 def _transcripts(world: K.World, *, leak: bool) -> None:
     world.plant_transcript(PLAIN_SESSION, "nothing of the set here: q070 and xq07 are other words")
     if leak:
-        world.plant_transcript(LEAK_SESSION, "the session opened q07 and read it")
+        world.plant_transcript(LEAK_SESSION, f"the session opened {HIDDEN} q07 and read it")  # S13 M1: name and id
 
 
 BUSY = {

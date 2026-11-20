@@ -28,11 +28,10 @@ def _scan(set_root, projects, env, cwd, *extra, json_form):
 def test_f2_no_output_holds_a_line_of_a_set_file_but_its_id(tmp_path, home, env, json_form, finding):
     set_root = _set(home)
     projects = home / ".claude" / "projects"
-    s.transcript(projects / "-p" / "sess-leak.jsonl", [
-        s.say("2026-11-10T09:00:00Z", "sess-leak", f"q01 asks: {QUESTION} The answer: {GOLD}"),
-    ], IN)
-    extra = [] if finding else ["--id", "zz9"]
-    run = _scan(set_root, projects, env, tmp_path, *extra, json_form=json_form)
+    # The fix under W2-204 (S13 M1, S14 M2): the question's text read is the finding; without it, a bare id is none.
+    said = f"q01 asks: {QUESTION} The answer: {GOLD}" if finding else f"q01 asks about the lanterns. The answer: {GOLD}"
+    s.transcript(projects / "-p" / "sess-leak.jsonl", [s.say("2026-11-10T09:00:00Z", "sess-leak", said)], IN)
+    run = _scan(set_root, projects, env, tmp_path, json_form=json_form)
     assert run.code == (1 if finding else 0), f"exit {run.code}: {run.both[-600:]}"
     if json_form:
         assert isinstance(run.envelope()["result"]["findings"], list)
@@ -64,7 +63,8 @@ def test_f2_an_unreadable_transcript_and_no_finding_exits_3_naming_it(tmp_path, 
 def test_f2_an_unreadable_transcript_beside_a_finding_is_named_in_problems(tmp_path, home, env):
     set_root = _set(home)
     projects = home / ".claude" / "projects"
-    s.transcript(projects / "-p" / "sess-named.jsonl", [s.say("2026-11-10T09:00:00Z", "sess-named", "q03 here")], IN)
+    s.transcript(projects / "-p" / "sess-named.jsonl",
+                 [s.say("2026-11-10T09:00:00Z", "sess-named", "20261101 q03 here")], IN)
     locked = s.transcript(projects / "-p" / "sess-locked.jsonl",
                           [s.say("2026-11-10T09:00:00Z", "sess-locked", "nothing")], IN)
     locked.chmod(0)
