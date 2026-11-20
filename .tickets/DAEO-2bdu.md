@@ -366,3 +366,27 @@ This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill
 **Reopened 2026-11-16 09:1x by the CTO (DEC-1156 (7), DEC-1157 (12); a path case from the 11-16 nightly triage; listed for the owner's reading):** S27's case `tests/acceptance/W2-88/test_w2_88_scan_speed.py::test_s27_many_texts_are_judged_per_gitleaks_process` (at most one gitleaks process per 10 files asked, both rule sets counted: DEC-1183 (2), run 9) fails alone without a slot budget: `_batches` (src/gov/secrets/__init__.py:440) sizes batches by `ceil(texts/width)` with width the CPU count, so on 20 CPUs 300 files over 2 rule sets start 40 processes against the bound of 30; inside a heavy slot it passes. The bound is the decided behaviour: an engineer makes the scan keep it whatever the width (the case is not changed), with a unit test beside it. Allowed paths narrowed to this round (the earlier list is in git history at cacfea453). A narrow independent check (DEC-1154) judges the change.
 
 **Path case 2026-11-16 10:4x (S27W-F5 (a); the CTO, DEC-1156 (7); listed for the owner's reading):** the S27-W round's fix passed its narrow check (a5e445a7f), but W2-88's planted F5 case (`tests/acceptance/W2-88/test_w2_88_f5_paths.py:20,49`) reads its INSIDE path, `src/gov/adopt/assess.py`, from this ticket's `allowed_paths`, which the 11-16 reopen had narrowed away. The path is restored to the list (no worker writes it in this round; the list's narrowing was the CTO's). The durable form, INSIDE taken from the copied ticket's own list by a test designer, is a row (DND), so a later narrowing cannot redden the case again.
+
+## Fix: FABRIC_INCOMPLETE names each file in neither list (W2-81's proving run on 0.1.4)
+
+Found by W2-81's proving run on release 0.1.4 (analysis row P3; rust-workspace F-008, F-010): A9 stopped with
+`FABRIC_INCOMPLETE "vectors: 2 file(s) judged and in neither list"` and named no file, so the adopter could not see which
+two (the cause there was an overlapping path map, `governance/project/audits/**` in two namespaces). That breaks S1,
+"every tracked file is either indexed or named with its reason". The ticket stays closed or as it is; no new ticket
+(DEC-1219 (6)). The overlap check itself (A3 and `gov doctor` refusing a path in two namespaces) is a new line on closed
+tickets and is the analysis's A4, not this fix.
+
+- **Line (fix):** `FABRIC_INCOMPLETE` names each file that a store judged and holds in neither of its two lists, and each
+  it holds in both: the message lists the paths and `details` carries them (`details['missing']`, sorted, over every
+  store; `details['both']`, sorted), so no refusal says only a count. A store's record in the A9 stores dict carries
+  `judged_files`; a record without it keeps the count message and still raises as before. A file in both lists now also
+  raises.
+- **Verify:** `tests/acceptance/W2-88/test_w2_88_fix_fabric_names_files.py` (12 cases: 10 red on the base, 2 guards; its
+  end-to-end case reproduces the adopter's refusal word for word, with `details['missing'] == []` on the base); mapped to
+  `failure-2` in the README. Unit: `tests/unit/adopt/test_fabric_coverage_names.py`.
+- **Built in:** `src/gov/adopt/fabric.py`: `judged_files` on the vectors and code-graph stores, and `check_coverage`.
+- **Commits:** tests `91b562178`, README map `a8c915df1`, engineer `94369a648` and `878c0e6dc` (a local name the S20
+  guard read as a second copy of the figures).
+- **Green:** `gov accept W2-88 --root <worktree> --timeout 5400`: outcome pass, 335 passed, 0 failed, 2 skipped (39 mapped
+  lines pass; failure-2 20 passed). The suite takes about 31 minutes, so the landing's default timeout of 1800 s ends
+  it as `error_kind: timeout`, not as a result: give the landing a longer one.

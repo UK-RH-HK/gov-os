@@ -76,3 +76,30 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-52), added by DEC-741 H (i) (2026-10-17)
   W2-52's embedding stand-in answers the device listing as W2-54's and W2-32's do (`Rewrite-Reason: DEC-1065`), no
   expectation lowered. The old FULL probe holds for this test-only change (no product code changes); the merge queue's
   scoped run is the backstop.
+
+## Fix: a verdict the A5, A7 or A10 gate accepts is a record the store reads (W2-81's proving run on 0.1.4)
+
+Found by W2-81's proving run on release 0.1.4 (analysis row P2, `docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`;
+rust-workspace F-013 and python-app-clean F-013): the adopters' verdicts for A5 and A7 stated `id` and `type` but no
+`status`; the gates accepted them (exit 0) and the final `gov rebuild` listed both as invalid records ("required key
+missing or not a string: status": the store requires `id`, `type` and `status` of any file whose front matter has an
+`id`). The ticket stays closed; no new ticket (DEC-1219 (6)).
+
+- **Line (fix):** a verdict that the A5, A7 or A10 gate accepts is a record the store reads. A verdict whose front matter
+  states an `id` but lacks a non-empty string `type` or `status` is refused by the gate with `VERDICT_NOT_A_RECORD`
+  (envelope `ADOPT_VERDICT_NOT_A_RECORD`), naming the file and the keys; the check runs after the existing checks, so
+  every earlier refusal keeps its code and order. A verdict with no `id` (as the adopt skill gives its keys) and one with
+  `id`, `type` and `status` are accepted, and `gov rebuild` then lists none invalid.
+- **Verify:** `tests/acceptance/W2-52/test_w2_52_verdict_is_a_record.py` (24 cases, 16 red on the base for "expected a
+  refusal, but the tool reports success", 8 green guards); mapped to `failure-1` in the README. Unit:
+  `tests/unit/adopt/test_lite_gates_record.py`.
+- **Built in:** `require_record` in `src/gov/adopt/lite_gates.py`, called last in `_auditor` (A7, A10) and in `_verdict`
+  (`src/gov/adopt/stages.py`, A5; A6 and A8 re-run it through their guard). `project.py` is not touched (W2-23's unit
+  test pins its bytes).
+- **Consequence to know:** an A7 or A10 `fail` verdict with an `id` and no `status` is now refused as not a record,
+  where it was written as a failing record; the refusal names the keys. The adopt skill's text is unchanged (kernel text
+  is the CTO's, EMERGENCY-2 3.5); the re-run's adopter brief carries the key rule.
+- **Commits:** tests `04996744e`, README map `0424e83f1` (the map's pre-existing continuation rows renamed so
+  `gov accept` can read it; `Rewrite-Reason` in the commit), engineer `752650822` and `612a4d1da`.
+- **Green:** `gov accept W2-52 --root <worktree>`: outcome pass, 89 passed, 0 failed, 0 skipped (success-1 9, success-2
+  33, success-3 9, failure-1 41, 1 unmapped).
