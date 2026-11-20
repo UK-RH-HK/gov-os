@@ -1,0 +1,9 @@
+# The owner's standing yes for patch releases cut by the CTO (RELEASE-ON-BEHALF G0; DEC-1223).
+#
+# `gov release <X> --patch` reads this file first and refuses unless `patch_releases` is on, a decision is named, the
+# file is committed as it stands and its last commit carries `Decided-by: owner...`. It is changed only by a
+# decision-record commit of the owner's decision; no command writes it. `off` is the committed state until the
+# rehearsal's record is read (the string is quoted, so YAML does not turn it into a boolean).
+patch_releases: "off"
+decision: DEC-1223
+bake_hours: 4

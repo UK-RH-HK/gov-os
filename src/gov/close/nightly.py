@@ -1,6 +1,6 @@
 """The nightly full regression (W2-66; DEC-880 item 2 (c), DEC-852 item 3, DEC-889 items 2 b, 4 and 12).
 
-``python3 -m gov.close.nightly <branch> --root <project> [--coverage] --json`` runs the full uncached regression
+``python3 -m gov.close.nightly <branch> --root <project> [--coverage] [--optin <suite>]... --json`` runs the full uncached regression
 on the branch's head (a detached worktree of that commit, never the working tree) in the close's form: one
 parallel run, then the serial-only cases alone, with the per-test limit, the distribution mode, the temp-folder
 retention (``-o tmp_path_retention_policy=failed``, DEC-905) and JUnit XML.
@@ -10,6 +10,10 @@ over the commits since the last green night; a red that passes alone is a flaky 
 that a scoped close since the last green night left out, or ran and passed, is a P1 selection miss carrying the
 test map's correction. With ``--coverage`` (the weekly run) coverage.py measures which tests executed each source
 file, child processes included (lens H's shim), and the record names the measured map.
+
+``--optin <suite>`` (``weekly``, ``lifted`` or ``breadth``, repeatable) adds the suite to the caller's
+``GOV_TESTS_OPTIN`` in every test run, and the record's ``optin`` lists the suites the run opted in to, from the option
+and the environment alike (``[]`` when none): G2 of a patch release reads it for the weekly tier (W2-209).
 
 The record is ``docs/close/nightly/NR-<UTC stamp>-<head12>.json`` of the project's working tree; the output is
 the API-0002 envelope: ``ok: true``, exit 0, ``result.record`` on a green night; ``ok: false``, exit 3,
@@ -25,6 +29,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -40,6 +45,8 @@ DEFAULT_RUN_LIMIT = 7200
 PRIORITY = "P1"
 GREEN, RED = "green", "red"
 FAILED, PASSED = "failed", "passed"
+OPTIN_ENV = "GOV_TESTS_OPTIN"  # tests/conftest.py's variable: the suites a run opts in to, comma-separated
+OPTIN_SUITES = ("weekly", "lifted", "breadth")  # the opt-in suites the test configuration knows (tests/optin-*.txt)
 
 
 def _last_green(root: Path, head: str) -> str | None:
@@ -346,10 +353,51 @@ def rebuild_stores(tree: Path) -> dict:
     return {**outcome, SECRETS_FULL_SCAN: "1"}
 
 
-def night(root: Path, branch: str, coverage: bool = False, rebuild: bool = True) -> dict:
+def optin_names(option, environ=None) -> list[str]:
+    """The suites a run opts in to (W2-209 S11): the option's names and the caller's ``GOV_TESTS_OPTIN`` (comma-separated),
+    sorted, none dropped; ``[]`` when there are none."""
+    held = (os.environ if environ is None else environ).get(OPTIN_ENV, "")
+    return sorted({name.strip() for name in held.split(",") if name.strip()} | set(option or ()))
+
+
+def check_optin(option) -> None:
+    """Refuse (``GovError``, naming it) an option name that is not an opt-in suite the test configuration knows."""
+    unknown = sorted(set(option or ()) - set(OPTIN_SUITES))
+    if unknown:
+        raise GovError("NIGHTLY_USAGE", f"unknown opt-in suite {', '.join(map(repr, unknown))}: the test configuration "
+                       f"knows {', '.join(OPTIN_SUITES)}", {"optin": unknown})
+
+
+@contextmanager
+def optin_environment(option):
+    """The runs' environment: ``GOV_TESTS_OPTIN`` is the union of the option's names and the caller's, sorted and
+    joined by commas, and absent when the union is empty; the caller's value is put back after."""
+    before = os.environ.get(OPTIN_ENV)
+    names = optin_names(option)
+    if names:
+        os.environ[OPTIN_ENV] = ",".join(names)
+    else:
+        os.environ.pop(OPTIN_ENV, None)
+    try:
+        yield names
+    finally:
+        if before is None:
+            os.environ.pop(OPTIN_ENV, None)
+        else:
+            os.environ[OPTIN_ENV] = before
+
+
+def night(root: Path, branch: str, coverage: bool = False, rebuild: bool = True, optin=None) -> dict:
     """Run the night on ``branch``'s head; its record, written to the working tree. ``rebuild``: the project
     worktree's stores rebuilt first with the full secrets scan (S8); the strict close's batch, which rebuilds before
-    it, passes False (today's, F4)."""
+    it, passes False (today's, F4). ``optin``: opt-in suites the run is made with (``weekly``, ``lifted``,
+    ``breadth``; W2-209 S11): added to the caller's ``GOV_TESTS_OPTIN``, and the record's ``optin`` lists them all."""
+    check_optin(optin)  # before anything runs
+    with optin_environment(optin) as opted:
+        return _night(Path(root), branch, coverage, rebuild, opted)
+
+
+def _night(root: Path, branch: str, coverage: bool, rebuild: bool, opted: list[str]) -> dict:
     root = Path(root)
     head = _git(root, "rev-parse", "--verify", "--quiet", f"{branch}^{{commit}}", ok=(0, 1)).strip()
     if not head:
@@ -424,7 +472,7 @@ def night(root: Path, branch: str, coverage: bool = False, rebuild: bool = True)
     # rebuild's error goes to stderr); the tests' verdict stays the tests' own, as the strict close's batch reads it
     verdict = GREEN if not findings and not listed else RED
     record = {"branch": branch, "head": head, "tree": tree_id, "base": since, "scope": "full", "verdict": verdict,
-              "secrets_full_scan": bool(rebuilt["ok"]),
+              "secrets_full_scan": bool(rebuilt["ok"]), "optin": opted,
               "junit_xml": junit, "failures": listed, "packages": packages, "tests_run": counts,
               "findings": findings, "per_test_timeout": per_test, "distribution": distribution,
               "tmp_path_retention_policy": scope["tmp_path_retention_policy"], "created": _close._now()}
@@ -443,11 +491,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("branch")
     parser.add_argument("--root", default=".")
     parser.add_argument("--coverage", action="store_true")
+    parser.add_argument("--optin", action="append", choices=OPTIN_SUITES, metavar="<suite>", default=[],
+                        help=f"run with this opt-in suite too ({', '.join(OPTIN_SUITES)}; repeatable): G2 of a patch "
+                             "release reads the record's optin for the weekly tier")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--session", default="")
     args = parser.parse_args(argv)
     try:
-        result = night(Path(args.root), args.branch, args.coverage)
+        result = night(Path(args.root), args.branch, args.coverage, optin=args.optin)
     except GovError as error:
         envelope = {"ok": False, "command": COMMAND, "result": {}, "session": args.session,
                     "error": {"code": error.code, "message": error.message, "details": error.details}}
