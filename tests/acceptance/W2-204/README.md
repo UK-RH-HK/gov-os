@@ -107,6 +107,49 @@ limit by design once the commands exist (a whole fresh 80 with fakes is about 20
 W2-171 and W2-172; about 10 s per judged half on this machine); each run is built once. On the base the folder runs
 in about 12 s (every command ends at once).
 
+## The fix under the closed ticket: S13 to S16 (EXAMIN's F-033, 2026-11-20)
+
+Written by the independent test designer from the ticket's last section (`## Fix: the transcript scan's id match`),
+its terms and its lines S13 (M1) to S16 (M4), on the base `d42b1d833`, before any implementation. Public interface only:
+`gov memaudit scan` as a child process (`python3 -m gov.cli.main memaudit scan --set ... --since ... [--until ...]
+--projects <planted> [--json]`), its lines (`MEASURE VOID: <n> finding(s), <k> transcripts read`, one line per finding
+`<file>:<line> session=.. role=.. kind=.. match=..`, `no transcript in the window names the set: <k> transcripts read,
+<n> ids`, `SCAN INCOMPLETE`), its exit codes (0, 1, 3) and the `--json` envelope's `result.findings` and
+`result.transcripts_read`; and `fresh`'s close (`SCAN <audit> clean`) on a new planted run, `busy`.
+
+- **Planted** (`w2_204_scan_support.py`): a home under `tmp_path`; the set at `<home>/eval/fixtures/evaluation/
+  memory-audit-20261107` (tag `20261107`), its `hidden/q<nn>.yaml` written with `yaml.safe_dump` in a delivered half's
+  fields (a long question folded over two lines by the dumper), or empty (a dummy); transcripts in Claude Code's JSONL
+  form under a planted projects folder (chat, text, Bash `tool_use`, `tool_result`, a Read tool's numbered output, a
+  line of `\u` escapes, a sub-agent's transcript), with planted timestamps and mtimes. Every question and gold answer
+  holds a word found nowhere else (`Velloran`, `Zephranel`, ...), checked absent from stdout and stderr.
+- **The `busy` stage** (`w2_204_stages.py`): `misses`'s run with every answer right and three more transcripts in the
+  window (bare `q01`..`q40`, a numbered list, another set's name and path beside `q07`), none naming either half.
+- **Readings where the fix leaves a detail open** (tested no further than stated):
+  1. A key is looked for in each decoded text value of a line, normalised; a line that holds the key across two text
+     values is not tested. The question files' text is read as YAML (`question` field).
+  2. The 48-character cut: a line ending right after the first 48 characters of a question holds its key; one
+     holding the first 47 and then another character does not. Every planted key ends in a letter, so a key's
+     trailing space never decides a case.
+  3. An unreadable question file with no finding: exit 3 and the output names the file (`q01.yaml`), as an unreadable
+     transcript is named today. An empty file is no problem (exit 0).
+  4. A set whose path holds no audit or standing name: its own folder's name (the parent's when `--set` is the
+     `hidden` folder), at least 8 characters, is its name; a shorter one gives no name, so its ids are never a finding
+     (the path forms still are).
+  5. A line holding both a bare id and a question's text gives `kind=text` (the bare id is no evidence); a line with
+     the set's path gives `kind=path` (the most specific form) whatever else it holds. A line holding a key and the
+     name beside an id is not planted (which kind wins is not stated).
+  6. `--id` with the text match: not tested (the ticket does not say whether `--id` narrows the keys); W2-198's F2
+     no-finding case no longer uses `--id` for that reason.
+- **Rewritten existing cases** (a separate commit, trailer `Rewrite-Reason`): the cases that planted a bare id as the
+  evidence now plant the tag or the audit name beside it, findings unchanged: W2-198 S3 (lines 6 and 8 of
+  `sess-main`, the sub-agent's line, `--id h7`'s line; the names-only case renamed `..._even_when_the_files_cannot_be_read`),
+  W2-198 F2 (the finding beside an unreadable transcript; the no-finding case plants a bare id and the gold answer,
+  without `--id`), `tests/unit/memaudit/test_w2_198_scan.py` (the id cases through `scan.scan` with the tag; the
+  bare-id assertion of the path-form case removed; "never opened" becomes "never changed, text never in the result")
+  and this folder's S12 `void` and `right` stages (the leak line names the hidden half's audit name beside `q07`).
+  Red on the base after the rewrite: only W2-198 F2's two no-finding cases (a bare `q01` is still a finding there).
+
 ## KPI map
 
 | KPI id | tests | expected red reason |
@@ -127,6 +170,10 @@ in about 12 s (every command ends at once).
 | failure-2 (F2) | `test_w2_204_f_guards.py::test_f2_the_prompts_the_model_calls_and_their_test_are_the_base_s_bytes` | **Green on the base by design (a guard):** `prompts.py`, `claude.py` and `tests/unit/memaudit/test_prompts.py` are the base's blobs; red if the ticket touches one |
 | failure-3 (F3) | `test_w2_204_f_guards.py::test_f3_no_line_of_a_whole_run_holds_a_question_an_answer_or_a_source`, `test_w2_204_f_guards.py::test_f3_the_figures_the_ledger_and_the_records_hold_counts_only`, `test_w2_204_f_guards.py::test_f3_no_file_outside_the_sets_and_the_run_folders_holds_a_planted_word`, `test_w2_204_f_guards.py::test_f3_say_stays_the_only_printer`, `test_w2_204_s9_s10_brief_deliver.py::test_s10_a_good_writer_delivery_lands_forty_files_and_prints_counts_only`, `test_w2_204_s9_s10_brief_deliver.py::test_s9_each_brief_is_an_event_of_the_audit_s_ledger` | the whole run did not end 0 (`fresh` does not exist). **Green on the base by design (a guard):** `test_f3_say_stays_the_only_printer` (no module but `say.py` and `command.py` prints today) |
 | failure-4 (F4) | `test_w2_204_s4_s6_second_repo.py::test_f4_a_question_labelled_with_a_gov_os_category_is_pf_form`, `test_w2_204_s4_s6_second_repo.py::test_f4_a_half_with_no_register_question_is_not_thin_for_a_gov_os_domain`, `test_w2_204_s4_s6_second_repo.py::test_f4_void_never_calls_a_gov_os_domain_thin` | `gov memaudit preflight` is not on the CLI (exit 2); no `PREFLIGHT.json`, no `DROPS.json` |
+| success-13 (S13) | `test_w2_204_s13_s16_scan_id_match.py::test_s13_bare_ids_in_many_transcripts_and_a_dummy_set_are_no_finding`, `test_w2_204_s13_s16_scan_id_match.py::test_s13_an_id_beside_the_tag_or_the_audit_name_is_a_finding_naming_its_transcript`, `test_w2_204_s13_s16_scan_id_match.py::test_s13_the_name_and_the_tag_count_only_as_whole_tokens`, `test_w2_204_s13_s16_scan_id_match.py::test_s13_the_set_s_names_come_from_its_real_path`, `test_w2_204_s13_s16_scan_id_match.py::test_s13_a_set_folder_name_under_8_characters_names_nothing_so_its_ids_are_no_finding`, `test_w2_204_s13_s16_scan_id_match.py::test_s13_guard_every_transcript_of_the_window_is_read` | the scan matches every bare `q<nn>` as a whole token: the busy window gives `MEASURE VOID: <n> finding(s)` (exit 1) where exit 0 is due, and the tagged and named lines come among many bare-id findings, not alone. **Green on the base by design (a guard):** `test_s13_guard_every_transcript_of_the_window_is_read` (A-12: `transcripts_read` counts every transcript of the window, the ones with no finding and a sub-agent's included); red if the fix narrows which transcripts are read |
+| success-14 (S14) | `test_w2_204_s13_s16_scan_id_match.py::test_s14_a_question_s_text_read_is_a_text_finding_whose_match_is_its_id`, `test_w2_204_s13_s16_scan_id_match.py::test_s14_the_key_is_the_first_48_normalised_characters_and_text_of_no_question_is_clean`, `test_w2_204_s13_s16_scan_id_match.py::test_s14_two_questions_each_read_are_two_findings_each_matching_its_own_id`, `test_w2_204_s13_s16_scan_id_match.py::test_s14_a_question_under_24_normalised_characters_gives_no_text_finding`, `test_w2_204_s13_s16_scan_id_match.py::test_s14_an_unreadable_question_file_is_a_problem_an_empty_one_is_not`, `test_w2_204_s13_s16_scan_id_match.py::test_s15_a_question_and_its_gold_answer_read_from_a_file_are_printed_nowhere` | the scan never reads a question's text: a transcript holding it is clean (`no transcript in the window names the set`, exit 0) or gives only `kind=id` findings from a bare id beside it, never `kind=text`; an unreadable question file is not opened, so no `SCAN INCOMPLETE` (exit 0, not 3) |
+| success-15 (S15) | `test_w2_204_s13_s16_scan_id_match.py::test_s15_guard_each_path_form_and_a_question_file_path_is_a_path_finding`, `test_w2_204_s13_s16_scan_id_match.py::test_s15_a_question_and_its_gold_answer_read_from_a_file_are_printed_nowhere` | the read file's line gives `kind=id match=q02` (the bare `id: q02` in it) and the quoted question none: `MEASURE VOID: 2 finding(s)` where 3 (path, text, text) are due. **Green on the base by design (a guard):** `test_s15_guard_each_path_form_and_a_question_file_path_is_a_path_finding`; red if a path form stops counting. S15's other verify, W2-198's path cases and the rewritten bare-id cases (W2-198 S3 and F2, `tests/unit/memaudit/test_w2_198_scan.py`), runs in those folders, not under `gov accept W2-204` |
+| success-16 (S16) | `test_w2_204_s13_s16_scan_id_match.py::test_s16_examin_s_case_the_one_typed_path_is_the_only_finding_and_without_it_the_window_is_clean`, `test_w2_204_s13_s16_scan_id_match.py::test_s16_the_fresh_close_agrees_a_busy_window_without_the_path_is_clean` | EXAMIN's case as found: the busy window gives the typed path among many `kind=id` findings (`MEASURE VOID: <n> finding(s)`, n above 1) and without the path line still exit 1; `fresh` on the `busy` stage prints `MEASURE VOID <audit>` for both halves, exit 2, no `SCAN <audit> clean` and no verdict |
 
 ### The one change to existing test files (I6)
 
