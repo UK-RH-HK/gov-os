@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -836,3 +837,25 @@ def test_the_reasons_of_a_real_judgement_carry_ids_and_are_named_one_by_one(grou
                                       f"python-app: {control['id']} is FLAGGED", "python-app: stage A7 is ABSENT"]
     assert judge.overall(*args, exceptions=_owner(ids))["verdict"] == judge.READY_WITH_EXCEPTIONS
     assert judge.overall(*args, exceptions=_owner(ids[:-1]))["verdict"] == judge.NOT_READY
+
+
+# --------------------------------------------------------------------------
+# Fix T5 (W2-81's proving run on 0.1.4): the capability table and the README's rows are current (a text test)
+# --------------------------------------------------------------------------
+
+def test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_verdict_stage_is():
+    here = Path(__file__).resolve().parent
+    source = (here / "w2_81_judge.py").read_text(encoding="utf-8")
+    dated = [line for line in source.splitlines() if "as read in src/gov/adopt/ on" in line]
+    assert len(dated) == 1 and "2026-11-20" in dated[0] and "2026-10-31" not in dated[0], dated
+    readme = (here / "README.md").read_text(encoding="utf-8")
+    assert "not merged" not in readme, "W2-52 is closed: nothing in the README is waiting for its merge"
+    rows = [line for line in readme.splitlines() if line.startswith("| `VERDICT` |")]
+    assert len(rows) == 1, rows
+    row = rows[0]
+    assert "no stage or command gives the lite verdict yet (CAP-44.h, W2)" in row, row
+    assert "W2-52 built A7 and A10 only" in row, row
+    spec_audit = [line for line in readme.splitlines() if line.startswith("| `AS` |")]
+    assert len(spec_audit) == 1, spec_audit
+    assert "CAP-44.m" in spec_audit[0] and "| yes |" in spec_audit[0] and "A2" in spec_audit[0] \
+        and "A3" in spec_audit[0], spec_audit[0]
