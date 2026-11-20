@@ -108,3 +108,135 @@ def own_project(adopted, tmp_path):
 @pytest.fixture()
 def sandbox(tmp_path):
     return support.make_sandbox(tmp_path / "sandbox")
+
+
+# ==========================================================================
+# The fixes S5 to S7 (DEC-1223 (6)); added, nothing above is changed
+# ==========================================================================
+
+PATCH, NO_KIND, UNREADABLE_KIND, OTHER_KIND = (support.PATCH, support.NO_KIND, support.UNREADABLE_KIND,
+                                              support.OTHER_KIND)
+
+
+@pytest.fixture(scope="session")
+def planted_sources(source, tmp_path_factory):
+    """Copies of the source with two Fix: commits and a chore between v0.9.0 and v0.9.1, and B's kind: ``patch``
+    (kind.json says patch; a decoy tag v0.9.2 with no record), ``no-kind`` (no kind.json), ``unreadable-kind``
+    (kind.json not JSON), ``other-kind`` (kind.json says minor). Never changed."""
+    base = tmp_path_factory.mktemp("w2-17-planted")
+    kinds = {PATCH: support.PATCH_KIND, NO_KIND: None, UNREADABLE_KIND: b"{ not JSON: W2-17\n",
+             OTHER_KIND: {"kind": "minor"}}
+    return _built(lambda: {name: support.plant_source(source, base / name, kind=kind, decoy=name == PATCH)
+                           for name, kind in kinds.items()})
+
+
+@dataclass(frozen=True)
+class DoctorCase:
+    project: Path
+    reference: object         # gov doctor --json with the source untouched (the link names the shared source)
+    runs: dict                # {name: gov doctor --json with the link naming that source}
+
+
+def _doctor_case(adopted, source, base, sources, prepare=None):
+    """A copy of the adopted project whose answers name its source through a link; ``prepare(project)`` first;
+    doctor run with the source untouched, then once per named source."""
+    project = support.copy_project(adopted, base / "product")
+    sandbox = support.make_sandbox(base / "sandbox")
+    if prepare:
+        prepare(project)
+    link = base / "source-link"
+    support.name_source_by_link(project, link, source.repo)
+    reference = support.gov(project, sandbox, "doctor", "--json")
+    runs = {}
+    for name, target in sources.items():
+        support.point(link, target)
+        runs[name] = support.gov(project, sandbox, "doctor", "--json")
+    support.point(link, source.repo)
+    return DoctorCase(project, reference, runs)
+
+
+@pytest.fixture(scope="session")
+def doctor_at_a(adopted, source, planted_sources, tmp_path_factory):
+    """The clone at A: doctor with the source untouched, then with each planted source and with no source."""
+    base = tmp_path_factory.mktemp("w2-17-doctor-a")
+    sources = {**planted_sources, "nowhere": base / "nowhere"}
+    return _built(lambda: _doctor_case(adopted, source, base, sources))
+
+
+@pytest.fixture(scope="session")
+def doctor_rolled_back_here(adopted, source, planted_sources, tmp_path_factory):
+    """The clone at A holding governance/updates/<B>.rolled-back.json: doctor untouched, then with the patch source."""
+    base = tmp_path_factory.mktemp("w2-17-doctor-held")
+    return _built(lambda: _doctor_case(adopted, source, base, {PATCH: planted_sources[PATCH]},
+                                       prepare=support.plant_rolled_back_record))
+
+
+@pytest.fixture(scope="session")
+def doctor_no_release(adopted, source, planted_sources, tmp_path_factory):
+    """The clone whose lock states release: null: doctor untouched, then with the patch source."""
+    base = tmp_path_factory.mktemp("w2-17-doctor-null")
+    return _built(lambda: _doctor_case(adopted, source, base, {PATCH: planted_sources[PATCH]},
+                                       prepare=support.set_lock_release_null))
+
+
+@dataclass(frozen=True)
+class HookClone:
+    project: Path
+    sandbox: object
+    link: Path                # the link the clone's _src_path names; it names the patch source
+    quiet: Path               # a folder whose tk prints nothing
+    source: Path              # the patch source
+
+
+@pytest.fixture()
+def hook_clone(adopted, planted_sources, tmp_path):
+    """This case's copy of the adopted project at A, its source the patch source through a link."""
+    def make():
+        project = support.copy_project(adopted, tmp_path / "product")
+        link = tmp_path / "source-link"
+        support.name_source_by_link(project, link, planted_sources[PATCH])
+        return HookClone(project, support.make_sandbox(tmp_path / "sandbox"), link,
+                         support.fake_tk(tmp_path / "tk-quiet"), planted_sources[PATCH])
+    return _built(make)
+
+
+@pytest.fixture(scope="session")
+def pinned_updated(adopted, tmp_path_factory):
+    """A copy of the adopted project with A pinned (gov install A), then updated to B. Never changed."""
+    base = tmp_path_factory.mktemp("w2-17-pinned-updated")
+    return _built(lambda: support.build_pinned_update(adopted, base))
+
+
+@dataclass(frozen=True)
+class RolledBack:
+    project: Path
+    sandbox: object
+    before: dict              # tree_state before the rollback
+    before_pin: object        # pin_state before the rollback
+    update_commit: str        # HEAD before the rollback: the update commit
+    commit_before: str        # the commit before the update (A's)
+    run: object               # gov update --rollback --json
+
+
+def _rolled_back(origin_project, commit_before, base, binary_of=None):
+    project = support.copy_project(origin_project, base / "product")
+    sandbox = support.make_sandbox(base / "sandbox")
+    before, before_pin, update_commit = support.tree_state(project), support.pin_state(project), support.head(project)
+    binary = binary_of(project) if binary_of else None
+    run = support.rollback(project, sandbox, binary=binary)
+    return RolledBack(project, sandbox, before, before_pin, update_commit, commit_before, run)
+
+
+@pytest.fixture(scope="session")
+def rolled_back(pinned_updated, tmp_path_factory):
+    """A copy of the pinned update, rolled back by A's environment's gov (<common>/gov/envs/<A>/bin/gov)."""
+    base = tmp_path_factory.mktemp("w2-17-rolled-back")
+    return _built(lambda: _rolled_back(pinned_updated.project, pinned_updated.before["head"], base,
+                                       lambda project: support.env_gov(project, support.A)))
+
+
+@pytest.fixture(scope="session")
+def rolled_back_no_pin(updated, tmp_path_factory):
+    """A copy of S2's update (no pin before it), rolled back by this worktree's gov (there is no A environment)."""
+    base = tmp_path_factory.mktemp("w2-17-rolled-back-no-pin")
+    return _built(lambda: _rolled_back(updated.project, updated.before["head"], base))
