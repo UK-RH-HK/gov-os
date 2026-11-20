@@ -24,6 +24,13 @@ journal; the report and the record say which (``settings: {"removed": [...]}``; 
 deny and allow lines are compared with those before the update: a line gone that is neither a legacy line nor one the
 old release generated is the project's own, and the update fails at the step ``settings``, naming it, and rolls back.
 
+``rollback`` (W2-17 fix S7, DEC-1223 (6); ``gov update --rollback``): the update the lock's held release B came by is
+undone in one commit: ``git revert --no-commit`` of the commit that added ``governance/updates/<B>.json`` (a conflict
+with later commits stops it, nothing changed), the pin put back from the record's ``pin_before`` (a record written
+before the field: the environment of the record's ``from`` release, ``no_previous_pin`` where there is none),
+``governance/updates/<B>.rolled-back.json`` written, one commit; then ``gov rebuild`` with the restored pin's gov.
+B's environment folder stays. A failure before the commit puts HEAD, the tree and the pin back.
+
 The commit is made with ``--no-verify``: the project's pre-commit checks are for its agents' changes, and the update's
 bytes are hash-verified and lock-checked (the ticket lead's call).
 """
@@ -308,6 +315,19 @@ def _pin_state(root: Path, version: str) -> dict:
             "env_existed": os.path.lexists(root / "envs" / version)}
 
 
+def pin_before(state: dict) -> dict:
+    """The pin as ``_pin_state`` found it, in the record's shape: ``{"existed", "link", "record"}`` (``record`` the
+    ``pin.json`` parsed as JSON, ``None`` where absent or not JSON)."""
+    import json
+    record = None
+    if state["record"] is not None:
+        try:
+            record = json.loads(state["record"])
+        except ValueError:
+            record = None
+    return {"existed": state["existed"], "link": state["link"], "record": record}
+
+
 def _restore_pin(root: Path, version: str, state: dict) -> None:
     if not state["existed"]:
         shutil.rmtree(root, ignore_errors=True)
@@ -548,7 +568,8 @@ def _apply(project, version, held, src, data, digest, manifest, files, actions, 
         step = "commit"
         record = {"from": held, "to": version, "source": str(src), "manifest_sha256": digest,
                   "wheel": {"name": manifest["wheel"]["name"], "sha256": manifest["wheel"]["sha256"]},
-                  "files": files, "settings": report["settings"], "commit_before": head}
+                  "files": files, "settings": report["settings"], "commit_before": head,
+                  "pin_before": pin_before(state)}
         journal.write(report["record"], (json.dumps(record, indent=2) + "\n").encode())
         _git(project, "add", "-A")
         _git(project, "-c", "commit.gpgsign=false", "commit", "--no-verify", "-q", "-m",
@@ -576,3 +597,155 @@ def _rollback(project: Path, head: str, journal: Journal, root: Path, version: s
     _git(project, "clean", "-fdq", check=False)  # the tree was clean: an untracked file is the update's
     journal.restore()
     _restore_pin(root, version, state)
+
+
+# --------------------------------------------------------------------------
+# The rollback (W2-17 fix S7)
+# --------------------------------------------------------------------------
+
+def _set_pin(root: Path, existed: bool, link: str | None, record: bytes | None) -> None:
+    """The pin's link and ``pin.json`` as given; ``existed`` false takes both out and the then-empty ``bin`` and
+    ``gov`` folders, never an environment (``envs/<B>`` stays for diagnosis)."""
+    link_path, record_path = root / "bin" / "gov", root / install_pin.RECORD
+    if not existed:
+        for path in (link_path, record_path):
+            if os.path.lexists(path):
+                os.unlink(path)
+        for folder in (root / "bin", root):
+            try:
+                folder.rmdir()
+            except OSError:
+                pass
+        return
+    root.mkdir(parents=True, exist_ok=True)
+    if record is None:
+        record_path.unlink(missing_ok=True)
+    elif not record_path.is_file() or record_path.read_bytes() != record:
+        install_pin._write_atomic(record_path, record)
+    if link is None:
+        if os.path.lexists(link_path):
+            os.unlink(link_path)
+    elif not os.path.islink(link_path) or os.readlink(link_path) != link:
+        link_path.parent.mkdir(exist_ok=True)
+        install_pin._link(link_path, link)
+
+
+def _previous_pin(record: dict, previous: str, root: Path) -> dict:
+    """The pin to restore, in the shape of ``pin_before``: the record's own, or (a record written before the field)
+    the environment of release ``previous``; ``no_previous_pin`` where that folder is not there."""
+    found = record.get("pin_before")
+    if isinstance(found, dict) and isinstance(found.get("existed"), bool):
+        link = found.get("link") if isinstance(found.get("link"), str) else None
+        stored = found.get("record") if isinstance(found.get("record"), dict) else None
+        return {"existed": found["existed"], "link": link, "record": stored}
+    environment = root / "envs" / previous
+    if not (environment / "bin" / "gov").exists():
+        raise UpdateRefused("no_previous_pin", f"the update record names no pin before it and {environment} is not "
+                                               f"there: the pin of release {previous} cannot be restored; nothing "
+                                               "was changed")
+    return {"existed": True, "link": str(environment / "bin" / "gov"),
+            "record": {"version": previous, "environment": str(environment)}}
+
+
+def _pin_bytes(pin: dict) -> bytes | None:
+    import json
+    return (json.dumps(pin["record"], indent=2) + "\n").encode() if pin["record"] is not None else None
+
+
+def _revert(project: Path, update_commit: str, head: str) -> None:
+    """``git revert --no-commit``; a failure is a conflict: refused (``rollback_conflict``) naming the paths, HEAD and
+    the tree as before."""
+    done = _git(project, "revert", "--no-commit", update_commit, check=False)
+    if not done.returncode:
+        return
+    paths = [line for line in _git(project, "diff", "--name-only", "--diff-filter=U", check=False).stdout.split("\n")
+             if line]
+    if _git(project, "revert", "--abort", check=False).returncode:
+        _git(project, "reset", "-q", "--hard", head, check=False)
+    _git(project, "reset", "-q", "--hard", head, check=False)
+    _git(project, "clean", "-fdq", check=False)
+    if not paths:
+        raise RuntimeError(f"git revert {update_commit[:12]} failed: {(done.stderr or done.stdout).strip()[-500:]}")
+    raise UpdateRefused("rollback_conflict", f"later commits conflict with undoing {update_commit[:12]} in "
+                                             f"{', '.join(paths[:20])}; nothing was changed (HEAD, the files and the "
+                                             "pin are as before)")
+
+
+def _commit_rollback(project: Path, held: str, previous: str, update_commit: str, pin: dict, rel: str) -> str:
+    import json
+    record = {"from": held, "to": previous, "update_commit": update_commit, "pin": pin}
+    path = project / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    _git(project, "add", "-A")
+    _git(project, "-c", "commit.gpgsign=false", "commit", "--no-verify", "-q", "-m",
+         f"gov update --rollback: release {held} -> {previous}\n\nThe update to release {held} "
+         f"({update_commit}) is reverted; the project holds release {previous} again; the record is {rel}.")
+    return _git(project, "rev-parse", "HEAD").stdout.strip()
+
+
+def _rebuild(project: Path, link: Path | None) -> tuple[int, str]:
+    """``gov rebuild`` by the restored pin's gov, else by the running gov; ``(exit code, output)``."""
+    if link is not None:
+        done = _pinned(link, project, "rebuild")
+    else:
+        import sys
+        env = {**os.environ, "GOV_PIN": "off"}
+        done = subprocess.run([sys.executable, "-m", "gov.cli.main", "rebuild"], cwd=str(project), env=env,
+                              capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    return done.returncode, (done.stderr or done.stdout).strip()[-500:]
+
+
+def rollback(project) -> dict:
+    """Undo the update the project's lock came by (release B, ``governance/updates/<B>.json``): the report."""
+    import json
+    project = Path(os.path.abspath(os.fspath(project)))
+    held = held_release(project)
+    record_rel = f"{UPDATES_REL}/{held}.json"
+    added = _git(project, "log", "--diff-filter=A", "-1", "--format=%H", "--", record_rel, check=False)
+    update_commit = added.stdout.strip() if not added.returncode else ""
+    record = None
+    if update_commit and (project / record_rel).is_file():
+        try:
+            record = json.loads((project / record_rel).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            record = None
+    if not isinstance(record, dict) or not isinstance(record.get("from"), str) or not record["from"]:
+        raise UpdateRefused("no_update", f"no update to undo: {record_rel} is absent, was never committed or does not "
+                                         f"read, so there is no update to release {held} to roll back")
+    previous = record["from"]
+    dirty = uncommitted(project)
+    if dirty:
+        raise UpdateRefused("dirty", f"the tree has uncommitted changes the rollback could not roll back to: "
+                                     f"{', '.join(dirty[:20])}; commit or remove them first")
+    root = pin_root(common_dir(project))
+    pin = _previous_pin(record, previous, root)
+    head = _git(project, "rev-parse", "HEAD").stdout.strip()
+    state = _pin_state(root, previous)
+    rolled_rel = f"{UPDATES_REL}/{held}.rolled-back.json"
+    step = "revert"
+    try:
+        _revert(project, update_commit, head)
+        step = "pin"
+        _set_pin(root, pin["existed"], pin["link"], _pin_bytes(pin))
+        step = "commit"
+        commit = _commit_rollback(project, held, previous, update_commit, pin, rolled_rel)
+    except UpdateRefused:
+        _git(project, "reset", "-q", "--hard", head, check=False)
+        raise
+    except BaseException as exc:
+        _git(project, "reset", "-q", "--hard", head, check=False)
+        _git(project, "clean", "-fdq", check=False)
+        _set_pin(root, state["existed"], state["link"], state["record"])
+        raise UpdateFailed(step, f"the rollback of release {held} failed at the step {step} ({exc}); HEAD, the files "
+                                 f"and the pin are as before ({head})") from None
+    report = {"from": held, "to": previous, "update_commit": update_commit, "commit": commit, "pin": pin,
+              "record": rolled_rel}
+    link = root / "bin" / "gov"
+    code, output = _rebuild(project, link if os.path.exists(link) else None)
+    if code:
+        report["store"] = "failed"
+        raise StoreFailed(f"the rollback of release {held} is committed ({commit}), but the memory store was not "
+                          f"refreshed ({output}): run `gov rebuild`", report)
+    report["store"] = "refreshed"
+    return report
