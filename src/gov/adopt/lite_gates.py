@@ -101,6 +101,7 @@ def _auditor(run, gate: str) -> dict:
             raise refuse("VERDICT_OTHER_RECORD", f"{rel}: the sha256 it gives for the {stage} record {checked} "
                          f"({given[checked]!r}) is not that record's as it stands ({run.hashes[stage]})", verdict=rel,
                          stage=stage)
+    project.require_record(head, rel)
     return {"record": rel, "sha256": project.sha256(data), "commit": brought, "session": session,
             "verdict": head["verdict"]}
 

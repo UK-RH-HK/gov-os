@@ -560,6 +560,7 @@ def _verdict(run: Run, rel: str) -> dict:
         raise refuse("VERDICT_NOT_INDEPENDENT", f"{rel}: its auditor_session ({session!r}) must be named and differ "
                      f"from the sessions that ran the stages ({stages}, now {run.args.session!r}); the path map must "
                      "name its own (--session)", verdict=rel)
+    project.require_record(head, rel)
     return {"verdict": rel, "verdict_sha256": project.sha256(data), "verdict_commit": brought,
             "auditor_session": session, "path_map": project.record_path("A3"), "path_map_hash": run.hashes["A3"]}
 

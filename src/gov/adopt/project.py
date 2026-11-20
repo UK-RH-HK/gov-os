@@ -172,6 +172,23 @@ def read_record(root: Path, tracked: dict, rel: str) -> tuple[dict, bytes]:
     return head, data
 
 
+RECORD_KEYS = ("id", "type", "status")  # what the store requires of a record (``gov.store.loader.REQUIRED``)
+
+
+def require_record(head: dict, rel: str) -> None:
+    """``VERDICT_NOT_A_RECORD`` for a verdict whose front matter states an ``id`` but no non-empty string ``type`` or
+    ``status``: the store lists such a file invalid at the next ``gov rebuild``, so a gate that accepted it would
+    leave the adopter's tree with an invalid record. A front matter with no ``id`` is no record to the store and is
+    accepted as it was. Run after every other check of the gate, so each earlier refusal keeps its code."""
+    if "id" not in head:
+        return
+    missing = [key for key in RECORD_KEYS if not isinstance(head.get(key), str) or not head[key]]
+    if missing:
+        raise refuse("VERDICT_NOT_A_RECORD", f"{rel}: its front matter states an id but lacks a non-empty string "
+                     f"{' and '.join(missing)}, so the store lists it as an invalid record: add the missing key(s) "
+                     "or leave out the id", verdict=rel, keys=missing)
+
+
 def chain(root: Path, tracked: dict, stage: str) -> tuple[dict, dict]:
     """The records of every stage before ``stage`` and their hashes, each standing on the one before it."""
     records, hashes, previous = {}, {}, None
