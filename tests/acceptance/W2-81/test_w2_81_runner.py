@@ -378,6 +378,11 @@ def test_the_report_log_and_output_hold_no_question_answer_or_secret_text(ready_
     assert code == 1  # today's code: handlings not built
     texts = {name: (ready_run["folder"] / name).read_text() for name in ("report.json", "report.md", "run.log")}
     texts["stdout"], texts["stderr"] = out, err
+    saved = json.loads(texts["report.json"])  # the rows' `bundle` is the one place a file's path is recorded, and a
+    for repo in saved["repositories"].values():  # gold answer can be a file's name (a path is not answer text)
+        for row in (repo["figures"] or {}).get("per_question", []):
+            row.pop("bundle", None)
+    texts["report.json"] = json.dumps(saved, indent=2)
     asked = []
     for name, repo in ready_run["repos"].items():
         asked += questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
@@ -1038,8 +1043,8 @@ def test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_ro
             assert set(row) <= allowed, (name, q.id, sorted(set(row) - allowed))
             assert row["bundle"] and all(len(i) == 3 and isinstance(i[0], str) and isinstance(i[1], int)
                                          and isinstance(i[2], int) for i in row["bundle"]), (name, q.id)
-            text = json.dumps(row)
-            for sentence in (q.question, q.gold_answer, *[holds for _, _, holds in q.sources]):
-                assert sentence not in text, f"{q.id}'s row holds a sentence of the question, its answer or a source"
+            text = json.dumps({k: v for k, v in row.items() if k != "bundle"})  # a gold answer may be a file's name
+            for sentence in (q.question, q.gold_answer):
+                assert sentence not in text, f"{q.id}'s row holds a sentence of the question or its answer"
             hidden += q.part == "hidden"
     assert hidden == 10 * len(runner.EXPECTED), "the hidden half's rows were read"

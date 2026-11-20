@@ -18,7 +18,9 @@ forbidden one (the stale spec, the superseded plan): an answer that is right wit
   that does not say so.
 
 The results name questions by id only, with booleans, fixed reason words and a rank: never a question's text or an
-answer.
+answer. A question's row also holds the ranked bundle the retrieval gave (``bundle``: ``[path, start, end]`` in rank
+order, ``None`` when it gave none) and ``forbidden_rank`` and ``gold_rank``, the 1-based rank of the first item whose
+path is a forbidden source or a gold source (``None`` when none): paths, line numbers and ranks only (T6).
 """
 
 from __future__ import annotations
@@ -109,9 +111,15 @@ def score_question(question, stacked):
     forbidden = any(item[0] in question.forbidden for item in items[:5])
     rank = next((n for n, item in enumerate(items, 1) if any(hits(item, s) for s in question.sources)), None)
     full = all(any(hits(item, s) for item in items) for s in question.sources)
+    gold_paths = {source[0] for source in question.sources}
     return {"id": question.id, "part": question.part, "answered": stacked is not None,
             "hit_at_5": rank is not None and rank <= 5 and not forbidden,
-            "full_evidence": full and not forbidden, "forbidden_in_top_5": forbidden, "first_gold_rank": rank}
+            "full_evidence": full and not forbidden, "forbidden_in_top_5": forbidden, "first_gold_rank": rank,
+            # the ranked bundle and the ranks of the first forbidden and the first gold source, by path (T6): paths,
+            # line numbers and ranks only, never a text; None where the retrieval gave no bundle
+            "bundle": None if stacked is None else [[item[0], item[1], item[2]] for item in items],
+            "forbidden_rank": next((n for n, item in enumerate(items, 1) if item[0] in question.forbidden), None),
+            "gold_rank": next((n for n, item in enumerate(items, 1) if item[0] in gold_paths), None)}
 
 
 def score_repository(name, questions, answers, verdicts=None):
@@ -124,7 +132,9 @@ def score_repository(name, questions, answers, verdicts=None):
     diag = [score_question(q, answers.get(q.id)) for q in questions]
     hit = round(100.0 * sum(d["hit_at_5"] for d in diag) / n, 1) if n else None
     stacked = round(100.0 * sum(d["full_evidence"] for d in diag) / n, 1) if n else None
-    per_question = [{**m, "diagnostic": {k: v for k, v in d.items() if k not in ("id", "part")}}
+    ranked = ("bundle", "forbidden_rank", "gold_rank")  # beside the diagnostics, not among them (T6)
+    per_question = [{**m, **{k: d[k] for k in ranked},
+                     "diagnostic": {k: v for k, v in d.items() if k not in ("id", "part", *ranked)}}
                     for m, d in zip(measured["per_question"], diag)]
     return {"repository": name, "questions": n, "right": measured["right"], "end_to_end": measured["end_to_end"],
             "bar": E2E_BAR, "met": measured["met"], "diagnostic": {"hit_at_5": hit, "stacked_share": stacked},
