@@ -101,6 +101,16 @@ def _env(folder):
     return env
 
 
+def _queue_env(env):
+    """The landing's environment: the run's own (``_env``) with the operator's ``HOME``, the runner process's own. The
+    pinned ``gov queue`` runs the repository's tests, and the tools they need (pytest) live in the operator's user
+    site; the scrubbed ``HOME`` suits retrieval's isolation, not the landing (the proving run on 0.1.4, T1)."""
+    landing = {k: v for k, v in env.items() if k != "HOME"}
+    if "HOME" in os.environ:
+        landing["HOME"] = os.environ["HOME"]
+    return landing
+
+
 class _Log:
     def __init__(self):
         self.lines = []
@@ -393,7 +403,7 @@ def run(options, built=None, session=None):
         if not options.pinned_gov or not tickets.get(name):
             lands[name] = {"run": False}
             continue
-        done = subprocess.run([options.pinned_gov, "queue", tickets[name]], cwd=repo.root, env=env,
+        done = subprocess.run([options.pinned_gov, "queue", tickets[name]], cwd=repo.root, env=_queue_env(env),
                               capture_output=True, text=True)
         lands[name] = {"run": True, "ticket": tickets[name], "exit": done.returncode}
         log(f"queue {name} {tickets[name]}: exit {done.returncode}")
