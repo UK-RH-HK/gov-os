@@ -97,3 +97,32 @@ the Definition of Done shrinks to those three lines and DOD-4 and DOD-6 go (succ
 is approved by the CTO's message (§3.5).
 
 **Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
+
+## Fix: the queue's selection refuses only the landing's own unplaced paths (L2-4, DEC-1217 (1), DEC-1223 (9))
+- **The bug (found by the CTO, 2026-11-20):** `gov queue DAEO-sdhj=e2/w2-17-fixes --onto w2/integrate --select` was refused,
+  `SELECTION_REFUSED: 6 changed path(s) nothing maps to a suite`: `docs/emergency-2/briefs/*.md`, `proposals/*.md`,
+  `release-0.1.4/STEPS.md` and `repin.sh`, none written by the branch. They were committed on `w2/integrate` after the last
+  green record (`e74765954`). Every document the CTO commits after a green run therefore blocks every landing.
+- **The cause, from the code and the tickets:** `select.scoped` counts the change as "everything since the newest green
+  record, with the ticket's own commits" (W2-115 S2, `0fb32b21f`; `test_s2_an_unmapped_path_merged_since_the_green_base_refuses`
+  pins it for `gov close`). `gov queue` calls it in the warm clone at the tested merge, so the green range holds the
+  base's own commits too, and a path of it that no suite places is refused as if the branch had written it. W2-115b's
+  success line 1 says the queue's change is "the branch's own commits since the integration head as well as the
+  ticket's"; its non-goals say `select.py` is open to it only for the keyword the queue passes and that the behaviour
+  without it is unchanged. The since-green range is `gov close`'s model (W2-115) and leaked into the queue; the base's
+  paths are neither this landing's change nor its to refuse (EMERGENCY-2 §3.2: a block must be within the change's
+  scope). The range stays (it selects what the untested base paths reach); the refusal does not apply to it.
+  The test map's `record_only` cannot take the documents (W2-66: DEC-891's places and nothing else, no code path).
+- **The fix line:** with `change` given, a path counted from the green record that neither the ticket's own commits nor
+  `change` wrote, and that nothing places, is not refused: it is listed under `unplaced_base` in the selection (the
+  object `--select` prints too), and every suite it does reach (imports, couplings, overlaps) is still selected.
+  A path the landing's own change wrote and nothing places is refused as before. Without `change` (`gov close`)
+  nothing changes. Verify: a planted project with a green record and, after it, two commits on the base that no ticket
+  made (a document outside `record_only`, a shell script) beside a branch that changes mapped code: `gov queue <T>=<branch>
+  --select` prints the object and exits 0, the two paths under `unplaced_base`; a branch that itself writes an unplaced
+  path is refused `SELECTION_REFUSED` (exit 2) naming it and not the base's; a base-side path a test imports still
+  selects that test; `select.scoped(root, T)` without `change` still refuses the base-side path.
+- **Order:** this section (`Role: orchestrator`); the test designer (Opus, the C3 trial of DEC-1222 (2); `src/gov/close/**`
+  and `src/gov/queue/**` are C3), tests under `tests/acceptance/W2-115b/` and `tests/unit/queue/`, red on the base;
+  the engineer (Sonnet) until `gov accept W2-115b` is green. Every commit carries `Task: DAEO-j9z6` and a `Fix:`
+  trailer with the line above. The ticket stays closed.
