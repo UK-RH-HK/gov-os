@@ -210,3 +210,51 @@ form; the skill's new steps must keep it (at most 2,500 tokens of body).
   conditions, and the skill tells the verdict's auditor that a missing gate record is a condition `not met`.
   The alternative is a reader in `lite_gates.py` with a command that lists a run's lite conditions and names a
   missing gate record as `not met`. That needs an interface decision, and perhaps W2-28's paths.
+
+## Fix: a verdict is a record (a fix under W2-52, `DAEO-siiz`; no new ticket)
+
+`Fix: A verdict that the A5 or A7 gate accepts is a record the store reads`. W2-81's proving run on release 0.1.4: an adopter's A5 and A7
+verdicts had the front matter `id`, `type: evidence`, `stage`, `verdict: pass`, the auditor's keys and no `status`. The gates accepted them
+(exit 0), and the final `gov rebuild` listed each file as invalid ("required key missing or not a string: status"). The store requires
+non-empty string `id`, `type` and `status` of every Markdown file whose front matter has an `id`; a file with front matter and no `id` is no
+record and is never listed. The gate and the store disagreed on what a verdict's front matter is. Written from the lead's KPI line and the
+analysis (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, rows P2 and "Draft KPI lines" 2); no implementation was read.
+
+KPI line (fix-1): "A verdict that the A5, A7 or A10 gate accepts is a record the store reads: a verdict whose front matter states an `id` but
+lacks a non-empty string `type` or `status` is refused by the gate with the refusal code `VERDICT_NOT_A_RECORD`, the message naming the missing
+keys and the file; a verdict that states `id`, `type`, `status` is accepted, and after the gate `gov rebuild` reports no invalid record for it; a
+verdict with no `id` at all, as the adopt skill describes it, is still accepted and `gov rebuild` still lists none invalid." Failure: a gate
+that accepts a verdict that rebuild then calls invalid.
+
+**What the cases hold.**
+
+- **The order.** The new refusal runs AFTER every existing check of the gate (A5: not a pass, other path map, not independent; A7 and A10:
+  other stage, no `verdict`, not independent, `checked` incomplete or with another hash). A verdict that would be refused anyway keeps its own
+  refusal and code, so no existing case changes. Three guard cases hold this (verdict `fail`, stage `A5` given to A7, committed without
+  `Role: independent-auditor`, each also lacking `status`).
+- **The code.** Every `gov adopt` refusal carries the `ADOPT_` prefix in the envelope (`ADOPT_VERDICT_NOT_PASS`). The cases strip it and compare
+  to `VERDICT_NOT_A_RECORD`, so both `VERDICT_NOT_A_RECORD` and `ADOPT_VERDICT_NOT_A_RECORD` pass.
+- **Refusal side.** `ok: false`, exit code 1, 3 or 4, the message names the file and each missing key (`type`, `status`, both for both),
+  and nothing is written (the tree at HEAD is as before; no stage record; clean tree). A `status` or `type` that is empty or not a string
+  (number, list) counts as missing.
+- **A10.** Reached through W2-52's own `after_a8` fixture (A8 straight after A6). A10 has the two refusal cases (no `status`, no `type`) and
+  the accepted case; its other cases (not a string, both missing, no `id`, the order guards) stay with A5 and A7.
+- **Accepted side.** With `id`, `type`, `status` the gate exits 0, `ok: true`; then `gov rebuild --json` is run in the same project and no
+  entry under its result's `invalid` (at any depth) names the verdict's path. With no `id` (and no `type`, `status`: the adopt skill's form)
+  the same.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| fix-1 (refusal, no `status`) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_an_id_and_no_status_is_refused_as_not_a_record` (A5, A7, A10) | red: the gate accepts the verdict (`expected a refusal, but the tool reports success`) |
+| fix-1 (refusal, no `type`) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_an_id_and_no_type_is_refused_as_not_a_record` (A5, A7, A10) | red: the gate accepts the verdict |
+| fix-1 (refusal, both keys named) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_neither_type_nor_status_names_both` (A5, A7) | red: the gate accepts the verdict |
+| fix-1 (refusal, empty or not a string) | `test_w2_52_verdict_is_a_record.py::test_a_status_that_is_not_a_non_empty_string_is_refused` (A5, A7 x empty, number, list); `test_w2_52_verdict_is_a_record.py::test_a_type_that_is_not_a_non_empty_string_is_refused` (A7 x empty, number) | red: the gate accepts the verdict |
+| fix-1 (accepted, the store reads it) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_id_type_and_status_is_accepted_and_the_store_reads_it` (A5, A7, A10) | GUARD, green on the base: the success side already holds; it guards the fix against a gate that refuses too much |
+| fix-1 (accepted, no `id`) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_no_id_is_still_accepted_and_listed_invalid_by_nothing` (A5, A7) | GUARD, green on the base: guards against a gate that demands an `id` |
+| fix-1 (order) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_that_is_not_a_pass_keeps_its_own_refusal_whatever_its_keys`; `test_w2_52_verdict_is_a_record.py::test_a_verdict_of_another_stage_keeps_its_own_refusal_whatever_its_keys`; `test_w2_52_verdict_is_a_record.py::test_a_verdict_not_committed_by_the_auditor_keeps_its_own_refusal_whatever_its_keys` | GUARD, green on the base: the existing refusal stays first |
+| failure (a gate that accepts what rebuild calls invalid) | the refusal rows above: each is the failure line's input (a verdict the store would list invalid) | red as above |
+
+**Red run on the base** (`w2/integrate` at `844723c60`, this worktree's `src/`, through the heavy slot): **24 cases, 16 red and 8 green**. The 16 red
+are every refusal case above (3 + 3 + 2 + 6 + 2): each ends at `expected a refusal, but the tool reports success`, the gate answering `ok: true`,
+exit 0 with its record written. The 8 green are guards (3 accepted-with-keys, 2 accepted-with-no-`id`, 3 order). The success side cannot be red on
+the base: the adopter's evidence is the failure side only.
