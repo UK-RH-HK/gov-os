@@ -3,7 +3,7 @@
     PYTHONPATH=<the release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py --folder <path> \
         --mode build|run|read [--seed N] [--gov <exe>] [--pinned-gov <exe>] [--adopter-model <id>] [--claude <exe>] \
         [--queue-ticket [<repository>=]<id>]... [--hidden <dir> | --sets-root <root>] [--manifests <dir>] \
-        [--large-size <bytes>] [--stages A0,A1,A2]
+        [--large-size <bytes>] [--stages A0,A1,A2] [--notify <address>] [--exceptions <file>]
 
 - ``--folder``: the run folder, by literal path: a temporary folder, or ``~/gov-os-runs/W2-81/<run>`` (DEC-728).
   It is refused inside this repository or inside any git work tree the runner did not build.
@@ -24,6 +24,12 @@
 - The report: ``<folder>/report.json`` and ``<folder>/report.md`` (the end-to-end figure per repository first and
   decisive; hit@5 and the stacked share beside it, diagnostic); a log of steps, ``<folder>/run.log``; each question's
   verdict row (its answer text included) under ``<folder>/e2e/<repository>/``.
+
+- ``--notify <address>`` (else the runner's own ``$GOV_MSG_ADDRESS``): the starter's inbox address, set as
+  ``GOV_MSG_ADDRESS`` for every process the runner starts and in its own process for the run (restored afterwards).
+- ``--exceptions <file>``: an owner's exceptions (JSON or YAML, ``decision`` and ``reasons``: reason ids), read by the
+  judge's ``overall``: READY_WITH_EXCEPTIONS when every judge reason is named. The runner's own reasons are never
+  excused by it; a faulty file is refused before any work (exit 2). ``gov queue`` runs with the operator's ``HOME``.
 
 The hidden half is read only from ``--hidden``, or from the default hidden folder when that exists; a ``--hidden``
 that names no existing folder is refused. ``--sets-root <root>`` (W2-93, DEC-1144 (6)) names the evaluation sets' root

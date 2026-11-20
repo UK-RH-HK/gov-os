@@ -4,12 +4,14 @@ Given one repository's manifest and an adoption's outputs on it, the judge gives
 each planted problem FOUND_AND_HANDLED, MISSED, MISHANDLED or NOT_BUILT, with the
 evidence it read (record and field), and each control CLEAN or FLAGGED. Over all
 the repositories and their end-to-end memory figures, it gives READY or NOT_READY, naming
-each reason. It writes nothing and prints nothing.
+each reason (each reason has a stable id, and an owner's exceptions that name every reason give READY_WITH_EXCEPTIONS:
+``overall``). It writes nothing and prints nothing.
 
 **What it reads (the adoption's outputs).** The adopted repository's working tree:
 
 - the stage records ``governance/adoption/<stage>-<title>.md`` (YAML front matter), named
-  as ``gov.adopt.project.record_path`` names them for A0 to A6 and A8, and as
+  as ``gov.adopt.project.record_path`` names them for A0 to A6 and A8, as ``gov.adopt.spec_audit.RECORD`` names AS
+  (the spec audit, between A2 and A3: ``AS-spec-audit.md``), and as
   ``PROVISIONAL`` names them for A7 and A10 (the names the lite gates write; built when
   ``gov.adopt.command.STAGES`` lists them; found only with ``result: pass``, the gate's own
   word, since a gate commits its record when it fails too) and the lite verdict (not built yet);
@@ -78,7 +80,7 @@ AS_RECORD = f"{FOLDER}/AS-spec-audit.md"
 BUILT_STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")  # the stages ``project.record_path`` names
 STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A8", "A7", "A10", "VERDICT")  # every stage the judge reads
 
-# What each handling needs. ``built`` is today's state of the code, as read in src/gov/adopt/ on 2026-10-31.
+# What each handling needs. ``built`` is today's state of the code, as read in src/gov/adopt/ on 2026-11-20.
 CAPABILITIES = {
     "A2-namespace": ("CAP-44.b", True, "A2 classes each tracked file by the path map's namespace "
                      "(stages.a2, project.classify)"),
