@@ -105,7 +105,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
     the source whose message has a `Fix:` trailer; 0 where the held tag is not an ancestor) and the next step (`at the
     next quiet point` for a patch; `bigger: the owner decides, gov update <version>` otherwise; where
     `governance/updates/<newest>.rolled-back.json` exists in the repository: `held: rolled back here; waits for a newer
-    release`). Keys: `status` is always `report` (a notice: it never makes doctor unhealthy, whatever the source says),
+    release`, with `pending: false` and `rolled_back: true`). Keys: `status` is always `report` (a notice: it never makes doctor unhealthy, whatever the source says),
     `held`, `newest`, `pending` (bool), `kind`, `fixes`, `next`, and `summary` (one line; `up to date (<held>)` when
     nothing newer exists). A repository with no held release, no readable source, or no verified newer record reports
     `pending: false` with `reason` and never raises. Verify: a planted source with two releases (A, and B a patch with
@@ -117,7 +117,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
   - **S6 / U2, session start prints one line when an update is pending.** The kernel's SessionStart hook adds one line
     to its `additionalContext` (a critical part, never trimmed by the cap) naming the held release, the newest and the
     next step, in the form `Gov OS update pending: this repository holds <held>, <newest> is the newest (<kind>): <next
-    step>.`, for any role; nothing when up to date or when the update is held after a rollback; it uses the same reading
+    step>.`, for any role (the step is the doctor's `next` text, except that for a bigger release the line says `the
+    owner decides, gov update <newest>` without the leading `bigger: `, the kind being in the parentheses); nothing when up to date or when the update is held after a rollback; it uses the same reading
     as the doctor's part (`gov.update.pending`), and a source that cannot be read, a repository that holds no release,
     or gov not importable prints nothing and the hook exits 0 (its other parts, the checkpoint resume and `tk ready`,
     are unchanged). Verify: the hook run with an empty event (`{}`) and `CLAUDE_PROJECT_DIR` the planted clone prints a
@@ -140,8 +141,11 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
     `pin.json` back to A (or removes them where the project held no pin before); runs `gov rebuild` with the restored
     pin's gov (the running gov where there is no pin), a failed rebuild leaving the rollback committed and exit
     non-zero as `UPDATE_STORE_FAILED` saying `gov rebuild` is to run; and writes
-    `governance/updates/<B>.rolled-back.json` (`from` B, `to` A, `update_commit`, `revert_commit`, `pin`) in that commit.
-    It leaves B's environment folder `<common>/gov/envs/<B>`. Any failure before the commit puts HEAD, the tree and the
+    `governance/updates/<B>.rolled-back.json` (`from` B, `to` A, `update_commit`, `pin`: the pin restored, in the shape
+    of `pin_before`) in that commit (a commit cannot name itself, so no key names the revert commit).
+    It leaves B's environment folder `<common>/gov/envs/<B>`. **Which gov runs it (W2-18's dispatch):** in a repository
+    pinned at B, a gov started there is handed to B's, the one in doubt; so the pin dispatch (`gov.install.dispatch`)
+    hands nothing over for `update --rollback`: the gov that was started, A's by the path above, runs it. Any failure before the commit puts HEAD, the tree and the
     pin back as they were. Verify: a planted clone updated A to B (the S2 fixture), then `--rollback`: every tracked
     file but the rolled-back record equals A's tracked state (the bytes of the commit before the update: lock, answers,
     settings lines, adapters, shipped files), the pin link and `pin.json` name A, `envs/<B>` still exists, the record
