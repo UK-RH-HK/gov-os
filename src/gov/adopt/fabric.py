@@ -462,11 +462,11 @@ def check_coverage(record: dict, tracked) -> None:
                 errors.append(f"{name}: {store['error']}")
             continue
         indexed = set(store.get("indexed") or [])
-        refused = {item.get("path") for item in store.get("refused") or [] if isinstance(item, dict)}
+        reasoned = {item.get("path") for item in store.get("refused") or [] if isinstance(item, dict)}
         judged_files = store.get("judged_files")
-        gone = tracked - (indexed | refused) if name == "lexical" else \
-            set(judged_files) - (indexed | refused) if isinstance(judged_files, list) else set()
-        twice = indexed & refused
+        gone = tracked - (indexed | reasoned) if name == "lexical" else \
+            set(judged_files) - (indexed | reasoned) if isinstance(judged_files, list) else set()
+        twice = indexed & reasoned
         missing |= gone
         both |= twice
         if gone:
@@ -474,7 +474,7 @@ def check_coverage(record: dict, tracked) -> None:
         if twice:
             said.append(f"{name}: {len(twice)} file(s) in both the indexed list and the refused list: "
                         f"{', '.join(sorted(twice))}")
-        gap = (store.get("judged") or 0) - len(indexed | refused)
+        gap = (store.get("judged") or 0) - len(indexed | reasoned)
         if name != "lexical" and not isinstance(judged_files, list) and gap > 0:  # an older record: the count only
             short.append(f"{name}: {gap} file(s) judged and in neither list")
     if said or short or not_built:
