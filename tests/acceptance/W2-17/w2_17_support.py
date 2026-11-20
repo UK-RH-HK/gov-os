@@ -471,6 +471,10 @@ QUIET_STEP = "at the next quiet point"
 OWNER_STEP = f"gov update {B}"
 HELD_STEP = "held: rolled back here; waits for a newer release"
 PENDING_LINE = f"Gov OS update pending: this repository holds {A}, {B} is the newest (patch): {QUIET_STEP}."
+BIGGER_LINE = (f"Gov OS update pending: this repository holds {A}, {B} is the newest (bigger): the owner decides, "
+               f"{OWNER_STEP}.")
+ROLLED_BACK_KEYS = ("from", "to", "update_commit", "pin")    # no key names the revert commit (dd4206a99)
+STAND_IN_MARK = "b-gov-ran.txt"                              # written by the stand-in for B's pinned gov
 HOOK = REPO_ROOT / "template" / "governance" / "kernel" / "hooks" / "sessionstart.py"
 HOOK_TIMEOUT_S = 120.0
 PATCH, NO_KIND, UNREADABLE_KIND, OTHER_KIND = "patch", "no-kind", "unreadable-kind", "other-kind"  # planted sources
@@ -540,8 +544,9 @@ def name_source_by_link(project, link, target):
 
 def plant_rolled_back_record(project):
     """``governance/updates/<B>.rolled-back.json`` committed in the clone, as a rollback of B would leave it."""
-    _write(project, ROLLED_BACK_REL, json.dumps({"from": B, "to": A, "update_commit": None, "revert_commit": None,
-                                                 "pin": None}, indent=2) + "\n")
+    _write(project, ROLLED_BACK_REL, json.dumps({"from": B, "to": A, "update_commit": None,
+                                                 "pin": {"existed": False, "link": None, "record": None}},
+                                                indent=2) + "\n")
     commit_all(project, f"W2-17: an update to {B} rolled back here")
 
 
@@ -721,6 +726,26 @@ def amend_record_without_pin_before(project):
     assert "pin_before" not in (show_json(project, "HEAD", RECORD_REL) or {"pin_before": 1}), (
         "the amended update commit's record still holds pin_before")
     assert not porcelain_paths(project), f"the clone is not clean: {porcelain_paths(project)}"
+
+
+def stand_in_b_gov(project, mark_folder):
+    """B's pinned gov replaced by a stand-in that writes ``mark_folder/STAND_IN_MARK`` and exits 3: the copy's
+    ``<common>/gov/envs/<B>/bin/gov`` becomes that script and ``<common>/gov/bin/gov`` names it (pin.json still names
+    B). A gov handed over to the pin runs the stand-in; the mark says it ran."""
+    gov_path = env_gov(project, B)
+    mark = Path(mark_folder) / STAND_IN_MARK
+    gov_path.unlink()
+    gov_path.write_text(f"#!/bin/sh\necho \"$0 $*\" >> '{mark}'\necho 'W2-17 stand-in for B: it ran' >&2\nexit 3\n",
+                        encoding="utf-8")
+    gov_path.chmod(0o755)
+    _link_pin(project, gov_path)
+    return mark
+
+
+def _link_pin(project, target):
+    link = common_dir(project) / "gov" / "bin" / "gov"
+    link.unlink()
+    os.symlink(str(target), str(link))
 
 
 def revert_in_progress(project):

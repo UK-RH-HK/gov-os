@@ -34,6 +34,16 @@ def test_session_start_prints_the_pending_line(hook_clone):
     _line_printed(hook_clone)
 
 
+def test_session_start_prints_the_bigger_form_without_the_leading_bigger(hook_clone, planted_sources):
+    support.point(hook_clone.link, planted_sources[support.NO_KIND])
+    run = support.session_start(hook_clone.project, hook_clone.sandbox, hook_clone.quiet)
+    assert run.returncode == 0, f"a bigger release B pending: the hook does not exit 0\n{run.describe()}"
+    context = support.hook_context(run)
+    assert context is not None and support.BIGGER_LINE in context.splitlines(), (
+        f"a bigger release B pending: the hook's additionalContext does not hold the line {support.BIGGER_LINE!r}\n"
+        f"{run.describe()}")
+
+
 def test_session_start_prints_nothing_when_up_to_date(hook_clone, project_at_b, tmp_path):
     _line_printed(hook_clone)
     project = support.copy_project(project_at_b, tmp_path / "at-b")

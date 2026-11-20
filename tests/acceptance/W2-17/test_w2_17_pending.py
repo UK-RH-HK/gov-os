@@ -94,6 +94,8 @@ def test_doctor_holds_an_update_rolled_back_here(doctor_rolled_back_here):
     part = _part(run, what)
     assert support.HELD_STEP in str(part.get("next")), (
         f"{what}: the next step is not {support.HELD_STEP!r}: {part!r}")
+    assert part.get("pending") is False and part.get("rolled_back") is True, (
+        f"{what}: the updates part does not report pending false and rolled_back true: {part!r}")
     _same_as_untouched(doctor_rolled_back_here, run, what)
 
 

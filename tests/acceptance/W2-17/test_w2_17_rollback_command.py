@@ -95,8 +95,15 @@ def test_rollback_is_one_revert_commit_holding_its_record(rolled_back):
         "the history no longer holds the update commit and the commit before it")
     record = support.show_json(project, "HEAD", support.ROLLED_BACK_REL)
     assert isinstance(record, dict), f"the rollback commit does not hold {support.ROLLED_BACK_REL}"
-    missing = [key for key in ("from", "to", "update_commit", "revert_commit", "pin") if key not in record]
+    missing = [key for key in support.ROLLED_BACK_KEYS if key not in record]
     assert not missing, f"{support.ROLLED_BACK_REL} lacks {missing}: {record!r}"
+    assert "revert_commit" not in record, (
+        f"{support.ROLLED_BACK_REL} names the revert commit, which a commit cannot hold: {record!r}")
+    pin = record.get("pin")
+    assert isinstance(pin, dict) and pin.get("existed") is True and pin.get("link") == support.pin_link(project) \
+        and _record_pin(pin.get("record")) == support.pin_record(project), (
+            f"the record's pin is not the pin restored, in the shape of pin_before (existed true, link "
+            f"{support.pin_link(project)!r}, record {support.pin_record(project)!r}): {pin!r}")
     named = (record.get("from"), record.get("to"), record.get("update_commit"))
     assert named == (support.B, support.A, update_commit), (
         f"{support.ROLLED_BACK_REL} does not name from {support.B}, to {support.A} and the update commit "
@@ -126,6 +133,20 @@ def test_rollback_rebuilds_the_store_at_the_rollback_commit(rolled_back):
     store = retrieved.result().get("store") or {}
     assert store.get("commit") == support.head(rolled_back.project), (
         f"the memory store was not rebuilt at the rollback commit {support.head(rolled_back.project)}: {store!r}")
+
+
+def test_rollback_is_run_by_a_gov_not_handed_to_b_pin(pinned_updated, tmp_path, sandbox):
+    project = support.copy_project(pinned_updated.project, tmp_path / "product")
+    mark = support.stand_in_b_gov(project, tmp_path)
+    what = "A's gov started in a clone whose pinned B gov is a stand-in that marks and fails"
+    run = support.rollback(project, sandbox, binary=support.env_gov(project, support.A))
+    assert not mark.exists(), (
+        f"{what}: the rollback was handed to B's pinned gov (the pin dispatch), not run by A's gov: "
+        f"{mark.read_text(encoding='utf-8').strip()}\n{run.describe()}")
+    _succeeded(run, what)
+    _assert_release_a_restored(project, pinned_updated.before["head"], what)
+    record = support.pin_record(project) or {}
+    assert record.get("version") == support.A, f"{what}: <common>/gov/pin.json does not name {support.A}: {record!r}"
 
 
 # --- no pin before the update -----------------------------------------------------------------------------------
