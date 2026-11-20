@@ -2012,6 +2012,16 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-20 ("I am cutting release 0.1.4 now ... RB-1 a, RB-2 a, RB-3 b, RB-4 b, RB-5 a, RB-6 a, RB-7 keep both ... The study ceiling ... confirmed. After the release, your order stands ..."); the incident behind (1): every release so far waited on the owner's hand (0.1.2, 0.1.3), and the green base of 0.1.4 waited from 21:41 for his cut.
 - **Governing sources:** docs/emergency-2/proposals/RELEASE-ON-BEHALF.md; docs/emergency-2/proposals/IMPORTS-ADOPTION-SPEC.md; EMERGENCY-2 2.5, 8.2, 8.3; DEC-772; DEC-1220 (3); DEC-1222.
 
+### DEC-1224 — EXAMIN's own rules under review until its planning stage, X12 held; release acceptance item 4 moves to EXAMIN's first planned wave; releasing on the owner's behalf starts now, slice (a) first; 0.1.5 the last release cut by hand
+- **Status:** ACCEPTED (owner, 2026-11-20 about 15:10, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1214 E1 to E3, DEC-1223 · **Changes:** EMERGENCY-2 8.2 item 4 (moved: the release acceptance rests on items 2 and 3, with item 1 as recorded); DEC-1223 (9) (EXAMIN's feature ticket); the release design's placement (`docs/emergency-2/proposals/RELEASE-ON-BEHALF.md`: not after W2-207)
+- **Decision:**
+  - (1) **EXAMIN:** its own rules are under review until its planning stage, which starts after its memory measure passes and begins with EXAMIN's Contract. **X12** (EXAMIN's decision D-X12, the Socratic constraint) **is held until then.**
+  - (2) **Release acceptance item 4** (one EXAMIN feature ticket through the flow) becomes the first ticket of EXAMIN's first planned wave. **The release acceptance rests on the proving run (W2-81) and EXAMIN's fresh 80.**
+  - (3) **Releasing on the owner's behalf starts now, not after W2-207. Slice (a) first:** the patch rule, the gates, `gov release --patch`, the general re-pin with its rollback, and the push. **Slice (b)**, the automatic update of adopted repositories, follows when W2-207 allows; by hand until then (RB-5). **The proving check (G3)** uses the kept outputs of the W2-81 run now going. Rehearse on a scratch clone, then turn the authority file on and tell the owner.
+  - (4) **0.1.5 is the last release the owner cuts by hand:** push him the moment the scan fix (EXAMIN's F-033) has landed and the suite is green.
+- **Basis:** the owner's message of 2026-11-20 ("EXAMIN: its own rules are under review until its planning stage ... Release on my behalf: start it now, not after W2-207 ... 0.1.5 is the last release I cut by hand ..."); the incidents behind it: the release design placed itself after W2-207's cut-over, which waits by day; EXAMIN's Wave 0 rules predate its planning stage.
+- **Governing sources:** docs/emergency-2/proposals/RELEASE-ON-BEHALF.md; EMERGENCY-2 7, 8.2; DEC-1214; DEC-1223.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
