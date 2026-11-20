@@ -954,3 +954,92 @@ def test_the_adoption_stages_carry_the_address_too_and_keep_the_runs_own_home(tm
 def test_notify_is_an_option_of_the_command_and_names_no_default():
     assert runner.parse(["--folder", "x"]).notify is None
     assert runner.parse(["--folder", "x", "--notify", ADDRESS]).notify == ADDRESS
+
+
+def _asked(ready_run, name):
+    """The questions of one repository as the runner asks them (the visible half and the stand-in hidden half)."""
+    repo = ready_run["repos"][name]
+    return questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
+                             "visible") + questions.resolve(questions.sets_in(ready_run["hidden"])[name],
+                                                            repo.manifest, repo.root, "hidden")
+
+
+def _once(items):
+    """The stack a question's bundle becomes: each (path, start, end) taken once, in order."""
+    out = []
+    for item in items:
+        if item not in out:
+            out.append(item)
+    return out
+
+
+def _rows_saved(ready_run, name):
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    return {row["id"]: row for row in saved["repositories"][name]["figures"]["per_question"]}
+
+
+@pytest.mark.parametrize("order", ["forbidden", "late"])
+def test_the_report_records_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source(ready_run, order):
+    """Fix T6: each row of a repository's ``per_question`` holds the bundle the retrieval gave (``[path, start, end]``
+    in rank order, all items), the 1-based rank of the first forbidden source (null when none) and of the first gold
+    source; ``first_gold_rank`` stays. ``forbidden``: a forbidden path first, then the gold; ``late``: five filler
+    items before the gold (the gold is at rank 6)."""
+    govs = ready_run["govs"]
+    _read(ready_run, gov=govs[order], pinned_gov=govs["good"], queue_ticket="PG-1")
+    checked = 0
+    for name in runner.EXPECTED:
+        rows = _rows_saved(ready_run, name)
+        for q in _asked(ready_run, name):
+            gold = [[p, line, line] for p, line, _ in q.sources]
+            first = [[q.forbidden[0], 1, 1]] if order == "forbidden" and q.forbidden else \
+                [[f"filler/f{n}.md", 1, 1] for n in range(5)] if order == "late" else []
+            row = rows[q.id]
+            assert row["bundle"] == [list(i) for i in _once(tuple(i) for i in first + gold)], (name, q.id)
+            shift = len(first)
+            assert row["gold_rank"] == shift + 1 and row["diagnostic"]["first_gold_rank"] == shift + 1, (name, q.id)
+            assert row["forbidden_rank"] == (1 if order == "forbidden" and q.forbidden else None), (name, q.id)
+            checked += 1
+    assert checked >= 60, "every question of every repository, the hidden half's too"
+
+
+def test_a_question_whose_retrieval_failed_has_no_bundle_and_no_rank(ready_run, tmp_path):
+    broken = tmp_path / "tools" / "gov-broken"
+    broken.parent.mkdir()
+    broken.write_text("#!/bin/sh\ncase \"$1\" in --version) echo \"gov 0.1.4 (commit 0123456789ab)\" ;;\n"
+                      "retrieve) exit 3 ;; queue|adopt) exit 0 ;; *) exit 64 ;; esac\n")
+    broken.chmod(0o755)
+    _read(ready_run, gov=broken, pinned_gov=broken, queue_ticket="PG-1")
+    rows = _rows_saved(ready_run, "python-app")
+    assert rows and all(r["bundle"] is None and r["forbidden_rank"] is None and r["gold_rank"] is None
+                        and r["diagnostic"]["first_gold_rank"] is None for r in rows.values())
+
+
+def test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_rows_included(ready_run, tmp_path):
+    """Fix T6, and the rule of F4 kept: a row holds ids, numbers and the repository's own paths; no hidden question
+    holds a sentence of itself, its answer, or an item's text in the report, its markdown or the log."""
+    ranking = {}
+    for name in runner.EXPECTED:
+        ranking.update(standin.ranking_for(name, _asked(ready_run, name), "forbidden"))
+    for n, items in enumerate(ranking.values()):
+        for item in items:
+            item["text"] = f"Zephyr-item-text-{n}: a sentence of the repository's own file"
+    gov = standin.write_gov(tmp_path / "tools", "gov-text", ranking)
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1")
+    shown = {name: (ready_run["folder"] / name).read_text() for name in ("report.json", "report.md", "run.log")}
+    for where, text in shown.items():
+        assert "Zephyr-item-text" not in text and "a sentence of the repository" not in text, where
+    allowed = {"id", "part", "right", "reason", "citation_right", "forbidden_cited", "grade", "reader", "diagnostic",
+               "bundle", "forbidden_rank", "gold_rank"}
+    hidden = 0
+    for name in runner.EXPECTED:
+        rows = _rows_saved(ready_run, name)
+        for q in _asked(ready_run, name):
+            row = rows[q.id]
+            assert set(row) <= allowed, (name, q.id, sorted(set(row) - allowed))
+            assert row["bundle"] and all(len(i) == 3 and isinstance(i[0], str) and isinstance(i[1], int)
+                                         and isinstance(i[2], int) for i in row["bundle"]), (name, q.id)
+            text = json.dumps(row)
+            for sentence in (q.question, q.gold_answer, *[holds for _, _, holds in q.sources]):
+                assert sentence not in text, f"{q.id}'s row holds a sentence of the question, its answer or a source"
+            hidden += q.part == "hidden"
+    assert hidden == 10 * len(runner.EXPECTED), "the hidden half's rows were read"

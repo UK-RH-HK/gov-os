@@ -256,3 +256,67 @@ def test_a_run_record_naming_another_model_for_any_session_is_refused(role, mode
     reasons = score.check_models(_record(**{role: model}))
     assert reasons and all(role in r for r in reasons), reasons
     assert score.check_models(_record()) == [], "and the same record on Sonnet passes"
+
+
+# --------------------------------------------------------------------------
+# Fix T6 (W2-81's proving run on 0.1.4): the ranked bundle and the ranks of the forbidden and the gold source
+# --------------------------------------------------------------------------
+
+def _rows(question, stacked):
+    result = score.score_repository("r", [question], {question.id: stacked}, _verdict(question))
+    return result["per_question"][0]
+
+
+def test_a_row_holds_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source():
+    q = _q(1)  # gold: src/a.py line 10; forbidden: docs/old.md
+    stacked = [("filler/x.md", 1, 5), (STALE, 1, 3), ("filler/y.md", 4, 9), ("src/a.py", 8, 12), (STALE, 5, 9)]
+    row = _rows(q, stacked)
+    assert [list(item) for item in row["bundle"]] == [list(item) for item in stacked], "all items, in rank order"
+    assert row["forbidden_rank"] == 2, "the first item whose path is a forbidden source"
+    assert row["gold_rank"] == 4 and row["diagnostic"]["first_gold_rank"] == 4, "the existing diagnostic stays"
+    assert row["diagnostic"]["forbidden_in_top_5"] is True
+
+
+def test_a_row_names_no_rank_where_the_bundle_holds_no_such_item_and_no_bundle_where_none_was_given():
+    q = _q(1)
+    row = _rows(q, [("filler/x.md", 1, 5), ("filler/y.md", 1, 5)])
+    assert len(row["bundle"]) == 2 and row["forbidden_rank"] is None and row["gold_rank"] is None
+    assert row["diagnostic"]["first_gold_rank"] is None
+    none = _rows(q, None)  # the retrieval failed: no bundle, so no rank
+    assert none["bundle"] is None and none["forbidden_rank"] is None and none["gold_rank"] is None
+    empty = _rows(q, [])  # the retrieval answered nothing
+    assert empty["bundle"] in (None, []) and empty["forbidden_rank"] is None and empty["gold_rank"] is None
+    free = _rows(_q(2, forbidden=()), [(STALE, 1, 3), ("src/a.py", 8, 12)])  # a question that forbids nothing
+    assert free["forbidden_rank"] is None and free["gold_rank"] == 2
+
+
+def test_the_forbidden_rank_is_by_path_over_any_forbidden_source_and_ranks_start_at_1():
+    q = Question("r-q09", "visible", "which-spec-governs", "secret question 9", "secret answer 9",
+                 [("src/a.py", 10, "A = 1"), ("src/b.py", 20, "B = 2")], ["docs/old.md", "docs/older.md"])
+    row = _rows(q, [("docs/older.md", 100, 120), ("src/b.py", 18, 22), ("docs/old.md", 1, 2), ("src/a.py", 9, 11)])
+    assert row["forbidden_rank"] == 1, "the first of any of the question's forbidden sources, whatever its lines"
+    assert row["gold_rank"] == 2 and row["diagnostic"]["first_gold_rank"] == 2, "the first of any gold source"
+
+
+def test_the_gold_rank_is_by_the_gold_sources_path_where_the_first_gold_rank_is_by_its_line():
+    """``gold_rank`` is "likewise" the forbidden rank, by path: an item of a gold source's file whose lines do not hold
+    the gold line is the first of its file (rank 1); the existing ``first_gold_rank`` stays the one that holds the
+    line (rank 2)."""
+    q = _q(1)
+    row = _rows(q, [("src/a.py", 40, 60), ("src/a.py", 8, 12)])
+    assert row["gold_rank"] == 1 and row["diagnostic"]["first_gold_rank"] == 2
+
+
+def test_the_new_fields_hold_paths_line_numbers_and_ranks_only():
+    asked = [_q(n) for n in range(1, 4)]
+    answers = {"r-q01": [("src/a.py", 8, 12)], "r-q02": [(STALE, 1, 3), ("src/a.py", 8, 12)], "r-q03": None}
+    said = {q.id: {"reader": SAID, "grader": "correct"} for q in asked}
+    result = score.score_repository("r", asked, answers, said)
+    for row in result["per_question"]:
+        assert set(row) <= {"id", "part", "right", "reason", "citation_right", "forbidden_cited", "grade", "reader",
+                            "diagnostic", "bundle", "forbidden_rank", "gold_rank"}, sorted(row)
+        for item in row["bundle"] or []:
+            assert len(item) == 3 and isinstance(item[0], str) and all(isinstance(n, int) for n in item[1:])
+    text = json.dumps(result)
+    for q in asked:
+        assert q.question not in text and q.gold_answer not in text
