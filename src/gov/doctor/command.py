@@ -869,6 +869,19 @@ def _check_templates(root: Path) -> dict:
             "reason": f"role template copies {named}; gov adapters generate writes them"}
 
 
+def _check_updates(root: Path) -> dict:
+    """The pending-update report (W2-17 fix S5, CAP-45.b): the held release, the newest verified release in the local
+    source, its kind, its fixes and the next step. A notice (status ``report``): it never makes doctor unhealthy, and a
+    read that fails is ``pending: false`` with a reason."""
+    from gov.update import pending
+    try:
+        return pending.pending(root)
+    except Exception as exc:
+        return {"status": "report", "held": None, "newest": None, "pending": False, "kind": None, "fixes": 0,
+                "next": None, "summary": "no update pending: the report could not be read",
+                "reason": f"{type(exc).__name__}: {exc}"}
+
+
 def _part(name: str, check, *args) -> dict:
     """What the part ``check`` gives. An exception it raises ends doctor as a GovError naming the part, the exception
     and its text (I4 finding 5): an envelope with ok false, never a bare traceback, and never a pass."""
@@ -897,6 +910,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
             "claude_code": _part("claude_code", _check_claude_code, root),
             "held_out": _part("held_out", _check_held_out, root),
             "templates": _part("templates", _check_templates, root),
+            "updates": _part("updates", _check_updates, root),
         }
     finally:
         _probe_deadline = None

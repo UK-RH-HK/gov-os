@@ -84,3 +84,76 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
 - **The fix (built on branch `e2/kit-e2` under the W2-208 ticket `DAEO-kt8e`, before the owner's ruling that it is a fix here reached its lead; merged into `w2/integrate` at `fc8a52fb9` on 2026-11-19):** the kit's permission source and kernel settings hold the two deny lines (`git push`, `sudo`) and no allow line (K1, `c81e9b796`); `gov update` takes the legacy lines out of a project's settings through its journal and keeps a line the owner added by hand (K2, F2, `f8b4a677f`); the held-out `Read` deny step retires (`write_read_rules` gone; K3, F1, `62658001c`). Its tests are `tests/acceptance/W2-208/` (K1 to K3, F1, F2; designer commit `d513e8559`), read by `gov accept W2-208`.
 - **The chore beside it (DEC-1217 (7)):** the golden rules head the kit's CLAUDE.md and AGENTS.md and `judging-work` 1.2.0 agrees (K4 to K6: `1589dd08a`, `fa4bf7346`, `dced49bb6`): kernel text, the CTO's (EMERGENCY-2 3.5).
 - **Evidence on the merged tree:** W2-208, W2-17, W1-38, W2-195, W2-56, W2-188, W2-201 and the adapters, update, brief, launch and opt-in unit tests: 1,958 passed, 0 failed.
+
+## Fix: pending-update report and rollback (DEC-1223 (6))
+- **The gap:** CAP-45.a lists "rollback" and CAP-45.b (`gov doctor` reports a pending update) has no code; both are gaps in
+  this closed feature, found in `docs/emergency-2/proposals/RELEASE-ON-BEHALF.md` ("Adopted repositories: the quiet point
+  and the update"; "Placement and size") and approved by the owner as RB-6 (a), DEC-1223 (6): two fixes under W2-17, no
+  new ticket. The tests are written first, red on the base (`tests/acceptance/W2-17/`, S5 to S7, the next S numbers).
+- **Not here:** `gov release --patch`, the re-pin, the update pass (`gov update --auto`) and the quiet point: the feature
+  ticket, later. Nothing in `src/gov/queue/**`.
+- **Allowed paths for the fixes:** `src/gov/update/**`, `src/gov/doctor/**`, `src/gov/cli/**` where a command's arguments
+  need it, `template/governance/kernel/hooks/sessionstart.py` (and its copy where the repository keeps one),
+  `tests/unit/update/**`, `tests/unit/doctor/**`, `tests/unit/hooks/**`, `tests/acceptance/W2-17/**`.
+- **Fix lines** (each observable, each with its verify; S5 to S7 in the acceptance README):
+  - **S5 / U1, `gov doctor` reports a pending update (CAP-45.b).** A part `updates` reads, from the local source only
+    (`_src_path` of the repository's `.copier-answers.yml`; its tags `v<X>` and the records at them; nothing is fetched,
+    no network, no copier): the release the repository holds (its lock), the newest release in the source that has a
+    verified record (`gov.release.verify_at`, manifest only) and is newer than the held one, that release's kind (`patch`
+    or `bigger`: the `kind` key of `docs/releases/<X>/kind.json` at the tag where the record has one; no file, or one
+    that does not read, or any other value: `bigger`), how many fixes it carries (the commits of `v<held>..v<newest>` in
+    the source whose message has a `Fix:` trailer; 0 where the held tag is not an ancestor) and the next step (`at the
+    next quiet point` for a patch; `bigger: the owner decides, gov update <version>` otherwise; where
+    `governance/updates/<newest>.rolled-back.json` exists in the repository: `held: rolled back here; waits for a newer
+    release`, with `pending: false` and `rolled_back: true`). Keys: `status` is always `report` (a notice: it never makes doctor unhealthy, whatever the source says),
+    `held`, `newest`, `pending` (bool), `kind`, `fixes`, `next`, and `summary` (one line; `up to date (<held>)` when
+    nothing newer exists). A repository with no held release, no readable source, or no verified newer record reports
+    `pending: false` with `reason` and never raises. Verify: a planted source with two releases (A, and B a patch with
+    `kind.json` and two `Fix:` commits) and an adopted clone holding A: `gov doctor --json`'s `updates` part names A, B,
+    `patch`, 2 and the quiet-point step; with B's record carrying no `kind.json`, kind `bigger` and the owner step naming
+    `gov update B`; with the clone at B: `up to date`, `pending` false; with `_src_path` pointing nowhere: `pending`
+    false with a reason, doctor's exit and `healthy` as without the part; in every case `healthy` and the other parts'
+    statuses are exactly those of the same clone with the source untouched.
+  - **S6 / U2, session start prints one line when an update is pending.** The kernel's SessionStart hook adds one line
+    to its `additionalContext` (a critical part, never trimmed by the cap) naming the held release, the newest and the
+    next step, in the form `Gov OS update pending: this repository holds <held>, <newest> is the newest (<kind>): <next
+    step>.`, for any role (the step is the doctor's `next` text, except that for a bigger release the line says `the
+    owner decides, gov update <newest>` without the leading `bigger: `, the kind being in the parentheses); nothing when up to date or when the update is held after a rollback; it uses the same reading
+    as the doctor's part (`gov.update.pending`), and a source that cannot be read, a repository that holds no release,
+    or gov not importable prints nothing and the hook exits 0 (its other parts, the checkpoint resume and `tk ready`,
+    are unchanged). Verify: the hook run with an empty event (`{}`) and `CLAUDE_PROJECT_DIR` the planted clone prints a
+    JSON `additionalContext` that holds the line with both releases and the step, exit 0; up to date: no output, exit 0;
+    `_src_path` broken: no output, exit 0; with the source tree's `GOV_ROLE=orchestrator` environment the line is there
+    beside the existing parts.
+  - **S7 / U3, `gov update --rollback` restores the previous release in one command.** Run from the repository root with
+    the previous release's gov (`<git common dir>/gov/envs/<A>/bin/gov update --rollback`; no version given: with one
+    it refuses, reason `usage`): it finds the update to undo as the lock's held release B and the commit that added
+    `governance/updates/<B>.json` (refused as `UPDATE_REFUSED` with reason `no_update` where there is none, `dirty`
+    for an uncommitted change); it takes the previous pin from the record's new field `pin_before` (`{"existed": bool,
+    "link": <target or null>, "record": <pin.json as it was or null>}`, written by `gov update` into the record from the
+    state it records before it installs B). **A record written before the field existed** (releases 0.1.3 and 0.1.4's
+    updates): A is the record's `from`; the pin goes to `<common>/gov/envs/<A>` where that folder exists (the link to
+    its `bin/gov` and a `pin.json` naming A and that environment), and the rollback is refused with reason
+    `no_previous_pin` before anything changes where it does not. It reverts the update commit with `git revert` (a
+    new commit; one commit holds the revert and the record below; history keeps the update commit and the revert);
+    where later commits make the revert conflict it stops, runs nothing else, leaves HEAD, the tree and the pin as
+    before and refuses with reason `rollback_conflict` naming the conflicting paths; it puts the pin's link and
+    `pin.json` back to A (or removes them where the project held no pin before); runs `gov rebuild` with the restored
+    pin's gov (the running gov where there is no pin), a failed rebuild leaving the rollback committed and exit
+    non-zero as `UPDATE_STORE_FAILED` saying `gov rebuild` is to run; and writes
+    `governance/updates/<B>.rolled-back.json` (`from` B, `to` A, `update_commit`, `pin`: the pin restored, in the shape
+    of `pin_before`) in that commit (a commit cannot name itself, so no key names the revert commit).
+    It leaves B's environment folder `<common>/gov/envs/<B>`. **Which gov runs it (W2-18's dispatch):** in a repository
+    pinned at B, a gov started there is handed to B's, the one in doubt; so the pin dispatch (`gov.install.dispatch`)
+    hands nothing over for `update --rollback`: the gov that was started, A's by the path above, runs it. Any failure before the commit puts HEAD, the tree and the
+    pin back as they were. Verify: a planted clone updated A to B (the S2 fixture), then `--rollback`: every tracked
+    file but the rolled-back record equals A's tracked state (the bytes of the commit before the update: lock, answers,
+    settings lines, adapters, shipped files), the pin link and `pin.json` name A, `envs/<B>` still exists, the record
+    exists, `git log` holds the update commit and the revert, the status is clean, the store was rebuilt (`retrieve
+    --json`'s `store.commit` is HEAD); a planted later commit that changes a file the update changed makes the same
+    command refuse with `rollback_conflict` naming it and HEAD, the tree and the pin unchanged; a record with its
+    `pin_before` taken out rolls back the same way through the fallback; a project with no pin before the update has
+    none after.
+- **Order:** this section (`Role: orchestrator`); the test designer (Opus, the C3 trial of DEC-1222 (2); `src/gov/update/**`
+  is C3); the engineer (Sonnet) until `gov accept W2-17` is green. Every commit carries `Task: DAEO-sdhj` and a `Fix:`
+  trailer with the line's summary. The ticket stays closed.

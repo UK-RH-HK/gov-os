@@ -129,6 +129,21 @@ def test_dispatch_breaks_a_loop_through_a_pin_that_is_not_its_environment_s(tmp_
     assert dispatch.target(str(repo), environ, "/usr") is None
 
 
+def test_dispatch_hands_nothing_over_for_update_rollback(tmp_path):
+    """W2-17 S7: the rollback is run by the gov that was started, not by the pin's (B's, the one in doubt)."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-q")
+    _fake_pin(repo)
+    for argv in (["update", "--rollback"], ["--root", ".", "update", "--rollback", "--json"],
+                 ["update", "--json", "--rollback"]):
+        assert dispatch.target(str(repo), {}, "/usr", argv) is None
+    # a version, a plain update, or --rollback after a bare -- are handed over as before
+    for argv in (["update", "0.9.1"], ["doctor", "--rollback"], ["update", "--", "--rollback"], []):
+        assert dispatch.target(str(repo), {}, "/usr", argv) is not None
+    assert dispatch.target(str(repo), {}, "/usr") is not None
+
+
 def test_gov_started_in_a_subfolder_of_a_pinned_repository_reruns_the_pin_with_its_arguments(tmp_path):
     repo = tmp_path / "repo"
     (repo / "sub").mkdir(parents=True)

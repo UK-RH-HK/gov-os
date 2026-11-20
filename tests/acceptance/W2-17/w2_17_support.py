@@ -450,3 +450,303 @@ def assert_never_applied(run, what):
               if not NEGATION.search(run.output[max(0, found.start() - 30):found.start()])]
     assert run.envelope().get("ok") is False and not claims, (
         f"{what}: the output says the update was applied ({claims})\n{run.describe()}")
+
+
+# ==========================================================================
+# The fixes S5 to S7 (DEC-1223 (6)): gov doctor's ``updates`` part, the session-start line, ``gov update --rollback``
+# ==========================================================================
+#
+# Added for the fixes; nothing above is changed. Public interfaces only: ``gov doctor --json``, the kernel's
+# SessionStart hook run as a program (a JSON event on standard input, ``CLAUDE_PROJECT_DIR`` the clone),
+# ``gov update --rollback [--json]``, ``gov install``, ``git`` and the files of the clone.
+
+RELEASES_REL = w216.RELEASES_REL                         # docs/releases
+KIND_REL = f"{RELEASES_REL}/{B}/kind.json"               # release B's kind, in its record at the tag
+ROLLED_BACK_REL = f"governance/updates/{B}.rolled-back.json"
+UPDATE_STORE_FAILED = "UPDATE_STORE_FAILED"
+DECOY_TAG = "v0.9.2"                                     # a tag with no release record: never the newest release
+PATCH_KIND = {"kind": "patch", "rules": {"P1": "pass", "P2": "pass", "P3": "pass", "P4": "pass", "P5": "pass"}}
+FIXES = 2                                                # the Fix: commits planted between v0.9.0 and v0.9.1
+QUIET_STEP = "at the next quiet point"
+OWNER_STEP = f"gov update {B}"
+HELD_STEP = "held: rolled back here; waits for a newer release"
+PENDING_LINE = f"Gov OS update pending: this repository holds {A}, {B} is the newest (patch): {QUIET_STEP}."
+BIGGER_LINE = (f"Gov OS update pending: this repository holds {A}, {B} is the newest (bigger): the owner decides, "
+               f"{OWNER_STEP}.")
+ROLLED_BACK_KEYS = ("from", "to", "update_commit", "pin")    # no key names the revert commit (dd4206a99)
+STAND_IN_MARK = "b-gov-ran.txt"                              # written by the stand-in for B's pinned gov
+HOOK = REPO_ROOT / "template" / "governance" / "kernel" / "hooks" / "sessionstart.py"
+HOOK_TIMEOUT_S = 120.0
+PATCH, NO_KIND, UNREADABLE_KIND, OTHER_KIND = "patch", "no-kind", "unreadable-kind", "other-kind"  # planted sources
+UPDATES_KEYS = ("status", "held", "newest", "pending", "kind", "fixes", "next", "summary")
+
+
+# --- the planted sources ------------------------------------------------------------------------------------
+
+def plant_source(source, destination, kind=PATCH_KIND, fixes=FIXES, decoy=False):
+    """A copy of the source whose tag ``vB`` is moved onto commits added after B's record commit: ``fixes`` empty
+    commits each with a ``Fix:`` trailer, one chore commit with none, then (``kind`` not None) a commit adding
+    ``docs/releases/<B>/kind.json`` (``kind`` a dict is written as JSON, bytes as they are). B's manifest, its
+    ``manifest.sha256`` and every file under ``template/`` are unchanged at the moved tag, so B still verifies as a
+    release. With ``decoy``, a tag ``v0.9.2`` on a later commit that holds no record of 0.9.2."""
+    repo = w216.clone_folder(source.repo, destination)
+    old = git(repo, "rev-parse", f"{TAG_B}^{{commit}}").strip()
+    git(repo, "checkout", "-q", "--detach", old)
+    for number in range(1, fixes + 1):
+        git(repo, "commit", "-q", "--allow-empty", "-m", f"W2-17 stand-in fix {number}",
+            "-m", f"A fix to the stand-in Gov OS between {TAG_A} and {TAG_B}.",
+            "-m", f"Task: DAEO-w217\nFix: the stand-in fix number {number}")
+    git(repo, "commit", "-q", "--allow-empty", "-m", "W2-17 stand-in chore",
+        "-m", "A chore with no Fix trailer: it is not one of the release's fixes.", "-m", "Class: C")
+    if kind is not None:
+        path = Path(repo) / KIND_REL
+        path.write_bytes(kind if isinstance(kind, bytes) else (json.dumps(kind, indent=2) + "\n").encode())
+        commit_all(repo, f"the kind of release {B}")
+    git(repo, "tag", "-f", TAG_B, "HEAD")
+    new = head(repo)
+    for rel in (f"{RELEASES_REL}/{B}/manifest.json", f"{RELEASES_REL}/{B}/manifest.sha256", "template"):
+        assert git(repo, "rev-parse", f"{old}:{rel}") == git(repo, "rev-parse", f"{new}:{rel}"), (
+            f"the planted source changed {rel} at {TAG_B}: B would no longer verify")
+    counted = [line for line in git(repo, "log", "--format=%(trailers:key=Fix,valueonly)%x00",
+                                    f"{TAG_A}..{TAG_B}").split("\0") if line.strip()]
+    assert len(counted) == fixes, (
+        f"the planted source holds {len(counted)} Fix: commits in {TAG_A}..{TAG_B}, not {fixes}")
+    if decoy:
+        git(repo, "commit", "-q", "--allow-empty", "-m", "W2-17: after 0.9.1, a tag with no release record")
+        git(repo, "tag", DECOY_TAG, "HEAD")
+        assert git(repo, "ls-tree", "-r", "--name-only", DECOY_TAG, "--", f"{RELEASES_REL}/0.9.2").strip() == "", (
+            f"the decoy tag {DECOY_TAG} holds a record")
+    return Path(repo)
+
+
+def point(link, target):
+    """The symbolic link ``link`` made to name ``target`` (which need not exist)."""
+    link = Path(link)
+    if os.path.lexists(link):
+        link.unlink()
+    link.parent.mkdir(parents=True, exist_ok=True)
+    os.symlink(str(target), str(link))
+
+
+def name_source_by_link(project, link, target):
+    """``_src_path`` of the project's answers set to ``link`` (a symbolic link naming ``target``), committed, so a
+    case can change the source the clone reads without changing the clone."""
+    point(link, target)
+    path = Path(project) / ANSWERS_REL
+    text = path.read_text(encoding="utf-8")
+    changed = re.sub(r"(?m)^_src_path:.*$", f"_src_path: {json.dumps(str(link))}", text, count=1)
+    assert changed != text, f"{ANSWERS_REL} has no _src_path line"
+    path.write_text(changed, encoding="utf-8")
+    commit_all(project, "W2-17: the source named through a link")
+    assert (read_yaml(path) or {}).get("_src_path") == str(link), f"{ANSWERS_REL} does not name {link}"
+    assert not porcelain_paths(project), f"the clone is not clean: {porcelain_paths(project)}"
+
+
+def plant_rolled_back_record(project):
+    """``governance/updates/<B>.rolled-back.json`` committed in the clone, as a rollback of B would leave it."""
+    _write(project, ROLLED_BACK_REL, json.dumps({"from": B, "to": A, "update_commit": None,
+                                                 "pin": {"existed": False, "link": None, "record": None}},
+                                                indent=2) + "\n")
+    commit_all(project, f"W2-17: an update to {B} rolled back here")
+
+
+def set_lock_release_null(project):
+    """The clone's lock made to state ``release: null`` (no held release), committed."""
+    path = Path(project) / LOCK_REL
+    text = path.read_text(encoding="utf-8")
+    header = "".join(line for line in text.splitlines(keepends=True) if line.startswith("#"))
+    data = yaml.safe_load(text)
+    data["release"] = None
+    path.write_text(header + yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+    commit_all(project, "W2-17: the lock states release: null")
+    assert lock_release(project) is None, "the lock does not state release: null"
+
+
+# --- gov doctor -----------------------------------------------------------------------------------------------
+
+def doctor_report(run):
+    """The doctor's report: the envelope's result when healthy, the error's details when not (exit 3)."""
+    envelope = run.envelope()
+    report = envelope.get("result") or (envelope.get("error") or {}).get("details") or {}
+    assert isinstance(report, dict) and "healthy" in report, (
+        f"gov doctor gave no report with `healthy`\n{run.describe()}")
+    return report
+
+
+def updates_part(run):
+    part = doctor_report(run).get("updates")
+    assert isinstance(part, dict), f"gov doctor's report has no `updates` part\n{run.describe()}"
+    return part
+
+
+def other_statuses(run):
+    """``healthy`` and every part's status but the ``updates`` part's."""
+    report = doctor_report(run)
+    return {"healthy": report.get("healthy"),
+            **{name: part.get("status") for name, part in report.items()
+               if name != "updates" and isinstance(part, dict)}}
+
+
+# --- the session-start hook -----------------------------------------------------------------------------------
+
+def fake_tk(folder, text=""):
+    """A ``tk`` in ``folder`` whose ``tk ready`` prints ``text`` (nothing for ""), to be put first on PATH."""
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "tk-ready.txt").write_text(text, encoding="utf-8")
+    path = folder / "tk"
+    path.write_text(f"#!/bin/sh\ncat '{folder / 'tk-ready.txt'}'\nexit 0\n", encoding="utf-8")
+    path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    return folder
+
+
+def session_start(project, sandbox, tk_folder, role=None, with_src=True, event="{}"):
+    """The kernel's SessionStart hook of this worktree run as a program: ``event`` on standard input,
+    ``CLAUDE_PROJECT_DIR`` the clone, ``GOV_ROLE`` ``role`` (absent for None), ``PYTHONPATH`` this worktree's
+    ``src/`` (none with ``with_src`` False), no ``GOV_TICKET``."""
+    env = environment(sandbox, first=(tk_folder,), with_src=with_src)
+    env["CLAUDE_PROJECT_DIR"] = str(project)
+    if role:
+        env["GOV_ROLE"] = role
+    argv = (sys.executable, str(HOOK))
+    try:
+        done = subprocess.run(list(argv), cwd=str(project), env=env, input=event, capture_output=True, text=True,
+                              timeout=HOOK_TIMEOUT_S)
+    except subprocess.TimeoutExpired:
+        raise AssertionError(f"the SessionStart hook did not end within {HOOK_TIMEOUT_S:.0f} s") from None
+    return Run(argv, done.returncode, done.stdout, done.stderr)
+
+
+def hook_context(run):
+    """The ``additionalContext`` the hook printed, or None where it printed nothing."""
+    if not run.stdout.strip():
+        return None
+    data = run.envelope()
+    output = data.get("hookSpecificOutput")
+    assert isinstance(output, dict) and isinstance(output.get("additionalContext"), str), (
+        f"the hook's output has no hookSpecificOutput.additionalContext\n{run.describe()}")
+    return output["additionalContext"]
+
+
+def gov_importable(sandbox, with_src):
+    done = subprocess.run([sys.executable, "-c", "import gov"], env=environment(sandbox, with_src=with_src),
+                          capture_output=True, text=True, cwd=str(sandbox.elsewhere))
+    return done.returncode == 0
+
+
+# --- gov install, the update with a pin, and gov update --rollback --------------------------------------------
+
+def pin_link(project):
+    """The target of ``<common>/gov/bin/gov``, or None where there is no link."""
+    link = common_dir(project) / "gov" / "bin" / "gov"
+    return os.readlink(link) if os.path.islink(link) else None
+
+
+def pin_record(project):
+    """``<common>/gov/pin.json`` read as JSON, or None where it is absent."""
+    path = common_dir(project) / "gov" / "pin.json"
+    return json.loads(path.read_bytes()) if path.is_file() else None
+
+
+def env_gov(project, version):
+    """``<common>/gov/envs/<version>/bin/gov`` of the project."""
+    return common_dir(project) / "gov" / "envs" / version / "bin" / "gov"
+
+
+@dataclass(frozen=True)
+class PinnedUpdate:
+    project: Path
+    sandbox: object
+    before: dict            # tree_state before the update (A's commit)
+    before_pin: object      # pin_state before the update
+    link_before: str        # <common>/gov/bin/gov's target before the update (A's environment)
+    record_before: dict     # pin.json before the update, as JSON
+    run: object             # gov update B --json
+
+
+def build_pinned_update(adopted, base):
+    """A copy of the adopted project with release A pinned (``gov install A``), then updated to B (``gov update B``)."""
+    base = Path(base)
+    project = copy_project(adopted, base / "product")
+    sandbox = make_sandbox(base / "sandbox")
+    installed = gov(project, sandbox, "install", A, "--json")
+    assert installed.returncode == 0, f"`gov install {A}` did not pin release A\n{installed.describe()}"
+    link, record = pin_link(project), pin_record(project)
+    assert link and link.rstrip("/").endswith(f"gov/envs/{A}/bin/gov") and (record or {}).get("version") == A, (
+        f"`gov install {A}` left no pin naming A: link {link!r}, pin.json {record!r}")
+    assert not porcelain_paths(project), f"`gov install` changed the tree: {porcelain_paths(project)}"
+    before, before_pin = tree_state(project), pin_state(project)
+    run = update(project, sandbox)
+    assert run.returncode == 0 and run.result().get("to") == B, (
+        f"`gov update {B}` of the project with A pinned did not succeed (S2's update, not the fix)\n{run.describe()}")
+    return PinnedUpdate(Path(project), sandbox, before, before_pin, link, record, run)
+
+
+def rollback(project, sandbox, *args, binary=None, json_form=True):
+    """``gov update --rollback [args] [--json]`` from the project's root: with ``binary`` (a pinned environment's
+    ``bin/gov``, run without PYTHONPATH), else with this worktree's gov."""
+    extra = ("--json",) if json_form else ()
+    if binary is None:
+        return gov(project, sandbox, "update", "--rollback", *args, *extra)
+    assert Path(binary).exists(), f"no gov at {binary}"
+    return _run((binary, "update", "--rollback", *args, *extra), project, environment(sandbox, with_src=False))
+
+
+def tracked(project, rev):
+    """``{path: (mode, blob)}`` of every tracked file at ``rev``."""
+    listing = git(project, "ls-tree", "-r", "-z", "--full-tree", rev)
+    entries = {}
+    for item in listing.split("\0"):
+        if item:
+            meta, path = item.split("\t", 1)
+            mode, _kind, blob = meta.split()
+            entries[path] = (mode, blob)
+    return entries
+
+
+def tracked_difference(expected, actual):
+    return sorted(rel for rel in set(expected) | set(actual) if expected.get(rel) != actual.get(rel))
+
+
+def show_json(project, rev, rel):
+    """The JSON file ``rel`` at ``rev``, or None where it is not there."""
+    done = subprocess.run(["git", "-C", str(project), "show", f"{rev}:{rel}"], capture_output=True)
+    return json.loads(done.stdout) if done.returncode == 0 else None
+
+
+def amend_record_without_pin_before(project):
+    """The update commit (HEAD) amended so its record holds no ``pin_before``, as records written before the field
+    existed (0.1.3, 0.1.4) hold none; still the commit that added the record."""
+    path = Path(project) / RECORD_REL
+    record = json.loads(path.read_bytes())
+    record.pop("pin_before", None)
+    path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    git(project, "add", RECORD_REL)
+    git(project, "-c", "commit.gpgsign=false", "commit", "-q", "--amend", "--no-edit", "--no-verify")
+    assert "pin_before" not in (show_json(project, "HEAD", RECORD_REL) or {"pin_before": 1}), (
+        "the amended update commit's record still holds pin_before")
+    assert not porcelain_paths(project), f"the clone is not clean: {porcelain_paths(project)}"
+
+
+def stand_in_b_gov(project, mark_folder):
+    """B's pinned gov replaced by a stand-in that writes ``mark_folder/STAND_IN_MARK`` and exits 3: the copy's
+    ``<common>/gov/envs/<B>/bin/gov`` becomes that script and ``<common>/gov/bin/gov`` names it (pin.json still names
+    B). A gov handed over to the pin runs the stand-in; the mark says it ran."""
+    gov_path = env_gov(project, B)
+    mark = Path(mark_folder) / STAND_IN_MARK
+    gov_path.unlink()
+    gov_path.write_text(f"#!/bin/sh\necho \"$0 $*\" >> '{mark}'\necho 'W2-17 stand-in for B: it ran' >&2\nexit 3\n",
+                        encoding="utf-8")
+    gov_path.chmod(0o755)
+    _link_pin(project, gov_path)
+    return mark
+
+
+def _link_pin(project, target):
+    link = common_dir(project) / "gov" / "bin" / "gov"
+    link.unlink()
+    os.symlink(str(target), str(link))
+
+
+def revert_in_progress(project):
+    return (common_dir(project) / "REVERT_HEAD").exists()

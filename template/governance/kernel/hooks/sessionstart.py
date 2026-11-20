@@ -19,6 +19,12 @@ Critical parts (W1-49, W2-62, orchestrator only, never cut):
   - the whole RESUME HERE section, only when it fits within the cap
     with the rest; a section is never cut (DEC-837)
 
+Critical part (W2-17 fix S6, DEC-1223 (6), every role, with or without a ticket, last of the critical parts):
+  - when an update is pending, one line: "Gov OS update pending: this repository holds <held>, <newest> is the newest
+    (<kind>): <step>." (``gov.update.pending``, the reading behind gov doctor's part updates). Nothing when up to
+    date, when the update is held after a rollback, when the source cannot be read, when no release is held or when
+    gov is not importable; it never fails the hook.
+
 Optional parts (W1-29, all roles, the ones trimmed):
   - gov context --brief output
   - tk ready output
@@ -113,6 +119,24 @@ def _add_src(project_root: str) -> None:
         sys.path.insert(0, src_dir)
 
 
+def pending_line(project_root: str) -> str:
+    """The one line of an update pending (W2-17 fix S6), or "" for anything else, a failure and gov not importable
+    included; it writes nothing."""
+    try:
+        _add_src(project_root)
+        from gov.update.pending import pending
+        found = pending(project_root)
+        if not found.get("pending"):
+            return ""
+        step = found["next"]
+        if found["kind"] == "bigger":
+            step = f"the owner decides, gov update {found['newest']}"
+        return (f"Gov OS update pending: this repository holds {found['held']}, {found['newest']} is the newest "
+                f"({found['kind']}): {step}.")
+    except Exception:
+        return ""
+
+
 def main() -> None:
     sys.dont_write_bytecode = True
     try:
@@ -138,6 +162,8 @@ def main() -> None:
         except Exception as exc:
             resume = None
             _no_gov(exc, "the checkpoint resume brief was not added")
+
+    update_line = pending_line(project_root)
 
     if role == "orchestrator":
         from precompact import STAMP, checkpoint_rel, split
@@ -172,7 +198,7 @@ def main() -> None:
                 f"Read the RESUME HERE section of {rel} in full before anything else: "
                 f"lines {first}-{last}, {len(section):,} characters.")
             whole = f"The whole RESUME HERE section of {rel} (lines {first}-{last}):\n\n{section}"
-            if len("\n\n".join(critical_parts + [whole])) <= CAP_CHARS:
+            if len("\n\n".join(critical_parts + [whole] + ([update_line] if update_line else []))) <= CAP_CHARS:
                 critical_parts.append(whole)
             else:
                 critical_parts.append(
@@ -181,6 +207,9 @@ def main() -> None:
                     "reads as it takes.")
         else:
             critical_parts.append(f"{rel} is missing, can't be read or has no RESUME HERE section.")
+
+    if update_line:
+        critical_parts.append(update_line)
 
     optional_parts: list[str] = []
     # The owner's Emergency 2 (2026-11-16): no `gov context` packet at session start; the checkpoint injection stays.

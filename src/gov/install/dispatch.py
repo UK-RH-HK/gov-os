@@ -2,8 +2,9 @@
 
 ``<common>/gov/bin/gov`` (``<common>`` the git common dir, found by ``locate`` without a subprocess) is run with the
 same arguments and without ``PYTHONPATH``, unless ``GOV_PIN=off`` is set or the running gov is already that
-environment's (``sys.prefix`` is the environment the link names). It never loops: the re-run carries
-``GOV_PIN_DISPATCHED`` naming the link, and a gov that finds it naming the same link runs itself.
+environment's (``sys.prefix`` is the environment the link names). ``gov update --rollback`` is never handed over (W2-17
+S7): the pin is B's, the release in doubt, so the gov that was started (A's) runs it. It never loops: the re-run
+carries ``GOV_PIN_DISPATCHED`` naming the link, and a gov that finds it naming the same link runs itself.
 """
 
 from __future__ import annotations
@@ -16,9 +17,16 @@ from gov.install.locate import common_dir
 MARK = "GOV_PIN_DISPATCHED"
 
 
-def target(cwd: str, environ: dict, prefix: str) -> tuple[str, dict] | None:
+def _is_rollback(argv: list[str] | None) -> bool:
+    """``update`` and ``--rollback`` both on the command line before a bare ``--``."""
+    words = list(argv or [])
+    words = words[:words.index("--")] if "--" in words else words
+    return "update" in words and "--rollback" in words
+
+
+def target(cwd: str, environ: dict, prefix: str, argv: list[str] | None = None) -> tuple[str, dict] | None:
     """``(program, environment)`` to re-run, or ``None`` to run the gov that is running."""
-    if environ.get("GOV_PIN") == "off":
+    if environ.get("GOV_PIN") == "off" or _is_rollback(argv):
         return None
     common = common_dir(cwd)
     if common is None:
@@ -40,7 +48,7 @@ def run(argv: list[str]) -> None:
         cwd = os.getcwd()
     except OSError:
         return
-    found = target(cwd, dict(os.environ), sys.prefix)
+    found = target(cwd, dict(os.environ), sys.prefix, argv)
     if found is None:
         return
     program, environ = found
