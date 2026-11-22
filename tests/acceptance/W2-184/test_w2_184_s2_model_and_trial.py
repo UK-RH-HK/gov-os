@@ -72,13 +72,13 @@ def test_s2_the_resolved_model_after_the_double_dash_on_a_role_with_no_table_is_
 
 def test_s2_a_planted_trial_admits_the_launch_and_the_record_holds_its_id(project, launch, tk):
     s.plant_trial(project, TRIAL, tk=tk)
-    s.assert_session(launch(ENG, tk, trial=TRIAL), s.HAIKU5, "high", criticality="C2", model_source="trial",
+    s.assert_session(launch(ENG, tk, trial=TRIAL), s.TRIAL_MODEL, "high", criticality="C2", model_source="trial",
                      effort_source="trial", trial=TRIAL)
 
 
 def test_s2_a_trial_s_effort_below_the_floor_is_accepted(project, launch, tk):
     s.plant_trial(project, TRIAL, tk=tk, effort="low")
-    s.assert_session(launch(ENG, tk, trial=TRIAL), s.HAIKU5, "low", criticality="C2", model_source="trial",
+    s.assert_session(launch(ENG, tk, trial=TRIAL), s.TRIAL_MODEL, "low", criticality="C2", model_source="trial",
                      effort_source="trial", trial=TRIAL)
 
 
@@ -86,24 +86,24 @@ def test_s2_a_trial_s_max_needs_a_reason(project, launch, tk):
     s.plant_trial(project, TRIAL, tk=tk, effort="max")
     s.refused(launch(ENG, tk, trial=TRIAL), "max", "reason")
     text = "the trial measures the deepest setting"
-    s.assert_session(launch(ENG, tk, trial=TRIAL, reason=text), s.HAIKU5, "max", criticality="C2",
+    s.assert_session(launch(ENG, tk, trial=TRIAL, reason=text), s.TRIAL_MODEL, "max", criticality="C2",
                      model_source="trial", effort_source="trial", trial=TRIAL, effort_reason=text)
 
 
 def test_s2_a_trial_id_may_hold_dots_underscores_and_hyphens(project, launch, tk):
     s.plant_trial(project, "t.1_a-b", tk=tk)
-    s.assert_session(launch(ENG, tk, trial="t.1_a-b"), s.HAIKU5, "high", criticality="C2", model_source="trial",
+    s.assert_session(launch(ENG, tk, trial="t.1_a-b"), s.TRIAL_MODEL, "high", criticality="C2", model_source="trial",
                      effort_source="trial", trial="t.1_a-b")
 
 
 def test_s2_the_trial_s_own_model_and_effort_after_the_double_dash_are_accepted_once(project, launch, tk):
     s.plant_trial(project, TRIAL, tk=tk)
-    s.assert_session(launch(ENG, tk, "--model", s.HAIKU5, "--effort", "high", trial=TRIAL), s.HAIKU5, "high",
+    s.assert_session(launch(ENG, tk, "--model", s.TRIAL_MODEL, "--effort", "high", trial=TRIAL), s.TRIAL_MODEL, "high",
                      criticality="C2", model_source="trial", effort_source="trial", trial=TRIAL)
 
 
 @pytest.mark.parametrize("passed,words", [
-    (("--model", s.OPUS), (s.OPUS, s.HAIKU5)), (("--model", s.SONNET), (s.SONNET, s.HAIKU5)),
+    (("--model", s.OPUS), (s.OPUS, s.TRIAL_MODEL)), (("--model", s.HAIKU5), (s.HAIKU5, s.TRIAL_MODEL)),
     (("--effort", "xhigh"), ("xhigh", "high")), (("--effort", "medium"), ("medium", "high"))])
 def test_s2_a_model_or_effort_after_the_double_dash_that_differs_from_the_trial_s_is_refused_naming_both(
         project, launch, tk, passed, words):
@@ -223,5 +223,5 @@ def test_s2_the_subagent_model_is_a_trial_s_model_in_the_settings_and_the_record
     s.plant_trial(project, TRIAL, tk=tk)
     result = launch(ENG, tk, trial=TRIAL)
     s.b.assert_launched(result)
-    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.HAIKU5, result.env_block()
-    assert result.record().get("subagent_model") == s.HAIKU5 and result.record().get("model") == s.HAIKU5
+    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.TRIAL_MODEL, result.env_block()
+    assert result.record().get("subagent_model") == s.TRIAL_MODEL and result.record().get("model") == s.TRIAL_MODEL

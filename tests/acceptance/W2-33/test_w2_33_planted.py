@@ -88,8 +88,6 @@ PLANTS = {
                                                          lambda l: l + ", no-such-skill-w2-33"), "no-such-skill-w2-33"),
     "model-tier-line-changed": (_change("independent-auditor", W.TIER_HEAD, lambda l: "- **Model tier:** standard"),
                                 "Model tier"),
-    "criticality-entries-out-of-order": (_change("engineer", W.CRITICALITY_HEAD,
-                                                 lambda l: l.replace("C3 model", "C1 model", 1)), "Launch by criticality"),
     # the two sentences altered or taken out (S4, S5)
     "work-order-altered": (_edit("ticket-lead", "work in parallel from them", "work one after the other from them"),
                            "work-order"),
@@ -108,23 +106,29 @@ PLANTS = {
     "engineer-default-opus": (_change("engineer", W.DEFAULT_HEAD, lambda l: l.replace(W.SONNET, W.OPUS)), "Launch default"),
     "product-spec-default-opus": (_change("product-spec", W.DEFAULT_HEAD, lambda l: l.replace(W.SONNET, W.OPUS)),
                                   "Launch default"),
-    "test-designer-c3-sonnet": (_change("independent-test-designer", W.CRITICALITY_HEAD,
-                                        lambda l: l.replace(f"C3 model {W.OPUS}", f"C3 model {W.SONNET}", 1)),
-                                "Launch by criticality"),
-    # Rewrite-Reason: DEC-1214 K1 (W2-201 S1): the QA engineer's C2 entry is plain Sonnet now, so the departure is
-    # the old Opus-on-FULL form written back (was "qa-c2-not-the-full-form"); the auditor's file now varies by class,
-    # so "a line where RUBRIC-2 does not vary" is planted in the orchestrator's file (was the auditor's).
-    "qa-c2-opus-on-full-again": (_change("qa-engineer", W.CRITICALITY_HEAD,
-                                         lambda l: l.replace(f"C2 model {W.SONNET}, effort high", W.QA_C2, 1)),
-                                 "Launch by criticality"),
-    "criticality-line-removed-where-it-varies": (_drop_lines("engineer", W.CRITICALITY_HEAD), "Launch by criticality"),
+    # Rewrite-Reason: DEC-1225 (W2-201 R1): no role file carries a Launch by criticality line now, so the departures that
+    # edited, reordered, truncated or removed the engineer's, the test designer's or the QA engineer's line
+    # ("criticality-entries-out-of-order", "test-designer-c3-sonnet", "qa-c2-opus-on-full-again",
+    # "criticality-line-removed-where-it-varies", "c0-entry-malformed") have no line to depart from. The departure is
+    # the line written back: on the four roles that had one and on the orchestrator ("criticality-line-where-rubric-2-
+    # does-not-vary", as before), each a fault naming the file.
+    "criticality-line-written-back-in-the-engineer": (
+        _change("engineer", W.DEFAULT_HEAD,
+                lambda l: l + f"\n- **Launch by criticality:** C3 model {W.OPUS}, effort high; C2 model {W.SONNET}, "
+                          f"effort high; C1 model {W.SONNET}, effort high; C0 model {W.SONNET}, effort low"),
+        "Launch by criticality"),
+    "criticality-line-written-back-in-the-qa-engineer": (
+        _change("qa-engineer", W.DEFAULT_HEAD,
+                lambda l: l + f"\n- **Launch by criticality:** C3 model {W.OPUS}, effort high; {W.QA_C2}; "
+                          f"C1 model {W.SONNET}, effort high; C0 model {W.SONNET}, effort low"),
+        "Launch by criticality"),
+    "auditor-default-opus": (_change("independent-auditor", W.DEFAULT_HEAD, lambda l: l.replace(W.SONNET, W.OPUS)),
+                             "Launch default"),
     "criticality-line-where-rubric-2-does-not-vary": (
         _change("orchestrator", W.DEFAULT_HEAD,
                 lambda l: l + f"\n- **Launch by criticality:** C3 model {W.OPUS}, effort high; C2 model {W.OPUS}, "
                           f"effort high; C1 model {W.OPUS}, effort high; C0 model {W.SONNET}, effort high"),
         "Launch by criticality"),
-    "c0-entry-malformed": (_change("engineer", W.CRITICALITY_HEAD, lambda l: l.rsplit("; C0", 1)[0] + "; C0 deterministic"),
-                           "Launch by criticality"),
     # the roster of files
     "ticket-lead-file-missing": (_drop_file("ticket-lead"), "ticket-lead.md"),
     "qa-engineer-file-missing": (_drop_file("qa-engineer"), "qa-engineer.md"),

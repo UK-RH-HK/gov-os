@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # start_cto.sh: the morning's fresh Gov OS CTO (DEC-1212 (1)), in tmux `cto-<yyyymmdd>` with Remote Control "Gov OS CTO",
-# on the rubric's model (Opus, DEC-1212 (3); Claude Fable 5.2 while the owner's temporary substitution is active,
-# DEC-1215, governance/project/model-substitution.yaml) at high effort, in the no-prompt mode, the full window (no cap).
+# on Opus (claude-opus-5-5: the app's CTO is one of the two orchestrating roles that run Opus, DEC-1225 (1)) at high
+# effort, in the no-prompt mode, the full window (no cap). No session runs Fable (DEC-1225 (3)).
 # Run by the outgoing CTO at the handover, after it has written docs/emergency-2/CTO-HANDOVER.md; leads started with
 # start_lead.sh keep running (their returns reach the CTO's inbox, ~/.gov-os/inbox/cto, read with `gov msg read cto`).
 set -euo pipefail
 REPO=/home/usain/Dynamic-Agentic-Engineering-OS
 name=cto-$(date +%Y%m%d-%H%M)
-model=$(cd "$REPO" && PYTHONPATH="$REPO/src" python3 -c 'from pathlib import Path; from gov.launch.role import substitute; print(substitute(Path("."), "claude-opus-5-5", "high")[0])' 2>/dev/null || echo claude-opus-5-5)
+model=claude-opus-5-5
 tmux has-session -t "$name" 2>/dev/null && { echo "tmux $name already runs" >&2; exit 2; }
 [ -s "$REPO/docs/emergency-2/CTO-HANDOVER.md" ] || { echo "no handover at docs/emergency-2/CTO-HANDOVER.md" >&2; exit 2; }
 first="You are the Gov OS CTO, starting fresh (a handover; the outgoing CTO retires once you have taken over). Read in full, in this order: docs/emergency-2/EMERGENCY-2.md \

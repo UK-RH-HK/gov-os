@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from gov.launch import criticality as crit, model_exceptions
+from gov.launch import criticality as crit
 
 REPO = Path(__file__).resolve().parents[3]
 HOOK = REPO / ".claude" / "hooks" / "agent_model.py"
@@ -44,11 +44,6 @@ def plant(root, name, data):
 def ticket(root, tid, allowed, profile="STANDARD", **more):
     front = {"id": tid, "status": "in_progress", "profile": profile, "allowed_paths": allowed, **more}
     (root / ".tickets" / f"{tid}.md").write_text("---\n" + yaml.safe_dump(front) + "---\n# t\n", encoding="utf-8")
-
-
-def substitution(root, **change):
-    plant(root, "model-substitution", {"active": True, "from": OPUS, "to": FABLE, "effort": "high",
-                                       "until": "2999-01-01T00:00:00+00:00", **change})
 
 
 def run(root, kind=None, model=None, prompt="Do it.", tool="Agent", raw=None):
@@ -136,29 +131,39 @@ def test_a_general_purpose_spawn_with_no_model_passes(bed):
     passes(run(bed, "general-purpose"))
 
 
-# --- S9 -------------------------------------------------------------------------------------------------------------
+# --- S9 (DEC-1215's substitution) is gone (DEC-1225, R3) -----------------------------------------------------------
+# Rewrite-Reason: DEC-1225: these cases pinned Fable judged as Opus while the substitution file is active, Opus refused
+# with the Fable hint, and Fable refused with the file inactive or absent. R3: the file and its readers are gone and no
+# session runs Fable; Fable is refused for every type whatever the entries name and the file says.
 
 @pytest.mark.parametrize("model", ("fable", FABLE))
-def test_while_the_substitution_is_active_fable_is_judged_as_opus(bed, model):
-    substitution(bed)
-    passes(run(bed, "engineer", model, "Task: DAEO-c3aa"))
-    refuses(run(bed, "engineer", model, "Task: DAEO-c2aa"), "DAEO-c2aa", "C2", "C3 work only")
-    refuses(run(bed, "engineer", model), "Task:")
-    refuses(run(bed, "general-purpose", model, "Task: DAEO-c3aa"), "model-exceptions.yaml")
+def test_fable_is_refused_whatever_the_entries_and_a_planted_old_file_say(bed, model):
+    plant(bed, "model-exceptions", {"exceptions": [{"subagent_type": who, "model": name, "class": "C3", "decided": "x"}
+                                                    for who in ("engineer", "*") for name in ("fable", FABLE, "opus")]})
+    plant(bed, "model-substitution", {"active": True, "from": OPUS, "to": FABLE, "effort": "high",
+                                      "until": "2999-01-01T00:00:00+00:00"})
+    for kind in ("engineer", "general-purpose"):
+        done = run(bed, kind, model, "Task: DAEO-c3aa")
+        refuses(done)
+        assert "substitut" not in done.stderr.lower(), done.stderr
+    refuses(run(bed, "fork", model), "a fresh helper from a written brief")
 
 
-def test_while_the_substitution_is_active_opus_is_refused_with_the_fable_hint_and_a_fork_stays_refused(bed):
-    substitution(bed)
-    refuses(run(bed, "engineer", "opus", "Task: DAEO-c3aa"), "DEC-1215", "Claude Fable 5.2", "'fable'")
-    refuses(run(bed, "fork", "fable"), "a fresh helper from a written brief")
+def test_opus_is_judged_by_its_limiter_alone_with_no_fable_hint(bed):
+    refuses(run(bed, "engineer", "opus", "Task: DAEO-c2aa"), "DAEO-c2aa", "C2")
+    done = run(bed, "engineer", "opus", "Task: DAEO-c2aa")
+    assert "fable" not in done.stderr.lower() and "dec-1215" not in done.stderr.lower(), done.stderr
 
 
-@pytest.mark.parametrize("change", ({"active": False}, {"until": "2000-01-01T00:00:00+00:00"}, None))
-def test_with_the_substitution_inactive_past_or_absent_fable_is_refused_and_opus_is_judged_as_before(bed, change):
-    if change is not None:
-        substitution(bed, **change)
-    refuses(run(bed, "engineer", FABLE, "Task: DAEO-c3aa"), "model-exceptions.yaml")
-    passes(run(bed, "engineer", "opus", "Task: DAEO-c3aa"))
+@pytest.mark.parametrize("limiters, prompt, lifted", (
+    ({"decision": ["DEC-1230"]}, "Decision: DEC-1230", True), ({"decision": ["DEC-1230"]}, "Decision: DEC-1299", False),
+    ({"decision": ["DEC-1230"]}, "Task: DAEO-c3aa", False), ({"task": ["DAEO-c2aa"]}, "Task: DAEO-c2aa", True),
+    ({"task": ["DAEO-c2aa"]}, "Task: DAEO-c3aa", False), ({}, "Task: DAEO-c3aa\nDecision: DEC-1230", False)))
+def test_the_decision_and_task_limiters_and_an_opus_entry_with_none(bed, limiters, prompt, lifted):
+    plant(bed, "model-exceptions", {"exceptions": [{"subagent_type": "independent-auditor", "model": "opus",
+                                                    "decided": "x", **limiters}]})
+    done = run(bed, "independent-auditor", "opus", prompt)
+    passes(done) if lifted else refuses(done)
 
 
 # --- F1 -------------------------------------------------------------------------------------------------------------
@@ -219,17 +224,14 @@ def test_the_hook_and_ticket_criticality_give_the_same_class_on_the_real_rubric(
     assert _hook().ticket_class(str(REPO), front) == crit.ticket_criticality(REPO, front)
 
 
-@pytest.mark.parametrize("entry, model, active", (
-    ("opus", "opus", False), ("opus", OPUS, False), (OPUS, "opus", False), ("opus", SONNET, False),
-    ("opus", FABLE, True), ("opus", "fable", True), ("opus", FABLE, False), ("claude-haiku-5-5", FABLE, True),
-    ("claude-haiku-5-5", "claude-haiku-5-5", False), ("opus", "claude-opusx", False)))
-def test_the_hook_and_the_launcher_match_a_model_by_one_rule(entry, model, active):
-    assert _hook().model_matches(entry, model, active) is model_exceptions.model_matches(entry, model, active)
+# Rewrite-Reason: DEC-1225: ``test_the_hook_and_the_launcher_match_a_model_by_one_rule`` compared the hook's and the
+# launcher's ``model_matches(entry, model, substituted)``, whose substituted case R3 removes. Deleted: the acceptance
+# file ``test_w2_201_r3_limiters.py`` runs the hook and the launcher on one table of entries and spawns instead.
 
 
-def test_the_real_exceptions_file_lists_the_four_c3_roles():
+def test_the_real_exceptions_file_holds_the_one_auditor_entry():
+    """Rewrite-Reason: DEC-1225: the file listed the four C3 roles (``DEC-1214 K1``); R3: one entry,
+    ``independent-auditor``, ``opus``, ``decision: [DEC-1230]``."""
     data = yaml.safe_load((REPO / "governance/project/model-exceptions.yaml").read_text(encoding="utf-8"))
-    assert [(e["subagent_type"], e["model"], e["class"]) for e in data["exceptions"]] == [
-        (role, "opus", "C3") for role in ("independent-test-designer", "engineer", "independent-auditor",
-                                          "qa-engineer")]
-    assert all("DEC-1214 K1" in e["decided"] for e in data["exceptions"])
+    assert [(e["subagent_type"], e["model"], e.get("decision")) for e in data["exceptions"]] == [
+        ("independent-auditor", "opus", ["DEC-1230"])]

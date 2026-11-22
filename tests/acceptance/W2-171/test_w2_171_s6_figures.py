@@ -42,7 +42,11 @@ def same(want, got, path="figures"):
 @pytest.mark.parametrize("name", ["five", "clean", "below", "five37"])
 def test_s6_figures_json_has_exactly_the_keys_of_item_10_and_the_planted_values(make_world, name):
     world = make_world(f"judged:{name}")
-    figures = world.json_of("FIGURES.json")
+    figures = dict(world.json_of("FIGURES.json"))
+    # Rewrite-Reason: DEC-1225 (R4): FIGURES.json names the reader, grader and checker models (key ``models``), beside
+    # the keys of item 10; its three values are Sonnet. The rest is compared as before.
+    models = figures.pop("models")
+    assert isinstance(models, dict) and len(models) == 3 and set(models.values()) == {"claude-sonnet-5-5"}, models
     assert set(figures) == TOP
     assert set(figures["verdict"]) == VERDICT and set(figures["beside"]) == BESIDE
     assert set(figures["misses"]) == MISSES
@@ -89,7 +93,8 @@ def test_s6_figures_json_holds_no_planted_word_gold_path_or_answer(make_world):
     forbidden += [d["question"] for d in world.docs().values()] + [d["gold_answer"] for d in world.docs().values()]
     found = [w for w in forbidden if w in text]
     assert found == [], found
-    assert set(json.loads(text)) == TOP
+    # Rewrite-Reason: DEC-1225 (R4): FIGURES.json also holds ``models`` (the reader, grader and checker models)
+    assert set(json.loads(text)) - {"models"} == TOP
 
 
 def _plant_classes(world, classes: dict[str, str], reason="reasonwordxyz"):

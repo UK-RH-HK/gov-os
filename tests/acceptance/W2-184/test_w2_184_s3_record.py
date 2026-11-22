@@ -28,14 +28,16 @@ def test_s3_a_launch_by_criticality_records_its_fields(project, launch):
 def test_s3_a_launch_with_a_trial_records_the_trial_id(project, launch):
     tk = s.ticket(project, ENG, "C2", tk=TK)
     s.plant_trial(project, "trial-7", tk=tk)
-    s.assert_session(launch(ENG, tk, trial="trial-7"), s.HAIKU5, "high", criticality="C2", model_source="trial",
+    s.assert_session(launch(ENG, tk, trial="trial-7"), s.TRIAL_MODEL, "high", criticality="C2", model_source="trial",
                      effort_source="trial", trial="trial-7")
 
 
 def test_s3_a_promoted_launch_records_the_promotion_reason_and_the_record(project, launch):
     tk = s.ticket(project, ENG, "C2", tk=TK)
+    # Rewrite-Reason: DEC-1225: a promotion launched on Opus. R2: it keeps its record and the table's effort and
+    # launches the table's model (the engineer's C2 entry: Sonnet); the model's source word is left open.
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk), s.OPUS, "high", criticality="C2", model_source="promotion",
+    s.assert_session(launch(ENG, tk), s.TABLES[ENG]["C2"][0], "high", criticality="C2", model_source=s.ANY,
                      effort_source="by criticality",
                      promotion={"reason": "two failed reviews", "record": record})
 

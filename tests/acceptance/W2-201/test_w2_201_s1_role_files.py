@@ -1,10 +1,14 @@
-"""W2-201 S1: the role files carry the rubric (audit 4 Table 3 with DEC-1212 (3) and DEC-1214 K1).
+"""W2-201 S1 (revised for DEC-1225, lines R1): the role files carry the rubric.
+
+Rewrite-Reason: DEC-1225: this case pinned S1's table (Opus at C3 for four roles, Haiku at C0, a table line for each).
+It now pins DEC-1225 (1)'s: ``w2_201_support.TABLE`` gives Opus, high, only to ``orchestrator`` and
+``senior-engineer`` and Sonnet, high, to every other role, none of them with a table line.
 
 Every role file, in the kernel folder and in each generated copy (``.rulesync/subagents``,
 ``template/.rulesync/subagents``, ``.claude/agents``), is read with the launcher's role reader (``gov.launch.role``:
 ``launch_default`` for the ``Launch default`` line, ``read_by_criticality`` for the ``Launch by criticality`` line), the
 copy planted alone where the reader reads a role file; the model and effort per class, on a FULL ticket and otherwise,
-must equal S1's table (``w2_201_support.TABLE``). A copy that differs from it, so from the kernel file, fails.
+must equal the table (``w2_201_support.TABLE``). A copy that differs from it, so from the kernel file, fails.
 """
 
 from __future__ import annotations
@@ -45,6 +49,6 @@ def test_s1_each_role_file_and_copy_gives_the_table_s_model_and_effort_per_class
 
 
 def test_s1_the_kernel_folder_holds_the_nine_roles_of_the_table():
-    """Guard: the table names every kernel role file, so no role file escapes the case above."""
+    """Guard: the table names every kernel role file, so no role file escapes the case above (the roster is unchanged)."""
     names = sorted(p.stem for p in (k.REPO_ROOT / k.ROLES_REL).glob("*.md") if p.name.lower() != "readme.md")
     assert names == sorted(k.TABLE), f"the kernel role files are {names}; S1's table names {sorted(k.TABLE)}"

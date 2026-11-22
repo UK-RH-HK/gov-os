@@ -30,7 +30,7 @@ import yaml
 
 from gov.cli.errors import GovError
 
-DEFAULT_MODEL, DEFAULT_EFFORT = "claude-opus-5-5", "high"  # DEC-839's worker defaults, until roles state their own
+DEFAULT_MODEL, DEFAULT_EFFORT = "claude-sonnet-5-5", "high"  # DEC-839's worker defaults, until roles state their own
 SCENARIOS, RECORD = "scenarios.md", "scenario-records.yaml"
 SUMMARIES = "scenario-summaries.md"  # hand-written beside them (W2-100's and W2-101's interface); never shown to the session
 IMPORTS = "governance/project/skill-imports.yaml"
