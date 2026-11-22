@@ -7,7 +7,7 @@ of ``src``, C1 ``docs``, FULL at least C2) and an exceptions file listing the fo
 ``class: C3``. The ticket is the one the prompt's ``Task: <id>`` line names. A refusal exits 2 with its reason on
 stderr; a spawn let through exits 0.
 
-The last cases are on this repository's own files: the exceptions file's four entries, and the hook's outcome against
+The last cases are on this repository's own files: the exceptions file's one entry (DEC-1225, R3), and the hook's outcome against
 ``gov.launch.criticality.ticket_criticality`` over the real rubric on a table of ``allowed_paths``.
 """
 
@@ -67,10 +67,15 @@ def test_s5_the_highest_matching_rule_gives_the_class(project):
     k.let_through(_run(project, model="opus", tasks=("DAEO-mixd",)))
 
 
-def test_s5_an_entry_without_a_class_is_not_limited_to_c3(hook_base):
+def test_s5_an_opus_entry_without_a_class_or_any_limiter_lifts_nothing(hook_base):
+    """Rewrite-Reason: DEC-1225: this case pinned "an entry without a class is not limited to C3" and let an Opus spawn
+    for a C2 ticket through. R3: an entry that names Opus and carries no limiter (``class``, ``task``, ``decision``)
+    lifts nothing, whatever the ticket and whether the prompt carries a ``Task:`` line or not."""
     project = k.hook_project(hook_base, exceptions={"exceptions": [
         {"subagent_type": ENG, "model": "opus", "decided": k.DECIDED}]})
-    k.let_through(_run(project, model="opus", tasks=(k.C2_TICKET,)))
+    k.refused(_run(project, model="opus", tasks=(k.C2_TICKET,)))
+    k.refused(_run(project, model="opus", tasks=(k.C3_TICKET,)))
+    k.refused(_run(project, model=k.OPUS, tasks=()))
 
 
 def test_s5_the_task_tool_name_is_judged_as_the_agent_tool(project):
@@ -121,19 +126,19 @@ def test_s5_a_sonnet_or_no_model_spawn_is_let_through_whatever_the_ticket(projec
 # This repository's own files
 # --------------------------------------------------------------------------
 
-def test_s5_the_real_exceptions_file_lists_the_four_roles_on_opus_for_c3_by_dec_1214_k1():
+def test_s5_the_real_exceptions_file_holds_one_entry_the_auditor_on_opus_limited_by_dec_1230():
+    """Rewrite-Reason: DEC-1225: this case pinned the four C3 entries (``class: C3``, ``DEC-1214 K1``). R3: the file
+    holds one entry: ``independent-auditor``, ``opus``, ``decision: [DEC-1230]``."""
     data = yaml.safe_load((k.REPO_ROOT / k.EXCEPTIONS_REL).read_text(encoding="utf-8"))
     assert isinstance(data, dict) and isinstance(data.get("exceptions"), list), (
         f"{k.EXCEPTIONS_REL} is not a map with an exceptions list: {data!r}")
     entries = data["exceptions"]
-    kinds = sorted(str(e.get("subagent_type")) for e in entries if isinstance(e, dict))
-    assert kinds == sorted(k.FOUR) and len(entries) == 4, (
-        f"{k.EXCEPTIONS_REL} lists {kinds}; S5 names {sorted(k.FOUR)}, one entry each")
-    for entry in entries:
-        model = str(entry.get("model"))
-        assert model == "opus" or model.startswith("claude-opus-"), f"the entry {entry} is not for Opus"
-        assert entry.get("class") == "C3", f"the entry {entry} does not carry class: C3"
-        assert "DEC-1214 K1" in str(entry.get("decided", "")), f"the entry {entry}'s decided text does not name DEC-1214 K1"
+    assert len(entries) == 1 and isinstance(entries[0], dict), f"{k.EXCEPTIONS_REL} does not hold one entry: {entries}"
+    entry = entries[0]
+    model = str(entry.get("model"))
+    assert (entry.get("subagent_type"), model == "opus" or model.startswith("claude-opus-"),
+            entry.get("decision")) == ("independent-auditor", True, ["DEC-1230"]), (
+        f"the entry is {entry}, not independent-auditor on Opus with decision [DEC-1230]")
 
 
 ROWS = {
@@ -156,14 +161,18 @@ ROWS = {
 @pytest.mark.parametrize("row", sorted(ROWS))
 @pytest.mark.parametrize("kind", [ENG, k.QA])
 def test_s5_the_hook_and_ticket_criticality_give_the_same_class_on_the_real_rubric(hook_base, row, kind):
-    """The real criticality and exceptions files copied into the project; the ticket's class by
-    ``ticket_criticality`` on this repository: an Opus spawn is let through when it is C3, else refused naming that
-    class. Red on the base for every row that is not C3 there (the hook lets the listed types through)."""
+    """The real criticality file copied into the project, with the fixture exceptions file (the engineer and the QA
+    engineer on Opus with ``class: C3``); the ticket's class by ``ticket_criticality`` on this repository: an Opus spawn
+    is let through when it is C3, else refused naming that class.
+
+    Rewrite-Reason: DEC-1225: the real exceptions file was copied in as well and listed the four roles with ``class:
+    C3``. It lists one auditor entry now, so the class limiter is shown with the fixture entries; the class the hook
+    computes from the real rubric is what this case pins, as before. A guard on the base."""
     allowed, profile = ROWS[row]
     want = k.real_criticality(allowed, profile)
     tk = "DAEO-row1"
     tickets = {tk: k.ticket_file_text(k.front_matter(allowed, profile, tk=tk))}
-    project = k.hook_project(hook_base, rubric="real", exceptions="real", tickets=tickets)
+    project = k.hook_project(hook_base, rubric="real", tickets=tickets)
     run = k.run_hook(project, k.spawn(kind=kind, model="opus", tasks=(tk,)))
     if want == "C3":
         k.let_through(run)

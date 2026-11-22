@@ -102,6 +102,9 @@ TESTS_SUFFIX = "-tests"  # W2-60b S10: the tests worktree and its branch are the
 # environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
 LEAD_ROLES = ("lead", "orchestrator")
 LEAD_GOV_ROLE = "orchestrator"
+# DEC-1225: Opus only for the two orchestrating roles' own sessions (the CTO and the senior engineer, started by their
+# own start lines); every session ``gov launch`` starts runs Sonnet. A lead gets this model added by the launcher.
+LEAD_MODEL = "claude-sonnet-5-5"
 # W2-153 (DEC-1050, W2-128 TPL-4): the role -> template map. The template is the session's appended system prompt;
 # gov.adapters.portability reuses the map for the subagent sources and the template copies.
 ROLE_TEMPLATES = {
@@ -716,44 +719,64 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
             table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
     trial = _trial(root, trial_id, role, ticket_class, names) if trial_id is not None else None
 
-    # the model: promotion, trial, probe (only where it changes the model), then the table's
-    if promotion is not None:
-        model, model_source, why = opus, "promotion", f"a promotion applies ({promotion['reason']})"
-    elif trial is not None:
-        model, model_source, why = trial["model"], "trial", f"the trial {trial_id}'s"
-    elif probe and opus != table_model:
-        model, model_source, why = opus, "probe", f"the second review is the probe ({opus})"
-    else:
-        model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
+    # the model (DEC-1225): the table's, or the trial's; a promotion's or probe's Opus only where an exceptions entry for
+    # this role, ticket and --owner-named covers it (resolved after the table's model is known)
     exception = None
-    if given["model"] is not None:
-        if given["model"] != model:
-            # W2-201 S4 (DEC-1212 (2), DEC-1214 K1): another model only by an entry of the exceptions file, and only
-            # where the table decides: a promotion, a trial and the probe stay as they are
-            shown = ticket_class if ticket_class is not None else \
-                "none (a chore has no ticket)" if chore else f"none (no {crit.REL})"
-            refusal = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
-                       f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3)); another model comes "
-                       f"only from an exception in {model_exceptions.REL} (DEC-1212 (2))")
-            substituted = roles.substitution_active(root)
-            if substituted and model_exceptions.names_opus(given["model"]):
-                # W2-201 S9 (DEC-1215): as the helper hook refuses an Opus spawn, whatever the exceptions file holds
-                raise _refuse(f"the CLI arguments carry --model {given['model']}: while the owner's temporary "
-                              f"substitution is active (DEC-1215, {roles.SUBSTITUTION_REL}) every Opus role runs "
-                              f"Claude Fable 5.2 instead; name no model, or 'fable' (claude-fable-5-2) where an "
-                              f"exception in {model_exceptions.REL} covers it")
-            if model_source != table_source:
-                raise _refuse(refusal)
+    if promotion is not None or probe:
+        entry = None  # an exceptions file that is missing or unreadable covers nothing: the model stays the table's
+        if opus != table_model:
             try:
-                entry = model_exceptions.find(root, role, given["model"], ticket_class, substituted)
-            except GovError as error:
-                raise _refuse(f"{refusal}: {error.message}") from None
-            if entry is None:
-                raise _refuse(f"{refusal}: it holds none for '{role}' with that model"
-                              f"{' and class' if ticket_class is not None else ''}")
+                entry, _ = model_exceptions.find(root, role, opus, ticket_class, ticket_id, owner_named)
+            except GovError:
+                pass
+        if entry is not None:
+            model, exception = opus, str(entry.get("decided"))
+            model_source = "promotion" if promotion is not None else "probe"
+            why = (f"a promotion applies ({promotion['reason']})" if promotion is not None
+                   else f"the second review is the probe ({opus})")
+    if exception is None and trial is not None:
+        model, model_source, why = trial["model"], "trial", f"the trial {trial_id}'s"
+    elif exception is None:
+        model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
+    shown = ticket_class if ticket_class is not None else \
+        "none (a chore has no ticket)" if chore else f"none (no {crit.REL})"
+
+    def lifted(asked: str, said: str) -> dict:
+        """The entry of the exceptions file that lets ``asked`` start, or the refusal (DEC-1225): no session runs
+        Fable, and any model but Sonnet needs an entry whose limiters this launch meets."""
+        if model_exceptions.names_fable(asked):
+            raise _refuse(f"{said}: no session runs Fable, whatever {model_exceptions.REL} holds (DEC-1225 (3))")
+        try:
+            entry, unmet = model_exceptions.find(root, role, asked, ticket_class, ticket_id, owner_named)
+        except GovError as error:
+            raise _refuse(f"{said}: {error.message}") from None
+        if entry is None:
+            raise _refuse(f"{said}: only a comprehensive audit the owner asks for runs another model, from an entry "
+                          f"in {model_exceptions.REL} whose limiters the launch meets (DEC-1225 (2)); "
+                          f"{'limiter not met: ' + '; '.join(unmet) if unmet else 'it holds none for ' + repr(role) + ' with that model'}")
+        return entry
+
+    if given["model"] is not None:
+        if model_exceptions.names_fable(given["model"]):
+            raise _refuse(f"the CLI arguments carry --model {given['model']}: no session runs Fable, whatever "
+                          f"{model_exceptions.REL} holds (DEC-1225 (3))")
+        if given["model"] != model:
+            # W2-201 S4, R2 (DEC-1212 (2), DEC-1225): another model only by an entry of the exceptions file whose
+            # limiters this launch meets, and only where the table decides: a trial stays as it is
+            said = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
+                    f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3), DEC-1225)")
+            if (promotion is not None or probe or trial is not None) and exception is None:
+                raise _refuse(f"{said}; another model comes only from an exception in {model_exceptions.REL} "
+                              f"(DEC-1225)")
+            entry = lifted(given["model"], said)
             model, model_source, exception = given["model"], "exception", str(entry.get("decided"))
         elif model_source == table_source:
             model_source = "after --"
+    if exception is None and model_source == "trial" and not model_exceptions.is_sonnet(model):
+        # the one choke point behind the trial's file: a trial that names a model other than Sonnet needs the same entry
+        entry = lifted(model, f"the session's model {model} ({why}; the ticket's class is {shown}) is not Sonnet "
+                              f"(DEC-1225)")
+        exception = str(entry.get("decided"))
 
     # the effort: trial, after --, probe, then the table's
     own = True
@@ -837,6 +860,43 @@ def _worker_plan(root: Path, role: str, ticket_id: str | None, given: dict, temp
     return {"role": role, "ticket": ticket_id, "root": root, "given": given, "model": model, "effort": effort,
             "ticket_class": ticket_class, "chosen": chosen, "records": records, "resumed": resumed is not None, "origin": origin,
             "composed": composed, "projection_usd": projection_usd, "kind": kind}
+
+
+def _lead_model_args(root: Path, role: str, ticket_id: str | None, cli_args: list[str]) -> list[str]:
+    """DEC-1225 (R2): the arguments that give a lead its model: ``--model <LEAD_MODEL>`` added by the launcher (the CLI's
+    own default, the CTO's Opus, is never a lead's model), or none when the caller's ``--model`` is that model (not
+    doubled). Any other ``--model`` refuses (``LAUNCH_REFUSED``) unless an entry of the exceptions file for this role
+    and model has every limiter met by this launch; a lead takes no ``--owner-named``, so no decision limiter is met.
+    Fable is refused whatever the file holds."""
+    asked: dict = {}
+    for arg, value in zip(cli_args, [*cli_args[1:], None]):
+        found = _given_value("--model", arg, value, asked)
+        if found is not None:
+            asked["--model"] = found
+    model = asked.get("--model")
+    if model is None:
+        return ["--model", LEAD_MODEL]
+    if model == LEAD_MODEL:
+        return []
+    said = (f"the CLI arguments carry --model {model} for a lead ({role}): a lead runs {LEAD_MODEL} (DEC-1225); "
+            f"another model comes only from an entry of {model_exceptions.REL}")
+    if model_exceptions.names_fable(model):
+        raise _refuse(f"{said}; no session runs Fable, whatever the file holds (DEC-1225 (3))")
+    ticket_class = None
+    if ticket_id is not None and crit.exists(root):
+        ticket = _load_ticket(str(root), ticket_id)
+        try:
+            ticket_class = crit.ticket_criticality(root, ticket) if ticket is not None else None
+        except GovError:
+            ticket_class = None
+    try:
+        entry, unmet = model_exceptions.find(root, role, model, ticket_class, ticket_id, None)
+    except GovError as error:
+        raise _refuse(f"{said}: {error.message}") from None
+    if entry is None:
+        raise _refuse(f"{said} whose limiters the launch meets; "
+                      f"{'limiter not met: ' + '; '.join(unmet) if unmet else 'it holds none for ' + repr(role) + ' with that model'}")
+    return []
 
 
 def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
@@ -1117,6 +1177,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
             # W2-201 X3: a fix is not planned, so the plan is not asked; its owning ticket must exist, whatever status
             raise _refuse(f"unknown ticket '{ticket_id}'")
         _check_cli_args(cli_args)
+        model_args = _lead_model_args(root, role, ticket_id, cli_args)  # DEC-1225: before anything is read or started
         _check_repository_settings(root, False)
         template = template_args(root, role)
         cli = _cli()
@@ -1127,7 +1188,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
             _admit_start(root, role, label, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-            return _run(root, cli, settings, [*_mode_args(cli_args), *cli_args, *template],
+            return _run(root, cli, settings, [*_mode_args(cli_args), *model_args, *cli_args, *template],
                         entry=(label, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()

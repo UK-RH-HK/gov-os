@@ -28,7 +28,7 @@ from gov.memaudit.measure import write_text
 
 WORKERS = 4
 PER_QUESTION = 0.157  # the fresh 80's spend a question (FRESH-80-RESULT); the projection is this times n
-READER, GRADER, CHECK = "claude-opus-5-5", "claude-opus-5-5", "claude-sonnet-5-5"
+READER, GRADER, CHECK = "claude-sonnet-5-5", "claude-sonnet-5-5", "claude-sonnet-5-5"  # DEC-1225 (1), (4)
 READER_BUDGET, GRADER_BUDGET = 1.5, 0.5
 
 
@@ -268,6 +268,8 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
     fig, misses = figures.build(audit, decl, qs, rows, counting, parsed, control, spend, cfg.quotas)
     if not week:  # a standing run's questions leave nothing behind but its rows in this run folder (S4)
         figures.write_misses(run_dir, misses)
+    # DEC-1225 (4): the models that answered and graded, so the figures compare only from the first fresh 80 on Sonnet
+    fig["models"] = {"reader": READER, "grader": GRADER, "checker": CHECK}
     figures.write_figures(run_dir, fig)
     v = fig["verdict"]
     events.append(run_dir, "figures", right=v["right"], wrong=v["wrong"], n=fig["n"], passes=v["passes"])

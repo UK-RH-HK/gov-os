@@ -13,8 +13,10 @@ from .conftest import AUDIT, UNIQUE
 from .fakes import FakeClaude, judge_args, measure_args, measured, prepare
 from .test_measure import events, snapshot
 
+# Rewrite-Reason: DEC-1225 (R4): FIGURES.json names the reader, grader and checker models (``models``)
 FIGURE_KEYS = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend",
-               "forbidden_rule"}  # DEC-1227 D5: the record names the strict rule
+               "forbidden_rule",  # DEC-1227 D5: the record names the strict rule
+               "models"}
 MISS_KEYS = ["id", "question", "gold_answer", "gold_sources", "answer", "outcome", "evidence_in_bundle"]
 
 
@@ -117,6 +119,8 @@ def test_figures_json_holds_exactly_item_10s_keys_and_counts(plant):
     assert set(m["by_route"]) == {"lexical", "semantic", "both", "other", "none"} and sum(m["by_route"].values()) == 6
     assert f["control"] == {"hit5": 34, "of": 40, "last": 34, "last_audit": None}
     assert f["pool"] is None and f["classes"] is None
+    assert isinstance(f["models"], dict) and len(f["models"]) == 3 and {"reader", "grader"} <= set(f["models"]), f["models"]
+    assert set(f["models"].values()) == {"claude-sonnet-5-5"}  # DEC-1225 (4): reader, grader and checker, all Sonnet
     assert set(f["spend"]) == {"usd", "projection", "brake"} and f["spend"]["projection"] == 6.28
     assert f["spend"]["brake"] == 12.56 and f["spend"]["usd"] > 0
     assert "figures" in [e["event"] for e in events(plant)]
@@ -232,10 +236,12 @@ def test_each_call_is_the_fresh_80s_argv_with_no_tools_and_the_models_of_item_7(
     assert {c["tools"] for c in calls} == {""} and {c["first"][0] for c in calls} == {"-p"}
     readers = [c for c in calls if not c["grader"]]
     graders = [c for c in calls if c["grader"]]
-    assert {(c["model"], c["budget"]) for c in readers} == {("claude-opus-5-5", "1.5")}
-    assert {(c["model"], c["budget"]) for c in graders} == {("claude-opus-5-5", "0.5"), ("claude-sonnet-5-5", "0.5")}
+    # Rewrite-Reason: DEC-1225 (R4): the reader and the named grader ran claude-opus-5-5 and only the check Sonnet. The
+    # reader, the grader and the check each run claude-sonnet-5-5; the budgets are unchanged.
+    assert {(c["model"], c["budget"]) for c in readers} == {("claude-sonnet-5-5", "1.5")}
+    assert {(c["model"], c["budget"]) for c in graders} == {("claude-sonnet-5-5", "0.5")}
     assert len(readers) == 40 and len(graders) == 80
-    argv = argv_of("claude", "claude-opus-5-5", prompts.READER_SYS, prompts.READER_SCHEMA, 1.5)
+    argv = argv_of("claude", "claude-sonnet-5-5", prompts.READER_SYS, prompts.READER_SCHEMA, 1.5)
     assert argv[1:8] == ["-p", "--safe-mode", "--tools", "", "--no-session-persistence", "--output-format", "json"]
     assert argv[-2:] == ["--json-schema", json.dumps(prompts.READER_SCHEMA)] and "--effort" in argv
 
@@ -256,7 +262,10 @@ def test_a_call_that_returns_nothing_is_run_once_more_never_a_third_time(plant):
 
 def test_the_second_grader_disagreeing_is_counted_beside_the_verdict(plant):
     fake, ranks, claude = measured(plant)
-    claude.plan["rules"].insert(0, {"said": ["RIGHT"], "model": "claude-sonnet-5-5", "grade": "wrong"})
+    # Rewrite-Reason: DEC-1225 (R4): the second grader was told from the named one by its model (Sonnet against Opus). Both
+    # are Sonnet now, so the plan's rule names the call instead: ``nth`` 2 is the second grading call of one prompt, the
+    # check's (the fake claude counts the calls of a prompt).
+    claude.plan["rules"].insert(0, {"said": ["RIGHT"], "nth": 2, "grade": "wrong"})
     claude.save()
     assert run_judge(plant, claude).returncode == 0
     f = json.loads((plant.run_dir / "FIGURES.json").read_text())

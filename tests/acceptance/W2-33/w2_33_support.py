@@ -73,26 +73,32 @@ ONE_WRITER = (
 WELL = "well formed"   # the table's "present and well formed, value not asserted"
 _H = (OPUS, "high")
 _S = (SONNET, "high")
-_CRIT_ENGINEER = {"C3": _H, "C2": _S, "C1": _S, "C0": WELL}
-_CRIT_QA = {"C3": _H, "C2": _S, "C1": _S, "C0": WELL}
-_CRIT_AUDITOR = {"C3": _H, "C2": _S, "C1": _S, "C0": WELL}
 # role file -> (Launch default, Launch by criticality or None for "absent"): S7's table (DEC-1120 (2), DEC-1119 (2)),
 # as DEC-1214 K1 changes it.
 # Rewrite-Reason: DEC-1214 K1 (the owner, 2026-11-18): the rubric is audit 4's Table 3 with audit 09's model changes
 # (W2-201 S1): the CTO (orchestrator) and the senior engineer on Opus, effort high, no table line; the ticket lead on
 # Sonnet; the independent auditor's default Sonnet with a table line (C3 Opus, C2 and C1 Sonnet); the QA engineer's
 # default Sonnet and its C2 entry plain Sonnet (no Opus on FULL any more). C0 stays "well formed, value not asserted".
+# Rewrite-Reason: DEC-1225 (the owner, 2026-11-22; W2-201 R1): Opus only for the orchestrator (each app's CTO) and the
+# senior engineer; every other role Sonnet, high, at every class, so no role file carries a ``Launch by criticality``
+# line any more (the engineer, test designer, auditor and QA engineer had one: C3 Opus, C0 Haiku). The table's rows for
+# those four lose their by-criticality entries; "absent" is every role's now. The independent auditor's Model tier line
+# says an Opus audit is only the exceptions file's entry for a comprehensive audit the owner asked for (DEC-1225 (2)).
 TABLE = {
     "orchestrator": (_H, None),
     "ticket-lead": (_S, None),
     "senior-engineer": (_H, None),
-    "engineer": (_S, _CRIT_ENGINEER),
-    "independent-test-designer": (_S, _CRIT_ENGINEER),
-    "qa-engineer": (_S, _CRIT_QA),
-    "independent-auditor": (_S, _CRIT_AUDITOR),
+    "engineer": (_S, None),
+    "independent-test-designer": (_S, None),
+    "qa-engineer": (_S, None),
+    "independent-auditor": (_S, None),
     "product-spec": (_S, None),
     "research": (_S, None),
 }
+AUDITOR_TIER_LINE = ("- **Model tier:** an Opus audit is only the exceptions file's entry for a comprehensive audit the "
+                     "owner asked for (DEC-1225 (2)), not a role default")
+# the Model tier line each role file carries: "see Launch default", but for the auditor's (R1)
+TIER_FORMS = {"independent-auditor": re.compile(r"- \*\*Model tier:\*\* .*DEC-1225.*")}
 # The QA engineer's C2 entry before DEC-1214 K1 (Opus on FULL): the F2 plant writes it back, and the table refuses it.
 QA_C2 = f"C2 model {OPUS}, effort high on FULL, model {SONNET}, effort high otherwise"
 
@@ -295,7 +301,9 @@ def parse_criticality(value: str):
 def lines_s7(name: str, text: str) -> list[str]:
     """S7: the Launch default and Launch by criticality lines equal the table; the Model tier line is kept."""
     out = []
-    tier = line_fault(text, TIER_HEAD, TIER_LINE, "- **Model tier:** see Launch default")
+    tier = line_fault(text, TIER_HEAD, TIER_FORMS.get(name, TIER_LINE),
+                      "- **Model tier:** an Opus audit is only the exceptions file's entry ... (DEC-1225 (2))"
+                      if name in TIER_FORMS else "- **Model tier:** see Launch default")
     if tier:
         out.append(f"{name}.md: key 'Model tier': the file {tier}")
     if name not in TABLE:
@@ -401,7 +409,9 @@ def synthetic_text(name: str) -> str:
             else:
                 entries.append(f"{cls} model {want[0]}, effort {want[1]}")
         lines.append(f"{CRITICALITY_HEAD} " + "; ".join(entries))
-    lines += ["- **Skills:** checkpoint, retrieval", "- **Model tier:** see Launch default", WORK_ORDER, ONE_WRITER, ""]
+    lines += ["- **Skills:** checkpoint, retrieval",
+              AUDITOR_TIER_LINE if name == "independent-auditor" else "- **Model tier:** see Launch default",
+              WORK_ORDER, ONE_WRITER, ""]
     return "\n".join(lines)
 
 

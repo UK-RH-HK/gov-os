@@ -160,7 +160,8 @@ def test_every_launched_role_has_a_template_in_the_map():
 
 @pytest.mark.parametrize("role", ALL_ROLES)
 def test_the_flag_comes_after_the_callers_arguments_by_absolute_path(project, role):
-    args = ["-p", "go", "--model", ROLE_MODEL]
+    # DEC-1225 (R2): a lead's --model other than the launcher's own Sonnet is refused, so a lead passes its own
+    args = ["-p", "go", "--model", ROLE_MODEL if role in launcher.WORKER_ROLES else launcher.LEAD_MODEL]
     argv = _launch(project, role, args)
     if role in launcher.WORKER_ROLES:
         _assert_one_appended_role_file(project, role, argv)
@@ -189,7 +190,8 @@ def test_the_launch_is_otherwise_what_it_was(project, role):
         assert between["--strict-mcp-config"] is None and between["--setting-sources"] == "project,local", argv
         assert re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", between["--session-id"])
     else:
-        assert between == {"--permission-mode": "bypassPermissions"}, argv  # Emergency 2 (2.3): a lead's too
+        # Emergency 2 (2.3): a lead's too; DEC-1225 (R2): and the launcher adds the lead's model, Sonnet
+        assert between == {"--permission-mode": "bypassPermissions", "--model": launcher.LEAD_MODEL}, argv
 
 
 def _options(items: list[str]) -> dict:

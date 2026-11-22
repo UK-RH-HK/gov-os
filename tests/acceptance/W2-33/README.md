@@ -138,3 +138,13 @@ TMPDIR=<outside the repository> bash .../heavy_slot.sh env HOME=<empty scratch> 
 ```
 
 Nothing is left out by the exclusion: no case is marked `local_only` and none is named `real`, `green_here` or `time_limit`.
+
+## Revised for DEC-1225 (W2-201 R1, 2026-11-22)
+
+`Rewrite-Reason: DEC-1225`. S7's table (`w2_33_support.TABLE`): no role file carries a `Launch by criticality` line (the
+engineer, test designer, auditor and QA engineer had one), every role but the orchestrator and the senior engineer is
+Sonnet, high; the independent auditor's `Model tier` line says an Opus audit is only the exceptions file's entry for a
+comprehensive audit the owner asked for (DEC-1225 (2)) where the others say `see Launch default`. F2's plants that edited
+those lines (`criticality-entries-out-of-order`, `test-designer-c3-sonnet`, `qa-c2-opus-on-full-again`,
+`criticality-line-removed-where-it-varies`, `c0-entry-malformed`) have no line to depart from and are replaced by the line
+written back in the engineer's and the QA engineer's files and by the auditor's default on Opus.

@@ -31,9 +31,12 @@ def test_f1_a_promotion_is_recorded_and_applied(project, launch):
     tk = s.ticket(project, ENG, "C2", tk="DAEO-f101")
     record = s.promote_two_failed(project, tk)
     result = launch(ENG, tk)
-    s.assert_session(result, s.OPUS, "high", criticality="C2", model_source="promotion",
+    # Rewrite-Reason: DEC-1225: pinned a promotion applied as Opus. R2: it is recorded and applied as the table's model
+    # (the engineer's C2 entry: Sonnet) at the table's effort; the model's source word is left open.
+    model = s.TABLES[ENG]["C2"][0]
+    s.assert_session(result, model, "high", criticality="C2", model_source=s.ANY,
                      effort_source="by criticality", promotion={"reason": "two failed reviews", "record": record})
-    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.OPUS
+    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == model
 
 
 @pytest.mark.parametrize("given", ["low", "medium"])

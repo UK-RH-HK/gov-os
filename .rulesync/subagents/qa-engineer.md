@@ -11,9 +11,8 @@ claudecode:
 
 The per-stream checking role, which replaces the planned independent reviewer (DEC-957, DEC-959 item 3, DEC-1010 item 1). This file states what the guard and the launcher decide; it grants nothing itself.
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Launch default:** model claude-sonnet-5-5, effort high
-- **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
 - **Skills:** qa-review, judging-work
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.

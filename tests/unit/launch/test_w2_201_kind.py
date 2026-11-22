@@ -173,7 +173,9 @@ def test_a_chore_starts_with_no_ticket_on_the_role_default(project, monkeypatch)
     assert project.envs[-1]["GOV_MSG_ADDRESS"].startswith("engineer:chore-")
 
 
-def test_a_chore_s_other_model_needs_an_exception_with_no_class(project):
+def test_a_chore_s_other_model_needs_an_exception_whose_limiter_it_meets(project):
+    """DEC-1225 (R3): a chore has no ticket and no class, so a class or task limiter is unmet; an Opus entry with no
+    limiter lifts nothing; one limited by ``decision`` lifts it when the launch is given ``--owner-named``."""
     path = project.root / "governance/project/model-exceptions.yaml"
     project.refused(args=["--model", OPUS], tid=None, chore=CHORE)
     path.write_text(yaml.safe_dump({"exceptions": [{"subagent_type": "engineer", "model": "opus", "class": "C3",
@@ -181,8 +183,11 @@ def test_a_chore_s_other_model_needs_an_exception_with_no_class(project):
     project.refused("none (a chore has no ticket)", args=["--model", OPUS], tid=None, chore=CHORE)
     path.write_text(yaml.safe_dump({"exceptions": [{"subagent_type": "engineer", "model": "opus", "decided": "K2"}]}),
                     encoding="utf-8")
-    project.launch(args=["--model", OPUS], tid=None, chore=CHORE)
-    assert (project.last()["model_source"], project.last()["exception"]) == ("exception", "K2")
+    project.refused("limiter", args=["--model", OPUS], tid=None, chore=CHORE)
+    path.write_text(yaml.safe_dump({"exceptions": [{"subagent_type": "engineer", "model": "opus",
+                                                    "decision": ["DEC-1230"], "decided": "K3"}]}), encoding="utf-8")
+    project.launch(args=["--model", OPUS], tid=None, chore=CHORE, owner_named="DEC-1230")
+    assert (project.last()["model_source"], project.last()["exception"]) == ("exception", "K3")
 
 
 def test_a_chore_takes_no_trial(project):

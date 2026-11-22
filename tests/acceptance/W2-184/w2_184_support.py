@@ -158,7 +158,13 @@ def make_project(sandbox, tables=True, criticality=True):
 # Trial and probe records
 # --------------------------------------------------------------------------
 
-def trial_data(tk, role=ENGINEER, criticality="C2", model=HAIKU5, effort="high", tickets=None, reviewer=OPUS):
+# Rewrite-Reason: DEC-1225: the fixture trial's model was Haiku (a model below the table's). R2: a trial's model is the
+# table's, Sonnet, unless an exceptions entry covers another; the trial mechanism (id, role, criticality, effort, tickets,
+# reviewer, the record) is what these cases pin, shown with a Sonnet trial. The reviewer stays Opus (the trial file's form).
+TRIAL_MODEL = SONNET
+
+
+def trial_data(tk, role=ENGINEER, criticality="C2", model=TRIAL_MODEL, effort="high", tickets=None, reviewer=OPUS):
     return {"role": role, "criticality": criticality, "model": model, "effort": effort,
             "tickets": tickets if tickets is not None else ["DAEO-aaaa", tk], "reviewer": {"model": reviewer}}
 

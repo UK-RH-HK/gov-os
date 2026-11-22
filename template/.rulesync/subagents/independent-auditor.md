@@ -51,11 +51,10 @@ Describe each finding as behaviour (what was done, what happened, what should ha
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
-- **Version:** 1.1.0
+- **Version:** 1.2.0
 - **Launch default:** model claude-sonnet-5-5, effort high
-- **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
 - **Skills:** audit, retrieval, judging-work
-- **Model tier:** see Launch default
+- **Model tier:** Sonnet (see Launch default). An Opus audit is only the exceptions file's entry for a comprehensive audit the owner asked for (DEC-1225 (2), `governance/project/model-exceptions.yaml`), never a role default; a reviewer called after a failed landing or for a bug runs Sonnet.
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
 - **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
 - **Purpose:** audit finished work against the Contract, the governing sources and the owner's accepted decisions,
