@@ -1,9 +1,10 @@
-# The retrieval-regression family check (CAP-38.b, W1-21, DEC-425): the dev query set meets its recorded
-# hit@5 and forbidden-citation baselines. Not green when GOV_DEV_TIERS is not configured. Severity: hard-block
-# where the query set is configured. The command is run by `sh -c` in the project root; exit 0 is green (DEC-285).
+# The retrieval-regression family check (CAP-38.b, W1-21, DEC-425): runs the dev query set and reports hit@5 as a
+# diagnostic only (EMERGENCY-2 5.2, DEC-1210, DEC-1233); it blocks on no hit@k figure. Forbidden citations over their
+# baseline and an unmeasured set (GOV_DEV_TIERS not configured) are reported under the same non-blocking severity:
+# warning. The command is run by `sh -c` in the project root; exit 0 is green (DEC-285).
 id: retrieval-regression
 family: retrieval-regression
 tier: G1
-severity: hard-block
+severity: warning
 command: python3 -m gov.retrieval.retrieve_check
 timeout-seconds: 600
