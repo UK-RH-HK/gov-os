@@ -106,12 +106,13 @@ class _Judge:
         got = [item for b in bundles for item in b]
         outside = [c for c in cites if not any(pth == c[0] and s <= c[2] and c[1] <= e for pth, s, e, *_ in got)]
         inside = [c for c in cites if c not in outside]
-        right_cite = (not q["apart"]) and matcher.cited(self.repo, q, cites)
-        right_inside = (not q["apart"]) and matcher.cited(self.repo, q, inside)
+        right_cite = matcher.citation_right(self.repo, q, cites)
+        right_inside = matcher.citation_right(self.repo, q, inside)
+        forbidden_cited = (not q["apart"]) and matcher.forbidden_cited(q, cites)
         row = {"id": q["id"], "kind": "audit", "apart": q["apart"], "final_verdict": verdict, "attempts": attempts,
                "answered_at": len(attempts) if verdict == "answer" else None,
                "gold_in_bundle": [any(matcher.hit(it, q) for it in b) for b in bundles],
-               "citation_right": right_cite, "grades": grades, "searches": searches,
+               "citation_right": right_cite, "forbidden_cited": forbidden_cited, "grades": grades, "searches": searches,
                "search_failures": sum(1 for s in searches if not s["ok"]), "citations": len(cites),
                "citations_outside": len(outside), "citation_right_only_outside": right_cite and not right_inside,
                "calls_retried": sum(1 for a in attempts if a.get("retried"))
@@ -269,6 +270,7 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
         figures.write_misses(run_dir, misses)
     # DEC-1225 (4): the models that answered and graded, so the figures compare only from the first fresh 80 on Sonnet
     fig["models"] = {"reader": READER, "grader": GRADER, "checker": CHECK}
+    fig["reader_model"], fig["grader_models"] = READER, [GRADER, CHECK]  # F15: the stamp's models
     figures.write_figures(run_dir, fig)
     v = fig["verdict"]
     events.append(run_dir, "figures", right=v["right"], wrong=v["wrong"], n=fig["n"], passes=v["passes"])

@@ -398,7 +398,8 @@ class World:
         doc.update(copy.deepcopy(spec.get("extra", {})))
         return doc
 
-    def write_half(self, audit: str, specs: list[dict], *, salt: str | None = None, folder: Path | None = None) -> Path:
+    def write_half(self, audit: str, specs: list[dict], *, salt: str | None = None, folder: Path | None = None,
+                   forbidden_default: bool = True) -> Path:
         """``specs`` as ``q<nn>.yaml`` in the half's ``hidden/`` (or in ``folder``); ``salt`` changes one file's bytes
         and nothing a check reads (a round 2 whose digest differs)."""
         half = dict(HALVES)[audit]
@@ -408,6 +409,8 @@ class World:
         folder.mkdir(parents=True)
         for spec in specs:
             doc = self.question_doc(half, spec)
+            if forbidden_default and spec is specs[0] and not any((x.get("extra") or {}).get("forbidden") for x in specs):
+                doc["forbidden"] = ["docs/superseded-planted.md"]  # F15: declare refuses a set with no forbidden list
             if salt and spec["id"] == "q01":
                 doc["naive_answer"] = f"the replaced answer {salt}"
             (folder / f"{spec['id']}.yaml").write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True),
@@ -524,7 +527,7 @@ class World:
     def prepare(self, audit: str = HIDDEN, specs=None, *, env=None, verdicts=None) -> None:
         """One half delivered, pre-flighted and voided by the step commands: ``measure`` starts here."""
         self.make_step_store()
-        self.write_half(audit, specs or clean_specs())
+        self.write_half(audit, specs or clean_specs(), forbidden_default=specs is None)
         run = self.step("preflight", audit, env=env)
         assert run.code == 0, ("the clean half's pre-flight did not pass", run)
         self.write_notes(audit, 1, verdicts)

@@ -219,6 +219,13 @@ def preflighted(pre, hidden: Path) -> bool:
     return True
 
 
+def _any_forbidden(hidden: Path) -> bool:
+    """Whether any question file of ``hidden`` carries a non-empty ``forbidden`` list."""
+    from gov.memaudit.preflight import _load
+    files, _ = layout.entries(Path(hidden))
+    return any(isinstance(d := _load(f), dict) and isinstance(d.get("forbidden"), list) and d["forbidden"] for f in files)
+
+
 def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None,
             week=None) -> tuple[str, dict]:
     """Returns the exit word (``ok``, ``refused`` with its codes, or ``used``) and the counts the subcommand prints. A
@@ -270,6 +277,8 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
     map_code, new_map = plan_map(p, audit)
     if map_code:
         codes.append(map_code)
+    if not _any_forbidden(p["hidden"]):  # F15: the strict rule is stamped on the figures, so some question must carry a list
+        codes.append("DC-FORBIDDEN")
     if codes:
         return "refused", {"codes": codes}
 

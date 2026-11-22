@@ -16,11 +16,14 @@ import pytest
 import w2_171_scenario as S
 import w2_171_world as W
 
-TOP = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend"}
+TOP = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend",
+       "forbidden_rule",  # DEC-1227 D5
+       # Rewrite-Reason: F15 (W2-204 S17): FIGURES.json also carries the rest of the stamp
+       "release", "commit", "reader_model", "grader_models", "questions_with_forbidden"}
 VERDICT = {"right", "wrong", "passes", "right_ok", "wrong_ok", "target_ok", "interval_exact", "not_run"}
 BESIDE = {"hit5", "hit10", "hit20", "mrr", "in_bundle", "full_evidence", "correct_citation_aside", "not_found",
           "a1_right", "a3_right", "mcnemar_a1_a2", "grader_agree", "graded", "search_failures"}
-MISSES = {"total", "by_outcome", "by_rank", "by_namespace", "by_category", "by_route"}
+MISSES = {"total", "by_outcome", "by_rank", "by_namespace", "by_category", "by_route", "forbidden_cited"}  # DEC-1227 D5
 CLASSES = ("gold_wrong", "question_ambiguous", "out_of_scope", "retrieval_miss", "answer_wrong")
 
 

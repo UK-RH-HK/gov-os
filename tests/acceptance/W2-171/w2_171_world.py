@@ -504,8 +504,11 @@ class World:
         self.hidden.mkdir(parents=True)
         self.specs = copy.deepcopy(specs)
         for spec in specs:
+            doc = self.question_doc(spec)
+            if spec is specs[0] and not any((x.get("extra") or {}).get("forbidden") for x in specs):
+                doc["forbidden"] = ["docs/superseded-planted.md"]  # F15: declare refuses a set with no forbidden list
             (self.hidden / f"{spec['id']}.yaml").write_text(
-                yaml.safe_dump(self.question_doc(spec), sort_keys=False, allow_unicode=True), encoding="utf-8")
+                yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8")
         (self.set_dir / "selection.json").write_text(json.dumps({
             "commit": self.audit_commit, "last_audit": self.base_commit,
             "seed_sha256": sha_bytes(f"{SEED}\n".encode()), "changed": list(self.changed),

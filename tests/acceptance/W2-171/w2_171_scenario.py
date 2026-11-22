@@ -339,6 +339,17 @@ class Expected:
             return "semantic"
         return "other"
 
+    def stamp(self) -> dict:
+        """F15: the stamp the run's FIGURES.json carries besides ``forbidden_rule``."""
+        import tomllib
+        from pathlib import Path
+        tree = Path(__file__).resolve().parents[3]
+        docs = self.world.docs() if self.world else {}
+        return {"release": tomllib.loads((tree / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"],
+                "commit": self.world.audit_commit, "reader_model": "claude-sonnet-5-5",
+                "grader_models": ["claude-sonnet-5-5", "claude-sonnet-5-5"],
+                "questions_with_forbidden": sum(1 for d in docs.values() if d.get("forbidden"))}
+
     def figures(self, *, spent: float, projection: float | None = None, control_hit5: int = 34, last=34) -> dict:
         projection = 0.157 * self.n if projection is None else projection
         right, wrong = self.right_wrong()
@@ -361,7 +372,8 @@ class Expected:
             by_route[self.route_of(m)] += 1
             by_out[m["outcome"]] += 1
         return {
-            "audit": W.AUDIT, "n": n, "n_gold": self.ng, "bar": b,
+            "audit": W.AUDIT, "n": n, "n_gold": self.ng, "bar": b, "forbidden_rule": "strict",  # DEC-1227 D5
+            **self.stamp(),  # F15
             "verdict": {"right": right, "wrong": wrong, "passes": right >= b["need_right"] and wrong <= b["max_wrong"],
                         "right_ok": right >= b["need_right"], "wrong_ok": wrong <= b["max_wrong"],
                         "target_ok": right >= b["target_right"], "interval_exact": [round(lo, 4), round(hi, 4)]},
@@ -374,7 +386,8 @@ class Expected:
                        "mcnemar_a1_a2": {"gains": g, "losses": l, "p": p}, "grader_agree": agree, "graded": graded,
                        "search_failures": self.later_failures()},
             "misses": {"total": len(misses), "by_outcome": by_out, "by_rank": by_rank, "by_namespace": by_ns,
-                       "by_category": by_cat, "by_route": by_route},
+                       "by_category": by_cat, "by_route": by_route,
+                       "forbidden_cited": 0},  # DEC-1227 D5: no planted question lists a forbidden path
             "control": {"hit5": control_hit5, "of": 40, "last": last},
             "spend": {"usd": spent, "projection": projection, "brake": 2 * projection},
         }
