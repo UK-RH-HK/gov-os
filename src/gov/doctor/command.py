@@ -1,6 +1,7 @@
 """``gov doctor`` (W1-27): a read command that reports installation health.
 
-Exit 0 when all checks pass. Exit 3 when any check fails or reports drift.
+Exit 0 when all checks pass. Exit 3 when a check fails or reports drift beyond a patch-only CLI/extension difference
+(W2-22, DEC-1227 D6 (a)): that difference is reported as drift and exits 0.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ from gov.util.gitenv import git_env
 
 CLASS = "read"
 HELP = "health of the installation and the project"
-EXIT_CODES = {3: "one or more health checks failed or reported drift"}
+EXIT_CODES = {3: "a health check failed or reported drift beyond a patch-only CLI/extension difference"}
 
 CLAUDE_CODE_MINIMUM = "2.1.285"
 
@@ -96,6 +97,19 @@ def _extract_path_prefix(install_cmd: str) -> str | None:
 
 def _version_tuple(v: str) -> tuple:
     return tuple(int(x) for x in re.findall(r"\d+", v))
+
+
+def _is_patch_only_gap(cli_version: str, ext_version: str) -> bool:
+    """True when the two versions differ in the patch number only (same major and minor): drift that does not block
+    (W2-22, DEC-1227 D6 (a)). A version that does not parse as major.minor.patch is no patch-only gap: it blocks."""
+    a, b = _version_tuple(cli_version), _version_tuple(ext_version)
+    return len(a) >= 3 and len(b) >= 3 and a[:2] == b[:2] and a != b
+
+
+def _blocks_health(section: dict) -> bool:
+    """Whether a section makes doctor unhealthy: a failure, or a drift that does not say it is non-blocking."""
+    status = section.get("status")
+    return status == "fail" or (status == "drift" and section.get("drift_blocking", True) is not False)
 
 
 def _real_home() -> Path:
@@ -646,7 +660,7 @@ def _failed_parts(sections: dict) -> str:
     """The parts that failed or drifted, each with its reason where it gives one: what plain ``gov doctor`` prints."""
     failed = []
     for name, section in sections.items():
-        if section.get("status") in ("fail", "drift"):
+        if _blocks_health(section):
             reason = section.get("reason")
             failed.append(f"{name} ({reason})" if isinstance(reason, str) and reason else name)
     return "; ".join(failed)
@@ -792,7 +806,9 @@ def _check_claude_code(root: Path) -> dict:
         cv = cli_version.lstrip("v")
         ev = ext_version.lstrip("v")
         if cv != ev:
-            issues.append({"type": "drift", "detail": f"CLI {cli_version} differs from extension {ext_version}"})
+            blocking = not _is_patch_only_gap(cv, ev)  # a patch-only gap is drift, reported, not blocking (D6 (a))
+            issues.append({"type": "drift", "blocking": blocking,
+                           "detail": f"CLI {cli_version} differs from extension {ext_version}"})
             has_drift = True
             if status != "fail":
                 status = "drift"
@@ -801,7 +817,7 @@ def _check_claude_code(root: Path) -> dict:
         cv = cli_version.lstrip("v")
         pv = pinned_version.lstrip("v")
         if _version_tuple(cv) > _version_tuple(pv):
-            issues.append({"type": "drift", "detail": f"CLI {cli_version} newer than registry {pinned_version}"})
+            issues.append({"type": "drift", "blocking": True, "detail": f"CLI {cli_version} newer than registry {pinned_version}"})
             has_drift = True
             if status != "fail":
                 status = "drift"
@@ -810,7 +826,7 @@ def _check_claude_code(root: Path) -> dict:
         ev = ext_version.lstrip("v")
         pv = pinned_version.lstrip("v")
         if _version_tuple(ev) > _version_tuple(pv):
-            issues.append({"type": "drift", "detail": f"extension {ext_version} newer than registry {pinned_version}"})
+            issues.append({"type": "drift", "blocking": True, "detail": f"extension {ext_version} newer than registry {pinned_version}"})
             has_drift = True
             if status != "fail":
                 status = "drift"
@@ -819,7 +835,7 @@ def _check_claude_code(root: Path) -> dict:
         ev = ext_version.lstrip("v")
         pv = pinned_version.lstrip("v")
         if ev == pv and ext_binary_sha != pinned_sha:
-            issues.append({"type": "drift", "detail": "extension binary sha256 mismatch at recorded version"})
+            issues.append({"type": "drift", "blocking": True, "detail": "extension binary sha256 mismatch at recorded version"})
             has_drift = True
             if status != "fail":
                 status = "drift"
@@ -833,6 +849,7 @@ def _check_claude_code(root: Path) -> dict:
         "status": status,
         **reason,
         "drift": has_drift,
+        "drift_blocking": any(i["blocking"] for i in issues if i["type"] == "drift"),
         "cli_version": cli_version,
         "cli_sha256": cli_sha,
         "extension_version": ext_version,
@@ -924,10 +941,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
     if note and isinstance(semantic, dict):  # beside the canary's answer, which stays as given: no failure added
         semantic["embedding"] = note
 
-    healthy = all(
-        s.get("status") not in ("fail", "drift")
-        for s in sections.values()
-    )
+    healthy = not any(_blocks_health(s) for s in sections.values())
 
     result = {"healthy": healthy, **sections}
 
