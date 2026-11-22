@@ -6,14 +6,17 @@ every helper spawned with the Agent tool runs the model the rubric gives helpers
    Only an entry for `subagent_type: fork` in the exceptions file lifts it.
 2. A spawn that names no model takes CLAUDE_CODE_SUBAGENT_MODEL (claude-sonnet-5-5 in the user settings) and passes;
    so does one that names Sonnet.
-3. Any other model is refused unless governance/project/model-exceptions.yaml lists an exception for it
-   (`exceptions: [{subagent_type: <name or "*">, model: <alias or id>, decided: <DEC or date>, class: C3?}]`). An entry
-   that names Opus covers every Opus model. An entry with `class: C3` holds only for C3 work: the spawn's prompt names
-   its ticket in a line `Task: <ticket id>`, and the ticket's class is computed from
-   governance/project/criticality.yaml by the rule of gov.launch.criticality.ticket_criticality (the highest matching
-   rule over `allowed_paths` and `profile`; the ticket's `class` key is never read).
-4. While the owner's temporary substitution (governance/project/model-substitution.yaml, DEC-1215) is active, Fable
-   is judged as Opus, and a spawn that names Opus is refused with the hint to name Fable.
+3. Fable (any model whose name has `fable`) is refused for every type: no session runs it (DEC-1225 (3)), and no entry
+   covers it.
+4. Any other model is refused unless governance/project/model-exceptions.yaml lists an exception for it
+   (`exceptions: [{subagent_type: <name or "*">, model: <alias or id>, decided: <DEC or date>, class?, task?,
+   decision?}]`). An entry that names Opus covers every Opus model. Three keys limit an entry, and every one it carries
+   must be met (DEC-1225 (2)): `class: C3` (the spawn's ticket is C3: the prompt names it in a line `Task: <ticket id>`,
+   and the class is computed from governance/project/criticality.yaml by the rule of
+   gov.launch.criticality.ticket_criticality, the highest matching rule over `allowed_paths` and `profile`; the
+   ticket's `class` key is never read), `task: <id or list>` (that `Task:` line names one of them) and
+   `decision: <DEC-id or list>` (a line `Decision: <DEC-id>` names one of them). An entry that names Opus and carries
+   none of the three lifts nothing.
 
 The CTO's own session is not a helper and is not judged here. Exit 2 refuses, with the reason on stderr. Whatever
 cannot be read (the exceptions file, the rubric, the ticket) refuses a spawn that names another model: unreadable
@@ -28,7 +31,8 @@ EXCEPTIONS_REL = "governance/project/model-exceptions.yaml"
 CRITICALITY_REL = "governance/project/criticality.yaml"
 CLASSES = ("C0", "C1", "C2", "C3")  # lowest first
 TASK_LINE = re.compile(r"^Task: (DAEO-[a-z0-9]+)\s*$", re.MULTILINE)
-FABLE = ("fable", "claude-fable-5-2")
+DECISION_LINE = re.compile(r"^Decision: (DEC-[0-9]+)\s*$", re.MULTILINE)
+LIMITERS = ("class", "task", "decision")
 
 
 class Unreadable(Exception):
@@ -43,12 +47,21 @@ def names_opus(model) -> bool:
     return isinstance(model, str) and (model == "opus" or model.startswith("claude-opus-"))
 
 
-def model_matches(entry_model, model: str, substituted: bool) -> bool:
-    """The rule of gov.launch.model_exceptions.model_matches: the same text, Opus for Opus (alias or id), and, while
-    the substitution is active, Opus for Fable."""
-    if entry_model == model:
-        return True
-    return names_opus(entry_model) and (names_opus(model) or (substituted and model in FABLE))
+def names_fable(model) -> bool:
+    return isinstance(model, str) and "fable" in model.lower()
+
+
+def model_matches(entry_model, model: str) -> bool:
+    """The rule of gov.launch.model_exceptions.model_matches: the same text, or Opus for Opus (alias or id); never
+    Fable."""
+    if names_fable(model):
+        return False
+    return entry_model == model or (names_opus(entry_model) and names_opus(model))
+
+
+def as_list(value) -> list:
+    """A `task` or `decision` given as one string is a list of one."""
+    return list(value) if isinstance(value, (list, tuple)) else [value]
 
 
 def _yaml(path: str, what: str):
@@ -65,24 +78,6 @@ def exceptions(root: str) -> list:
     if not isinstance(data, dict) or not isinstance(data.get("exceptions"), list):
         raise Unreadable(f"{EXCEPTIONS_REL} is not a map with an 'exceptions' list")
     return [e for e in data["exceptions"] if isinstance(e, dict)]
-
-
-def substitution(root: str) -> str:
-    """The `until` of the owner's active temporary substitution (governance/project/model-substitution.yaml, DEC-1215)
-    of Opus by Fable, or '' when there is none, it is inactive, unreadable or past its `until`."""
-    try:
-        import yaml
-        from datetime import datetime, timezone
-        with open(os.path.join(root, "governance/project/model-substitution.yaml"), encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
-        if not data.get("active") or data.get("to") != "claude-fable-5-2":
-            return ""
-        until = str(data.get("until") or "")
-        if until and datetime.now(timezone.utc) >= datetime.fromisoformat(until):
-            return ""
-        return until or "revoked"
-    except Exception:
-        return ""
 
 
 def _matches(glob: str, path: str) -> bool:
@@ -167,35 +162,56 @@ def judge(args: dict, root: str) -> int:
                           f"an entry for 'fork' in {EXCEPTIONS_REL} lifts this.")
     if not model or allowed(model):
         return 0
-    sonnet = (f"model rule (the owner's decision, 2026-11-18): a helper runs Sonnet; '{model}' for '{kind}' is "
-              f"refused")
+    said = (f"model rule (the owner's decision, DEC-1225): a helper runs Sonnet; '{model}' for '{kind}' is refused")
+    if names_fable(model):
+        return refuse(f"{said}: no session runs Fable (DEC-1225 (3)), and no exception covers it. Spawn it without a "
+                      f"model (the default is Sonnet).")
     try:
-        sub = substitution(root)
         entries = [e for e in exceptions(root) if e.get("subagent_type") in (kind, "*")
-                   and model_matches(e.get("model"), model, bool(sub))]
+                   and model_matches(e.get("model"), model)]
         if not entries:
-            return refuse(f"{sonnet}. Spawn it without a model (the default is Sonnet), or bring the owner one line "
+            return refuse(f"{said}. Spawn it without a model (the default is Sonnet), or bring the owner one line "
                           f"asking for an exception ({EXCEPTIONS_REL}).")
-        if sub and names_opus(model):  # DEC-1215: while the substitution is active, an Opus exception is Fable's
-            return refuse(f"model rule (DEC-1215, the owner's temporary substitution until {sub}): every Opus role "
-                          f"runs Claude Fable 5.2 instead; spawn '{kind}' with model 'fable'.")
-        if any("class" not in e for e in entries):
-            return 0
-        needed = sorted({str(e["class"]) for e in entries})
         prompt = args.get("prompt")
-        ids = sorted(set(TASK_LINE.findall(prompt if isinstance(prompt, str) else "")))
-        if len(ids) != 1:
-            found = "none" if not ids else "more than one ticket: " + ", ".join(ids)
-            return refuse(f"{sonnet}: Opus is for {', '.join(needed)} work only, and the spawn's prompt must name "
-                          f"its ticket in one line 'Task: <ticket id>' (found {found}), so its class cannot be read "
-                          f"(unreadable means Sonnet).")
-        found = ticket_class(root, ticket_front(root, ids[0]))
-        if found in needed:
-            return 0
-        return refuse(f"{sonnet}: the ticket {ids[0]} is {found}, and Opus is for {', '.join(needed)} work only "
-                      f"(DEC-1214 K1). Spawn it without a model (the default is Sonnet).")
+        prompt_text = prompt if isinstance(prompt, str) else ""
+        ids = sorted(set(TASK_LINE.findall(prompt_text)))
+        decisions = set(DECISION_LINE.findall(prompt_text))
+        reasons = []
+        for entry in entries:
+            missing = []
+            if "class" in entry:
+                if len(ids) != 1:
+                    found = "none" if not ids else "more than one ticket: " + ", ".join(ids)
+                    missing.append(f"class: the entry holds for {entry['class']} work only, and the spawn's prompt "
+                                   f"must name its ticket in one line 'Task: <ticket id>' (found {found}), so its class "
+                                   f"cannot be read (unreadable means Sonnet)")
+                else:
+                    found = ticket_class(root, ticket_front(root, ids[0]))
+                    if found != entry["class"]:
+                        missing.append(f"class: the entry holds for {entry['class']} work only, and the ticket "
+                                       f"{ids[0]} is {found}")
+            if "task" in entry:
+                listed = [str(i) for i in as_list(entry["task"])]
+                if len(ids) != 1 or ids[0] not in listed:
+                    missing.append(f"task: the entry holds for {', '.join(listed)}, and the spawn's prompt must carry "
+                                   f"one line 'Task: <ticket id>' naming one of them (found "
+                                   f"{', '.join(ids) if ids else 'none'})")
+            if "decision" in entry:
+                listed = [str(i) for i in as_list(entry["decision"])]
+                if not decisions & set(listed):
+                    missing.append(f"decision: the entry holds for {', '.join(listed)}, and the spawn's prompt must "
+                                   f"carry one line 'Decision: <DEC-id>' naming one of them (found "
+                                   f"{', '.join(sorted(decisions)) if decisions else 'none'})")
+            if not missing and names_opus(entry.get("model")) and not any(key in entry for key in LIMITERS):
+                missing.append("limiter: an entry that names Opus carries a class, task or decision limiter, and "
+                               "this one carries none, so it lifts nothing")
+            if not missing:
+                return 0
+            reasons += missing
+        return refuse(f"{said}: no exception in {EXCEPTIONS_REL} is met (DEC-1225 (2)); limiter not met: "
+                      f"{'; '.join(reasons)}. Spawn it without a model (the default is Sonnet).")
     except Unreadable as error:
-        return refuse(f"{sonnet}: {error} (unreadable means Sonnet).")
+        return refuse(f"{said}: {error} (unreadable means Sonnet).")
 
 
 def main() -> int:
