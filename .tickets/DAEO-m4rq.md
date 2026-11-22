@@ -90,3 +90,11 @@ not a round.
 - **S6:** the text output's first line, before `measure: set …`, is `families: <name> (<n> members), …` in the path
   map's order, or `families: none`. It names the families in force live and under `--kept`, including families
   declared only in the sets root's path map. With `--json`, standard output stays one JSON document.
+
+## Fix: S4's expected total line has no floor or target wording (F9; DEC-1210, DEC-1233)
+
+2026-11-22: F9 (see W2-61 `DAEO-iw1f` and W1-21 `DAEO-5x4l`) removes the hit@5 floor and target from the measure's report.
+This ticket's acceptance test `tests/acceptance/W2-134/test_w2_134_s4_unchanged.py` asserted `TODAY_TOTAL = "total: hit@5 4 of
+6 (66.7 %, floor 85); full evidence 4 of 6 (66.7 %, target 99 %)"`; it now expects `total: hit@5 4 of 6 (66.7 %); full
+evidence 4 of 6 (66.7 %)`, revised by the independent test designer with a `Rewrite-Reason` naming DEC-1210 and DEC-1233
+(`a8711e647`). Nothing else of this ticket changes. `gov accept W2-134` green (28 passed).
