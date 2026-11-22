@@ -180,3 +180,68 @@ its terms and its lines S13 (M1) to S16 (M4), on the base `d42b1d833`, before an
 `tests/conftest.py`: the session-wide autouse fixture `_gov_os_memaudit_config` sets `MEMAUDIT_CONFIG` to
 `<tree>/governance/project/memory-audit.yaml` (commit trailer `Rewrite-Reason`). Unused by the base's code;
 `tests/unit/memaudit` and the existing memaudit acceptance folders are green with it on the base.
+
+## The fix under the closed ticket: the strict forbidden-citation rule (DEC-1227 D5 (a)), S1 to S4 of the fix
+
+Written by the independent test designer from the ticket's last section (`## Fix: the strict forbidden-citation rule in
+the product's own grading`), its lines S1 to S4 and the interface the lead named, on the base `c03de39f2`, before any
+implementation. The fix's lines are numbered S1 to S4 in the ticket and **share the ids `success-1` to `success-4`**
+with the ticket's own lines in the map below (each row says `(S<n> of the fix)`): the ticket's own tests under those
+ids stay green, and `gov accept` passes a line when every test it names was found and none failed. All the new cases
+are in `test_w2_204_fix_forbidden.py`.
+
+- **The rule** is W2-81's (`tests/acceptance/W2-81/w2_81_score.py`, loaded by path in the parity cases, never edited):
+  a citation is right when a cited place holds a gold line and no cited path is one of the question's forbidden paths
+  (equality); an answer is right when the grade is `correct` and the citation is right.
+- **Public interface only:** `gov memaudit preflight`, `brief` and `fresh` as child processes; the files of a planted
+  run (`FIGURES.json`, `misses.jsonl`, the reader's rows `reader/<id>.json` in the run folder); in process, the
+  interface the lead named: `preflight.form_ok`, `matcher.questions` (the key `forbidden`), `matcher.forbidden_cited`
+  and `matcher.citation_right`. The reader and the graders are W2-171's fakes (the planted `claude_plan.json` is
+  edited after `install_plans`: each question's cited places and grade).
+- **The planted run `forbidden`** (`ST.BUILDS`, built once per session like the folder's other stages): both halves
+  delivered with `forbidden` on some questions, then `fresh`. Hidden: q05 gold and a forbidden path cited, grade
+  correct (wrong); q06 a list never cited (right); q08 gold cited, grade wrong (wrong); q09 gold and an unlisted path
+  (right); the hidden half therefore holds exactly **one** forbidden-cited answer. Visible: q05 the forbidden path
+  alone (wrong); q06 gold and forbidden, grade wrong (wrong, forbidden cited); q07 the list's second path cited
+  before the gold, grade correct (wrong); q08 right; q10 no `forbidden` key, a path other questions list cited (right,
+  as before); q40 the apart question, not found, a listed path cited (right, `forbidden_cited` false). Strict
+  figures: hidden 38 of 40 (misses `{q05: incomplete, q08: wrong}`, `forbidden_cited` 1); visible 37 of 40 (misses
+  q05, q07 `incomplete` and q06 `wrong`, `forbidden_cited` 3).
+- **Readings where the fix leaves a detail open** (tested no further than stated):
+  1. A malformed `forbidden` is tested with ten variants (a string, a mapping, a number, a bool, an empty item alone
+     or after a path, a number item, a null item, a list item, a mapping item). An explicit `forbidden: null`, a
+     whitespace-only item, a path that does not exist in the repository, and a forbidden path that is also a gold
+     path are not tested (the lead's text does not say).
+  2. `misses.forbidden_cited` counts the misses whose row says a forbidden path was cited, whatever the grade (visible
+     q06 is a wrong-grade miss and is counted); an apart question's row says `false` even when its reader cited a
+     listed path.
+  3. W2-81's `judge_question` has no apart concept (it reads a `not_found` reader as a miss), so the parity cases
+     leave the apart question out; for the others the product's verdict is "not among `misses.jsonl`".
+  4. The brief cases read text, not wording: a fenced `yaml` block with a `forbidden:` line, a rule that ties
+     `forbidden` to the stale, superseded or legacy source and to naming it, a sentence that says a forbidden source
+     is never also a gold one; the checker's input-form sentence names `forbidden` within 300 characters of
+     `naive_answer`.
+- **Existing cases rewritten** (a separate commit, trailer `Rewrite-Reason`: DEC-1227 D5; red on the base after the
+  rewrite): they pin the old key sets of `FIGURES.json` and of a judge row. `tests/unit/memaudit/test_judge.py`
+  (`FIGURE_KEYS` gains `forbidden_rule`); `tests/acceptance/W2-171/test_w2_171_s3_judge.py` (`ROW_KEYS` gains
+  `forbidden_cited`); `tests/acceptance/W2-171/test_w2_171_s6_figures.py` (`TOP` gains `forbidden_rule`, `MISSES` gains
+  `forbidden_cited`) and its expected figures in `w2_171_scenario.py` (`"forbidden_rule": "strict"`, `forbidden_cited`
+  0: no planted question there lists a forbidden path).
+- **Green on the base by design (guards):** `test_fix_s1_form_ok_refuses_a_malformed_field[...]` and
+  `test_fix_s1_form_ok_accepts_the_field_and_its_absence[absent]` and the pre-flight case with the field absent (the
+  base refuses an unknown key and accepts a set without it); `test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files`
+  (red if the fix touches `template/`, `prompts.py` or `claude.py`; the `test_prompts.py` hash pin and F2 stand too).
+- **Red on the base, and why:** every case of the planted run `forbidden` stops at `STOPPED`/`WAITING ... writer-2`
+  (exit 5): the base's pre-flight refuses a question file with the unknown key `forbidden` (`PF-FORM`), so no judge
+  runs. Without the key (probed on the base) the rule is missing: q05 of the hidden half is right, `forbidden_cited`
+  is absent from every row and `FIGURES.json`. The matcher cases: `matcher` has no `forbidden_cited`,
+  `citation_right` or key `forbidden`. The brief cases: no `forbidden:` line, no rule.
+
+### KPI map of the fix
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-1 (S1 of the fix) | `test_w2_204_fix_forbidden.py::test_fix_s1_form_ok_accepts_the_field_and_its_absence`, `test_w2_204_fix_forbidden.py::test_fix_s1_form_ok_refuses_a_malformed_field`, `test_w2_204_fix_forbidden.py::test_fix_s1_a_set_with_or_without_the_field_passes_the_pre_flight`, `test_w2_204_fix_forbidden.py::test_fix_s1_a_malformed_field_is_pf_form_naming_the_question`, `test_w2_204_fix_forbidden.py::test_fix_s1_two_malformed_fields_name_both_questions`, `test_w2_204_fix_forbidden.py::test_fix_s1_the_loaded_question_holds_its_forbidden_paths`, `test_w2_204_fix_forbidden.py::test_fix_s1_a_question_without_the_field_loads_an_empty_list` | `form_ok` and the pre-flight refuse the unknown key `forbidden` (`PF-FORM refused` naming the good questions too: 3 where 2 or 1 are due); `matcher.questions` gives no key `forbidden` (`KeyError`). **Green on the base by design:** the `absent` cases and `form_ok`'s refusals of a malformed field |
+| success-2 (S2 of the fix) | `test_w2_204_fix_forbidden.py::test_fix_s2_matcher_forbidden_cited_is_path_equality`, `test_w2_204_fix_forbidden.py::test_fix_s2_matcher_citation_right_is_gold_cited_and_no_forbidden_cited`, `test_w2_204_fix_forbidden.py::test_fix_s2_matcher_citation_right_is_the_old_gold_test_less_a_forbidden_citation`, `test_w2_204_fix_forbidden.py::test_fix_s2_planted_correct_and_gold_cited_is_right`, `test_w2_204_fix_forbidden.py::test_fix_s2_planted_correct_and_forbidden_cited_alone_is_wrong`, `test_w2_204_fix_forbidden.py::test_fix_s2_planted_correct_with_gold_and_forbidden_cited_is_wrong`, `test_w2_204_fix_forbidden.py::test_fix_s2_planted_wrong_grade_with_gold_cited_is_wrong_and_forbidden_cited_is_what_was_cited`, `test_w2_204_fix_forbidden.py::test_fix_s2_planted_a_question_without_a_list_is_graded_as_before`, `test_w2_204_fix_forbidden.py::test_fix_s2_planted_an_apart_question_is_unchanged`, `test_w2_204_fix_forbidden.py::test_fix_s2_the_planted_misses_are_exactly_the_cases_that_cite_a_forbidden_path_or_are_graded_wrong`, `test_w2_204_fix_forbidden.py::test_fix_s2_parity_the_product_and_w2_81_agree_on_every_planted_question`, `test_w2_204_fix_forbidden.py::test_fix_s2_parity_matcher_citation_right_agrees_with_w2_81_over_citations_and_grades` | `matcher` has no `forbidden_cited` or `citation_right` (`AttributeError`); the planted run stops at the pre-flight (`PF-FORM`, exit 5, no `misses.jsonl`, no rows); the rule itself is absent on the base (q05 right, no `forbidden_cited` in a row) |
+| success-3 (S3 of the fix) | `test_w2_204_fix_forbidden.py::test_fix_s3_the_writer_brief_s_question_form_shows_the_optional_forbidden_field`, `test_w2_204_fix_forbidden.py::test_fix_s3_the_writer_brief_tells_the_writer_to_name_the_stale_sources`, `test_w2_204_fix_forbidden.py::test_fix_s3_the_writer_brief_says_a_forbidden_source_is_never_also_a_gold_source`, `test_w2_204_fix_forbidden.py::test_fix_s3_the_checker_brief_names_the_optional_forbidden_field_in_its_input_form`, `test_w2_204_fix_forbidden.py::test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files` | the generated briefs hold no `forbidden:` line, no rule and no word `forbidden` in the checker's input form. **Green on the base by design:** the kernel guard |
+| success-4 (S4 of the fix) | `test_w2_204_fix_forbidden.py::test_fix_s4_a_run_with_one_forbidden_cited_answer_counts_one_and_names_the_rule`, `test_w2_204_fix_forbidden.py::test_fix_s4_the_forbidden_cited_misses_are_counted_apart_from_the_others`, `test_w2_204_fix_forbidden.py::test_fix_s4_a_run_with_none_gives_zero_and_the_key_is_there`, `test_w2_204_fix_forbidden.py::test_fix_s4_the_run_s_printed_verdict_lines_count_the_strict_rule_in_their_old_form`, `test_w2_204_fix_forbidden.py::test_fix_s4_counts_only_no_text_path_or_answer_reaches_a_line_or_the_figures` | `FIGURES.json` holds no `forbidden_rule` and no `misses.forbidden_cited` (`KeyError`); the planted run `forbidden` stops at the pre-flight (exit 5) |

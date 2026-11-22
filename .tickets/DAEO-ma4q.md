@@ -213,3 +213,32 @@ question text has no key and is not a problem.
   --projects <planted>`; the `fresh` close (`SCAN <audit> clean`) agrees on the second.
 
 **Landed:** merged into `w2/integrate` at `cc857b977` on 2026-11-20 by hand (the CTO); on the merged tree W2-204, W2-198, W2-208 and the memaudit and opt-in units: 653 passed. EXAMIN's reproduction on the real transcripts: VOID with 1,025 findings on the base, clean on the fix. For release 0.1.5.
+
+## Fix: the strict forbidden-citation rule in the product's own grading (DEC-1227 D5 (a))
+
+Found in the 0.1.4 proving run (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, rows T7 and line 169): W2-81's
+scorer counts an answer wrong when it cites a forbidden (stale, superseded, legacy) source; the product's
+`judge.one` sets `citation_right` from gold alone and `prompts.outcome` has no forbidden concept, so 24 of the proving
+run's 30 misses would have been graded right by the product. The owner (DEC-1227 D5 (a)) keeps W2-81's strict rule and
+applies it to the product's own measure, so EXAMIN's 95 % is graded the way the proving run is. Kind: a fix, no new
+ticket; the ticket stays closed; `Fix:` trailer. The test designer's cases are red on the base first. Code is C3
+(`src/gov/memaudit/**`); every helper Sonnet (DEC-1225).
+
+W2-81's rule, which the product now follows: `citation_right = (a cited place holds a gold line) and (no cited path is a
+forbidden path)`; the answer is right only when the grade is `correct` and `citation_right` (a path matches a forbidden
+path by equality, as W2-81's `cited` does). Correct + gold + forbidden cited = wrong. `prompts.py` stays untouched (its
+hash is pinned by `test_prompts.py`): the rule lives in `judge.py`'s `citation_right`, which `prompts.outcome` reads.
+
+- **S1 A question may name forbidden sources.** A question file may hold `forbidden: [<repository path>, ...]` (a list of
+  non-empty path strings, W2-81's shape; absent = none). Verify: a set with and without the field both load and pass the
+  pre-flight; a malformed one (not a list, an empty list item, a non-string item) is `PF-FORM`, naming the question's id.
+- **S2 Citing a forbidden source makes the answer wrong,** whatever the grader says. Verify: planted grades through
+  `judge`: correct + gold cited = right; correct + forbidden cited = wrong; correct + gold and forbidden cited = wrong;
+  grade wrong = wrong; no forbidden list = as before. One function (`gov.memaudit.matcher`) holds the rule, and a
+  parity test pins it against W2-81's `judge_question` on the same planted cases.
+- **S3 The question writer is told to name the forbidden sources** where a stale or superseded source exists for a
+  question (the generated writer brief's form and rubric text; the checker's input form names the field). Verify: the
+  generated briefs hold the `forbidden` field and the instruction; kernel text is untouched.
+- **S4 The record says it.** `FIGURES.json` holds `forbidden_rule: "strict"` and `misses.forbidden_cited` (the
+  forbidden-cited misses counted apart, a subset of `misses.total`) (the five printed verdict lines are unchanged). Verify: a
+  planted run with a forbidden citation gives the count 1 and the key; with none, 0.

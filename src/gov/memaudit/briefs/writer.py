@@ -106,6 +106,9 @@ If a file you opened turns out to be one of these, stop reading it and do not us
      of a running measure. The gold answer carries no line number.
 5. **Wording and answers.** A question is one or two sentences. The gold answer is one to three sentences, in your
    own words, with the facts only. Never copy a long passage.
+   **Forbidden sources.** Where a question has a stale, superseded or legacy source that a reader could wrongly cite,
+   name its repository path in `forbidden` (a list). A forbidden source is never also a gold source. Where none
+   exists, leave the field out.
 6. **The `nonexistent-id` question.** Ask about an id that exists nowhere (an id of one of the repository's own id
    forms, past its highest number or outside its range). Its gold source is the line that settles the absence, and its
    gold answer says "none".
@@ -147,6 +150,7 @@ verdict (`accept`, `revise` or `reject`), its codes, the other places that state
   drawn: changed                   # changed, sample or none
   keyword: true                    # only when R2 needs it; otherwise leave the line out
   naive_answer: <the replaced record's answer>   # only for a supersession question
+  forbidden: [<repository path>]   # only where a stale, superseded or legacy source exists; never a gold source
   ```
 - `out/conflicts.md` only when you stop (§9): ids and path classes, never content.
 
