@@ -174,3 +174,16 @@ the form of `BRANCH_UNKNOWN`: the lead's ruling), `72034b182`; units `tests/unit
 `fixes-015b` (Sonnet), branch `e2/fixes-015b`. `gov accept W2-115b` green on the first run (every README line then, success-1 to success-14,
 failure-1 to failure-4; 74 passed); `tests/unit/queue`: 119 passed. A worktree holding the branch with untracked files that
 are not gitignored (stray tool folders) now refuses: intended.
+
+## Fix: gov queue's selection, I-1 and I-2 (2026-11-22; FINDINGS I-1, I-2; DEC-1239)
+
+- **I-1:** `select.scoped` with `change` given lists a path the change deleted (absent from HEAD) under `deleted`; it is never
+  selected as `TEST_CHANGED` nor counted unplaced; its suite folder still runs if it remains. A map-named target that is gone
+  (couplings, `every_close`, `record_reading`) still refuses `FILE_GONE` (DEC-912 item 3).
+- **I-2:** with `change` given, an unplaced `.md` outside `src/`, `tests/`, `template/`, `governance/kernel/`, `.claude/` and
+  `.rulesync/` is a record: listed under `records`, notice `RECORD_PLACED <path>` under `notices` in `--select`'s object, the
+  landing's answer and `queue.json` (top level and under `result`). Rule chosen: the map's `record_only` patterns already make
+  records; Markdown outside code, tests and the kit's executable/instruction parts is documentation the branch writes, never
+  something a suite could test. Code and tests nothing places still refuse. `gov close` (no `change`) unchanged.
+- **Tests:** `tests/acceptance/W2-115b/test_w2_115b_select_fixes.py` (9 cases, 8 red on the base), unit
+  `tests/unit/queue/test_queue_select_deleted_records.py`. Also fixed the ticket's YAML escaping of the new KPI lines.
