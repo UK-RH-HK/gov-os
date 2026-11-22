@@ -240,5 +240,5 @@ hash is pinned by `test_prompts.py`): the rule lives in `judge.py`'s `citation_r
   question (the generated writer brief's form and rubric text; the checker's input form names the field). Verify: the
   generated briefs hold the `forbidden` field and the instruction; kernel text is untouched.
 - **S4 The record says it.** `FIGURES.json` holds `forbidden_rule: "strict"` and `misses.forbidden_cited` (the
-  forbidden-cited misses counted apart, a subset of `misses.total`), and the verdict lines say the rule. Verify: a
+  forbidden-cited misses counted apart, a subset of `misses.total`) (the five printed verdict lines are unchanged). Verify: a
   planted run with a forbidden citation gives the count 1 and the key; with none, 0.
