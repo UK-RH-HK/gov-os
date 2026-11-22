@@ -408,3 +408,11 @@ Cases: 42 in the full run, 3 in `breadth`, 0 in `lifted`.
 | F1: A Stop hook loops | `test_session_hooks.py::TestStop::test_respects_stop_hook_active` | the ticket's words |
 | F2: SessionStart injects more than the cap | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_ticket`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions` | the ticket's words |
 | F3: A handoff or ticket close proceeds while the latest checkpoint is stale for its policy (watchdog, Contract v3 N3) | `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation`, `test_session_hooks.py::TestWatchdogBlocksStale::test_stale_on_ticket_transition`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_stop_writes_checkpoint_not_only_precompact` | the ticket's words |
+
+## Fix F12: the SubagentStop hook stops blocking twice (fixes-015a; owner W1-29)
+
+| KPI | Tests | Today (base), and why |
+|---|---|---|
+| fix-F12 | `test_w1_29_fix_stop_hook.py::test_a_return_with_each_value_on_the_next_line_passes` (plain and heading labels) | **red**: a value on the line after its label is not read, so the return blocks |
+| fix-F12 | `test_w1_29_fix_stop_hook.py::test_stop_hook_active_exits_zero_even_for_a_return_that_would_block` | **red**: `stop_hook_active` is not read, exit 2 |
+| fix-F12 | `test_w1_29_fix_stop_hook.py::test_a_label_with_nothing_after_it_still_blocks`, `test_an_incomplete_return_blocks_once_without_stop_hook_active`, `test_a_return_with_each_value_on_the_next_line_passes` (bold label) | green today (guards: the block stays for a real gap) |

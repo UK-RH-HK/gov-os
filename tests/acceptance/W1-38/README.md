@@ -905,3 +905,11 @@ Cases: 42 in the full run, 159 in `breadth`, 0 in `lifted`.
 | F2: A generated file is hand-edited | `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_claude_md` | the ticket's words |
 
 **D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** the `launched` fixture plants W1-46's open gate (`plant_open_gate`) in the stand-in home and runs the launch through `_run_launch`, W1-07's `run_gov_with_code` with the gate's `GOV_RESOURCES_*` added. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
+
+## Fix F11: no unfilled slot in a generated agent file (fixes-015a; owner W1-38)
+
+| KPI | Tests | Today (base), and why |
+|---|---|---|
+| fix-F11 | `test_w1_38_fix_slots.py::test_generation_into_a_planted_tree_leaves_no_slot_in_any_agent_file` | **red**: generated agent files hold `{CMD:...}` and `{ID}`-style slots |
+| fix-F11 | `test_w1_38_fix_slots.py::test_the_portability_check_refuses_a_generated_file_holding_a_slot_and_names_it` | **red**: the check reports only `GENERATED_DIFFERS`; no finding whose code holds SLOT or PLACEHOLDER |
+| fix-F11 | `test_w1_38_fix_slots.py::test_the_checked_in_agent_files_and_the_kits_copies_hold_no_slot` | **red**: `.claude/agents/*.md` and the kit's sources hold slots |
