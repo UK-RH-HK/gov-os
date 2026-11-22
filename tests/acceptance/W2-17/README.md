@@ -150,3 +150,32 @@ added to `conftest.py` and `w2_17_support.py`.
 Run the fixes alone: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_pending.py
 tests/acceptance/W2-17/test_w2_17_session_start.py tests/acceptance/W2-17/test_w2_17_rollback_command.py -n auto
 --dist loadfile` (each file's session fixtures built once on its worker; the rollback file builds the update twice).
+
+## The fix S8 (F4): `gov update` never registers a hook a second time (EXAMIN report 28)
+
+Written by the independent test designer from the fix line (`gov update` never adds a hook entry already present, and
+an update of a repository that has `context_watch.py` twice leaves it once) and EXAMIN's report 28
+(`.claude/settings.json` held `context_watch.py` twice, in two groups under `hooks.PostToolUse`, matcher `Bash`, whose
+command strings differ: an older and a newer generation of the same hook). "Already present" is read as: an entry of
+the same event and matcher that runs the same hook program (`governance/kernel/hooks/context_watch.py`), whatever its
+command text and position. The ticket line S8 is for the lead to record; S8 here is this fix.
+
+Fixtures: a copy of the project adopted at A, its `.claude/settings.json` planted (the project's own hook entries
+first: a PreToolUse `Agent|Task` entry, two PostToolUse `Bash` entries, one a look-alike `tools/context_watch.py`, a
+Stop entry; then the `PostToolUse` groups of the case), committed, then `gov update B --json`. Read: the settings file
+(JSON) after the update, public. Every case asserts that the update exited 0, that every kernel hook the project at A
+runs is registered exactly once, and that the project's own hook entries are the planted ones in their order. Which
+form of the command survives is not asserted.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| S8 | `test_w2_17_fix_hook_once.py::test_an_entry_present_once_is_still_once_after_the_update`, `test_w2_17_fix_hook_once.py::test_an_entry_present_twice_is_left_once`, `test_w2_17_fix_hook_once.py::test_an_entry_twice_in_one_group_is_left_once`, `test_w2_17_fix_hook_once.py::test_an_absent_entry_is_added_once`, `test_w2_17_fix_hook_once.py::test_the_older_form_of_the_entry_is_not_registered_beside_the_new_one`, `test_w2_17_fix_hook_once.py::test_two_forms_of_the_entry_are_left_as_one`, `test_w2_17_fix_hook_once.py::test_the_projects_own_hooks_stay_beside_the_collapsed_entry`, `test_w2_17_fix_hook_once.py::test_a_second_update_is_refused_and_the_settings_stay_as_they_were`, `test_w2_17_fix_hook_once.py::test_a_rollback_leaves_the_hook_once` | After `gov update` the settings hold `context_watch.py` twice: the older form that the update cannot unmerge stays and the generated one is added beside it (cases older-form, two-forms: 2 entries), and the identical command twice in one group gets a third (3 entries). Green on the base, as guards: once stays once, the identical entry in two groups (the unmerge removes both and one is regenerated), the absent entry added once, the rollback restoring the planted settings |
+
+Red on the base: `test_an_entry_twice_in_one_group_is_left_once`,
+`test_the_older_form_of_the_entry_is_not_registered_beside_the_new_one`, `test_two_forms_of_the_entry_are_left_as_one`,
+`test_the_projects_own_hooks_stay_beside_the_collapsed_entry`,
+`test_a_second_update_is_refused_and_the_settings_stay_as_they_were` (the last two share the two-forms state, so
+they fail at its duplicate). Green guards: the other four.
+
+Run: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_fix_hook_once.py` (nine cases, six
+updates, about a minute).
