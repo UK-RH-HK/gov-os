@@ -150,3 +150,30 @@ Cases: 99 in the full run, 26 in `breadth`, 0 in `lifted`.
 
 **Retired (DEC-1220 (1), TI-6):** `test_w2_61_visible_half.py::test_every_source_exists_at_head_and_every_heading_is_found_there` and the helpers only it used: the line-pinned gold sources are history's (DEC-1210), so no case holds them to the files of HEAD.
 **Also retired (DEC-1220 (1), TI-6):** `test_w2_61_baseline.py` (8 cases: the baseline record `docs/research/W2-61-baseline.md`, a past record) and the scores cases' floor 85 and target 99 labels (E2 5.2: hit@k is no floor). The scores cases keep the figures themselves.
+
+## Fix: no hit@5 floor and no hard-blocking kit check on hit@k (audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Written by the independent test designer from the fix's behaviour, before any implementation of it. "hit@5 I DON'T CARE
+if it's even 10%": hit@k is a reported diagnostic only. The runner of `gov accept` reads only KPI cells that name
+`success N` or `failure N`, and a fix has no line of its own in the ticket, so each row of this map is read as
+`Failure 1` (the fix is named in its cell), as W2-52's and W2-88's fix rows are.
+
+Interface assumed (today's, minus two phrases): `python3 -m gov.retrieval.measure <set> --root <root> --gov <gov> [--json] [--out <dir>]`.
+The text report's total line is `total: hit@5 <n> of <of> (<p> %); full evidence <n> of <of> (<p> %)`, today's line without
+`, floor 85` and `, target 99 %`. In the JSON (and the `--out` record) `total.hit_at_5` and `total.full_evidence` hold `count`, `of`,
+`percent` and nothing else. The measure's exit code follows no figure. `measure.py` holds no `FLOOR` and no `TARGET`, and no
+docstring that states `floor of 85` or `target of 99`. The planted worlds are `w2_61_support`'s; 9 cases, 2 s.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (nofloor-1: the total line reports the figures and names no floor or target) | `test_w2_61_no_floor.py::test_the_total_line_gives_both_figures_and_names_no_floor_or_target`, `test_w2_61_no_floor.py::test_the_total_line_is_exactly_the_two_figures` | red: the line reads `total: hit@5 2 of 4 (50.0 %, floor 85); full evidence 3 of 4 (75.0 %, target 99 %)` |
+| Failure 1 (nofloor-2: the JSON total and the record hold counts only) | `test_w2_61_no_floor.py::test_the_json_total_holds_counts_and_no_floor_or_target_field`, `test_w2_61_no_floor.py::test_the_record_written_by_out_holds_no_floor_or_target_field` | red: `total.hit_at_5` holds `floor` and `total.full_evidence` holds `target` |
+| Failure 1 (nofloor-3: no exit code or verdict follows a figure, GUARD green on the base) | `test_w2_61_no_floor.py::test_the_exit_code_does_not_depend_on_the_hit_at_5_figure` (every miss, every hit, mixed) | GUARD, green on the base: they hold the fix back from making the exit follow a figure |
+| Failure 1 (nofloor-4: the source holds no literal hit@k floor) | `test_w2_61_no_floor.py::test_the_measure_source_holds_no_floor_or_target_constant`, `test_w2_61_no_floor.py::test_no_source_file_holds_a_hit_at_k_floor_literal` | red: `FLOOR, TARGET = 85, 99` and the docstring's `floor of 85` / `target of 99` in `measure.py`, `hit_at_5_threshold` in `retrieve_check.py` |
+
+`test_no_source_file_holds_a_hit_at_k_floor_literal` is a source-level guard over `src/gov` (not a record-reading case): its patterns
+are the old names and a hit@k name compared with a floor-like name; the gitleaks `_FLOOR`, the disk floors and the launcher's effort
+floor do not match. The memory audit's control (`hit@5` within a spread of the last audit's figure) and its pool's 3-point fall flag
+are reported comparisons with the last audit, not a floor or a target, and are not judged here.
+
+**Red run on the base:** 9 cases, 6 red and 3 green (the guards).
