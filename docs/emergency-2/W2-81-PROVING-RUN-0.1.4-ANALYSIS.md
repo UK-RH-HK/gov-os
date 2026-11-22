@@ -1,6 +1,6 @@
 ---
 id: W2-81-PROVING-RUN-0.1.4-ANALYSIS
-type: research-record
+type: research
 status: DRAFT
 state_class: EVIDENCE
 title: "W2-81's proving run on release 0.1.4 (NOT_READY, seed 7429927): why, by class, and the plan"
