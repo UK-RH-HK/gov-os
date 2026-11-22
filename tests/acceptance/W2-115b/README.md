@@ -292,3 +292,30 @@ the project) that holds `topic/aa`, or the project's own main tree switched to `
 3. **"Not poisoned":** after the change is discarded (`git checkout -- <file>`), or committed in the worktree (the entry
    then lands with the new tip), the same command lands and closes the ticket.
 4. **The main tree holding the branch** is planted with the root switched to `topic/aa` and `--onto main`.
+
+## Fix: the selection's deleted test and record-only document (I-1, I-2; DEC-1239)
+
+Written by the independent test designer from the four `Fix,` lines at the end of the ticket's `success:` list, before
+any implementation. They are numbered after the ticket's own (the KPI ids below follow the order of the lines, success
+18 to 21, after the adoption fix's 14 to 16 and the dirty worktree's 17 there; the ids are labels of this table).
+Acceptance cases in `test_w2_115b_select_fixes.py`; public interfaces only: `gov queue PROJ-aaaa=topic/aa --select`
+(one JSON object on stdout, or `SELECTION_REFUSED` on stderr, exit 2) and the landing with `--json`.
+
+**What is planted:** A and B on `main`, a suite folder `tests/suite_x/` with two test files (`test_one.py`,
+`test_two.py`, the latter importing the widget), `tests/gone/test_gone.py`, a green nightly record, then A's branch
+`topic/aa` with one commit of A's changing the widget and, by case, deleting `test_one.py` or `test_gone.py`, or
+writing `docs/x.md` (outside `record_only`, placed by nothing), `tools/stray.sh`, `src/app/NOTES.md` or
+`template/guide.md`. The map-named case replaces the test map with one whose coupling names `tests/gone/test_gone.py`
+for the widget's path.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-18 (a deleted test file is no target, I-1) | `test_w2_115b_select_fixes.py::test_a_deleted_test_file_is_listed_under_deleted_not_selected_and_its_folder_still_runs`, `test_w2_115b_select_fixes.py::test_the_landing_beside_a_deleted_test_file_lands_and_closes`, `test_w2_115b_select_fixes.py::test_deleted_is_present_and_empty_when_the_change_deletes_nothing` | `--select` exits 2 `SELECTION_REFUSED ... tests/suite_x/test_one.py (FILE_GONE)`; the landing is refused the same way; the third: the `deleted` key is missing |
+| success-19 (a map-named target that is gone still refuses, I-1) | `test_w2_115b_select_fixes.py::test_a_map_named_target_the_branch_deletes_still_refuses_file_gone` | none: a guard, green on the base; it must stay green |
+| success-20 (a record-only document is placed with a notice, I-2) | `test_w2_115b_select_fixes.py::test_a_document_nothing_places_is_a_record_with_a_notice_and_select_exits_0`, `test_w2_115b_select_fixes.py::test_the_landing_places_the_record_and_holds_the_notice_in_its_answer_and_the_queue_record` | `--select` exits 2 `SELECTION_REFUSED ... docs/x.md`; the landing is refused the same way (`ok: false`) |
+| success-21 (code the branch writes that nothing places still refuses, I-2) | `test_w2_115b_select_fixes.py::test_code_beside_a_record_is_refused_naming_the_code_and_not_the_record`, `test_w2_115b_select_fixes.py::test_a_markdown_file_under_src_or_template_that_nothing_places_still_refuses` (two cases: `src/app/NOTES.md`, `template/guide.md`) | the refusal exits 2 as required but names `docs/x.md` beside the code or Markdown file, which is the base's behaviour; green once only the non-record path is named |
+
+**Readings:** the queue record is read at the answer's `record` path; its top-level `notices` is asserted (the record
+equals the answer's result, reading 5 above). `records` is asserted equal to the one planted document; `notices` by
+membership. The refusal cases write `docs/x.md` beside the offending path so each is red on the base (the base names
+both).
