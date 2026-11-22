@@ -37,9 +37,11 @@ lives in an agent session or a vendor account (DEC-057).
   EXAMIN feature ticket through the flow (item 4) is the first ticket of EXAMIN's first planned wave, and the acceptance
   rests on the proving run and EXAMIN's fresh 80 (DEC-1224 (1)-(2)). After it, the Gov OS changes only from friction
   with adopted repositories; Wave 3 is the list of items built only then.
-- The release is pinned and hash-verified (DEC-1214 L3). The CTO cuts patch releases by code once
-  `governance/project/release-authority.yaml` is on; bigger releases (Contract or Charter changes, new features, a new
-  command or record kind) and every push stay the owner's (DEC-1223 RB-1, DEC-1226). The lite adoption verdict
+- The release is pinned and hash-verified (DEC-1214 L3). Release 0.1.5 is the owner's last manual cut (DEC-1226). After
+  it the CTO cuts every release whose content the owner has already approved (features he approved, Contract and Charter
+  changes he approved), by code, once `governance/project/release-authority.yaml` is on, only when the release
+  acceptance passes, with the re-pin's self-rollback and a push to the owner each time; pushes to GitHub and sudo stay
+  the owner's (DEC-1223 RB-1, DEC-1235). The lite adoption verdict
   (CAP-44.h) comes in the release after 0.1.5 (DEC-1231). No tag is signed until friction asks for it.
 - EXAMIN runs Wave 0 as direct work: memory built through `gov adopt` and the refactor, no tickets and no later waves
   before the release (EMERGENCY-2 §7). Every other product repository adopts on the release, through `gov adopt`, and

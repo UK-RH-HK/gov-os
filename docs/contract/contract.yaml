@@ -70,8 +70,9 @@ change_log:
     decisions list, the source map. 69 capabilities; 239 covers items.'
 - change: 'Text for release 0.1.5 (a chore, `docs/emergency-2/briefs/LEAD-contract-015.md`; audit 1, `docs/emergency-2/audits/E2-AUDIT-1-DECISIONS.md`,
     fix 5), carrying the owner''s decisions of 2026-11-22: DEC-1233 (1) N-27, the release lines (CAP-43 wave note, CAP-43.c
-    and CAP-44.h, with the Charter''s §1): the CTO cuts patch releases by code once the authority file is on, bigger releases
-    and every push stay the owner''s (DEC-1223 RB-1, DEC-1226); release acceptance item 4 is the first ticket of EXAMIN''s
+    and CAP-44.h, with the Charter''s §1): 0.1.5 is the owner''s last manual cut; after it the CTO cuts every release whose content
+    the owner has approved, by code, once the authority file is on and the release acceptance passes, pushes to GitHub
+    and sudo staying the owner''s (DEC-1223 RB-1, DEC-1226, DEC-1235); release acceptance item 4 is the first ticket of EXAMIN''s
     first planned wave and the acceptance rests on the proving run and EXAMIN''s fresh 80 (DEC-1224 (1)-(2)); the lite verdict
     comes in the release after 0.1.5 (DEC-1231); DEC-1233 (1) N-29, CAP-24.c: no approved-bytes list (EMERGENCY-2 §2.10, §3.5);
     DEC-1227 D6 (a), landed as 9a4adb350: CAP-25''s acceptance and CAP-61.e, a patch-only gap between the Claude Code CLI
@@ -2693,10 +2694,11 @@ capabilities:
   acceptance: '`framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of
     them disagrees with the installed kernel.'
   wave: W1
-  wave_note: the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); the CTO cuts patch
-    releases by code once `governance/project/release-authority.yaml` is on; bigger releases (Contract or Charter changes,
-    new features, a new command or record kind) and every push stay the owner's (DEC-1223 RB-1, DEC-1226; EMERGENCY-2 §8.3
-    as they amend it); release contents of CAP-43.d are friction
+  wave_note: the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); 0.1.5 is the owner's
+    last manual cut (DEC-1226); after it the CTO cuts every release whose content the owner has already approved (features
+    and Contract or Charter changes he approved), by code, once `governance/project/release-authority.yaml` is on, only
+    when the release acceptance passes, with the re-pin's self-rollback and a push to the owner each time; pushes to GitHub
+    and sudo stay the owner's (DEC-1223 RB-1, DEC-1235; EMERGENCY-2 §8.3 as they amend it); release contents of CAP-43.d are friction
   provider:
   - Copier 9.18.2
   - W1-39
