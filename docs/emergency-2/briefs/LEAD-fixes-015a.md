@@ -70,6 +70,16 @@ Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a`, branc
   (registry entries, Python packages with no binary) read `ok: false`; doctor checks them as packages (by
   `importlib.metadata` version, as `pyyaml` is), not as binaries. Owner: W2-22 `DAEO-xm6l`.
 
+- **F19 No launch takes a model the rubric does not give** (DEC-1225, the owner's priority 1; `models-rubric`'s return,
+  "what is not enforced"): a worker launched on a role file whose table still names Opus (an adopted repository on an
+  older kit) gets Opus. Add the one condition in `gov launch`'s `_rubric` that refuses (or replaces with the rubric's
+  Sonnet) any model the rubric table does not give that role, whatever the role file says, and move the planted role
+  files in the unit and W2-184, W2-33, W2-60a fixtures to Sonnet (the lead measured 92 unit and 272 acceptance cases that
+  plant Opus tables). Also the orchestration tools that still launch Haiku: `governance/project/orchestration/tools/dispatch/dispatcher.py`
+  (about `:1426`) and the dead-man (`deadman.py:158`, `:301`, wherever it lives in the tree) launch Sonnet; and
+  `governance/project/briefs/LEAD-w2-common.md`'s `--model claude-opus-5-5` lines (29, 93, 97) are archived or corrected.
+  No role's model or effort changes beyond DEC-1225 and DEC-1236 (2). Owner: W2-201 `DAEO-k1us`.
+
 ## Green and return
 `gov accept` of each owning ticket green; `tests/unit/launch`, `tests/unit/hooks` (with F13's cases), `tests/unit/update`,
 `tests/unit/adapters`, `tests/unit/memaudit`, W2-204, W1-06, W1-21, W1-28, W1-29, W1-38, W1-48, W2-22, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
