@@ -179,3 +179,32 @@ they fail at its duplicate). Green guards: the other four.
 
 Run: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_fix_hook_once.py` (nine cases, six
 updates, about a minute).
+
+## The fix S9 (F6): `gov update` leaves `gov doctor` as green as it was (G3 run of 2026-11-22)
+
+Written by the independent test designer from the fix line (`gov update` classifies `governance/updates/**` in an
+adopted repository's path map as a merge, so `gov doctor`'s exit is equal before and after the update; the kit's path
+map classifies it) and the G3 run's record (`unclassified: ["governance/updates/0.1.5.json"]`, doctor exit 0 before and
+3 after, in all six kept repositories). The ticket line S9 is for the lead to record; S9 here is this fix.
+
+Fixture (`previous`): a project adopted at A without local changes (the lock matches), then made what an earlier kit
+adopted: every line naming `governance/updates` taken out of `governance/project/path-map.yaml`, and a namespace
+`fixture-rest` of directory patterns (the project's own) classifying every other tracked path, so that doctor's
+`path_map` part passes before the update (checked by the fixture) and only the update's own files can fail it
+afterwards. The doctor is run with `gov doctor --json`; the full doctor is green before in this fixture (exit 0), so
+its exit code is compared whole, and the `path_map` part by its `status`, `unclassified_count` and `unclassified`.
+Read: the path map file (YAML, and its lines for the merge cases), the template's path map, `gov update B --json`,
+`gov doctor --json`.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| S9 | `test_w2_17_fix_updates_path_map.py::test_the_kits_path_map_template_classifies_governance_updates`, `test_w2_17_fix_updates_path_map.py::test_a_freshly_adopted_repository_already_classifies_governance_updates`, `test_w2_17_fix_updates_path_map.py::test_the_update_adds_the_line_to_a_path_map_without_it_once`, `test_w2_17_fix_updates_path_map.py::test_doctors_path_map_part_has_no_unclassified_update_record_after_the_update`, `test_w2_17_fix_updates_path_map.py::test_doctors_exit_code_is_the_same_before_and_after_the_update`, `test_w2_17_fix_updates_path_map.py::test_the_update_merges_the_line_and_keeps_the_projects_own_lines`, `test_w2_17_fix_updates_path_map.py::test_the_update_of_a_path_map_that_has_the_line_leaves_it_once` | The template `template/governance/project/path-map.yaml` and a freshly adopted repository's path map hold no `governance/updates/**` line (0, not one); after `gov update` the path map still holds none, and doctor's `path_map` part fails with `unclassified: ["governance/updates/0.9.1.json"]`, doctor's exit 0 before and 3 after. Green on the base, as a guard: the map that already has the line stays at one line after the update |
+
+Red on the base: the first six; green guard: `test_the_update_of_a_path_map_that_has_the_line_leaves_it_once`.
+
+The merge case keeps every line of a path map the project edited (an extra pattern in a kit namespace, an own
+namespace, its own comment) in its order and asserts no conflict is reported for the path map and no conflict marker
+is written; the update must succeed (exit 0). Not asserted: the namespace the line lands in, or its position.
+
+Run: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_fix_updates_path_map.py` (seven cases,
+three updates, about a minute).
