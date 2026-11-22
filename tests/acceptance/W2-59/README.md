@@ -379,3 +379,21 @@ Its other cases need `retrieve_baseline.yaml` shipped in the wheel, which stays 
 | Failure 1 (nofloor-1: the installed check prints its hit@5 with no threshold, revised case) | `test_w2_59_baseline.py::test_the_installed_check_reads_its_threshold_from_the_installed_package` | red: the line reads `hit@5: 100.0 (baseline: 80.0)` |
 
 **Red run on the base:** the revised case red; the other 3 cases of the file green.
+
+## Fix F3: `gov --version` in a pinned install prints its commit (fixes-015a, release 0.1.5)
+
+`gov --version` is W2-59's (DAEO-kh9l, success 5). The fix line, numbered after the ticket's five success lines:
+
+- **success-6:** `gov --version` run from an installed wheel (no git repository around it) prints the commit the wheel was
+  built from, not `commit unknown`; from a source checkout it prints that repository's git head as before.
+
+The wheel is built through `gov.release._wheel(repo, commit)` (the route shared by release, install and update) from a
+small repository holding a copy of this tree's `src/` and `pyproject.toml`; the test names no build-info file.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-6 | `test_w2_59_fix_version_commit.py::test_the_installed_wheel_prints_the_commit_it_was_built_from` | red: `gov 0.1.4 (commit unknown)` |
+| success-6 | `test_w2_59_fix_version_commit.py::test_the_installed_wheel_inside_another_repository_still_prints_its_own_commit` | red: names no commit |
+| success-6 | `test_w2_59_fix_version_commit.py::test_a_source_checkout_still_prints_its_git_head` | green today (guard) |
+
+**Red run on the base:** 2 red, 1 green.

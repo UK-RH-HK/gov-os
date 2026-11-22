@@ -47,7 +47,10 @@ TOOL_BINARIES = {
 NO_BINARY_TOOLS = frozenset({
     "pyyaml", "superpowers", "qwen3-embedding", "sqlite-vec",
     "reranker-venv", "reranker",
+    "pytest-xdist", "pytest-timeout", "pytest-testmon",
 })
+
+PYTHON_PACKAGES = frozenset({"pytest-xdist", "pytest-timeout", "pytest-testmon"})  # F18: checked as packages
 
 HISTORICAL_PATHS = [
     "docs/DECISION_REGISTER.md",
@@ -348,6 +351,19 @@ def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -
         ok = ver == pinned
         result = {"name": name, "pinned_version": pinned, "found_version": ver,
                   "sha256_match": False, "ok": ok}
+        if not ok:
+            result["reason"] = f"version {ver} does not match pin {pinned}"
+        return result
+
+    if name in PYTHON_PACKAGES:  # F18: the package's installed version, as importlib.metadata reads it
+        from importlib import metadata
+        try:
+            ver = metadata.version(name)
+        except metadata.PackageNotFoundError:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False, "reason": f"{name} is not installed"}
+        ok = ver == str(pinned).lstrip("v")
+        result = {"name": name, "pinned_version": pinned, "found_version": ver, "sha256_match": False, "ok": ok}
         if not ok:
             result["reason"] = f"version {ver} does not match pin {pinned}"
         return result

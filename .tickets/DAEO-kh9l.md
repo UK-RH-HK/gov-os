@@ -68,3 +68,13 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-59), from the accepted revised plan (`do
   - `gov --version` names the version and the commit.
 - **KPIs, failure:** a check edited in the tree does not change the verdict of the pinned judge; a wheel without the data file fails the build or its test; a module that still reads the repository from its install path fails a test.
 - **After it merges,** the owner re-pins at its merge commit, which must also hold W2-50's secrets fix (DEC-853 item 4).
+
+## Fix: `gov --version` in a pinned install prints its commit (fixes-015a, F3)
+
+Found 2026-11-22: from an installed wheel `gov --version` printed `commit unknown`, so the pin answered only the version.
+No test caught it. Required (success-6): the wheel prints the commit it was built from; a source checkout its git head
+as before. Option (a): `gov.release._wheel`, the one build route of release, install and update, writes the commit into
+`gov/_build_info.py` inside the wheel; `gov --version` reads it when there is no source tree. Kind: a fix, no new
+ticket; the ticket stays closed. Failing tests first: `tests/acceptance/W2-59/test_w2_59_fix_version_commit.py`
+(2 red, 1 guard), `de2cc13db`; code `src/gov/release/__init__.py` (`BUILD_INFO`), `src/gov/cli/main.py` (`_version`).
+Lead `fixes-015a-sc` (Sonnet), branch `e2/fixes-015a-sc`.

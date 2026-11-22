@@ -80,7 +80,7 @@ from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as 
 from gov.launch.store import main_root as main_store_root
 from gov.spend import brake as spend_brake
 from gov.util import runs
-from gov.util.freeze import freeze_state
+from gov.util.freeze import freeze_state, paused_error
 from gov.util.gitenv import git_binary, git_env
 from gov.util.parts import load_yaml_unique
 from gov.util.tickets import _load_ticket
@@ -359,10 +359,9 @@ def _check_not_paused(root: Path) -> None:
         roots.add(record.main_checkout(root, "the freeze flag gov pause sets"))
     except GovError:
         pass
-    for each in sorted(roots, key=str):
-        if freeze_state(str(each)) == "frozen":
-            raise _refuse(f"the project is paused (gov pause set {each}/.gov-runtime/freeze): no session starts "
-                          f"until the owner lifts it with gov pause --off (CAP-05)")
+    error = paused_error(*roots)
+    if error is not None:
+        raise error
 
 
 def _check_role_settings(data: dict, rel: str) -> None:
