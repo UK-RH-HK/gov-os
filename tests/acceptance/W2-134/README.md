@@ -129,3 +129,20 @@ red, the control has already passed.
 - **A heading-cited source.** A heading found at the root governs, as today, and S4's q02 checks that this is
   unchanged. A heading not found that falls back to its lines is not re-anchored by any case.
 - **An alternative's entry number (`k.j`)** in the naming.
+
+## Fix: no hit@5 floor and no hard-blocking kit check on hit@k (audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Written by the independent test designer from the fix's behaviour, before any implementation of it. "hit@5 I DON'T CARE
+if it's even 10%": hit@k is a reported diagnostic only. The runner of `gov accept` reads only KPI cells that name
+`success N` or `failure N`, and a fix has no line of its own in the ticket, so each row of this map is read as
+`Failure 1` (the fix is named in its cell), as W2-52's and W2-88's fix rows are.
+
+`test_w2_134_s4_unchanged.py`'s expected total line is today's line minus the floor and target phrases (this README's
+interface item 5, "keep today's form", reads so from F9 on): `total: hit@5 4 of 6 (66.7 %); full evidence 4 of 6 (66.7 %)`.
+Revised with a Rewrite-Reason (DEC-1210, DEC-1233, EMERGENCY-2 5.2: no hit@5 floor); no other line of S4 changed.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (nofloor-1: the total line carries no floor or target, revised cases) | `test_w2_134_s4_unchanged.py::test_s4_with_every_cited_block_unmoved_the_lines_and_totals_are_today_s`, `test_w2_134_s4_unchanged.py::test_s4_kept_outputs_re_score_as_the_run_with_families` | red: the measure's total line still reads `(66.7 %, floor 85); ... (66.7 %, target 99 %)` |
+
+**Red run on the base:** the 2 revised cases red; the folder's other cases as before.
