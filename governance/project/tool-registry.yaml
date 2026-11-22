@@ -241,3 +241,20 @@ tools:
     date: "2026-11-20"
     approved_by: "DEC-1209"
     note: "Re-pin from release 0.1.4 (EMERGENCY-2.md 6.1, 8.3; the owner's act): the wheel of the numbered release 0.1.4, tag v0.1.4 on the record commit whose parent is 961db6546490; built twice from 961db6546490 with SOURCE_DATE_EPOCH, equal to the record's sha256; its own environment ~/.local/share/gov-os/pin-961db6546490; linked from ~/.local/bin/gov by an atomic rename (script sha256 e9b59406687bf34f9a66e807b742b5cf7df6b59e54259734153f00e1ad7443bf). Replaces the entry of pin-1d4e6a875a5d, kept for a one-command rollback (the uninstall line)."
+  # --- Imports: MCP tools for study work (the owner, DEC-1228 (2); approved by the CTO under DEC-1214 G7) ---
+  - name: node-22.23.5
+    version: "v22.23.5"
+    sha256: "2f822d544601dfff107f57d945b649d15c5bf6302595735a6bd9cdc7ee9669bd"
+    install: "bash -c '. ~/.nvm/nvm.sh && nvm install 22.23.5 && nvm alias default 18'"
+    uninstall: "bash -c '. ~/.nvm/nvm.sh && nvm uninstall v22.23.5'"
+    date: "2026-11-22"
+    approved_by: "CTO (DEC-1214 G7)"
+    note: "A second tools-only Node at ~/.nvm/versions/node/v22.23.5/bin/node (sha256 of that binary; nvm's checksum matched), because rea-agents 6.10.1 requires node ^22.23.4 and the stack pin is v22.23.3 (left as it is). The nvm default stays v18.20.8. Used only by the REA study's MCP server below; about 120 MB."
+  - name: rea-agents
+    version: "6.10.1"
+    sha256: "e8cf08c9fa954e998fc8868c23fa8e5f518cdb9553488ec227b31a3bb6903150"
+    install: "cd ~/gov-os-runs/study-startup-launchpad/tool && PATH=$HOME/.nvm/versions/node/v22.23.5/bin:$PATH npm install --save-exact --omit=optional --ignore-scripts rea-agents@6.10.1"
+    uninstall: "rm -rf ~/gov-os-runs/study-startup-launchpad/tool/node_modules ~/gov-os-runs/study-startup-launchpad/tool/package-lock.json"
+    date: "2026-11-22"
+    approved_by: "CTO (DEC-1214 G7)"
+    note: "REA (github.com/morluto/rea, MIT; npm rea-agents 6.10.1 of 2026-11-20), an MCP server and CLI for reverse engineering, the first MCP tool imported (DEC-1228 (2)); sha256 of the npm tarball (npm integrity sha512-3AWrfFEXppvC98FWhZR2Tzulnqs5xJQrSKmAub6+QME/I58Pr3h8pHqqwM30z2DvlnIx/8Hsu8woMngfi4SNyg==). Installed locally in the study's folder, never globally: 187 MB on disk (tarball 42 MB). Optional natives (frida) omitted and install scripts not run; `rea setup` deliberately not run (it writes agent MCP configs and skills). Given only to the Startup Launchpad study's sessions, as an MCP server through ~/gov-os-runs/study-startup-launchpad/mcp.json (--mcp-config with --strict-mcp-config); no Gov OS or EXAMIN settings name it. Work it serves: the study of DEC-1228 (4). Code it reconstructs is study with its origin recorded (DEC-1228 (3)). Moves into the imports register when that feature lands."

@@ -2058,6 +2058,12 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-22.
 - **Governing sources:** docs/emergency-2/EMERGENCY-2.md; docs/contract/CONTRACT_v5.md; docs/DECISION_REGISTER.md.
 
+### DEC-1231 — D1, the lite verdict stage (CAP-44.h), rides the next release after 0.1.5; 0.1.5 is not held for it
+- **Status:** ACCEPTED (owner, 2026-11-22 about 13:40, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1226, DEC-1227 · **Changes:** DEC-1227 D1 ("before the release": the release after 0.1.5)
+- **Decision:** "D1: the verdict stage rides in the next release, after 0.1.5, so 0.1.5 is not held for it and EXAMIN's measure starts sooner."
+- **Basis:** the owner's message of 2026-11-22, answering the handover's one-line question (CTO-HANDOVER §3.3); holding 0.1.5 for a new feature ticket would delay EXAMIN's fresh 80.
+- **Governing sources:** docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md; docs/emergency-2/CTO-HANDOVER.md; DEC-1226; DEC-1227.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
