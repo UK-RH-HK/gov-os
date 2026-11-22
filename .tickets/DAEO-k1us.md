@@ -32,6 +32,9 @@ allowed_paths:
 - .claude/agents/*.md
 - tests/unit/launch/**
 - tests/unit/hooks/**
+- .claude/skills/orchestration/SKILL.md
+- docs/emergency-2/audits/04-tickets-and-rubric.md
+- docs/emergency-2/briefs/NIGHT-COMMON.md
 est_loc: 600
 kpis:
   success:
