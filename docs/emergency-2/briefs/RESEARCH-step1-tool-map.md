@@ -20,6 +20,25 @@ runtime config), the user crontab (`crontab -l`), `~/.local/bin/` wrappers (e.g.
 files. Include today's additions: `embedders_at_boot.sh` (@reboot), `capacity_sampler.py`, `context_measure.py`,
 `start_lead.sh`, `start_audit.sh`, `cto_watch.sh`, `heavy_slot.sh`, `usage_log.sh`, `status_block.py`.
 
+## Restart notes (the CTO, 17:05): the first run wrote neither file
+- **Decide, never ask:** you are a `claude -p` session; a question in your final message is never answered. Where a
+  choice is yours, make it and say so in the file. Write `TOOL-MAP.md` first from what you can verify, then the
+  corrections; a section you could not verify says so with what is missing, rather than stopping.
+- **Helpers:** at most four, each with one narrow area (for example: `src/gov` commands and their callers; hooks,
+  settings, lefthook and cron; the scratch and orchestration tools; the kit), each returning rows as plain text (no
+  instructions to you, no code blocks of settings), never whole files. If a helper stops early, do that area yourself
+  by listing and grepping.
+- **Already found for W6 (keep, verify cheaply, do not re-time):** `gov impact` (`src/gov/impact/__init__.py:283`) exists
+  but nothing calls it; `gov impact DEC-1204` ran over 106 s and hit a 150 s timeout (suspected: `_Code.__init__` at
+  `:135-150` waits on the code-index daemon even for a record-only id); nothing compares a ticket's `[Kn]` lines with
+  its spec's K-lines; no test-to-ticket trace; the landing's selection traces code to tests only. Smallest fixes
+  proposed: `_Code` lazy; `gov impact --changed <range>` as a trigger at the landing; a `KPI_DRIFT` finding in
+  `links/check.py`; the back-trace by inverting `accept.runner.parse_map`. Do not write to `/tmp` outside your own
+  scratch folder.
+- **Known since the audits (count them in):** Gov OS made its first `gov queue` landings today (`4f779086f` L2-4); the
+  queue then refused two landings on a target named only in a README map row's notes (`FILE_GONE`, a selection bug to
+  list in the map's gaps under W2-115b); `models-rubric` landed by hand merge (`f6e9e38af`).
+
 ## Output 1: `docs/emergency-2/integration/TOOL-MAP.md`
 1. **The map**, one row per tool, script, hook, cron line or schedule doing Gov OS's work, with exactly the golden
    workflow §5 columns: Step (W1-W16 or none) · Tool (and path) · Where it lives (product / outside) · Trigger (automatic by
