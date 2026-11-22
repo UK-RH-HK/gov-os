@@ -38,7 +38,9 @@ def test_s11_a_launch_with_a_promotion_records_the_tier_the_criticality_and_the_
     s.promote_two_failed(project, tk)
     record, launched, model = _launched(cli, launch, project, tk)
     assert launched["promotion"] is not None and launched["criticality"] == "C2", "the fixture made no promotion"
-    assert t.measured(record, "tier") == "opus", f"the tier of {model} is not 'opus'"
+    # Rewrite-Reason: DEC-1225 (R2): a promotion launched on Opus (tier "opus"); it launches the table's model now, here the
+    # engineer's C2 entry, Sonnet (tier "sonnet"): the tier is derived from the model's name as before
+    assert t.measured(record, "tier") == "sonnet", f"the tier of {model} is not 'sonnet'"
     t.copied(record, "criticality", "C2")
     promotion = t.measured(record, "promotion")
     assert promotion in (launched["promotion"], launched["promotion"]["reason"]), (

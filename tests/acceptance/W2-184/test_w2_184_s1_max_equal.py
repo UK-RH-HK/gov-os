@@ -139,15 +139,17 @@ def test_s4_the_probe_launched_in_the_joined_spelling_needs_no_reason(full, laun
                      review_round=2)
 
 
-def test_s4_the_probe_that_changes_the_model_is_recorded_as_the_probe_when_given_after_the_double_dash(
+def test_s4_the_probe_s_max_after_the_double_dash_on_the_table_s_sonnet_is_the_probe_s_own_setting(
         project, full, launch):
-    """The auditor's table says Sonnet for C2: round 2's probe is Opus max; given as such after ``--`` it is the
-    probe's own setting (the given model equals the resolved one, and the probe changed it: ``probe`` first)."""
+    """Rewrite-Reason: DEC-1225: the auditor's table says Sonnet for C2: round 2's probe was Opus max, and given as such
+    after ``--`` it was the probe's own setting. R2: the probe no longer changes the model; round 2 is Sonnet max and
+    ``--model <sonnet> --effort max`` after ``--`` is its own setting, while ``--model <opus>`` is refused."""
     s.write_role(project, AUD, table={**s.TABLES[AUD], "C2": (SONNET, "high")})
     s.assert_session(launch(AUD, FULL), SONNET, "high", criticality="C2", model_source="by criticality",
                      effort_source="by criticality", review_round=1)
-    s.assert_session(launch(AUD, FULL, "--model", OPUS, "--effort", "max"), OPUS, "max", criticality="C2",
-                     model_source="probe", effort_source="probe", review_round=2)
+    s.refused(launch(AUD, FULL, "--model", OPUS, "--effort", "max"), "--model", OPUS, SONNET)
+    s.assert_session(launch(AUD, FULL, "--model", SONNET, "--effort", "max"), SONNET, "max", criticality="C2",
+                     model_source=s.ANY, effort_source="probe", review_round=2)
 
 
 def test_s4_a_reason_beside_the_probe_s_max_after_the_double_dash_is_recorded(full, launch):
@@ -215,7 +217,7 @@ def test_s1_still_refused_3_2a_a_trial_s_max_after_the_double_dash_needs_a_reaso
     s.plant_trial(project, TRIAL, tk=tk, effort="max")
     s.refused(launch(ENG, tk, "--effort", "max", trial=TRIAL), "max", "reason")
     text = "the trial's deepest setting, named"
-    s.assert_session(launch(ENG, tk, "--effort", "max", trial=TRIAL, reason=text), s.HAIKU5, "max", criticality="C2",
+    s.assert_session(launch(ENG, tk, "--effort", "max", trial=TRIAL, reason=text), s.TRIAL_MODEL, "max", criticality="C2",
                      model_source="trial", effort_source="trial", trial=TRIAL, effort_reason=text)
 
 

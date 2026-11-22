@@ -1,6 +1,10 @@
 """W2-201 (DAEO-k1us), a fix at the land (2026-11-19): a lead writes its feature as a ticket on its own branch, so the
 ticket of a helper spawn is often in a worktree of the repository and not yet in the project's own ``.tickets/``. The
-hook reads it there; a ticket in no worktree is still unreadable (Sonnet). Builder tests."""
+hook reads it there; a ticket in no worktree is still unreadable (Sonnet). Builder tests.
+
+Rewrite-Reason: DEC-1225: the cases ran under DEC-1215's substitution (``substitution(bed)``) and spawned the engineer on
+Fable, judged as Opus. The substitution is gone (R3); they spawn on ``opus``, which the bed's engineer entry (``class:
+C3``, the class limiter R3 keeps) judges by the ticket's class as Fable was."""
 
 from __future__ import annotations
 
@@ -12,7 +16,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # the sibling builder file, whatever folder pytest starts in
 import test_w2_201_agent_model as base  # noqa: E402
-from test_w2_201_agent_model import FABLE, bed, passes, refuses, run, substitution, ticket  # noqa: E402,F401
+from test_w2_201_agent_model import bed, passes, refuses, run, ticket  # noqa: E402,F401
 
 GIT_ENV = {"PATH": "/usr/bin:/bin", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid",
            "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid", "HOME": "/nonexistent"}
@@ -36,27 +40,22 @@ def branch_bed(bed, tmp_path):
 
 
 def test_a_c3_ticket_that_is_only_in_another_worktree_is_read_there(branch_bed):
-    substitution(branch_bed)
-    passes(run(branch_bed, "engineer", FABLE, "Build it.\nTask: DAEO-c3br\n"))
+    passes(run(branch_bed, "engineer", "opus", "Build it.\nTask: DAEO-c3br\n"))
 
 
 def test_a_c2_ticket_in_another_worktree_is_still_refused_by_its_class(branch_bed):
-    substitution(branch_bed)
-    refuses(run(branch_bed, "engineer", FABLE, "Build it.\nTask: DAEO-c2br\n"), "DAEO-c2br", "C2")
+    refuses(run(branch_bed, "engineer", "opus", "Build it.\nTask: DAEO-c2br\n"), "DAEO-c2br", "C2")
 
 
 def test_a_ticket_in_no_worktree_is_still_unreadable(branch_bed):
-    substitution(branch_bed)
-    refuses(run(branch_bed, "engineer", FABLE, "Build it.\nTask: DAEO-nope\n"), "DAEO-nope")
+    refuses(run(branch_bed, "engineer", "opus", "Build it.\nTask: DAEO-nope\n"), "DAEO-nope")
 
 
 def test_the_project_s_own_ticket_wins_over_a_worktree_s_copy(branch_bed, tmp_path):
-    substitution(branch_bed)
     ticket(tmp_path / "lead-worktree", "DAEO-c2aa", ["src/gov/close/z.py"])  # the branch's copy would be C3
-    refuses(run(branch_bed, "engineer", FABLE, "Build it.\nTask: DAEO-c2aa\n"), "DAEO-c2aa", "C2")
+    refuses(run(branch_bed, "engineer", "opus", "Build it.\nTask: DAEO-c2aa\n"), "DAEO-c2aa", "C2")
 
 
 def test_a_project_that_is_no_git_repository_reads_only_its_own_tickets(bed):
-    substitution(bed)
-    refuses(run(bed, "engineer", FABLE, "Build it.\nTask: DAEO-c3br\n"), "DAEO-c3br")
+    refuses(run(bed, "engineer", "opus", "Build it.\nTask: DAEO-c3br\n"), "DAEO-c3br")
     assert base.HOOK.is_file()

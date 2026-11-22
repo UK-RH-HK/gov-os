@@ -56,20 +56,24 @@ def test_s4_the_probe_names_no_reason_and_the_line_carries_max(full, launch):
     assert second.values("--effort") == ["max"] and second.record()["effort_reason"] is None
 
 
-def test_s4_a_probe_that_changes_the_model_is_recorded_as_the_model_s_source(project, full, launch):
-    """The auditor's table says Sonnet for C2: round 1 Sonnet, round 2 the probe on ``criticality.yaml``'s Opus."""
+def test_s4_the_probe_no_longer_changes_the_model(project, full, launch):
+    """Rewrite-Reason: DEC-1225: the auditor's table says Sonnet for C2: round 1 Sonnet, round 2 the probe on
+    ``criticality.yaml``'s Opus, recorded ``probe`` as the model's source. R2: the probe keeps its effort (max, source
+    ``probe``) and its round, and no longer chooses Opus: round 2 stays on the table's Sonnet."""
     s.write_role(project, AUD, table={**s.TABLES[AUD], "C2": (s.SONNET, "high")})
     s.assert_session(launch(AUD, full), s.SONNET, "high", criticality="C2", model_source="by criticality",
                      effort_source="by criticality", review_round=1)
-    s.assert_session(launch(AUD, full), s.OPUS, "max", criticality="C2", model_source="probe",
+    s.assert_session(launch(AUD, full), s.SONNET, "max", criticality="C2", model_source=s.ANY,
                      effort_source="probe", review_round=2)
 
 
-def test_s4_the_probe_s_model_is_the_criticality_file_s_opus(project, full, launch):
+def test_s4_the_criticality_file_s_opus_key_is_no_probe_model(project, full, launch):
+    """Rewrite-Reason: DEC-1225: the probe's model was the criticality file's ``opus`` (here ``claude-opus-9-9``). The key
+    names no probe model now (R2); round 2 is the table's Sonnet."""
     s.write_role(project, AUD, table={**s.TABLES[AUD], "C2": (s.SONNET, "high")})
     s.write_criticality(project, s.crit_text(opus="claude-opus-9-9"))
     launch(AUD, full)
-    s.assert_session(launch(AUD, full), "claude-opus-9-9", "max", criticality="C2", model_source="probe",
+    s.assert_session(launch(AUD, full), s.SONNET, "max", criticality="C2", model_source=s.ANY,
                      effort_source="probe", review_round=2)
 
 

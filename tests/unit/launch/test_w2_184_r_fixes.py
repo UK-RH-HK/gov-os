@@ -189,8 +189,8 @@ def test_r1_a_worker_launch_with_each_option_is_unchanged(project, gov, option):
     """Unchanged (green at the head): an engineer's launch takes each option as interface 7.2a says."""
     tk = s.ticket(project, ENG, "C2", tk=WORKER_TK)
     if option == "trial":
-        s.plant_trial(project, "t1", tk=tk)  # Haiku 5, high
-        s.assert_session(gov(ENG, tk, options=("--trial", "t1")), s.HAIKU5, "high", criticality="C2",
+        s.plant_trial(project, "t1", tk=tk)  # Sonnet, high (DEC-1225: it was Haiku 5)
+        s.assert_session(gov(ENG, tk, options=("--trial", "t1")), s.TRIAL_MODEL, "high", criticality="C2",
                          model_source="trial", effort_source="trial", trial="t1")
         return
     word, key, value = {"reason": ("--reason", "effort_reason", "x"),
@@ -485,7 +485,8 @@ def _bring(repo, source_branch="w2/W2-r3aa"):
 
 
 def _promoted(result, table, reason, record):
-    return s.assert_session(result, s.OPUS, table[1], criticality="C2", model_source="promotion",
+    # Rewrite-Reason: DEC-1225: a promotion launched on Opus; it launches the table's model now (R2), the source word open
+    return s.assert_session(result, table[0], table[1], criticality="C2", model_source=s.ANY,
                             effort_source="by criticality", promotion={"reason": reason, "record": record})
 
 
@@ -507,7 +508,7 @@ def test_r3_a_stale_launch_root_copy_and_a_newer_ticket_copy_with_the_finding_pr
     assert (repo.tests / rel).read_bytes() != (repo.ticket / rel).read_bytes(), "premise: the copies do not differ"
     b.assert_launched(launch(ENG, R3_TK, cwd=repo.ticket))
     _promoted(launch(TD, R3_TK, cwd=repo.tests), TD_C2, FAIL_OPEN, rel)
-    s.refused(launch(TD, R3_TK, "--model", TD_C2[0], cwd=repo.tests), TD_C2[0], s.OPUS)
+    s.refused(launch(TD, R3_TK, "--model", s.OPUS, cwd=repo.tests), s.OPUS, TD_C2[0])  # DEC-1225: was the reverse
 
 
 def test_r3_the_reverse_a_launch_root_copy_with_the_finding_and_another_root_s_copy_without_it_promote(repo, launch):

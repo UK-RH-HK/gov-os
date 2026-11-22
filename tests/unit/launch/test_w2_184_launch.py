@@ -156,7 +156,9 @@ class Project:
         return path.relative_to(self.root).as_posix()
 
     def trial(self, tid="trial-1", **change):
-        data = {"role": "engineer", "criticality": "C2", "model": HAIKU, "effort": "high",
+        # Rewrite-Reason: DEC-1225: the planted trial's model was Haiku. R2: a trial's model is the table's, Sonnet,
+        # unless an exceptions entry covers another; the cases below pin the mechanism with a Sonnet trial.
+        data = {"role": "engineer", "criticality": "C2", "model": SONNET, "effort": "high",
                 "tickets": ["T-1", "T-other"], "reviewer": {"model": OPUS}}
         data.update(change)
         path = self.root / launcher.TRIALS_REL / f"{tid}.yaml"
@@ -479,18 +481,18 @@ def test_a_model_after_the_double_dash_equal_to_the_resolved_one_is_accepted_and
 
 def test_a_planted_trial_admits_its_model_and_effort_and_is_recorded(project):
     project.ticket()
-    argv = project.launch(args=["--model", HAIKU], trial=project.trial())
+    argv = project.launch(args=["--model", SONNET], trial=project.trial())
     assert argv.count("--model") == 1 and _flag(argv, "--effort") == "high"
     record = project.last()
     assert (record["model"], record["model_source"], record["tier"], record["trial"], record["subagent_model"]) == \
-        (HAIKU, "trial", "haiku", "trial-1", HAIKU)
+        (SONNET, "trial", "sonnet", "trial-1", SONNET)
     assert (record["effort"], record["effort_source"]) == ("high", "trial")
 
 
 def test_a_trial_with_no_model_after_the_double_dash_sets_the_line(project):
     project.ticket()
     argv = project.launch(trial=project.trial())
-    assert (_flag(argv, "--model"), project.last()["model_source"]) == (HAIKU, "trial")
+    assert (_flag(argv, "--model"), project.last()["model_source"]) == (SONNET, "trial")
 
 
 @pytest.mark.parametrize("args", (["--model", OPUS], ["--effort", "xhigh"]))
@@ -562,13 +564,15 @@ CLEAN = {"kpis": [{"kpi": "S1", "verdict": "pass", "findings": [
     {"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "loses work"}]}]}
 
 
-def test_a_fail_open_finding_promotes_the_next_round_to_opus_at_the_table_s_effort(project):
-    project.ticket(allowed=["notes/a.md"])  # C0 on haiku, low: opus at low
+def test_a_fail_open_finding_promotes_the_next_round_at_the_table_s_model_and_effort(project):
+    """Rewrite-Reason: DEC-1225: this pinned a promotion on Opus (C0 on Haiku, low: Opus at low). R2: a promotion keeps
+    its record and the table's effort and no longer chooses Opus: the table's model, here C0's Haiku, at low."""
+    project.ticket(allowed=["notes/a.md"])  # C0 on haiku, low
     rel = project.probe("T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
     argv = project.launch()
-    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (OPUS, "low")
+    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (HAIKU, "low")
     record = project.last()
-    assert (record["model"], record["model_source"], record["tier"], record["subagent_model"]) == (OPUS, "promotion", "opus", OPUS)
+    assert (record["model"], record["tier"], record["subagent_model"]) == (HAIKU, "haiku", HAIKU)
     assert (record["effort"], record["effort_source"]) == ("low", "by criticality")
     assert record["promotion"] == {"reason": "a fail-open finding", "record": rel}
 
@@ -580,7 +584,7 @@ def test_two_failed_reviews_promote_and_name_the_second_failed_record(project):
     project.probe("T-1", "c.md", judgement="passed")
     project.launch()
     assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-1/sub/b.md"}
-    assert project.last()["model"] == OPUS
+    assert project.last()["model"] == SONNET  # DEC-1225: the table's (it was Opus)
 
 
 def test_a_fail_open_finding_is_checked_before_two_failed_reviews(project):
@@ -605,7 +609,7 @@ def test_the_promotion_applies_to_every_worker_role_on_the_ticket(project):
     project.ticket()
     project.probe("T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
     project.launch("independent-test-designer")
-    assert project.last()["model"] == OPUS
+    assert project.last()["model"] == SONNET  # DEC-1225: the table's (it was Opus)
 
 
 def test_the_records_of_another_ticket_do_not_promote(project):
@@ -643,10 +647,13 @@ def test_an_unreadable_probe_record_refuses_naming_it(project, make):
 def test_a_promotion_refuses_a_model_after_the_double_dash_and_a_trial(project):
     project.ticket()
     project.probe("T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
-    project.refused(HAIKU, OPUS, args=["--model", HAIKU])
+    # Rewrite-Reason: DEC-1225: the promoted model was Opus (Haiku refused naming Opus, Opus accepted). It is the table's
+    # Sonnet now: another model is refused naming it, Sonnet is accepted.
+    project.refused(HAIKU, SONNET, args=["--model", HAIKU])
+    project.refused(OPUS, SONNET, args=["--model", OPUS])
     project.refused("promotion", trial=project.trial())
-    project.launch(args=["--model", OPUS])
-    assert (project.last()["model"], project.last()["model_source"]) == (OPUS, "promotion")
+    project.launch(args=["--model", SONNET])
+    assert project.last()["model"] == SONNET and project.last()["promotion"] is not None
 
 
 def test_a_promotion_with_a_malformed_criticality_file_refuses(project):
@@ -681,12 +688,14 @@ def test_round_one_takes_the_table_and_round_two_is_the_probe_at_max(full):
     assert second["model_source"] == "role default"  # the probe did not change the model
 
 
-def test_the_probe_sets_the_model_when_the_table_s_is_lower(full):
+def test_the_probe_no_longer_sets_the_model_when_the_table_s_is_lower(full):
+    """Rewrite-Reason: DEC-1225: round 2's probe set Opus when the table's model was lower (source ``probe``). R2: the
+    probe keeps its effort (max) and no longer chooses Opus: round 2 stays on the table's Sonnet."""
     full.role_file("independent-auditor", pair(SONNET, "high"))
     _review(full)
     assert (full.last()["model"], full.last()["model_source"]) == (SONNET, "role default")
     _review(full)
-    assert (full.last()["model"], full.last()["model_source"], full.last()["effort"]) == (OPUS, "probe", "max")
+    assert (full.last()["model"], full.last()["effort"], full.last()["effort_source"]) == (SONNET, "max", "probe")
 
 
 def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):  # 6.3, on round 2
