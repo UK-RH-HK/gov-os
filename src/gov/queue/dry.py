@@ -28,13 +28,14 @@ def out_dir(root: Path, given: list[str], out: str | None) -> Path:
 
 
 def selection_object(tickets: list[str], suites: list[str], options: list[str],
-                     unplaced_base: list[str] | None = None) -> dict:
+                     found: dict | None = None) -> dict:
     """The selection as ``--select`` prints it: ``tickets``, and ``ticket`` too for one ticket (with ``suites`` and
     ``pytest_options``, ``gov close --select``'s object); ``suites``; ``pytest_options``; ``unplaced_base``, the
-    paths the base's range holds that nothing places (L2-4), where a selection was computed (not ``--full``)."""
+    paths the base's range holds that nothing places (L2-4), ``deleted`` (I-1), ``records`` and ``notices`` (I-2),
+    where a selection was computed (not ``--full``): ``found``."""
     named = {"ticket": tickets[0]} if len(tickets) == 1 else {}
-    found = {} if unplaced_base is None else {"unplaced_base": list(unplaced_base)}
-    return {**named, "tickets": list(tickets), "suites": list(suites), "pytest_options": list(options), **found}
+    more = {} if found is None else {k: list(v) for k, v in found.items()}
+    return {**named, "tickets": list(tickets), "suites": list(suites), "pytest_options": list(options), **more}
 
 
 class Out:
