@@ -64,7 +64,7 @@ _H, _S = (OPUS, "high"), (SONNET, "high")
 TABLE = {
     "orchestrator": (_H, None),
     "senior-engineer": (_H, None),
-    "ticket-lead": (_S, None),
+    "ticket-lead": ((SONNET, "medium"), None),   # Rewrite-Reason: F14 (fixes-015a): a ticket lead runs medium
     "engineer": (_S, None),
     "independent-test-designer": (_S, None),
     "independent-auditor": (_S, None),

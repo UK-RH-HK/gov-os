@@ -208,3 +208,9 @@ is written; the update must succeed (exit 0). Not asserted: the namespace the li
 
 Run: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_fix_updates_path_map.py` (seven cases,
 three updates, about a minute).
+
+## The fix F1 (a): the connectors key in the adopted repository's settings (fixes-015a)
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| F1 | `test_w2_17_fix_connectors_key.py::test_the_kits_settings_carry_the_key`; `test_w2_17_fix_connectors_key.py::test_a_freshly_adopted_repository_has_the_key`; `test_w2_17_fix_connectors_key.py::test_gov_update_adds_the_key_to_settings_that_lack_it` | `template/governance/kernel/settings.json` has no `disableClaudeAiConnectors`; the adopted project's and the updated project's `.claude/settings.json` lack it. Guard, green: `test_gov_update_keeps_every_other_key_of_the_settings` |
