@@ -45,6 +45,47 @@ touched; no network. The support file reuses W1-27's and W1-07's helpers (`w2_22
 Red run on the base (4 red, 12 green, the green ones being the guards above):
 `4 failed, 12 passed`.
 
+## Fix F2: `gov doctor` checks a tool installed in its own folder (audit 3, M-04; DEC-1232, DEC-1233)
+
+Also a fix under this ticket (lead `fixes-015b`; the ticket's status and KPIs are not changed). Lines `success-3` to
+`success-7` are this fix's, in `test_w2_22_tool_in_own_folder.py` (helpers `w2_22_tools_support.py`); `success-1` and
+`success-2` above stay as they are.
+
+- **success-3.** A second Node, registry name `node-22.23.5` pinned `v22.23.5`, installed under
+  `<HOME>/.nvm/versions/node/v22.23.5/bin/node` (stand-in printing `v22.23.5`): `gov doctor --json`'s `tools` part
+  reports it `ok` true, `found_version` v22.23.5.
+- **success-4.** `rea-agents` pinned `6.10.1`, installed as `<folder>/node_modules/.bin/rea` where `<folder>` is the
+  `cd <folder> && ...` of its install line (stand-in printing `6.10.1`): `ok` true, `found_version` 6.10.1.
+- **success-5.** A tool at another version still fails (`ok` false); a tool whose binary is nowhere still fails.
+- **success-6.** Never cross-answer: with `node` (v22.23.3, no prefix of its own) and `node-22.23.5` in one registry,
+  the v22.23.5 prefix in rea-agents' install line before node's own place (and, in some cases, the v22.23.3 prefix in
+  openspec's), a stand-in `node` printing v18.20.8 first on the `PATH`: both installed, both ok; only v22.23.5
+  installed, `node` not ok and not read as v22.23.5, `node-22.23.5` ok; only v22.23.3 installed, `node-22.23.5` not ok
+  and not read as v22.23.3, `node` ok.
+- **success-7.** DEC-452 stays: `openspec` with no prefix of its own, a decoy `openspec` (another version) on the `PATH`,
+  the right one under the prefix `ccusage`'s install line carries: found under it, ok.
+
+No registry key is added or removed; every case builds its own HOME, repository, registry and stand-ins (shell scripts)
+under `tmp_path`; no network. Two spellings of the places are run: `real` (`~` and `$HOME` in the install lines, as the
+real registry has them) and `abs` (the sandbox home written out). The `real` cases need `~` and `$HOME` read from the
+`HOME` the process runs with, not from the account's home (`_extract_path_prefix` reads the account's today).
+
+| KPI | Tests | Today (base), and why |
+|---|---|---|
+| success-3 | `test_w2_22_tool_in_own_folder.py::test_a_second_node_in_its_own_nvm_folder_is_found_and_read` (the `real` and `abs` spellings) | **red**: `node-22.23.5` found nowhere (`ok` false, `found_version` null): doctor looks for a binary named `node-22.23.5` |
+| success-4 | `test_w2_22_tool_in_own_folder.py::test_rea_agents_in_its_folders_node_modules_bin_is_found_and_read` (the `real` and `abs` spellings) | **red**: `rea-agents` found nowhere: doctor looks only under the `PATH=` prefix (the node folder) and the `PATH` |
+| success-5 | `test_w2_22_tool_in_own_folder.py::test_a_second_node_at_another_version_still_fails`, `test_rea_agents_at_another_version_still_fails`, `test_tools_whose_binary_is_absent_still_fail` | green today (guards: a fix that passes a wrong version or an absent tool turns them red) |
+| success-6 | `test_w2_22_tool_in_own_folder.py::test_each_node_is_judged_against_its_own_pin_only` (cases both-installed, only-22.23.5 and only-22.23.3, each in five registry layouts) | **red** in every layout but two: `node-22.23.5` is never found, and in the only-22.23.5 case the v22.23.5 binary answers for `node` (`found_version` v22.23.5, found through rea-agents' prefix) and in the only-22.23.3 case `node` is not found (the v22.23.3 place is no prefix of any install line); **green** (guards) for the only-22.23.3 case in the two layouts where openspec's install line carries the v22.23.3 prefix |
+| success-7 | `test_w2_22_tool_in_own_folder.py::test_a_tool_without_a_prefix_is_still_found_under_another_entrys_prefix` | green today (guard for DEC-452) |
+
+Red run on the base (17 red, 13 green): `17 failed, 13 passed`.
+
+### Open points (F2)
+
+- The `real` spelling can only pass when `~`, `$HOME` and the nvm place are read from the process's `HOME`.
+- Where a stand-in prints a version doctor can read, a wrong binary is already refused by the version comparison; the
+  cross-answer the cases catch is the one that decides which binary `node` is judged on (`found_version`).
+
 ## Open points (for the owner or the lead, not guessed)
 
 - **Drift from the registry's record beside a patch-only gap.** `test_a_patch_only_gap_does_not_mask_drift_from_the_record`
