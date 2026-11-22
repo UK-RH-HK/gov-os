@@ -19,6 +19,7 @@ from pathlib import Path, PurePosixPath
 import yaml
 
 from gov.adopt import lite_gates, project, safety, spec_audit
+from gov.adopt import verdict as lite_verdict
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
 from gov.adopt import coordination as roster_key
@@ -62,6 +63,9 @@ def run(root: Path, args, config: dict) -> dict:
         project.require_commit(root)
         safety.refuse_ignored(root)  # S26: before anything else, at once
         return ma(Run(root, args, config, "MA", {}, {}, {}))
+    if args.stage == "VERDICT":  # W2-210: no chain; the stage reads the owner's file, then the clean tree, itself
+        project.require_commit(root)
+        return lite_verdict.stage(Run(root, args, config, "VERDICT", {}, {}, {}))
     project.require_repository(root)
     tracked = project.tree(root)
     if args.stage in lite_gates.GATES:  # A7 and A10 are in no chain: each reads the records it stands on itself
@@ -715,4 +719,4 @@ def a8(run: Run) -> dict:
 
 
 STAGE = {"A0": a0, "A1": a1, "A2": a2, "AS": spec_audit.stage, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
-         "A9": a9, "A10": lite_gates.gate, "MA": ma}
+         "A9": a9, "A10": lite_gates.gate, "VERDICT": lite_verdict.stage, "MA": ma}
