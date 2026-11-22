@@ -421,7 +421,7 @@ def test_s7_with_no_family_declared_every_score_is_as_today(tmp_path):
         found = SCORE_LINE.match(line)
         assert found and (found[2], found[3], found[4]) == (hit, rank, full), line
         assert "famil" not in line.lower(), line
-    assert "total: hit@5 1 of 3 (33.3 %, floor 85); full evidence 1 of 3 (33.3 %, target 99 %)" in text
+    assert "total: hit@5 1 of 3 (33.3 %); full evidence 1 of 3 (33.3 %)" in text  # F9: no floor or target wording (DEC-1210, DEC-1233)
 
 
 # --------------------------------------------------------------------------------------------------------------------
