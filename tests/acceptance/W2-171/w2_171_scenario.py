@@ -361,7 +361,7 @@ class Expected:
             by_route[self.route_of(m)] += 1
             by_out[m["outcome"]] += 1
         return {
-            "audit": W.AUDIT, "n": n, "n_gold": self.ng, "bar": b,
+            "audit": W.AUDIT, "n": n, "n_gold": self.ng, "bar": b, "forbidden_rule": "strict",  # DEC-1227 D5
             "verdict": {"right": right, "wrong": wrong, "passes": right >= b["need_right"] and wrong <= b["max_wrong"],
                         "right_ok": right >= b["need_right"], "wrong_ok": wrong <= b["max_wrong"],
                         "target_ok": right >= b["target_right"], "interval_exact": [round(lo, 4), round(hi, 4)]},
@@ -374,7 +374,8 @@ class Expected:
                        "mcnemar_a1_a2": {"gains": g, "losses": l, "p": p}, "grader_agree": agree, "graded": graded,
                        "search_failures": self.later_failures()},
             "misses": {"total": len(misses), "by_outcome": by_out, "by_rank": by_rank, "by_namespace": by_ns,
-                       "by_category": by_cat, "by_route": by_route},
+                       "by_category": by_cat, "by_route": by_route,
+                       "forbidden_cited": 0},  # DEC-1227 D5: no planted question lists a forbidden path
             "control": {"hit5": control_hit5, "of": 40, "last": last},
             "spend": {"usd": spent, "projection": projection, "brake": 2 * projection},
         }

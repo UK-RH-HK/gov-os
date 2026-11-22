@@ -13,7 +13,8 @@ from .conftest import AUDIT, UNIQUE
 from .fakes import FakeClaude, judge_args, measure_args, measured, prepare
 from .test_measure import events, snapshot
 
-FIGURE_KEYS = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend"}
+FIGURE_KEYS = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend",
+               "forbidden_rule"}  # DEC-1227 D5: the record names the strict rule
 MISS_KEYS = ["id", "question", "gold_answer", "gold_sources", "answer", "outcome", "evidence_in_bundle"]
 
 

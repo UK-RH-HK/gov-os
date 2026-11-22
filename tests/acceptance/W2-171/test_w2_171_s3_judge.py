@@ -40,7 +40,8 @@ PINNED = {
 GRADER_FORM = "Question: {question}\n\nGold answer: {gold}\n\nAnswer to grade: {said}"
 ROW_KEYS = {"id", "kind", "apart", "final_verdict", "attempts", "answered_at", "gold_in_bundle", "citation_right",
             "grades", "searches", "search_failures", "citations", "citations_outside",
-            "citation_right_only_outside", "calls_retried", "first_stopping_reason", "first_gaps_name_ids"}
+            "citation_right_only_outside", "calls_retried", "first_stopping_reason", "first_gaps_name_ids",
+            "forbidden_cited"}  # DEC-1227 D5: the row says whether a forbidden path was cited
 
 
 def sha(text: str) -> str:
