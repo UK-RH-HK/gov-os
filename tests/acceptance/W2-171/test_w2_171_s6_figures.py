@@ -93,7 +93,8 @@ def test_s6_figures_json_holds_no_planted_word_gold_path_or_answer(make_world):
     forbidden += [d["question"] for d in world.docs().values()] + [d["gold_answer"] for d in world.docs().values()]
     found = [w for w in forbidden if w in text]
     assert found == [], found
-    assert set(json.loads(text)) == TOP
+    # Rewrite-Reason: DEC-1225 (R4): FIGURES.json also holds ``models`` (the reader, grader and checker models)
+    assert set(json.loads(text)) - {"models"} == TOP
 
 
 def _plant_classes(world, classes: dict[str, str], reason="reasonwordxyz"):
