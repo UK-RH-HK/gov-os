@@ -2118,6 +2118,12 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-22; the incident behind (2) and (3): the CTO set leads to medium effort in its start script (DEC-1235 (4), usage) before asking; output at high effort was 27 % of the day's spend.
 - **Governing sources:** docs/emergency-2/proposals/DECISIONS-BY-PAGE-SPEC.md; docs/emergency-2/proposals/gov-os-decisions.html; .gov-runtime/scratch/orchestrator/log/usage-breakdown-2026-11-22.md; DEC-1225; DEC-1235.
 
+### DEC-1237 — N-28 approved: EMERGENCY-2's dated block of changes since v3 (§13), with the owner's two added rows
+- **Status:** ACCEPTED (owner, 2026-11-22 about 15:25, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1233 (1) N-28 · **Changes:** EMERGENCY-2 (§13 appended; the status line names it)
+- **Decision:** "N-28 approved, with two rows added: 2026-11-19: Gov OS's golden rules and 'value first' stand at the head of every adopted repository's CLAUDE.md and AGENTS.md, carried by the kit through gov adopt and gov update. 2026-11-20 and 22: the imports feature: what a repository brings in is classed use, absorb or study and placed in memory accordingly, MCP tools among them; code reconstructed with REA is study until an absorb assessment names a commercial licence. Put the decision ids beside each, as in the other rows, then append the block in one commit."
+- **Basis:** the owner's message of 2026-11-22; audit 1 (fix 7, E1): EMERGENCY-2 §2.5, §5.3, §8.2 and §8.3 said the old thing.
+- **Governing sources:** docs/emergency-2/EMERGENCY-2.md §13; docs/emergency-2/audits/E2-AUDIT-1-DECISIONS.md; DEC-1233.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
