@@ -128,3 +128,37 @@ line's "every question figure meets its floor" and the mutation line's "a scorer
 single figure"): the self-tests now check the end-to-end bar for them, and the CTO may reword them.
 
 **The CTO, 2026-11-19 (DEC-1221 (1)):** the judge, mutation and landing lines reworded to the end-to-end figure and `gov queue`; the proving run's record (not the runner) carries `gov doctor`'s exit code and the governance share per repository; the grader's word for a miss is the product's, `wrong`.
+
+## Fix: the proving run's runner and judge (W2-81's proving run on 0.1.4)
+
+W2-81's proving run on release 0.1.4 (NOT_READY, seed 7429927; `docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`,
+"Class 2: test-code defects", T1 to T6, and the CTO's T10 of 2026-11-20) found defects in this folder's own support code.
+All are fixes under the closed ticket (DEC-1219 (6)); each has its red tests first (a commit of its own, run on the base),
+then the support change. The detail is in `tests/acceptance/W2-81/FIXES-0.1.4.md`; the cases are mapped in the README's
+table "Fix: W2-81's test code, six defects". Fix lines:
+
+- **T1:** the runner starts the pinned `gov queue` with the operator's `HOME`; `gov adopt` and `gov retrieve` keep the
+  scrubbed one (the landing's pytest lives in the operator's user site: all six landings were `outcome: error,
+  error_kind: crash`, 0 tests).
+- **T2:** stage AS is a required stage between A2 and A3 (capability row CAP-44.m, built); an absent or unreadable AS
+  record is `stage AS is ABSENT` or `UNREADABLE` in the reasons, the judge's own words for a built stage (the lead's
+  brief said MISSED; that is the planted problems' word).
+- **T3:** every reason has a stable id `<repository>:<CODE>:<subject>`; `overall(..., exceptions=)` and the runner's
+  `--exceptions <file>` read an owner's `{"decision": "DEC-<n>", "reasons": [ids]}`; the verdict is `READY_WITH_EXCEPTIONS`
+  only when every reason is named, one unnamed stays NOT_READY, the runner's own reasons (queue, hidden half, stage exit,
+  model line) are never excusable, a faulty file is refused before any work. The result's `exceptions` also carries an
+  `unnamed` list beside `decision`, `named`, `unused`; the command exits 0 for `READY_WITH_EXCEPTIONS`.
+- **T5:** `CAPABILITIES` dated 2026-11-20 and the README's VERDICT row current (no stage or command gives the lite
+  verdict yet, CAP-44.h, W2; W2-52 built A7 and A10 only), AS in the table.
+- **T6:** each `per_question` row holds `bundle` (`[path, start, end]` in rank order), `forbidden_rank` and `gold_rank`
+  (by the source's path; `first_gold_rank` stays by line); paths, numbers and ranks only. One existing case,
+  `test_the_report_log_and_output_hold_no_question_answer_or_secret_text`, now drops the rows' `bundle` before comparing
+  gold answers (paths can equal a gold answer such as `pyproject.toml`); `Rewrite-Reason` in its commit.
+- **T10:** `--notify <address>`, else the runner's own `$GOV_MSG_ADDRESS`, is set in every process the runner starts and,
+  for the run's duration, in its own process (the reader's and grader's sessions inherit it); restored afterwards. The
+  adopters are started by the driver, `docs/plan/wave-2/w2-81-proving-run/tools/drive-rerun.sh`, which refuses to start
+  without the address.
+- **Not here (they wait for the owner's D1 to D9):** the verdict stage, the stale-document route, `gov doctor`'s drift
+  policy, F1, the exceptions list, the re-run itself. The re-run's adopter brief is
+  `docs/plan/wave-2/w2-81-proving-run/adopter-brief-rerun.md` (placeholders for D1, D3, D7, D8).
+- **Green:** `gov accept W2-81 --root <worktree>`: 448 passed, 0 failed, 0 skipped.

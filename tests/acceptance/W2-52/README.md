@@ -160,16 +160,16 @@ and to the A5 precedent (W1-41, "The A5 verdict") as it could be.
 | KPI line | Tests | Red reason |
 |---|---|---|
 | **Success 1**: `gov adopt` runs the lite A7 and A10 gates; each writes its own stage record with its evidence [CAP-44.f] | `a7_gate`: `test_a7_passes_on_the_auditors_pass_and_is_recorded_as_its_own_stage`, `test_a7_writes_over_no_other_stages_record`; `a10_gate`: `test_a10_passes_on_the_auditors_pass_and_is_recorded_as_its_own_stage`, `test_a10_writes_over_no_other_stages_record`; every `assert_passed` and `assert_failing_record` (record committed, own path, own folder, nothing else changed) | `--stage` does not offer A7/A10 |
-| … the adopt skill names both steps | `skill`: `test_the_adopt_skill_names_the_a7_step`, `test_the_adopt_skill_names_the_a10_step` | the skill names no such step |
+| Success 1: the adopt skill names both steps | `skill`: `test_the_adopt_skill_names_the_a7_step`, `test_the_adopt_skill_names_the_a10_step` | the skill names no such step |
 | **Success 2**: each gate checks what v4.2 says. A7: the A6 migration against the A3 path map and the A4 plan reviewed at A5, by a fresh auditor | `a7_gate`: `test_a7_record_names_what_it_checked`; `test_a_migration_the_project_no_longer_holds_fails_a7` (2: moved back, target gone); `test_a_path_map_changed_after_its_a5_review_fails_a7`; `test_a_plan_that_is_not_the_one_executed_fails_a7`; `test_an_auditors_record_that_does_not_cover_a_checked_record_never_passes` (4: A3, A4, A5, A6); `test_an_auditors_record_about_another_a6_record_never_passes`; `test_an_auditors_record_not_committed_by_the_independent_auditor_never_passes` (3); `test_an_auditors_record_from_the_session_that_ran_the_stages_never_passes` | `--stage` does not offer A7 |
-| … A10: the A8 extraction and retirement, the derived state rebuilt from git, the canary of each index (CAP-55), by a fresh auditor | `a10_gate`: `test_a10_record_names_the_a8_record_and_the_auditor`, `test_a10_record_carries_the_digest_of_the_derived_state_rebuilt_from_git`, `test_a10_record_names_the_canary_of_each_index`; `test_a_retirement_the_project_no_longer_holds_fails_a10` (3: rule file, memory store, chat database); `test_an_extraction_the_project_no_longer_holds_fails_a10`; `test_a_lexical_canary_miss_fails_a10`; `test_a_semantic_canary_miss_fails_a10`; `test_an_auditors_record_that_does_not_cover_the_a8_record_never_passes`; `test_an_auditors_record_about_another_a8_record_never_passes`; `test_an_auditors_record_not_committed_by_the_independent_auditor_never_passes`; `test_an_auditors_record_from_the_session_that_ran_a8_never_passes` | `--stage` does not offer A10 |
-| … each record names what stays for Wave 3 | `test_a7_record_names_what_stays_for_wave_3`, `test_a10_record_names_what_stays_for_wave_3`, and the failing records of `test_an_auditor_who_does_not_pass_the_migration_gets_a_failing_a7_record` and `test_an_auditor_who_does_not_pass_the_memory_gets_a_failing_a10_record` | as above |
+| Success 2: A10: the A8 extraction and retirement, the derived state rebuilt from git, the canary of each index (CAP-55), by a fresh auditor | `a10_gate`: `test_a10_record_names_the_a8_record_and_the_auditor`, `test_a10_record_carries_the_digest_of_the_derived_state_rebuilt_from_git`, `test_a10_record_names_the_canary_of_each_index`; `test_a_retirement_the_project_no_longer_holds_fails_a10` (3: rule file, memory store, chat database); `test_an_extraction_the_project_no_longer_holds_fails_a10`; `test_a_lexical_canary_miss_fails_a10`; `test_a_semantic_canary_miss_fails_a10`; `test_an_auditors_record_that_does_not_cover_the_a8_record_never_passes`; `test_an_auditors_record_about_another_a8_record_never_passes`; `test_an_auditors_record_not_committed_by_the_independent_auditor_never_passes`; `test_an_auditors_record_from_the_session_that_ran_a8_never_passes` | `--stage` does not offer A10 |
+| Success 2: each record names what stays for Wave 3 | `test_a7_record_names_what_stays_for_wave_3`, `test_a10_record_names_what_stays_for_wave_3`, and the failing records of `test_an_auditor_who_does_not_pass_the_migration_gets_a_failing_a7_record` and `test_an_auditor_who_does_not_pass_the_memory_gets_a_failing_a10_record` | as above |
 | **Success 3**: the adoption verdict (W2-02's type) reads both records as named conditions [CAP-44.h] | `a7_gate`: `test_a7_record_gives_a_met_condition_a_verdict_can_carry`; `a10_gate`: `test_a10_record_gives_a_met_condition_a_verdict_can_carry`; `verdict_conditions`: `test_the_a7_and_a10_records_each_give_a_condition_the_verdict_carries`, `test_a_verdict_reading_both_passing_records_can_be_healthy`, `test_the_conditions_say_where_they_come_from`; the rule: `test_the_cases_read_conditions_as_cap_44_h_says` (4, green) | `--stage` does not offer A7 (the protocol-order fixture stops at A7) |
-| **Failure**: a lite gate that fails writes a failing record, and the verdict cannot be ADOPTED_HEALTHY | `test_an_auditor_who_does_not_pass_the_migration_gets_a_failing_a7_record` (3: fail, inconclusive, pass_with_findings), `test_an_auditor_who_does_not_pass_the_memory_gets_a_failing_a10_record`, and every failing case of the Success 2 rows (`assert_failing_record`: committed, a condition `not met`, none `accepted`, the CAP-44.h rule not healthy) | `--stage` does not offer A7/A10 |
-| … a missing record is a named failure, never healthy | the record a gate stands on: `test_a_missing_a6_record_is_a_named_failure_of_a7`, `test_a_missing_a8_record_is_a_named_failure_of_a10`; the auditor's record: `test_an_auditors_record_that_does_not_exist_never_passes` (A7, A10), `test_an_auditors_record_written_and_not_committed_never_passes` (A7); the gate's own record read by the verdict: `skill`: `test_the_adopt_skill_says_a_missing_gate_record_is_a_condition_not_met` (2) — package P-1 | `--stage` / the skill |
-| … (in its spirit) an unreadable or partial record is never read as healthy | `test_an_auditors_record_that_cannot_be_read_never_passes` (3: broken YAML, no frontmatter, no `verdict`), `test_a10_with_an_unreadable_auditors_record_never_passes`, `test_the_a5_verdict_given_to_a7_never_passes`, `test_the_a5_verdict_given_to_a10_never_passes` | `--stage` does not offer A7/A10 |
-| **Unchanged**: A0 to A6 and A8 keep their behaviour; A8 runs after A6 without an A7 record (W2-24's row) | `unchanged`: `test_a8_runs_after_a6_without_an_a7_record` (green); the two session fixtures run A0 to A6 and A8 through W1-41's `ok`; `verdict_conditions`: `test_a8_runs_after_a7` | green / `--stage` does not offer A7 |
-| DEC-732: the code under test is this worktree's | `unchanged`: `test_the_cases_run_this_worktrees_gov` (green) | — |
+| **Failure 1**: a lite gate that fails writes a failing record, and the verdict cannot be ADOPTED_HEALTHY | `test_an_auditor_who_does_not_pass_the_migration_gets_a_failing_a7_record` (3: fail, inconclusive, pass_with_findings), `test_an_auditor_who_does_not_pass_the_memory_gets_a_failing_a10_record`, and every failing case of the Success 2 rows (`assert_failing_record`: committed, a condition `not met`, none `accepted`, the CAP-44.h rule not healthy) | `--stage` does not offer A7/A10 |
+| Failure 1: a missing record is a named failure, never healthy | the record a gate stands on: `test_a_missing_a6_record_is_a_named_failure_of_a7`, `test_a_missing_a8_record_is_a_named_failure_of_a10`; the auditor's record: `test_an_auditors_record_that_does_not_exist_never_passes` (A7, A10), `test_an_auditors_record_written_and_not_committed_never_passes` (A7); the gate's own record read by the verdict: `skill`: `test_the_adopt_skill_says_a_missing_gate_record_is_a_condition_not_met` (2) — package P-1 | `--stage` / the skill |
+| Failure 1: (in its spirit) an unreadable or partial record is never read as healthy | `test_an_auditors_record_that_cannot_be_read_never_passes` (3: broken YAML, no frontmatter, no `verdict`), `test_a10_with_an_unreadable_auditors_record_never_passes`, `test_the_a5_verdict_given_to_a7_never_passes`, `test_the_a5_verdict_given_to_a10_never_passes` | `--stage` does not offer A7/A10 |
+| **Success 1** (unchanged): A0 to A6 and A8 keep their behaviour; A8 runs after A6 without an A7 record (W2-24's row) | `unchanged`: `test_a8_runs_after_a6_without_an_a7_record` (green); the two session fixtures run A0 to A6 and A8 through W1-41's `ok`; `verdict_conditions`: `test_a8_runs_after_a7` | green / `--stage` does not offer A7 |
+| Success 1 (DEC-732: the code under test is this worktree's) | `unchanged`: `test_the_cases_run_this_worktrees_gov` (green) | — |
 
 ### Covers → tests
 
@@ -210,3 +210,53 @@ form; the skill's new steps must keep it (at most 2,500 tokens of body).
   conditions, and the skill tells the verdict's auditor that a missing gate record is a condition `not met`.
   The alternative is a reader in `lite_gates.py` with a command that lists a run's lite conditions and names a
   missing gate record as `not met`. That needs an interface decision, and perhaps W2-28's paths.
+
+## Fix: a verdict is a record (a fix under W2-52, `DAEO-siiz`; no new ticket)
+
+`Fix: A verdict that the A5 or A7 gate accepts is a record the store reads`. W2-81's proving run on release 0.1.4: an adopter's A5 and A7
+verdicts had the front matter `id`, `type: evidence`, `stage`, `verdict: pass`, the auditor's keys and no `status`. The gates accepted them
+(exit 0), and the final `gov rebuild` listed each file as invalid ("required key missing or not a string: status"). The store requires
+non-empty string `id`, `type` and `status` of every Markdown file whose front matter has an `id`; a file with front matter and no `id` is no
+record and is never listed. The gate and the store disagreed on what a verdict's front matter is. Written from the lead's KPI line and the
+analysis (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, rows P2 and "Draft KPI lines" 2); no implementation was read.
+
+KPI line (fix-1): "A verdict that the A5, A7 or A10 gate accepts is a record the store reads: a verdict whose front matter states an `id` but
+lacks a non-empty string `type` or `status` is refused by the gate with the refusal code `VERDICT_NOT_A_RECORD`, the message naming the missing
+keys and the file; a verdict that states `id`, `type`, `status` is accepted, and after the gate `gov rebuild` reports no invalid record for it; a
+verdict with no `id` at all, as the adopt skill describes it, is still accepted and `gov rebuild` still lists none invalid." Failure: a gate
+that accepts a verdict that rebuild then calls invalid.
+
+**What the cases hold.**
+
+- **The order.** The new refusal runs AFTER every existing check of the gate (A5: not a pass, other path map, not independent; A7 and A10:
+  other stage, no `verdict`, not independent, `checked` incomplete or with another hash). A verdict that would be refused anyway keeps its own
+  refusal and code, so no existing case changes. Three guard cases hold this (verdict `fail`, stage `A5` given to A7, committed without
+  `Role: independent-auditor`, each also lacking `status`).
+- **The code.** Every `gov adopt` refusal carries the `ADOPT_` prefix in the envelope (`ADOPT_VERDICT_NOT_PASS`). The cases strip it and compare
+  to `VERDICT_NOT_A_RECORD`, so both `VERDICT_NOT_A_RECORD` and `ADOPT_VERDICT_NOT_A_RECORD` pass.
+- **Refusal side.** `ok: false`, exit code 1, 3 or 4, the message names the file and each missing key (`type`, `status`, both for both),
+  and nothing is written (the tree at HEAD is as before; no stage record; clean tree). A `status` or `type` that is empty or not a string
+  (number, list) counts as missing.
+- **A10.** Reached through W2-52's own `after_a8` fixture (A8 straight after A6). A10 has the two refusal cases (no `status`, no `type`) and
+  the accepted case; its other cases (not a string, both missing, no `id`, the order guards) stay with A5 and A7.
+- **Accepted side.** With `id`, `type`, `status` the gate exits 0, `ok: true`; then `gov rebuild --json` is run in the same project and no
+  entry under its result's `invalid` (at any depth) names the verdict's path. With no `id` (and no `type`, `status`: the adopt skill's form)
+  the same.
+
+The runner of `gov accept` reads only KPI cells that name `success N` or `failure N`, so each row of this map is read as `Failure 1` (fix-1 is named in its cell).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (fix-1: refusal, no `status`) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_an_id_and_no_status_is_refused_as_not_a_record` (A5, A7, A10) | red: the gate accepts the verdict (`expected a refusal, but the tool reports success`) |
+| Failure 1 (fix-1: refusal, no `type`) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_an_id_and_no_type_is_refused_as_not_a_record` (A5, A7, A10) | red: the gate accepts the verdict |
+| Failure 1 (fix-1: refusal, both keys named) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_neither_type_nor_status_names_both` (A5, A7) | red: the gate accepts the verdict |
+| Failure 1 (fix-1: refusal, empty or not a string) | `test_w2_52_verdict_is_a_record.py::test_a_status_that_is_not_a_non_empty_string_is_refused` (A5, A7 x empty, number, list); `test_w2_52_verdict_is_a_record.py::test_a_type_that_is_not_a_non_empty_string_is_refused` (A7 x empty, number) | red: the gate accepts the verdict |
+| Failure 1 (fix-1: accepted, the store reads it) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_id_type_and_status_is_accepted_and_the_store_reads_it` (A5, A7, A10) | GUARD, green on the base: the success side already holds; it guards the fix against a gate that refuses too much |
+| Failure 1 (fix-1: accepted, no `id`) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_with_no_id_is_still_accepted_and_listed_invalid_by_nothing` (A5, A7) | GUARD, green on the base: guards against a gate that demands an `id` |
+| Failure 1 (fix-1: order) | `test_w2_52_verdict_is_a_record.py::test_a_verdict_that_is_not_a_pass_keeps_its_own_refusal_whatever_its_keys`; `test_w2_52_verdict_is_a_record.py::test_a_verdict_of_another_stage_keeps_its_own_refusal_whatever_its_keys`; `test_w2_52_verdict_is_a_record.py::test_a_verdict_not_committed_by_the_auditor_keeps_its_own_refusal_whatever_its_keys` | GUARD, green on the base: the existing refusal stays first |
+| Failure 1 (fix-1, the failure line: a gate that accepts what rebuild calls invalid) | the refusal rows above: each is the failure line's input (a verdict the store would list invalid) | red as above |
+
+**Red run on the base** (`w2/integrate` at `844723c60`, this worktree's `src/`, through the heavy slot): **24 cases, 16 red and 8 green**. The 16 red
+are every refusal case above (3 + 3 + 2 + 6 + 2): each ends at `expected a refusal, but the tool reports success`, the gate answering `ok: true`,
+exit 0 with its record written. The 8 green are guards (3 accepted-with-keys, 2 accepted-with-no-`id`, 3 order). The success side cannot be red on
+the base: the adopter's evidence is the failure side only.
