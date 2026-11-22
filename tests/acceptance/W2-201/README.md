@@ -48,7 +48,7 @@ the engineer's work on this ticket was read (there was none on the branch beyond
 The folder: 188 cases, 106 red and 82 green on the base (146ad302e). A green case on the base is a guard: the part of the
 line that already holds there (named in the last column), kept so that the change cannot break it.
 
-S9 was added after DEC-1215 by a second designer (one file, `test_w2_201_s9_substitution.py`, deleted by the DEC-1225 revision below; helpers appended to
+S9 was added after DEC-1215 by a second designer (one file, deleted by the DEC-1225 revision below; helpers appended to
 `w2_201_support.py`, none changed): 51 cases, 26 red and 25 green on the base (the tree of ae2b19ed7), beside the count
 above; the last 11 (a caller's Opus) came with the ticket's S9 sentence of 7bba0fdb1. S7 was revised with it: 7 cases, 6
 red and 1 green on the same base.
