@@ -54,10 +54,14 @@ kpis:
   - 'Fix, the landing''s own unplaced path is still refused: a path the branch itself wrote (the ticket''s own commits or `change`) that nothing places is refused `SELECTION_REFUSED` (exit 2 for `--select`), the reason naming it and none of the base''s paths Verify: the same project with the branch also writing `tools/stray.sh`: the refusal names `tools/stray.sh` and neither base-side path. [L2-4]'
   - 'Fix, a base-side path that is placed still selects: a path counted from the green record that nothing of the landing wrote but a test imports (or a coupling or a ticket''s allowed paths holds) selects that suite and is not under `unplaced_base` Verify: a base commit changing a module a test imports: that test is in the selection. [L2-4]'
   - 'Fix, `gov close` is unchanged: without `change`, a path counted from the green record that nothing places is refused as before Verify: `gov close --select <T>` in the same project: `SELECTION_REFUSED`, exit 2, naming the base''s paths. [L2-4; W2-115 S2]'
+  - 'Fix, adopted repositories land (D7, DEC-1227): a repository adopted with `gov adopt --lite` lands a ticket through `gov queue` with the stage commits in the branch''s range. The stage commits carry no `Role` or `Task` trailer by design (W1-41; `governance/project/bootstrap.md`, "The adoption''s commits"), and the landing asks none of them: no trailer check, no marker Verify: a planted project (the adoption ticket''s `allowed_paths` hold `governance/adoption/**`, `.gitleaks.toml` and `.gitignore`) whose branch holds `gov adopt --lite` stages A0, A1 and A2 as committed by the tool, then one feature commit with `Task:` and `Role: engineer`: every stage commit has no `Role` and no `Task` trailer, and `gov queue <T>=<branch>` exits 0, lands and closes the ticket, `refused` and `culprits` empty. [DEC-1227 D7; CAP-58.h, CAP-63.a, CAP-63.d]'
+  - 'Fix, what the stage commits write outside the ticket''s places is named, not refused: the coordination ticket A0 files and the roster it writes are notices (`path_notices`, `ticket_notices`) in the answer of the same landing, exit 0 Verify: the run of the line above: `path_notices` names a path of A0''s commit, and the exit is 0. [DEC-1227 D7; audit 7 C-6]'
+  - 'Fix, a hand edit of a stage record is still caught, by `gov adopt` and not by trailers: a stage record changed by a commit that is not the tool''s (even with `Role: orchestrator` and a `Task:`) is refused by the next stage as `ADOPT_CHAIN_BROKEN`, naming the record that no longer stands, and nothing is committed Verify: the same planted project: a committed hand edit of `governance/adoption/A1-inventory.md`, then `gov adopt --lite --stage AS`: non-zero exit, `ADOPT_CHAIN_BROKEN` naming `A2-classification.md`, HEAD unchanged. [DEC-1227 D7; W1-41]'
   failure:
   - 'The integration branch advanced after a red, after a refusal, or to anything but the tested merge with its close commits; or advanced from a head other than the one the run merged onto. Verify: planted runs that are red, red on the base too (`BATCH_UNEXPLAINED`), refused by G-1, and one where the integration branch moves during the run (`HEAD_MOVED`, exit 3): the branch is not moved by the queue in any of them (the moved head stays as it was moved).'
   - 'A ticket merged and not closed, or closed and not merged. Verify: after every planted run, each planted ticket''s status at the integration head is `closed` exactly when its branch''s tip is an ancestor of that head.'
   - 'A path the landing wrote that nothing places is no longer refused, or, without `change`, the base''s unmapped path stops being refused Verify: the two cases of success lines 11 and 13 above.'
+  - 'A commit whose subject is a stage commit''s and that changes the acceptance tests is let through for it Verify: a branch commit with the subject `gov adopt --lite A0: safety baseline`, no `Role` trailer, that adds a file under `tests/acceptance/`: `gov queue` refuses it `TEST_AUTHOR_REFUSED` naming the commit, nothing lands. [DEC-1227 D7; MR-3, CAP-58.h]'
 non_goals:
 - the close itself (W2-115), its strict mode, W2-193 and W2-194
 - Gov OS's own landing tools (land.py, merge_queue.py, landing_select.sh) and the switch-over to gov queue (the CTO's, later)
@@ -131,3 +135,23 @@ is approved by the CTO's message (§3.5).
   and `src/gov/queue/**` are C3), tests under `tests/acceptance/W2-115b/` and `tests/unit/queue/`, red on the base;
   the engineer (Sonnet) until `gov accept W2-115b` is green. Every commit carries `Task: DAEO-j9z6` and a `Fix:`
   trailer with the line above. The ticket stays closed.
+
+## Fix: adopted repositories land; the stage commits need no trailer and no marker (D7, DEC-1227)
+- **The finding (measured 2026-11-22, `~/gov-os-runs/d7/`, this branch's code):** on a synthetic repository with a path map, a
+  branch holding `gov adopt --lite` A0, A1 and A2 (subject-only commits, `Role` and `Task` absent) and one feature commit, `gov
+  queue` lands green with the adoption ticket's `allowed_paths` holding `governance/adoption/**`, `.gitleaks.toml` and
+  `.gitignore` (the shape of W2-81's adoption ticket). Nothing refuses: the trailer check (`queue/checks.py` reads `Role` only for
+  paths under the acceptance places), the path check (a notice, never a refusal) and test authorship (adopt writes nothing under
+  `tests/acceptance/`) pass. The only extras are notices (A0's coordination ticket and roster: `path_notices`,
+  `NEW_TICKET_NOT_FEATURE`). The red of W2-81's six dry runs was the set-up's own F1 (`setup_0.1.4.py:125`), not the product.
+  A hand edit of a stage record is refused by `gov adopt`'s own chain (`ADOPT_CHAIN_BROKEN`), whatever trailers it carries.
+- **The choice (DEC-1227 D7):** neither (T) trailers on the stage commits nor (M) a marker the landing accepts: nothing refuses, so
+  nothing is built. Both would add code and a Contract-visible rule for a refusal that does not exist. The fix is the pin: tests
+  on a real adopted repository, so a later change to the landing that starts to ask adopt's commits for trailers goes red.
+- **What stays as it is, and is told:** a ticket whose `allowed_paths` do not hold `governance/adoption/**` and A0's set-up files
+  (not the proving run's case, whose adoption ticket does) is refused `SELECTION_REFUSED` naming exactly those paths, as any
+  unplaced code path; `record_only` is not widened (W2-66, DEC-891). A6's moves into `tests/acceptance/` would be refused by G-1
+  for want of `Role` (failure line above): rare, named, the owner's `Role: owner` answers it.
+- **Order:** this section (`Role: orchestrator`); the independent test designer (Sonnet, DEC-1225), tests under
+  `tests/acceptance/W2-115b/`, green on the base by design (a pin, the measurement above); no engineer: nothing to build.
+  Every commit carries `Task: DAEO-j9z6` and the `Fix:` line below. The ticket stays closed.
