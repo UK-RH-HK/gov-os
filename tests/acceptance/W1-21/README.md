@@ -272,3 +272,36 @@ after D-4b's measure 3; until then the hit@5 rows above judge against 80.
 **D-10 run 2 (W2-138 `dcda27011`, DEC-1090 (3); DEC-1122 (3)):** `test_the_command_returns_the_bundle_of_the_function` takes the command's `store` ({commit, root}) off, checks its form, and compares the rest with the function's bundle whole.
 
 **Retired (DEC-1220 (1), TI-6; E2 5.2: hit@k is no floor):** the case that held mean hit@5 at the pass line of 80 on the dev tiers. The forbidden-citation, rerank and timing cases stay.
+
+## Fix: no hit@5 floor and no hard-blocking kit check on hit@k (audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Written by the independent test designer from the fix's behaviour, before any implementation of it. "hit@5 I DON'T CARE
+if it's even 10%": hit@k is a reported diagnostic only. The runner of `gov accept` reads only KPI cells that name
+`success N` or `failure N`, and a fix has no line of its own in the ticket, so each row of this map is read as
+`Failure 1` (the fix is named in its cell), as W2-52's and W2-88's fix rows are.
+
+Interface assumed (the check's own, unchanged): `python3 -m gov.retrieval.retrieve_check` in a project root with
+`GOV_DEV_TIERS` naming a folder with `a-dev` and `dev-queryset.yaml`. It prints `hit@5: <figure>` (no threshold beside
+it) and `forbidden: <n> (baseline: <m>)`; it exits 1 for "unmeasured" and for forbidden citations over the baseline, and
+never for hit@5. `retrieve_baseline.yaml` keeps `forbidden_citations` and holds no hit@k key. No check of the kit that
+runs `retrieve_check` has severity `hard-block` (the check may stay as a warning, or go; the cases accept either, but
+`test_w1_21_family_check.py`'s other cases and `conftest.py`'s `family_check` need the check to stay registered).
+The new cases plant their dev tiers in `tmp_path`, point the embedder at an address nothing listens on (lexical only,
+no network) and switch the secrets scan off by the project's own switch (DEC-1045): no gitleaks, no model. 9 cases, 2 s.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (nofloor-1: the check is not red on a low hit@5) | `test_w1_21_no_hit_floor.py::test_the_check_is_not_red_when_hit_at_5_is_far_below_the_old_baseline` | red: exit 1 on `hit@5: 0.0 (baseline: 80.0)` with `forbidden: 0 (baseline: 2)` |
+| Failure 1 (nofloor-1: the dev tiers that miss every gold, revised) | `test_w1_21_family_check.py::test_the_check_is_not_red_for_a_low_hit_at_5_when_the_dev_tiers_miss_every_gold` | red: exit 1 on `hit@5: 0.0 (baseline: 80.0)`, forbidden 2 of baseline 2 (revised from `test_the_check_is_red_when_the_dev_tiers_fail_the_baselines`, which asserted exit != 0: Rewrite-Reason DEC-1210, DEC-1233) |
+| Failure 1 (nofloor-2: the hit@5 line is a figure, no threshold) | `test_w1_21_no_hit_floor.py::test_the_hit_at_5_line_is_a_figure_and_carries_no_threshold` | red: the line is `hit@5: 0.0 (baseline: 80.0)` |
+| Failure 1 (nofloor-3: the baseline file holds no hit@k key) | `test_w1_21_no_hit_floor.py::test_the_baseline_file_holds_no_hit_at_k_key` | red: `hit_at_5: 80` is in `retrieve_baseline.yaml` |
+| Failure 1 (nofloor-4: no hard-block check runs retrieve_check; its text names no hit@5 baseline) | `test_w1_21_no_hit_floor.py::test_no_kit_check_that_runs_retrieve_check_is_a_hard_block`, `test_w1_21_no_hit_floor.py::test_no_kit_check_text_says_the_query_set_meets_a_recorded_hit_at_5_baseline` | red: `template/governance/kernel/checks/retrieval-regression.yaml` is `severity: hard-block` and says "meets its recorded hit@5 and forbidden-citation baselines" |
+| Failure 1 (nofloor-5: the source reads and compares no hit@5 threshold) | `test_w1_21_no_hit_floor.py::test_retrieve_check_reads_and_compares_no_hit_at_5_threshold` | red: `hit_at_5_threshold` in `retrieve_check.py` |
+| Failure 1 (nofloor-6: what is not hit@k stays, GUARDS green on the base) | `test_w1_21_no_hit_floor.py::test_forbidden_citations_over_the_baseline_still_fail_the_check`, `test_w1_21_no_hit_floor.py::test_where_no_dev_tiers_are_configured_the_check_still_reports_unmeasured_and_exits_1`, `test_w1_21_no_hit_floor.py::test_a_query_set_that_hits_does_not_change_the_answer` | GUARD, green on the base: they hold the fix back from removing the forbidden-citation exit, the "unmeasured" exit, or making a hit end otherwise |
+
+**Red run on the base** (`w2/integrate`'s code as this worktree holds it, through the heavy slot): 9 new cases, 6 red and 3 green (the guards);
+`test_w1_21_family_check.py`: the revised case red, the other two green.
+
+**Revised (Rewrite-Reason: DEC-1210, DEC-1233, EMERGENCY-2 5.2):** `test_w1_21_family_check.py::test_the_check_is_red_when_the_dev_tiers_fail_the_baselines`
+became `test_the_check_is_not_red_for_a_low_hit_at_5_when_the_dev_tiers_miss_every_gold` (hit@5 is no floor: the planted miss now ends 0 and
+reports `hit@5: 0.0`); two docstrings drop "hit@5 >= 80" and "Severity: hard-block".
