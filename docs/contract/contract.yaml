@@ -1,9 +1,9 @@
 # Contract v5 — machine-readable. Same content as CONTRACT_v5.md.
 id: CONTRACT-v5
 status: ACCEPTED
-version: '5.0'
+version: '5.1'
 date: '2026-09-30'
-revised: '2026-11-18'
+revised: '2026-11-22'
 charter: '6'
 change_log:
 - version: '4.0'
@@ -68,6 +68,17 @@ change_log:
     CAP-69 (the landing, the run-time tool, memory by construction, the hidden-set scan, backups, the basis line, transcripts
     kept). Status ACCEPTED. CAP-44.m''s leftovers settled: the records'' version, DEC-1200 in the
     decisions list, the source map. 69 capabilities; 239 covers items.'
+- change: 'Text for release 0.1.5 (a chore, `docs/emergency-2/briefs/LEAD-contract-015.md`; audit 1, `docs/emergency-2/audits/E2-AUDIT-1-DECISIONS.md`,
+    fix 5), carrying the owner''s decisions of 2026-11-22: DEC-1233 (1) N-27, the release lines (CAP-43 wave note, CAP-43.c
+    and CAP-44.h, with the Charter''s §1): the CTO cuts patch releases by code once the authority file is on, bigger releases
+    and every push stay the owner''s (DEC-1223 RB-1, DEC-1226); release acceptance item 4 is the first ticket of EXAMIN''s
+    first planned wave and the acceptance rests on the proving run and EXAMIN''s fresh 80 (DEC-1224 (1)-(2)); the lite verdict
+    comes in the release after 0.1.5 (DEC-1231); DEC-1233 (1) N-29, CAP-24.c: no approved-bytes list (EMERGENCY-2 §2.10, §3.5);
+    DEC-1227 D6 (a), landed as 9a4adb350: CAP-25''s acceptance and CAP-61.e, a patch-only gap between the Claude Code CLI
+    and the VS Code extension is drift with exit 0. No capability or covers item added: 69 capabilities; 239 covers items.
+    The Charter carries no version of its own: its §1 release lines follow this row.'
+  date: '2026-11-22'
+  version: '5.1'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v6 → Contract v5 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -1532,8 +1543,9 @@ capabilities:
     - W1-36
   - id: CAP-24.c
     item: Kernel and instruction text (role files, brief and role templates, skills, CLAUDE.md and AGENTS.md) changes only
-      by the CTO's decision, approval and own commit; the landing checks kernel bytes against the CTO-approved list
-    source: Framework v4.1.2 §5, §27; EMERGENCY-2 §3.5 (DEC-1211)
+      when the CTO decides, approves and makes the change (EMERGENCY-2 §3.5); there is no approved-bytes list, the lists
+      being retired by EMERGENCY-2 §2.10
+    source: Framework v4.1.2 §5, §27; EMERGENCY-2 §2.10, §3.5 (DEC-1211); DEC-1233 (1)
     wave: W1
     provider:
     - W1-35
@@ -1542,7 +1554,9 @@ capabilities:
   title: Tool registry and capability memory (lite)
   outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and trust that the CTO approved and
     recorded each install.
-  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; every install is recorded
+  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on a failure or on drift, except that
+    a difference of patch version only (same major and minor) between the Claude Code CLI and the VS Code extension is reported
+    as drift and exits 0 (DEC-1227 D6 (a)); every install is recorded
     in the tool registry with the CTO''s approval, its scope and its machine cost; `sudo` stays the owner''s (the deny line
     refuses it in every permission mode).'
   wave: W1
@@ -2679,8 +2693,10 @@ capabilities:
   acceptance: '`framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of
     them disagrees with the installed kernel.'
   wave: W1
-  wave_note: the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); the release is cut and re-pinned
-    by the owner once the release acceptance passes (EMERGENCY-2 §8.3); release contents of CAP-43.d are friction
+  wave_note: the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); the CTO cuts patch
+    releases by code once `governance/project/release-authority.yaml` is on; bigger releases (Contract or Charter changes,
+    new features, a new command or record kind) and every push stay the owner's (DEC-1223 RB-1, DEC-1226; EMERGENCY-2 §8.3
+    as they amend it); release contents of CAP-43.d are friction
   provider:
   - Copier 9.18.2
   - W1-39
@@ -2714,9 +2730,11 @@ capabilities:
     source: Contract v3 S2; Framework v4.1.2 §75D; DEC-722; DEC-1214 L3
     wave: W2
   - id: CAP-43.c
-    item: 'Release certification by the release acceptance (EMERGENCY-2 §8.2): the Contract''s checks, the proving run, EXAMIN''s
-      copy adopted, one EXAMIN feature ticket through the flow'
-    source: Framework v4.1.2 §75C; DEC-067; EMERGENCY-2 §8.2 (DEC-1211)
+    item: 'Release certification by the release acceptance (EMERGENCY-2 §8.2): the Contract''s checks, the proving run (W2-81)
+      and EXAMIN''s copy adopted with memory at 95 % or more end to end on its fresh 80; item 4, one EXAMIN feature ticket
+      through the flow, is the first ticket of EXAMIN''s first planned wave and is not a part of the acceptance (DEC-1224
+      (1)-(2)); a patch release is gated by the update rehearsal on W2-81''s six kept repositories, by code (DEC-1223 RB-2)'
+    source: Framework v4.1.2 §75C; DEC-067; EMERGENCY-2 §8.2 (DEC-1211); DEC-1223; DEC-1224
     wave: W2
     provider:
     - W2-81
@@ -2828,8 +2846,10 @@ capabilities:
       when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY;
       only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions
       it does not check; at the release, EXAMIN''s copy gets its verdict with memory at 95 % or more end to end on a fresh
-      80 (EMERGENCY-2 §8.2 item 3)'
-    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.2 (DEC-1211)
+      80 (EMERGENCY-2 §8.2 item 3); the verdict stage is built in the release after 0.1.5, and 0.1.5 is not held for it
+      (DEC-1231)'
+    source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722; EMERGENCY-2 §8.2 (DEC-1211); DEC-1227
+      D1; DEC-1231
     wave: W2
   - id: CAP-44.i
     item: Interrupted-session recovery and freeze during adoption
@@ -3615,9 +3635,10 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-61.e
-    item: Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs is aligned with the VS Code extension's
-      bundled version
-    source: DEC-153; EXP-001 §5.5
+    item: Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs has the same major and minor version
+      as the VS Code extension's bundled version (a difference of patch version only is reported by `gov doctor` as drift,
+      exit 0; a larger difference fails, exit 3)
+    source: DEC-153; DEC-1227 D6 (a); EXP-001 §5.5
     wave: W1
     provider:
     - W1-48

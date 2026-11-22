@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-39: Governance health tiers and the landing's checks (G1-G5)
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** Governance checks run at the right tier automatically, and a stale required index fails the landing.
 - **Acceptance:** The landing fails when a required index is stale, and records each check it ran with its tier and its RED, YELLOW or GREEN result; `gov ci` runs the CI tiers.

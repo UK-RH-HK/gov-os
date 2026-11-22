@@ -2,7 +2,7 @@
 id: CHARTER-v6
 status: ACCEPTED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
-decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173, DEC-848, DEC-1204, DEC-1211, DEC-1212, DEC-1214]
+decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173, DEC-848, DEC-1204, DEC-1211, DEC-1212, DEC-1214, DEC-1223, DEC-1224, DEC-1226, DEC-1227, DEC-1231, DEC-1233]
 type: specification
 state_class: AUTHORITATIVE
 ---
@@ -33,11 +33,14 @@ lives in an agent session or a vendor account (DEC-057).
   contract.
 - The Gov OS is built in two waves, Wave 1 Integrate and Wave 2 Strengthen, and then released lean (EMERGENCY-2 §8).
   The release is accepted by §8.2 of EMERGENCY-2: the Contract's checks pass, the proving run on the synthetic
-  repositories passes, EXAMIN's copy is adopted with memory at 95 % or more end to end on a fresh 80, and one EXAMIN
-  feature ticket goes through the flow. After it, the Gov OS changes only from friction with adopted repositories;
-  Wave 3 is the list of items built only then.
-- The release is pinned and hash-verified, cut and re-pinned by the owner (DEC-1214 L3). No tag is signed until
-  friction asks for it.
+  repositories passes, and EXAMIN's copy is adopted with memory at 95 % or more end to end on a fresh 80. The one
+  EXAMIN feature ticket through the flow (item 4) is the first ticket of EXAMIN's first planned wave, and the acceptance
+  rests on the proving run and EXAMIN's fresh 80 (DEC-1224 (1)-(2)). After it, the Gov OS changes only from friction
+  with adopted repositories; Wave 3 is the list of items built only then.
+- The release is pinned and hash-verified (DEC-1214 L3). The CTO cuts patch releases by code once
+  `governance/project/release-authority.yaml` is on; bigger releases (Contract or Charter changes, new features, a new
+  command or record kind) and every push stay the owner's (DEC-1223 RB-1, DEC-1226). The lite adoption verdict
+  (CAP-44.h) comes in the release after 0.1.5 (DEC-1231). No tag is signed until friction asks for it.
 - EXAMIN runs Wave 0 as direct work: memory built through `gov adopt` and the refactor, no tickets and no later waves
   before the release (EMERGENCY-2 §7). Every other product repository adopts on the release, through `gov adopt`, and
   moves between releases with `gov update`.
