@@ -125,6 +125,38 @@ def _record(root: Path, ticket: str, caller: str, line: str) -> None:
                        {"ticket": ticket})
 
 
+def _stop_sessions(root: Path, caller: str) -> list[str]:
+    """F10 (fixes-015a, CAP-05.a): one stop message, a ``wake`` naming the pause, to each running session of this
+    repository, from the machine registry (``~/.gov-os/machine/sessions/<pid>.json``, address ``<role>:<ticket>``); a
+    session whose process is gone gets none. The addresses written to."""
+    from gov.dispatch import inbox
+    from gov.resources import registry
+    from gov.launch import record
+
+    here = {str(root.resolve())}
+    try:
+        here.add(str(record.main_checkout(root, "the sessions gov pause stops").resolve()))
+    except Exception:
+        pass
+    live, _cleared, _why = registry.sessions()
+    sent = []
+    for entry in live:
+        try:
+            if str(Path(entry["repository"]).resolve()) not in here:
+                continue
+            address = entry.get("address") or f"{entry['role']}:{entry['ticket']}"
+        except (KeyError, TypeError, OSError):
+            continue
+        text = (f"STOP: gov pause is set by {caller} (the freeze flag {'.gov-runtime/freeze'}): stop work now and "
+                "wait; nothing starts until the owner lifts the pause (CAP-05)")
+        try:
+            inbox.send(address, "wake", text, sender=f"pause:{caller}", message_id=f"pause-{entry['pid']}-{int(time.time())}")
+            sent.append(address)
+        except Exception as error:
+            sys.stderr.write(f"stop message to {address}: {error}\n")
+    return sent
+
+
 def _cancel(root: Path, caller: str) -> list[dict]:
     from gov.tasks.claims import CLAIMS_REL, holder, release
 
@@ -312,11 +344,12 @@ def run(root: Path, args, config: dict) -> dict:
     if flag.parent.is_symlink():  # DEC-404: nothing is written through it, and the owner repairs the folder
         raise _linked(flag)
     _freeze(root, flag, caller)
+    stopped = {"stopped": sent} if (sent := _stop_sessions(root, caller)) else {}
     if args.cancel_agents:
-        return {"paused": True, "cancelled": _cancel(root, caller)}
+        return {"paused": True, **stopped, "cancelled": _cancel(root, caller)}
     if not args.rollback:
-        return {"paused": True}
+        return {"paused": True, **stopped}
     try:
-        return {"paused": True, **_rollback(root, args.rollback, caller)}
+        return {"paused": True, **stopped, **_rollback(root, args.rollback, caller)}
     finally:  # DEC-378: a revert or the reset may have overwritten or removed the flag, so it is set again
         _freeze(root, flag, caller)

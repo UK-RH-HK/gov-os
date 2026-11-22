@@ -253,3 +253,13 @@ def test_a_rollback_whose_flag_is_no_freeze_at_its_end_ends_in_an_error_not_paus
     with pytest.raises(GovError) as refusal:
         _pause(project, rollback=TICKET)
     assert refusal.value.code == "PAUSE_NOT_SET"
+
+
+def test_paused_error_names_the_pause_only_when_frozen(tmp_path):
+    from gov.util.freeze import paused_error
+
+    assert paused_error(tmp_path) is None
+    (tmp_path / ".gov-runtime").mkdir()
+    (tmp_path / ".gov-runtime/freeze").write_text("FROZEN owner now\n")
+    error = paused_error(tmp_path)
+    assert error.code == "PAUSED" and "paused" in error.message

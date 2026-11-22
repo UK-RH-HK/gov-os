@@ -35,6 +35,8 @@ def render(data: dict) -> str:
            + (f" (exit {data['exit_code']})" if data.get("exit_code") else "")]
     if data["outcome"] == "OFF":
         return out[0] + " (an OFF file is present: no pass ran)\n"
+    if data["outcome"] == "PAUSED":
+        return out[0] + f" (PAUSED: {data.get('message', 'gov pause holds')}: no session started)\n"
     running = data["running"]
     out.append(f"running ({len(running)}): " + (", ".join(f"{r['ticket']} pid {r['pid']}" for r in running) or "none"))
     load, memory, gate = data["load"], data["memory"], data["gate"]
