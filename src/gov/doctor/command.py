@@ -943,6 +943,24 @@ def _check_templates(root: Path) -> dict:
             "reason": f"role template copies {named}; gov adapters generate writes them"}
 
 
+CONNECTORS_KEY = "disableClaudeAiConnectors"
+
+
+def _check_connectors(root: Path) -> dict:
+    """The project's ``.claude/settings.json`` carries ``disableClaudeAiConnectors: true`` (fixes-015a F1). A file that
+    lacks the key, or is missing or unreadable, is drift that does not block (exit 0): ``gov update`` adds the key."""
+    path = root / ".claude" / "settings.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, ValueError):
+        data = None
+    if isinstance(data, dict) and data.get(CONNECTORS_KEY) is True:
+        return {"status": "pass", "drift": False}
+    return {"status": "drift", "drift": True, "drift_blocking": False,
+            "reason": f".claude/settings.json does not carry {CONNECTORS_KEY}: true, so claude.ai connectors can load "
+                      f"into a session; gov update adds it"}
+
+
 def _check_updates(root: Path) -> dict:
     """The pending-update report (W2-17 fix S5, CAP-45.b): the held release, the newest verified release in the local
     source, its kind, its fixes and the next step. A notice (status ``report``): it never makes doctor unhealthy, and a
@@ -985,6 +1003,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
             "held_out": _part("held_out", _check_held_out, root),
             "templates": _part("templates", _check_templates, root),
             "updates": _part("updates", _check_updates, root),
+            "connectors": _part("connectors", _check_connectors, root),
         }
     finally:
         _probe_deadline = None
