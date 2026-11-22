@@ -196,7 +196,8 @@ def _version() -> str:
     """``gov <version> (commit <sha>)``: the code's own version and commit, never those of the working folder's repository.
 
     Run from a source tree, the version is its ``pyproject.toml``'s and the commit the ``HEAD`` of the repository
-    whose top is that tree. An installed package names the version it was built with, and its commit as unknown."""
+    whose top is that tree. An installed package names the version and the commit it was built with (``gov._build_info``, written by
+    ``gov.release._wheel``), or unknown for a commit it does not carry."""
     import subprocess
 
     from gov.util.gitenv import git_env
@@ -214,7 +215,11 @@ def _version() -> str:
             version = installed("gov")
         except PackageNotFoundError:
             version = "unknown"
-        commit = "unknown"
+        try:  # F3: the commit the wheel was built from, written into the package when it was built
+            from gov import _build_info
+            commit = _build_info.COMMIT
+        except (ImportError, AttributeError):
+            commit = "unknown"
     return f"gov {version} (commit {commit})"
 
 
