@@ -34,7 +34,18 @@ Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a`, branc
   `stop_hook_active` (exit 0 when set). Verify: a planted return with the value on the next line passes once; with
   `stop_hook_active` true the hook exits 0. Owner: W1-29.
 
+- **F13 Every helper runs Sonnet, whatever its agent type** (DEC-1225, the owner's priority 1): on 2026-11-22 audit 1's
+  four `Explore` helpers (the built-in type, no `model` named) ran **Opus** although `CLAUDE_CODE_SUBAGENT_MODEL` named
+  Sonnet (`.gov-runtime/scratch/orchestrator/log/usage-breakdown-2026-11-22.md`, audit 1's helpers); general-purpose and
+  role helpers ran Sonnet. `.claude/hooks/agent_model.py` passes a spawn that names no model on the assumption the
+  default applies. Make the hook write the model into the spawn: a PreToolUse hook may return `updatedInput`; every
+  Agent spawn that names no model gets `model: "sonnet"` (and an Opus spawn the exceptions file lets through keeps its
+  model), so no built-in or plugin agent type can run its own or its parent's model. The kit's copy of the hook does the
+  same (EXAMIN gets it by `gov update`). Verify: planted spawns of `Explore`, `Plan`, `general-purpose` and a role type
+  with no model each come back with `model: "sonnet"`; an Opus auditor under the exception keeps Opus; Fable refused.
+  Owner: W2-201 `DAEO-k1us`.
+
 ## Green and return
-`gov accept` of each owning ticket green; `tests/unit/launch`, `tests/unit/hooks`, `tests/unit/update`,
+`gov accept` of each owning ticket green; `tests/unit/launch`, `tests/unit/hooks` (with F13's cases), `tests/unit/update`,
 `tests/unit/adapters`, W1-28, W1-29, W1-38, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
 owning ticket and tests; reds not yours; the trial figures.
