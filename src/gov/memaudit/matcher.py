@@ -25,8 +25,8 @@ class MatcherError(Exception):
 def questions(sets_root, set_name: str, part: str, repo, only: str | None = None, default=None) -> list[dict]:
     """The questions of ``<sets root>/fixtures/evaluation/<set>/<part>/*.yaml`` in file-name order, each as
     ``gov.retrieval.measure._load`` returns it (``id``, ``question``, ``sources`` as matchable entries, ``unresolved``)
-    with the YAML's own ``gold`` (the gold answer), ``category``, ``keyword``, ``raw_sources``, ``apart`` and the
-    question's ``commit`` added.
+    with the YAML's own ``gold`` (the gold answer), ``category``, ``keyword``, ``raw_sources``, ``apart``, the
+    question's ``commit`` and its ``forbidden`` paths (a list, empty when the file names none) added.
     ``only`` is a file's stem: the one-file form (W2-187 I6), which loads that question alone (none when it has no
     file). ``default`` is the set's entry when the sets root's path map holds none yet."""
     root, repo = Path(sets_root).resolve(), Path(repo).resolve()
@@ -51,7 +51,8 @@ def questions(sets_root, set_name: str, part: str, repo, only: str | None = None
         q = M._load(file, part, repo, quoting, declared, cache)
         raw = yaml.safe_load(file.read_text(encoding="utf-8"))
         q.update(gold=raw.get("gold_answer"), category=raw.get("category"), keyword=raw.get("keyword") is True,
-                 raw_sources=raw.get("sources"), apart=raw.get("category") == APART, commit=raw.get("commit"))
+                 raw_sources=raw.get("sources"), apart=raw.get("category") == APART, commit=raw.get("commit"),
+                 forbidden=list(raw.get("forbidden") or []))
         out.append(q)
     return out
 
@@ -105,6 +106,18 @@ def text_of(repo, path: str, first: int, last: int) -> str:
 def cited(repo, q: dict, citations) -> bool:
     """Whether any cited ``(path, first, last)`` is a gold place of ``q``."""
     return any(hit((p, a, z, text_of(repo, p, a, z)), q) for p, a, z in citations)
+
+
+def forbidden_cited(q: dict, citations) -> bool:
+    """Whether any cited ``(path, first, last)`` names a path in the question's ``forbidden`` list (path equality, as
+    W2-81's ``cited`` matches; the lines do not matter)."""
+    return any(p in q["forbidden"] for p, _, _ in citations)
+
+
+def citation_right(repo, q: dict, citations) -> bool:
+    """The strict rule (DEC-1227 D5 (a)): a cited place holds a gold line and no cited path is a forbidden one. An apart
+    question has no gold place, so its citation is never right."""
+    return (not q["apart"]) and cited(repo, q, citations) and not forbidden_cited(q, citations)
 
 
 def names_the_ids(result: dict, question: str) -> bool:

@@ -27,7 +27,7 @@ MIN_FILES = 36  # of 40: the configuration scales it to its half (``Config.min_k
 SAMPLE_N = 300
 MAX_IDS = 40
 REQUIRED = {"id", "question", "gold_answer", "sources", "commit", "category", "drawn"}
-OPTIONAL = {"keyword", "naive_answer"}
+OPTIONAL = {"keyword", "naive_answer", "forbidden"}
 DRAWN = ("changed", "sample", "none")
 PATH_MAP = "governance/project/path-map.yaml"
 EXCLUDE = "governance/project/indep-walls/tree-exclude.txt"
@@ -85,6 +85,8 @@ def form_ok(data, stem: str, categories=None) -> bool:
     if "keyword" in data and not isinstance(data["keyword"], bool):
         return False
     if "naive_answer" in data and not isinstance(data["naive_answer"], str):
+        return False
+    if "forbidden" in data and not (isinstance(data["forbidden"], list) and all(_text(f) for f in data["forbidden"])):
         return False
     if data["id"] != stem or not all(_text(data[k]) for k in ("id", "question", "gold_answer")):
         return False
