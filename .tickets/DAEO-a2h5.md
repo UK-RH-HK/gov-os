@@ -108,3 +108,19 @@ gains `--optin`. `governance/project/release-authority.yaml` is committed with `
 On a scratch clone of this repository and a scratch `$HOME`: a planted patch passes G1, each planted bigger change is
 refused by name, a cut with a planted green record and G3 stood in re-pins in the scratch `$HOME`, and a planted failing
 post-pin check rolls back and marks the release burned. Evidence under `docs/plan/wave-2/w2-209-rehearsal/`.
+
+## Fix: G3 judges the update by regression, not by an absolute READY (F7; the CTO's ruling; DEC-1232, DEC-1233)
+
+Found 2026-11-22: the kept W2-81 run of 0.1.4 is NOT_READY and four of its queue tickets hold no acceptance test (`gov close`
+refuses `NO_ACCEPTANCE_TESTS` before any update), so `rehearse`'s judge step (`verdicts == [READY, READY]`) and close step
+(`rc == 0`) could never pass on it; and a relative `root` (`.`) failed the scratch clone (`fatal: repository '.' does not
+exist`). Required: each step passes when the copy after the update is no worse than the kept repository before it: the
+judge's verdict over the copy equals its verdict over the kept repository (an improvement passes, a regression fails);
+`gov close` of the queue ticket exits as it does on an un-updated copy (`close_before`); the report names both values;
+`rehearse` resolves `root` to an absolute path. Kind: a fix; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-209/test_w2_209_regression.py` (README ids S12 to S15; 9 red, 16 guards on the base), `b981b8eed`;
+code `src/gov/release/proving.py`, `ce63f8d49` (one existing unit test revised: its stand-in judge now returns READY over the
+kept repository and NOT_READY over the copy; it also had a `parts[-3]` check that could never match). Lead `fixes-015b`
+(Sonnet), branch `e2/fixes-015b`. `gov accept W2-209` green on the first run (144 passed); `tests/unit/release`: 41 passed.
+Open: unequal nonzero close exits (1 before, 2 after) are not covered by the ruling; the code treats them as not worse only
+when equal or 0 after. The real G3 against the kept 0.1.4 run is the CTO's to run.

@@ -270,3 +270,20 @@ no hidden file was read, every proof below is on planted data:
 rewritten) and the DEC-1178 (1) section's item 3, "changed is listed": read with the section rule above.
 
 Revision 2026-11-19 (the S4 notice under xdist): `test_s4_the_notice_category_is_importable_without_this_folder_on_the_path` (V, covers S4) shows the notice's category importable from a clean interpreter and the one emitted; red before: the category lived in `w2_61h_support`, which the controller of a parallel run cannot import.
+
+## Fix: no hit@5 floor and no hard-blocking kit check on hit@k (audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Written by the independent test designer from the fix's behaviour, before any implementation of it. "hit@5 I DON'T CARE
+if it's even 10%": hit@k is a reported diagnostic only. The runner of `gov accept` reads only KPI cells that name
+`success N` or `failure N`, and a fix has no line of its own in the ticket, so each row of this map is read as
+`Failure 1` (the fix is named in its cell), as W2-52's and W2-88's fix rows are.
+
+`test_w2_61h_families.py::test_s7_with_no_family_declared_every_score_is_as_today` expects the total line without the floor
+and target phrases: `total: hit@5 1 of 3 (33.3 %); full evidence 1 of 3 (33.3 %)`. Revised with a Rewrite-Reason (DEC-1210,
+DEC-1233, EMERGENCY-2 5.2: no hit@5 floor); no other assertion of the case changed.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (nofloor-1: the total line carries no floor or target, revised case) | `test_w2_61h_families.py::test_s7_with_no_family_declared_every_score_is_as_today` | red: the measure's total line still reads `(33.3 %, floor 85); ... (33.3 %, target 99 %)` |
+
+**Red run on the base:** the revised case red; the folder's other cases as before.

@@ -61,3 +61,22 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-61), from the accepted plan's §4.4, ord
 - **Place:** first in block B; W2-03, W2-55, W2-64, W2-04, W2-05, W2-06, W2-13 and W2-15a follow, and the measure is repeated after each. W2-58's refusal (d) is merged (`4845b9b8`) and in the second pin (`5c401220`); W2-58's close is still pending, so it is not a `depends_on`.
 - **The split (card):** the questions by an independent auditor session, the script by an engineer. This ticket's role and paths are the engineer's. The engineer is a measured role (`measures: roles: [engineer, research]`), so it never reads the hidden half; its tests use a planted set.
 - **The auditor session's files** (named here, not in the engineer's paths): `fixtures/evaluation/memory-retrieval/hidden/**`, the 20 hidden questions and their gold answers.
+
+## Fix: no hit@5 floor or target in the measure (F9; audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Found 2026-11-22 (audit N-14; the owner: "so no hit@5 floor or hard-blocking kit check is left when EXAMIN's measure runs on
+0.1.5"). `src/gov/retrieval/measure.py` carried `FLOOR, TARGET = 85, 99` and printed `floor 85` / `target 99 %`; EMERGENCY-2
+5.2 and DEC-1210 say hit@k is a reported diagnostic, never a target or a floor. Kind: a fix; the ticket stays closed.
+Failing tests first: `tests/acceptance/W2-61/test_w2_61_no_floor.py` (README ids nofloor-N; 6 red, 3 guards on the base),
+`e57df5b68`; code `src/gov/retrieval/measure.py` (no floor or target, the total line is `total: hit@5 N of M (P %); full
+evidence N of M (P %)`, docstring wording gone), `392390765`. Tests revised with a `Rewrite-Reason` naming DEC-1210 and
+DEC-1233 (they asserted the old line): `tests/acceptance/W2-134/test_w2_134_s4_unchanged.py` (`a8711e647`, W2-134 `DAEO-m4rq`),
+`tests/acceptance/W2-61h/test_w2_61h_families.py` (`b9ed1076f`), `tests/unit/memaudit/test_fault.py` (`357f11130`),
+`tests/acceptance/W2-59/test_w2_59_baseline.py` (`53f82adab`) and a W1-21 case (below). The memory audit's control
+(`src/gov/memaudit/measure.py`) and the pool's 3-point fall flag (`pool.py`) are diagnostics, left as they are; so is
+`src/gov/adopt/fabric.py`'s reported `hit_at_5`. Who holds what: `measure.py` W2-61 (this ticket); `retrieve_check.py`,
+`retrieve_baseline.yaml` and the kit check `retrieval-regression.yaml` W1-21 (`DAEO-5x4l`); the acceptance test that
+asserts the report line W2-134 (`DAEO-m4rq`). Also `c438a2694`: `tests/acceptance/W2-61/README.md` made readable by `gov
+accept` (rows named no KPI line: `ACCEPT_MAP_UNREADABLE`, also on the base), no test changed; success-2 (hidden half),
+success-7 (baseline record) and the ticket's own failure-1 have no mapped test (their cases were retired). Lead
+`fixes-015b` (Sonnet), branch `e2/fixes-015b`. `gov accept W2-61` green (83 passed).

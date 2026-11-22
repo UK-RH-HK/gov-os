@@ -83,3 +83,14 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-16), as approved (DEC-729). The list row
   - The vendored skills carry their licence and version in the release [W2-L002, W2-L014].
 - **KPIs, failure:** a release whose files or manifest do not match their hashes is refused by `gov install`, `gov update` and `gov doctor`.
 - **DEC-752 (owner, 2026-10-17):** a stacked early start on W2-49's held branch; it merges W2-49's later changes in and re-verifies, and merges only after W2-49 has closed.
+
+## Fix: `gov accept W2-16` reads its README map (F5; DEC-1232, DEC-1233)
+
+Found 2026-11-22 (audit 2/3 follow-up): `gov accept W2-16` stopped with `ACCEPT_NO_MAP`. The README's only KPI table has the
+headers `KPI line | case(s) in the full run… | placed by`; `parse_map` needs a column that begins with `Test` or `File`, so
+it skipped that table. Kind: a fix, no test changed. The independent test designer appended a "KPI map for `gov accept`"
+section (`KPI | Test | What it covers`) mapping success-1 to success-5 and failure-1 to `file::function` items, each checked
+to exist; the existing prose stays. Commit `69263d2c9` (`tests/acceptance/W2-16/README.md` only). `gov accept W2-16`:
+outcome pass, 141 passed, 0 failed, 1 skipped; one case
+(`test_w2_16_last_round.py::test_the_suite_runs_gov_and_copier_with_gov_role_unset`) maps to no line and is counted
+unmapped. Other D-4-regenerated READMEs may have the same header fault; not checked.

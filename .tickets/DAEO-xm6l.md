@@ -94,3 +94,21 @@ code `src/gov/doctor/command.py` (`_is_patch_only_gap`, `_blocks_health`). Lead 
 `e2/d6-doctor-drift` (`7db019b2f` tests, `fffebea78` code), merged as `9a4adb350`; on the merged tree `gov accept W2-22`
 green and 192 passed (W2-22, doctor units, W1-27, W1-48, W2-57, optin). The Contract's CAP-25 acceptance and CAP-61.e
 still read "exits non-zero on drift" and "aligned": their replacement wording goes to the owner with 0.1.5.
+
+## Fix: `gov doctor` checks a tool installed in its own folder (audit 3, M-04; DEC-1232, DEC-1233)
+
+Found 2026-11-22 by the E2 audit 3 (`docs/emergency-2/audits/E2-AUDIT-3-MCP-TOOLS.md`, M-04): the registry entries
+`node-22.23.5` and `rea-agents` read `ok: false` in doctor's `tools` part, because doctor found a binary only by
+`TOOL_BINARIES` or a `PATH=<prefix>:$PATH` in the install line. No test caught it. Required: both found and versioned with
+no schema change; a `PATH=` prefix from one tool's install line never answers for another tool of the same binary at
+another version (v22.23.5 never for `node` v22.23.3, nor the reverse). Kind: a fix, no new ticket; the ticket stays
+closed. Failing tests first: `tests/acceptance/W2-22/test_w2_22_tool_in_own_folder.py` (README ids success-3 to
+success-7; 17 red, 13 guards on the base), `1015d60e8`; code `src/gov/doctor/command.py` (a `<binary>-<version>` name maps
+to its binary; a tool's places are its own `PATH=` prefix, a local install's `<cd folder>/node_modules/.bin` and a Node's
+nvm folder for its pinned version; a folder owned by an entry of the same binary at another pinned version is skipped;
+the install line's `~` and `$HOME` read the process's HOME), `d21973e3c`; units `tests/unit/doctor/test_w2_22_own_folder.py`.
+Lead `fixes-015b` (Sonnet), branch `e2/fixes-015b`. `gov accept W2-22` green (success-1 to success-7, 46 passed) on the
+first run after the engineer's commit; `tests/unit/doctor`, W1-27, W1-06, W1-48, W2-22: 229 passed. On the real machine
+`gov doctor --json` now reads `node` v22.23.3, `node-22.23.5` v22.23.5 and `rea-agents` 6.10.1, all `ok: true`; the
+`pytest-xdist`, `pytest-timeout` and `pytest-testmon` entries (Python packages with no binary, not in `NO_BINARY_TOOLS`)
+still read `ok: false`, as on the base: not this fix's.

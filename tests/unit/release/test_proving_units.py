@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import tempfile
 from pathlib import Path
 
 from gov.release import proving
@@ -60,7 +61,7 @@ def test_all_steps_passing_is_ready_and_a_failing_step_names_the_repository_and_
     assert report["repositories"]["legacy-docs"]["failed"] == "update"
     again = proving.rehearse(tmp_path, "0" * 40, "0.1.2", kept, run=run,
                              judge=lambda repository, root, outputs: {"verdict": "NOT_READY" if repository == "rust-workspace"
-                                                                       and Path(root).parts[-3] != "repos" else "READY"})
+                                                                       and Path(root).parts[-2] != "repos" else "READY"})
     assert "rust-workspace: judge" in " ".join(again["reasons"])
 
 
@@ -74,3 +75,50 @@ def test_a_conflict_listed_by_the_check_is_not_ready(tmp_path, monkeypatch):
 
     report = proving.rehearse(tmp_path, "0" * 40, "0.1.2", kept, run=run, judge=lambda *a: {"verdict": "READY"})
     assert report["verdict"] == "NOT_READY" and report["reasons"][0].startswith("secret-history: check")
+
+
+def regression_case(tmp_path, monkeypatch, kept_verdict, copy_verdict, before=0, after=0):
+    stand_in_source(monkeypatch)
+    tmp_path = Path(tempfile.mkdtemp(dir=tmp_path))
+    kept = kept_run(tmp_path / "kept", queue={"python-app": "T-1"})
+    calls = []
+
+    def run(step, repository, argv, cwd):
+        calls.append((step, repository))
+        if step == "close_before":
+            return before, ""
+        if step == "close":
+            return after, ""
+        return 0, json.dumps({"result": {"files": {"conflicts": []}}})
+
+    def judge(repository, project, outputs):
+        return {"verdict": kept_verdict if Path(project).parts[-2] == "repos" else copy_verdict}
+
+    report = proving.rehearse(tmp_path, "0" * 40, "0.1.2", kept, run=run, judge=judge)
+    return report["repositories"]["python-app"], calls
+
+
+def test_the_judge_passes_when_the_copy_is_no_worse_and_fails_when_it_regresses(tmp_path, monkeypatch):
+    for kept, copy, ok in (("READY", "READY", True), ("NOT_READY", "NOT_READY", True), ("NOT_READY", "READY", True),
+                           ("READY", "NOT_READY", False)):
+        one, _ = regression_case(tmp_path, monkeypatch, kept, copy)
+        assert one["steps"]["judge"]["pass"] is ok and one["steps"]["judge"]["verdicts"] == [kept, copy]
+    one, _ = regression_case(tmp_path, monkeypatch, None, None)
+    assert one["steps"]["judge"]["pass"] is False
+
+
+def test_the_close_step_compares_the_exit_before_and_after_the_update(tmp_path, monkeypatch):
+    for before, after, ok in ((0, 0, True), (1, 1, True), (1, 0, True), (0, 1, False)):
+        one, calls = regression_case(tmp_path, monkeypatch, "READY", "READY", before, after)
+        step = one["steps"]["close"]
+        assert step["pass"] is ok and (step["before"], step["after"]) == (before, after)
+        order = [c[0] for c in calls if c[1] == "python-app"]
+        assert order.index("close_before") < order.index("update") < order.index("close")
+
+
+def test_a_relative_root_is_resolved(tmp_path, monkeypatch):
+    seen = []
+    monkeypatch.setattr(proving, "_scratch_source", lambda root, *a: seen.append(root) or (_ for _ in ()).throw(RuntimeError("x")))
+    monkeypatch.chdir(tmp_path)
+    proving.rehearse(".", "0" * 40, "0.1.2", kept_run(tmp_path / "kept"))
+    assert seen and seen[0].is_absolute()

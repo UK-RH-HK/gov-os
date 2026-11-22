@@ -232,9 +232,27 @@ def _candidate(root: Path, base: str, given: str, settings: dict) -> dict:
             fix = None
         if fix is None:
             refuse("TICKET_CLOSED", "", {})
+    tree = _checked_out(root, branch)
+    if tree is not None:
+        _refuse_dirty(tree, branch, ticket)
     at_tip = _front_at(root, tip, ticket)
     return {"ticket": ticket, "branch": branch, "tip": tip, "front": front, "merged": merged, "since": since,
             "at_tip": at_tip if isinstance(at_tip, dict) else front, "folder": None, "record": None, "fix": fix}
+
+
+def _refuse_dirty(tree: Path, branch: str, ticket: str | None = None) -> None:
+    """``QUEUE_WORKTREE_DIRTY`` (W2-115b fix, audit N-01) before any merge: the worktree ``tree`` that holds
+    ``branch`` has uncommitted or untracked work the branch's tip does not contain, which the landing would leave
+    behind. The message names the worktree and each dirty file; the candidate is refused as a ``BRANCH_UNKNOWN`` is."""
+    from gov.queue import checks
+
+    files = checks.dirty_files(tree)
+    if files:
+        who = f"{ticket}: " if ticket else ""
+        _refuse("QUEUE_WORKTREE_DIRTY", f"{who}the worktree {tree} holds {branch} with uncommitted work the landing "
+                f"would leave behind ({len(files)} file{'s' if len(files) != 1 else ''}): {', '.join(files)}; "
+                "commit or discard it, then queue the entry again; nothing lands",
+                {"ticket": ticket, "branch": branch, "worktree": str(tree), "files": files})
 
 
 def _on_record(front: dict) -> bool:

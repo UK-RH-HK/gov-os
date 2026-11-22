@@ -63,7 +63,7 @@ def test_answered_names_why_a_search_was_not_answered_as_declared(rc, doc, ok, w
 LINES = ("families: contract (4 members)\nmeasure: set s, part hidden\n"
          "q01 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 1 calls\n"
          "q02 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls; family hits: 1\n"
-         "total: hit@5 1 of 2 (50.0 %, floor 85); full evidence 1 of 2 (50.0 %, target 99 %)\n")
+         "total: hit@5 1 of 2 (50.0 %); full evidence 1 of 2 (50.0 %)\n")  # F9: hit@5 is reported, no floor or target
 
 
 def test_parse_reads_the_measures_own_question_lines():

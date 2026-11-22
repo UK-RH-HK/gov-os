@@ -29,7 +29,7 @@ TODAY_LINES = {
     "q05": "q05 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 1 calls",
     "q06": "q06 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 1 calls",
 }
-TODAY_TOTAL = "total: hit@5 4 of 6 (66.7 %, floor 85); full evidence 4 of 6 (66.7 %, target 99 %)"
+TODAY_TOTAL = "total: hit@5 4 of 6 (66.7 %); full evidence 4 of 6 (66.7 %)"  # F9: no floor or target wording (DEC-1210, DEC-1233)
 TODAY_FIGURES = {
     "q01": (True, 2, True, True, 1, 1),
     "q02": (True, 1, True, False, 1, 2),

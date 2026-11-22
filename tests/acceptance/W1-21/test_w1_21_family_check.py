@@ -39,9 +39,8 @@ def test_where_nothing_is_indexed_the_check_is_not_green_and_builds_nothing(box,
 @pytest.mark.local_only
 @pytest.mark.needs("gitleaks", "sqlite_vec", "ollama", "reranker")
 def test_the_check_is_green_when_the_dev_tiers_meet_the_baselines(box, family_check, repo):
-    """DEC-425: hit@5 >= 80 and forbidden citations <= 2. A project with dev tiers that meet the baselines reports
-    green (exit 0). Needs the real Ollama endpoint and the reranker to produce hit@5 above the pass line; the
-    stand-in vectors score only 73.2."""
+    """DEC-425: forbidden citations <= 2 (the hit@5 line of it is no floor since F9, DEC-1210, DEC-1233). A project
+    with dev tiers that meet the baseline reports green (exit 0). Needs the real Ollama endpoint and the reranker."""
     box.build(repo, env=box.real_env())
     env = box.real_env()
     env["GOV_DEV_TIERS"] = str(support.DEV_TIERS)
@@ -73,10 +72,12 @@ def _planted_failing_tiers(folder):
 
 
 @pytest.mark.needs("gitleaks", "sqlite_vec")
-def test_the_check_is_red_when_the_dev_tiers_fail_the_baselines(box, family_check, repo, ollama, tmp_path):
-    """DEC-425: hit@5 < 80 or forbidden > 2. A project with dev tiers that fail the baselines reports red
-    (exit != 0). The tiers are made to fail: their query set's gold names paths no tier holds, so hit@5 is 0; the
-    check measures them (it does not stop "unmeasured") and is red."""
+def test_the_check_is_not_red_for_a_low_hit_at_5_when_the_dev_tiers_miss_every_gold(box, family_check, repo, ollama,
+                                                                                    tmp_path):
+    """Revised for F9 (DEC-1210, DEC-1233, EMERGENCY-2 5.2: hit@5 is no floor): the tiers are made to miss, their
+    query set's gold names paths no tier holds, so hit@5 is 0, and forbidden citations are within the baseline. The
+    check measures them (it does not stop "unmeasured"), prints the hit@5 figure as a diagnostic and is green: it
+    is red only for what is not hit@k."""
     tiers = _planted_failing_tiers(tmp_path / "planted-tiers")
     if tiers is None:
         pytest.skip(f"no dev tiers and dev query set at {support.DEV_TIERS} (GOV_DEV_TIERS)")
@@ -84,13 +85,13 @@ def test_the_check_is_red_when_the_dev_tiers_fail_the_baselines(box, family_chec
     env = box.scratch_env(ollama.host, GOV_DEV_TIERS=str(tiers))
     run = support.run_check(family_check, repo, env)
     assert "unmeasured" not in run.output.lower(), f"the planted tiers were not measured\n{run.describe()}"
-    assert run.returncode != 0, f"the baselines are not met and the check is green\n{run.describe()}"
+    assert "hit@5: 0.0" in run.output, f"the check does not report the hit@5 figure\n{run.describe()}"
+    assert run.returncode == 0, f"a low hit@5 turns the check red: hit@k is no floor\n{run.describe()}"
 
 
 @pytest.mark.needs("gitleaks", "sqlite_vec")
 def test_without_dev_tiers_the_check_reports_unmeasured_and_is_not_green(box, family_check, repo, ollama):
-    """DEC-425: where GOV_DEV_TIERS is not configured, the check reports "unmeasured" as a warning and is never
-    shown as green. Severity: hard-block where the query set is configured."""
+    """DEC-425: where GOV_DEV_TIERS is not configured, the check reports "unmeasured" and is never shown as green."""
     box.build(repo, ollama.host)
     env = box.scratch_env(ollama.host)
     env.pop("GOV_DEV_TIERS", None)
