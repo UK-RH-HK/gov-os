@@ -80,3 +80,17 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-22), as approved (DEC-729). The list row
 - **KPIs, failure:** a tool at the wrong version still fails; a real canary miss still fails.
 
 **D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): B1-24 ("`gov doctor` green" lives in W2-27 and W2-46).
+
+## Fix: the patch-only Claude Code CLI/extension gap (DEC-1227 D6 (a))
+
+Found 2026-11-20 by W2-81's proving run on release 0.1.4 (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md` rows P1,
+A1): `gov doctor` exited 3 (`DOCTOR_UNHEALTHY`) in every adopted repository on CLI 2.1.329 against extension 2.1.328,
+because any difference of the two strings was `drift` and `drift` counted as unhealthy; the extension auto-updates, so a
+patch gap is the normal state. No test caught it (`tests/acceptance/W2-22/` did not exist). The owner chose D6 (a): a
+patch-only gap (same major and minor) is drift, reported, exit 0; a minor or major gap, a CLI below the minimum and a CLI
+sha256 mismatch at the recorded version still exit 3; drift against the registry's recorded version still exits 3. Kind:
+a fix, no new ticket; the ticket stays closed. Failing tests first (`tests/acceptance/W2-22/`, A1; A2 guards the edges);
+code `src/gov/doctor/command.py` (`_is_patch_only_gap`, `_blocks_health`). Lead `d6-doctor-drift` (Sonnet), branch
+`e2/d6-doctor-drift` (`7db019b2f` tests, `fffebea78` code), merged as `9a4adb350`; on the merged tree `gov accept W2-22`
+green and 192 passed (W2-22, doctor units, W1-27, W1-48, W2-57, optin). The Contract's CAP-25 acceptance and CAP-61.e
+still read "exits non-zero on drift" and "aligned": their replacement wording goes to the owner with 0.1.5.
