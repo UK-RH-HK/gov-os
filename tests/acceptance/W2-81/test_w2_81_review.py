@@ -328,7 +328,9 @@ def test_any_verdict_but_not_adopted_healthy_with_the_secret_open_is_mishandled(
     built_repo = ground["secret-history"]
     entry = _entry(built_repo, "secret")
     model = standin.perfect(built_repo)
-    model["records"]["VERDICT"]["verdict"] = verdict
+    model["records"]["VERDICT"]["verdict"] = verdict  # a well-formed record (W2-210 V5): its conditions agree
+    model["records"]["VERDICT"]["conditions"] = standin.verdict_conditions(
+        "accepted" if verdict == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS" else "met")
     judgement, _ = _judge(built_repo, model, tmp_path)
     assert _status(judgement, entry["id"]) == judge.MISHANDLED
 

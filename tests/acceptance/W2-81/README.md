@@ -238,7 +238,8 @@ repository. `judge_repository` judges one repository. The judge writes and print
 - each control is **CLEAN** or **FLAGGED**;
 - each stage (A0 to A6, A8, A7, A10, the lite verdict, and the findings) is **PRESENT**, **ABSENT**, **UNREADABLE**,
   **MALFORMED** or **NOT_BUILT**. A lite A7 or A10 record is PRESENT only when its front matter's `result` is exactly
-  `pass` (the gate's own word); one that says otherwise (`fail`, no `result`, any other value) is MALFORMED.
+  `pass` (the gate's own word); one that says otherwise (`fail`, no `result`, any other value) is MALFORMED. The lite
+  verdict record is PRESENT only when well formed (W2-210 V5; below); a missing one is ABSENT, a malformed one MALFORMED.
 
 Where several apply to one problem, MISHANDLED comes first, then NOT_BUILT, then MISSED. A secret's value found in
 an output is MISHANDLED even if its stage is not built.
@@ -307,7 +308,7 @@ never reaches READY on a failed A7 or A10 gate. The judge holds A7's and A10's o
 | `index` | CAP-44.d | yes | `gov rebuild` after A6 and A8 recreates `.gov-runtime/store.db`: `lexical_chunk.path`, and `semantic_vector.chunk_id` only for namespaces whose `embedding_policy` is `embedded` |
 | `A3`, `A5`, `A6` | CAP-44.b, .c, .d | yes | the A3 path map, the A5 review (`path_map_hash` = the sha256 of A3's record), the A6 batches |
 | `A7`, `A10` | CAP-44.f | **yes**, built, from `command.STAGES` | the lite gates (W2-52, `gov.adopt.lite_gates`): `gov.adopt.command.STAGES` lists A7 and A10, and `built_today()` reads that list (not `project.STAGES`) |
-| `VERDICT` | CAP-44.h | **no** | the lite verdict (W2-52, not merged) |
+| `VERDICT` | CAP-44.h | **yes**, built, from `command.STAGES` | the lite verdict (W2-210, `gov.adopt.verdict`): `gov.adopt.command.STAGES` lists `VERDICT`, and `built_today()` reads that list, as for A7 and A10 |
 
 **On an adoption that ran nothing, at today's code and seed 8128,** every repository is NOT_READY:
 
@@ -321,7 +322,8 @@ never reaches READY on a failed A7 or A10 gate. The judge holds A7's and A10's o
 | python-app-clean | none | 2 CLEAN |
 
 In every repository the stages are ABSENT (A7 and A10 included: built today, so measured, and their absent records
-named), or NOT_BUILT for the verdict and the findings.
+named; the verdict too once `gov.adopt.command.STAGES` lists `VERDICT`), or NOT_BUILT for the findings (and for the
+verdict while that list does not name it).
 
 ### What the judge reads, per kind
 
@@ -375,9 +377,10 @@ judge) must stay as the build left it:
 | large file | classed and kept out of the semantic index, **where the file now is** | in its place: A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db`. **Moved by a reviewed MOVE or RENAME** (its target holding it as built): the same three facts read **at the target**, its namespace being the one the path map's `namespaces[].paths` patterns give the target now (the adoption tool's own matcher, `gov.adopt.project.classify`), and its presence in the lexical index named in the evidence | it has semantic vectors, or its namespace is embedded, **at the target when it moved** (the evidence names the target) | **built**: judged today |
 
 **The verdict with accepted exceptions (CAP-44.h).** CAP-44.h allows ADOPTED_WITH_ACCEPTED_EXCEPTIONS only when each
-unmet condition is accepted by name in an owner decision (`Role: owner`). The record that acceptance would be read
-from does not exist today: the lite verdict and its owner acceptance arrive with W2-52. So it is NOT_BUILT and not
-read. With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY is MISHANDLED.
+unmet condition is accepted by name in an owner decision (`Role: owner`). The lite verdict stage (W2-210) reads the
+owner's exceptions file and records each accepted condition; the judge does not read the owner's acceptance itself (its
+own owner-exceptions input stays T3's). With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY is
+MISHANDLED, whichever well-formed record says it (a record that is not well formed is MALFORMED and gives no verdict).
 
 | Control | FLAGGED when |
 |---|---|
@@ -420,8 +423,13 @@ real forms when those land:
   the judge reads them as any built stage's record, with one rule of its own: a lite record counts as found
   (PRESENT) only when its `result` is exactly `pass`, the gate's own word (a gate commits its record when it fails
   too, with `result: fail`); MALFORMED names one that says otherwise (`fail`, no `result`, any other value). The verdict
-  holds `verdict` (one of `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS`, `NOT_ADOPTED_HEALTHY`), `lite: true`
-  and `conditions_not_checked`.
+  (built since W2-210: `VERDICT` is in `command.STAGES`, so `built_today()` counts it) is **PRESENT only when well
+  formed**: `verdict` one of `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS`, `NOT_ADOPTED_HEALTHY`; `lite: true`;
+  `conditions` a list of mappings with a `name` and a `state` (`met`, `not met` or `accepted`); `conditions_not_checked`
+  a list; and the verdict the one its conditions give (CAP-44.h, W2-210 V2: ADOPTED_HEALTHY only over conditions all
+  met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS only over conditions all met or accepted, one accepted; NOT_ADOPTED_HEALTHY
+  otherwise, `w2_81_judge.derived_verdict`). A missing record is ABSENT; one that is not well formed is MALFORMED and
+  gives the judge no verdict to read. The stand-in writes such a record (`w2_81_standin.verdict_conditions`).
 
 ## The mutation self-tests (`test_w2_81_judge.py`)
 
@@ -429,8 +437,8 @@ real forms when those land:
 with the end-to-end figure exactly at the bar. `render` writes it into a temporary copy of the built repository's
 working tree (no `.git`) and a folder beside it. On it, with every capability counted as built, the judge says
 READY. On today's code it says NOT_BUILT for each handling not built, and FOUND_AND_HANDLED for the large files;
-the stages A7 and A10 are PRESENT (built today, from `gov.adopt.command.STAGES`), the verdict and the findings
-NOT_BUILT.
+the stages A7, A10 and the verdict are PRESENT (built today, from `gov.adopt.command.STAGES`; the verdict's stand-in
+record is well formed), the findings NOT_BUILT.
 
 **One killed mutant per planted problem (21).** `standin.miss` removes exactly one handling. The judge must say
 NOT_READY with exactly one reason, `<repository>: <id> is MISSED`:
@@ -470,7 +478,9 @@ finding, is FLAGGED too.
   class outside the vocabulary: each is MISSED for every problem that needs A2.
 - An unreadable A3 record flags the controls.
 - An unreadable finding, an unreadable output (a symbolic link), or no held value: each makes the secret MISSED.
-- A7's record absent is named; a verdict outside the vocabulary is MALFORMED.
+- A7's record absent is named; a verdict outside the vocabulary is MALFORMED, and so is a lite verdict record that is
+  not well formed (W2-210 V5: `lite` not true, no `conditions` mappings, no `conditions_not_checked` list, or a verdict
+  its conditions do not give).
 - **S-STAGES, on today's code (`built=None`):** A7 and A10 count as built exactly when `gov.adopt.command.STAGES`
   lists them, whatever `project.STAGES` says; either lite record absent is ABSENT, and either one without front
   matter, with front matter that is not a mapping, or with bad YAML is UNREADABLE, and either one whose front matter

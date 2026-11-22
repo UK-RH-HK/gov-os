@@ -31,6 +31,20 @@ def _namespace(paths, policy):
             "provenance": "the W2-81 stand-in", "deletion_rebuild": "rebuilt from git"}
 
 
+VERDICT_CONDITIONS = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8", "lite A7 gate", "lite A10 gate")
+
+
+def verdict_conditions(last="met"):
+    """The lite verdict's conditions as a well-formed record gives them (W2-210 V5): every one met but the last, whose
+    state is ``last`` (``met``, ``not met`` or ``accepted``, the last with its owner entry). The verdict that agrees:
+    ADOPTED_HEALTHY, NOT_ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS."""
+    found = [{"name": name, "source": "CAP-44.h", "state": "met"} for name in VERDICT_CONDITIONS]
+    found[-1]["state"] = last
+    if last == "accepted":
+        found[-1]["owner_entry"] = "DEC-999"
+    return found
+
+
 def perfect(built):
     """The model of an adoption that handles everything planted in ``built`` and flags no control."""
     data = built.manifest
@@ -91,6 +105,7 @@ def perfect(built):
             "A7": {"result": "pass", "checked": ["A6 against A3 and A4"]},
             "A10": {"result": "pass", "checked": ["A8", "the derived state rebuilt from git", "the canaries"]},
             "VERDICT": {"verdict": "NOT_ADOPTED_HEALTHY" if secret_open else "ADOPTED_HEALTHY", "lite": True,
+                        "conditions": verdict_conditions("not met" if secret_open else "met"),
                         "conditions_not_checked": ["(2)", "(7)", "(8)", "(10)"]},
         },
         "findings": findings,
