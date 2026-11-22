@@ -2109,6 +2109,15 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-22; the plan at 5 % at 14:30 and 6 % by 14:45 after about 80 minutes of work since the machine came back at 13:26.
 - **Governing sources:** docs/emergency-2/proposals/RELEASE-ON-BEHALF.md; .gov-runtime/scratch/orchestrator/log/usage-breakdown-2026-11-22.md; DEC-1223; DEC-1226; DEC-1229.
 
+### DEC-1236 — Decisions by page approved (DB-1 a, DB-2 c, DB-3 a, DB-4 a, DB-5 a) with the owner's page as the golden example; leads at medium effort, a change to the rubric; any change to a role's model or effort goes to the owner first
+- **Status:** ACCEPTED (owner, 2026-11-22 about 15:15, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1225, DEC-1235 (3) · **Changes:** DEC-1214 K1's rubric table and DEC-1225's (ticket leads run Sonnet at medium effort, not high); DEC-220 and DEC-093's cap of five open packages (superseded by the page's batch limit, as the proposal states)
+- **Decision:**
+  - (1) **Decisions by page** (`docs/emergency-2/proposals/DECISIONS-BY-PAGE-SPEC.md`, KPIs PG-1 to PG-9): **DB-1 (a)** one feature ticket in two slices, in the release after 0.1.5; **DB-2 (c)** published by the CTO's Artifact tool as a private page, the HTML file as fallback; **DB-3 (a)** a morning page, plus an immediate page for a decision that stops work, carrying every open card; **DB-4 (a)** notes only, every answer picks an option; **DB-5 (a)** one register entry per decision. **The golden example** of the page is the owner's own: `docs/emergency-2/proposals/gov-os-decisions.html` ("Gov OS decisions, 18 November"), committed as the template's reference.
+  - (2) **Leads at medium effort:** "approved as a change to the rubric; record it." Ticket leads (and fix and chore leads) run Sonnet at `--effort medium`; their helpers inherit it.
+  - (3) **The rule from now on:** "a change to any role's model or effort comes to me first." The CTO proposes; the owner decides; nothing changes a role's model or effort in code, settings, scripts or briefs before his yes.
+- **Basis:** the owner's message of 2026-11-22; the incident behind (2) and (3): the CTO set leads to medium effort in its start script (DEC-1235 (4), usage) before asking; output at high effort was 27 % of the day's spend.
+- **Governing sources:** docs/emergency-2/proposals/DECISIONS-BY-PAGE-SPEC.md; docs/emergency-2/proposals/gov-os-decisions.html; .gov-runtime/scratch/orchestrator/log/usage-breakdown-2026-11-22.md; DEC-1225; DEC-1235.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
