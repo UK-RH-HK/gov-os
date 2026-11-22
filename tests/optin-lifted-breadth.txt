@@ -333,7 +333,7 @@ tests/acceptance/W1-21/test_w1_21_expansion.py::test_a_bundle_budget_of_nothing_
 tests/acceptance/W1-21/test_w1_21_expansion.py::test_every_span_wider_than_its_chunk_is_a_named_expansion  # cap
 tests/acceptance/W1-21/test_w1_21_failure_memory.py::test_a_record_out_of_scope_is_not_returned  # cap
 tests/acceptance/W1-21/test_w1_21_failure_memory.py::test_the_records_come_ahead_in_a_small_first_batch_too  # cap
-tests/acceptance/W1-21/test_w1_21_family_check.py::test_the_check_is_red_when_the_dev_tiers_fail_the_baselines  # cap
+tests/acceptance/W1-21/test_w1_21_family_check.py::test_the_check_is_not_red_for_a_low_hit_at_5_when_the_dev_tiers_miss_every_gold  # cap
 tests/acceptance/W1-21/test_w1_21_family_check.py::test_without_dev_tiers_the_check_reports_unmeasured_and_is_not_green  # cap
 tests/acceptance/W1-21/test_w1_21_merge.py::test_a_chunk_both_routes_return_is_cited_once_and_names_both  # cap
 tests/acceptance/W1-21/test_w1_21_merge.py::test_small_batches_cite_no_chunk_twice  # cap
