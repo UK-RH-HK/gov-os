@@ -196,3 +196,35 @@ base: all but the guard, each by `SelectionRefused` naming the base's paths, or 
    naming the base's paths. Whether `scoped`'s dict without `change` holds the key is not tested.
 4. **The landing case** asserts only that the ticket lands and closes as a green landing does (success 1 and 2's
    checks); what the close record's `selection` holds of `unplaced_base` is not tested.
+
+## Fix: `gov queue` never leaves uncommitted work behind (audit N-01)
+
+Written by the independent test designer from the fix line "`gov queue` refuses a branch whose worktree holds
+uncommitted or untracked work in tracked paths, `QUEUE_WORKTREE_DIRTY`, naming the worktree and the files", before any
+implementation of it. The fix adds no line to the ticket's `kpis:`, so it is mapped as `success-14` (the refusal, its
+forms and that the entry is not poisoned by it) and `failure-4` (honest work is not refused: the controls), numbered
+after the ticket's own and the earlier fix's (success 10 to 13, failure 3). Every case is of the acceptance kind, in
+`test_w2_115b_dirty_worktree.py`. Public interface only: `gov queue PROJ-aaaa=topic/aa [--onto main] --json`, its
+envelope, stderr and exit code, the planted repository's refs and each worktree's `git status --porcelain`.
+
+**What is planted:** a fresh project per case (A and B on `main`, `.gitignore` holding `.gov-runtime/`, `__pycache__/`,
+`*.pyc`, `build/`), A's branch `topic/aa` with one commit changing the widget, and a worktree `wt-aa` (a sibling folder of
+the project) that holds `topic/aa`, or the project's own main tree switched to `topic/aa` (with `--onto main`).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-14 | `test_w2_115b_dirty_worktree.py::test_a_modified_tracked_file_in_the_branch_s_worktree_refuses`, `test_w2_115b_dirty_worktree.py::test_a_staged_change_in_the_branch_s_worktree_refuses`, `test_w2_115b_dirty_worktree.py::test_an_untracked_new_file_in_a_tracked_directory_refuses`, `test_w2_115b_dirty_worktree.py::test_a_deleted_tracked_file_in_the_branch_s_worktree_refuses`, `test_w2_115b_dirty_worktree.py::test_two_dirty_files_are_both_named`, `test_w2_115b_dirty_worktree.py::test_the_main_tree_holding_the_branch_dirty_refuses`, `test_w2_115b_dirty_worktree.py::test_after_the_change_is_discarded_the_same_entry_lands`, `test_w2_115b_dirty_worktree.py::test_after_the_change_is_committed_the_same_entry_lands_with_it` | on the base the queue ignores the worktree and lands: the answer is `ok: true`, exit 0, not `QUEUE_WORKTREE_DIRTY` (the last two fail at their refusal half) |
+| failure-4 | `test_w2_115b_dirty_worktree.py::test_a_clean_worktree_holding_the_branch_lands`, `test_w2_115b_dirty_worktree.py::test_a_clean_main_tree_holding_the_branch_lands`, `test_w2_115b_dirty_worktree.py::test_files_the_gitignore_ignores_are_not_dirty`, `test_w2_115b_dirty_worktree.py::test_a_branch_checked_out_in_no_worktree_lands`, `test_w2_115b_dirty_worktree.py::test_another_branch_s_dirty_worktree_does_not_refuse` | none: guards, green on the base; they must stay green |
+
+**Readings this fix's cases take.**
+
+1. **Dirty** is what `git status --porcelain` of the worktree lists (modified, staged, deleted, or untracked and not
+   ignored by `.gitignore`). A file the `.gitignore` ignores is not dirty.
+2. **The refusal's form:** `ok: false`, `error.code` `QUEUE_WORKTREE_DIRTY` (also on stderr as `QUEUE_WORKTREE_DIRTY:`),
+   `error.message` holding the worktree's path and each dirty file's repository-relative path, an exit code of 1 (a
+   candidate refused before the run, as `BRANCH_UNKNOWN`) or 3 (the run refused as a whole): either is accepted, 0 and
+   2 are not. Nothing moves: every ref, the root's `HEAD`, status and tracked files, no `docs/close/`, the ticket
+   still `open`, the branch not merged; the dirty worktree itself is left as it was.
+3. **"Not poisoned":** after the change is discarded (`git checkout -- <file>`), or committed in the worktree (the entry
+   then lands with the new tip), the same command lands and closes the ticket.
+4. **The main tree holding the branch** is planted with the root switched to `topic/aa` and `--onto main`.
