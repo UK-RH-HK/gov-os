@@ -219,13 +219,20 @@ def history(state, *rows_):
     standing.append(state, "HISTORY.jsonl", *rows_)
 
 
+# Rewrite-Reason: F15 (W2-204 S19): a figure is compared only with one that carries the stamp, so the planted lines and
+# the fresh figure carry it
+STAMP = {"release": "0.1.5", "commit": "a" * 40, "reader_model": "m", "grader_models": ["m"],
+         "forbidden_rule": "strict", "questions_with_forbidden": 3}
+
+
 def lines_at(pcts, name=SET):
     return [{"kind": "standing", "set": name, "week": f"2026-W{40 + i}", "measured": True, "n": 100, "right": p,
-             "pct": float(p), "word": "pass" if p >= 95 else "miss", "passes": p >= 95} for i, p in enumerate(pcts)]
+             "pct": float(p), "word": "pass" if p >= 95 else "miss", "passes": p >= 95, **STAMP}
+            for i, p in enumerate(pcts)]
 
 
 def fresh_fig(right, n=100):
-    return {"n": n, "verdict": {"right": right}}
+    return {"n": n, "verdict": {"right": right}, **STAMP}
 
 
 def set_live(plant):

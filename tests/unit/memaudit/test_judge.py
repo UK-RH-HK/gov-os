@@ -15,7 +15,9 @@ from .test_measure import events, snapshot
 
 # Rewrite-Reason: DEC-1225 (R4): FIGURES.json names the reader, grader and checker models (``models``)
 FIGURE_KEYS = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend",
-               "models", "forbidden_rule"}  # DEC-1227 D5: the record names the strict rule
+               "models", "forbidden_rule",  # DEC-1227 D5: the record names the strict rule
+               # Rewrite-Reason: F15 (W2-204 S17): the rest of the stamp
+               "release", "commit", "reader_model", "grader_models", "questions_with_forbidden"}
 MISS_KEYS = ["id", "question", "gold_answer", "gold_sources", "answer", "outcome", "evidence_in_bundle"]
 
 

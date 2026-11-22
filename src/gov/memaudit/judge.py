@@ -270,6 +270,7 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
         figures.write_misses(run_dir, misses)
     # DEC-1225 (4): the models that answered and graded, so the figures compare only from the first fresh 80 on Sonnet
     fig["models"] = {"reader": READER, "grader": GRADER, "checker": CHECK}
+    fig["reader_model"], fig["grader_models"] = READER, [GRADER, CHECK]  # F15: the stamp's models
     figures.write_figures(run_dir, fig)
     v = fig["verdict"]
     events.append(run_dir, "figures", right=v["right"], wrong=v["wrong"], n=fig["n"], passes=v["passes"])

@@ -22,7 +22,7 @@ import time
 from datetime import timedelta
 from pathlib import Path
 
-from gov.memaudit import declare, digest, schedule
+from gov.memaudit import declare, digest, figures, schedule
 from gov.memaudit import standing as record
 from gov.memaudit.common import GitError, blob_at, git_code, sha256_bytes, write_whole
 
@@ -360,6 +360,7 @@ def _standing_line(state, st, at, churn, r28, fig, repo, gov, measured) -> dict:
                     word=word)
         if isinstance(n, int) and n < record.MIN_LIVE:  # I6: below 70 live questions the word is a list that names it
             line["word"] = [word, f"STANDING_THIN {n}"]
+    line.update({k: fig[k] for k in figures.STAMP_KEYS if k in fig})  # F15: the stamp the drift check compares
     line.update(gov_pin=declare.gov_pin(gov or "~/.local/bin/gov"),
                 retrieval_yaml_sha256=_sha_at(repo, st["commit"], declare.RETRIEVAL),
                 path_map_sha256=_sha_at(repo, st["commit"], "governance/project/path-map.yaml"))

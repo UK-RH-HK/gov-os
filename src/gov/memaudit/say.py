@@ -55,3 +55,14 @@ def say(line, sets_root=None, *, err: bool = False) -> tuple[str, dict]:
         raise SystemExit(4)
     _write(text, err)
     return "ok", {"printed": 1}
+
+
+def say_stderr(line, sets_root=None) -> None:
+    """The one ``line`` on standard error alone (F15's stamp: the verdict lines on standard output keep their form). A
+    line that names a sets-root folder is refused as ``say`` refuses it."""
+    text = str(line)
+    if "\n" in text or "\r" in text or refused(text, sets_root):
+        _write(REFUSAL, True)
+        raise SystemExit(4)
+    sys.stderr.write(text + "\n")
+    sys.stderr.flush()

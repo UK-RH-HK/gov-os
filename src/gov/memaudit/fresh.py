@@ -32,7 +32,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from gov.memaudit import config as _config
-from gov.memaudit import driver, drops, layout, ledger
+from gov.memaudit import driver, drops, figures, layout, ledger
+from gov.memaudit.say import say_stderr
 from gov.memaudit.common import (UsageError, git_code, read_json, resolve_commit, set_digest, sha256_file, toplevel,
                                  utc_iso, write_whole)
 
@@ -322,6 +323,8 @@ class _Fresh:
                               "visible": {"right": vis["right"], "n": fig[self.visible]["n"]}}
         self.st["state"] = "done"
         self.save()
+        for line in figures.stamp_lines(fig[self.hidden]):  # F15: the stamp, on stderr (the verdict lines keep their form)
+            say_stderr(line, self.root)
         self.emit(f"FRESH VERDICT hidden right {right} of {n} ({100 * right / n:.1f} %): "
                   f"{'passes' if hid['passes'] else 'misses'}")
         self.emit(f"FRESH BESIDE visible right {vis['right']} of {fig[self.visible]['n']}")
