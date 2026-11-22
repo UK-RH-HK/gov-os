@@ -76,7 +76,7 @@ here, once.
    writes nothing: HEAD, the refs, the tree and the working tree as before.
 3. **The commit.** One commit, its subject `gov adopt --lite VERDICT: lite adoption verdict` (the cases test the prefix
    `gov adopt --lite VERDICT:`), touching `governance/adoption/VERDICT-lite.md` alone, no `Role` trailer needed. The
-   stage run again replaces the record: `supersedes` = the sha256 of the record it replaces; git keeps the old one.
+   stage run again replaces the record: `supersedes` = a list holding the sha256 of the record it replaces, `[<sha256>]` (`common.schema.json` types it as an array of strings); git keeps the old one.
 
 ### `gov.adopt.verdict`
 
@@ -130,8 +130,8 @@ certification by `qualification` and a separate `verifier` role; `stands_on`: th
 sha256, commit, session, role}` for the A5, A7 and A10 auditor records (`path` as the stage records them,
 `sha256` of the file as it stands, `commit` the commit that last touched it, `session` its `auditor_session`, `role` =
 `independent-auditor`); `unused_exceptions`: a list of `{condition, decision}` for each entry of the owner's file that
-named a condition that is `met` or does not exist (empty or absent when none); `supersedes`: the sha256 of the record
-it replaces (absent at a first run); `produced_by`.
+named a condition that is `met` or does not exist (empty or absent when none); `supersedes`: a list holding the sha256 of
+the record it replaces, `[<sha256>]` (an array of strings under `common.schema.json`; absent at a first run); `produced_by`.
 
 ### `produced_by` (F1)
 

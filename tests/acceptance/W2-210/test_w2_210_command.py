@@ -125,13 +125,17 @@ def test_an_owner_exceptions_file_gives_adopted_with_accepted_exceptions_and_the
 
 
 def test_the_stage_run_again_after_the_owners_commit_replaces_the_earlier_record(cli_plain, cli_owner):
-    """V2: the re-run replaces the earlier record: ``supersedes`` names the sha256 of the record it replaces; git
-    keeps the old one."""
+    """V2: the re-run replaces the earlier record: ``supersedes`` is a list (common.schema.json types it as an array of
+    strings) holding the sha256 of the record it replaces; git keeps the old one; the record stays valid under the W2-02
+    schema and ``gov rebuild`` lists none invalid."""
     d1.taken(cli_owner)
     front, _ = d1.record_at_head(cli_owner.project)
     old_commit = d1.last_commit(cli_plain.project, d1.VERDICT_REL)
     old = support.at_head(cli_plain.project, d1.VERDICT_REL)
-    assert front.get("supersedes") == d1.hashlib.sha256(old).hexdigest()
+    assert front.get("supersedes") == [d1.hashlib.sha256(old).hexdigest()]
+    assert d1.schema_errors(front) == [], d1.schema_errors(front)
+    rebuilt = cli_owner.ad.gov("rebuild", "--json").envelope()
+    assert rebuilt["ok"] is True and rebuilt["result"]["store"]["invalid"] == [], rebuilt
     kept = support.git(cli_owner.project, "show", f"{old_commit}:{d1.VERDICT_REL}")
     assert kept.encode("utf-8") == old, "git keeps the earlier record"
     assert d1.head_files(cli_owner.project) == [d1.VERDICT_REL]
