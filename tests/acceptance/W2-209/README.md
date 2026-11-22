@@ -143,6 +143,37 @@ Run: `TMPDIR=$(mktemp -d) PYTHONPATH=$PWD/src python3 -m pytest tests/acceptance
   `--queue-ticket` form); with none, the step is `{"pass": true, "skipped": true, "reason": ...}` and does not run.
 - It writes nothing in `kept` (`.git` folders included) or in `root` (files, refs, HEAD, index).
 
+### The rehearsal judged by regression (S12 to S15; the CTO's ruling on W2-209, DEC-1232, DEC-1233)
+
+The kept W2-81 run of release 0.1.4 is NOT_READY and four of its queue tickets hold no acceptance test (`gov close`
+refuses `NO_ACCEPTANCE_TESTS` before any update), so an absolute READY and a close exit of 0 can never pass on it. This
+section **supersedes** the sentences above that say the judge step "passes when both are `READY`" and that `close`
+"fails when it exits non-zero"; everything else of S5 stands.
+
+- **Judge step** (S12): passes when the verdict over the updated copy **equals** the verdict over the kept repository
+  (`NOT_READY` and `NOT_READY` passes, `READY` and `READY` passes); `READY` over the kept repository and `NOT_READY` over
+  the copy **fails**; `NOT_READY` and then `READY` (an improvement) **passes** (not worse; open point, see below). A
+  judge that raises, or returns no `verdict`, is never a pass, even when both calls fail the same way.
+- **Close step** (S13), run per repository with a queue ticket: `gov close <ticket>` runs once **before** the update, in
+  a throwaway copy that has not been updated (never in `kept` or `root`), with the runner's step label
+  **`close_before`**, and once after the update, with the label **`close`** (as today), in the updated clone. The
+  label `close_before` is fixed here, as `doctor_before` is. The order of a repository's runner calls has
+  `close_before` before `update`, and `close` after it. The step passes when the two exit codes are **equal** or
+  the exit code before was non-zero and after is 0 (nonzero before, 0 after passes; 0 before, non-zero after fails).
+  With no queue ticket the step is skipped as today and neither `close_before` nor `close` runs.
+- **The report** (S14): the `judge` step's entry keeps `verdicts`, a two-element list `[over the kept repository,
+  over the copy]` (one element when the judge raised); the `close` step's entry holds `before` and `after`, the two exit
+  codes (and `ticket`), as the `doctor` entry holds `before` and `after`. The NOT_READY reason of a failed `judge` step
+  names both verdicts and that of a failed `close` step both exit codes (the reason lines are built from the step's
+  fields, as they are today).
+- **A relative `root`** (S15): `rehearse` resolves `root` to an absolute path, so `rehearse(".", ...)` with the process
+  in the repository, or `rehearse("../root", ...)` from another folder, behaves as the absolute path does (the scratch
+  source is made; no "does not exist" reason).
+- **Stand-ins** (`w2_209_rg_standins.py`, `w2_209_rg_driver.py`; the base stand-ins are unchanged): `rg_runner` answers
+  `close_before` and `close` with the case's exit codes and writes `UPDATED` in the folder an `update` ran in (so a
+  close call shows whether its folder was updated); `rg_judge` answers the case's verdict over the kept repository and
+  over any other folder (`READY`, `NOT_READY`, `raise`, `none`).
+
 ### The cut (S7) and its seam
 
 - `gov.release._patch_test(root, version, *, suite=None, rehearse=None, repin=None, push=None, caller=None)` is the
@@ -236,6 +267,10 @@ Run: `TMPDIR=$(mktemp -d) PYTHONPATH=$PWD/src python3 -m pytest tests/acceptance
 | S4, F3 | `test_w2_209_suite.py::test_s4_a_record_for_c_full_green_with_the_weekly_tier_passes_g2`, `test_w2_209_suite.py::test_s4_no_suite_record_is_refused`, `test_w2_209_suite.py::test_s4_f3_a_record_not_for_the_exact_commit_or_without_the_weekly_tier_is_refused` | `gov release` has no `--patch` (argparse, no envelope) |
 | F3 | `test_w2_209_suite.py::test_f3_a_record_that_cannot_be_read_is_refused_as_unreadable` | `gov release` has no `--patch` (argparse, no envelope) |
 | S5 | `test_w2_209_proving.py::test_s5_all_steps_passing_is_ready_in_throwaway_clones_of_the_kept_repositories`, `test_w2_209_proving.py::test_s5_the_close_step_lands_the_kept_run_queue_ticket`, `test_w2_209_proving.py::test_s5_one_failing_step_is_not_ready_naming_the_repository_and_the_step`, `test_w2_209_proving.py::test_s5_a_kept_run_with_five_repositories_is_not_ready`, `test_w2_209_proving.py::test_s5_a_missing_kept_folder_is_not_ready` | `gov.release.proving` does not exist (`missing`) |
+| S12 | `test_w2_209_regression.py::test_s12_a_not_ready_kept_run_and_an_equally_not_ready_copy_with_equal_doctor_and_close_is_ready`, `test_w2_209_regression.py::test_s12_ready_before_and_not_ready_after_is_a_regression_naming_the_repository_the_step_and_both_values`, `test_w2_209_regression.py::test_s12_not_ready_before_and_ready_after_is_not_worse_and_passes_the_judge_step`, `test_w2_209_regression.py::test_s12_a_judge_that_raises_or_returns_no_verdict_is_never_a_pass` | the judge step passes only on READY and READY: NOT_READY and NOT_READY, and NOT_READY then READY, fail it; the regression and no-verdict cases pin today's refusal and pass on the base |
+| S13 | `test_w2_209_regression.py::test_s13_a_close_that_refuses_before_the_update_and_refuses_the_same_after_it_passes`, `test_w2_209_regression.py::test_s13_gov_close_runs_as_close_before_in_an_unupdated_throwaway_copy_before_the_update_and_as_close_after_it`, `test_w2_209_regression.py::test_s13_a_close_that_exits_0_before_the_update_and_not_after_it_fails_naming_close_and_both_exit_codes`, `test_w2_209_regression.py::test_s13_a_close_that_refuses_before_the_update_and_exits_0_after_it_passes`, `test_w2_209_regression.py::test_s13_with_no_queue_ticket_the_close_step_is_skipped_and_no_close_runs_at_all` | no `close_before` call is made and the close step passes only on exit 0 (a close refusing the same before and after fails it); its entry and reason hold no `before` exit code; the no-ticket case pins today's skip and passes on the base |
+| S14 | `test_w2_209_regression.py::test_s14_each_judge_and_close_entry_holds_both_values` | the close step's entry holds only `exit` and `ticket`, no `before` and `after` |
+| S15 | `test_w2_209_regression.py::test_s15_a_relative_root_behaves_as_the_absolute_one` | `root` is not resolved: the scratch clone fails with `fatal: repository '.' does not exist`, NOT_READY "the rehearsal could not run" |
 | S6 | `test_w2_209_state.py::test_s6_each_state_condition_alone_is_refused_at_g4_after_g3`, `test_w2_209_state.py::test_s6_two_reds_at_once_name_the_earlier_gate_g2_before_g4`, `test_w2_209_state.py::test_s6_two_reds_at_once_name_the_earlier_gate_g3_before_g4_on_the_command_line`, `test_w2_209_state.py::test_s6_two_reds_at_once_name_the_earlier_gate_g3_before_g4_through_the_seam` | `gov.release._patch_test` does not exist (`missing`); `gov release` has no `--patch` (argparse, no envelope) |
 | S7 | `test_w2_209_cut.py::test_s7_the_cut_tags_the_record_commit_annotated_unsigned_with_c_its_parent`, `test_w2_209_cut.py::test_s7_the_record_commit_adds_the_record_files_only`, `test_w2_209_cut.py::test_s7_the_record_commit_carries_the_orchestrator_the_standing_decision_and_task_release`, `test_w2_209_cut.py::test_s7_w2_integrate_holds_the_record_commit_by_an_ordinary_merge`, `test_w2_209_cut.py::test_s7_the_manifest_is_built_as_gov_release_builds_it_and_verifies`, `test_w2_209_cut.py::test_s7_gates_json_and_suite_json_hold_the_evidence`, `test_w2_209_cut.py::test_s7_g3_ran_once_on_c_and_the_re_pin_after_the_tag`, `test_w2_209_cut.py::test_s7_every_caller_but_the_orchestrator_is_refused_before_anything_is_read`, `test_w2_209_cut.py::test_s7_a_role_flag_does_not_make_an_orchestrator`, `test_w2_209_cut.py::test_s7_the_owner_plain_terminal_is_refused_and_never_asked_the_typed_code`, `test_w2_209_cut.py::test_s7_the_plain_form_from_an_orchestrator_session_is_refused_as_today`, `test_w2_209_cut.py::test_s7_gov_release_has_the_patch_flags_and_no_stand_in_flag`, `test_w2_209_cut.py::test_s7_the_command_line_runs_the_real_rehearsal_whatever_the_environment_says` | `gov.release._patch_test` does not exist (`missing`); `gov release` has no `--patch` (argparse, no envelope; `--help` lacks `--patch`, `--check`, `--suite`, `--kept`, `--push`); the plain-form case pins DEC-772 and passes on the base |
 | S8 | `test_w2_209_repin.py::test_s8_a_green_re_pin_switches_the_link_to_the_new_pin`, `test_w2_209_repin.py::test_s8_a_green_re_pin_commits_the_registry_entry_with_the_orchestrator_and_the_standing_decision`, `test_w2_209_repin.py::test_s8_a_green_re_pin_writes_repin_json_ok_and_rollback_sh`, `test_w2_209_repin.py::test_s8_each_early_stop_changes_nothing` | `gov.release.repin` does not exist (`missing`) |
@@ -250,7 +285,9 @@ Run: `TMPDIR=$(mktemp -d) PYTHONPATH=$PWD/src python3 -m pytest tests/acceptance
 **Green on the base, by design** (they pin today's behaviour the ticket says stays): the two
 `test_s2_pending_reads_the_kind_of_the_release_record` rows, `test_s7_the_plain_form_from_an_orchestrator_session_is_refused_as_today`,
 `test_f5_the_plain_form_is_refused_from_an_orchestrator_session` and
-`test_f5_the_plain_form_is_refused_without_a_terminal_and_without_a_role`. Every line they sit under also holds
+`test_f5_the_plain_form_is_refused_without_a_terminal_and_without_a_role`. The regression fix's guards are green on the base too: `test_s12_ready_before_and_not_ready_after_is_a_regression_...`
+(the base already refuses a READY-then-NOT_READY judge and names both verdicts), the five `test_s12_a_judge_that_raises_or_returns_no_verdict_is_never_a_pass`
+cases and `test_s13_with_no_queue_ticket_...`. Every line they sit under also holds
 cases that are red on the base. W2-16's owner-terminal cases (`tests/acceptance/W2-16/test_w2_16_owner_terminal.py`)
 stay in W2-16's folder; the landing selects them for any change under `src/gov/release`.
 
