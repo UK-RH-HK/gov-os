@@ -1,9 +1,11 @@
 # Criticality rules (W2-184, DEC-1120 (1), DEC-1167 (2); the list of audit 4's Table 3, DEC-1214 K1, W2-201): a ticket's
-# class is the highest of the rules that match. Read at launch by gov.launch.criticality and by the helper model rule
+# class is the highest of the rules that match. Since DEC-1225 (2026-11-22) a class no longer picks a model: every
+# agent but the two orchestrating roles runs Sonnet at every class, and an Opus run is only an exceptions entry
+# (governance/project/model-exceptions.yaml); the class is only what an entry's `class: C3` limiter reads. Read at launch by gov.launch.criticality and by the helper model rule
 # (.claude/hooks/agent_model.py). A glob matches an allowed path as an fnmatch pattern ('*' crosses '/').
 version: 1
 default: C2                    # the class when no rule matches
-opus: claude-opus-5-5          # the Opus model a promotion and a FULL ticket's probe use
+opus: claude-opus-5-5          # the Opus model an exceptions entry may cover (a promotion's and a probe's too); a class picks no model
 rules:
   # C3: the kernel and the Contract; the landing and close; the memory measure and sets; release, update and pin; the
   # path map. The guard, the hooks, the settings, secrets, walls, held-out and operator entries are retired (DEC-1214 K1).

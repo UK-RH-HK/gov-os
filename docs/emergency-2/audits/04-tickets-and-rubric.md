@@ -175,19 +175,19 @@ Find the KPI line with `gov retrieve` first (5.4).
 - **C2:** all other `src/**`, schemas, the test map, run-time tool code.
 - **C1:** records, docs, scratch tools.
 
-**Model and effort per role.** This is DEC-1120 (2)-(3) with the reviewer rows removed (3.6) and the landing auditor added (O-5). Max only with a recorded reason (DEC-1120 (3)). RT-8 reads this table.
+**Model and effort per role.** This is DEC-1120 (2)-(3) with the reviewer rows removed (3.6) and the landing auditor added (O-5). Max only with a recorded reason (DEC-1120 (3)). RT-8 reads this table. **Note, DEC-1225 (2026-11-22):** the table below replaces DEC-1214 K1's. Opus runs only the orchestrating sessions (each app's CTO and the senior engineer); every other agent runs Sonnet, high, at every class, C3 and C0 included; no session runs Fable. The one exception is a wide, comprehensive audit the owner asks for, which runs on Opus through the exceptions file (`governance/project/model-exceptions.yaml`); a reviewer called after a failed landing or for a bug runs Sonnet. A class no longer picks a model.
 
 | Role | C3 | C2 | C1 |
 |---|---|---|---|
 | CTO, senior engineer | Opus, high | Opus, high | Opus, high |
-| Ticket lead (features) | Opus, high | Opus, high (a Sonnet trial is allowed, DEC-1120 (3)) | not ticketed |
-| Independent test designer | Opus, high | Sonnet, high | Sonnet, high |
-| Engineer (feature or launched fix) | Opus, high | Sonnet, high | Sonnet, high |
-| Quality auditor on a red landing or failed merge | Opus, high | Sonnet, high; Opus after a second failure | Sonnet, high |
-| Batched review (3.6) | Opus, high | Opus, high | — |
+| Ticket lead (features) | Sonnet, high | Sonnet, high | not ticketed |
+| Independent test designer | Sonnet, high | Sonnet, high | Sonnet, high |
+| Engineer (feature or launched fix) | Sonnet, high | Sonnet, high | Sonnet, high |
+| Quality auditor on a red landing or failed merge | Sonnet, high | Sonnet, high | Sonnet, high |
+| Batched review (3.6) | Sonnet, high | Sonnet, high | — |
 | Product-spec, research | Sonnet, high | Sonnet, high | Sonnet, high |
-| Question writers / their checkers / the memory reader | Sonnet, high / Opus, high / Opus, high, no tools (DEC-1098) | | |
-| Watchers, C0 helpers | Haiku | Haiku | Haiku |
+| Question writers / their checkers / the memory reader | Sonnet, high / Sonnet, high / Sonnet, high, no tools (DEC-1098, DEC-1225 (4)) | | |
+| Watchers, C0 helpers | Sonnet | Sonnet | Sonnet |
 
 **Measured against the 141 (estimate; method below).**
 

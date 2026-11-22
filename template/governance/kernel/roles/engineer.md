@@ -5,9 +5,8 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 - **Purpose:** implement one ticket to fulfil the spec and its KPIs, with builder tests as regression evidence. A
   session runs as `GOV_ROLE=engineer`, started with `gov launch engineer <ticket>` on an `in_progress` ticket whose
   `role` is engineer.
-- **Version:** 1.1.0
+- **Version:** 1.2.0
 - **Launch default:** model claude-sonnet-5-5, effort high
-- **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
 - **Skills:** test-driven-development, systematic-debugging, verification-before-completion, retrieval
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
