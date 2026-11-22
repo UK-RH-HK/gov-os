@@ -45,6 +45,12 @@ Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a`, branc
   with no model each come back with `model: "sonnet"`; an Opus auditor under the exception keeps Opus; Fable refused.
   Owner: W2-201 `DAEO-k1us`.
 
+- **F14 Ticket leads run Sonnet at medium effort** (DEC-1236 (2), the owner's change to the rubric): the rubric table
+  (`governance/project/criticality.yaml` and wherever `e2/models-rubric` put the DEC-1225 table), the role files and
+  their copies, and `gov launch` give a ticket lead (and a fix or chore lead) `--effort medium`; every other role's
+  model and effort stay exactly as DEC-1225 and the table set them (DEC-1236 (3): no other change to a model or effort).
+  Verify: a planted lead launch records Sonnet and medium; a worker launch is unchanged. Owner: W2-201 `DAEO-k1us`.
+
 ## Green and return
 `gov accept` of each owning ticket green; `tests/unit/launch`, `tests/unit/hooks` (with F13's cases), `tests/unit/update`,
 `tests/unit/adapters`, W1-28, W1-29, W1-38, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
