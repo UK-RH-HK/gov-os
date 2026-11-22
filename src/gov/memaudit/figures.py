@@ -96,7 +96,7 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
     graded = [r for r in rows.values() if r.get("grades")]
     agree = sum(1 for r in graded if (r["grades"].get("grader") or {}).get("grade")
                 == (r["grades"].get("check") or {}).get("grade"))
-    misses, by_outcome = [], {k: 0 for k in OUTCOMES}
+    misses, by_outcome, forbidden_cited = [], {k: 0 for k in OUTCOMES}, 0
     by_rank, by_ns = {"rank_1_5": 0, "rank_6_20": 0, "not_in_20": 0}, {"embedded": 0, "keyword_only": 0}
     by_cat, by_route = {c: 0 for c in categories}, {k: 0 for k in ROUTES}
     for q in questions:
@@ -108,6 +108,7 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
         misses.append({"id": i, "question": q["question"], "gold_answer": q["gold"], "gold_sources": q["raw_sources"],
                        "answer": answer_shown(row), "outcome": outcome, "evidence_in_bundle": bool(line.get("bundle"))})
         by_outcome[outcome] += 1
+        forbidden_cited += 1 if row.get("forbidden_cited") is True else 0  # rows from before the rule have no key
         rank = line.get("rank")
         by_rank["rank_1_5" if rank and rank <= 5 else "rank_6_20" if rank and rank <= 20 else "not_in_20"] += 1
         by_ns["keyword_only" if q["keyword"] else "embedded"] += 1
@@ -115,7 +116,7 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
             by_cat[q["category"]] += 1
         by_route[first_route(counting_folder, q, *where[i]) if i in where else "none"] += 1
     figures = {
-        "audit": audit, "n": n, "n_gold": ret["n"],
+        "audit": audit, "n": n, "n_gold": ret["n"], "forbidden_rule": "strict",
         "bar": {k: bar[k] for k in ("need_right", "max_wrong", "target_right")},
         "verdict": {"right": right, "wrong": wrong, "passes": right >= bar["need_right"] and wrong <= bar["max_wrong"],
                     "right_ok": right >= bar["need_right"], "wrong_ok": wrong <= bar["max_wrong"],
@@ -129,7 +130,7 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
                    "mcnemar_a1_a2": {"gains": gains, "losses": losses, "p": round(p, 6)},
                    "grader_agree": agree, "graded": len(graded),
                    "search_failures": sum(r.get("search_failures", 0) for r in rows.values())},
-        "misses": {"total": len(misses), "by_outcome": by_outcome, "by_rank": by_rank,
+        "misses": {"total": len(misses), "forbidden_cited": forbidden_cited, "by_outcome": by_outcome, "by_rank": by_rank,
                    "by_namespace": by_ns, "by_category": by_cat, "by_route": by_route},
         "control": None if control is None else {k: control.get(k) for k in ("hit5", "of", "last", "last_audit")},
         "pool": None, "classes": None, "spend": spend,
