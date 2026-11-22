@@ -131,3 +131,18 @@ is approved by the CTO's message (§3.5).
   and `src/gov/queue/**` are C3), tests under `tests/acceptance/W2-115b/` and `tests/unit/queue/`, red on the base;
   the engineer (Sonnet) until `gov accept W2-115b` is green. Every commit carries `Task: DAEO-j9z6` and a `Fix:`
   trailer with the line above. The ticket stays closed.
+
+## Fix: `gov queue` never leaves uncommitted work behind (F8; audit N-01; DEC-1232, DEC-1233)
+
+Found 2026-11-22 by the E2 audits (merged table, N-01), the one new gap that meets EMERGENCY-2 §3.2: it loses work. The queue
+merges the branch tip; a worktree holding that branch with uncommitted or untracked work was left behind unmerged and
+unnoticed. Required: such a worktree (linked or the main tree) is refused before the merge, `QUEUE_WORKTREE_DIRTY`, naming
+the worktree and the files; ignored files are not dirty; another branch's dirty worktree does not refuse; after commit or
+discard the same entry lands. Kind: a fix; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-115b/test_w2_115b_dirty_worktree.py` (README ids success-14 and failure-4; 8 red, 5 guards on the
+base), `708efc2c0`; code `src/gov/queue/checks.py` (`dirty_files`: `git status --porcelain -z --untracked-files=all
+--no-optional-locks`, never writes the worktree's index) and `command.py` (`_refuse_dirty`, called from `_candidate`; exit 1,
+the form of `BRANCH_UNKNOWN`: the lead's ruling), `72034b182`; units `tests/unit/queue/test_queue_dirty_worktree.py`. Lead
+`fixes-015b` (Sonnet), branch `e2/fixes-015b`. `gov accept W2-115b` green on the first run (success-1 to success-14,
+failure-1 to failure-4; 74 passed); `tests/unit/queue`: 119 passed. A worktree holding the branch with untracked files that
+are not gitignored (stray tool folders) now refuses: intended.
