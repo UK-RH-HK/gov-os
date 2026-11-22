@@ -57,7 +57,20 @@ Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a`, branc
   question carries a `forbidden` list; a figure without the stamp is never compared with one that has it. Builds on D5's
   `forbidden_rule` (landed with `e2/d5-memaudit-strict`). Owner: W2-204 `DAEO-ma4q`.
 
+- **F16 W1-21's two rerank cases pin a retired bound:** `tests/acceptance/W1-21/test_w1_21_merge.py`
+  `test_several_batches_are_reranked_in_one_pass_over_the_merged_set` and `test_a_rerank_over_more_than_thirty_candidates`
+  assert at most 16 texts a request (DEC-1067 (f)); the code's bound is `MAX_REQUEST_TEXTS = 64` with
+  `MAX_REQUEST_CHARS = 24_000` (`src/gov/retrieval/rerank.py:38-50`, DEC-1090 (2), W2-137), so both fail on a green base
+  (18 and 40 texts). The test designer revises them to the bounds in force (count ≤ `MAX_REQUEST_TEXTS`, padded size ≤
+  `MAX_REQUEST_CHARS`, read from the module, not restated), with a Rewrite-Reason naming DEC-1090 (2). No code change.
+  Owner: W1-21 `DAEO-5x4l`.
+- **F17 `gov accept W1-06` and `gov accept W1-48` stop with `ACCEPT_MAP_UNREADABLE`:** the test designer writes each
+  README's KPI map in the form `gov accept` reads (as fixes-015b's F5 did for W2-16); no test changed. Owners: W1-06, W1-48.
+- **F18 `gov doctor` reports the pytest plugins as missing tools:** `pytest-xdist`, `pytest-timeout`, `pytest-testmon`
+  (registry entries, Python packages with no binary) read `ok: false`; doctor checks them as packages (by
+  `importlib.metadata` version, as `pyyaml` is), not as binaries. Owner: W2-22 `DAEO-xm6l`.
+
 ## Green and return
 `gov accept` of each owning ticket green; `tests/unit/launch`, `tests/unit/hooks` (with F13's cases), `tests/unit/update`,
-`tests/unit/adapters`, `tests/unit/memaudit`, W2-204, W1-28, W1-29, W1-38, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
+`tests/unit/adapters`, `tests/unit/memaudit`, W2-204, W1-06, W1-21, W1-28, W1-29, W1-38, W1-48, W2-22, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
 owning ticket and tests; reds not yours; the trial figures.
