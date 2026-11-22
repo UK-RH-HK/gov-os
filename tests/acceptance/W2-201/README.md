@@ -372,9 +372,9 @@ promotion, probe, trial and substitution rules:
 
 Extra evidence for S21 (R4), outside this folder and not in the map: `tests/unit/memaudit/test_judge.py::test_each_call_is_the_fresh_80s_argv_with_no_tools_and_the_models_of_item_7` and `::test_figures_json_holds_exactly_item_10s_keys_and_counts` (run with `--optin=lifted`), and W2-171's `test_s3_the_calls_carry_the_fresh_80s_prompts_models_budgets_and_flags` and `test_s6_figures_json_has_exactly_the_keys_of_item_10_and_the_planted_values` (with `--optin=lifted`): the reader, grader and check calls carry `--model claude-sonnet-5-5`, and `FIGURES.json` holds `models` with the three. W2-171's `fake_claude.py` tells the check from the grader by call order, as `tests/unit/memaudit/fakes.py` does, since the model no longer does.
 
-## Fix F13: the hook writes the model into the spawn (fixes-015a; owner W2-201)
+## Fix F13 (success-22): the hook writes the model into the spawn (fixes-015a; owner W2-201)
 
 | KPI | Tests | Today (base), and why |
 |---|---|---|
-| fix-F13 | `test_w2_201_fix_f13_model_written.py::test_a_spawn_naming_no_model_comes_back_with_sonnet_and_every_other_key` (Explore, Plan, general-purpose, engineer, no type; tools Agent and Task) | **red**: the hook prints nothing for a spawn naming no model, so no `updatedInput` carries `model` sonnet |
-| fix-F13 | `test_w2_201_fix_f13_model_written.py::test_an_opus_auditor_under_an_exception_keeps_its_model`, `test_fable_is_refused`, `test_a_spawn_already_naming_sonnet_passes_with_its_model`, `test_another_tool_is_left_alone` | green today (guards) |
+| success-22 | `test_w2_201_fix_f13_model_written.py::test_a_spawn_naming_no_model_comes_back_with_sonnet_and_every_other_key` (Explore, Plan, general-purpose, engineer, no type; tools Agent and Task) | **red**: the hook prints nothing for a spawn naming no model, so no `updatedInput` carries `model` sonnet |
+| success-22 | `test_w2_201_fix_f13_model_written.py::test_an_opus_auditor_under_an_exception_keeps_its_model`, `test_fable_is_refused`, `test_a_spawn_already_naming_sonnet_passes_with_its_model`, `test_another_tool_is_left_alone` | green today (guards) |

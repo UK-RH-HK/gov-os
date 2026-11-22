@@ -22,7 +22,7 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 
 ## KPI-to-test map
 
-### Success line 1 — SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_active [CAP-15.g, CAP-37.b]
+### Success 1 — SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_active [CAP-15.g, CAP-37.b]
 
 | Test | Covers | Red reason |
 |------|--------|------------|
@@ -38,27 +38,27 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 | `TestStop::test_no_checkpoint_without_ticket` | CAP-37.b, Point 4 | GREEN (Stop already skips when GOV_TICKET is empty) |
 | `TestStop::test_respects_stop_hook_active` | CAP-37.b | hook not built |
 
-### Success line 2 — SubagentStop enforces the 12-field return contract of Framework §61 [CAP-37.d]
+### Success 2 — SubagentStop enforces the 12-field return contract of Framework §61 [CAP-37.d]
 
 | Test | Covers | Red reason |
 |------|--------|------------|
 | `TestSubagentStop::test_accepts_all_twelve_fields` | CAP-37.d | hook not built |
 | `TestSubagentStop::test_blocks_missing_fields` | CAP-37.d | hook not built |
 | `TestSubagentStop::test_block_includes_reason_and_is_once` | CAP-37.d | hook not built |
-| `TestSubagentStop::test_malformed_input_fails_closed[empty stdin]` | CAP-37.d, DEC-136 | hook not built |
-| `TestSubagentStop::test_malformed_input_fails_closed[invalid JSON]` | CAP-37.d, DEC-136 | hook not built |
-| `TestSubagentStop::test_malformed_input_fails_closed[null last_assistant_message]` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_malformed_input_fails_closed` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_malformed_input_fails_closed` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_malformed_input_fails_closed` | CAP-37.d, DEC-136 | hook not built |
 | `TestSubagentStop::test_text_labels_without_content_do_not_satisfy_contract` | CAP-37.d, DEC-413, Point 5 | RED (text-path regex accepts labels without content — fail-open) |
 | `TestSubagentStop::test_empty_and_null_values_do_not_satisfy_contract` | CAP-37.d, DEC-136 | hook not built |
 
-### Success line 3 — A checkpoint is written when context utilisation passes the threshold, not only at PreCompact [CAP-37.c]
+### Success 3 — A checkpoint is written when context utilisation passes the threshold, not only at PreCompact [CAP-37.c]
 
 | Test | Covers | Red reason |
 |------|--------|------------|
 | `TestCheckpointOnContextUtilisation::test_stop_writes_checkpoint_not_only_precompact` | CAP-37.c | hook not built |
 | `TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation` | CAP-37.c | GREEN (tests W1-25 `record.watch`) |
 
-### Success line 4 — Compaction preserves decisions, ticket and loop counts; PreCompact checkpoint, SessionStart re-injection, auto-compact threshold (DEC-208)
+### Success 4 — Compaction preserves decisions, ticket and loop counts; PreCompact checkpoint, SessionStart re-injection, auto-compact threshold (DEC-208)
 
 | Test | Covers | Red reason |
 |------|--------|------------|
@@ -67,19 +67,19 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 | `TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts` | DEC-208, DEC-096, KPI line 4 | GREEN (preservation already works) |
 | `TestCompactionPreservesState::test_auto_compact_threshold` | DEC-208 | GREEN (rewrite: owner correction — see §9 below) |
 
-### Failure line 1 — A Stop hook loops
+### Failure 1 — A Stop hook loops
 
 | Test | Covers | Red reason |
 |------|--------|------------|
 | `TestNoStopLoop::test_stop_exits_without_side_effects_when_active` | DEC-025 | hook not built |
 
-### Failure line 2 — SessionStart injects more than the cap
+### Failure 2 — SessionStart injects more than the cap
 
 | Test | Covers | Red reason |
 |------|--------|------------|
 | `TestInjectionCap::test_large_context_within_cap` | CAP-15.g | hook not built |
 
-### Failure line 3 — A handoff or ticket close proceeds while the latest checkpoint is stale for its policy
+### Failure 3 — A handoff or ticket close proceeds while the latest checkpoint is stale for its policy
 
 | Test | Covers | Red reason |
 |------|--------|------------|
@@ -401,18 +401,18 @@ Cases: 42 in the full run, 3 in `breadth`, 0 in `lifted`.
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_a... | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestStop::test_respects_stop_hook_active`, `test_session_hooks.py::TestSessionStart::test_reinjects_on_compact_clear_resume` (3 of 3) | the ticket's words |
-| S2: SubagentStop enforces the 12-field return contract of Framework §61 (task, status, work_completed, files_changed, evidence, tests, discoveries,... | `test_session_hooks.py::TestSubagentStop::test_accepts_all_twelve_fields`, `test_session_hooks.py::TestSubagentStop::test_blocks_missing_fields`, `test_session_hooks.py::TestSubagentStop::test_text_labels_without_content_do_not_satisfy_contract` | the ticket's words |
-| S3: A checkpoint is written when the session's context utilisation passes the configured threshold, not only at PreCompact [CAP-37.c] | `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation` | the ticket's words |
-| S4: A compaction preserves the open decisions, the active ticket and the loop counts; PreCompact writes the checkpoint, and SessionStart (on compac... | `test_session_hooks.py::TestCompactionPreservesState::test_auto_compact_threshold`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts` | the ticket's words |
-| F1: A Stop hook loops | `test_session_hooks.py::TestStop::test_respects_stop_hook_active` | the ticket's words |
-| F2: SessionStart injects more than the cap | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_ticket`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions` | the ticket's words |
-| F3: A handoff or ticket close proceeds while the latest checkpoint is stale for its policy (watchdog, Contract v3 N3) | `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation`, `test_session_hooks.py::TestWatchdogBlocksStale::test_stale_on_ticket_transition`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_stop_writes_checkpoint_not_only_precompact` | the ticket's words |
+| success-1: SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_a... | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestStop::test_respects_stop_hook_active`, `test_session_hooks.py::TestSessionStart::test_reinjects_on_compact_clear_resume` (3 of 3) | the ticket's words |
+| success-2: SubagentStop enforces the 12-field return contract of Framework §61 (task, status, work_completed, files_changed, evidence, tests, discoveries,... | `test_session_hooks.py::TestSubagentStop::test_accepts_all_twelve_fields`, `test_session_hooks.py::TestSubagentStop::test_blocks_missing_fields`, `test_session_hooks.py::TestSubagentStop::test_text_labels_without_content_do_not_satisfy_contract` | the ticket's words |
+| success-3: A checkpoint is written when the session's context utilisation passes the configured threshold, not only at PreCompact [CAP-37.c] | `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation` | the ticket's words |
+| success-4: A compaction preserves the open decisions, the active ticket and the loop counts; PreCompact writes the checkpoint, and SessionStart (on compac... | `test_session_hooks.py::TestCompactionPreservesState::test_auto_compact_threshold`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts` | the ticket's words |
+| failure-1: A Stop hook loops | `test_session_hooks.py::TestStop::test_respects_stop_hook_active` | the ticket's words |
+| failure-2: SessionStart injects more than the cap | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_ticket`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions` | the ticket's words |
+| failure-3: A handoff or ticket close proceeds while the latest checkpoint is stale for its policy (watchdog, Contract v3 N3) | `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation`, `test_session_hooks.py::TestWatchdogBlocksStale::test_stale_on_ticket_transition`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_stop_writes_checkpoint_not_only_precompact` | the ticket's words |
 
-## Fix F12: the SubagentStop hook stops blocking twice (fixes-015a; owner W1-29)
+## Fix F12 (success-5): the SubagentStop hook stops blocking twice (fixes-015a; owner W1-29)
 
 | KPI | Tests | Today (base), and why |
 |---|---|---|
-| fix-F12 | `test_w1_29_fix_stop_hook.py::test_a_return_with_each_value_on_the_next_line_passes` (plain and heading labels) | **red**: a value on the line after its label is not read, so the return blocks |
-| fix-F12 | `test_w1_29_fix_stop_hook.py::test_stop_hook_active_exits_zero_even_for_a_return_that_would_block` | **red**: `stop_hook_active` is not read, exit 2 |
-| fix-F12 | `test_w1_29_fix_stop_hook.py::test_a_label_with_nothing_after_it_still_blocks`, `test_an_incomplete_return_blocks_once_without_stop_hook_active`, `test_a_return_with_each_value_on_the_next_line_passes` (bold label) | green today (guards: the block stays for a real gap) |
+| success-5 | `test_w1_29_fix_stop_hook.py::test_a_return_with_each_value_on_the_next_line_passes` (plain and heading labels) | **red on the base** (green now): a value on the line after its label is not read, so the return blocks |
+| success-5 | `test_w1_29_fix_stop_hook.py::test_stop_hook_active_exits_zero_even_for_a_return_that_would_block` | **red**: `stop_hook_active` is not read, exit 2 |
+| success-5 | `test_w1_29_fix_stop_hook.py::test_a_label_with_nothing_after_it_still_blocks`, `test_an_incomplete_return_blocks_once_without_stop_hook_active`, `test_a_return_with_each_value_on_the_next_line_passes` (bold label) | green today (guards: the block stays for a real gap) |

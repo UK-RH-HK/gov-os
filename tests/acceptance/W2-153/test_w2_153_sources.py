@@ -22,6 +22,7 @@ import sys
 import pytest
 
 import w2_153_support as support
+from gov.adapters import portability
 from w2_153_support import KERNEL_ROLE_TEMPLATE, SKILLS
 
 TREES = (".rulesync", "template/.rulesync")
@@ -48,6 +49,7 @@ def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_
     rel = f"{tree}/subagents/{role}.md"
     front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
     _template_front, template_body = support.split_front(_template_text(role))
+    template_body = portability.fill_slots(template_body)  # F11 (DAEO-3ef2): a role file holds no unfilled slot
     _role_front, role_body = support.split_front(_role_text(role))
     expected_body = support.composed_body(template_body, role_body)
     assert body == expected_body, (

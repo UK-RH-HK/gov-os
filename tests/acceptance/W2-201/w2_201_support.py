@@ -206,8 +206,24 @@ def run_hook(project, event, base=None):
 
 
 def let_through(run):
+    """Exit 0. A spawn that names no model comes back with its input whole and ``model`` ``sonnet`` (F13, the hook
+    writes the model into the spawn, PreToolUse ``updatedInput``); one that names a model prints nothing, or the
+    same input unchanged."""
     assert run.code == 0, f"the hook did not let the spawn through (exit 0)\n{run.describe()}"
-    assert run.stdout.strip() == "", f"the hook let the spawn through but wrote to stdout\n{run.describe()}"
+    try:
+        event = json.loads(run.event)
+        sent = event["tool_input"] if event.get("tool_name") in ("Agent", "Task") else None
+    except (ValueError, KeyError, AttributeError, TypeError):
+        sent = None
+    if isinstance(sent, dict) and not str(sent.get("model") or "").strip():
+        out = json.loads(run.stdout)["hookSpecificOutput"]
+        assert out["permissionDecision"] == "allow", run.describe()
+        assert out["updatedInput"] == {**sent, "model": "sonnet"}, run.describe()
+        return
+    if run.stdout.strip():
+        assert sent is not None, f"the hook wrote to stdout for an event that is not a spawn\n{run.describe()}"
+        out = json.loads(run.stdout)["hookSpecificOutput"]
+        assert out["updatedInput"] == sent, f"the hook changed a spawn that named a model\n{run.describe()}"
 
 
 def refused(run, *words):
