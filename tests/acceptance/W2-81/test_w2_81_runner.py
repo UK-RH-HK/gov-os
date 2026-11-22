@@ -378,6 +378,11 @@ def test_the_report_log_and_output_hold_no_question_answer_or_secret_text(ready_
     assert code == 1  # today's code: handlings not built
     texts = {name: (ready_run["folder"] / name).read_text() for name in ("report.json", "report.md", "run.log")}
     texts["stdout"], texts["stderr"] = out, err
+    saved = json.loads(texts["report.json"])  # the rows' `bundle` is the one place a file's path is recorded, and a
+    for repo in saved["repositories"].values():  # gold answer can be a file's name (a path is not answer text)
+        for row in (repo["figures"] or {}).get("per_question", []):
+            row.pop("bundle", None)
+    texts["report.json"] = json.dumps(saved, indent=2)
     asked = []
     for name, repo in ready_run["repos"].items():
         asked += questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
@@ -833,3 +838,396 @@ def test_a_sets_root_whose_variants_file_cannot_be_read_is_refused_naming_the_fi
     out, err = capfd.readouterr()
     assert code == 2 and err.startswith("refused: the hidden file variants.yaml cannot be read"), (code, out, err)
     assert "Zephyr" not in out + err
+
+
+# --------------------------------------------------------------------------
+# Fixes of W2-81's proving run on 0.1.4 (the test designer's own test code; the failing test first)
+# --------------------------------------------------------------------------
+
+def _calls(gov, sub):
+    """The environments (name -> value) a stand-in gov ran its calls of one subcommand in."""
+    return [env for name, env in standin.env_of(gov) if name == sub]
+
+
+def test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_before(ready_run, tmp_path, monkeypatch):
+    """Fix T1: the landing's ``gov queue`` is started with the ``HOME`` of the runner's own process (pytest lives in
+    the operator's user site); ``gov retrieve`` keeps the run's scrubbed ``HOME``, and no other variable differs."""
+    operator = tmp_path / "operator-home"
+    operator.mkdir()
+    monkeypatch.setenv("HOME", str(operator))
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1")
+    folder = ready_run["folder"]
+    queues, retrieves = _calls(gov, "queue"), _calls(gov, "retrieve")
+    assert len(queues) == len(runner.EXPECTED) and retrieves
+    assert all(env.get("HOME") == str(operator) for env in queues), [env.get("HOME") for env in queues]
+    assert all(Path(env["HOME"]).resolve() == (folder / ".home").resolve() for env in retrieves), \
+        "gov retrieve keeps the run's scrubbed HOME"
+    assert all(Path(env["TMPDIR"]).resolve() == (folder / ".tmp").resolve() for env in queues + retrieves)
+    as_before = {k: v for k, v in retrieves[0].items() if k != "HOME"}
+    for env in queues:
+        assert {k: v for k, v in env.items() if k != "HOME"} == as_before, "a variable other than HOME differs"
+    assert os.environ["HOME"] == str(operator), "the runner's own process keeps its HOME"
+
+
+ADDRESS = "lead:E2-w2-81-fixes"  # the starter's address, as a ticket lead's launched sessions carry it
+UNSET = object()
+
+
+class _Watching(standin.Sessions):
+    """The stand-in session starter, recording the ``GOV_MSG_ADDRESS`` of the process it runs in (the product's
+    ``run_claude`` inherits the runner's own environment, so that is what a launched session would see)."""
+
+    def __init__(self, *args, fail=False, **more):
+        super().__init__(*args, **more)
+        self.addresses, self.fail = [], fail
+
+    def __call__(self, argv, prompt, cwd):
+        self.addresses.append(os.environ.get("GOV_MSG_ADDRESS", UNSET))
+        if self.fail:
+            raise RuntimeError("a session that falls over")
+        return super().__call__(argv, prompt, cwd)
+
+
+def _addresses(gov, *subs):
+    return [env.get("GOV_MSG_ADDRESS", UNSET) for name, env in standin.env_of(gov) if name in subs]
+
+
+@pytest.mark.parametrize("how", ["from-the-environment", "notify-wins", "neither"])
+def test_every_process_the_run_starts_carries_the_address_of_whoever_started_it(ready_run, tmp_path, monkeypatch, how):
+    """Fix T10: ``gov retrieve``, ``gov queue`` and the reader's and grader's sessions all carry the starter's
+    ``$GOV_MSG_ADDRESS`` (``--notify`` wins over it); started with neither, nothing is set (today's behaviour: the
+    product's launcher then defaults the address to the live CTO's inbox, which is the defect)."""
+    more = {}
+    if how == "neither":
+        monkeypatch.delenv("GOV_MSG_ADDRESS", raising=False)
+        wanted = UNSET
+    elif how == "from-the-environment":
+        monkeypatch.setenv("GOV_MSG_ADDRESS", ADDRESS)
+        wanted = ADDRESS
+    else:
+        monkeypatch.setenv("GOV_MSG_ADDRESS", "lead:another-starter")
+        more["notify"], wanted = ADDRESS, ADDRESS
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    session = _Watching("search-first")
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=session, **more)
+    seen = _addresses(gov, "retrieve", "queue")
+    assert "queue" in [n for n, _ in standin.env_of(gov)] and "retrieve" in [n for n, _ in standin.env_of(gov)]
+    assert seen and all(a == wanted for a in seen), set(map(str, seen))
+    assert session.addresses and all(a == wanted for a in session.addresses), set(map(str, session.addresses))
+    # restored afterwards: the process is left as the run found it
+    found = {"neither": UNSET, "from-the-environment": ADDRESS, "notify-wins": "lead:another-starter"}[how]
+    assert os.environ.get("GOV_MSG_ADDRESS", UNSET) == found
+
+
+@pytest.mark.parametrize("before", [ADDRESS, None])
+def test_the_address_is_restored_after_the_run_even_when_a_session_falls_over(ready_run, tmp_path, monkeypatch, before):
+    """Fix T10: ``--notify`` is set in the runner's own process for the duration of the run only, and put back (or
+    removed) when the run ends, whether it ends in a report or in an error."""
+    if before is None:
+        monkeypatch.delenv("GOV_MSG_ADDRESS", raising=False)
+    else:
+        monkeypatch.setenv("GOV_MSG_ADDRESS", before)
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    session = _Watching(fail=True)
+    with pytest.raises(RuntimeError):
+        _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1", session=session, notify="lead:during-the-run")
+    assert session.addresses and set(session.addresses) == {"lead:during-the-run"}, "set while the sessions ran"
+    assert os.environ.get("GOV_MSG_ADDRESS") == before, "restored (or removed) afterwards"
+
+
+def test_the_adoption_stages_carry_the_address_too_and_keep_the_runs_own_home(tmp_path, monkeypatch):
+    """Fix T10 for ``gov adopt`` (run mode), and a guard for Fix T1: ``gov adopt`` keeps the scrubbed ``HOME`` while
+    ``gov queue`` is given the operator's."""
+    operator = tmp_path / "operator-home"
+    operator.mkdir()
+    monkeypatch.setenv("HOME", str(operator))
+    monkeypatch.setenv("GOV_MSG_ADDRESS", ADDRESS)
+    gov = standin.write_gov(tmp_path / "tools", "gov-env", {})
+    session = _Watching()
+    runner.run(_options(tmp_path / "run", "run", seed=11, gov=gov, pinned_gov=gov, adopter_model=SONNET,
+                        queue_ticket="PG-1"), session=session)
+    adopts = _calls(gov, "adopt")
+    assert len(adopts) == len(runner.EXPECTED) * len(runner.DEFAULT_STAGES)
+    assert all(env.get("GOV_MSG_ADDRESS") == ADDRESS for env in adopts)
+    assert all(Path(env["HOME"]).resolve() == (tmp_path / "run" / ".home").resolve() for env in adopts)
+    assert all(env.get("GOV_MSG_ADDRESS") == ADDRESS and env.get("HOME") == str(operator)
+               for env in _calls(gov, "queue"))
+    assert all(a == ADDRESS for a in session.addresses)
+
+
+def test_notify_is_an_option_of_the_command_and_names_no_default():
+    assert runner.parse(["--folder", "x"]).notify is None
+    assert runner.parse(["--folder", "x", "--notify", ADDRESS]).notify == ADDRESS
+
+
+def _asked(ready_run, name):
+    """The questions of one repository as the runner asks them (the visible half and the stand-in hidden half)."""
+    repo = ready_run["repos"][name]
+    return questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
+                             "visible") + questions.resolve(questions.sets_in(ready_run["hidden"])[name],
+                                                            repo.manifest, repo.root, "hidden")
+
+
+def _once(items):
+    """The stack a question's bundle becomes: each (path, start, end) taken once, in order."""
+    out = []
+    for item in items:
+        if item not in out:
+            out.append(item)
+    return out
+
+
+def _rows_saved(ready_run, name):
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    return {row["id"]: row for row in saved["repositories"][name]["figures"]["per_question"]}
+
+
+@pytest.mark.parametrize("order", ["forbidden", "late"])
+def test_the_report_records_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source(ready_run, order):
+    """Fix T6: each row of a repository's ``per_question`` holds the bundle the retrieval gave (``[path, start, end]``
+    in rank order, all items), the 1-based rank of the first forbidden source (null when none) and of the first gold
+    source; ``first_gold_rank`` stays. ``forbidden``: a forbidden path first, then the gold; ``late``: five filler
+    items before the gold (the gold is at rank 6)."""
+    govs = ready_run["govs"]
+    _read(ready_run, gov=govs[order], pinned_gov=govs["good"], queue_ticket="PG-1")
+    checked = 0
+    for name in runner.EXPECTED:
+        rows = _rows_saved(ready_run, name)
+        for q in _asked(ready_run, name):
+            gold = [[p, line, line] for p, line, _ in q.sources]
+            first = [[q.forbidden[0], 1, 1]] if order == "forbidden" and q.forbidden else \
+                [[f"filler/f{n}.md", 1, 1] for n in range(5)] if order == "late" else []
+            row = rows[q.id]
+            assert row["bundle"] == [list(i) for i in _once(tuple(i) for i in first + gold)], (name, q.id)
+            shift = len(first)
+            assert row["gold_rank"] == shift + 1 and row["diagnostic"]["first_gold_rank"] == shift + 1, (name, q.id)
+            assert row["forbidden_rank"] == (1 if order == "forbidden" and q.forbidden else None), (name, q.id)
+            checked += 1
+    assert checked >= 60, "every question of every repository, the hidden half's too"
+
+
+def test_a_question_whose_retrieval_failed_has_no_bundle_and_no_rank(ready_run, tmp_path):
+    broken = tmp_path / "tools" / "gov-broken"
+    broken.parent.mkdir()
+    broken.write_text("#!/bin/sh\ncase \"$1\" in --version) echo \"gov 0.1.4 (commit 0123456789ab)\" ;;\n"
+                      "retrieve) exit 3 ;; queue|adopt) exit 0 ;; *) exit 64 ;; esac\n")
+    broken.chmod(0o755)
+    _read(ready_run, gov=broken, pinned_gov=broken, queue_ticket="PG-1")
+    rows = _rows_saved(ready_run, "python-app")
+    assert rows and all(r["bundle"] is None and r["forbidden_rank"] is None and r["gold_rank"] is None
+                        and r["diagnostic"]["first_gold_rank"] is None for r in rows.values())
+
+
+def test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_rows_included(ready_run, tmp_path):
+    """Fix T6, and the rule of F4 kept: a row holds ids, numbers and the repository's own paths; no hidden question
+    holds a sentence of itself, its answer, or an item's text in the report, its markdown or the log."""
+    ranking = {}
+    for name in runner.EXPECTED:
+        ranking.update(standin.ranking_for(name, _asked(ready_run, name), "forbidden"))
+    for n, items in enumerate(ranking.values()):
+        for item in items:
+            item["text"] = f"Zephyr-item-text-{n}: a sentence of the repository's own file"
+    gov = standin.write_gov(tmp_path / "tools", "gov-text", ranking)
+    _read(ready_run, gov=gov, pinned_gov=gov, queue_ticket="PG-1")
+    shown = {name: (ready_run["folder"] / name).read_text() for name in ("report.json", "report.md", "run.log")}
+    for where, text in shown.items():
+        assert "Zephyr-item-text" not in text and "a sentence of the repository" not in text, where
+    allowed = {"id", "part", "right", "reason", "citation_right", "forbidden_cited", "grade", "reader", "diagnostic",
+               "bundle", "forbidden_rank", "gold_rank"}
+    hidden = 0
+    for name in runner.EXPECTED:
+        rows = _rows_saved(ready_run, name)
+        for q in _asked(ready_run, name):
+            row = rows[q.id]
+            assert set(row) <= allowed, (name, q.id, sorted(set(row) - allowed))
+            assert row["bundle"] and all(len(i) == 3 and isinstance(i[0], str) and isinstance(i[1], int)
+                                         and isinstance(i[2], int) for i in row["bundle"]), (name, q.id)
+            text = json.dumps({k: v for k, v in row.items() if k != "bundle"})  # a gold answer may be a file's name
+            for sentence in (q.question, q.gold_answer):
+                assert sentence not in text, f"{q.id}'s row holds a sentence of the question or its answer"
+            hidden += q.part == "hidden"
+    assert hidden == 10 * len(runner.EXPECTED), "the hidden half's rows were read"
+
+
+# --------------------------------------------------------------------------
+# Fix T3 (W2-81's proving run on 0.1.4): --exceptions <file>, an owner's exceptions read by the judge's overall
+# --------------------------------------------------------------------------
+
+DECISION_ID = "DEC-2001"
+
+
+def _judge_ids(report):
+    """The ids of the judge's reasons, <repository>:<CODE>:<subject>, as a report's judgements give them: what an
+    owner names in an exceptions file (a FOUND problem or a PRESENT stage is never one of them)."""
+    ids = []
+    for name in runner.EXPECTED:
+        repo = report["repositories"][name]
+        j = repo["judgement"] or {}
+        ids += [f"{name}:PLANTED:{p['id']}" for p in j.get("planted", []) if p["status"] != judge.FOUND]
+        ids += [f"{name}:CONTROL:{c['id']}" for c in j.get("controls", []) if c["status"] != judge.CLEAN]
+        ids += [f"{name}:STAGE:{s}" for s, v in j.get("stages", {}).items() if v["status"] != "PRESENT"]
+        value = (repo["figures"] or {}).get("end_to_end")
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 95.0:
+            ids.append(f"{name}:FIGURE:end_to_end")
+    return ids
+
+
+def _owner_file(folder, ids, name="owner-exceptions.json", decision=DECISION_ID):
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / name
+    data = {"decision": decision, "reasons": list(ids)}
+    path.write_text(json.dumps(data) if name.endswith(".json") else yaml.safe_dump(data), encoding="utf-8")
+    return path
+
+
+def _todays(ready_run, **more):
+    """A read on today's code (``built=None``): every handling not built is a reason, the landing and the hidden half
+    are as they should be, so the judge's reasons are all there is."""
+    govs = ready_run["govs"]
+    more.setdefault("gov", govs["good"])
+    more.setdefault("pinned_gov", govs["good"])
+    more.setdefault("queue_ticket", "PG-1")
+    return _read(ready_run, built=None, **more)
+
+
+@pytest.mark.parametrize("name", ["owner-exceptions.json", "owner-exceptions.yaml"])
+def test_every_judge_reason_named_in_the_owners_file_is_ready_with_exceptions_naming_the_decision(ready_run, tmp_path,
+                                                                                                  name):
+    first = _todays(ready_run)
+    ids = _judge_ids(first)
+    assert first["verdict"] == judge.NOT_READY and len(ids) > 10
+    path = _owner_file(tmp_path / "owner", [*ids, "python-app:STAGE:A9"], name)
+    report = _todays(ready_run, exceptions=path)
+    assert report["verdict"] == judge.READY_WITH_EXCEPTIONS == "READY_WITH_EXCEPTIONS", report["reasons"]
+    assert report["reasons"] == first["reasons"], "the reasons stay reasons"
+    assert report["reason_ids"] == ids and json.loads(
+        (ready_run["folder"] / "report.json").read_text())["reason_ids"] == ids, "the owner reads the ids here"
+    assert report["exceptions"]["decision"] == DECISION_ID
+    assert sorted(report["exceptions"]["named"]) == sorted(ids)
+    assert report["exceptions"]["unused"] == ["python-app:STAGE:A9"], "an unused id is reported, never an error"
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert saved["verdict"] == judge.READY_WITH_EXCEPTIONS and saved["exceptions"] == report["exceptions"]
+    markdown = (ready_run["folder"] / "report.md").read_text()
+    assert markdown.startswith("# W2-81 proving ground: READY_WITH_EXCEPTIONS")
+    assert DECISION_ID in markdown and all(i in markdown for i in ids), "the decision and each excepted id"
+
+
+def test_one_reason_the_owners_file_does_not_name_keeps_the_run_not_ready_and_is_named(ready_run, tmp_path):
+    ids = _judge_ids(_todays(ready_run))
+    path = _owner_file(tmp_path / "owner", ids[:-1])
+    report = _todays(ready_run, exceptions=path)
+    assert report["verdict"] == judge.NOT_READY
+    assert report["exceptions"]["unnamed"] == [ids[-1]] and sorted(report["exceptions"]["named"]) == sorted(ids[:-1])
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert saved["verdict"] == judge.NOT_READY and saved["exceptions"]["unnamed"] == [ids[-1]]
+    assert (ready_run["folder"] / "report.md").read_text().startswith("# W2-81 proving ground: NOT_READY")
+
+
+@pytest.mark.parametrize("extra, said", [
+    ("queue-fails", "gov queue PG-1 ended with exit 3"),
+    ("queue-not-run", "gov queue was not run"),
+    ("hidden-half-absent", "the measurement (hidden) half is not present and asked: 9 hidden questions asked"),
+])
+def test_the_runners_own_reasons_are_never_excusable_by_the_owners_file(ready_run, tmp_path, extra, said):
+    """A queue that did not land (not run, or not exit 0) and a hidden half that is absent are reasons no exceptions
+    file takes away, whatever it names."""
+    more = {}
+    if extra == "queue-fails":
+        more["pinned_gov"] = ready_run["govs"]["queue-fails"]
+    elif extra == "queue-not-run":
+        more["queue_ticket"] = []  # no ticket given: the landing is not run
+    else:
+        hidden = tmp_path / "hidden"
+        shutil.copytree(ready_run["hidden"], hidden)
+        data = yaml.safe_load((hidden / "rust-workspace.yaml").read_text())
+        data["questions"] = data["questions"][:9]
+        (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
+        more["hidden"] = hidden
+    ids = _judge_ids(_todays(ready_run, **more))
+    path = _owner_file(tmp_path / "owner", [*ids, "python-app:RUNNER:queue", "python-app:NOTJUDGED:-"])
+    report = _todays(ready_run, exceptions=path, **more)
+    assert report["verdict"] == judge.NOT_READY, "every judge reason is named, the runner's own is not excusable"
+    assert any(said in reason for reason in report["reasons"]), report["reasons"]
+
+
+def test_a_failing_adoption_stage_is_never_excusable_by_the_owners_file(tmp_path):
+    gov = standin.write_gov(tmp_path / "tools", "gov-adopt-fails", {}, adopt_exit=5)
+    common = {"seed": 11, "gov": gov, "pinned_gov": gov, "adopter_model": SONNET}
+    first = runner.run(_options(tmp_path / "run-a", "run", **common), session=standin.Sessions())
+    ids = _judge_ids(first)
+    assert ids and "python-app: gov adopt --lite --stage A0 ended with exit 5" in first["reasons"]
+    path = _owner_file(tmp_path / "owner", ids)
+    report = runner.run(_options(tmp_path / "run-b", "run", exceptions=path, **common), session=standin.Sessions())
+    assert report["verdict"] == judge.NOT_READY
+    assert "python-app: gov adopt --lite --stage A0 ended with exit 5" in report["reasons"]
+
+
+def test_exceptions_where_there_is_no_reason_leave_a_ready_run_ready(ready_run, tmp_path):
+    govs = ready_run["govs"]
+    path = _owner_file(tmp_path / "owner", ["python-app:STAGE:A7"])
+    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], queue_ticket="PG-1", exceptions=path)
+    assert report["verdict"] == judge.READY and report["reasons"] == [], report["reasons"]
+    assert report["exceptions"]["named"] == [] and report["exceptions"]["unused"] == ["python-app:STAGE:A7"]
+
+
+def test_the_command_exits_0_for_ready_with_exceptions_and_1_for_not_ready(ready_run, tmp_path, capfd):
+    govs = ready_run["govs"]
+    ids = _judge_ids(_todays(ready_run))
+    base = ["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(ready_run["hidden"]),
+            "--gov", str(govs["good"]), "--queue-ticket", "PG-1", *_flags(ready_run)]
+    whole = _owner_file(tmp_path / "owner", ids)
+    code = runner.main([*base, "--exceptions", str(whole)])
+    out, err = capfd.readouterr()
+    assert code == 0 and out.startswith("READY_WITH_EXCEPTIONS (seed "), (code, out, err)
+    short = _owner_file(tmp_path / "owner", ids[:-1], "short.json")
+    code = runner.main([*base, "--exceptions", str(short)])
+    out, err = capfd.readouterr()
+    assert code == 1 and out.startswith("NOT_READY (seed "), (code, out, err)
+    code = runner.main(base)  # no exceptions: as before
+    out, _ = capfd.readouterr()
+    assert code == 1 and out.startswith("NOT_READY (seed ")
+
+
+FAULTS = {  # a name -> (the file's text, or None for no file, a word the refusal says)
+    "no-such-file": (None, "read"),
+    "not-json-or-yaml": ('{"decision": "DEC-1", "reasons": [', "read"),
+    "a-list-not-a-mapping": ('["DEC-1", "r:STAGE:A7"]', "mapping"),
+    "no-decision": ('{"reasons": ["r:STAGE:A7"]}', "decision"),
+    "decision-not-a-string": ('{"decision": 12, "reasons": []}', "decision"),
+    "decision-not-dec-digits": ('{"decision": "DEC-12x", "reasons": []}', "decision"),
+    "decision-lower-case": ('{"decision": "dec-12", "reasons": []}', "decision"),
+    "decision-without-digits": ('{"decision": "DEC-", "reasons": []}', "decision"),
+    "decision-with-a-prefix": ('{"decision": "see DEC-12", "reasons": []}', "decision"),
+    "decision-empty": ('{"decision": "", "reasons": []}', "decision"),
+    "no-reasons": ('{"decision": "DEC-12"}', "reasons"),
+    "reasons-a-string": ('{"decision": "DEC-12", "reasons": "r:STAGE:A7"}', "reasons"),
+    "reasons-a-number": ('{"decision": "DEC-12", "reasons": [7]}', "reasons"),
+    "reasons-an-empty-string": ('{"decision": "DEC-12", "reasons": ["r:STAGE:A7", ""]}', "reasons"),
+    "reasons-null": ('{"decision": "DEC-12", "reasons": [null]}', "reasons"),
+    "a-duplicate-id": ('{"decision": "DEC-12", "reasons": ["r:STAGE:A7", "r:STAGE:A7"]}', "duplicate"),
+}
+
+
+@pytest.mark.parametrize("fault", sorted(FAULTS))
+def test_a_faulty_exceptions_file_is_refused_before_any_work_naming_the_file_and_the_fault(tmp_path, capfd, fault):
+    text, word = FAULTS[fault]
+    path = tmp_path / "owner" / "faulty-owner-file.json"
+    if text is not None:
+        path.parent.mkdir()
+        path.write_text(text, encoding="utf-8")
+    gov = standin.write_gov(tmp_path / "tools", "gov", {})
+    folder = tmp_path / "run"
+    code = runner.main(["--folder", str(folder), "--mode", "run", "--large-size", str(SMALL), "--seed", "11",
+                        "--hidden", str(_EMPTY_HIDDEN[0]), "--gov", str(gov), "--pinned-gov", str(gov),
+                        "--adopter-model", SONNET, "--claude", NO_CLAUDE, "--exceptions", str(path)])
+    out, err = capfd.readouterr()
+    assert code == 2 and not out, (code, out, err)
+    assert err.startswith("refused: ") and path.name in err and word in err.lower(), err
+    assert not folder.exists(), "something was built before the refusal"
+    assert standin.calls_of(gov) == [], "a gov was started before the refusal"
+
+
+def test_exceptions_is_an_option_of_the_command_and_has_no_default():
+    assert runner.parse(["--folder", "x"]).exceptions is None
+    assert runner.parse(["--folder", "x", "--exceptions", "owner.json"]).exceptions == "owner.json"

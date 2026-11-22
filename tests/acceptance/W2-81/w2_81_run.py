@@ -3,7 +3,7 @@
     PYTHONPATH=<the release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py --folder <path> \
         --mode build|run|read [--seed N] [--gov <exe>] [--pinned-gov <exe>] [--adopter-model <id>] [--claude <exe>] \
         [--queue-ticket [<repository>=]<id>]... [--hidden <dir> | --sets-root <root>] [--manifests <dir>] \
-        [--large-size <bytes>] [--stages A0,A1,A2]
+        [--large-size <bytes>] [--stages A0,A1,A2] [--notify <address>] [--exceptions <file>]
 
 - ``--folder``: the run folder, by literal path: a temporary folder, or ``~/gov-os-runs/W2-81/<run>`` (DEC-728).
   It is refused inside this repository or inside any git work tree the runner did not build.
@@ -24,6 +24,12 @@
 - The report: ``<folder>/report.json`` and ``<folder>/report.md`` (the end-to-end figure per repository first and
   decisive; hit@5 and the stacked share beside it, diagnostic); a log of steps, ``<folder>/run.log``; each question's
   verdict row (its answer text included) under ``<folder>/e2e/<repository>/``.
+
+- ``--notify <address>`` (else the runner's own ``$GOV_MSG_ADDRESS``): the starter's inbox address, set as
+  ``GOV_MSG_ADDRESS`` for every process the runner starts and in its own process for the run (restored afterwards).
+- ``--exceptions <file>``: an owner's exceptions (JSON or YAML, ``decision`` and ``reasons``: reason ids), read by the
+  judge's ``overall``: READY_WITH_EXCEPTIONS when every judge reason is named. The runner's own reasons are never
+  excused by it; a faulty file is refused before any work (exit 2). ``gov queue`` runs with the operator's ``HOME``.
 
 The hidden half is read only from ``--hidden``, or from the default hidden folder when that exists; a ``--hidden``
 that names no existing folder is refused. ``--sets-root <root>`` (W2-93, DEC-1144 (6)) names the evaluation sets' root
@@ -89,7 +95,7 @@ def _refuse_place(folder):
     return folder
 
 
-def _env(folder):
+def _env(folder, notify=None):
     home, tmp = folder / ".home", folder / ".tmp"
     home.mkdir(exist_ok=True)
     tmp.mkdir(exist_ok=True)
@@ -98,7 +104,32 @@ def _env(folder):
            "GIT_AUTHOR_NAME": "W2-81 runner", "GIT_AUTHOR_EMAIL": "w2-81-runner@example.invalid",
            "GIT_COMMITTER_NAME": "W2-81 runner", "GIT_COMMITTER_EMAIL": "w2-81-runner@example.invalid"}
     env.update({k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"})
+    if notify:  # the starter's inbox address: without it the product's launcher defaults to the live CTO's (T10)
+        env["GOV_MSG_ADDRESS"] = notify
     return env
+
+
+def _owner_exceptions(options):
+    """The owner's exceptions (``--exceptions <file>``), checked, or None: a file that cannot be read, with no decision
+    of the form DEC-<digits>, whose reasons are not a list of non-empty strings, or with a duplicate id is refused
+    (``refused: <file>: <fault>``, exit 2), before anything is built, started or asked."""
+    given = getattr(options, "exceptions", None)
+    if not given:
+        return None
+    try:
+        return judge.load_exceptions(Path(given).expanduser())
+    except judge.ExceptionsError as refused:
+        raise RunnerError(str(refused)) from None
+
+
+def _queue_env(env):
+    """The landing's environment: the run's own (``_env``) with the operator's ``HOME``, the runner process's own. The
+    pinned ``gov queue`` runs the repository's tests, and the tools they need (pytest) live in the operator's user
+    site; the scrubbed ``HOME`` suits retrieval's isolation, not the landing (the proving run on 0.1.4, T1)."""
+    landing = {k: v for k, v in env.items() if k != "HOME"}
+    if "HOME" in os.environ:
+        landing["HOME"] = os.environ["HOME"]
+    return landing
 
 
 class _Log:
@@ -331,10 +362,30 @@ def follow_moves(asked, moves):
 
 
 def run(options, built=None, session=None):
+    """The run, with the starter's address in the environment of every process it starts. The address is
+    ``--notify`` (``options.notify``), else the runner process's own ``$GOV_MSG_ADDRESS``, else none (then nothing is
+    set: today's behaviour). The reader's and grader's sessions are started by the product's ``run_claude``, which
+    inherits this process's environment, so the address is set here for the duration of the run and put back (or
+    removed) when it ends, whether in a report or an error. See ``_run`` for the rest."""
+    notify = getattr(options, "notify", None) or os.environ.get("GOV_MSG_ADDRESS") or None
+    before = os.environ.get("GOV_MSG_ADDRESS")
+    if notify:
+        os.environ["GOV_MSG_ADDRESS"] = notify
+    try:
+        return _run(options, built, session, notify)
+    finally:
+        if before is None:
+            os.environ.pop("GOV_MSG_ADDRESS", None)
+        else:
+            os.environ["GOV_MSG_ADDRESS"] = before
+
+
+def _run(options, built, session, notify):
     """The run; returns the report (also written in the folder). ``built``: the capabilities counted as built (the
     judge's ``built``); the command leaves it to today's code, and only the self-tests pass it. ``session``: the
     function that starts a reader or grader session, ``start(argv, prompt, cwd) -> standard output``; the command
     leaves it to the product's ``run_claude``, and only the self-tests pass a stand-in (no model runs)."""
+    exceptions = _owner_exceptions(options)  # a faulty exceptions file is refused before any work
     _hidden_folder(options)  # a wrong --sets-root or --hidden is refused first, before anything is built or written
     folder = _refuse_place(options.folder)
     if options.mode == "run":
@@ -349,7 +400,7 @@ def run(options, built=None, session=None):
     if options.mode in ("read", "run"):  # before any stage, search or session: the model line, or a refusal
         record = _model_line(options, record)
         (folder / "run.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-    env = _env(folder)
+    env = _env(folder, notify)
     held = [h for r in repos.values() for h in r.secrets]
     stage_runs = {}
     if options.mode == "run":
@@ -393,28 +444,32 @@ def run(options, built=None, session=None):
         if not options.pinned_gov or not tickets.get(name):
             lands[name] = {"run": False}
             continue
-        done = subprocess.run([options.pinned_gov, "queue", tickets[name]], cwd=repo.root, env=env,
+        done = subprocess.run([options.pinned_gov, "queue", tickets[name]], cwd=repo.root, env=_queue_env(env),
                               capture_output=True, text=True)
         lands[name] = {"run": True, "ticket": tickets[name], "exit": done.returncode}
         log(f"queue {name} {tickets[name]}: exit {done.returncode}")
     cases = [(repo.manifest, repo.root, folder / "outputs" / name, repo.secrets) for name, repo in repos.items()]
-    judged = judge.judge(cases, score.figures(scores), EXPECTED, built, run_folder=folder)
-    reasons = list(judged["reasons"])
+    judged = judge.judge(cases, score.figures(scores), EXPECTED, built, run_folder=folder, exceptions=exceptions)
+    own = []  # the runner's own reasons: no exceptions file excuses them (the landing, the hidden half, the stages)
     for name in EXPECTED:
         if not hidden[name]["present"]:
-            reasons.append(f"{name}: the measurement (hidden) half is not present and asked: {hidden[name]['asked']} "
-                           f"hidden questions asked, at least {HIDDEN_NEEDED} needed")
+            own.append(f"{name}: the measurement (hidden) half is not present and asked: {hidden[name]['asked']} "
+                       f"hidden questions asked, at least {HIDDEN_NEEDED} needed")
         land = lands[name]
         if not land["run"]:
-            reasons.append(f"{name}: gov queue was not run")
+            own.append(f"{name}: gov queue was not run")
         elif land["exit"] != 0:
-            reasons.append(f"{name}: gov queue {land['ticket']} ended with exit {land['exit']}")
+            own.append(f"{name}: gov queue {land['ticket']} ended with exit {land['exit']}")
         failed = [s for s in stage_runs.get(name, []) if s.get("run") and s["exit"] != 0]
-        reasons += [f"{name}: gov adopt --lite --stage {s['stage']} ended with exit {s['exit']}" for s in failed]
-    verdict = judged["verdict"] if judged["verdict"] == judge.ERROR else (judge.NOT_READY if reasons else judge.READY)
+        own += [f"{name}: gov adopt --lite --stage {s['stage']} ended with exit {s['exit']}" for s in failed]
+    reasons = list(judged["reasons"]) + own
+    # in step with the reasons: the judge's ids, and none (null) for the runner's own, which no file can name
+    reason_ids = list(judged.get("reason_ids") or []) + [None] * len(own)
+    verdict = judged["verdict"] if judged["verdict"] == judge.ERROR else (
+        judge.NOT_READY if own else judged["verdict"])  # READY, READY_WITH_EXCEPTIONS or NOT_READY, as the judge says
     by_name = {j["repository"]: j for j in judged.get("repositories", [])}
     report = {"form": "w2-81-report/1", "mode": options.mode, "seed": record["seed"], "verdict": verdict,
-              "reasons": reasons, "hidden_half": _hidden_summary(hidden),
+              "reasons": reasons, "reason_ids": reason_ids, "hidden_half": _hidden_summary(hidden),
               "gov": options.gov, "pinned_gov": options.pinned_gov,
               "models": record.get("models"), "release": record.get("release"), "bar": score.E2E_BAR,
               "repositories": {name: {"judgement": by_name.get(name), "figures": next(
@@ -423,6 +478,8 @@ def run(options, built=None, session=None):
                   "not_built": (by_name.get(name) or {}).get("not_built"), "queue": lands[name],
                   "hidden_half": hidden[name],
                   "stages_run": stage_runs.get(name, [])} for name in EXPECTED}}
+    if exceptions is not None and judged.get("exceptions"):
+        report["exceptions"] = judged["exceptions"]  # the decision and the ids named, unnamed and unused
     text = json.dumps(report, indent=2, sort_keys=True)
     markdown = _markdown(report)
     if any(h.found_in(t) for h in held for t in (text, markdown, "\n".join(log.lines))):
@@ -457,6 +514,12 @@ def _markdown(report):
     rows += [f"- {reason}" for reason in report["reasons"]] or ["- every planted problem handled, no control "
                                                                  "flagged, every repository's end-to-end figure at "
                                                                  f"{score.E2E_BAR:g} or more, every landing at exit 0"]
+    owner = report.get("exceptions")
+    if owner:
+        rows += ["", f"Exceptions named in {owner['decision']} (an owner's decision, one id each):"]
+        rows += [f"- excepted: `{i}`" for i in owner["named"]] or ["- none of the reasons"]
+        rows += [f"- not named, so still a reason: `{i}`" for i in owner.get("unnamed", [])]
+        rows += [f"- named, matching no reason: `{i}`" for i in owner["unused"]]
     for name, repo in report["repositories"].items():
         j, f = repo["judgement"] or {}, repo["figures"] or {}
         diagnostic = f.get("diagnostic") or {}
@@ -495,6 +558,8 @@ def parse(argv):
     parser.add_argument("--manifests", default=None)
     parser.add_argument("--large-size", dest="large_size", type=int, default=build.REAL_RUN_LARGE)
     parser.add_argument("--stages", default=None)
+    parser.add_argument("--notify", default=None)
+    parser.add_argument("--exceptions", default=None)
     return parser.parse_args(argv)
 
 
@@ -507,8 +572,9 @@ def main(argv=None):
     if "verdict" not in report:
         print(f"BUILT (seed {report['seed']})")
         return 0
-    print(f"{report['verdict']} (seed {report['seed']}; hidden half: {report.get('hidden_half', 'not read')})")
-    return 0 if report.get("verdict", judge.READY) == judge.READY else 1
+    excepted = f"; exceptions named in {report['exceptions']['decision']}" if report.get("exceptions") else ""
+    print(f"{report['verdict']} (seed {report['seed']}; hidden half: {report.get('hidden_half', 'not read')}{excepted})")
+    return 0 if report.get("verdict", judge.READY) in judge.READY_VERDICTS else 1
 
 
 if __name__ == "__main__":

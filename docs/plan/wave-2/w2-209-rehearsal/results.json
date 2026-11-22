@@ -1,0 +1,247 @@
+{
+  "scratch": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq",
+  "cases": [
+    {
+      "case": "A",
+      "ok": true,
+      "what": "the planted patch passes G1 (--check says patch)",
+      "rules": {
+        "P1": true,
+        "P2": true,
+        "P3": true,
+        "P4": true,
+        "P5": true
+      },
+      "answer": null
+    },
+    {
+      "case": "A",
+      "ok": true,
+      "what": "--check wrote nothing (the tree is clean)"
+    },
+    {
+      "case": "B",
+      "ok": true,
+      "what": "docs/contract edit: refused as bigger, naming P2",
+      "failed": [
+        "P2"
+      ],
+      "detail": {
+        "P2": "changed since the last release: docs/contract/PLANTED.md"
+      }
+    },
+    {
+      "case": "B",
+      "ok": true,
+      "what": "EMERGENCY-2 edit: refused as bigger, naming P2",
+      "failed": [
+        "P2"
+      ],
+      "detail": {
+        "P2": "changed since the last release: docs/emergency-2/EMERGENCY-2.md"
+      }
+    },
+    {
+      "case": "B",
+      "ok": true,
+      "what": "a closed feature ticket: refused as bigger, naming P3",
+      "failed": [
+        "P3"
+      ],
+      "detail": {
+        "P3": "ticket DAEO-zzzz closed since the last release"
+      }
+    },
+    {
+      "case": "B",
+      "ok": true,
+      "what": "a new command: refused as bigger, naming P4",
+      "failed": [
+        "P4"
+      ],
+      "detail": {
+        "P4": "the commands differ (added: planted)"
+      }
+    },
+    {
+      "case": "B",
+      "ok": true,
+      "what": "a new kit schema: refused as bigger, naming P5",
+      "failed": [
+        "P5"
+      ],
+      "detail": {
+        "P5": "kit schemas changed in number: planted.schema.json added"
+      }
+    },
+    {
+      "case": "B",
+      "ok": true,
+      "what": "a feature commit with no trailer: refused as bigger, naming P3",
+      "failed": [
+        "P3"
+      ],
+      "detail": {
+        "P3": "commit fa9942ce046a planted: a feature commit with no trailer: no Fix: with a Task: ticket closed at the last release, no Class: Q, no Class: C"
+      }
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the cut with a planted green record and G3 stood in cuts, tags, merges and re-pins in the scratch home",
+      "exit": 0,
+      "repin": {
+        "status": "ok",
+        "version": "0.9.1",
+        "commit": "3c46edbee3513eba5c78c57e757895e7a9e926ad",
+        "step": null,
+        "check": null,
+        "pin": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/home/.local/share/gov-os/pin-3c46edbee351",
+        "old_pin": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/home/.local/share/gov-os/pin-30438fd9397e",
+        "push_text": "Gov OS 0.9.1 released (patch, 1 fix). Suite green on 3c46edbe, proving run READY, pin live. Roll back: bash ~/.local/share/gov-os/rollback.sh"
+      },
+      "stderr": ""
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the scratch link names the new pin",
+      "link": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/home/.local/share/gov-os/pin-3c46edbee351/bin/gov"
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the record folder holds the six files",
+      "files": [
+        "NOTE.md",
+        "gates.json",
+        "kind.json",
+        "manifest.json",
+        "manifest.sha256",
+        "suite.json"
+      ]
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the tag v0.9.1 is annotated and its parent is C",
+      "tag_kind": "tag",
+      "parents": [
+        "64b1f0b33073c02912c21721e18bff1f2381ad15",
+        "3c46edbee3513eba5c78c57e757895e7a9e926ad"
+      ]
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the record commit's trailers are the orchestrator's with the owner's standing decision",
+      "trailers": "orchestrator\n|owner (standing, DEC-1223)\n|release"
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "one push of at most 190 characters carrying the version and the rollback line",
+      "pushes": [
+        "Gov OS 0.9.1 released (patch, 1 fix). Suite green on 3c46edbe, proving run READY, pin live. Roll back: bash ~/.local/share/gov-os/rollback.sh"
+      ],
+      "length": [
+        141
+      ]
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the registry entry was committed",
+      "commit": "Re-pin from release 0.9.1: gov from the release's wheel (tag v0.9.1, commit 3c46edbee351)|owner (standing, DEC-1223)"
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "NOTE.md holds the evidence and the rollback line"
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "rollback.sh and repin.json are written",
+      "repin": {
+        "status": "ok",
+        "version": "0.9.1",
+        "commit": "3c46edbee3513eba5c78c57e757895e7a9e926ad",
+        "pin": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/home/.local/share/gov-os/pin-3c46edbee351",
+        "old_pin": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/home/.local/share/gov-os/pin-30438fd9397e",
+        "check": null,
+        "at": "2026-11-20T16:34:28Z"
+      }
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "the cut did not write the authority file"
+    },
+    {
+      "case": "C",
+      "ok": true,
+      "what": "rollback.sh run in a plain shell with no gov on its path puts the previous link back and burns the release",
+      "link": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/home/.local/share/gov-os/pin-30438fd9397e/bin/gov",
+      "burned": [
+        "0.9.1"
+      ]
+    },
+    {
+      "case": "D",
+      "ok": true,
+      "what": "a planted failing hook rolls the re-pin back",
+      "check": "hooks",
+      "stderr": ""
+    },
+    {
+      "case": "D",
+      "ok": true,
+      "what": "the scratch link names the old pin again",
+      "link": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/d/home/.local/share/gov-os/pin-30438fd9397e/bin/gov",
+      "seconds": 29.9
+    },
+    {
+      "case": "D",
+      "ok": true,
+      "what": "the release is burned (its tag and record stay)",
+      "tag": "v0.9.1"
+    },
+    {
+      "case": "D",
+      "ok": true,
+      "what": "one failure push, at most 190 characters",
+      "pushes": [
+        "Gov OS 0.9.1 NOT pinned: post-pin check failed (hooks). Rolled back, old gov live, nothing for you to do. Release burned; CTO cuts the next patch."
+      ]
+    },
+    {
+      "case": "D",
+      "ok": true,
+      "what": "no registry commit was made"
+    },
+    {
+      "case": "D",
+      "ok": true,
+      "what": "a second re-pin of the burned release is refused (stopped at `burned`), the link unchanged",
+      "answer": {
+        "status": "stopped",
+        "version": "0.9.1",
+        "commit": null,
+        "step": "burned",
+        "check": null,
+        "pin": null,
+        "old_pin": null,
+        "push_text": null,
+        "reason": "release 0.9.1 is burned: it is never pinned"
+      },
+      "link": "/tmp/tmp.jz3CjUAQRN/w2-209-rehearsal-6756b0fq/d/home/.local/share/gov-os/pin-30438fd9397e/bin/gov"
+    },
+    {
+      "case": "Z",
+      "ok": true,
+      "what": "the real ~/.local/bin/gov link is as before",
+      "link": "/home/usain/.local/share/gov-os/pin-961db6546490/bin/gov"
+    }
+  ]
+}

@@ -372,3 +372,97 @@ def lock_from(project: Path, source: Path) -> tuple[Path, str | None]:
         raise ReleaseError(f"{tag!r} names no release under {RELEASES_REL}/ of the template: install a release tag")
     data, _ = verify(source, version)
     return lock.write(project, release=(version, data)), version
+
+
+# ---------------------------------------------------------------------------
+# The patch release (W2-209, RELEASE-ON-BEHALF slice (a); DEC-1223)
+# ---------------------------------------------------------------------------
+
+PATCH_CALLER = "orchestrator"
+_UNSET = object()
+
+
+def _refuse(message: str, details: dict):
+    from gov.cli.errors import GovError
+
+    return GovError("RELEASE_REFUSED", message, details)
+
+
+def _caller(caller) -> None:
+    """Only ``GOV_ROLE=orchestrator`` cuts or checks a patch release, before anything is read (DEC-772 stays the
+    owner's for the plain form, which this never is). The caller is the role in the process's environment."""
+    role = os.environ.get("GOV_ROLE") if caller is _UNSET else caller
+    if role != PATCH_CALLER:
+        raise _refuse(f"gov release --patch is refused for GOV_ROLE={role!r}: only the orchestrator "
+                      "(GOV_ROLE=orchestrator) cuts a patch release; the owner uses the plain gov release",
+                      {"caller": role})
+
+
+def _patch_check(root: Path, version: str, caller=_UNSET) -> dict:
+    """``gov release <X> --patch --check``: the patch rule at HEAD, nothing read beyond git objects, nothing written."""
+    from gov.release import patch
+
+    _caller(caller)
+    try:
+        result = patch.evaluate(Path(root), version)
+    except ReleaseError as exc:
+        raise _refuse(f"the patch rule cannot be read: {exc}", {"gate": "G1", "reason": str(exc)}) from None
+    if result["kind"] != "patch":
+        named = "; ".join(f"{rule}: {result['rules'][rule]['detail']}" for rule in result["failed"])
+        raise _refuse(f"this is a bigger release ({named}): only the owner builds it, gov release {version}",
+                      {"kind": "bigger", "from": result["from"], "commit": result["commit"], "rules": result["rules"],
+                       "failed": result["failed"]})
+    return result
+
+
+def _cut(root: Path, version: str, *, suite=None, kept=None, rehearse=None, repin=None, push=None, caller=_UNSET) -> dict:
+    """The cut: the caller, then G0 to G4 in order (the first red refuses, naming the gate), then the record committed
+    on a side branch of C, tagged and merged, then the re-pin. ``rehearse`` and ``repin`` default to the real ones;
+    only ``_patch_test`` passes others."""
+    from gov.release import cut, gates, patch, proving, repin as repinning
+
+    _caller(caller)
+    root = Path(root)
+    rehearse = rehearse or proving.rehearse
+    repin = repin or repinning.repin
+    try:
+        authority = gates.g0(root)
+        result = gates.g1(root, version)
+        commit = result["commit"]
+        evidence = gates.g2(root, suite, commit)
+        report = gates.g3(root, commit, version, lambda: rehearse(root, commit, version, kept))
+        gates.g4(root, commit, version, result["from"])
+    except gates.GateRefused as red:
+        raise _refuse(f"patch release {version} refused at {red.gate}: {red.reason}", red.details) from None
+    decision = authority["decision"]
+    kind = patch.kind_record(result)
+
+    def extras(record: dict) -> dict:
+        fixes, chores = patch.changes(root, result["from"], commit)
+        listed = Path.home() / ".gov-os" / "update" / "repositories"
+        try:
+            repositories = [line.strip() for line in listed.read_text(encoding="utf-8").splitlines() if line.strip()]
+        except OSError:
+            repositories = []
+        shown = {"record": evidence["record"], "head": evidence["head"], "verdict": report.get("verdict"),
+                 "kind": kind["kind"]}
+        gates_json = {"suite": {key: evidence[key] for key in ("record", "head", "tree", "optin")}, "proving": report,
+                      "rule": {"kind": kind["kind"], "rules": kind["rules"]}}
+        return {"kind.json": patch.dumps(kind).encode("utf-8"), "gates.json": patch.dumps(gates_json).encode("utf-8"),
+                "suite.json": evidence["raw"],
+                "NOTE.md": repinning.note_text(version, result["from"], fixes, chores, shown, repositories).encode("utf-8")}
+
+    try:
+        made = cut.cut(root, version, commit, extras, decision)
+    except ReleaseError as exc:
+        raise _refuse(f"patch release {version} not cut: {exc}", {"gate": "G4", "reason": str(exc)}) from None
+    pinned = repin(root, version, Path.home(), push=push)
+    return {"version": version, "commit": commit, "tag": made["tag"], "record": made["record"],
+            "record_commit": made["record_commit"], "kind": kind, "repin": pinned}
+
+
+def _patch_test(root: Path, version: str, *, suite=None, rehearse=None, repin=None, push=None, caller=_UNSET) -> dict:
+    """Test seam for the cut, beside ``gov release --patch`` as ``command._release_test`` is beside the plain form:
+    G3, the re-pin and the push may be stood in, and ``caller`` named. The command line never reaches it: it calls
+    ``_cut`` with the real rehearsal and re-pin only, so no flag or variable stands in for a gate."""
+    return _cut(root, version, suite=suite, rehearse=rehearse, repin=repin, push=push, caller=caller)

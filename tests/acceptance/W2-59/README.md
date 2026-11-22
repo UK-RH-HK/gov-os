@@ -360,3 +360,22 @@ this README's; the lead numbers its packages.)
   still run, with the judge's interpreter (W1-26 runs declared commands as written).
 
 - **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_59_support.session_env` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
+
+## Fix: no hit@5 floor and no hard-blocking kit check on hit@k (audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Written by the independent test designer from the fix's behaviour, before any implementation of it. "hit@5 I DON'T CARE
+if it's even 10%": hit@k is a reported diagnostic only. The runner of `gov accept` reads only KPI cells that name
+`success N` or `failure N`, and a fix has no line of its own in the ticket, so each row of this map is read as
+`Failure 1` (the fix is named in its cell), as W2-52's and W2-88's fix rows are.
+
+`test_w2_59_baseline.py::test_the_installed_check_reads_its_thresholds_from_the_installed_package` became
+`test_the_installed_check_reads_its_threshold_from_the_installed_package` (`local_only`, as before): the installed package's one
+baseline is the forbidden-citation count, which the measured check still prints, and its `hit@5:` line carries no threshold. The
+project's decoy baseline still holds other numbers. Revised with a Rewrite-Reason (DEC-1210, DEC-1233, EMERGENCY-2 5.2).
+Its other cases need `retrieve_baseline.yaml` shipped in the wheel, which stays (`forbidden_citations`).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (nofloor-1: the installed check prints its hit@5 with no threshold, revised case) | `test_w2_59_baseline.py::test_the_installed_check_reads_its_threshold_from_the_installed_package` | red: the line reads `hit@5: 100.0 (baseline: 80.0)` |
+
+**Red run on the base:** the revised case red; the other 3 cases of the file green.

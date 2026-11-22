@@ -49,8 +49,9 @@ order, as the measure's ``GOV_KEEP`` wrapper keeps them) in place of running a r
 budgets as the kept run give the same calls. A kept output missing, or one left over, refuses the run.
 
 **The figures**, always together (DEC-833 item 3): hit@5, a source matched by one of the first five items of the
-stacked context (in the bundle: by an item of the first call), against CAP-10's floor of 85; full evidence, every
-entry matched by the stacked context across batches, against the owner's target of 99 %. The stacked context is
+stacked context (in the bundle: by an item of the first call); full evidence, every entry matched by the stacked
+context across batches. Both are reported figures and nothing here is judged against a number: hit@k is a
+diagnostic only (EMERGENCY-2 5.2, DEC-1210, DEC-1233). The stacked context is
 the calls' items in order, each taken once, within the stack budget (an item's size: its text's length / 4,
 rounded up); a call continues the last while it returned a continuation and the stack budget is not reached
 (DEC-860). For the hidden part, only ids, counts, ranks, digests and pass or fail are shown or written.
@@ -75,7 +76,6 @@ from gov.util.parts import PATH_MAP_REL, SETS_KEY, PolicyError, _Part, _ticket, 
 
 EVALUATION = "fixtures/evaluation"
 FAMILIES_KEY = "evaluation_families"
-FLOOR, TARGET = 85, 99
 TOKEN_CHARS = 4
 FIGURES = ("hit_at_5", "in_bundle", "full_evidence", "first_gold_rank", "stacked_digest")
 _HEADING = re.compile(r"(#{1,6})\s")
@@ -405,11 +405,10 @@ def _ask(q: dict, args, call, quoting: _Part) -> dict:
 def _total(questions: list[dict]) -> dict:
     n = len(questions)
 
-    def share(key, line, name):
+    def share(key):
         count = sum(q[key] for q in questions)
-        return {"count": count, "of": n, "percent": round(100 * count / n, 1) if n else 0.0, name: line}
-    return {"questions": n, "hit_at_5": share("hit_at_5", FLOOR, "floor"),
-            "full_evidence": share("full_evidence", TARGET, "target")}
+        return {"count": count, "of": n, "percent": round(100 * count / n, 1) if n else 0.0}
+    return {"questions": n, "hit_at_5": share("hit_at_5"), "full_evidence": share("full_evidence")}
 
 
 def _compare(questions: list[dict], records: list[str]) -> None:
@@ -465,8 +464,8 @@ def _text(doc: dict) -> str:
             out.append(f"{q['id']} ({q['part']}): " + (f"the same as record {n}" if c["same"] else
                                                        f"differ from record {n}: {', '.join(c['differs'])}{now}"))
     h, f = t["hit_at_5"], t["full_evidence"]
-    out.append(f"total: hit@5 {h['count']} of {h['of']} ({h['percent']} %, floor {FLOOR}); "
-               f"full evidence {f['count']} of {f['of']} ({f['percent']} %, target {TARGET} %)")
+    out.append(f"total: hit@5 {h['count']} of {h['of']} ({h['percent']} %); "
+               f"full evidence {f['count']} of {f['of']} ({f['percent']} %)")
     return "\n".join(out)
 
 

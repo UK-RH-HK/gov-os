@@ -79,5 +79,6 @@
       "Bash(sudo *)"
     ],
     "defaultMode": "bypassPermissions"
-  }
+  },
+  "disableClaudeAiConnectors": true
 }

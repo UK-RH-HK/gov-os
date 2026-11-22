@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-62: Sandbox escape hatch denied
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** (none — non-goal)
 - **Acceptance:** No file of the kernel implements a sandbox or the denial of its escape hatch; the release acceptance finds none (EMERGENCY-2 §2.2).

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -637,3 +638,224 @@ def test_the_judge_never_writes_the_value_even_when_an_output_is_named_by_it(gro
     out, err = capfd.readouterr()
     for text, where in ((json.dumps(result), "the result"), (out, "standard output"), (err, "standard error")):
         assert_absent(held, text, where)
+
+
+# --------------------------------------------------------------------------
+# Fix T2 (W2-81's proving run on 0.1.4): stage AS, the spec audit (CAP-44.m), is a required stage of the judge
+# --------------------------------------------------------------------------
+
+AS_RECORD = "governance/adoption/AS-spec-audit.md"  # the name `gov adopt --lite --stage AS` commits its record under
+AS_DATA = {"stands_on": "0" * 64, "specs": [], "modules": [], "tickets": [], "gaps": []}
+
+
+def _with_as(model):
+    model["records"]["AS"] = dict(AS_DATA)
+    return model
+
+
+def test_stage_as_is_in_the_stage_list_between_a2_and_a3_and_in_the_capability_table():
+    from gov.adopt import spec_audit
+
+    assert spec_audit.RECORD == AS_RECORD, "today's code names the record as this suite does"
+    assert "AS" in judge.STAGES
+    stages = judge.STAGES
+    assert stages.index("A2") + 1 == stages.index("AS") and stages.index("AS") + 1 == stages.index("A3"), stages
+    assert judge.record_name("AS") == AS_RECORD
+    contract, built, why = judge.CAPABILITIES["AS"]
+    assert contract == "CAP-44.m" and built is True and why
+    assert "AS" in judge.built_today()
+
+
+def test_a_present_as_record_is_present_and_gives_no_reason(ground, tmp_path):
+    built_repo = ground["python-app"]
+    judgement = _judge(built_repo, _with_as(standin.perfect(built_repo)), tmp_path)
+    assert judgement["stages"]["AS"] == {"status": "PRESENT", "record": AS_RECORD}
+    result = _reasons(judgement, built_repo.name)
+    assert result["verdict"] == judge.READY, result["reasons"]
+    assert not any("stage AS" in r for r in result["reasons"]), result["reasons"]
+
+
+@pytest.mark.parametrize("built", [ALL, None], ids=["all-built", "todays-code"])
+@pytest.mark.parametrize("how, status", [("absent", "ABSENT"), ("no-front-matter", "UNREADABLE"),
+                                         ("front-matter-not-a-mapping", "UNREADABLE"), ("bad-yaml", "UNREADABLE")])
+def test_an_as_record_that_is_absent_or_unreadable_is_named_and_the_run_is_not_ready(ground, tmp_path, how, status,
+                                                                                    built):
+    """The missed form of a stage the judge builds (its record's own state: ABSENT, UNREADABLE or MALFORMED), never
+    NOT_BUILT and never PRESENT: ``stage AS is <state>`` in the reasons, NOT_READY, and no other stage touched."""
+    built_repo = ground["python-app-clean"]
+    model = standin.perfect(built_repo)
+    model["records"]["AS"] = None
+    model["raw"] = {} if how == "absent" else {AS_RECORD: {
+        "no-front-matter": b"# the spec audit, with no front matter\n",
+        "front-matter-not-a-mapping": b"---\n- one\n- two\n---\n",
+        "bad-yaml": b"---\nspecs: [unclosed\n---\n"}[how]}
+    judgement = _judge(built_repo, model, tmp_path, built=built)
+    assert judgement["stages"]["AS"]["status"] == status and status in MISSED_FORMS
+    assert judgement["stages"]["AS"]["record"] == AS_RECORD
+    assert all(v["status"] == "PRESENT" for s, v in judgement["stages"].items() if s in ("A0", "A1", "A2", "A3", "A7"))
+    result = _reasons(judgement, built_repo.name)
+    assert result["verdict"] == judge.NOT_READY
+    assert f"{built_repo.name}: stage AS is {status}" in result["reasons"], result["reasons"]
+    if built is ALL:
+        assert result["reasons"] == [f"{built_repo.name}: stage AS is {status}"], "AS alone is what is named"
+
+
+def test_an_adoption_that_ran_nothing_names_stage_as_absent(ground, tmp_path):
+    built_repo = ground["python-app-clean"]
+    empty = {"files": [], "records": {}, "findings": [], "path_map": None, "index": None, "extra": {},
+             "removed": [], "beside": {}, "raw": {}}
+    judgement = _judge(built_repo, empty, tmp_path, built=None)
+    assert judgement["stages"]["AS"]["status"] == "ABSENT" and "AS" not in judgement["not_built"]
+    assert f"{built_repo.name}: stage AS is ABSENT" in _reasons(judgement, built_repo.name)["reasons"]
+
+
+# --------------------------------------------------------------------------
+# Fix T3 (W2-81's proving run on 0.1.4): ``overall`` reads an owner's exceptions
+# --------------------------------------------------------------------------
+
+DECISION = "DEC-1234"
+
+
+def _made(name="r"):
+    """A judgement as the judge gives it, written by hand: one planted problem found and two not, one control clean
+    and one flagged, stages present, absent and not built."""
+    return {"repository": name,
+            "planted": [{"id": f"{name}.stale-spec.x", "status": judge.FOUND},
+                        {"id": f"{name}.secret.y", "status": judge.NOT_BUILT},
+                        {"id": f"{name}.large-file.z", "status": judge.MISSED}],
+            "controls": [{"id": f"{name}.control.a", "status": judge.CLEAN},
+                         {"id": f"{name}.control.b", "status": judge.FLAGGED}],
+            "stages": {"A0": {"status": "PRESENT"}, "A7": {"status": "ABSENT"},
+                       "VERDICT": {"status": judge.NOT_BUILT}, "findings": {"status": judge.NOT_BUILT}}}
+
+
+MADE_IDS = ["r:PLANTED:r.secret.y", "r:PLANTED:r.large-file.z", "r:CONTROL:r.control.b", "r:STAGE:A7",
+            "r:STAGE:VERDICT", "r:STAGE:findings", "r:FIGURE:end_to_end"]
+MADE_TEXTS = ["r: r.secret.y is NOT_BUILT", "r: r.large-file.z is MISSED", "r: r.control.b is FLAGGED",
+              "r: stage A7 is ABSENT", "r: stage VERDICT is NOT_BUILT", "r: stage findings is NOT_BUILT",
+              "r: the end-to-end figure is 90, below its bar of 95"]
+
+
+def _owner(ids, decision=DECISION):
+    return {"decision": decision, "reasons": list(ids)}
+
+
+def _over(exceptions=None, figures=None, **more):
+    return judge.overall([_made()], {"r": {"end_to_end": 90.0}} if figures is None else figures, ["r"],
+                         exceptions=exceptions, **more)
+
+
+def test_every_reason_has_a_stable_id_in_step_with_its_text_and_the_texts_are_unchanged():
+    result = _over()
+    assert result["reasons"] == MADE_TEXTS
+    assert result["reason_ids"] == MADE_IDS, "<repository>:<CODE>:<subject>, in the order of the reasons"
+    assert result["verdict"] == judge.NOT_READY and not result.get("exceptions")
+
+
+def test_each_kind_of_reason_has_its_code_and_subject():
+    missing = judge.overall([_made()], {}, ["r", "s"])
+    assert missing["reason_ids"] == ["s:NOTJUDGED:-", *MADE_IDS], "a repository not judged comes first, as its text did"
+    assert missing["reasons"][0] == "s: not judged"
+    assert missing["reasons"][-1] == "r: the end-to-end figure is missing (its bar is 95)"
+    hidden = {"repository": "r", "controls": [], "stages": {}, "planted": [
+        {"id": "hidden variant #3 (o1)", "kind": "hidden", "status": judge.MISSED}]}
+    result = judge.overall([hidden], {"r": {"end_to_end": 100.0}}, ["r"])
+    assert result["reason_ids"] == ["r:PLANTED:hidden variant #3 (o1)"], "a hidden variant by its number and id"
+
+
+def test_with_no_exceptions_ready_and_not_ready_are_as_before_and_ready_needs_no_reason():
+    assert judge.READY_WITH_EXCEPTIONS == "READY_WITH_EXCEPTIONS" and \
+        len({judge.READY, judge.NOT_READY, judge.ERROR, judge.READY_WITH_EXCEPTIONS}) == 4
+    clean = {"repository": "r", "planted": [], "controls": [], "stages": {"A0": {"status": "PRESENT"}}}
+    for exceptions in (None, _owner([]), _owner(["r:STAGE:A7"])):
+        result = judge.overall([clean], {"r": {"end_to_end": 95.0}}, ["r"], exceptions=exceptions)
+        assert result["verdict"] == judge.READY and result["reasons"] == [] and result["reason_ids"] == []
+    named = judge.overall([clean], {"r": {"end_to_end": 95.0}}, ["r"], exceptions=_owner(["r:STAGE:A7"]))
+    assert named["exceptions"]["decision"] == DECISION and named["exceptions"]["named"] == [], named["exceptions"]
+    assert named["exceptions"]["unused"] == ["r:STAGE:A7"], "no reason, so READY and the id is reported unused"
+
+
+def test_every_reason_named_is_ready_with_exceptions_and_the_reasons_stay_reasons():
+    result = _over(_owner(MADE_IDS))
+    assert result["verdict"] == judge.READY_WITH_EXCEPTIONS
+    assert result["reasons"] == MADE_TEXTS and result["reason_ids"] == MADE_IDS
+    assert result["exceptions"]["decision"] == DECISION and result["exceptions"]["unused"] == []
+    assert sorted(result["exceptions"]["named"]) == sorted(MADE_IDS)
+
+
+@pytest.mark.parametrize("left_out", MADE_IDS)
+def test_one_reason_not_named_keeps_not_ready_and_the_result_names_it(left_out):
+    named = [i for i in MADE_IDS if i != left_out]
+    result = _over(_owner(named))
+    assert result["verdict"] == judge.NOT_READY
+    assert result["exceptions"]["unnamed"] == [left_out], "the ids no exception names"
+    assert sorted(result["exceptions"]["named"]) == sorted(named) and result["exceptions"]["unused"] == []
+    assert result["reasons"] == MADE_TEXTS
+
+
+def test_an_id_that_matches_no_reason_is_reported_as_unused_and_is_never_an_error():
+    extra = ["r:STAGE:A9", "s:PLANTED:r.secret.y", "an id in no form"]
+    result = _over(_owner([*extra, *MADE_IDS]))
+    assert result["verdict"] == judge.READY_WITH_EXCEPTIONS
+    assert sorted(result["exceptions"]["unused"]) == sorted(extra)
+    assert sorted(result["exceptions"]["named"]) == sorted(MADE_IDS)
+
+
+def test_a_reasons_text_or_another_repositorys_id_names_nothing():
+    result = _over(_owner([*MADE_TEXTS, "q:STAGE:A7", "r:stage:A7", "r:STAGE:a7"]))
+    assert result["verdict"] == judge.NOT_READY and result["exceptions"]["named"] == []
+    assert sorted(result["exceptions"]["unnamed"]) == sorted(MADE_IDS)
+    assert len(result["exceptions"]["unused"]) == len(MADE_TEXTS) + 3
+
+
+@pytest.mark.parametrize("suffix", [".json", ".yaml"])
+def test_overall_reads_the_exceptions_from_a_json_or_yaml_file(tmp_path, suffix):
+    path = tmp_path / f"exceptions{suffix}"
+    if suffix == ".json":
+        path.write_text(json.dumps(_owner(MADE_IDS)))
+    else:
+        path.write_text("decision: DEC-1234\nreasons:\n" + "".join(f"  - '{i}'\n" for i in MADE_IDS))
+    for given in (path, str(path)):
+        result = _over(given)
+        assert result["verdict"] == judge.READY_WITH_EXCEPTIONS and result["exceptions"]["decision"] == DECISION
+        assert sorted(result["exceptions"]["named"]) == sorted(MADE_IDS)
+
+
+def test_the_reasons_of_a_real_judgement_carry_ids_and_are_named_one_by_one(ground, tmp_path):
+    built_repo = ground["python-app"]
+    planted = _entry(ground, "python-app.stale-spec.newer-version")[1]
+    control = _entry(ground, "python-app.control.current-spec-looks-old")[1]
+    model = standin.flag(standin.miss(standin.perfect(built_repo), planted), control)
+    model["records"]["A7"] = None
+    judgement = _judge(built_repo, model, tmp_path)
+    ids = ["rust-workspace:NOTJUDGED:-", f"python-app:PLANTED:{planted['id']}", f"python-app:CONTROL:{control['id']}",
+           "python-app:STAGE:A7", "python-app:FIGURE:end_to_end"]
+    args = ([judgement], {"python-app": {"end_to_end": 90.0}}, ["python-app", "rust-workspace"])
+    result = judge.overall(*args)
+    assert result["reason_ids"] == ids and len(result["reasons"]) == 5
+    assert result["reasons"][1:4] == [f"python-app: {planted['id']} is MISSED",
+                                      f"python-app: {control['id']} is FLAGGED", "python-app: stage A7 is ABSENT"]
+    assert judge.overall(*args, exceptions=_owner(ids))["verdict"] == judge.READY_WITH_EXCEPTIONS
+    assert judge.overall(*args, exceptions=_owner(ids[:-1]))["verdict"] == judge.NOT_READY
+
+
+# --------------------------------------------------------------------------
+# Fix T5 (W2-81's proving run on 0.1.4): the capability table and the README's rows are current (a text test)
+# --------------------------------------------------------------------------
+
+def test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_verdict_stage_is():
+    here = Path(__file__).resolve().parent
+    source = (here / "w2_81_judge.py").read_text(encoding="utf-8")
+    dated = [line for line in source.splitlines() if "as read in src/gov/adopt/ on" in line]
+    assert len(dated) == 1 and "2026-11-20" in dated[0] and "2026-10-31" not in dated[0], dated
+    readme = (here / "README.md").read_text(encoding="utf-8")
+    assert "not merged" not in readme, "W2-52 is closed: nothing in the README is waiting for its merge"
+    rows = [line for line in readme.splitlines() if line.startswith("| `VERDICT` |")]
+    assert len(rows) == 1, rows
+    row = rows[0]
+    assert "no stage or command gives the lite verdict yet (CAP-44.h, W2)" in row, row
+    assert "W2-52 built A7 and A10 only" in row, row
+    spec_audit = [line for line in readme.splitlines() if line.startswith("| `AS` |")]
+    assert len(spec_audit) == 1, spec_audit
+    assert "CAP-44.m" in spec_audit[0] and "| yes |" in spec_audit[0] and "A2" in spec_audit[0] \
+        and "A3" in spec_audit[0], spec_audit[0]

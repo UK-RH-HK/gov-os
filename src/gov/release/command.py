@@ -42,6 +42,14 @@ def add_arguments(parser) -> None:
     parser.add_argument("version", nargs="?", metavar="<version>", help="the semantic version of the release")
     parser.add_argument("--lock-from", metavar="<template>",
                         help="the template's Copier task: verify the installed release and write framework.lock")
+    parser.add_argument("--patch", action="store_true",
+                        help="the patch release, the CTO's (GOV_ROLE=orchestrator) after the five gates G0 to G4")
+    parser.add_argument("--check", action="store_true",
+                        help="with --patch: print the patch rule's result (kind, P1 to P5) and write nothing")
+    parser.add_argument("--suite", metavar="<record file>", help="with --patch: the nightly record of the release commit (G2)")
+    parser.add_argument("--kept", metavar="<run folder>", help="with --patch: the kept W2-81 run the update rehearsal reads (G3)")
+    parser.add_argument("--push", metavar="<command>", help="with --patch: the command that pushes the owner's one text "
+                                                           "(the text is its last argument)")
 
 
 def _refused(reason: str):
@@ -115,11 +123,44 @@ def release(root: Path, version: str | None) -> dict:
     return _release_test(root, version)
 
 
+def _usage(why: str):
+    from gov.cli.errors import GovError
+
+    return GovError("RELEASE_REFUSED", f"gov release is refused: {why}: nothing is built", {"reason": "usage"})
+
+
+def _patch(root: Path, args) -> dict:
+    """``gov release <X> --patch [--check]``: the CTO's patch release. The caller comes first, before anything is read;
+    no flag or environment variable stands in for a gate, the rehearsal, the re-pin or the push (``release._patch_test``
+    is the seam, never reached from here)."""
+    from gov import release as releases
+
+    releases._caller(releases._UNSET)
+    if args.lock_from is not None:
+        raise _usage("--patch does not take --lock-from")
+    if args.version is None:
+        raise _usage("no version given: gov release <version> --patch")
+    if args.check:
+        given = [flag for flag, value in (("--suite", args.suite), ("--kept", args.kept), ("--push", args.push)) if value]
+        if given:
+            raise _usage(f"--check takes no {', '.join(given)}: it reads the rule alone")
+        return releases._patch_check(root, args.version)
+    return releases._cut(root, args.version, suite=Path(args.suite) if args.suite else None,
+                         kept=Path(args.kept) if args.kept else None, push=args.push)
+
+
 def run(root: Path, args, config: dict) -> dict:
     from gov.cli.errors import GovError
     from gov.lock import LockError
     from gov.release import ReleaseError, lock_from
 
+    if getattr(args, "patch", False):
+        return _patch(root, args)
+    given = [flag for flag, value in (("--check", getattr(args, "check", False)), ("--suite", getattr(args, "suite", None)),
+                                      ("--kept", getattr(args, "kept", None)), ("--push", getattr(args, "push", None)))
+             if value]
+    if given:
+        raise _usage(f"{', '.join(given)} belong to --patch")
     if args.lock_from is None:
         return release(root, args.version)  # DEC-772: nothing from outside the process fills its other parameters
     role = os.environ.get("GOV_ROLE")  # DEC-365: the caller; unset, the owner

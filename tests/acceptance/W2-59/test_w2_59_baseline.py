@@ -50,17 +50,20 @@ def test_the_installed_check_does_not_fail_for_want_of_its_baseline(stand_in, tm
 
 
 @pytest.mark.local_only
-def test_the_installed_check_reads_its_thresholds_from_the_installed_package(stand_in, gitleaks, tmp_path):
-    """The project holds baselines of its own, with other thresholds, where a lookup from the project would find
-    them; the measured check prints the installed package's thresholds."""
+def test_the_installed_check_reads_its_threshold_from_the_installed_package(stand_in, gitleaks, tmp_path):
+    """Revised for F9 (DEC-1210, DEC-1233, EMERGENCY-2 5.2: hit@5 is no floor): the one baseline left is the
+    forbidden-citation count. The project holds baselines of its own, with other thresholds, where a lookup from the
+    project would find them; the measured check prints the installed package's forbidden-citation baseline, and
+    prints its hit@5 figure with no threshold beside it."""
     values = support.baseline_values()
     decoy = "# a baseline of the project's own\nhit_at_5: 7\nforbidden_citations: 99\n"
     files = {"src/gov/retrieval/retrieve_baseline.yaml": decoy, "retrieve_baseline.yaml": decoy}
     project = support.make_repository(tmp_path / "project", files, support.RETRIEVAL_PROJECTS["this-repository"])
     done = support.retrieval_check(stand_in, project, tmp_path, gitleaks)
-    assert f"(baseline: {float(values['hit_at_5'])})" in done.stdout, (
-        f"the measured check did not print the installed hit@5 baseline {float(values['hit_at_5'])}\n"
-        f"{done.describe()}")
     assert f"(baseline: {int(values['forbidden_citations'])})" in done.stdout, (
         f"the measured check did not print the installed forbidden-citation baseline "
         f"{int(values['forbidden_citations'])}\n{done.describe()}")
+    hit_line = next((line for line in done.stdout.splitlines() if line.startswith("hit@5")), None)
+    assert hit_line is not None, f"the measured check printed no hit@5 line\n{done.describe()}"
+    assert "baseline" not in hit_line and "(7" not in hit_line, (
+        f"the hit@5 line names a threshold: {hit_line!r}\n{done.describe()}")

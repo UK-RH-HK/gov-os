@@ -1,6 +1,6 @@
 # Emergency 2: the strategy
 
-`docs/emergency-2/EMERGENCY-2.md` · Status: **v3, in force from 17 November, when the owner launched the fresh CTO with it; the owner may still amend it** · 2026-11-17
+`docs/emergency-2/EMERGENCY-2.md` · Status: **v3, in force from 17 November, when the owner launched the fresh CTO with it; amended by §13 (2026-11-22); the owner may still amend it** · 2026-11-17
 
 Every Gov OS session reads this file first. Once the owner approves it, it supersedes anything that contradicts it (11.2).
 
@@ -429,3 +429,28 @@ Steps 1 and 2 are done. [WS]
 - [x] A-12: the transcript scan's window and targets (2.7)
 - [x] A-13: `judging-work` and the CLAUDE.md section trimmed to 3.4 (3.7)
 - [x] A-14: audit 7 checks the Charter too (9.2)
+
+---
+
+## 13. Changed since v3 (dated; the owner's decisions win over the text above where they differ)
+
+Written by the CTO for N-28 (DEC-1233 (1)); **approved by the owner on 2026-11-22, with two rows he added** (DEC-1237). Each row names the section it changes.
+
+| Date | Section | What changed | Decision |
+|---|---|---|---|
+| 2026-11-19 | §4.1-4.6 | A new ticket is opened only for a new feature; the launcher accepts a fix under its owning ticket and a chore with no ticket | DEC-1219 (5), (6) |
+| 2026-11-19 | §2.11 | One real-gitleaks case is kept in the weekly tier, for the scan before a repository goes public or is shared | DEC-1220 (1) TI-3 |
+| 2026-11-19 | §3, §7 | Gov OS's golden rules and "value first" stand at the head of every adopted repository's CLAUDE.md and AGENTS.md, carried by the kit through `gov adopt` and `gov update` | DEC-1217 (7), DEC-1219 (4) |
+| 2026-11-20, 2026-11-22 | §2.5, §8.3 | 0.1.5 is the owner's last manual cut. After it the CTO cuts every release whose content the owner has already approved (features he approved, Contract and Charter changes he approved), by code, once `governance/project/release-authority.yaml` is on, only when the release acceptance passes, with the re-pin's self-rollback and a push to the owner each time. Pushes to GitHub and sudo stay the owner's | DEC-1223 RB-1, DEC-1224 (3)-(4), DEC-1226, DEC-1235 (2) |
+| 2026-11-20 | §8.2 | Item 4 (one EXAMIN feature ticket through the flow) moves to EXAMIN's first planned wave; the release acceptance rests on the proving run (W2-81) and EXAMIN's fresh 80 | DEC-1224 (1)-(2) |
+| 2026-11-20, 2026-11-22 | §5, §6.1 | The imports feature: what a repository brings in is classed use, absorb or study and placed in memory accordingly, MCP tools among them; code reconstructed with REA is study until an absorb assessment names a commercial licence | DEC-1221 (2), DEC-1222 (1), DEC-1223 (8), DEC-1228 (1)-(3) |
+| 2026-11-22 | §4.5, §6.3 (RT-8), §10.4 | Models: Opus only for each app's CTO and a senior engineer; every other agent Sonnet, C3 work included; no Fable; one exception, a wide audit the owner asks for, on Opus; enforced by code | DEC-1225 |
+| 2026-11-22 | §4.5, §6.3 (RT-8) | Ticket leads (and fix and chore leads) run Sonnet at medium effort | DEC-1236 (2) |
+| 2026-11-22 | §3.5, §6.3 (RT-8) | A change to any role's model or effort comes to the owner first; nothing changes one in code, settings, scripts or briefs before his yes | DEC-1236 (3) |
+| 2026-11-22 | §5.3 | The measure's reader and grader run Sonnet (the first fresh 80 graded on Sonnet is the new baseline); citing a forbidden (stale, superseded, legacy) source makes an answer wrong, in the product's measure as in W2-81's | DEC-1225 (4), DEC-1227 D5 |
+| 2026-11-22 | §8.2 | The lite adoption verdict (CAP-44.h) rides the release after 0.1.5 | DEC-1231 |
+| 2026-11-22 | §2.3 | No Gov OS or EXAMIN session loads the owner's claude.ai connectors; each session gets only the MCP tools its role needs; MCP tools are imports (registered, pinned, given by role) | DEC-1232 (6), DEC-1228 (2) |
+| 2026-11-22 | §1, §11 | The owner's order: the model rubric in code; 0.1.5 then the automated release; W2-81 READY; EXAMIN's fresh 80 at 95 %; EXAMIN's planning stage; then EXAMIN's development under Gov OS. Everything else in parallel, never ahead | DEC-1232 (1) |
+| 2026-11-22 | §9, §12 | Every decision that needs the owner is a structured record (question, findings, options with costs, recommendation, sources), batched into one interactive page (a card per decision, an option, a note, a copyable answer sheet) published privately for his phone; his answer sheet is written into the register by code; the escalation rubric routes every owner decision through it (built in the release after 0.1.5) | DEC-1235 (3), DEC-1236 (1) |
+| 2026-11-22 | §5.9 | The weekly maintenance is a chore; W2-187 and W2-188 are not reopened | DEC-1233 (1) N-31 |
+| 2026-11-22 | §10 (new rule) | **Whatever can be deterministic becomes code; what cannot is specified so** (what each agent type receives, what it produces and in what form, and how code checks it). The Charter states the rule; every Contract item carries whether it is built, how it is enforced today, if not built why and when, and what it should be; the release acceptance checks them | DEC-1233 (6) |

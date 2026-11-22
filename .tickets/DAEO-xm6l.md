@@ -80,3 +80,35 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-22), as approved (DEC-729). The list row
 - **KPIs, failure:** a tool at the wrong version still fails; a real canary miss still fails.
 
 **D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): B1-24 ("`gov doctor` green" lives in W2-27 and W2-46).
+
+## Fix: the patch-only Claude Code CLI/extension gap (DEC-1227 D6 (a))
+
+Found 2026-11-20 by W2-81's proving run on release 0.1.4 (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md` rows P1,
+A1): `gov doctor` exited 3 (`DOCTOR_UNHEALTHY`) in every adopted repository on CLI 2.1.329 against extension 2.1.328,
+because any difference of the two strings was `drift` and `drift` counted as unhealthy; the extension auto-updates, so a
+patch gap is the normal state. No test caught it (`tests/acceptance/W2-22/` did not exist). The owner chose D6 (a): a
+patch-only gap (same major and minor) is drift, reported, exit 0; a minor or major gap, a CLI below the minimum and a CLI
+sha256 mismatch at the recorded version still exit 3; drift against the registry's recorded version still exits 3. Kind:
+a fix, no new ticket; the ticket stays closed. Failing tests first (`tests/acceptance/W2-22/`, A1; A2 guards the edges);
+code `src/gov/doctor/command.py` (`_is_patch_only_gap`, `_blocks_health`). Lead `d6-doctor-drift` (Sonnet), branch
+`e2/d6-doctor-drift` (`7db019b2f` tests, `fffebea78` code), merged as `9a4adb350`; on the merged tree `gov accept W2-22`
+green and 192 passed (W2-22, doctor units, W1-27, W1-48, W2-57, optin). The Contract's CAP-25 acceptance and CAP-61.e
+still read "exits non-zero on drift" and "aligned": their replacement wording goes to the owner with 0.1.5.
+
+## Fix: `gov doctor` checks a tool installed in its own folder (audit 3, M-04; DEC-1232, DEC-1233)
+
+Found 2026-11-22 by the E2 audit 3 (`docs/emergency-2/audits/E2-AUDIT-3-MCP-TOOLS.md`, M-04): the registry entries
+`node-22.23.5` and `rea-agents` read `ok: false` in doctor's `tools` part, because doctor found a binary only by
+`TOOL_BINARIES` or a `PATH=<prefix>:$PATH` in the install line. No test caught it. Required: both found and versioned with
+no schema change; a `PATH=` prefix from one tool's install line never answers for another tool of the same binary at
+another version (v22.23.5 never for `node` v22.23.3, nor the reverse). Kind: a fix, no new ticket; the ticket stays
+closed. Failing tests first: `tests/acceptance/W2-22/test_w2_22_tool_in_own_folder.py` (README ids success-3 to
+success-7; 17 red, 13 guards on the base), `1015d60e8`; code `src/gov/doctor/command.py` (a `<binary>-<version>` name maps
+to its binary; a tool's places are its own `PATH=` prefix, a local install's `<cd folder>/node_modules/.bin` and a Node's
+nvm folder for its pinned version; a folder owned by an entry of the same binary at another pinned version is skipped;
+the install line's `~` and `$HOME` read the process's HOME), `d21973e3c`; units `tests/unit/doctor/test_w2_22_own_folder.py`.
+Lead `fixes-015b` (Sonnet), branch `e2/fixes-015b`. `gov accept W2-22` green (success-1 to success-7, 46 passed) on the
+first run after the engineer's commit; `tests/unit/doctor`, W1-27, W1-06, W1-48, W2-22: 229 passed. On the real machine
+`gov doctor --json` now reads `node` v22.23.3, `node-22.23.5` v22.23.5 and `rea-agents` 6.10.1, all `ok: true`; the
+`pytest-xdist`, `pytest-timeout` and `pytest-testmon` entries (Python packages with no binary, not in `NO_BINARY_TOOLS`)
+still read `ok: false`, as on the base: not this fix's.

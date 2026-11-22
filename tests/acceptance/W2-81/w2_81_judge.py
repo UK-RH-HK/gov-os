@@ -4,12 +4,14 @@ Given one repository's manifest and an adoption's outputs on it, the judge gives
 each planted problem FOUND_AND_HANDLED, MISSED, MISHANDLED or NOT_BUILT, with the
 evidence it read (record and field), and each control CLEAN or FLAGGED. Over all
 the repositories and their end-to-end memory figures, it gives READY or NOT_READY, naming
-each reason. It writes nothing and prints nothing.
+each reason (each reason has a stable id, and an owner's exceptions that name every reason give READY_WITH_EXCEPTIONS:
+``overall``). It writes nothing and prints nothing.
 
 **What it reads (the adoption's outputs).** The adopted repository's working tree:
 
 - the stage records ``governance/adoption/<stage>-<title>.md`` (YAML front matter), named
-  as ``gov.adopt.project.record_path`` names them for A0 to A6 and A8, and as
+  as ``gov.adopt.project.record_path`` names them for A0 to A6 and A8, as ``gov.adopt.spec_audit.RECORD`` names AS
+  (the spec audit, between A2 and A3: ``AS-spec-audit.md``), and as
   ``PROVISIONAL`` names them for A7 and A10 (the names the lite gates write; built when
   ``gov.adopt.command.STAGES`` lists them; found only with ``result: pass``, the gate's own
   word, since a gate commits its record when it fails too) and the lite verdict (not built yet);
@@ -34,6 +36,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import sqlite3
 import subprocess
 from dataclasses import dataclass, field
@@ -47,6 +50,8 @@ from w2_81_secret import make_secret
 FOUND, MISSED, MISHANDLED, NOT_BUILT = "FOUND_AND_HANDLED", "MISSED", "MISHANDLED", "NOT_BUILT"
 CLEAN, FLAGGED = "CLEAN", "FLAGGED"
 READY, NOT_READY, ERROR = "READY", "NOT_READY", "ERROR"
+READY_WITH_EXCEPTIONS = "READY_WITH_EXCEPTIONS"  # every reason is named in an owner's exceptions (``overall``)
+READY_VERDICTS = (READY, READY_WITH_EXCEPTIONS)  # the verdicts that are a pass
 PRECEDENCE = (MISHANDLED, NOT_BUILT, MISSED, FOUND)
 
 FOLDER = "governance/adoption"
@@ -69,10 +74,13 @@ from w2_81_score import E2E_BAR  # noqa: E402 - the one bar: memory judged end t
 PROVISIONAL = {"A7": f"{FOLDER}/A7-independent-migration-verification.md",
                "A10": f"{FOLDER}/A10-independent-memory-verification.md",
                "VERDICT": f"{FOLDER}/VERDICT-lite.md"}
-BUILT_STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
-STAGES = (*BUILT_STAGES, "A7", "A10", "VERDICT")
+# AS, the spec audit (CAP-44.m, W2: ``gov adopt --lite --stage AS``, between A2 and A3), commits its record under the
+# name ``gov.adopt.spec_audit.RECORD`` gives; ``project.record_path`` does not name it (AS is in no ``TITLES``).
+AS_RECORD = f"{FOLDER}/AS-spec-audit.md"
+BUILT_STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")  # the stages ``project.record_path`` names
+STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A8", "A7", "A10", "VERDICT")  # every stage the judge reads
 
-# What each handling needs. ``built`` is today's state of the code, as read in src/gov/adopt/ on 2026-10-31.
+# What each handling needs. ``built`` is today's state of the code, as read in src/gov/adopt/ on 2026-11-20.
 CAPABILITIES = {
     "A2-namespace": ("CAP-44.b", True, "A2 classes each tracked file by the path map's namespace "
                      "(stages.a2, project.classify)"),
@@ -85,6 +93,8 @@ CAPABILITIES = {
                      "(legacy.KINDS); it extracts or retires no legacy document"),
     "index": ("CAP-44.d", True, "gov rebuild after A6 and A8 recreates .gov-runtime/store.db; the semantic "
               "vectors hold only namespaces whose embedding_policy is `embedded`"),
+    "AS": ("CAP-44.m", True, "AS records the spec audit between A2 and A3 (gov.adopt.spec_audit): the specs, what is "
+                             "built of each, the tickets and each gap as a question to the owner"),
     "A3": ("CAP-44.b", True, "A3 records the path map from the caller's proposal"),
     "A5": ("CAP-44.c", True, "A5 records the independent review of the path map"),
     "A6": ("CAP-44.d", True, "A6 executes the batches"),
@@ -152,6 +162,8 @@ def built_today():
 
 
 def record_name(stage):
+    if stage == "AS":
+        return AS_RECORD
     if stage in BUILT_STAGES:
         from gov.adopt import project
 
@@ -854,40 +866,107 @@ def _is_number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and value == value  # not a boolean, not NaN
 
 
-def overall(judgements, figures, expected):
+class ExceptionsError(ValueError):
+    """An owner's exceptions that cannot be used: its message names the file and the fault."""
+
+
+DECISION_FORM = re.compile(r"DEC-\d+")
+
+
+def load_exceptions(source):
+    """An owner's exceptions, checked: ``{"decision": "DEC-<digits>", "reasons": [<reason id>, ...]}``, given as a
+    mapping or as the path of a JSON or YAML file. An ``ExceptionsError`` names the file (its name only) and the fault:
+    unreadable, not a mapping, no decision or one not of the form ``DEC-<digits>``, reasons not a list of non-empty
+    strings, or a duplicate id."""
+    if isinstance(source, (str, os.PathLike)):
+        label = Path(source).name
+        try:
+            text = Path(source).read_text(encoding="utf-8")
+            try:
+                data = json.loads(text)
+            except ValueError:
+                data = yaml.safe_load(text)
+        except (OSError, UnicodeDecodeError, ValueError, yaml.YAMLError) as exc:
+            raise ExceptionsError(f"{label}: the exceptions file cannot be read ({type(exc).__name__})") from None
+    else:
+        label, data = "the exceptions", source
+    if not isinstance(data, dict):
+        raise ExceptionsError(f"{label}: not a mapping with a `decision` and a list of `reasons`")
+    decision, reasons = data.get("decision"), data.get("reasons")
+    if not isinstance(decision, str) or not DECISION_FORM.fullmatch(decision):
+        raise ExceptionsError(f"{label}: the `decision` is missing or is not of the form DEC-<digits>")
+    if not isinstance(reasons, list) or not all(isinstance(r, str) and r.strip() for r in reasons):
+        raise ExceptionsError(f"{label}: `reasons` is not a list of non-empty strings (reason ids)")
+    duplicates = sorted({r for r in reasons if reasons.count(r) > 1})
+    if duplicates:
+        raise ExceptionsError(f"{label}: duplicate id in `reasons`: {', '.join(duplicates)}")
+    return {"decision": decision, "reasons": list(reasons)}
+
+
+def overall(judgements, figures, expected, exceptions=None):
     """READY only when every repository expected is judged, every planted problem is FOUND_AND_HANDLED, no control is
     FLAGGED, every stage is present (none NOT_BUILT), and every repository's end-to-end figure (the share of its
     questions judged right) is at least ``E2E_BAR``. ``figures`` maps a repository to ``{"end_to_end": f}``; hit@5 and
-    the stacked share may sit beside it as diagnostics and are never read: low or absent, they change nothing."""
-    reasons = []
+    the stacked share may sit beside it as diagnostics and are never read: low or absent, they change nothing.
+
+    Every reason has a stable id, ``<repository>:<CODE>:<subject>``, in ``reason_ids``, in step with ``reasons`` (the
+    text of each): CODE is PLANTED (the planted problem's id), CONTROL (the control's id), STAGE (the stage's name),
+    FIGURE (``end_to_end``) or NOTJUDGED (``-``).
+
+    ``exceptions`` is an owner's, a mapping or the path of a JSON or YAML file (``load_exceptions``): ``{"decision":
+    "DEC-<n>", "reasons": [<reason id>, ...]}``. With none, the verdict is READY or NOT_READY as above. With them, a
+    run with reasons is READY_WITH_EXCEPTIONS only when every reason's id is named, and NOT_READY when one is not; the
+    result's ``exceptions`` holds the ``decision``, the ids ``named`` (those that matched a reason), the ids
+    ``unnamed`` (reasons the owner did not name) and the ids ``unused`` (named, matching no reason: reported, never an
+    error). A FOUND problem or a PRESENT stage is never a reason, so never needs naming."""
+    owner = None if exceptions is None else load_exceptions(exceptions)
+    records = []  # (id, text), in the order of the reasons
     by_name = {j["repository"]: j for j in judgements}
-    reasons += [f"{name}: not judged" for name in expected if name not in by_name]
+    records += [(f"{name}:NOTJUDGED:-", f"{name}: not judged") for name in expected if name not in by_name]
     for j in judgements:
         name = j["repository"]
-        reasons += [f"{name}: {p['id']} is {p['status']}" for p in j["planted"] if p["status"] != FOUND]
-        reasons += [f"{name}: {c['id']} is FLAGGED" for c in j["controls"] if c["status"] != CLEAN]
-        reasons += [f"{name}: stage {s} is {v['status']}" for s, v in j["stages"].items() if v["status"] != "PRESENT"]
+        records += [(f"{name}:PLANTED:{p['id']}", f"{name}: {p['id']} is {p['status']}")
+                    for p in j["planted"] if p["status"] != FOUND]
+        records += [(f"{name}:CONTROL:{c['id']}", f"{name}: {c['id']} is FLAGGED")
+                    for c in j["controls"] if c["status"] != CLEAN]
+        records += [(f"{name}:STAGE:{s}", f"{name}: stage {s} is {v['status']}")
+                    for s, v in j["stages"].items() if v["status"] != "PRESENT"]
         given = (figures or {}).get(name)
         value = given.get("end_to_end") if isinstance(given, dict) else None
         if not _is_number(value):
-            reasons.append(f"{name}: the end-to-end figure is missing (its bar is {E2E_BAR:g})")
+            records.append((f"{name}:FIGURE:end_to_end", f"{name}: the end-to-end figure is missing "
+                                                          f"(its bar is {E2E_BAR:g})"))
         elif value < E2E_BAR:
-            reasons.append(f"{name}: the end-to-end figure is {value:g}, below its bar of {E2E_BAR:g}")
-    return {"verdict": NOT_READY if reasons else READY, "reasons": reasons, "repositories": judgements}
+            records.append((f"{name}:FIGURE:end_to_end", f"{name}: the end-to-end figure is {value:g}, below its bar "
+                                                          f"of {E2E_BAR:g}"))
+    ids, reasons = [i for i, _ in records], [t for _, t in records]
+    result = {"verdict": READY if not reasons else NOT_READY, "reasons": reasons, "reason_ids": ids,
+              "repositories": judgements}
+    if owner is not None:
+        listed, seen = set(owner["reasons"]), set(ids)
+        unnamed = [i for i in dict.fromkeys(ids) if i not in listed]
+        result["exceptions"] = {"decision": owner["decision"],
+                                "named": [i for i in dict.fromkeys(ids) if i in listed], "unnamed": unnamed,
+                                "unused": [i for i in owner["reasons"] if i not in seen]}
+        if reasons and not unnamed:
+            result["verdict"] = READY_WITH_EXCEPTIONS
+    return result
 
 
-def judge(cases, figures, expected, built=None, run_folder=None):
+def judge(cases, figures, expected, built=None, run_folder=None, exceptions=None):
     """The whole judgement, failing closed: ``cases`` is a list of (manifest or its path, root, beside, secrets).
+    ``exceptions``: an owner's, as ``overall`` reads them (checked first: a fault in them is raised, never judged).
 
     Any error is an ERROR result, never READY; no secret value is ever in the result (checked in memory)."""
     held = [h for case in cases for h in case[3]]
+    exceptions = None if exceptions is None else load_exceptions(exceptions)
     try:
         judgements = []
         for manifest, root, beside, secrets in cases:
             if not isinstance(manifest, dict):
                 manifest = manifest_form.load(manifest)
             judgements.append(judge_repository(manifest, root, beside, secrets, built, run_folder))
-        result = overall(judgements, figures, expected)
+        result = overall(judgements, figures, expected, exceptions)
         text = json.dumps(result, sort_keys=True)
     except Exception as exc:  # noqa: BLE001 - whatever stops the judge is an error, never a pass
         result = {"verdict": ERROR, "error": type(exc).__name__, "reasons": ["the judge could not judge"]}

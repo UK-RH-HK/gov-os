@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-37: Structured checkpoints and mandatory triggers
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
 - **Acceptance:** After every ticket transition a checkpoint file exists; after a forced compaction and after a killed session, a session resumes at the checkpoint's recorded next step without the owner restating it (RT-5).

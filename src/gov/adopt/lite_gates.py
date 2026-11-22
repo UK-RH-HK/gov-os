@@ -64,6 +64,23 @@ def _stood_on(run, gate: str) -> tuple[dict, dict]:
     return records, hashes
 
 
+RECORD_KEYS = ("id", "type", "status")  # what the store requires of a record (``gov.store.loader.REQUIRED``)
+
+
+def require_record(head: dict, rel: str) -> None:
+    """``VERDICT_NOT_A_RECORD`` for a verdict whose front matter states an ``id`` but no non-empty string ``type`` or
+    ``status``: the store lists such a file invalid at the next ``gov rebuild``, so a gate that accepted it would
+    leave the adopter's tree with an invalid record. A front matter with no ``id`` is no record to the store and is
+    accepted as it was. Run after every other check of the gate, so each earlier refusal keeps its code."""
+    if "id" not in head:
+        return
+    missing = [key for key in RECORD_KEYS if not isinstance(head.get(key), str) or not head[key]]
+    if missing:
+        raise refuse("VERDICT_NOT_A_RECORD", f"{rel}: its front matter states an id but lacks a non-empty string "
+                     f"{' and '.join(missing)}, so the store lists it as an invalid record: add the missing key(s) "
+                     "or leave out the id", verdict=rel, keys=missing)
+
+
 def _auditor(run, gate: str) -> dict:
     """The auditor's record for ``gate``, held to the A5 rule for each record it checks; a refusal otherwise."""
     rel = run.args.verdict
@@ -101,6 +118,7 @@ def _auditor(run, gate: str) -> dict:
             raise refuse("VERDICT_OTHER_RECORD", f"{rel}: the sha256 it gives for the {stage} record {checked} "
                          f"({given[checked]!r}) is not that record's as it stands ({run.hashes[stage]})", verdict=rel,
                          stage=stage)
+    require_record(head, rel)
     return {"record": rel, "sha256": project.sha256(data), "commit": brought, "session": session,
             "verdict": head["verdict"]}
 

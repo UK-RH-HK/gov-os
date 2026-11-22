@@ -31,6 +31,14 @@ before the field: the environment of the record's ``from`` release, ``no_previou
 ``governance/updates/<B>.rolled-back.json`` written, one commit; then ``gov rebuild`` with the restored pin's gov.
 B's environment folder stays. A failure before the commit puts HEAD, the tree and the pin back.
 
+After the legacy lines, every kernel hook program is registered once per event and matcher (W2-17 fix F4, EXAMIN report
+28; ``gov.update.hooks``): the regeneration merges release B's hooks beside an older form of the same hook, and the last
+entry, release B's, is the one that stays.
+
+The path map (W2-17 fix F6, ``gov.update.pathmap``): a path map that does not classify ``governance/updates/**`` (the
+records this update writes) gets the line added as a merge, listed under ``merged`` and exempt from the overlay check;
+the project's other lines and comments stay.
+
 The commit is made with ``--no-verify``: the project's pre-commit checks are for its agents' changes, and the update's
 bytes are hash-verified and lock-checked (the ticket lead's call).
 """
@@ -48,6 +56,8 @@ from pathlib import Path
 from gov import lock, release
 from gov.install import pin as install_pin
 from gov.install.locate import common_dir, pin_root
+from gov.update import hooks as kernel_hooks
+from gov.update import pathmap
 
 SETTINGS = ".claude/settings.json"
 PERMISSION_KINDS = ("deny", "allow")
@@ -165,7 +175,20 @@ def plan(old_root: Path, project: Path, new_root: Path) -> tuple[dict, dict]:
             files[outcome].append(rel)
         if action is not None:
             actions[rel] = action
+    _merge_path_map(project, files, actions)
     return files, actions
+
+
+def _merge_path_map(project: Path, files: dict, actions: dict) -> None:
+    """W2-17 fix F6: the project's path map without the ``governance/updates/**`` line gets it, as a merge (``merged``,
+    a ``write`` of the project's own text with the one line added). It is the overlay's one file the update writes."""
+    own = _entry(project / pathmap.REL)
+    if own is None or not _text(own) or pathmap.REL in actions:
+        return
+    merged = pathmap.merge(own[1].decode("utf-8"))
+    if merged is not None:
+        files["merged"] = sorted([*files["merged"], pathmap.REL])
+        actions[pathmap.REL] = ("write", merged.encode("utf-8"), own[2], False)
 
 
 class Journal:
@@ -533,6 +556,8 @@ def _apply(project, version, held, src, data, digest, manifest, files, actions, 
     state = _pin_state(root, version)
     drift_before = set(lock.compare(project).drifted_files)
     overlay = _overlay(project)
+    if pathmap.REL in actions:  # the merge of the path map's line is the update's, not a change of the overlay
+        overlay[pathmap.REL[len(OVERLAY):]] = actions[pathmap.REL][1]
     legacy, before = legacy_lines(project), permission_lines(_settings_bytes(project))
     old_rules = scratch / "old-rules"
     if (project / SOURCES).is_dir():
@@ -559,6 +584,7 @@ def _apply(project, version, held, src, data, digest, manifest, files, actions, 
         adapters_kept, generated = _regenerate(project, old_rules, scratch / "generated-A", link, journal)
         step = "settings"
         remove_legacy(project, legacy, journal)
+        kernel_hooks.dedupe_settings(project, journal)
         lost = lost_lines(before, permission_lines(_settings_bytes(project)), legacy, generated)
         if lost:
             raise RuntimeError(f"the regenerated {SETTINGS} lost the project's own line(s), which the update may not "
