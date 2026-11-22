@@ -130,12 +130,14 @@ def test_every_kernel_role_file_s_line_parses(path, tmp_path):
             assert model.startswith("claude-") and effort in role.EFFORTS
 
 
-def test_the_qa_engineer_s_c2_is_sonnet_on_every_profile():  # W2-201 S1 (DEC-1214 K1): no Opus on FULL any more
-    table = role.read_by_criticality(REPO, "qa-engineer")
-    assert table["C2"] == {"full": ("claude-sonnet-5-5", "high"), "other": ("claude-sonnet-5-5", "high")}
+def test_the_qa_engineer_runs_sonnet_on_every_profile_by_its_default_line():
+    """Rewrite-Reason: DEC-1225: this read the QA engineer's table line (C2 Sonnet on every profile). R1: the role files
+    carry no table line; Sonnet, high is the role's default and so every class's and profile's."""
+    assert role.read_by_criticality(REPO, "qa-engineer") is None
+    assert role.launch_default(REPO, "qa-engineer") == ("claude-sonnet-5-5", "high")
 
 
-def test_the_engineer_s_table_is_the_kernel_s():
-    table = role.read_by_criticality(REPO, "engineer")
-    assert table["C3"]["other"] == ("claude-opus-5-5", "high")
-    assert table["C0"]["other"] == ("claude-haiku-5-5", "low")
+def test_the_engineer_has_no_table_line_and_runs_sonnet():
+    """Rewrite-Reason: DEC-1225: this pinned the engineer's table (C3 Opus, C0 Haiku, low). R1: none; Sonnet, high."""
+    assert role.read_by_criticality(REPO, "engineer") is None
+    assert role.launch_default(REPO, "engineer") == ("claude-sonnet-5-5", "high")

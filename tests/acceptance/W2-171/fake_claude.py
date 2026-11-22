@@ -10,8 +10,12 @@ Plan: ``{"q": {<question text>: {"id", "reader": [<response>...], "grader": [..]
 "cost": {"reader", "grader", "check"}}}, "cost": {...}, "sleep": <seconds>}``. A response is the structured output
 (a reader's object, or a grade word for a grader) or ``"empty"``: the call returns nothing (exit 1, no standard
 output, or the text in ``garbage``). Responses are taken by the number of this question's calls of that kind so far
-(a call run once more is the next one). Reader or grader kind: by the schema (``verdict`` or ``grade``) and the model
-(``opus`` grades, ``sonnet`` checks).
+(a call run once more is the next one). Reader or grader kind: by the schema (``verdict`` or ``grade``) and, for a grading call, by its order
+(the first call of a question's grading is the grader's, the next, once the grader's has answered or been run once
+more, the check's).
+
+Rewrite-Reason: DEC-1225 (R4): the grader was told from the check by the model (``opus`` grades, ``sonnet`` checks).
+Reader, grader and check all run claude-sonnet-5-5 now, so the model says nothing; the order does.
 """
 import fcntl
 import json
@@ -49,6 +53,35 @@ def counter(key):
         os.close(fd)
 
 
+def _gpath(qid):
+    os.makedirs(os.path.join(STATE, "claude_state"), exist_ok=True)
+    return os.path.join(STATE, "claude_state", ("grader-state-" + str(qid)).replace("/", "_").replace(" ", "_")[:150])
+
+
+def grader_done(qid):
+    """True once this question's grader has answered, or has been called twice (a call is run once more, never a third
+    time): the next grading call is the check's."""
+    try:
+        with open(_gpath(qid), encoding="utf-8") as f:
+            return f.read().strip() == "done"
+    except OSError:
+        return False
+
+
+def grader_ran(qid, empty):
+    path = _gpath(qid)
+    calls = 0
+    try:
+        with open(path, encoding="utf-8") as f:
+            word = f.read().strip()
+        calls = int(word.split()[1]) if word.startswith("calls") else 0
+    except (OSError, ValueError, IndexError):
+        pass
+    calls += 1
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("done" if (not empty or calls >= 2) else f"calls {calls}")
+
+
 def main():
     argv = sys.argv[1:]
     flags = {}
@@ -59,13 +92,15 @@ def main():
     schema = json.loads(flags.get("--json-schema", "{}"))
     model = flags.get("--model", "")
     props = schema.get("properties", {})
-    kind = "reader" if "verdict" in props else ("grader" if "opus" in model else "check")
+    kind = "reader" if "verdict" in props else "grading"
     first = prompt.split("\n\nGold answer: ", 1)[0] if kind != "reader" else prompt.split("\n", 1)[0]
     text = first[len("Question: "):] if first.startswith("Question: ") else first
     os.makedirs(STATE, exist_ok=True)
     with open(os.path.join(STATE, "claude_plan.json"), encoding="utf-8") as f:
         plan = json.load(f)
     spec = plan.get("q", {}).get(text, {})
+    if kind == "grading":
+        kind = "check" if grader_done(spec.get("id", "unknown")) else "grader"
     n = counter(f"{spec.get('id', 'unknown')}|{kind}")
     script = spec.get(kind) or []
     response = script[n] if n < len(script) else (script[-1] if script else None)
@@ -77,6 +112,8 @@ def main():
     locked("claude_calls.jsonl", json.dumps({
         "qid": spec.get("id"), "kind": kind, "inv": n, "model": model, "usd": cost, "empty": empty,
         "argv": argv, "prompt": prompt, "t0": started, "t1": time.time()}) + "\n")
+    if kind == "grader":
+        grader_ran(spec.get("id", "unknown"), empty)
     if os.environ.get("W171_STDERR_WORDS"):
         sys.stderr.write(os.environ["W171_STDERR_WORDS"] + "\n")
     if empty:

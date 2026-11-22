@@ -221,9 +221,10 @@ def test_the_five_briefs_pass_stage_ten_in_dry_builds(s):
         assert_counts(counts, 0, "dry")
         m = json.loads((s.wall(counts) / "WALL.json").read_text())
         entry = indep_launch.load_briefs((TEMPLATE / "kinds.yaml").read_bytes())[bid]
-        assert m["model"] == "claude-opus-5-5" and m["result_schema"] == entry["result_schema"]
+        # Rewrite-Reason: DEC-1225 (R4): the shipped kinds file's models were claude-opus-5-5; they are Sonnet now
+        assert m["model"] == "claude-sonnet-5-5" and m["result_schema"] == entry["result_schema"]
         assert m["brief_id"] == bid and m["flow"] == entry["flow"]
-        assert json.loads((s.wall(counts) / ".claude" / "settings.json").read_text())["model"] == "claude-opus-5-5"
+        assert json.loads((s.wall(counts) / ".claude" / "settings.json").read_text())["model"] == "claude-sonnet-5-5"
 
 
 GUARD_GLOBS = [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
@@ -239,7 +240,7 @@ AUDITOR_TELL_FILES = ["governance/project/orchestration/packages/sgx1/README.md"
 def test_template_kinds_yaml_holds_the_five_entries():
     data = (TEMPLATE / "kinds.yaml").read_bytes()
     kinds, briefs = indep_launch.load_kinds(data), indep_launch.load_briefs(data)
-    assert all(kinds[k]["model"] == "claude-opus-5-5" for k in KINDS)
+    assert all(kinds[k]["model"] == "claude-sonnet-5-5" for k in KINDS)  # DEC-1225 (R4): was claude-opus-5-5
     assert set(briefs) == {"sgx1-labeller", "sgx1-labeller-2", "sgx1-writer-tuning", "sgx1-writer-heldout",
                            "sgx1-overlap-auditor"}
     for bid, e in briefs.items():

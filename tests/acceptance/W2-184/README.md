@@ -474,3 +474,14 @@ folder); the revised cases are in the map above, under success-8.
 | success-8 | test_r3_identical_copies_of_one_failed_record_under_three_roots_count_once | pin |
 | success-8 | test_r3_two_differing_copies_of_one_failed_record_are_one_failed_review | pin (fails on a launcher that counts each copy) |
 | success-8 | the two revised cases of `test_w2_184_f1_tests_worktree.py` above | first copy wins (`two failed reviews` on `03-review.md` / `02-review.md`, not `a fail-open finding` on `01-review.md`) |
+
+## Revised for DEC-1225 (W2-201 R2, 2026-11-22)
+
+`Rewrite-Reason: DEC-1225` (commit trailer; each case carries a comment). The table mechanism (the `Launch by criticality`
+line's parse, the fixture tables with Opus and Haiku entries, the effort floor, `--reason`, the review rounds, the probe's
+max, the same-setting refusal) is unchanged and runs on the fixture role files. What changed is what DEC-1225 (1) takes
+from the launcher: a promotion and the second review's probe no longer choose Opus (`criticality.yaml`'s `opus` key names
+no model they launch), so they launch the table's model, keep their records, their effort and their round rules, and
+a model after `--` other than it is refused (Sonnet, the engineer's C2 entry, accepted); and a trial's model is Sonnet
+(`w2_184_support.TRIAL_MODEL`; a trial naming another model is refused, W2-201's `test_w2_201_r2_launch_model.py`). The
+kernel role files carry no table line, so `s1_no_criticality_file`'s kernel-lines case takes the table line as optional.

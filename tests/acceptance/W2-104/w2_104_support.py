@@ -41,7 +41,8 @@ COMMAND = "skilleval"
 SYSTEM_PATH = ("/usr/bin", "/bin")
 COMMAND_TIMEOUT_S = 240.0   # a wait under parallel load, not a time the ticket promises
 
-DEFAULT_MODEL = "claude-opus-5-5"   # DEC-839's worker defaults, as the contract states them
+# Rewrite-Reason: DEC-1225 (R2): the harness's default model was claude-opus-5-5 (DEC-839's worker defaults); it is Sonnet now
+DEFAULT_MODEL = "claude-sonnet-5-5"
 DEFAULT_EFFORT = "high"
 
 RECORD_FILE = "scenario-records.yaml"

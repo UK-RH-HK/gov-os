@@ -275,47 +275,12 @@ def _role_file(root: Path, role: str) -> tuple[str, bytes, list[str]]:
             from None
 
 
-SUBSTITUTION_REL = "governance/project/model-substitution.yaml"
-
-
-def substitute(root: Path, model: str, effort: str) -> tuple[str, str]:
-    """The owner's temporary model substitution (DEC-1215; ``governance/project/model-substitution.yaml``): while it is
-    active and its ``until`` has not passed, a role whose model is ``from`` runs ``to`` (at ``effort`` when given).
-    A missing, unreadable or inactive file, or a passed ``until``, changes nothing."""
-    try:
-        import yaml
-        from datetime import datetime, timezone
-        data = yaml.safe_load((Path(root) / SUBSTITUTION_REL).read_text(encoding="utf-8")) or {}
-        if not data.get("active") or model != data.get("from") or not data.get("to"):
-            return model, effort
-        until = data.get("until")
-        if until and datetime.now(timezone.utc) >= datetime.fromisoformat(str(until)):
-            return model, effort
-        return str(data["to"]), str(data.get("effort") or effort)
-    except Exception:
-        return model, effort
-
-
-def substitution_active(root: Path) -> bool:
-    """True while DEC-1215's substitution of Opus by Claude Fable 5.2 is active and its ``until`` has not passed
-    (``substitute``'s rule; the helper hook's ``substitution``). Anything missing or unreadable is inactive."""
-    try:
-        from datetime import datetime, timezone
-        data = yaml.safe_load((Path(root) / SUBSTITUTION_REL).read_text(encoding="utf-8")) or {}
-        if not data.get("active") or data.get("to") != "claude-fable-5-2":
-            return False
-        until = data.get("until")
-        return not (until and datetime.now(timezone.utc) >= datetime.fromisoformat(str(until)))
-    except Exception:
-        return False
-
-
 def launch_default(root: Path, role: str) -> tuple[str, str]:
     """The model and effort of the role file's default line alone, for ``gov launch --plan`` (DEC-1167 (2)): the same
     file and the same refusals as ``read_role``; no other line of it is read."""
     rel, _, lines = _role_file(root, role)
     default = _one_line(lines, DEFAULT_HEAD, DEFAULT_LINE, rel, DEFAULT_FORM, True)
-    return substitute(root, default.group(1), default.group(2))
+    return default.group(1), default.group(2)
 
 
 def _table(lines: list[str], rel: str) -> dict | None:
@@ -336,12 +301,6 @@ def _table(lines: list[str], rel: str) -> dict | None:
     return table
 
 
-def _substituted_table(root: Path, table: dict | None) -> dict | None:
-    if table is None:
-        return None
-    return {c: {k: substitute(root, *pair) for k, pair in entry.items()} for c, entry in table.items()}
-
-
 def read_by_criticality(root: Path, role: str) -> dict | None:
     """The role file's table alone (``_table``): the same file and refusals as ``read_role``'s for that line."""
     rel, _, lines = _role_file(root, role)
@@ -357,8 +316,8 @@ def read_role(root: Path, role: str) -> dict:
     rel, data, lines = _role_file(root, role)
     version = _one_line(lines, VERSION_HEAD, VERSION_LINE, rel, "- **Version:** <major>.<minor>.<patch>", True)
     default = _one_line(lines, DEFAULT_HEAD, DEFAULT_LINE, rel, DEFAULT_FORM, True)
-    by_criticality = _substituted_table(root, _table(lines, rel))
-    model, effort = substitute(root, default.group(1), default.group(2))
+    by_criticality = _table(lines, rel)
+    model, effort = default.group(1), default.group(2)
     named_line =_one_line(lines, SKILLS_HEAD, SKILLS_LINE, rel, "- **Skills:** <name>, <name>", False)
     named = named_line.group(1).split(", ") if named_line else []
     if len(set(named)) != len(named):

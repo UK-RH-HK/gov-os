@@ -190,9 +190,14 @@ if grader:
     question = prompt.split("\\n\\nGold answer:")[0]
     said = prompt.split("Answer to grade: ", 1)[1]
     grade = "correct"
+    import hashlib  # how many times this prompt was graded (a file a prompt, no shared write): the check is the second
+    seen = os.path.join(here, "claude-seen-" + hashlib.sha256(prompt.encode()).hexdigest()[:16])
+    with open(seen, "a") as mark:
+        mark.write("x")
+    nth = os.path.getsize(seen)
     for rule in plan["rules"]:
         if all(w in question for w in rule.get("q", [])) and all(w in said for w in rule.get("said", [])) \\
-                and rule.get("model", model) == model:
+                and rule.get("model", model) == model and rule.get("nth", nth) == nth:
             grade = rule["grade"]
             break
     out = {"grade": grade, "reason": "r"}

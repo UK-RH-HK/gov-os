@@ -143,7 +143,8 @@ def test_w2_104_all_pass_records_beside_the_skill(project, capsys):
     assert [e["scenario"] for e in entries] == [1, 2, 3]
     for entry in entries:
         assert entry["skill"] == "demo" and entry["skill_version"] == "1.2.0" and entry["verdict"] == "pass"
-        assert entry["model"] == "claude-opus-5-5" and entry["effort"] == "high"
+        # Rewrite-Reason: DEC-1225 (R2): the harness's default model was claude-opus-5-5; it is Sonnet now
+        assert entry["model"] == "claude-sonnet-5-5" and entry["effort"] == "high"
         assert isinstance(entry["seconds"], float) and entry["run_at"].endswith("+00:00")
     assert len(calls(log)) == 6
 

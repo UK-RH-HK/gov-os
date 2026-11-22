@@ -32,6 +32,9 @@ allowed_paths:
 - .claude/agents/*.md
 - tests/unit/launch/**
 - tests/unit/hooks/**
+- .claude/skills/orchestration/SKILL.md
+- docs/emergency-2/audits/04-tickets-and-rubric.md
+- docs/emergency-2/briefs/NIGHT-COMMON.md
 est_loc: 600
 kpis:
   success:
@@ -233,3 +236,80 @@ rewriting what it holds) and hands it to the session as an `in_progress` worker'
 engineer on a closed ticket (the stub CLI, a planted runs root): the folder exists under the root with its marker naming the
 repository, the same launch repeated reuses it, and the session's env/settings carry it as an `in_progress` ticket's launch
 does; the same launch without `--fix` on the closed ticket is refused as today; `--chore` makes none.
+
+## Fix, part 3: the model rubric of DEC-1225 in code (a fix under W2-201; lead `models-rubric`, 2026-11-22), lines R1 to R5
+
+The owner's DEC-1225 changes the rubric W2-201 put in code (S1, S3, S4, S5, S9): Opus only for each app's CTO and the senior
+engineer; every other agent Sonnet, C3 work included; one exception, a comprehensive audit the owner asks for, on Opus; no
+session runs Fable. The test designer (Sonnet, `Rewrite-Reason: DEC-1225`) revises the cases that pin the old table (S1's
+`TABLE`, S3's C3 Opus, S4/S5's `class: C3` entries and C3 Opus helpers, S9's whole substitution, the W2-184 and W2-60a cases that
+read C3 Opus or C0 Haiku from this repository's role files); the new cases below are written red on the base. Decisions the lead
+took where the brief leaves a choice: the `Launch by criticality` line goes from every role file (Sonnet at every class, C0
+Haiku included: the helper hook refuses Haiku already, and DEC-1225 says every other agent runs Sonnet); the promotion and the
+second-review probe keep their records, their effort and their review-round rules but no longer choose Opus (the model stays
+the table's, Sonnet) unless an exceptions entry covers it; DEC-1215's substitution file and every reader of it are removed.
+
+**R1 The role files carry the new table.** In `template/governance/kernel/roles/*.md`, and each copy the portability check holds
+equal to them (`template/.rulesync/subagents/`, `.rulesync/subagents/`, `.claude/agents/`, regenerated with the project's
+generator, `gov.adapters.portability`'s `rulesync generate` step), `orchestrator` and `senior-engineer` carry `Launch default`
+`claude-opus-5-5`, effort high, and no table line; every other role file (`ticket-lead`, `engineer`,
+`independent-test-designer`, `independent-auditor`, `qa-engineer`, `product-spec`, `research`) carries `Launch default`
+`claude-sonnet-5-5`, effort high, and no `Launch by criticality` line (so Sonnet at every class and profile; no
+`claude-opus-5-5` and no `claude-haiku-5-5` is left in a role file but the two Opus roles' default). `independent-auditor`'s
+`Model tier` line says an Opus audit is only the exceptions file's entry for a comprehensive audit the owner asked for
+(DEC-1225 (2)), not a role default. Each changed role file's `Version` goes up by one minor. `governance/project/criticality.yaml`'s
+comments say a class no longer picks a model (the key `opus` stays for the file's form and names the model an exceptions entry
+may cover), and audit 4's Table 3 (`docs/emergency-2/audits/04-tickets-and-rubric.md`, the rubric's source) carries the same
+table with a note naming DEC-1225. Verify: a test reads every role file with `gov.launch.role` (`launch_default`,
+`read_by_criticality`) and compares the model and effort per role with this table, for the kernel file and for each copy
+(a copy that differs from the kernel file fails it); a scan of `template/governance/kernel/roles/`, the three copy folders and
+`criticality.yaml` for `claude-opus-5-5` and `claude-haiku-5-5` finds them only as the two Opus roles' default and in
+`criticality.yaml`'s `opus` key; `gov adapters` portability check is green on the tree.
+
+**R2 `gov launch` picks the model by role.** A lead (`gov launch orchestrator|lead <ticket>`, with `--fix` or `--chore`) is
+started with `--model claude-sonnet-5-5` added by the launcher (the CLI's own default, the CTO's Opus, is never its model); a
+worker's model is its role file's default (Sonnet) at every class, a trial's model and a promotion's or probe's included
+(a trial file naming a model other than Sonnet is refused `LAUNCH_REFUSED` unless an exceptions entry covers it; a promotion
+or probe keeps its record and effort rule and the table's model). `--model` after `--` naming any model other than the session's
+is refused `LAUNCH_REFUSED` naming DEC-1225 and `governance/project/model-exceptions.yaml`, for a lead and for a worker, unless
+the exceptions file has an entry for that role and model whose limiter (R3) the launch meets; a `--model` naming Sonnet is not
+doubled; a model naming Fable (`fable` or `claude-fable-5-2`) is refused whatever the file holds (no session runs Fable, DEC-1225
+(3)). The skill evaluation harness's default model (`src/gov/skilleval/harness.py`, `DEFAULT_MODEL`) is Sonnet. Verify: on the stub
+CLI, planted launches of a lead, of a lead `--fix`, of a lead `--chore`, of a C3 engineer and of a C3 test designer record or
+pass `claude-sonnet-5-5` (the record's `model` and the stub's received `--model`); `--model claude-opus-5-5` for an engineer, for
+a test designer and for a lead is refused with no session and no record; `--model claude-fable-5-2` and `--model fable` are
+refused for each, also with an exceptions entry naming them; `--model claude-sonnet-5-5` starts one session with one `--model`;
+a trial naming Opus is refused; a ticket with two failed probe records (a promotion) on an auditor launches Sonnet, its record
+keeping `promotion`.
+
+**R3 The helper rule's Opus exception is limited to the audits the owner asks for.** An exceptions entry that names Opus lifts
+the refusal only when it carries a limiter and the spawn or launch meets it: `class: C3` (as before), `task: <id or list>`
+(the spawn prompt's one line `Task: <id>`, or the launch's ticket, is one of them) and `decision: <DEC-id or list>` (the spawn
+prompt carries a line `Decision: <DEC-id>`, or the launch is given `--owner-named <DEC-id>`, one of them); every limiter an
+entry carries must be met; an entry that names Opus and carries none lifts nothing. `governance/project/model-exceptions.yaml`
+holds one entry, `independent-auditor`, `opus`, `decision: [DEC-1230]`. The hook (`.claude/hooks/agent_model.py`) and
+`gov.launch.model_exceptions` read it by the same rule. A refusal exits 2 (the hook) or `LAUNCH_REFUSED` (the launcher) and says
+which limiter is not met. Fable is refused by both with no Fable hint and no substitution reading: DEC-1215's
+`governance/project/model-substitution.yaml` is deleted, with `roles.substitute`, `roles.substitution_active`, the hook's
+`substitution` and `model_matches`' substituted case, and the CTO's start script no longer reads it (it starts the CTO on
+`claude-opus-5-5`). Verify: the hook as a subprocess on events for an `independent-auditor` naming `opus` and `claude-opus-5-5`:
+with a prompt carrying `Decision: DEC-1230` (let through), with none (refused, naming the limiter), with `Decision: DEC-1299`
+(refused), with `Task:` only (refused); an `engineer` naming Opus (refused: no entry); an entry with `task: DAEO-x` met and
+unmet; an Opus entry with no limiter lifts nothing; `fable` and `claude-fable-5-2` refused for every type with an entry naming
+them, the reason carrying no word `substitut`; the launcher's matching cases with `--owner-named DEC-1230` (an auditor
+`--model claude-opus-5-5`, started and recorded `model_source` `exception`) and without it (refused); no file
+`governance/project/model-substitution.yaml`, and no `substitut` in `src/gov/launch/`, the hook and `start_cto.sh`.
+
+**R4 The memory measure's reader and grader run Sonnet.** `src/gov/memaudit/judge.py`'s `READER` and `GRADER` are
+`claude-sonnet-5-5` (`CHECK` already is); the models the call passes (`claude.py`'s `--model`), the shipped briefs under
+`src/gov/_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/` that name `claude-opus-5-5` and the shipped
+`indep-walls/kinds.yaml` models are Sonnet; the judged run's record (`FIGURES.json` and the run's declared record) names the
+reader, grader and checker models, so DEC-1098's figures stay comparable only from the first fresh 80 graded on Sonnet, which is
+the new baseline (DEC-1225 (4)); W2-81's runner already forces Sonnet. Verify: a unit test on the call the judge builds (the stub
+`claude` records `--model`) for a reader, a grader and a check, each `claude-sonnet-5-5`; `FIGURES.json` of a planted judged
+run holds `models` with the three; no `claude-opus` in `src/gov/memaudit/` or the shipped briefs and kinds file.
+
+**R5 EXAMIN's copy is listed.** The lead reads `/home/usain/gov-os-runs/W2-27/examin` (read only) and returns what carries the old
+table: its kernel role files and copies (reached by `gov update` to 0.1.5), its `.claude/hooks/agent_model.py` and
+`governance/project/model-exceptions.yaml`, its start scripts; for what the kit does not carry, the exact change for the EXAMIN
+CTO. Verify: the list in the lead's return, each item with its path, the line and the change; no file of that folder is written.

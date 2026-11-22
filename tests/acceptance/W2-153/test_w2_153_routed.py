@@ -57,16 +57,20 @@ def _carried_cases():
 
 
 def test_routed_guard_the_cases_below_are_not_a_silent_narrowing():
-    """Nine kernel role files on this tree; every label is carried by at least one, and every role file carries
-    ``Launch default`` and ``Skills`` (``Launch by criticality`` only some), so the skipped cases are the ones
-    the role files themselves leave out and nothing more."""
+    """Nine kernel role files on this tree; ``Launch default`` and ``Skills`` are carried by every one, so the skipped
+    cases are the ones the role files themselves leave out and nothing more.
+
+    Rewrite-Reason: DEC-1225 (R1): this also required a ``Launch by criticality`` line in some role file. No role file
+    carries one now (Sonnet at every class), so every one of its routed cases is skipped by design and the line is
+    guarded where the table mechanism lives: the planted stand-in's role file carries it, its hand edit is named as
+    drifted (``test_routed_a_hand_edit_to_one_of_the_three_lines_is_named_as_drifted``), and a real role file that
+    carries one again has it carried byte for byte (the cases above are collected for it)."""
     assert ROLE_FILES, f"no kernel role file under {ROLES_DIR}"
-    for label in LABELS:
-        assert any(_lines(path.read_bytes(), label) for path in ROLE_FILES), (
-            f"no kernel role file carries a '{label}' line: the routed cases would all skip")
     for label in ("Launch default", "Skills"):
         lacking = [path.name for path in ROLE_FILES if not _lines(path.read_bytes(), label)]
         assert lacking == [], f"role files without a '{label}' line: {lacking}"
+    assert "Launch by criticality" in STAND_IN_LINES and STAND_IN_ROLE.count("- **Launch by criticality:**") == 1, (
+        "the stand-in's role file must carry the 'Launch by criticality' line the drift cases edit")
 
 
 @pytest.mark.parametrize("role, folder, label", _carried_cases())

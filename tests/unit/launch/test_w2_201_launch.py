@@ -13,7 +13,7 @@ import pytest
 import yaml
 
 from gov.cli.errors import GovError
-from gov.launch import criticality as crit, launcher, model_exceptions, role as roles
+from gov.launch import criticality as crit, launcher, role as roles
 
 from .test_w2_184_launch import HAIKU, OPUS, SONNET, Project, _flag
 
@@ -34,12 +34,6 @@ def exceptions(project, entries=None, text=None):
     path.write_text(text if text is not None else yaml.safe_dump({"exceptions": entries}), encoding="utf-8")
 
 
-def substitution(project, **change):
-    data = {"active": True, "from": OPUS, "to": FABLE, "effort": "high", "until": "2999-01-01T00:00:00+00:00"}
-    data.update(change)
-    (project.root / roles.SUBSTITUTION_REL).write_text(yaml.safe_dump(data), encoding="utf-8")
-
-
 # --- S4: the exceptions route ---------------------------------------------------------------------------------------
 
 def test_another_model_is_refused_naming_the_session_model_the_class_and_the_exceptions_file(project):
@@ -50,7 +44,9 @@ def test_another_model_is_refused_naming_the_session_model_the_class_and_the_exc
 
 def test_an_entry_for_the_role_and_model_starts_the_launch_on_it_and_the_record_names_the_decision(project):
     project.ticket()
-    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "DEC-9 (the owner)"}])
+    # Rewrite-Reason: DEC-1225: the entry had no limiter; R3: an Opus entry carries one, here the launch's ticket
+    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "DEC-9 (the owner)",
+                          "task": ["T-1"]}])
     argv = project.launch(args=["--model", OPUS])
     assert argv.count("--model") == 1 and _flag(argv, "--model") == OPUS
     last = project.last()
@@ -108,69 +104,30 @@ def test_a_promotion_still_refuses_another_model_whatever_the_file_says(project)
     project.probe(tid, "p1.md", "fail")
     project.probe(tid, "p2.md", "fail")
     exceptions(project, [{"subagent_type": "engineer", "model": HAIKU, "decided": "x"}])
-    project.refused(HAIKU, OPUS, args=["--model", HAIKU])
+    project.refused(HAIKU, SONNET, args=["--model", HAIKU])  # DEC-1225: the promoted model is the table's Sonnet
 
 
-# --- S9: under DEC-1215's substitution ------------------------------------------------------------------------------
+# --- S9 (DEC-1215's substitution) is gone (DEC-1225, R3) ------------------------------------------------------------
+# Rewrite-Reason: DEC-1225: the cases of this section (an Opus entry is Fable's while the substitution is active; Fable
+# refused when it is not; a caller's Opus refused naming DEC-1215 and Fable; the table's Opus run as Fable) and the
+# table of ``model_matches`` with its ``active`` argument pinned the substitution, which R3 removes with its file and
+# readers. Deleted, not replaced here: the acceptance cases ``test_w2_201_r3_limiters.py`` pin that Fable is refused
+# by the launcher and by the hook with an entry naming it and that nothing of the substitution is left; the
+# limiters (class, task, decision) are shown there on one table for both readers.
 
-def test_while_the_substitution_is_active_an_opus_entry_is_fable_s(project):
+# --- the limiters of an entry (R3), the launcher alone -------------------------------------------------------------
+
+def test_an_opus_entry_with_no_limiter_lifts_nothing(project):
     project.ticket()
-    substitution(project)
-    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "K1"}])
-    project.launch(args=["--model", FABLE])
-    assert (project.last()["model"], project.last()["model_source"]) == (FABLE, "exception")
-
-
-@pytest.mark.parametrize("change", ({"active": False}, {"until": "2000-01-01T00:00:00+00:00"}, None))
-def test_with_the_substitution_inactive_past_or_absent_fable_is_refused(project, change):
-    project.ticket()
-    if change is not None:
-        substitution(project, **change)
-    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "K1"}])
-    project.refused(FABLE, REL, args=["--model", FABLE])
-
-
-@pytest.mark.parametrize("entries", (None, [], [{"subagent_type": "engineer", "model": "opus", "decided": "K1"}],
-                                     [{"subagent_type": "engineer", "model": "opus", "class": "C3", "decided": "K1"}]))
-@pytest.mark.parametrize("allowed", (["src/guard/a.py"], ["src/x/a.py"], ["docs/a.md"]))
-@pytest.mark.parametrize("model", (OPUS, "claude-opus-9"))
-def test_while_the_substitution_is_active_a_caller_s_opus_is_refused_naming_dec_1215_and_fable(project, entries,
-                                                                                              allowed, model):
-    project.ticket(allowed=allowed)
-    substitution(project)
-    if entries is not None:
-        exceptions(project, entries)
-    project.refused("DEC-1215", "fable", args=["--model", model])
-
-
-@pytest.mark.parametrize("change", ({"active": False}, {"until": "2000-01-01T00:00:00+00:00"}, None))
-def test_with_the_substitution_inactive_past_or_absent_a_caller_s_opus_follows_s4(project, change):
-    project.ticket()
-    if change is not None:
-        substitution(project, **change)
-    exceptions(project, [])
+    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "x"}])
     project.refused(REL, args=["--model", OPUS])
-    exceptions(project, [{"subagent_type": "engineer", "model": "opus", "decided": "K1"}])
-    project.launch(args=["--model", OPUS])
-    assert (project.last()["model"], project.last()["model_source"]) == (OPUS, "exception")
 
 
-def test_the_table_s_opus_is_the_substituted_model_in_the_record(project):
-    project.ticket(allowed=["src/guard/a.py"])
-    substitution(project)
-    argv = project.launch()
-    assert _flag(argv, "--model") == FABLE and project.last()["model"] == FABLE
-
-
-# --- the reader (one rule for the launcher and the hook) -------------------------------------------------------------
-
-@pytest.mark.parametrize("entry, model, active, expected", (
-    ("opus", "opus", False, True), ("opus", OPUS, False, True), ("opus", "claude-opus-9", False, True),
-    (OPUS, "opus", False, True), ("opus", SONNET, False, False), (HAIKU, HAIKU, False, True),
-    ("opus", FABLE, True, True), ("opus", "fable", True, True), ("opus", FABLE, False, False),
-    (HAIKU, FABLE, True, False), ("opus", "claude-opusx", False, False)))
-def test_model_matches(entry, model, active, expected):
-    assert model_exceptions.model_matches(entry, model, active) is expected
+@pytest.mark.parametrize("model", ("fable", FABLE))
+def test_fable_is_refused_whatever_the_entries_name(project, model):
+    project.ticket()
+    exceptions(project, [{"subagent_type": "engineer", "model": name, "decided": "x"} for name in ("fable", FABLE, "opus")])
+    project.refused(args=["--model", model])
 
 
 # --- S7: the worker's 5-minute cache --------------------------------------------------------------------------------
@@ -220,11 +177,12 @@ def test_another_hook_or_another_event_or_a_lead_is_not_refused(tmp_path):
 
 # --- S1, S2: the real files -----------------------------------------------------------------------------------------
 
-_S, _O, _H = (SONNET, "high"), (OPUS, "high"), (HAIKU, "low")
-_TABLE = {"C3": _O, "C2": _S, "C1": _S, "C0": _H}
+# Rewrite-Reason: DEC-1225: this table gave Opus (C3), Haiku (C0) and a table line to four roles. R1: Opus, high only for
+# the orchestrator and the senior engineer; Sonnet, high and no table line for every other role.
+_S, _O = (SONNET, "high"), (OPUS, "high")
 RUBRIC = {"orchestrator": (_O, None), "senior-engineer": (_O, None), "ticket-lead": (_S, None),
-          "product-spec": (_S, None), "research": (_S, None), "engineer": (_S, _TABLE),
-          "independent-test-designer": (_S, _TABLE), "independent-auditor": (_S, _TABLE), "qa-engineer": (_S, _TABLE)}
+          "product-spec": (_S, None), "research": (_S, None), "engineer": (_S, None),
+          "independent-test-designer": (_S, None), "independent-auditor": (_S, None), "qa-engineer": (_S, None)}
 
 
 @pytest.mark.parametrize("role", sorted(RUBRIC))

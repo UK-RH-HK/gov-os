@@ -3,7 +3,7 @@ kind: auditor
 version: 1
 tools: [Read, Grep, Glob, Write, TodoWrite]
 sample: 0
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 effort: high
 result_schema: auditor-result.schema.json
 budget_usd: 6
