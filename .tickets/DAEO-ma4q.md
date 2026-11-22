@@ -242,3 +242,22 @@ hash is pinned by `test_prompts.py`): the rule lives in `judge.py`'s `citation_r
 - **S4 The record says it.** `FIGURES.json` holds `forbidden_rule: "strict"` and `misses.forbidden_cited` (the
   forbidden-cited misses counted apart, a subset of `misses.total`) (the five printed verdict lines are unchanged). Verify: a
   planted run with a forbidden citation gives the count 1 and the key; with none, 0.
+
+## Fix: the figure carries a stamp, and a figure without it is not compared (F15)
+
+Found 2026-11-22 (fixes-015a): `FIGURES.json` named no release, commit or model, so a run of one release could be set beside a
+figure of another, and a strict-rule run (D5) could be declared with no question that carries a `forbidden` list, a rule that
+then cannot fail. Owner-fixed: no opt-out flag. Kind: a fix, no new ticket; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-204/test_w2_204_fix_figure_stamp.py` (README ids success-17 to success-19; 8 red, 2 guards on the base).
+Code: `FIGURES.json` and the printed run carry `release` (`pyproject.toml` version), `commit` (the declared audit commit),
+`reader_model`, `grader_models`, `forbidden_rule`, `questions_with_forbidden` (`figures.py`, `judge.py`; the fresh run's
+stamp line goes to standard error through `say.say_stderr`, so its two verdict lines keep their form, `fresh.py`); a standing
+line copies the stamp (`driver.py`); `declare` refuses with `DC-FORBIDDEN` when no question carries a list (`declare.py`);
+`standing.drift` returns `comparable: false`, `missing: [...]` and `word: null`, and writes nothing, when either the fresh
+figure or one of the four lines lacks a stamp key (`standing.py`). Fixtures: the planted question sets carry a `forbidden` list
+(`tests/unit/memaudit/conftest.py`, `w2_171_world.py`, `w2_204_support.py`: the first question, when no spec lists one, and
+not when a case passes its own specs to `prepare`, so S18's case stays red-to-green), the stamp keys in the key-set pins of
+`test_judge.py` and `test_w2_171_s6_figures.py` and in W2-171's expected figures, the stamp on the planted lines of
+`test_standing.py` (each marked `# Rewrite-Reason:`). Verified: `tests/unit/memaudit`, W2-171, W2-204: 738 passed, 1 skipped,
+1 failed (`test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files`, red on the base: it diffs against
+`2f0c07bcb`, and `w2/integrate` holds the models-rubric merge after it).

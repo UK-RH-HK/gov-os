@@ -41,3 +41,11 @@ acceptance_tests:
 # W1-06 Wave 1 tool prerequisites
 
 Owner-approved installs and the registry for this repository: ccusage (DEC-086), Superpowers source, existing pins.
+
+## Fix: the KPI map of W1-06 in the form `gov accept` reads (F17)
+
+Found 2026-11-22 (fixes-015a): `gov accept W1-06` stopped with `ACCEPT_MAP_UNREADABLE`. Kind: a fix, no new ticket; the ticket
+stays closed. The README's map was rewritten in the form `gov accept` reads (`1771c4283`); no test changed. It now reads the map;
+lines that still read fail name tests of files retired by TI-6, not found: see the next paragraph.
+
+Left on the base: `failure-1` names `test_w1_06_approvals.py`'s three cases (retired, `1145eaef8`).
