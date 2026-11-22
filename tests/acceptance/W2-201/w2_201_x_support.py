@@ -153,5 +153,6 @@ def stop(sandbox, how):
 
 
 def stopped(result, words):
-    """A refusal by the pause or the gate: non-zero, nothing started, no record, LAUNCH_REFUSED and its words."""
-    b.assert_refused(result, "LAUNCH_REFUSED", *words)
+    """A refusal by the pause or the gate: non-zero, nothing started, no record and its words. A pause is refused with
+    PAUSED (F10, CAP-05.a), the memory gate with LAUNCH_REFUSED."""
+    b.assert_refused(result, "PAUSED" if "paused" in words else "LAUNCH_REFUSED", *words)
