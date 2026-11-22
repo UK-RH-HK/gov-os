@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-69: Transcripts kept
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can see what any session did for a year.
 - **Acceptance:** The harness setting `cleanupPeriodDays` is 365 in the owner's settings.

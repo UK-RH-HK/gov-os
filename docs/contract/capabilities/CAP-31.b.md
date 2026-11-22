@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-31.b: A known bug is a fix, not a ticket: a red landing generates no repair ticket; the fix is recorded in the owning ticket, the failing test first where no test caught it
 
-A covers item of CAP-31 (Unified task DAG). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-31 (Unified task DAG). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority (DEC-614).
 
 - **Item:** A known bug is a fix, not a ticket: a red landing generates no repair ticket; the fix is recorded in the owning ticket, the failing test first where no test caught it
 - **Wave:** W1

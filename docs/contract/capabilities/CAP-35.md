@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-35: Model routing from the owner's rubric
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can route each role and task class to a model and effort through his rubric, and no session chooses its own.
 - **Acceptance:** Every launch takes its model and effort from the owner's rubric (DEC-1120, DEC-1212) and states them in the launch log (RT-8); a launch that names another model is refused.

@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-64: The run-time tool
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The work keeps going without the owner as the relay: ready tickets start in the slots the machine has, a finished session is told to its lead, and a stalled session is woken.
 - **Acceptance:** RT-1 to RT-8 each pass their own verify (EMERGENCY-2 §6.3): no ready ticket waits more than 10 minutes while the machine has room for it; the orchestrating session gets a message within 2 minutes of any lead, worker or job finishing; slots come from the CPU, RAM and GPU detected at start; zero GPU spill events; a session resumes after a compaction, restart or crash at its recorded next step; messages go through per-session inbox files and none passes through the owner; one watcher process; the launcher states the rubric's model and effort.

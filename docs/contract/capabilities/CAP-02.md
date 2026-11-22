@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-02: Release authenticity (lite: pinned and hash-verified)
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can confirm that an installed kernel matches a released version.
 - **Acceptance:** `gov doctor` reports MATCH for the pinned `framework.lock` manifest against the release's own manifest and file hashes, and DRIFT naming the edited file after a one-byte edit; a release is pinned and hash-verified, and no tag signature is required.
