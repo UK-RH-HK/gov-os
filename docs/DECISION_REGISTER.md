@@ -2141,6 +2141,17 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-22; audit 4's finding (21 % of the live Contract items enforced on the path; most refusals built inside `gov queue` and `gov launch`, which Gov OS bypassed).
 - **Governing sources:** docs/emergency-2/GOLDEN-WORKFLOW.md; docs/emergency-2/audits/E2-AUDIT-4-DETERMINISM.md; docs/emergency-2/audits/E2-AUDIT-1-DECISIONS.md; docs/emergency-2/T2-ESCALATION-RUBRIC.md; DEC-1233; DEC-1236; DEC-1237.
 
+### DEC-1239 — Emergency mode while Gov OS is developed: its own fixes land by the plain path; its tools are proven on a scratch repository and in EXAMIN; the integration's exit test changes; I-1 in 0.1.5, I-2 a record placed with a notice
+- **Status:** ACCEPTED (owner, 2026-11-22 about 17:20, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1238 · **Changes:** DEC-1238 (7) (the plan's first item: Gov OS's own landings stay on the plain path; `gov queue` is proven on the scratch repository and in EXAMIN), (8) and (9) (the exit test), DEC-1233 (1)'s and audit 4's A-1 placement
+- **Decision:**
+  - (1) **I-1** (`gov queue`'s selection takes a test file deleted since the last green record as changed, then refuses `FILE_GONE`): "fix it in 0.1.5 if it can land before the version commit, failing test first; it costs no extra full suite and adopted repositories never meet it."
+  - (2) **I-2:** "a record-only document a branch writes is placed as a record with a notice at the landing, never refused."
+  - (3) **The norm while Gov OS is being developed: emergency mode.** "Gov OS is not developed through its own tools until they are integrated and proven working at a bare minimum: its own fixes land by the plain path (the change's own tests and the merged tree's suites green, a hand merge, recorded), so a broken tool never blocks the fix to itself. The tools run in full, and are proven, on a scratch repository and in EXAMIN, whose friction is the trial of how Gov OS works."
+  - (4) **The integration's exit test** is the scratch repository taken through the whole workflow and EXAMIN's planning on the integrated workflow, not Gov OS's own work; Gov OS moves onto its own tools only when the owner decides it, once they are proven.
+  - (5) Anything found when a tool is used goes into the findings log (`docs/emergency-2/integration/FINDINGS.md`).
+- **Basis:** the owner's message of 2026-11-22; the incidents behind it: `gov queue` refused two of Gov OS's own landings on 2026-11-22 (I-1, I-2) and the fixes landed by hand merge with their suites green on the merged tree.
+- **Governing sources:** docs/emergency-2/integration/FINDINGS.md; DEC-1238.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
