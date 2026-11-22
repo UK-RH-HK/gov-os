@@ -41,6 +41,7 @@ TOOL_BINARIES = {
     "lefthook": "lefthook", "check-jsonschema": "check-jsonschema",
     "ollama": "ollama", "ticket": "tk", "gitleaks": "gitleaks",
     "ccusage": "ccusage", "bubblewrap": "bwrap", "socat": "socat",
+    "rea-agents": "rea",
 }
 
 NO_BINARY_TOOLS = frozenset({
@@ -83,16 +84,54 @@ def _has_standalone_old_path(content: str, old_path: str, new_path: str) -> bool
     return old_path in content.replace(new_path, "")
 
 
+def _expand_home(text: str) -> str:
+    """``~`` and ``$HOME`` of a registry line read from the HOME this process runs with (W2-22 F2)."""
+    home = str(_home())
+    text = text.replace("$HOME", home)
+    if text.startswith("~"):
+        text = home + text[1:]
+    return text
+
+
 def _extract_path_prefix(install_cmd: str) -> str | None:
     m = re.search(r'PATH=([^:]+):\$PATH', install_cmd)
     if not m:
         return None
-    prefix = m.group(1)
-    home = str(_real_home())
-    prefix = prefix.replace("$HOME", home)
-    if prefix.startswith("~"):
-        prefix = home + prefix[1:]
-    return prefix
+    return _expand_home(m.group(1))
+
+
+def _install_folder(install_cmd: str) -> Path | None:
+    """The folder a local (not ``-g``) install line ``cd``s into: the tool is installed under its ``node_modules``."""
+    m = re.match(r"\s*cd\s+(\S+)\s*&&", install_cmd)
+    if not m or re.search(r"\s(-g|--global)(\s|$)", install_cmd):
+        return None
+    return Path(_expand_home(m.group(1)))
+
+
+def _binary_name(name: str) -> str:
+    """The binary a registry name stands for: the table, else ``<binary>-<version>`` (``node-22.23.5``) is ``<binary>``."""
+    if name in TOOL_BINARIES:
+        return TOOL_BINARIES[name]
+    m = re.fullmatch(r"(.+)-v?\d+(?:\.\d+)+", name)
+    if m:
+        return TOOL_BINARIES.get(m.group(1), m.group(1))
+    return name
+
+
+def _own_dirs(name: str, entry: dict, pinned: str) -> list[Path]:
+    """The folders where a tool's own registry entry says its binary is installed, with no schema change (W2-22 F2):
+    the ``PATH=`` prefix of its install line, a local install's ``<folder>/node_modules/.bin`` (the ``cd <folder>`` of
+    its install line), and, for a Node, the nvm folder of its pinned version."""
+    install = str(entry.get("install", "") or "")
+    dirs: list[Path] = []
+    folder = _install_folder(install)
+    if folder is not None:
+        dirs.append(folder / "node_modules" / ".bin")
+    elif (prefix := _extract_path_prefix(install)):
+        dirs.append(Path(prefix))
+    if _binary_name(name) == "node" and re.fullmatch(r"v?\d+(?:\.\d+)+", str(pinned)):
+        dirs.append(_home() / ".nvm" / "versions" / "node" / ("v" + str(pinned).lstrip("v")) / "bin")
+    return dirs
 
 
 def _version_tuple(v: str) -> tuple:
@@ -130,7 +169,7 @@ def _git(root: Path, *args: str) -> str:
         return ""
 
 
-def _probe(argv: list[str], limit: float, shared: bool = True) -> subprocess.CompletedProcess:
+def _probe(argv: list[str], limit: float, shared: bool = True, env: dict | None = None) -> subprocess.CompletedProcess:
     """``argv`` run within ``limit`` seconds, or what is left of the run's probe budget; TimeoutExpired when it gives
     no answer in time or no time is left: a tool that does not answer is read as not answering. A probe that is not
     ``shared`` has its own limit alone, which the other probes cannot spend."""
@@ -138,11 +177,11 @@ def _probe(argv: list[str], limit: float, shared: bool = True) -> subprocess.Com
         limit = min(limit, _probe_deadline - time.monotonic())
         if limit <= 0:
             raise subprocess.TimeoutExpired(argv, 0)
-    return subprocess.run(argv, capture_output=True, text=True, timeout=limit)
+    return subprocess.run(argv, capture_output=True, text=True, timeout=limit, env=env)
 
 
 def _find_binary(name: str) -> Path | None:
-    binary_name = TOOL_BINARIES.get(name, name)
+    binary_name = _binary_name(name)
     found = shutil.which(binary_name)
     if found:
         return Path(found)
@@ -156,7 +195,13 @@ def _find_binary(name: str) -> Path | None:
     return None
 
 
-def _tool_version(binary: Path, name: str) -> str | None:
+def _tool_version(binary: Path, name: str, run_prefix: str | None = None) -> str | None:
+    """The version *binary* prints. ``run_prefix`` is the ``PATH=`` prefix of the tool's own install line: a script run
+    with it first on the PATH, as its install line ran it, so the Node the line names runs it (W2-22 F2)."""
+    env = None
+    if run_prefix:
+        env = {**os.environ, "PATH": run_prefix + os.pathsep + os.environ.get("PATH", "")}
+    name = _binary_name(name)
     version_cmds = {
         "node": [str(binary), "--version"],
         "uv": [str(binary), "--version"],
@@ -165,14 +210,14 @@ def _tool_version(binary: Path, name: str) -> str | None:
     }
     if name in version_cmds:
         try:
-            result = _probe(version_cmds[name], VERSION_LIMIT)
+            result = _probe(version_cmds[name], VERSION_LIMIT, env=env)
             out = result.stdout.strip() or result.stderr.strip()
             m = re.search(r"v?(\d+[\d.]*\S*)", out)
             return m.group(0) if m else None
         except Exception:
             return None
     try:
-        result = _probe([str(binary), "--version"], VERSION_LIMIT)
+        result = _probe([str(binary), "--version"], VERSION_LIMIT, env=env)
         if result.returncode == 0:
             out = result.stdout.strip()
             if out:
@@ -448,6 +493,9 @@ def _check_tools(root: Path) -> dict:
 
     all_prefixes: list[str] = []
     seen_prefixes: set[str] = set()
+    # Where each tool's own entry says its binary is (W2-22 F2): a folder owned by an entry of binary B at version V
+    # answers for no other entry of binary B at another version.
+    owned: dict[str, list[tuple[str, str]]] = {}
     for entry in tools_list:
         if not isinstance(entry, dict):
             continue
@@ -455,6 +503,9 @@ def _check_tools(root: Path) -> dict:
         if pfx and pfx not in seen_prefixes:
             all_prefixes.append(pfx)
             seen_prefixes.add(pfx)
+        ename = str(entry.get("name", "unknown"))
+        for d in _own_dirs(ename, entry, str(entry.get("version", "unknown"))):
+            owned.setdefault(str(d), []).append((_binary_name(ename), str(entry.get("version", "")).lstrip("v")))
 
     results = []
     all_ok = True
@@ -474,19 +525,25 @@ def _check_tools(root: Path) -> dict:
             continue
         install_cmd = entry.get("install", "")
         own_prefix = _extract_path_prefix(install_cmd)
-        binary_name = TOOL_BINARIES.get(name, name)
+        binary_name = _binary_name(name)
+        own_dirs = _own_dirs(name, entry, pinned)
         binary = None
         registered_location = None
 
-        if own_prefix:
-            candidate = Path(own_prefix) / binary_name
+        for own_dir in own_dirs:
+            candidate = own_dir / binary_name
             if candidate.is_file():
                 binary = candidate
-                registered_location = own_prefix
+                registered_location = str(own_dir)
+                break
 
         if binary is None:
+            own = {str(d) for d in own_dirs}
             for pfx in all_prefixes:
-                if pfx == own_prefix:
+                if pfx in own:
+                    continue
+                # a folder of the same binary at another pinned version is no place for this one
+                if any(b == binary_name and v != str(pinned).lstrip("v") for b, v in owned.get(pfx, [])):
                     continue
                 candidate = Path(pfx) / binary_name
                 if candidate.is_file():
@@ -508,7 +565,7 @@ def _check_tools(root: Path) -> dict:
 
         found_sha = sha256_file(binary)
         sha_match = bool(pinned_sha and found_sha and pinned_sha == found_sha)
-        found_version = _tool_version(binary, name)
+        found_version = _tool_version(binary, name, own_prefix)
 
         if found_version is not None:
             clean_found = found_version.lstrip("v")
