@@ -25,6 +25,8 @@ import re
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, TD, AUD = s.ENGINEER, s.TEST_DESIGNER, s.AUDITOR
@@ -70,7 +72,7 @@ def test_nf_a_role_with_a_table_line_launches_on_its_default_line_with_no_critic
 
 
 def test_nf_a_the_full_form_table_line_is_not_applied_either(bare, launch):
-    s.write_role(bare, AUD, full={"C2": ((OPUS, "high"), (HAIKU5, "low"))})
+    s.write_role(bare, AUD, full={"C2": ((SONNET, "high"), (SONNET, "low"))})
     tk = s.ticket(bare, ENG, "C2", "FULL", tk=FULL)
     s.assert_session(launch(AUD, tk), *DEFAULT, **PLAIN, review_round=None)
 
@@ -96,7 +98,7 @@ BAD_LINE = {
     "class-twice": s.HEAD + " " + "; ".join((C3, C3, C1, C0)),
     "out-of-order": s.HEAD + " " + "; ".join((C2, C3, C1, C0)),
     "unknown-effort": s.HEAD + " " + "; ".join((C3, C2, C1.replace("xhigh", "extreme"), C0)),
-    "alias-model": s.HEAD + " " + "; ".join((C3.replace(OPUS, "opus"), C2, C1, C0)),
+    "alias-model": s.HEAD + " " + "; ".join((C3.replace(SONNET, "opus"), C2, C1, C0)),
 }
 
 

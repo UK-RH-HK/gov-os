@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG = s.ENGINEER
@@ -43,12 +45,12 @@ def test_s1_the_ticket_s_class_never_changes_the_result(project, launch, kind, c
 # The FULL form: "C<n> model M, effort E on FULL, model M, effort E otherwise"
 # --------------------------------------------------------------------------
 
-FULL_FORM = {"C2": ((s.OPUS, "high"), (s.SONNET, "xhigh")), "C0": ((s.SONNET, "low"), (s.HAIKU5, "low"))}
+FULL_FORM = {"C2": ((s.SONNET, "high"), (s.SONNET, "xhigh")), "C0": ((s.SONNET, "low"), (s.SONNET, "medium"))}
 
 
 @pytest.mark.parametrize("cls,profile,expected", [
-    ("C2", "FULL", (s.OPUS, "high")), ("C2", "STANDARD", (s.SONNET, "xhigh")), ("C2", "LITE", (s.SONNET, "xhigh")),
-    ("C0", "FULL", (s.SONNET, "low")), ("C0", "STANDARD", (s.HAIKU5, "low")),
+    ("C2", "FULL", (s.SONNET, "high")), ("C2", "STANDARD", (s.SONNET, "xhigh")), ("C2", "LITE", (s.SONNET, "xhigh")),
+    ("C0", "FULL", (s.SONNET, "low")), ("C0", "STANDARD", (s.SONNET, "medium")),
     ("C3", "FULL", s.TABLES[ENG]["C3"]), ("C1", "FULL", s.TABLES[ENG]["C1"]),
 ])
 def test_s1_the_full_form_takes_its_first_pair_on_a_full_ticket_and_its_second_otherwise(
@@ -113,8 +115,8 @@ MALFORMED_TABLE = {
     "ascending-order": _entries(C0, C1, C2, C3),
     "unknown-class": _entries(C3, C2, C1, C0.replace("C0", "C4")),
     "five-entries": _entries(C3, C2, C1, C0, C0),
-    "alias-model": _entries(C3.replace(s.OPUS, "opus"), C2, C1, C0),
-    "not-a-claude-model": _entries(C3.replace(s.OPUS, "gpt-5"), C2, C1, C0),
+    "alias-model": _entries(C3.replace(s.SONNET, "opus"), C2, C1, C0),
+    "not-a-claude-model": _entries(C3.replace(s.SONNET, "gpt-5"), C2, C1, C0),
     "upper-case-model": _entries(C3, C2.replace(s.SONNET, "Claude-Sonnet-5-5"), C1, C0),
     "unknown-effort": _entries(C3, C2, C1.replace("xhigh", "extreme"), C0),
     "no-effort": _entries(C3, C2, C1, f"C0 model {s.HAIKU5}"),

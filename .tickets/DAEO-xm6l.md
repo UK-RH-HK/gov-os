@@ -123,3 +123,12 @@ null. Kind: a fix, no new ticket; the ticket stays closed. Failing tests first:
 `tests/acceptance/W2-22/test_w2_22_fix_python_packages.py` (2 red, 1 guard), `de2cc13db`; code
 `src/gov/doctor/command.py` (`PYTHON_PACKAGES`, in `NO_BINARY_TOOLS`, read by `importlib.metadata.version`); units
 `tests/unit/doctor/test_f18_python_packages.py`. Lead `fixes-015a-sc` (Sonnet), branch `e2/fixes-015a-sc`.
+
+## Fix: `gov doctor` reports settings without the connectors key as a drift line (F1 (c); fixes-015a; DEC-1232, DEC-1233)
+
+Found by the E2 audit 3. Required: a repository whose `.claude/settings.json` lacks `disableClaudeAiConnectors: true` (or
+has no readable settings) is reported by `gov doctor` as a drift line that does not block (exit 0), naming the key and
+`gov update`. Kind: a fix; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-22/test_w2_22_fix_connectors_drift.py` (README "The fix F1 (c)"), `361802ceb`; code
+`src/gov/doctor/command.py` (the `connectors` section, `_check_connectors`: status `drift`, `drift_blocking` false), `83b73ba96`;
+unit `tests/unit/launch/test_fixes_015a_connectors.py`. Lead `fixes-015a`, branch `e2/fixes-015a`.

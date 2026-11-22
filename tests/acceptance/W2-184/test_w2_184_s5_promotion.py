@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
@@ -138,10 +140,10 @@ def test_s5_the_promoted_model_is_the_tables_whatever_the_criticality_file_s_opu
 
 
 def test_s5_a_ticket_whose_table_model_is_opus_is_still_recorded_as_promoted(project, launch):
-    """The fixture's engineer C3 entry is Opus (a mechanism fixture: the real role files have no table)."""
+    """The fixture's engineer C3 entry is Sonnet now (a mechanism fixture: the real role files have no table)."""
     tk = s.ticket(project, ENG, "C3")
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk), s.OPUS, "high", criticality="C3",
+    s.assert_session(launch(ENG, tk), s.SONNET, "high", criticality="C3",
                      promotion={"reason": "two failed reviews", "record": record}, **PROMOTED)
 
 

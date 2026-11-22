@@ -155,7 +155,7 @@ def send(channels, line, dry):
                                    timeout=60)
                 out.append(f"toast: rc {r.returncode}")
             elif ch == "push":
-                r = subprocess.run([str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-haiku-5-5",
+                r = subprocess.run([str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-sonnet-5-5",
                                     "--output-format", "json",
                                     "Load the PushNotification tool (ToolSearch select:PushNotification if deferred) "
                                     "and call it once, status proactive, with exactly this message: " + line[:190]
@@ -298,7 +298,7 @@ def xwake(name, text, cwd_parent):
     if cwd is None:
         return "xwake: refused (no private working folder)"
     try:
-        r = subprocess.run([str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-haiku-5-5",
+        r = subprocess.run([str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-sonnet-5-5",
                             "--output-format", "json", *XWAKE_TOOLS, "--",
                             "Load the SendMessage tool (ToolSearch select:SendMessage if deferred) and send ONE "
                             f"cross-session message to the session named {name} with exactly this text: {text} . "

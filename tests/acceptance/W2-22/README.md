@@ -109,3 +109,11 @@ The installed package is planted as a `.dist-info` folder on the `PYTHONPATH` of
 | success-10 | `test_w2_22_fix_python_packages.py::test_a_missing_package_reads_not_ok` | green today (guard) |
 
 Red run on the base: 2 failed, 1 passed.
+
+## The fix F1 (c): doctor reports settings without the connectors key as drift (fixes-015a)
+
+The doctor's part of F1 is kept here (W2-22's drift cases).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| F1 | `test_w2_22_fix_connectors_drift.py::test_settings_without_the_key_are_a_drift_line_and_doctor_exits_0`; `test_w2_22_fix_connectors_drift.py::test_the_drift_line_is_in_the_plain_output_too` | doctor's output never names `disableClaudeAiConnectors` (exit 0 already). Guard, green: `test_settings_with_the_key_have_no_drift_line` |

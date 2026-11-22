@@ -21,7 +21,9 @@ import w2_201_x_support as x
 s, b = x.s, x.b
 
 
-@pytest.mark.parametrize("status, cls, model", [("closed", "C3", x.OPUS), ("closed", "C2", x.SONNET),
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the fixture engineer's C3
+# entry was Opus and is Sonnet now, so a C3 fix launches Sonnet.
+@pytest.mark.parametrize("status, cls, model", [("closed", "C3", x.SONNET), ("closed", "C2", x.SONNET),
                                                 ("open", "C2", x.SONNET), ("in_progress", "C2", x.SONNET)])
 def test_x1_an_engineer_launches_with_fix_on_its_ticket_whatever_its_status(sandbox, project, cli, status, cls, model):
     tk = x.ticket(project, x.ENGINEER, cls, status, tk=f"DAEO-fx{cls.lower()}{status[0]}")

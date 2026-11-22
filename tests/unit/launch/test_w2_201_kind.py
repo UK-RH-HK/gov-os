@@ -116,13 +116,14 @@ def test_the_launcher_refuses_the_same_forms(project, role, tid, keywords):
 
 @pytest.mark.parametrize("status", ["closed", "open", "in_progress"])
 def test_a_fix_starts_on_its_ticket_whatever_its_status(project, status):
+    # Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give (the table's C3 was Opus)
     project.ticket(allowed=["src/guard/a.py"])
     _status(project, "T-1", status)
     argv = project.launch(fix=FIX)
     last = project.last()
     assert (last["kind"], last["kind_line"], last["ticket"]) == ("fix", FIX, "T-1")
-    assert (last["model"], last["model_source"], last["criticality"]) == (OPUS, "by criticality", "C3")
-    assert _flag(argv, "--model") == OPUS and _settings(argv)["env"]["GOV_TICKET"] == "T-1"
+    assert (last["model"], last["model_source"], last["criticality"]) == (SONNET, "by criticality", "C3")
+    assert _flag(argv, "--model") == SONNET and _settings(argv)["env"]["GOV_TICKET"] == "T-1"
 
 
 def test_without_fix_a_closed_ticket_is_refused_and_an_unknown_one_with_it(project):

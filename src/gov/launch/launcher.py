@@ -105,6 +105,8 @@ LEAD_GOV_ROLE = "orchestrator"
 # DEC-1225: Opus only for the two orchestrating roles' own sessions (the CTO and the senior engineer, started by their
 # own start lines); every session ``gov launch`` starts runs Sonnet. A lead gets this model added by the launcher.
 LEAD_MODEL = "claude-sonnet-5-5"
+LEAD_EFFORT = "medium"  # fixes-015a F14: a lead runs Sonnet at medium (ticket-lead.md's default line says the same)
+LEAD_MCP_ROLE = "ticket-lead"  # the role file whose MCP list a lead (launched as lead or orchestrator) carries
 # W2-153 (DEC-1050, W2-128 TPL-4): the role -> template map. The template is the session's appended system prompt;
 # gov.adapters.portability reuses the map for the subagent sources and the template copies.
 ROLE_TEMPLATES = {
@@ -138,7 +140,9 @@ PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
 BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
 # W2-56 S6 (DEC-826 Q5): arguments that add context or replace the role's prompt; refused alone, with a spaced value
 # and in the ``=`` form, wherever they stand after ``--``. Emergency 2: the guard's own (--restricted, --safe-mode) go.
-CONTEXT_FLAGS = ("--agents", "--plugin-dir", "--plugin-url", "--mcp-config", "--system-prompt")
+CONTEXT_FLAGS = ("--agents", "--plugin-dir", "--plugin-url", "--system-prompt")
+MCP_FLAG = "--mcp-config"  # fixes-015a F1: accepted only for what the role's MCP list allows (``_mcp_args``)
+CONNECTORS_ENV = "ENABLE_CLAUDEAI_MCP_SERVERS"  # set to false in every session's process environment
 GUARD_FLAGS = CONTEXT_FLAGS  # the former name, for its readers
 # W2-56 D-12: a worker's temp folder, short enough that its code-graph daemon folders fit the tool's socket (107
 # bytes, DEC-338); the prefix is what the weekly sweep (DEC-902) and the code index (``gov.codeintel``) look for.
@@ -395,6 +399,55 @@ def _check_cli_args(cli_args: list[str]) -> None:
         if name in CONTEXT_FLAGS:
             raise _refuse(f"the CLI arguments carry {name}: it adds context to a worker session or replaces its "
                           f"role's prompt (DEC-826 Q5)")
+
+
+def _mcp_value(arg: str, value: str | None) -> str | None:
+    """The value of a caller's ``--mcp-config`` (spaced or ``=``), ``None`` when ``arg`` is not one."""
+    if arg == MCP_FLAG:
+        return value if value is not None else ""
+    if arg.startswith(MCP_FLAG + "="):
+        return arg[len(MCP_FLAG) + 1:]
+    return None
+
+
+def _mcp_servers(raw: str) -> list[str]:
+    """The server names a ``--mcp-config`` value holds, inline JSON or the path of a JSON file; refused when it cannot
+    be read as ``{"mcpServers": {...}}``."""
+    text = raw
+    if not raw.lstrip().startswith("{"):
+        try:
+            text = Path(raw).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            raise _refuse(f"the CLI arguments carry {MCP_FLAG} {raw}, which is neither JSON nor a file that can be "
+                          f"read") from None
+    try:
+        data = json.loads(text)
+    except ValueError:
+        raise _refuse(f"the CLI arguments carry {MCP_FLAG} that is not JSON") from None
+    servers = data.get("mcpServers") if isinstance(data, dict) else None
+    if not isinstance(servers, dict):
+        raise _refuse(f"the CLI arguments carry {MCP_FLAG} with no 'mcpServers' map")
+    return [str(name) for name in servers]
+
+
+def _mcp_args(root: Path, role: str, cli_args: list[str]) -> list[str]:
+    """fixes-015a F1: the launcher's own ``--mcp-config`` for every session, a lead's too: one server per name in the
+    role file's ``- **MCP tools:**`` line (``{"mcpServers": {}}`` for none), always after ``--strict-mcp-config`` so
+    that no connector of the account loads. A caller's ``--mcp-config`` after ``--`` is accepted only when every
+    server it holds is in the role's list; otherwise refused, naming the flag and the server."""
+    lead = role in LEAD_ROLES
+    listed = roles.mcp_tools(root, LEAD_MCP_ROLE if lead else role, required=not lead)
+    for arg, value in zip(cli_args, [*cli_args[1:], None]):
+        raw = _mcp_value(arg, value)
+        if raw is None:
+            continue
+        for name in _mcp_servers(raw):
+            if name not in listed:
+                raise _refuse(f"the CLI arguments carry {MCP_FLAG} with the server '{name}', which the role file of "
+                              f"'{role}' does not list in its '{roles.MCP_HEAD}' line "
+                              f"({', '.join(listed) if listed else 'it lists none'}): a session loads no other MCP "
+                              f"server (fixes-015a F1)")
+    return [MCP_FLAG, json.dumps({"mcpServers": {name: {} for name in listed}})]
 
 
 def template_args(root: Path, role: str) -> list[str]:
@@ -716,6 +769,10 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
             table_source = "by criticality"
         else:
             table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    if not model_exceptions.is_sonnet(table_model):
+        # fixes-015a F19 (DEC-1225): the rubric gives every launched role Sonnet; a role file's table or default line
+        # naming another model never starts it, whatever the file says. Only an exceptions entry runs another model.
+        table_model = LEAD_MODEL
     trial = _trial(root, trial_id, role, ticket_class, names) if trial_id is not None else None
 
     # the model (DEC-1225): the table's, or the trial's; a promotion's or probe's Opus only where an exceptions entry for
@@ -898,6 +955,12 @@ def _lead_model_args(root: Path, role: str, ticket_id: str | None, cli_args: lis
     return []
 
 
+def _lead_effort_args(cli_args: list[str]) -> list[str]:
+    """fixes-015a F14: ``--effort medium`` for a lead, or none when the caller's own ``--effort`` stands (not doubled)."""
+    given = any(arg == "--effort" or arg.startswith("--effort=") for arg in cli_args)
+    return [] if given else ["--effort", LEAD_EFFORT]
+
+
 def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
     """W2-60a, once the temp folder exists: the appended file written, the launch record written before the session
     starts and keyed by its id, and the launcher's own arguments: those before the caller's, and the one appended
@@ -928,7 +991,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         data["projection_usd"] = plan["projection_usd"]
     written = record.write(plan["records"], data)
     plan["session_id"] = session_id  # W2-205 RT-5: the registry entry records it, for a relaunch
-    head = [*OWN_SWITCHES, *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
+    head = [*OWN_SWITCHES, *plan.get("mcp", []), *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
@@ -1177,6 +1240,8 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
             raise _refuse(f"unknown ticket '{ticket_id}'")
         _check_cli_args(cli_args)
         model_args = _lead_model_args(root, role, ticket_id, cli_args)  # DEC-1225: before anything is read or started
+        model_args += _lead_effort_args(cli_args)  # fixes-015a F14: Sonnet at medium
+        model_args += [OWN_SWITCHES[-1], *_mcp_args(root, role, cli_args)]  # fixes-015a F1: strict, own config
         _check_repository_settings(root, False)
         template = template_args(root, role)
         cli = _cli()
@@ -1206,6 +1271,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
     cli = _cli()
     # W2-60b S7: the role file says the role is a worker; today's refusals above come first (W2-60a Behaviour 10)
     _role_kind(root, role)
+    mcp = _mcp_args(root, role, cli_args)  # fixes-015a F1: the role's MCP list, and what a caller's config may hold
     # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree. Here, a planted or long-live
     # writer refuses before anything is written; the check that decides is made again under the start lock below.
     session_record.check_one_writer(root, str(root), role)
@@ -1215,6 +1281,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
     plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd,
                         (kind, line))
     plan["mode"] = _mode_args(cli_args)
+    plan["mcp"] = mcp
     lock = StartLock()
     try:
         # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start
@@ -1286,6 +1353,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
         env = environ.session_env(os.environ, own_env)
+        env[CONNECTORS_ENV] = "false"  # fixes-015a F1: no claude.ai connector in any session
         address = f"{entry[1]}:{entry[0]}" if entry is not None else None
         if address is not None:  # W2-121c RT-2: the session's own inbox address, in its process's environment
             env["GOV_MSG_ADDRESS"] = address
