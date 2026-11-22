@@ -525,3 +525,28 @@ designer's.
 - `test_the_launcher_refuses_the_same_cli_arguments_for_product_spec` keeps the refusal of `--settings` only (spaced and joined); the bypass, `--add-dir` and `--bare` rows are gone;
 - `test_the_extra_cli_arguments_reach_the_product_spec_session` no longer asks for the sandbox; `test_the_product_spec_session_has_a_temp_folder_of_its_own_and_may_write_there` asks for `TMPDIR` and the removal, not the sandbox's write allowance;
 - `test_a_refused_launch_leaves_no_temp_folder`: the `bypass-flag` and `unwired-guard` rows become `settings-flag` (`--settings {}`) and `unreadable-settings` (a local settings file that is not JSON), two refusals the launcher still makes.
+
+## Fix F10: a pause really stops (fixes-015a, release 0.1.5; CAP-05.a)
+
+KPI lines of the fix (a known bug in a closed feature, no ticket line of its own; numbered after the ticket's six
+success lines):
+
+- **success-7:** while `gov pause` holds (the flag `.gov-runtime/freeze`), `gov launch` and the dispatch pass start
+  nothing, and `gov release --patch` refuses: each is refused with the error code `PAUSED`, the message naming the pause
+  (the dispatch pass, which has no error envelope, says `PAUSED` in its output or status).
+- **success-8:** `gov pause` sends the stop message (a `wake`, its text naming the pause) to the inbox of every running
+  session, one message per session; a session whose process is gone gets none.
+
+Fixture: W2-121's planted project; the pause is planted as the flag file; running sessions are planted as machine-registry
+entries (`~/.gov-os/machine/sessions/<pid>.json`, with `address` `<role>:<ticket>`) over a planted process table.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-7 | `test_w1_28_fix_pause_stops.py::test_launch_is_refused_with_paused_while_paused[engineer]`, `[lead]` | red: code is `LAUNCH_REFUSED`, not `PAUSED` |
+| success-7 | `test_w1_28_fix_pause_stops.py::test_dispatch_tick_starts_nothing_while_paused` | red: the pass starts the ready session |
+| success-7 | `test_w1_28_fix_pause_stops.py::test_patch_release_is_refused_with_paused_while_paused` | red: refused at G0 (`RELEASE_REFUSED`), not `PAUSED` |
+| success-7 | `test_w1_28_fix_pause_stops.py::test_dispatch_tick_still_starts_a_session_when_not_paused` | green today (guard: with no pause the same project starts its session) |
+| success-8 | `test_w1_28_fix_pause_stops.py::test_pause_sends_one_stop_message_to_each_running_session` | red: 0 messages in each inbox |
+| success-8 | `test_w1_28_fix_pause_stops.py::test_pause_sends_no_message_to_a_session_whose_process_is_gone` | red: the running session gets 0 messages |
+
+**Red run on the base:** 6 red, 1 green (the guard).
