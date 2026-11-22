@@ -1,7 +1,7 @@
 # Lead brief: fixes-015a, five fixes for release 0.1.5 in how sessions start and stop (DEC-1232 (6), DEC-1233 (2))
 
 Read `docs/emergency-2/briefs/LEAD-COMMON.md` first and follow it. **Do not merge.** Every helper Sonnet (DEC-1225). Each fix: failing test first by the independent test designer, then the engineer; one commit series per fix with its own `Task:` and `Fix:` trailers; record each in its owning ticket's file as a `## Fix: ...` section (the form of `.tickets/DAEO-xm6l.md`'s last section). Find each owning ticket with `gov retrieve` and `grep -l "^wbs_id: W.-N" .tickets/*.md`. The audits these come from: `docs/emergency-2/audits/E2-AUDIT-{1,2,3}-*.md` and the merged table `.gov-runtime/scratch/orchestrator/log/audits-merged-2026-11-22.md` (ids N-nn, M-nn). Decisions: DEC-1232, DEC-1233.
-Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a`, branch `e2/fixes-015a` from `w2/integrate` (it already holds DEC-1225's launcher changes from `e2/models-rubric`).
+Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a` (if a worktree or branch of that name exists from a stopped first start, remove it first: `git worktree remove --force` and `git branch -D`), branch `e2/fixes-015a` from `w2/integrate`, **then merge `e2/models-rubric` into it first** (DEC-1225's launcher, role files and hook; it lands through `gov queue` before yours; read only, never commit to it). Effort: this lead runs medium (DEC-1236 (2)).
 
 ## The fixes
 - **F1 No session loads the owner's claude.ai connectors; each gets only its role's MCP tools** (the owner, DEC-1232 (6):
