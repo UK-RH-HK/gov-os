@@ -894,7 +894,8 @@ def test_f1_a_fail_open_record_under_a_root_a_launch_record_names_promotes(proje
     _names(project, other, role="engineer")
     project.launch("independent-test-designer")
     record = project.last()
-    assert (record["model"], record["model_source"]) == (OPUS, "promotion")
+    # DEC-1225 (R2): a promotion keeps its record; its model is the table's (Sonnet), not the rubric's Opus
+    assert record["model"] == SONNET
     assert record["promotion"] == {"reason": "a fail-open finding", "record": rel}  # root-relative
 
 

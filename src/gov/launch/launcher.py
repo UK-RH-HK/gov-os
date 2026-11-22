@@ -765,7 +765,7 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
             # limiters this launch meets, and only where the table decides: a trial stays as it is
             said = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
                     f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3), DEC-1225)")
-            if model_source != table_source and exception is None:
+            if (promotion is not None or probe or trial is not None) and exception is None:
                 raise _refuse(f"{said}; another model comes only from an exception in {model_exceptions.REL} "
                               f"(DEC-1225)")
             entry = lifted(given["model"], said)

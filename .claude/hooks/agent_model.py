@@ -177,18 +177,19 @@ def judge(args: dict, root: str) -> int:
         ids = sorted(set(TASK_LINE.findall(prompt_text)))
         decisions = set(DECISION_LINE.findall(prompt_text))
         reasons = []
+        who = "Opus" if names_opus(model) else repr(model)
         for entry in entries:
             missing = []
             if "class" in entry:
                 if len(ids) != 1:
                     found = "none" if not ids else "more than one ticket: " + ", ".join(ids)
-                    missing.append(f"class: the entry holds for {entry['class']} work only, and the spawn's prompt "
+                    missing.append(f"class: {who} is for {entry['class']} work only, and the spawn's prompt "
                                    f"must name its ticket in one line 'Task: <ticket id>' (found {found}), so its class "
                                    f"cannot be read (unreadable means Sonnet)")
                 else:
                     found = ticket_class(root, ticket_front(root, ids[0]))
                     if found != entry["class"]:
-                        missing.append(f"class: the entry holds for {entry['class']} work only, and the ticket "
+                        missing.append(f"class: {who} is for {entry['class']} work only, and the ticket "
                                        f"{ids[0]} is {found}")
             if "task" in entry:
                 listed = [str(i) for i in as_list(entry["task"])]
