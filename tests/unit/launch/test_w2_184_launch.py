@@ -33,7 +33,8 @@ def pair(model, effort):
 
 
 # the kernel engineer's table
-ENGINEER_TABLE = table(pair(OPUS, "high"), pair(SONNET, "high"), pair(SONNET, "high"), pair(HAIKU, "low"))
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
+ENGINEER_TABLE = table(pair(SONNET, "high"), pair(SONNET, "high"), pair(SONNET, "high"), pair(SONNET, "low"))
 CRITICALITY = {"version": 1, "default": "C2", "opus": OPUS, "rules": [
     {"class": "C3", "paths": ["src/guard/*"]}, {"class": "C1", "paths": ["docs/*"]},
     {"class": "C0", "paths": ["notes/*"]}, {"class": "C2", "profile": "FULL"}]}
@@ -65,7 +66,7 @@ class Project:
         for stem in set(launcher.ROLE_TEMPLATES.values()):
             (self.root / launcher.TEMPLATES_REL / f"{stem}.md").write_text(f"# {stem}\n", encoding="utf-8")
         self.role_file("engineer", pair(SONNET, "high"), ENGINEER_TABLE)
-        self.role_file("independent-auditor", pair(OPUS, "high"))
+        self.role_file("independent-auditor", pair(SONNET, "high"))
         self.role_file("independent-test-designer", pair(SONNET, "high"), ENGINEER_TABLE)
         self.criticality()
         for name in ("GOV_ROLE", "GOV_TICKET"):
@@ -181,8 +182,8 @@ def _flag(argv, name):
 
 @pytest.mark.parametrize("role", ("engineer", "independent-test-designer"))
 @pytest.mark.parametrize("allowed, cls, model, effort", (
-    (["src/guard/a.py"], "C3", OPUS, "high"), (["src/x/a.py"], "C2", SONNET, "high"),
-    (["docs/a.md"], "C1", SONNET, "high"), (["notes/a.md"], "C0", HAIKU, "low"),
+    (["src/guard/a.py"], "C3", SONNET, "high"), (["src/x/a.py"], "C2", SONNET, "high"),
+    (["docs/a.md"], "C1", SONNET, "high"), (["notes/a.md"], "C0", SONNET, "low"),
 ))
 def test_the_session_takes_the_table_s_model_and_effort_for_its_role_and_class(project, role, allowed, cls, model, effort):
     project.ticket(role=role, allowed=allowed)
@@ -201,28 +202,29 @@ def test_the_subagent_model_in_the_settings_env_is_the_session_s_final_model(pro
     project.ticket(allowed=["notes/a.md"])
     argv = project.launch()
     settings = json.loads(argv[argv.index("--settings") + 1])
-    assert settings["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] == HAIKU
+    assert settings["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] == SONNET
 
 
 def test_a_role_file_with_no_table_takes_its_default_for_every_class(project):
     project.role_file("research", pair(SONNET, "medium"))
-    project.role_file("independent-auditor", pair(OPUS, "high"))
+    project.role_file("independent-auditor", pair(SONNET, "high"))
     project.ticket(role="independent-auditor", allowed=["notes/a.md"], tid="T-a")
     project.launch("independent-auditor", "T-a")
     assert (project.last()["model"], project.last()["effort"], project.last()["model_source"],
-            project.last()["criticality"]) == (OPUS, "high", "role default", "C0")
+            project.last()["criticality"]) == (SONNET, "high", "role default", "C0")
 
 
 def test_the_full_form_takes_its_first_pair_on_a_full_ticket_and_its_second_otherwise(project):
-    line = table(pair(OPUS, "high"), f"{pair(OPUS, 'high')} on FULL, {pair(SONNET, 'high')} otherwise",
-                 pair(SONNET, "high"), pair(HAIKU, "low"))
+    # Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
+    line = table(pair(SONNET, "high"), f"{pair(SONNET, 'xhigh')} on FULL, {pair(SONNET, 'medium')} otherwise",
+                 pair(SONNET, "high"), pair(SONNET, "low"))
     project.role_file("engineer", pair(SONNET, "high"), line)
     project.ticket("T-f", profile="FULL")
     project.ticket("T-s", profile="STANDARD")
     project.launch(tid="T-f")
-    assert (project.last()["model"], project.last()["criticality"]) == (OPUS, "C2")
+    assert (project.last()["effort"], project.last()["criticality"]) == ("xhigh", "C2")
     project.launch(tid="T-s")
-    assert (project.last()["model"], project.last()["criticality"]) == (SONNET, "C2")
+    assert (project.last()["effort"], project.last()["criticality"]) == ("medium", "C2")
 
 
 @pytest.mark.parametrize("line", ("- **Launch by criticality:** C3 nonsense",
@@ -320,7 +322,7 @@ def test_no_file_an_auditor_on_a_full_ticket_has_no_round_no_probe_and_no_same_s
         record = project.last()
         assert (record["review_round"], record["model"], record["effort"], record["effort_source"],
                 record["model_source"], record["criticality"], record["owner_named"]) == (
-            None, OPUS, "high", "role default", "role default", None, None)
+            None, SONNET, "high", "role default", "role default", None, None)
 
 
 def test_no_file_a_launch_record_that_is_not_json_does_not_refuse_an_auditor_on_a_full_ticket(project):
@@ -566,13 +568,13 @@ CLEAN = {"kpis": [{"kpi": "S1", "verdict": "pass", "findings": [
 
 def test_a_fail_open_finding_promotes_the_next_round_at_the_table_s_model_and_effort(project):
     """Rewrite-Reason: DEC-1225: this pinned a promotion on Opus (C0 on Haiku, low: Opus at low). R2: a promotion keeps
-    its record and the table's effort and no longer chooses Opus: the table's model, here C0's Haiku, at low."""
-    project.ticket(allowed=["notes/a.md"])  # C0 on haiku, low
+    its record and the table's effort and no longer chooses Opus: the table's model, here C0's Sonnet, at low."""
+    project.ticket(allowed=["notes/a.md"])  # C0 on sonnet, low
     rel = project.probe("T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
     argv = project.launch()
-    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (HAIKU, "low")
+    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (SONNET, "low")
     record = project.last()
-    assert (record["model"], record["tier"], record["subagent_model"]) == (HAIKU, "haiku", HAIKU)
+    assert (record["model"], record["tier"], record["subagent_model"]) == (SONNET, "sonnet", SONNET)
     assert (record["effort"], record["effort_source"]) == ("low", "by criticality")
     assert record["promotion"] == {"reason": "a fail-open finding", "record": rel}
 
@@ -675,15 +677,16 @@ def full(project):
     return project
 
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
 def test_round_one_takes_the_table_and_round_two_is_the_probe_at_max(full):
     _review(full)
     first = full.last()
-    assert (first["model"], first["effort"], first["review_round"], first["criticality"]) == (OPUS, "high", 1, "C2")
+    assert (first["model"], first["effort"], first["review_round"], first["criticality"]) == (SONNET, "high", 1, "C2")
     assert (first["model_source"], first["effort_source"]) == ("role default", "role default")
     argv = _review(full)
     second = full.last()
-    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (OPUS, "max")
-    assert (second["model"], second["effort"], second["review_round"]) == (OPUS, "max", 2)
+    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (SONNET, "max")
+    assert (second["model"], second["effort"], second["review_round"]) == (SONNET, "max", 2)
     assert (second["effort_source"], second["effort_reason"]) == ("probe", None)
     assert second["model_source"] == "role default"  # the probe did not change the model
 
@@ -714,7 +717,7 @@ def test_round_three_after_the_probe_s_max_is_refused_by_the_round_and_accepted_
     _review(full)
     second = full.last()
     # both rules hold here: the round names the cap, and the repeated setting names the record it repeats
-    full.refused("review round 3", "DEC-1010", "--owner-named", second["session_id"], OPUS, "max",
+    full.refused("review round 3", "DEC-1010", "--owner-named", second["session_id"], SONNET, "max",
                  role="independent-auditor", tid="T-a")
     _review(full, owner_named="DEC-1010")
     third = full.last()
@@ -725,7 +728,7 @@ def test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_
     _review(full)
     _review(full, args=["--effort", "xhigh"])
     assert (full.last()["review_round"], full.last()["effort"]) == (2, "xhigh")
-    error = full.refused("3", "DEC-1010", role="independent-auditor", tid="T-a")  # Opus max: neither earlier setting
+    error = full.refused("3", "DEC-1010", role="independent-auditor", tid="T-a")  # Sonnet max: neither earlier setting
     assert "--owner-named" in error.message and "repeats" not in error.message
     full.refused("3", "DEC-1010", args=["--effort", "high"], role="independent-auditor", tid="T-a")
 
@@ -735,7 +738,7 @@ def test_round_three_is_accepted_when_the_owner_named_it(full):  # 6.3, F2
     _review(full, args=["--effort", "xhigh"])
     _review(full, owner_named="DEC-1010")
     third = full.last()
-    assert (third["review_round"], third["owner_named"], third["model"], third["effort"]) == (3, "DEC-1010", OPUS, "max")
+    assert (third["review_round"], third["owner_named"], third["model"], third["effort"]) == (3, "DEC-1010", SONNET, "max")
 
 
 def test_round_two_needs_no_owner_where_its_setting_is_new(full):  # 6.3, F2: the round cap starts at three

@@ -180,7 +180,7 @@ def test_another_hook_or_another_event_or_a_lead_is_not_refused(tmp_path):
 # Rewrite-Reason: DEC-1225: this table gave Opus (C3), Haiku (C0) and a table line to four roles. R1: Opus, high only for
 # the orchestrator and the senior engineer; Sonnet, high and no table line for every other role.
 _S, _O = (SONNET, "high"), (OPUS, "high")
-RUBRIC = {"orchestrator": (_O, None), "senior-engineer": (_O, None), "ticket-lead": (_S, None),
+RUBRIC = {"orchestrator": (_O, None), "senior-engineer": (_O, None), "ticket-lead": ((SONNET, "medium"), None),
           "product-spec": (_S, None), "research": (_S, None), "engineer": (_S, None),
           "independent-test-designer": (_S, None), "independent-auditor": (_S, None), "qa-engineer": (_S, None)}
 

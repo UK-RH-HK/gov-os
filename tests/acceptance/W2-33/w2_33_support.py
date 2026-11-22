@@ -73,6 +73,7 @@ ONE_WRITER = (
 WELL = "well formed"   # the table's "present and well formed, value not asserted"
 _H = (OPUS, "high")
 _S = (SONNET, "high")
+_M = (SONNET, "medium")  # fixes-015a F14 (DEC-1236 (2)): the ticket lead runs Sonnet at medium
 # role file -> (Launch default, Launch by criticality or None for "absent"): S7's table (DEC-1120 (2), DEC-1119 (2)),
 # as DEC-1214 K1 changes it.
 # Rewrite-Reason: DEC-1214 K1 (the owner, 2026-11-18): the rubric is audit 4's Table 3 with audit 09's model changes
@@ -86,7 +87,7 @@ _S = (SONNET, "high")
 # says an Opus audit is only the exceptions file's entry for a comprehensive audit the owner asked for (DEC-1225 (2)).
 TABLE = {
     "orchestrator": (_H, None),
-    "ticket-lead": (_S, None),
+    "ticket-lead": (_M, None),
     "senior-engineer": (_H, None),
     "engineer": (_S, None),
     "independent-test-designer": (_S, None),

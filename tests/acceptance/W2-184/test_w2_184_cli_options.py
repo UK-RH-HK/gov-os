@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
@@ -65,7 +67,7 @@ def _table(result, **keys):
 
 def _review(result, effort, effort_source, review_round, **keys):
     """An auditor's review of the FULL ticket on Opus (the table's, which the probe keeps)."""
-    return s.assert_session(result, s.OPUS, effort, criticality="C2", model_source="by criticality",
+    return s.assert_session(result, s.SONNET, effort, criticality="C2", model_source="by criticality",
                             effort_source=effort_source, review_round=review_round, **keys)
 
 
@@ -81,7 +83,7 @@ def _plant_two_trials(project, tk):
 def test_cli_owner_named_admits_a_full_ticket_s_review_that_repeats_a_recorded_setting(gov, full):
     first = gov(AUD, full)
     _review(first, "high", "by criticality", 1)
-    s.refused(gov(AUD, full, "--effort", "high"), first.session_id(), s.OPUS, "high")
+    s.refused(gov(AUD, full, "--effort", "high"), first.session_id(), s.SONNET, "high")
     _review(gov(AUD, full, "--effort", "high", options=("--owner-named", OWNER)), "high", "after --", 2,
             owner_named=OWNER)
 
@@ -90,7 +92,7 @@ def test_cli_owner_named_admits_a_third_review(gov, full):
     _review(gov(AUD, full), "high", "by criticality", 1)
     second = gov(AUD, full)
     _review(second, "max", "probe", 2)
-    s.refused(gov(AUD, full), second.session_id(), s.OPUS, "max")
+    s.refused(gov(AUD, full), second.session_id(), s.SONNET, "max")
     _review(gov(AUD, full, options=("--owner-named", OWNER)), "max", "probe", 3, owner_named=OWNER)
 
 
@@ -210,7 +212,7 @@ def test_cli_owner_named_after_the_double_dash_does_not_admit_a_repeated_setting
     """Guard (green at the head)."""
     first = gov(AUD, full)
     _review(first, "high", "by criticality", 1)
-    s.refused(gov(AUD, full, "--effort", "high", "--owner-named", OWNER), first.session_id(), s.OPUS, "high")
+    s.refused(gov(AUD, full, "--effort", "high", "--owner-named", OWNER), first.session_id(), s.SONNET, "high")
 
 
 def test_cli_reason_after_the_double_dash_does_not_admit_max(gov, tk):

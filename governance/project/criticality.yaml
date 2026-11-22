@@ -1,7 +1,8 @@
 # Criticality rules (W2-184, DEC-1120 (1), DEC-1167 (2); the list of audit 4's Table 3, DEC-1214 K1, W2-201): a ticket's
 # class is the highest of the rules that match. Since DEC-1225 (2026-11-22) a class no longer picks a model: every
 # agent but the two orchestrating roles runs Sonnet at every class, and an Opus run is only an exceptions entry
-# (governance/project/model-exceptions.yaml); the class is only what an entry's `class: C3` limiter reads. Read at launch by gov.launch.criticality and by the helper model rule
+# (governance/project/model-exceptions.yaml); the class is only what an entry's `class: C3` limiter reads. A ticket lead
+# (and a fix or chore lead) runs Sonnet at effort medium, every other launched role at high (DEC-1236 (2), F14). Read at launch by gov.launch.criticality and by the helper model rule
 # (.claude/hooks/agent_model.py). A glob matches an allowed path as an fnmatch pattern ('*' crosses '/').
 version: 1
 default: C2                    # the class when no rule matches
