@@ -196,3 +196,67 @@ base: all but the guard, each by `SelectionRefused` naming the base's paths, or 
    naming the base's paths. Whether `scoped`'s dict without `change` holds the key is not tested.
 4. **The landing case** asserts only that the ticket lands and closes as a green landing does (success 1 and 2's
    checks); what the close record's `selection` holds of `unplaced_base` is not tested.
+
+## Fix: adopted repositories land (D7, DEC-1227)
+
+Written by the independent test designer from the ticket's section "Fix: adopted repositories land; the stage commits
+need no trailer and no marker" and its KPI lines (success 14 to 16, failure 4, added at the end of `kpis:`). **The cases
+are pins, green on the base by design**: the measurement shows nothing refuses `gov adopt`'s stage commits (they carry no
+`Role` and no `Task` trailer, W1-41), so the fix builds nothing and the tests only stop a later change from starting to
+ask them for trailers. They are acceptance cases (not repository-state), in
+`test_w2_115b_adopted_stage_commits.py`; the whole file skips with a reason when `gitleaks` is not on `PATH` (stage A0
+sets up `.gitleaks.toml`). Public interfaces only: `python3 -m gov.cli.main adopt|queue ... --root <project> --json`
+(the pytest process's `src/` on `PYTHONPATH`, the sandbox environment of `w2_115b_support.base_env`, which holds the
+interpreter's user site so `pytest` is found), the git state of the planted repository.
+
+**What is planted** (three runs, each built once per session under a file lock in pytest's shared folder, as
+`conftest._shared`, from helpers in the test file; a `w2_115b_support.Planted` project each, one ticket `PROJ-adop`
+whose `allowed_paths` are the widget, its acceptance folder and the adoption ticket's places `governance/adoption/**`,
+`.gitleaks.toml`, `.gitignore`):
+
+| run | project and branch | command |
+|---|---|---|
+| landed | branch `work`: stages A0, A1, A2 **run by the tool** (`gov adopt --lite --stage <A> --role orchestrator`, each committed by `gov adopt`), then one feature commit (the widget) with `Task:` and `Role: engineer` | `gov queue PROJ-adop=work --json` |
+| edited | the same branch to A2, then a hand edit of `governance/adoption/A1-inventory.md` committed with `Task: PROJ-adop` and `Role: orchestrator` | `gov adopt --lite --stage AS --role orchestrator --json` |
+| stage_subject | branch `topic/ad`: an engineer commit (the widget), then a commit with the subject `gov adopt --lite A0: safety baseline`, no trailer, adding `tests/acceptance/F-ad/test_ad_more.py` | `gov queue PROJ-adop=topic/ad --json` |
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-14 (the adopted repository lands) | `test_w2_115b_adopted_stage_commits.py::test_the_stage_commits_carry_no_role_and_no_task_trailer`, `test_w2_115b_adopted_stage_commits.py::test_a_branch_of_stage_commits_and_a_feature_commit_lands_and_closes` | none on the base: pins, green by design. They go red when the landing asks the stage commits for a `Role` or `Task` trailer (`TEST_AUTHOR_REFUSED` or another refusal, `landed` empty, exit 3), or when `gov adopt` starts to write trailers (the premise case) |
+| success-15 (what the stage commits write outside the places is a notice) | `test_w2_115b_adopted_stage_commits.py::test_a_path_a_stage_commit_wrote_outside_the_ticket_s_places_is_a_notice_and_the_exit_is_0` | none on the base: a pin. Red when A0's coordination ticket or roster stop being told (`path_notices` holds no path of A0's commit) or become a refusal (exit not 0) |
+| success-16 (a hand edit of a stage record is caught by `gov adopt`) | `test_w2_115b_adopted_stage_commits.py::test_a_hand_edit_of_a_stage_record_is_refused_by_the_next_stage_as_adopt_chain_broken`, `test_w2_115b_adopted_stage_commits.py::test_the_refused_stage_commits_nothing` | none on the base: a pin. Red when the next stage runs over the edited record (exit 0), or refuses with another code, or moves HEAD or the working tree |
+| failure-4 (a stage's subject lets a change to the acceptance tests through) | `test_w2_115b_adopted_stage_commits.py::test_a_stage_subject_commit_that_adds_an_acceptance_test_is_refused_and_nothing_lands` | none on the base: a guard, green. Red when a commit with a stage's subject and no `Role` that adds a file under `tests/acceptance/` is let through (the ticket lands, or the refusal does not name the commit) |
+
+**Readings this fix's cases take.**
+
+1. **"The adopted repository"** is the synthetic one the measurement used (`~/gov-os-runs/d7/`): `gov adopt` runs for
+   real on the planted project (so its commit subjects `gov adopt --lite A0: safety baseline`, `... A1: inventory`,
+   `... A2: classification` and its trailer-less messages are the tool's, never hand-written); a fixture that cannot
+   adopt fails with `fixture: ...`, never as a red.
+2. **"No `Role` and no `Task` trailer"** is read twice from git: no line `Role:` or `Task:` in the commit's message and
+   no such key among its parsed trailers.
+3. **"Lands"** is success 1's checks on this branch: exit 0, `landed == [PROJ-adop]`, `refused` and `culprits` empty, the
+   ticket `closed` at the integration head through one close commit (`assert_landed_through_close_commits`), and the
+   stage commits and the feature commit under the head.
+4. **Success 15 pins "a path of A0's commit", not the paths**: at least one `path_notices` entry names A0's commit and a
+   path A0 wrote outside the places (the coordination ticket the tool files, the roster); every notice of that commit
+   names a path the commit wrote; the exit is 0 and nothing is refused. The ticket id of the coordination ticket is
+   random and never asserted.
+5. **Success 16's refusal** is read from the `--json` envelope (`ok: false`, `error.code: ADOPT_CHAIN_BROKEN`, the message
+   naming `A2-classification.md`), exit not 0 (it is 1 today); "nothing committed" is HEAD, every ref, the working tree
+   and the tracked files' bytes as before the call.
+6. **Failure 4's answer** is as G-1's alone case: `ok: true`, exit 3, `refused` holds the ticket once with
+   `TEST_AUTHOR_REFUSED` and the offending commit's full id, `landed` empty, `head` null, no branch moved, the ticket
+   `open`.
+
+**Controls (run by hand in a throwaway copy, never committed; they prove the cases can go red, they pin nothing).**
+
+- The landing made to demand a `Role` on every commit of the range (the author check without its restriction to the
+  acceptance places): success-14's landing case and success-15's case go red (`TEST_AUTHOR_REFUSED` naming the three
+  stage commits, exit 3); the premise, success-16 and failure-4 stay green.
+- The author check made to skip a commit whose subject starts `gov adopt --lite A`: failure-4's case goes red (the ticket
+  lands); the others stay green.
+- The same plant with a ticket whose `allowed_paths` do **not** hold `governance/adoption/**` and `.gitleaks.toml`: the
+  landing is refused `SELECTION_REFUSED` naming `.gitleaks.toml` and the three records (exit 2, nothing lands). This is the
+  ticket's "what stays as it is", told, not pinned here.
+- The same chain with no hand edit: `gov adopt --lite --stage AS` runs (exit 0), so success-16's refusal is the edit's.
