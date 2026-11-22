@@ -148,3 +148,51 @@ planted repository. No case is green on the base.
   `CLOSE_CLONE_FAILED`: the interface's codes no KPI line names.
 - The non-goals: the close itself, Gov OS's own landing tools, `merge_queue.py`'s speed-ups, a chore's run, other
   languages.
+
+## Fix: the base's unplaced paths (L2-4, DEC-1217 (1), DEC-1223 (9))
+
+Written by the independent test designer from the ticket's section "Fix: the queue's selection refuses only the
+landing's own unplaced paths" (the fix line and its Verify), before any implementation of the fix. The fix adds no
+line to the ticket's `kpis:`, so its clauses are mapped here as lines numbered after the ticket's own (success 10 to
+13, one per Verify clause; failure 3, the fix's failure line), so they never merge with success 1 to 9 or failure 1
+and 2. Every case is of the acceptance kind. Public interfaces only: `gov queue PROJ-aaaa=topic/aa --select` without
+`--json` (one JSON object on stdout, or `SELECTION_REFUSED` on stderr, exit 2), the landing with `--json`, and
+`gov close --select PROJ-aaaa` (the selection without a branch's change).
+
+**What is planted** (`test_w2_115b_unwritten_paths.py::_plant`, a fresh project per case, `planted`): A and B on
+`main`; a green nightly record `docs/close/nightly/NR-...json` (`verdict: green`, `head`: the first commit) committed
+by no ticket; then one direct commit per base-side path on `main` with `Role: orchestrator` and no `Task:`
+(`docs/emergency-2/briefs/LEAD-plan.md`, outside the test map's `record_only`; `repin.sh`; or `src/app/gizmo.py`,
+which `tests/unit/test_gizmo.py` imports); A's branch `topic/aa` forked at the green head with one commit of A's
+changing the widget (mapped: A's suite holds it, `tests/unit/test_uses_widget.py` imports it), plus
+`tools/stray.sh` in the refused case.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-10 (the fix's clause 1: the base's two paths under `unplaced_base`, exit 0) | `test_w2_115b_unwritten_paths.py::test_select_lists_the_base_s_unplaced_paths_under_unplaced_base_and_exits_0`, `test_w2_115b_unwritten_paths.py::test_the_landing_beside_the_base_s_unplaced_paths_lands_and_closes` | `--select` exits 2, `SELECTION_REFUSED: PROJ-aaaa: 2 changed path(s) nothing maps to a suite ...: docs/emergency-2/briefs/LEAD-plan.md, repin.sh`; the landing is refused the same way (`ok: false`, exit 3, "nothing lands") |
+| success-11 (clause 2: the branch's own unplaced path refused, naming it and not the base's) | `test_w2_115b_unwritten_paths.py::test_a_branch_that_writes_an_unplaced_path_is_refused_naming_it_and_not_the_base_s` | the refusal (exit 2) names the base's two paths beside `tools/stray.sh` |
+| success-12 (clause 3: a base-side path a test imports still selects that test) | `test_w2_115b_unwritten_paths.py::test_a_base_side_path_a_test_imports_still_selects_that_test` | `--select` exits 2, refused for the base's document |
+| success-13 (clause 4: without `change` the base-side path is still refused) | `test_w2_115b_unwritten_paths.py::test_gov_close_select_without_a_change_still_refuses_the_base_s_unplaced_paths` | none: a guard, green on the base; it must stay green (`gov close` does not change) |
+| failure-3 (a path the landing wrote that nothing places is no longer refused, or without `change` the base's unmapped path stops being refused) | `test_w2_115b_unwritten_paths.py::test_a_branch_that_writes_an_unplaced_path_is_refused_naming_it_and_not_the_base_s`, `test_w2_115b_unwritten_paths.py::test_gov_close_select_without_a_change_still_refuses_the_base_s_unplaced_paths` | the first as success-11; the second a guard, green on the base |
+
+**Unit tests beside them** (not run by `gov accept`; `tests/unit/queue/test_queue_select_unwritten.py`, the
+fix's `select.scoped` with and without `change`, on `queue_support`'s planted project, its map placing
+`docs/close/**` as records so `unplaced_base` is compared whole): the base's paths listed under `unplaced_base`
+(clause 1); `change=[]` still treats them as base-side; the key present and `[]` when there is none; another ticket's
+commit on the base is base-side too (the fix line: neither the ticket's own commits nor `change` wrote it); a
+base-side path an import or a coupling reaches still selects its suite (clause 3); a path the ticket's own trailered
+commit wrote is refused though the green range holds it, and a path `change` names is refused, each naming only
+itself (clause 2, failure 3); without `change` the base's paths are still refused (clause 4, a guard). Red on the
+base: all but the guard, each by `SelectionRefused` naming the base's paths, or the missing key.
+
+**Readings this fix's cases take.**
+
+1. **"Base-side"** is a path counted from the green record (the diff from the green head to the merged result)
+   that no commit carrying the ticket's `Task:` trailer changed and that the branch's change (`change`, the paths the
+   queue passes) does not name. A commit by another ticket is base-side too, as the fix line reads.
+2. **`unplaced_base`** is a sorted list of paths, always present in the selection when `change` is given, also when
+   given as an empty list; in `--select`'s object for one ticket. A batch's union of it is not tested.
+3. **"Without `change` nothing changes"** is read through `gov close --select`: still `SELECTION_REFUSED`, exit 2,
+   naming the base's paths. Whether `scoped`'s dict without `change` holds the key is not tested.
+4. **The landing case** asserts only that the ticket lands and closes as a green landing does (success 1 and 2's
+   checks); what the close record's `selection` holds of `unplaced_base` is not tested.

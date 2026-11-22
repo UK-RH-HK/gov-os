@@ -741,7 +741,8 @@ def _bookkeeping(root: Path, ticket: str, paths: list[str]) -> bool:
 
 def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
-    "base_from", "head"}`` (``base``: the head without the change, ``head_without_change``); ``SelectionRefused``
+    "base_from", "head"}`` (``base``: the head without the change, ``head_without_change``; ``unplaced_base`` too
+    when ``change`` is given); ``SelectionRefused``
     with its reason where it cannot be made. ``change``: paths counted in the change beside the ticket's own commits
     (``gov queue``: a work branch's changed paths, untrailered commits among them)."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter
@@ -815,6 +816,10 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
                 select(rel, f"IMPORTS {p}")
                 placed[p] = True
     unplaced = [p for p, hit in placed.items() if not hit]
+    # L2-4 (DAEO-j9z6): with ``change`` given, a path only the green range counted (neither the ticket's own commits
+    # nor ``change`` wrote it) is the base's, not this landing's to refuse: it is listed, and what it reaches stays
+    unplaced_base = sorted(set(unplaced) - set(own_paths) - set(change)) if change is not None else []
+    unplaced = [p for p in unplaced if p not in unplaced_base]
     if unplaced:
         raise SelectionRefused(f"{len(unplaced)} changed path(s) nothing maps to a suite (no coupling, no ticket "
                                f"with a suite holds them, no test imports them): {', '.join(sorted(unplaced))}")
@@ -842,7 +847,8 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
             "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only,
             "why": {t: why[t] for t in suites}, "base": judged_at, "base_from": judged_from,
-            "head": _git(root, "rev-parse", "HEAD").strip()}
+            "head": _git(root, "rev-parse", "HEAD").strip(),
+            **({"unplaced_base": unplaced_base} if change is not None else {})}
 
 
 def pytest_options(test_map: dict | None) -> list[str]:
