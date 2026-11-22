@@ -51,7 +51,13 @@ Name: `fixes-015a`; worktree `/home/usain/gov-os-worktrees/E2-fixes-015a`, branc
   model and effort stay exactly as DEC-1225 and the table set them (DEC-1236 (3): no other change to a model or effort).
   Verify: a planted lead launch records Sonnet and medium; a worker launch is unchanged. Owner: W2-201 `DAEO-k1us`.
 
+- **F15 The memory measure's figure carries its stamp** (audit 4 A-9, placed in 0.1.5 before EXAMIN's fresh 80; the
+  owner's priority 4): `FIGURES.json` (and the printed verdict) stamps `release`, `commit`, `reader_model`,
+  `grader_models`, `forbidden_rule` and `questions_with_forbidden: <n>`; `declare` refuses `forbidden_rule: strict` when no
+  question carries a `forbidden` list; a figure without the stamp is never compared with one that has it. Builds on D5's
+  `forbidden_rule` (landed with `e2/d5-memaudit-strict`). Owner: W2-204 `DAEO-ma4q`.
+
 ## Green and return
 `gov accept` of each owning ticket green; `tests/unit/launch`, `tests/unit/hooks` (with F13's cases), `tests/unit/update`,
-`tests/unit/adapters`, W1-28, W1-29, W1-38, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
+`tests/unit/adapters`, `tests/unit/memaudit`, W2-204, W1-28, W1-29, W1-38, W2-201, W2-17, `tests/unit/optin`. Return: branch and head; each fix with its
 owning ticket and tests; reds not yours; the trial figures.
