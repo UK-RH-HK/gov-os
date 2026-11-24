@@ -10,6 +10,8 @@ This project uses the Gov OS governance framework.
 
 **Read `docs/emergency-2/EMERGENCY-2.md` first.** It is the strategy in force (the owner's, approved 2026-11-17) and supersedes anything that contradicts it, the Contract included, until the Contract is re-baselined. The Contract (`docs/contract/`) and the decision register (`docs/DECISION_REGISTER.md`) hold where they do not contradict it. The old checkpoint, start-next-session page, decisions-in-force list and orchestrator prompt are history in `docs/emergency-2/archive/`; do not work from them.
 
+**The golden workflow** (`docs/emergency-2/GOLDEN-WORKFLOW.md`, approved by the owner on 2026-11-24, DEC-1244) is the spine: it says how work flows, step by step, and what code holds at each step; it stands beside the golden rule below, which says how work is judged. Whatever contradicts it is wrong.
+
 ## How we work (EMERGENCY-2 §2, §4)
 
 - **Trust, then catch and correct; do not prevent.** No guard, no sandbox, no permission prompts. Agents have full permission in the repository they work in, their worktree and their run folder; sessions stay apart by where they start, the folders they are given and their brief. Two denies stay, in the project settings: `git push` and `sudo`. Releases and re-pins are the owner's.
