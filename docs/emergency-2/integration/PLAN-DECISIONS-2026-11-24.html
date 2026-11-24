@@ -1,0 +1,743 @@
+<title>Integration plan decisions, 24 November</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding-block:10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding-block:22px 80px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0;min-width:0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+<header class="bar"><div class="bar-in">
+  <h1>Integration plan decisions, 24 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">This is the integration plan (73 items in seven phases) and the corrected golden workflow (v2), both for your yes (DEC-1238 (7), DEC-1241 GO), and the 14 open questions they raised, each as a decision record. None of the questions stops work in flight; each card says what waits. Each card gives what was found, the options with their costs, and the recommendation. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
+<p class="hint" id="batchline"></p>
+
+<section class="state" aria-labelledby="how">
+  <h3 id="how">How to answer</h3>
+  <ul>
+    <li>Tap one option on a card. A card you leave alone is sent as "skip".</li>
+    <li>"Take every recommendation" fills every card with its recommended option; your notes stay.</li>
+    <li>At the end, tap "Copy the answer sheet" and paste it to your advisor, then to the CTO.</li>
+  </ul>
+</section>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. A note is sent as one line, 400 characters at most.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const BATCH="B-2026-11-24-plan";
+const SECTIONS = [
+ {
+  "title": "The plan and the workflow",
+  "intro": "Two approvals first. The 14 questions below fold into them.",
+  "qs": [
+   {
+    "id": "PLAN",
+    "from": "INTEGRATION-PLAN.md §1 to §6 · DEC-1238 (7) · DEC-1241 GO",
+    "title": "Approve the integration plan as written?",
+    "found": [
+     "73 items in seven phases: 0 memory first and the git hook, 1 the landing, 2 the launch, 3 the schedule, 4 outside the product, 5 the forms and the rule, 6 the test.",
+     "The measures start at steps 1 / 11 / 4 today (on / partly / off, of 16). The exit needs 15 of 16 held by code, against a floor of 15. The margin is one step: W1 stays partly (imports wait).",
+     "Cost estimate: about $910 at list price over about 19 working days, 13 to 15 % of a week's plan each week.",
+     "Up to three streams at once, split by code area. Emergency mode: Gov OS's own work stays on the plain path until Day M (your decision).",
+     "Three new tickets only, all already approved by you: F-1 (enforcement field), F-2 and F-3 (decisions by page)."
+    ],
+    "opts": [
+     [
+      "a",
+      "Yes, as written; the answers to Q-1 to Q-14 below fold in",
+      "The CTO starts Phase 0 when you cut 0.1.5. Your answers below set the open defaults.",
+      1
+     ],
+     [
+      "b",
+      "Yes, with the changes in my note",
+      "Write the changes in the note box. The CTO applies them before Phase 0 starts."
+     ],
+     [
+      "c",
+      "Not yet",
+      "Nothing in the plan starts. 0.1.5 is not affected."
+     ]
+    ],
+    "reason": "The plan follows your order (DEC-1238 (7)) and every open point has its own card below, so a yes here does not hide a choice.",
+    "sources": "INTEGRATION-PLAN.md §1 to §4; DEC-1238 (3), (7); DEC-1239 (3), (4); DEC-1240; DEC-1241 GO; usage-breakdown-2026-11-22.md.",
+    "stops": "Gates the start of all 73 items (first: 0-1). It does not stop 0.1.5, which goes first."
+   },
+   {
+    "id": "GWV2",
+    "from": "GOLDEN-WORKFLOW-v2.md and its change log",
+    "title": "Approve the corrected golden workflow (v2) to replace your draft?",
+    "found": [
+     "Your draft's Today column is replaced by the corrected text: 16 corrections applied to the Today column and the rules (DEC-1241 C-ALL (a)).",
+     "Your answers of 24 November are in the text: P-1 to P-10, G-3, G-4 and G-8, and the DEC-1242 changes where they alter a step.",
+     "One change over your draft: T-12 replaces W11's \"a red calls a quality auditor\". On a red the landing writes the red's record and the CTO decides who fixes.",
+     "After you approve, v2 replaces the draft, which is archived with a pointer. The heads of CLAUDE.md and AGENTS.md point to it (plan item 5-3)."
+    ],
+    "opts": [
+     [
+      "a",
+      "Yes, it replaces my draft",
+      "Your draft is archived with a pointer. The Charter and the Contract are rebuilt around its 16 steps and 10 rules (5-3).",
+      1
+     ],
+     [
+      "b",
+      "Yes, with the changes in my note",
+      "Write the changes in the note box. The CTO applies them, then v2 replaces the draft."
+     ],
+     [
+      "c",
+      "Not yet",
+      "Your draft stays as you wrote it. Item 5-3 waits; nothing else changes."
+     ]
+    ],
+    "reason": "Every change has a line and a card id in the change log, and your draft stays untouched until you say yes.",
+    "sources": "GOLDEN-WORKFLOW-v2.md (change log, 46 lines); GOLDEN-WORKFLOW-CORRECTIONS.md §1, §2; DEC-1241; DEC-1242.",
+    "stops": "Gates plan item 5-3 (the workflow made the spine). Does not stop the earlier phases."
+   }
+  ]
+ },
+ {
+  "title": "The chain from feature to code",
+  "intro": "How a spec line, a ticket line, its test and the code are tied together by code.",
+  "qs": [
+   {
+    "id": "Q-3",
+    "from": "chain SQ-G7-1",
+    "title": "Which form is \"the spec\": the nine-part K-line form or OpenSpec Requirements and Scenarios?",
+    "found": [
+     "Gov OS ships both forms.",
+     "EXAMIN's real spec for X12 is OpenSpec only. <code>gov discover --check x12-term-registers</code> answers <code>DISCOVER_CHANGE_NOT_FOUND</code>.",
+     "Gov OS's own work has neither (a Contract item and decisions)."
+    ],
+    "opts": [
+     [
+      "a",
+      "The nine-part form is the spec; OpenSpec deltas hold the living behaviour beside it; a K-line names its Requirement",
+      "Two documents per feature.",
+      1
+     ],
+     [
+      "b",
+      "OpenSpec only; the other parts move to proposal.md and design.md (approach B)",
+      "check_spec.py, the skill and discover rewritten; the \"Fails if:\" lines lost or re-homed."
+     ],
+     [
+      "c",
+      "The nine-part form only; drop the OpenSpec delta",
+      "EXAMIN's X12 spec rewritten."
+     ]
+    ],
+    "reason": "Nothing in force changes now. Confidence: low, because it changes a form in force.",
+    "sources": "spec-form.md; check_spec.py; template/openspec/schemas/feature-readiness/schema.yaml; discover/command.py:87-110; EXAMIN openspec/changes/x12-term-registers/.",
+    "stops": "Does not stop work. Gates plan item 5-11 slice 3 (and approach B)."
+   },
+   {
+    "id": "Q-4",
+    "from": "chain SQ-G7-2",
+    "title": "What is a KPI line's identity: its position, or a stable id in the line?",
+    "found": [
+     "Ticket lines are named by position (<code>S&lt;n&gt;</code>, <code>success-N</code>).",
+     "479 of 2,336 lines carry a typed prefix, and 37 of those disagree with the position.",
+     "<code>gov discover</code> writes a stable <code>[K&lt;n&gt;]</code>. A line inserted later renumbers every later one silently."
+    ],
+    "opts": [
+     [
+      "a",
+      "A stable id as the first token of a new feature ticket's line, required by the schema; old tickets keep position",
+      "One convention.",
+      1
+     ],
+     [
+      "b",
+      "Position forever, plus a fingerprint of the line list",
+      "An edit shows as suspect, but not which line moved."
+     ],
+     [
+      "c",
+      "Both",
+      "Two names for one line."
+     ]
+    ],
+    "reason": "Lead with (a) and keep (b) as the drift catch. Confidence: medium.",
+    "sources": "brief/build.py:112-128; accept/runner.py:139; discover/tickets.py:107-117.",
+    "stops": "Does not stop work. Gates plan item 5-11 (slice 3)."
+   },
+   {
+    "id": "Q-5",
+    "from": "chain SQ-G7-3",
+    "title": "Is a ticket's KPI line a copy of the spec's K-line, or a refinement with the same id?",
+    "found": [
+     "<code>gov discover --ticket</code> copies the line verbatim and puts code names in <code>verify</code>.",
+     "EXAMIN's X12 lines name code in the line itself, which the spec form refuses."
+    ],
+    "opts": [
+     [
+      "a",
+      "Verbatim, plus a verify field that may name code",
+      "X12's three lines reworded. The check is exact.",
+      1
+     ],
+     [
+      "b",
+      "A refinement is allowed if it carries the id and the fingerprint of the line it refines",
+      "An agent decides what counts as a refinement."
+     ],
+     [
+      "c",
+      "No relation beyond the id",
+      "The spec-to-ticket check (A-23b) stays unmet."
+     ]
+    ],
+    "reason": "An exact copy is the only form code can compare. For new feature tickets. Confidence: medium.",
+    "sources": "discover/tickets.py:107-117; EXAMIN .tickets/exa-6lq4.md; spec-form.md:46-61; audit 4 A-23b.",
+    "stops": "Does not stop work. Gates plan item 5-11 (slice 3)."
+   },
+   {
+    "id": "Q-6",
+    "from": "chain SQ-G7-4",
+    "title": "Does <code>gov accept</code> fail a ticket line that no map row names, and for which tickets?",
+    "found": [
+     "<code>gov accept</code> judges only the lines the README names.",
+     "45 closed tickets have 138 lines (11 %) in no map.",
+     "T-3 does not say whether an unnamed line fails. A new KPI line on a closed feature is a new ticket (<code>CLAUDE.md</code>)."
+    ],
+    "opts": [
+     [
+      "a",
+      "Fail for tickets created at or after a cut date (<code>ready.new_since</code>); older ones are exempt",
+      "Two regimes and one cut date.",
+      1
+     ],
+     [
+      "b",
+      "Fail for every ticket; re-map or mark the 45 legacy",
+      "Work on closed records."
+     ],
+     [
+      "c",
+      "A notice only",
+      "Unproven lines keep landing."
+     ]
+    ],
+    "reason": "Closed work is not reopened, and every new ticket is held. Confidence: high.",
+    "sources": "accept/runner.py:662-705; brief/build.py:157-186; DEC-1242 T-3.",
+    "stops": "Does not stop work. Gates plan item 5-10; the slice's brief takes (a) as its default."
+   },
+   {
+    "id": "Q-12",
+    "from": "INTEGRATION-PLAN.md §5",
+    "title": "Which approach makes the chain from feature to code deterministic (G-7)?",
+    "found": [
+     "The friction is at one hop (ticket line, README map, test): 66 to 72 unreadable folders, 138 unproven lines, 15 phantom lines, 37 mis-numbered prefixes. One comparison is missing: a spec K-line against its ticket line.",
+     "A is a check over files that exist. B rewrites a spec form in force. C changes the store's schema in the middle of EXAMIN's memory measure."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approach A: derive and check. Size M (about 500 lines and 600 of tests); first slice about 150 lines",
+      "The plan builds it in four slices (5-10 to 5-12).",
+      1
+     ],
+     [
+      "b",
+      "Approach B: scenario first. Size L (about 1,500 and 1,000)",
+      "Needs Q-3 first; a spec form in force is rewritten."
+     ],
+     [
+      "c",
+      "Approach C: a typed graph. Size L to XL (about 1,800 and 1,200)",
+      "Needs the store at HEAD and rebuilds every store."
+     ]
+    ],
+    "reason": "A is the cheapest and touches nothing in force. Do not start B or C now.",
+    "sources": "CHAIN-DISCOVERY.md §3, §4.",
+    "stops": "Does not stop Phases 0 to 4. Gates plan items 5-10 to 5-12. A new gov trace command would be a feature and waits for you."
+   },
+   {
+    "id": "Q-2",
+    "from": "records SQ-R2 · chain SQ-G7-5",
+    "title": "The ticket's <code>specification</code> field: code reads it, no schema states it. Must a feature ticket name its spec?",
+    "found": [
+     "<code>readiness/checker.py:101</code> and <code>tasks/queue.py:80</code> read <code>specification</code>, and <code>gov discover</code> writes it. The schema does not name it.",
+     "0 of 271 tickets carry it. The queue treats \"has a spec\" as a non-empty body.",
+     "The drift check (<code>KPI_DRIFT</code>) needs one field that links a ticket to its spec."
+    ],
+    "opts": [
+     [
+      "a",
+      "A schema property, required for <code>kind: feature</code>; R-3's migration fills it where a spec exists",
+      "A rule is needed for the 162 tickets with no CAP source."
+     ],
+     [
+      "b",
+      "Required for new feature tickets only; optional on old ones",
+      "Old tickets stay unlinked.",
+      1
+     ],
+     [
+      "c",
+      "Leave it and use <code>sources</code>",
+      "A feature can name no spec and still land."
+     ]
+    ],
+    "reason": "Added in R-3's migration as an optional field for old tickets; no rule for the 162 is needed. Confidence: medium.",
+    "sources": "ticket.schema.json; queue/checks.py:121; DEC-1242 R-3; CHAIN-DISCOVERY.md §5.",
+    "stops": "Gates plan items 2-11 (the property) and 5-11 (KPI_DRIFT). Stops only 5-11."
+   }
+  ]
+ },
+ {
+  "title": "The landing, the loops and the floor",
+  "intro": "A new folder at the landing, a cap on fix loops, and what the 90 % floor does to a release.",
+  "qs": [
+   {
+    "id": "Q-1",
+    "from": "records SQ-R1",
+    "title": "At the landing, is a path the change adds that the path map does not hold exactly once a refusal or a notice?",
+    "found": [
+     "G-8 (a) says code proves exact coverage \"at every landing\". DEC-1239 (2) says a record-only document is placed with a notice, never refused. They meet on a new folder no namespace holds (18 and 22 November).",
+     "An unmapped path fails open: memory indexes it by default, so a hidden-set file outside its namespace would be indexed."
+    ],
+    "opts": [
+     [
+      "a",
+      "Refuse, naming the line to add",
+      "One bounce per new folder (two in a week).",
+      1
+     ],
+     [
+      "b",
+      "A notice, and doctor fails",
+      "The drift of 22 November (two days unmapped) stays possible."
+     ],
+     [
+      "c",
+      "Refuse only evaluation, hidden-set or doubled paths",
+      "A second rule, and most new folders still drift."
+     ]
+    ],
+    "reason": "A refusal closes a gap that fails open. It is one switch in queue.yaml if you change your mind.",
+    "sources": "DEC-1241 G-8; DEC-1239 (2); queue/after.py:8; path-map.yaml:58-62; RECORDS-MAP.md §3.3, §3.4.",
+    "stops": "Does not stop work. Gates plan item 1-11 (built with one switch, default refuse)."
+   },
+   {
+    "id": "Q-7",
+    "from": "G-9 SQ-5",
+    "title": "Do the build and fix loops have a cap, and what happens on exhaustion?",
+    "found": [
+     "W10 says \"builds until <code>gov accept</code> is green\" with no cap. Review has two rounds.",
+     "The only brake that counts nothing is <code>gov spend</code> at twice the projection.",
+     "Every engine and prototype read caps its loops."
+    ],
+    "opts": [
+     [
+      "a",
+      "Cost only (the spend brake and the stall watch)",
+      "Nothing new. A cheap loop can circle."
+     ],
+     [
+      "b",
+      "A count: three fix rounds on one signature, then the CTO decides",
+      "A small code change and one more number."
+     ],
+     [
+      "c",
+      "Count plus signature: the same failure three times",
+      "A small code change; a signature for each failure class.",
+      1
+     ]
+    ],
+    "reason": "Exhaustion goes to the CTO at P2, so no new owner decision.",
+    "sources": "brake.py:31; close/state.py:17; Fabro max_visits; Archon loop nodes; COMPETITIVE-ANALYSIS.md §6 SQ-5.",
+    "stops": "Does not stop work (default (c)). Gates plan items 5-13 and 5-14."
+   },
+   {
+    "id": "Q-14",
+    "from": "INTEGRATION-PLAN.md §5",
+    "title": "Does the 90 % floor refuse a release below it? (P-6: \"the minimum a release must show\")",
+    "found": [
+     "Today 1 of 16 steps is fully on, so a floor that refuses would refuse 0.1.5 and every release until the exit."
+    ],
+    "opts": [
+     [
+      "a",
+      "Print only; never refuse",
+      "The floor can be missed unseen."
+     ],
+     [
+      "b",
+      "Refuse from the first release after the exit",
+      "None before then.",
+      1
+     ],
+     [
+      "c",
+      "Refuse from now",
+      "Every release is blocked until Phase 5."
+     ]
+    ],
+    "reason": "It holds the floor where it can be met and blocks nothing on the way.",
+    "sources": "DEC-1241 P-6; INTEGRATION-PLAN.md §3.",
+    "stops": "Does not stop work. Gates plan item 5-6."
+   }
+  ]
+ },
+ {
+  "title": "Engines and the outside",
+  "intro": "Whether to adopt an open-source engine, what it would cost, and one licence question.",
+  "qs": [
+   {
+    "id": "Q-13",
+    "from": "COMPETITIVE-ANALYSIS.md §0, §5",
+    "title": "Adopt an open-source engine, or finish our own integration?",
+    "found": [
+     "No engine has memory-first retrieval, a decision register with levels, an independent test designer, an impact-selected landing or an adoption chain.",
+     "An engine would replace about 19 of 102 tool-map rows (launch and run). Gov OS's orchestration is built and bypassed; a second engine would be one more thing to bypass.",
+     "Fabro runs only on clones. Archon is pre-1.0 and changes node semantics fast."
+    ],
+    "opts": [
+     [
+      "a",
+      "Finish the integration and build the five small pieces (5-13 to 5-17)",
+      "The plan's own cost.",
+      1
+     ],
+     [
+      "b",
+      "Adopt Archon or Fabro for W8 and W15",
+      "A re-baseline of CAP-23.b and CAP-64.a; a pin that moves under gov update; the exit test moved."
+     ],
+     [
+      "c",
+      "Study only, with the check of §5.4",
+      "Look again if 6-4 shows a failure of workflow expression (parallel branches, durable pause, resume)."
+     ]
+    ],
+    "reason": "Lead with (a), with (c)'s check at the end of 6-4. The answer goes to you with the run's result.",
+    "sources": "COMPETITIVE-ANALYSIS.md §0, §5; DEC-1241 G-9.",
+    "stops": "Does not stop work. Gates nothing in this plan; item 6-4 reports the check."
+   },
+   {
+    "id": "Q-8",
+    "from": "G-9 SQ-1",
+    "title": "May an engine bill provider keys, or must orchestration stay on your Claude plan?",
+    "found": [
+     "Rule 8 makes a paid service yours to decide. No spec says whether a tool that bills keys by token may run Gov OS's agents.",
+     "Whether Fabro, Archon or OpenHands can use the plan login is not verified."
+    ],
+    "opts": [
+     [
+      "a",
+      "Plan only",
+      "Rules out Fabro and OpenHands unless they drive the claude CLI."
+     ],
+     [
+      "b",
+      "Keys for one named job at a time, as a paid-service decision",
+      "A new cost line."
+     ],
+     [
+      "c",
+      "Leave open until an engine is chosen",
+      "Nothing now.",
+      1
+     ]
+    ],
+    "reason": "It matters only if Q-13 changes. Item 5-17 prints tokens, not dollars, either way.",
+    "sources": "GOLDEN-WORKFLOW.md rules 7, 8; TOOL-MAP.md rows 82, 83; Fabro quick-start docs.",
+    "stops": "Does not stop work. Gates nothing now."
+   },
+   {
+    "id": "Q-9",
+    "from": "G-9 SQ-2",
+    "title": "Does a step \"held by an engine's graph\" count as held by code?",
+    "found": [
+     "P-6's floor counts steps held by code. P-7 treats a third-party program as outside the product, but pinned and checked.",
+     "There is no class for \"held by a pinned third-party program\"."
+    ],
+    "opts": [
+     [
+      "a",
+      "Counts, if the engine is pinned and its behaviour is checked by a test of ours",
+      "A test to write if an engine is adopted.",
+      1
+     ],
+     [
+      "b",
+      "A new class between code and judgement",
+      "A fourth class in every measure."
+     ],
+     [
+      "c",
+      "Does not count",
+      "An engine could never lift a step to \"held\"."
+     ]
+    ],
+    "reason": "Only if an engine is adopted; until then it changes nothing.",
+    "sources": "DEC-1241 P-6, P-7; audit 4 §0; GOLDEN-WORKFLOW.md §3.",
+    "stops": "Does not stop work. Gates nothing now."
+   },
+   {
+    "id": "Q-10",
+    "from": "G-9 SQ-3",
+    "title": "Is review by a model from another vendor wanted?",
+    "found": [
+     "Foreman's reviewer runs on a different vendor from its implementer.",
+     "Rule 7 says every agent except the two Opus orchestrators runs Sonnet, critical work included. It is silent on vendor."
+    ],
+    "opts": [
+     [
+      "a",
+      "One vendor",
+      "None.",
+      1
+     ],
+     [
+      "b",
+      "A one-wave trial of the independent auditor on a second vendor",
+      "A paid service, a second tool to pin, and a hidden-set risk if outputs leave the machine."
+     ],
+     [
+      "c",
+      "Add it to R-4's measured trial after the integration",
+      "Decided later, with figures."
+     ]
+    ],
+    "reason": "One vendor now; (c) after the exit.",
+    "sources": "GOLDEN-WORKFLOW.md rule 7; DEC-1242 R-4, R-5; Foreman README.",
+    "stops": "Does not stop work. Belongs after the exit; gates nothing in this plan."
+   },
+   {
+    "id": "Q-11",
+    "from": "G-9 SQ-4",
+    "title": "Gov OS has no licence file. Leave it?",
+    "found": [
+     "Neither the repository root nor <code>template/</code> holds a <code>LICENSE</code>, and <code>pyproject.toml</code> names none.",
+     "Adopted repositories get the kit by <code>copier</code>."
+    ],
+    "opts": [
+     [
+      "a",
+      "Leave it; you keep all rights and the kit is private to your repositories",
+      "None.",
+      1
+     ],
+     [
+      "b",
+      "State \"all rights reserved\" in a file",
+      "A chore."
+     ],
+     [
+      "c",
+      "Choose a licence now",
+      "An owner decision with a business angle."
+     ]
+    ],
+    "reason": "Revisit before anything is shared.",
+    "sources": "ls; pyproject.toml; IMPORTS-ADOPTION-SPEC.md (\"licence is a note, never a gate\").",
+    "stops": "Does not stop work. Gates nothing."
+   }
+  ]
+ }
+];
+
+const KEY="govos-plan-"+BATCH;
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* SHA-256 in plain script, so the page needs no secure context */
+function sha256(str){
+  const msg=new TextEncoder().encode(str);
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const len=msg.length, total=((len+9+63)>>6)<<6, buf=new Uint8Array(total);
+  buf.set(msg); buf[len]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(total-8,Math.floor(len/0x20000000),false); dv.setUint32(total-4,(len<<3)>>>0,false);
+  const w=new Uint32Array(64), rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+4*i,false);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&b)^(a&c)^(b&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+function canon(v){
+  if(Array.isArray(v)) return "["+v.map(canon).join(",")+"]";
+  if(v&&typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+canon(v[k])).join(",")+"}";
+  return JSON.stringify(v);
+}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.from}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<p class="src"><b>Sources:</b> ${q.sources}</p><p class="src"><b>Stops work?</b> ${q.stops}</p>`;
+    h+=`<div class="note cto"><span class="who">Recommended</span>${q.reason}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" maxlength="400" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+/* the batch hash: SHA-256 of the batch id and the cards in page order, as JSON with sorted keys and no spaces */
+const HASH=sha256(canon({batch:BATCH,cards:all.map(q=>({id:q.id,question:q.title,found:q.found,options:q.opts.map(o=>({key:o[0],label:o[1],cost:o[2]})),recommendation:{option:(q.opts.find(o=>o[3])||[])[0]||null,reason:q.reason},sources:q.sources,blocks:q.stops}))}));
+document.getElementById("batchline").textContent=`Batch ${BATCH} · hash ${HASH.slice(0,12)} · ${all.length} cards`;
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const stamp=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  const lines=["GOV-ANSWERS 1",`batch: ${BATCH}`,`hash: sha256:${HASH}`,`answered: ${stamp}`,`count: ${all.length}`];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id}: `;
+    if(v){n++; line+=v;} else line+="skip";
+    const note=(state.notes[q.id]||"").replace(/\s*[\r\n]+\s*/g," ").trim().slice(0,400);
+    if(note) line+=` | note: ${note}`;
+    lines.push(line);
+  }
+  lines.push("END");
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+let clearArmed=null;
+document.getElementById("clear").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!clearArmed){b.textContent="Tap again to clear every answer and note"; clearArmed=setTimeout(()=>{clearArmed=null; b.textContent="Clear my answers";},4000); return;}
+  clearTimeout(clearArmed); clearArmed=null; b.textContent="Clear my answers";
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  render();
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
