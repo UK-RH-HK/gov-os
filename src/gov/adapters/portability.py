@@ -442,6 +442,24 @@ def kit_text_findings(root: Path) -> list[dict]:
     return findings
 
 
+def _same_generated(path: Path, rel: str, content: bytes) -> bool:
+    """The project's file is what rulesync generated: its bytes equal, or (settings) equal but for the
+    ``disableClaudeAiConnectors`` key that ``gov adapters generate`` merges in (fixes-015a F1)."""
+    held = path.read_bytes()
+    if held == content:
+        return True
+    if rel != ".claude/settings.json":
+        return False
+    try:
+        own, generated = json.loads(held.decode("utf-8")), json.loads(content.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return False
+    if not (isinstance(own, dict) and isinstance(generated, dict)):
+        return False
+    key = "disableClaudeAiConnectors"
+    return {k: v for k, v in own.items() if k != key} == {k: v for k, v in generated.items() if k != key}
+
+
 def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
     """Comparison 3: ``(findings, number of files compared)``. rulesync generates from the project's
     sources into an empty temporary folder; each file it writes there is compared byte for byte with the
@@ -460,7 +478,7 @@ def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
         return [_finding("RULESYNC_FAILED", f"rulesync generate: {reason}")], 0
     findings = [_finding("GENERATED_DIFFERS", "is not what rulesync generates from its sources", rel)
                 for rel, content in made.items()
-                if not (root / rel).is_file() or (root / rel).read_bytes() != content]
+                if not (root / rel).is_file() or not _same_generated(root / rel, rel, content)]
     for path in sorted((root / ".claude/agents").glob("*.md")):
         if slots := sorted({m.group(0) for m in SLOT.finditer(path.read_text(encoding="utf-8"))}):
             findings.append(_finding("GENERATED_SLOT", f"holds an unfilled slot: {', '.join(slots)}",
