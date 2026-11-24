@@ -4,6 +4,6 @@
 # file is committed as it stands and its last commit carries `Decided-by: owner...`. It is changed only by a
 # decision-record commit of the owner's decision; no command writes it. `off` is the committed state until the
 # rehearsal's record is read (YAML reads `off` as false: G0 refuses anything but on).
-patch_releases: off
+patch_releases: on
 decision: DEC-1223
 bake_hours: 4
