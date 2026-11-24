@@ -44,7 +44,10 @@ def test_the_verdict_lines_show_the_planted_right_wrong_interval_and_the_bar(pla
     done = run_judge(plant, claude)
     assert done.returncode == 0, done.stdout
     out = done.stdout.splitlines()
-    assert out[0].startswith("VERDICT ") and len(out) == 5  # the five lines of item 8, nothing before them
+    # Rewrite-Reason: F15 (W2-204 S17, fixes-015a; DEC-1225 (4)): the figure's stamp is printed as one line after the five
+    # lines of item 8, so the output is six lines: the five of item 8 first, nothing before them, then the STAMP line.
+    assert out[0].startswith("VERDICT ") and len(out) == 6
+    assert out[5].startswith("STAMP release ") and all(not line.startswith("STAMP") for line in out[:5])
     verdict = [line for line in out if line.startswith(("VERDICT", "BAR", "BESIDE"))]
     assert verdict[0] == ("VERDICT right end to end 34 of 40 (85.0 %; exact 95 % interval 70.2 to 94.3 %); "
                           "wrong claims 2 of 40 (5.0 %)")
