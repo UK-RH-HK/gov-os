@@ -108,3 +108,9 @@ its install test runs with the committed settings loaded.
 
 **No `excludedCommands` (DEC-164).** The launcher sets none. Subagents inside a sandboxed worker session, and
 `excludedCommands`, are open residuals until experiment EXP-002 (Wave 2).
+
+## Fix: the launch cases model after `--` (DEC-1225)
+
+Cause: stale tests. `gov launch` refuses a `--model` after `--` that is not the session Sonnet (DEC-1225), and the
+W1-46 cases handed `claude-opus-5-5`. The cases now name Sonnet; no assertion dropped, no product change. Commit: the
+one carrying `Rewrite-Reason: DEC-1225` for tests/acceptance/W1-46 (`git log -1 -- tests/acceptance/W1-46`).

@@ -107,3 +107,7 @@ Filed 2026-11-17 by the ticket lead on the CTO's brief (EMERGENCY-2 §5.4, §5.6
 - The reader: `gov.memory_use.read`, `gov.memory_use.per_role_day`, and `gov memory-use [--since <day>] [--json]`.
 
 **Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
+
+## Fix: the rulesync subagent case read the memory line with its slot unfilled (F11; fixes-015a)
+
+Found 2026-11-24 in the weekly tier: `test_s6_rulesync_subagent_equals_its_composition` (6 cases) red, "lacks the shared memory line". Cause: a stale test. F11 (DAEO-3ef2) made `compose` fill every slot, so the source files hold "the `retrieve` command of your brief" where the test searched the raw `{CMD:retrieve}` form. Not a product bug (the line is there, filled). Test now looks for `fill_slots(MEMORY_LINE)`; the line's wording is still asserted. Commit 7770b67fc (Rewrite-Reason: F11); the test designer role should endorse it.

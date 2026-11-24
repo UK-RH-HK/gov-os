@@ -133,3 +133,13 @@ def test_the_twelve_sources_are_the_composition(base):
     for role in portability.ROLE_SKILLS:
         assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
             portability.compose(root, role), role
+
+
+def test_compose_fills_every_slot_of_the_template_body(project):
+    """F11 (DAEO-3ef2): a role file is written for no ticket, so no `{CMD:..}`/`{KEY}` slot is left in it."""
+    body = "Check {CMD:identity} (expect `engineer`, {ID}); work in {TREE}; ${HOME} stays.\n"
+    _write(project / "governance/kernel/templates/role-engineer.md", TEMPLATE.replace(TEMPLATE_BODY, body))
+    text = portability.compose(project, "engineer")
+    assert "{CMD" not in text and "{ID}" not in text and "{TREE}" not in text
+    assert "the `identity` command of your brief" in text and "${HOME}" in text
+    assert not portability.SLOT.search(text.replace("${HOME}", ""))

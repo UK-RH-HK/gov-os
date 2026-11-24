@@ -475,30 +475,47 @@ def refused_claude_words(command):
 # Node 22 commands (DEC-202, DEC-207)
 # --------------------------------------------------------------------------
 
-NODE_22_BIN = r"\.nvm/versions/node/v22\.23\.3/bin"
+# Rewrite-Reason: DEC-1228 (and DEC-1214 G7): the registry records a second Node 22, v22.23.5 (entry ``node-22.23.5``, the
+# REA study's), beside the stack's v22.23.3 (entry ``node``). A Node 22 command carries the PATH prefix of a Node 22 the
+# registry itself records; the nvm default v18 and any other version are no prefix (DEC-202, DEC-207).
+NODE_22_BIN = r"\.nvm/versions/node/v22\.\d+\.\d+/bin"   # any Node 22's bin: a command running it is a Node 22 command
 HOME_SPELLING = r"(?:~|\$HOME|\$\{HOME\})"
 
-# `PATH=<home>/.nvm/versions/node/v22.23.3/bin:$PATH`, as a word of its own, optionally in double quotes.
-NODE_22_PATH_PREFIX = re.compile(
-    rf"(?<!\S)PATH=\"?{HOME_SPELLING}/{NODE_22_BIN}:(?:\$PATH|\$\{{PATH\}})\"?(?!\S)"
-)
+
+def recorded_node_22_versions(registry=None):
+    """The Node 22 versions the registry records as entries: ``node`` and ``node-<version>`` entries whose version is 22.x.y,
+    as ``"22.23.3"`` (without the ``v``)."""
+    registry = load_registry() if registry is None else registry
+    return sorted({norm_version(entry.get("version", "")) for entry in entries(registry)
+                   if re.fullmatch(r"node(-\d[\w.]*)?", norm_name(entry.get("name", "")))
+                   and re.fullmatch(r"22\.\d+\.\d+", norm_version(entry.get("version", "")))})
+
+
+def node_22_path_prefix(versions):
+    """``PATH=<home>/.nvm/versions/node/v<version>/bin:$PATH``, as a word of its own, optionally in double quotes, for
+    any of ``versions``."""
+    chosen = "|".join(re.escape(version) for version in versions) or r"(?!)"
+    return re.compile(rf"(?<!\S)PATH=\"?{HOME_SPELLING}/\.nvm/versions/node/v(?:{chosen})/bin:(?:\$PATH|\$\{{PATH\}})\"?(?!\S)")
+
+
 # A Node package manager as a command word, by its bare name or by any path.
 NODE_PACKAGE_MANAGER = re.compile(r"(?<![\w.@-])(?:[^\s'\"]*/)?(?:npm|npx|pnpm|yarn|corepack)(?![\w.@/-])")
 
 
 def is_node_22_command(command):
-    """Whether the command runs a Node package manager, or anything from the ``bin`` of Node v22.23.3."""
+    """Whether the command runs a Node package manager, or anything from the ``bin`` of a Node 22."""
     return (NODE_PACKAGE_MANAGER.search(command) is not None
             or re.search(rf"{NODE_22_BIN}/[\w.-]+", command) is not None)
 
 
-def carries_node_22_prefix(command):
-    """Whether the prefix stands before the first Node package manager or Node 22 ``bin`` program of the command.
+def carries_node_22_prefix(command, versions=None):
+    """Whether the prefix of a Node 22 the registry records (``versions``, by default the registry's own) stands before the
+    first Node package manager or Node 22 ``bin`` program of the command.
 
     The text before the prefix must hold no such program, and the text after it
     must hold one.
     """
-    prefix = NODE_22_PATH_PREFIX.search(command)
+    prefix = node_22_path_prefix(recorded_node_22_versions() if versions is None else versions).search(command)
     if prefix is None:
         return False
     return not is_node_22_command(command[:prefix.start()]) and is_node_22_command(command[prefix.end():])

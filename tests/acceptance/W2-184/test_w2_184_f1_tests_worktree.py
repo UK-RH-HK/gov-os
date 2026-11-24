@@ -67,8 +67,12 @@ def repo(make_repo):
     return make_repo()
 
 
+# Rewrite-Reason: DEC-1225: a promotion launched the test designer on Opus (a model after -- other than Opus refused,
+# Opus accepted). R2: a promotion keeps its record and the table's effort and launches the table's model (the test
+# designer's C2 entry: Sonnet); a model after -- other than it is refused, it is accepted; the model's source word is
+# left open.
 def _promoted(result, reason, record):
-    return s.assert_session(result, s.OPUS, TABLE[1], criticality="C2", model_source="promotion",
+    return s.assert_session(result, TABLE[0], TABLE[1], criticality="C2", model_source=s.ANY,
                             effort_source="by criticality", promotion={"reason": reason, "record": record})
 
 
@@ -94,12 +98,13 @@ def test_f1_a_fail_open_record_on_the_ticket_branch_promotes_the_test_designer_i
     s.commit_all(repo.ticket, "the review records, on the ticket branch only")
     assert not (repo.tests / s.PROBES_REL).exists(), "the tests worktree holds probe records: the fixture is wrong"
     promotion = {"reason": FAIL_OPEN, "record": record}
-    engineer = s.assert_session(launch(ENG, TK, cwd=repo.ticket), s.OPUS, s.TABLES[ENG]["C2"][1], criticality="C2",
-                                model_source="promotion", effort_source="by criticality", promotion=promotion)
+    engineer = s.assert_session(launch(ENG, TK, cwd=repo.ticket), s.TABLES[ENG]["C2"][0],
+                                s.TABLES[ENG]["C2"][1], criticality="C2", model_source=s.ANY,
+                                effort_source="by criticality", promotion=promotion)
     assert engineer["root"] == os.path.realpath(repo.ticket), "the engineer's launch record does not name its worktree"
     _promoted(launch(TD, TK, cwd=repo.tests), FAIL_OPEN, record)
-    _promoted(launch(TD, TK, "--model", s.OPUS, cwd=repo.tests), FAIL_OPEN, record)
-    s.refused(launch(TD, TK, "--model", TABLE[0], cwd=repo.tests), TABLE[0], s.OPUS)
+    _promoted(launch(TD, TK, "--model", TABLE[0], cwd=repo.tests), FAIL_OPEN, record)
+    s.refused(launch(TD, TK, "--model", s.OPUS, cwd=repo.tests), s.OPUS, TABLE[0])
 
 
 @pytest.mark.parametrize("profile", ["STANDARD", "FULL"])
@@ -111,7 +116,7 @@ def test_f1_two_failed_records_on_the_ticket_branch_promote_the_test_designer_in
     s.commit_all(repo.ticket, "two failed review records, on the ticket branch only")
     b.assert_launched(launch(ENG, TK, cwd=repo.ticket))
     _promoted(launch(TD, TK, cwd=repo.tests), TWO_FAILED, record)
-    _promoted(launch(TD, TK, "--model", s.OPUS, cwd=repo.tests), TWO_FAILED, record)
+    _promoted(launch(TD, TK, "--model", TABLE[0], cwd=repo.tests), TWO_FAILED, record)
 
 
 @pytest.mark.parametrize("name,role", [("wbs_id", AUD), ("id", s.PRODUCT_SPEC)])

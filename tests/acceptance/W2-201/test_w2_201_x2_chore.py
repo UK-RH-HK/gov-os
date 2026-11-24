@@ -79,11 +79,23 @@ def test_x2_a_chore_asking_another_model_with_no_exceptions_file_is_refused(sand
     s.refused(_chore(sandbox, cli, x.ENGINEER, "--", "--model", x.OPUS), x.OPUS, k.EXCEPTIONS_REL)
 
 
-def test_x2_an_exception_with_no_class_lifts_a_chore_s_other_model(sandbox, project, cli):
-    """Reading (README): an entry without ``class`` is not limited by class (S4), so a chore may take it."""
+def test_x2_an_opus_exception_with_no_limiter_does_not_lift_a_chore_s_other_model(sandbox, project, cli):
+    """Rewrite-Reason: DEC-1225: this case pinned "an entry without ``class`` is not limited by class (S4), so a chore
+    may take it" and expected Opus with ``model_source`` ``exception``. R3: an entry that names Opus and carries no
+    limiter (``class``, ``task``, ``decision``) lifts nothing, for a chore too."""
     k.write_exceptions(project, {"exceptions": [{"subagent_type": x.ENGINEER, "model": "opus",
                                                  "decided": k.DECIDED}]})
     result = _chore(sandbox, cli, x.ENGINEER, "--", "--model", x.OPUS)
+    s.refused(result, x.OPUS, k.EXCEPTIONS_REL)
+
+
+def test_x2_an_opus_exception_limited_by_decision_lifts_a_chore_s_other_model_when_the_launch_names_it(
+        sandbox, project, cli):
+    """Rewrite-Reason: DEC-1225: as above, the chore's exception is now one whose ``decision`` limiter the launch meets
+    with ``--owner-named`` (a chore has no ticket and no class, so no other limiter can be met)."""
+    k.write_exceptions(project, {"exceptions": [{"subagent_type": x.ENGINEER, "model": "opus",
+                                                 "decision": ["DEC-1230"], "decided": k.DECIDED}]})
+    result = _chore(sandbox, cli, x.ENGINEER, "--owner-named", "DEC-1230", "--", "--model", x.OPUS)
     x.launched(result)
     got = x.record_of(result, "kind", "model", "model_source", "exception", "ticket")
     want = {"kind": "chore", "model": x.OPUS, "model_source": "exception", "exception": k.DECIDED, "ticket": None}

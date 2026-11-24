@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG = s.ENGINEER
@@ -28,14 +30,16 @@ def test_s3_a_launch_by_criticality_records_its_fields(project, launch):
 def test_s3_a_launch_with_a_trial_records_the_trial_id(project, launch):
     tk = s.ticket(project, ENG, "C2", tk=TK)
     s.plant_trial(project, "trial-7", tk=tk)
-    s.assert_session(launch(ENG, tk, trial="trial-7"), s.HAIKU5, "high", criticality="C2", model_source="trial",
+    s.assert_session(launch(ENG, tk, trial="trial-7"), s.TRIAL_MODEL, "high", criticality="C2", model_source="trial",
                      effort_source="trial", trial="trial-7")
 
 
 def test_s3_a_promoted_launch_records_the_promotion_reason_and_the_record(project, launch):
     tk = s.ticket(project, ENG, "C2", tk=TK)
+    # Rewrite-Reason: DEC-1225: a promotion launched on Opus. R2: it keeps its record and the table's effort and
+    # launches the table's model (the engineer's C2 entry: Sonnet); the model's source word is left open.
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk), s.OPUS, "high", criticality="C2", model_source="promotion",
+    s.assert_session(launch(ENG, tk), s.TABLES[ENG]["C2"][0], "high", criticality="C2", model_source=s.ANY,
                      effort_source="by criticality",
                      promotion={"reason": "two failed reviews", "record": record})
 
@@ -56,9 +60,9 @@ def test_s3_a_default_only_launch_with_a_criticality_file_records_the_criticalit
                      effort_source="role default")
 
 
-@pytest.mark.parametrize("model", [s.OPUS, s.SONNET, s.HAIKU5, s.HAIKU_DATED])
+@pytest.mark.parametrize("model", [s.SONNET, "claude-sonnet-4-5-20250929"])
 def test_s3_the_tier_is_the_family_word_of_the_model(project, launch, model):
-    """``claude-haiku-4-5-20251001`` is ``haiku``, as ``claude-haiku-5-5`` is."""
+    """``claude-sonnet-4-5-20250929`` is ``sonnet``, as ``claude-sonnet-5-5`` is."""
     s.write_role(project, ENG, table=None, default=(model, "medium"))
     tk = s.ticket(project, ENG, "C2", tk=TK)
     record = launch(ENG, tk).record()

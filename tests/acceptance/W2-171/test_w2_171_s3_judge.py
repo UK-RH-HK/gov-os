@@ -40,7 +40,8 @@ PINNED = {
 GRADER_FORM = "Question: {question}\n\nGold answer: {gold}\n\nAnswer to grade: {said}"
 ROW_KEYS = {"id", "kind", "apart", "final_verdict", "attempts", "answered_at", "gold_in_bundle", "citation_right",
             "grades", "searches", "search_failures", "citations", "citations_outside",
-            "citation_right_only_outside", "calls_retried", "first_stopping_reason", "first_gaps_name_ids"}
+            "citation_right_only_outside", "calls_retried", "first_stopping_reason", "first_gaps_name_ids",
+            "forbidden_cited"}  # DEC-1227 D5: the row says whether a forbidden path was cited
 
 
 def sha(text: str) -> str:
@@ -145,8 +146,10 @@ def test_s3_the_calls_carry_the_fresh_80s_prompts_models_budgets_and_flags(make_
     world = make_world("judged:five")
     calls = world.claude_calls()
     assert {c["kind"] for c in calls} == {"reader", "grader", "check"}
-    want = {"reader": ("claude-opus-5-5", "1.5", PINNED["READER_SYS"], PINNED["READER_SCHEMA"]),
-            "grader": ("claude-opus-5-5", "0.5", PINNED["GRADER_SYS"], PINNED["GRADER_SCHEMA"]),
+    # Rewrite-Reason: DEC-1225 (R4): the reader and the grader ran claude-opus-5-5 (the check Sonnet); all three run
+    # claude-sonnet-5-5 now (DEC-1225 (4): the first fresh 80 graded on Sonnet is the new baseline)
+    want = {"reader": ("claude-sonnet-5-5", "1.5", PINNED["READER_SYS"], PINNED["READER_SCHEMA"]),
+            "grader": ("claude-sonnet-5-5", "0.5", PINNED["GRADER_SYS"], PINNED["GRADER_SCHEMA"]),
             "check": ("claude-sonnet-5-5", "0.5", PINNED["GRADER_SYS"], PINNED["GRADER_SCHEMA"])}
     for call in calls:
         argv = call["argv"]

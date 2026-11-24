@@ -52,23 +52,28 @@ COPY_FOLDERS = (".rulesync/subagents", "template/.rulesync/subagents", ".claude/
 LOCATIONS = (ROLES_REL,) + COPY_FOLDERS
 
 # --------------------------------------------------------------------------
-# S1: the table (audit 4 Table 3, DEC-1212 (3), DEC-1214 K1), as the ticket's S1 states it
+# S1 / R1: the table (audit 4 Table 3 as DEC-1225 (1) revises it)
 # --------------------------------------------------------------------------
+# Rewrite-Reason: DEC-1225: S1's TABLE gave Opus at C3 to engineer, independent-test-designer, independent-auditor and
+# qa-engineer, Haiku at C0, and a `Launch by criticality` line for those four. DEC-1225 (1): Opus only for each app's
+# CTO (orchestrator) and the senior engineer; every other role Sonnet, high, at every class and profile, so no table
+# line (R1).
 
-_H, _S, _C0 = (OPUS, "high"), (SONNET, "high"), (HAIKU, "low")
-_VARIES = {"C3": _H, "C2": _S, "C1": _S, "C0": _C0}
+_H, _S = (OPUS, "high"), (SONNET, "high")
 # role -> (Launch default (model, effort), {class: (model, effort)} or None for no table line)
 TABLE = {
     "orchestrator": (_H, None),
     "senior-engineer": (_H, None),
-    "ticket-lead": (_S, None),
-    "engineer": (_S, _VARIES),
-    "independent-test-designer": (_S, _VARIES),
-    "independent-auditor": (_S, _VARIES),
-    "qa-engineer": (_S, _VARIES),
+    "ticket-lead": ((SONNET, "medium"), None),   # Rewrite-Reason: F14 (fixes-015a): a ticket lead runs medium
+    "engineer": (_S, None),
+    "independent-test-designer": (_S, None),
+    "independent-auditor": (_S, None),
+    "qa-engineer": (_S, None),
     "product-spec": (_S, None),
     "research": (_S, None),
 }
+# What the Opus and Haiku model ids may name in the role files and criticality.yaml (R1's scan)
+OPUS_ROLES = ("orchestrator", "senior-engineer")
 
 
 def plant_role_copy(tmp, location, role):
@@ -201,8 +206,24 @@ def run_hook(project, event, base=None):
 
 
 def let_through(run):
+    """Exit 0. A spawn that names no model comes back with its input whole and ``model`` ``sonnet`` (F13, the hook
+    writes the model into the spawn, PreToolUse ``updatedInput``); one that names a model prints nothing, or the
+    same input unchanged."""
     assert run.code == 0, f"the hook did not let the spawn through (exit 0)\n{run.describe()}"
-    assert run.stdout.strip() == "", f"the hook let the spawn through but wrote to stdout\n{run.describe()}"
+    try:
+        event = json.loads(run.event)
+        sent = event["tool_input"] if event.get("tool_name") in ("Agent", "Task") else None
+    except (ValueError, KeyError, AttributeError, TypeError):
+        sent = None
+    if isinstance(sent, dict) and not str(sent.get("model") or "").strip():
+        out = json.loads(run.stdout)["hookSpecificOutput"]
+        assert out["permissionDecision"] == "allow", run.describe()
+        assert out["updatedInput"] == {**sent, "model": "sonnet"}, run.describe()
+        return
+    if run.stdout.strip():
+        assert sent is not None, f"the hook wrote to stdout for an event that is not a spawn\n{run.describe()}"
+        out = json.loads(run.stdout)["hookSpecificOutput"]
+        assert out["updatedInput"] == sent, f"the hook changed a spawn that named a model\n{run.describe()}"
 
 
 def refused(run, *words):
@@ -264,24 +285,22 @@ def record_values(result, *keys):
 
 
 # --------------------------------------------------------------------------
-# S9: the owner's temporary substitution file (DEC-1215), in the real file's form
+# R3: Fable (DEC-1225 (3): no session runs Fable)
 # --------------------------------------------------------------------------
+# Rewrite-Reason: DEC-1225: S9 planted DEC-1215's substitution file (`governance/project/model-substitution.yaml`) in
+# four states and judged Fable as Opus while it was active. The file and its readers are gone (R3), so the states are
+# gone; what is kept is the two names Fable goes by, and `plant_substitution_file`, which plants a file in the old
+# form to show that nothing reads it any more.
 
 FABLE = "claude-fable-5-2"
 FABLE_NAMES = ("fable", FABLE)
 SUBSTITUTION_REL = "governance/project/model-substitution.yaml"
-FAR_FUTURE, LONG_PAST = "2099-01-01T09:00:00+00:00", "2020-01-01T09:00:00+00:00"
-# state -> (active, until); "none" plants no file
-SUBSTITUTION_STATES = {"active": (True, FAR_FUTURE), "inactive": (False, FAR_FUTURE), "past-until": (True, LONG_PAST)}
-SUBSTITUTION_OFF = ("none", "inactive", "past-until")
 
 
-def plant_substitution(project, state):
-    """``governance/project/model-substitution.yaml`` in ``project`` in one state of SUBSTITUTION_STATES (from Opus to
-    Fable, effort high, the keys of the real file); ``"none"`` plants nothing. Returns the project."""
-    if state != "none":
-        active, until = SUBSTITUTION_STATES[state]
-        data = {"active": active, "from": OPUS, "to": FABLE, "effort": "high", "until": until,
-                "decided": "DEC-1215 (W2-201 fixture)"}
-        b.write(Path(project) / SUBSTITUTION_REL, yaml.safe_dump(data, sort_keys=False))
+def plant_substitution_file(project):
+    """DEC-1215's file in its old form, active until far in the future (Opus to Fable): R3 says no reader of it is left,
+    so a launch or a spawn that names Fable is refused with it there as without it."""
+    data = {"active": True, "from": OPUS, "to": FABLE, "effort": "high", "until": "2099-01-01T09:00:00+00:00",
+            "decided": "DEC-1215 (W2-201 R3 fixture)"}
+    b.write(Path(project) / SUBSTITUTION_REL, yaml.safe_dump(data, sort_keys=False))
     return Path(project)

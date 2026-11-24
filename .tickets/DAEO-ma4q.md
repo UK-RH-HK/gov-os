@@ -213,3 +213,62 @@ question text has no key and is not a problem.
   --projects <planted>`; the `fresh` close (`SCAN <audit> clean`) agrees on the second.
 
 **Landed:** merged into `w2/integrate` at `cc857b977` on 2026-11-20 by hand (the CTO); on the merged tree W2-204, W2-198, W2-208 and the memaudit and opt-in units: 653 passed. EXAMIN's reproduction on the real transcripts: VOID with 1,025 findings on the base, clean on the fix. For release 0.1.5.
+
+## Fix: the strict forbidden-citation rule in the product's own grading (DEC-1227 D5 (a))
+
+Found in the 0.1.4 proving run (`docs/emergency-2/W2-81-PROVING-RUN-0.1.4-ANALYSIS.md`, rows T7 and line 169): W2-81's
+scorer counts an answer wrong when it cites a forbidden (stale, superseded, legacy) source; the product's
+`judge.one` sets `citation_right` from gold alone and `prompts.outcome` has no forbidden concept, so 24 of the proving
+run's 30 misses would have been graded right by the product. The owner (DEC-1227 D5 (a)) keeps W2-81's strict rule and
+applies it to the product's own measure, so EXAMIN's 95 % is graded the way the proving run is. Kind: a fix, no new
+ticket; the ticket stays closed; `Fix:` trailer. The test designer's cases are red on the base first. Code is C3
+(`src/gov/memaudit/**`); every helper Sonnet (DEC-1225).
+
+W2-81's rule, which the product now follows: `citation_right = (a cited place holds a gold line) and (no cited path is a
+forbidden path)`; the answer is right only when the grade is `correct` and `citation_right` (a path matches a forbidden
+path by equality, as W2-81's `cited` does). Correct + gold + forbidden cited = wrong. `prompts.py` stays untouched (its
+hash is pinned by `test_prompts.py`): the rule lives in `judge.py`'s `citation_right`, which `prompts.outcome` reads.
+
+- **S1 A question may name forbidden sources.** A question file may hold `forbidden: [<repository path>, ...]` (a list of
+  non-empty path strings, W2-81's shape; absent = none). Verify: a set with and without the field both load and pass the
+  pre-flight; a malformed one (not a list, an empty list item, a non-string item) is `PF-FORM`, naming the question's id.
+- **S2 Citing a forbidden source makes the answer wrong,** whatever the grader says. Verify: planted grades through
+  `judge`: correct + gold cited = right; correct + forbidden cited = wrong; correct + gold and forbidden cited = wrong;
+  grade wrong = wrong; no forbidden list = as before. One function (`gov.memaudit.matcher`) holds the rule, and a
+  parity test pins it against W2-81's `judge_question` on the same planted cases.
+- **S3 The question writer is told to name the forbidden sources** where a stale or superseded source exists for a
+  question (the generated writer brief's form and rubric text; the checker's input form names the field). Verify: the
+  generated briefs hold the `forbidden` field and the instruction; kernel text is untouched.
+- **S4 The record says it.** `FIGURES.json` holds `forbidden_rule: "strict"` and `misses.forbidden_cited` (the
+  forbidden-cited misses counted apart, a subset of `misses.total`) (the five printed verdict lines are unchanged). Verify: a
+  planted run with a forbidden citation gives the count 1 and the key; with none, 0.
+
+## Fix: the figure carries a stamp, and a figure without it is not compared (F15)
+
+Found 2026-11-22 (fixes-015a): `FIGURES.json` named no release, commit or model, so a run of one release could be set beside a
+figure of another, and a strict-rule run (D5) could be declared with no question that carries a `forbidden` list, a rule that
+then cannot fail. Owner-fixed: no opt-out flag. Kind: a fix, no new ticket; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-204/test_w2_204_fix_figure_stamp.py` (README ids success-17 to success-19; 8 red, 2 guards on the base).
+Code: `FIGURES.json` and the printed run carry `release` (`pyproject.toml` version), `commit` (the declared audit commit),
+`reader_model`, `grader_models`, `forbidden_rule`, `questions_with_forbidden` (`figures.py`, `judge.py`; the fresh run's
+stamp line goes to standard error through `say.say_stderr`, so its two verdict lines keep their form, `fresh.py`); a standing
+line copies the stamp (`driver.py`); `declare` refuses with `DC-FORBIDDEN` when no question carries a list (`declare.py`);
+`standing.drift` returns `comparable: false`, `missing: [...]` and `word: null`, and writes nothing, when either the fresh
+figure or one of the four lines lacks a stamp key (`standing.py`). Fixtures: the planted question sets carry a `forbidden` list
+(`tests/unit/memaudit/conftest.py`, `w2_171_world.py`, `w2_204_support.py`: the first question, when no spec lists one, and
+not when a case passes its own specs to `prepare`, so S18's case stays red-to-green), the stamp keys in the key-set pins of
+`test_judge.py` and `test_w2_171_s6_figures.py` and in W2-171's expected figures, the stamp on the planted lines of
+`test_standing.py` (each marked `# Rewrite-Reason:`). Verified: `tests/unit/memaudit`, W2-171, W2-204: 738 passed, 1 skipped,
+1 failed (`test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files`, red on the base: it diffs against
+`2f0c07bcb`, and `w2/integrate` holds the models-rubric merge after it).
+
+## Fix: declare notices, never refuses, a set with no forbidden list (fix-dc-forbidden, 2026-11-24)
+
+F15 made `gov memaudit declare` refuse (`DC-FORBIDDEN`) a set where no hidden question carries a `forbidden` list; W2-187's
+standing sets have none, so 42 cases failed in the 0.1.5 full suite. The CTO's ruling: a set with no forbidden list is
+legitimate. `declare` now never refuses for it: it prints `NOTICE DC-FORBIDDEN-NONE: no question carries a forbidden list;
+the strict rule grades as the lenient rule would`, and `DECLARATION.json` carries `forbidden_lists: <count>`; verdict and
+exit code unchanged. Two further causes of the remaining W2-187 reds, found on the way: the fresh figures line printed by
+`digest.figures` omitted the six stamp keys, so `standing.drift` never compared a real fresh run ("DRIFT not yet"), now
+copied from FIGURES.json; and W2-187's planted standing lines carried no stamp (fixture stamped). Tests: W2-204 S18 revised
+(Rewrite-Reason in its commit), W2-187 `std_line` stamped.

@@ -40,7 +40,7 @@ non_goals:
 - 'The box (`.gov-runtime/scratch/orchestrator/drafts/session-sandbox/`): scratch, archived by the CTO later.'
 sources: [EMERGENCY-2 2.1, EMERGENCY-2 2.2, EMERGENCY-2 6.1, docs/emergency-2/audits/05-repository.md]
 acceptance_tests:
-  path: tests/acceptance/
+  path: tests/acceptance/E2-retire-guard/
   author: none new (a retirement); the independent test designer deletes the acceptance tests whose subject is the guard or the sandbox and repoints the imports of the rest
 track: A
 ---
@@ -49,3 +49,16 @@ track: A
 EMERGENCY-2 §6.1 rows "The guard (PreToolUse hook, its rules and parser): switched off now; retired" and "The sandbox (SANDBOX-1 in gov launch); the box: switched off now; retired"; §2.1, §2.2. A retirement, not a feature: no new acceptance tests; tests whose subject is the retired guard or sandbox are deleted, tests of what stays are kept green.
 
 **Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
+
+## Fix: the ticket names no whole tree as its acceptance folder (L2-4, DEC-1217 (1))
+- **The bug (found by the L2-4 lead's proving landing, 2026-11-20):** this ticket declared `acceptance_tests.path:
+  tests/acceptance/` (a retirement writes no acceptance test of its own) and holds `src/gov/**` and `tests/unit/**` in
+  its `allowed_paths`. The selection reads a path a ticket with a suite holds as selecting that suite, so every change
+  under `src/gov/**` or `tests/unit/**` selected the whole `tests/acceptance/` and `gov queue` refused it,
+  `SELECTION_REFUSED: the selection would run the whole of tests/acceptance/`. It has refused every such landing since
+  this ticket closed (2026-11-18), behind the unplaced-path refusal of W2-115b's fix. No other ticket has this shape.
+- **The fix:** `acceptance_tests.path` is `tests/acceptance/E2-retire-guard/`, the folder the ticket's own id would
+  have (it holds no test, so the ticket holds no suite and its paths place nothing). The test is written first, red on
+  the base, by the independent test designer: `tests/unit/close/test_live_tickets_name_no_whole_suite.py` (no ticket
+  of the live tree names a whole tree as its suite). Commits carry `Task: DAEO-gr7t` and a `Fix:` trailer. The ticket
+  stays closed.

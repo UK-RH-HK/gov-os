@@ -107,11 +107,12 @@ TICKET_OF = {
 PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", ".claude/hooks", ".claude/skills",
                      SETTINGS_REL, "pyproject.toml", ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL,
                      ":(exclude)template/governance/kernel/vendor")
+# Rewrite-Reason: DEC-1225 (every role launches Sonnet, so the fixture model is Sonnet).
 # W2-60a (DAEO-cv58; P-8 (a)): gov launch refuses a model after ``--`` that is not the role file's (DEC-839 item 1).
-# The launch cases here hand a worker ``--model claude-opus-5-5`` after ``--``; the project's copies of the worker role
+# The launch cases here hand a worker ``--model claude-sonnet-5-5`` after ``--``; the project's copies of the worker role
 # files say that model at effort high (the rest of each file, its version and skills lines included, is this
 # repository's). A live case still sets Haiku at effort low on its own copy (``set_live_launch_default``).
-FIXTURE_MODEL = "claude-opus-5-5"
+FIXTURE_MODEL = "claude-sonnet-5-5"
 FIXTURE_LAUNCH_DEFAULT = f"- **Launch default:** model {FIXTURE_MODEL}, effort high"
 PROJECT_FILES = {
     "README.md": "# Launch fixture project\n",

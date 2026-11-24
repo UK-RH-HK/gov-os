@@ -360,3 +360,40 @@ this README's; the lead numbers its packages.)
   still run, with the judge's interpreter (W1-26 runs declared commands as written).
 
 - **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_59_support.session_env` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
+
+## Fix: no hit@5 floor and no hard-blocking kit check on hit@k (audit N-14; DEC-1210, DEC-1233, EMERGENCY-2 5.2)
+
+Written by the independent test designer from the fix's behaviour, before any implementation of it. "hit@5 I DON'T CARE
+if it's even 10%": hit@k is a reported diagnostic only. The runner of `gov accept` reads only KPI cells that name
+`success N` or `failure N`, and a fix has no line of its own in the ticket, so each row of this map is read as
+`Failure 1` (the fix is named in its cell), as W2-52's and W2-88's fix rows are.
+
+`test_w2_59_baseline.py::test_the_installed_check_reads_its_thresholds_from_the_installed_package` became
+`test_the_installed_check_reads_its_threshold_from_the_installed_package` (`local_only`, as before): the installed package's one
+baseline is the forbidden-citation count, which the measured check still prints, and its `hit@5:` line carries no threshold. The
+project's decoy baseline still holds other numbers. Revised with a Rewrite-Reason (DEC-1210, DEC-1233, EMERGENCY-2 5.2).
+Its other cases need `retrieve_baseline.yaml` shipped in the wheel, which stays (`forbidden_citations`).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| Failure 1 (nofloor-1: the installed check prints its hit@5 with no threshold, revised case) | `test_w2_59_baseline.py::test_the_installed_check_reads_its_threshold_from_the_installed_package` | red: the line reads `hit@5: 100.0 (baseline: 80.0)` |
+
+**Red run on the base:** the revised case red; the other 3 cases of the file green.
+
+## Fix F3: `gov --version` in a pinned install prints its commit (fixes-015a, release 0.1.5)
+
+`gov --version` is W2-59's (DAEO-kh9l, success 5). The fix line, numbered after the ticket's five success lines:
+
+- **success-6:** `gov --version` run from an installed wheel (no git repository around it) prints the commit the wheel was
+  built from, not `commit unknown`; from a source checkout it prints that repository's git head as before.
+
+The wheel is built through `gov.release._wheel(repo, commit)` (the route shared by release, install and update) from a
+small repository holding a copy of this tree's `src/` and `pyproject.toml`; the test names no build-info file.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-6 | `test_w2_59_fix_version_commit.py::test_the_installed_wheel_prints_the_commit_it_was_built_from` | red: `gov 0.1.4 (commit unknown)` |
+| success-6 | `test_w2_59_fix_version_commit.py::test_the_installed_wheel_inside_another_repository_still_prints_its_own_commit` | red: names no commit |
+| success-6 | `test_w2_59_fix_version_commit.py::test_a_source_checkout_still_prints_its_git_head` | green today (guard) |
+
+**Red run on the base:** 2 red, 1 green.

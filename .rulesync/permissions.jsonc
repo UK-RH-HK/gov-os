@@ -1,15 +1,10 @@
 {
   "permission": {
-    "read": {
-    },
-    "edit": {
-      "**/.env*": "deny",
-      "**/*.pem": "deny",
-      "**/*.key": "deny",
-      "config/secrets*": "deny"
-    },
     "bash": {
-      "sudo:*": "deny"
+      "git push:*": "deny",
+      "git push *": "deny",
+      "sudo:*": "deny",
+      "sudo *": "deny"
     }
   }
 }

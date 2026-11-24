@@ -80,7 +80,7 @@ from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as 
 from gov.launch.store import main_root as main_store_root
 from gov.spend import brake as spend_brake
 from gov.util import runs
-from gov.util.freeze import freeze_state
+from gov.util.freeze import freeze_state, paused_error
 from gov.util.gitenv import git_binary, git_env
 from gov.util.parts import load_yaml_unique
 from gov.util.tickets import _load_ticket
@@ -102,6 +102,11 @@ TESTS_SUFFIX = "-tests"  # W2-60b S10: the tests worktree and its branch are the
 # environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
 LEAD_ROLES = ("lead", "orchestrator")
 LEAD_GOV_ROLE = "orchestrator"
+# DEC-1225: Opus only for the two orchestrating roles' own sessions (the CTO and the senior engineer, started by their
+# own start lines); every session ``gov launch`` starts runs Sonnet. A lead gets this model added by the launcher.
+LEAD_MODEL = "claude-sonnet-5-5"
+LEAD_EFFORT = "medium"  # fixes-015a F14: a lead runs Sonnet at medium (ticket-lead.md's default line says the same)
+LEAD_MCP_ROLE = "ticket-lead"  # the role file whose MCP list a lead (launched as lead or orchestrator) carries
 # W2-153 (DEC-1050, W2-128 TPL-4): the role -> template map. The template is the session's appended system prompt;
 # gov.adapters.portability reuses the map for the subagent sources and the template copies.
 ROLE_TEMPLATES = {
@@ -135,7 +140,9 @@ PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
 BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
 # W2-56 S6 (DEC-826 Q5): arguments that add context or replace the role's prompt; refused alone, with a spaced value
 # and in the ``=`` form, wherever they stand after ``--``. Emergency 2: the guard's own (--restricted, --safe-mode) go.
-CONTEXT_FLAGS = ("--agents", "--plugin-dir", "--plugin-url", "--mcp-config", "--system-prompt")
+CONTEXT_FLAGS = ("--agents", "--plugin-dir", "--plugin-url", "--system-prompt")
+MCP_FLAG = "--mcp-config"  # fixes-015a F1: accepted only for what the role's MCP list allows (``_mcp_args``)
+CONNECTORS_ENV = "ENABLE_CLAUDEAI_MCP_SERVERS"  # set to false in every session's process environment
 GUARD_FLAGS = CONTEXT_FLAGS  # the former name, for its readers
 # W2-56 D-12: a worker's temp folder, short enough that its code-graph daemon folders fit the tool's socket (107
 # bytes, DEC-338); the prefix is what the weekly sweep (DEC-902) and the code index (``gov.codeintel``) look for.
@@ -356,10 +363,9 @@ def _check_not_paused(root: Path) -> None:
         roots.add(record.main_checkout(root, "the freeze flag gov pause sets"))
     except GovError:
         pass
-    for each in sorted(roots, key=str):
-        if freeze_state(str(each)) == "frozen":
-            raise _refuse(f"the project is paused (gov pause set {each}/.gov-runtime/freeze): no session starts "
-                          f"until the owner lifts it with gov pause --off (CAP-05)")
+    error = paused_error(*roots)
+    if error is not None:
+        raise error
 
 
 def _check_role_settings(data: dict, rel: str) -> None:
@@ -393,6 +399,55 @@ def _check_cli_args(cli_args: list[str]) -> None:
         if name in CONTEXT_FLAGS:
             raise _refuse(f"the CLI arguments carry {name}: it adds context to a worker session or replaces its "
                           f"role's prompt (DEC-826 Q5)")
+
+
+def _mcp_value(arg: str, value: str | None) -> str | None:
+    """The value of a caller's ``--mcp-config`` (spaced or ``=``), ``None`` when ``arg`` is not one."""
+    if arg == MCP_FLAG:
+        return value if value is not None else ""
+    if arg.startswith(MCP_FLAG + "="):
+        return arg[len(MCP_FLAG) + 1:]
+    return None
+
+
+def _mcp_servers(raw: str) -> list[str]:
+    """The server names a ``--mcp-config`` value holds, inline JSON or the path of a JSON file; refused when it cannot
+    be read as ``{"mcpServers": {...}}``."""
+    text = raw
+    if not raw.lstrip().startswith("{"):
+        try:
+            text = Path(raw).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            raise _refuse(f"the CLI arguments carry {MCP_FLAG} {raw}, which is neither JSON nor a file that can be "
+                          f"read") from None
+    try:
+        data = json.loads(text)
+    except ValueError:
+        raise _refuse(f"the CLI arguments carry {MCP_FLAG} that is not JSON") from None
+    servers = data.get("mcpServers") if isinstance(data, dict) else None
+    if not isinstance(servers, dict):
+        raise _refuse(f"the CLI arguments carry {MCP_FLAG} with no 'mcpServers' map")
+    return [str(name) for name in servers]
+
+
+def _mcp_args(root: Path, role: str, cli_args: list[str]) -> list[str]:
+    """fixes-015a F1: the launcher's own ``--mcp-config`` for every session, a lead's too: one server per name in the
+    role file's ``- **MCP tools:**`` line (``{"mcpServers": {}}`` for none), always after ``--strict-mcp-config`` so
+    that no connector of the account loads. A caller's ``--mcp-config`` after ``--`` is accepted only when every
+    server it holds is in the role's list; otherwise refused, naming the flag and the server."""
+    lead = role in LEAD_ROLES
+    listed = roles.mcp_tools(root, LEAD_MCP_ROLE if lead else role, required=not lead)
+    for arg, value in zip(cli_args, [*cli_args[1:], None]):
+        raw = _mcp_value(arg, value)
+        if raw is None:
+            continue
+        for name in _mcp_servers(raw):
+            if name not in listed:
+                raise _refuse(f"the CLI arguments carry {MCP_FLAG} with the server '{name}', which the role file of "
+                              f"'{role}' does not list in its '{roles.MCP_HEAD}' line "
+                              f"({', '.join(listed) if listed else 'it lists none'}): a session loads no other MCP "
+                              f"server (fixes-015a F1)")
+    return [MCP_FLAG, json.dumps({"mcpServers": {name: {} for name in listed}})]
 
 
 def template_args(root: Path, role: str) -> list[str]:
@@ -714,46 +769,70 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
             table_source = "by criticality"
         else:
             table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    if not model_exceptions.is_sonnet(table_model):
+        # fixes-015a F19 (DEC-1225): the rubric gives every launched role Sonnet; a role file's table or default line
+        # naming another model never starts it, whatever the file says. Only an exceptions entry runs another model.
+        table_model = LEAD_MODEL
     trial = _trial(root, trial_id, role, ticket_class, names) if trial_id is not None else None
 
-    # the model: promotion, trial, probe (only where it changes the model), then the table's
-    if promotion is not None:
-        model, model_source, why = opus, "promotion", f"a promotion applies ({promotion['reason']})"
-    elif trial is not None:
-        model, model_source, why = trial["model"], "trial", f"the trial {trial_id}'s"
-    elif probe and opus != table_model:
-        model, model_source, why = opus, "probe", f"the second review is the probe ({opus})"
-    else:
-        model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
+    # the model (DEC-1225): the table's, or the trial's; a promotion's or probe's Opus only where an exceptions entry for
+    # this role, ticket and --owner-named covers it (resolved after the table's model is known)
     exception = None
-    if given["model"] is not None:
-        if given["model"] != model:
-            # W2-201 S4 (DEC-1212 (2), DEC-1214 K1): another model only by an entry of the exceptions file, and only
-            # where the table decides: a promotion, a trial and the probe stay as they are
-            shown = ticket_class if ticket_class is not None else \
-                "none (a chore has no ticket)" if chore else f"none (no {crit.REL})"
-            refusal = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
-                       f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3)); another model comes "
-                       f"only from an exception in {model_exceptions.REL} (DEC-1212 (2))")
-            substituted = roles.substitution_active(root)
-            if substituted and model_exceptions.names_opus(given["model"]):
-                # W2-201 S9 (DEC-1215): as the helper hook refuses an Opus spawn, whatever the exceptions file holds
-                raise _refuse(f"the CLI arguments carry --model {given['model']}: while the owner's temporary "
-                              f"substitution is active (DEC-1215, {roles.SUBSTITUTION_REL}) every Opus role runs "
-                              f"Claude Fable 5.2 instead; name no model, or 'fable' (claude-fable-5-2) where an "
-                              f"exception in {model_exceptions.REL} covers it")
-            if model_source != table_source:
-                raise _refuse(refusal)
+    if promotion is not None or probe:
+        entry = None  # an exceptions file that is missing or unreadable covers nothing: the model stays the table's
+        if opus != table_model:
             try:
-                entry = model_exceptions.find(root, role, given["model"], ticket_class, substituted)
-            except GovError as error:
-                raise _refuse(f"{refusal}: {error.message}") from None
-            if entry is None:
-                raise _refuse(f"{refusal}: it holds none for '{role}' with that model"
-                              f"{' and class' if ticket_class is not None else ''}")
+                entry, _ = model_exceptions.find(root, role, opus, ticket_class, ticket_id, owner_named)
+            except GovError:
+                pass
+        if entry is not None:
+            model, exception = opus, str(entry.get("decided"))
+            model_source = "promotion" if promotion is not None else "probe"
+            why = (f"a promotion applies ({promotion['reason']})" if promotion is not None
+                   else f"the second review is the probe ({opus})")
+    if exception is None and trial is not None:
+        model, model_source, why = trial["model"], "trial", f"the trial {trial_id}'s"
+    elif exception is None:
+        model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
+    shown = ticket_class if ticket_class is not None else \
+        "none (a chore has no ticket)" if chore else f"none (no {crit.REL})"
+
+    def lifted(asked: str, said: str) -> dict:
+        """The entry of the exceptions file that lets ``asked`` start, or the refusal (DEC-1225): no session runs
+        Fable, and any model but Sonnet needs an entry whose limiters this launch meets."""
+        if model_exceptions.names_fable(asked):
+            raise _refuse(f"{said}: no session runs Fable, whatever {model_exceptions.REL} holds (DEC-1225 (3))")
+        try:
+            entry, unmet = model_exceptions.find(root, role, asked, ticket_class, ticket_id, owner_named)
+        except GovError as error:
+            raise _refuse(f"{said}: {error.message}") from None
+        if entry is None:
+            raise _refuse(f"{said}: only a comprehensive audit the owner asks for runs another model, from an entry "
+                          f"in {model_exceptions.REL} whose limiters the launch meets (DEC-1225 (2)); "
+                          f"{'limiter not met: ' + '; '.join(unmet) if unmet else 'it holds none for ' + repr(role) + ' with that model'}")
+        return entry
+
+    if given["model"] is not None:
+        if model_exceptions.names_fable(given["model"]):
+            raise _refuse(f"the CLI arguments carry --model {given['model']}: no session runs Fable, whatever "
+                          f"{model_exceptions.REL} holds (DEC-1225 (3))")
+        if given["model"] != model:
+            # W2-201 S4, R2 (DEC-1212 (2), DEC-1225): another model only by an entry of the exceptions file whose
+            # limiters this launch meets, and only where the table decides: a trial stays as it is
+            said = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
+                    f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3), DEC-1225)")
+            if (promotion is not None or probe or trial is not None) and exception is None:
+                raise _refuse(f"{said}; another model comes only from an exception in {model_exceptions.REL} "
+                              f"(DEC-1225)")
+            entry = lifted(given["model"], said)
             model, model_source, exception = given["model"], "exception", str(entry.get("decided"))
         elif model_source == table_source:
             model_source = "after --"
+    if exception is None and model_source == "trial" and not model_exceptions.is_sonnet(model):
+        # the one choke point behind the trial's file: a trial that names a model other than Sonnet needs the same entry
+        entry = lifted(model, f"the session's model {model} ({why}; the ticket's class is {shown}) is not Sonnet "
+                              f"(DEC-1225)")
+        exception = str(entry.get("decided"))
 
     # the effort: trial, after --, probe, then the table's
     own = True
@@ -839,6 +918,49 @@ def _worker_plan(root: Path, role: str, ticket_id: str | None, given: dict, temp
             "composed": composed, "projection_usd": projection_usd, "kind": kind}
 
 
+def _lead_model_args(root: Path, role: str, ticket_id: str | None, cli_args: list[str]) -> list[str]:
+    """DEC-1225 (R2): the arguments that give a lead its model: ``--model <LEAD_MODEL>`` added by the launcher (the CLI's
+    own default, the CTO's Opus, is never a lead's model), or none when the caller's ``--model`` is that model (not
+    doubled). Any other ``--model`` refuses (``LAUNCH_REFUSED``) unless an entry of the exceptions file for this role
+    and model has every limiter met by this launch; a lead takes no ``--owner-named``, so no decision limiter is met.
+    Fable is refused whatever the file holds."""
+    asked: dict = {}
+    for arg, value in zip(cli_args, [*cli_args[1:], None]):
+        found = _given_value("--model", arg, value, asked)
+        if found is not None:
+            asked["--model"] = found
+    model = asked.get("--model")
+    if model is None:
+        return ["--model", LEAD_MODEL]
+    if model == LEAD_MODEL:
+        return []
+    said = (f"the CLI arguments carry --model {model} for a lead ({role}): a lead runs {LEAD_MODEL} (DEC-1225); "
+            f"another model comes only from an entry of {model_exceptions.REL}")
+    if model_exceptions.names_fable(model):
+        raise _refuse(f"{said}; no session runs Fable, whatever the file holds (DEC-1225 (3))")
+    ticket_class = None
+    if ticket_id is not None and crit.exists(root):
+        ticket = _load_ticket(str(root), ticket_id)
+        try:
+            ticket_class = crit.ticket_criticality(root, ticket) if ticket is not None else None
+        except GovError:
+            ticket_class = None
+    try:
+        entry, unmet = model_exceptions.find(root, role, model, ticket_class, ticket_id, None)
+    except GovError as error:
+        raise _refuse(f"{said}: {error.message}") from None
+    if entry is None:
+        raise _refuse(f"{said} whose limiters the launch meets; "
+                      f"{'limiter not met: ' + '; '.join(unmet) if unmet else 'it holds none for ' + repr(role) + ' with that model'}")
+    return []
+
+
+def _lead_effort_args(cli_args: list[str]) -> list[str]:
+    """fixes-015a F14: ``--effort medium`` for a lead, or none when the caller's own ``--effort`` stands (not doubled)."""
+    given = any(arg == "--effort" or arg.startswith("--effort=") for arg in cli_args)
+    return [] if given else ["--effort", LEAD_EFFORT]
+
+
 def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
     """W2-60a, once the temp folder exists: the appended file written, the launch record written before the session
     starts and keyed by its id, and the launcher's own arguments: those before the caller's, and the one appended
@@ -869,7 +991,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         data["projection_usd"] = plan["projection_usd"]
     written = record.write(plan["records"], data)
     plan["session_id"] = session_id  # W2-205 RT-5: the registry entry records it, for a relaunch
-    head = [*OWN_SWITCHES, *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
+    head = [*OWN_SWITCHES, *plan.get("mcp", []), *plan.get("mode", []), *([] if given["model"] else ["--model", model]),
             *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
             *(["--fork-session"] if plan["resumed"] else [])]
     return head, [TEMPLATE_FLAG, str(appended)], written
@@ -1117,6 +1239,9 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
             # W2-201 X3: a fix is not planned, so the plan is not asked; its owning ticket must exist, whatever status
             raise _refuse(f"unknown ticket '{ticket_id}'")
         _check_cli_args(cli_args)
+        model_args = _lead_model_args(root, role, ticket_id, cli_args)  # DEC-1225: before anything is read or started
+        model_args += _lead_effort_args(cli_args)  # fixes-015a F14: Sonnet at medium
+        model_args += [OWN_SWITCHES[-1], *_mcp_args(root, role, cli_args)]  # fixes-015a F1: strict, own config
         _check_repository_settings(root, False)
         template = template_args(root, role)
         cli = _cli()
@@ -1127,7 +1252,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
             _admit_start(root, role, label, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-            return _run(root, cli, settings, [*_mode_args(cli_args), *cli_args, *template],
+            return _run(root, cli, settings, [*_mode_args(cli_args), *model_args, *cli_args, *template],
                         entry=(label, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
@@ -1146,6 +1271,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
     cli = _cli()
     # W2-60b S7: the role file says the role is a worker; today's refusals above come first (W2-60a Behaviour 10)
     _role_kind(root, role)
+    mcp = _mcp_args(root, role, cli_args)  # fixes-015a F1: the role's MCP list, and what a caller's config may hold
     # W2-60b S10, S12 (DEC-847, DEC-963, DEC-1156 (3)): no second writer in a worktree. Here, a planted or long-live
     # writer refuses before anything is written; the check that decides is made again under the start lock below.
     session_record.check_one_writer(root, str(root), role)
@@ -1155,6 +1281,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
     plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named), projection_usd,
                         (kind, line))
     plan["mode"] = _mode_args(cli_args)
+    plan["mcp"] = mcp
     lock = StartLock()
     try:
         # W2-60b review round 1, F1: the one-writer check under the start lock. A writing launch writes its start
@@ -1226,6 +1353,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
         env = environ.session_env(os.environ, own_env)
+        env[CONNECTORS_ENV] = "false"  # fixes-015a F1: no claude.ai connector in any session
         address = f"{entry[1]}:{entry[0]}" if entry is not None else None
         if address is not None:  # W2-121c RT-2: the session's own inbox address, in its process's environment
             env["GOV_MSG_ADDRESS"] = address

@@ -1,0 +1,3345 @@
+{
+  "bar": 95.0,
+  "form": "w2-81-report/1",
+  "gov": "/home/usain/.local/share/gov-os/pin-961db6546490/bin/gov",
+  "hidden_half": "present and asked in 6 of 6 repositories",
+  "mode": "read",
+  "models": {
+    "adopter": "claude-sonnet-5-5",
+    "grader": "claude-sonnet-5-5",
+    "reader": "claude-sonnet-5-5"
+  },
+  "pinned_gov": "/home/usain/.local/share/gov-os/pin-961db6546490/bin/gov",
+  "reasons": [
+    "python-app: python-app.misleading-name.live-under-old-name is NOT_BUILT",
+    "python-app: python-app.misleading-name.dead-under-current-name is NOT_BUILT",
+    "python-app: python-app.orphaned-test.module-removed is NOT_BUILT",
+    "python-app: python-app.superseded-plan.names-it is NOT_BUILT",
+    "python-app: python-app.stale-spec.newer-version is NOT_BUILT",
+    "python-app: hidden variant #1 (f01) is NOT_BUILT",
+    "python-app: stage VERDICT is NOT_BUILT",
+    "python-app: stage findings is NOT_BUILT",
+    "python-app: the end-to-end figure is 80.9524, below its bar of 95",
+    "rust-workspace: rust-workspace.orphaned-test.function-removed is NOT_BUILT",
+    "rust-workspace: rust-workspace.superseded-plan.by-version is NOT_BUILT",
+    "rust-workspace: rust-workspace.stale-spec.newer-rfc is NOT_BUILT",
+    "rust-workspace: hidden variant #2 (f02) is NOT_BUILT",
+    "rust-workspace: hidden variant #3 (f03) is NOT_BUILT",
+    "rust-workspace: hidden variant #4 (f04) is NOT_BUILT",
+    "rust-workspace: rust-workspace.control.current-spec-looks-old is FLAGGED",
+    "rust-workspace: rust-workspace.control.live-file-in-legacy-folder is FLAGGED",
+    "rust-workspace: stage A10 is ABSENT",
+    "rust-workspace: stage VERDICT is NOT_BUILT",
+    "rust-workspace: stage findings is NOT_BUILT",
+    "rust-workspace: the end-to-end figure is 75, below its bar of 95",
+    "typescript-monorepo: typescript-monorepo.misleading-name.live-under-old-name is NOT_BUILT",
+    "typescript-monorepo: typescript-monorepo.misleading-name.dead-under-current-name is NOT_BUILT",
+    "typescript-monorepo: typescript-monorepo.secret.token-in-script is NOT_BUILT",
+    "typescript-monorepo: typescript-monorepo.orphaned-test.file-removed is NOT_BUILT",
+    "typescript-monorepo: typescript-monorepo.stale-spec.newer-adr is NOT_BUILT",
+    "typescript-monorepo: hidden variant #5 (f05) is NOT_BUILT",
+    "typescript-monorepo: stage VERDICT is NOT_BUILT",
+    "typescript-monorepo: stage findings is NOT_BUILT",
+    "typescript-monorepo: the end-to-end figure is 60, below its bar of 95",
+    "legacy-docs: legacy-docs.legacy-document.extract is NOT_BUILT",
+    "legacy-docs: legacy-docs.legacy-document.retire is NOT_BUILT",
+    "legacy-docs: legacy-docs.large-file.dataset is MISSED",
+    "legacy-docs: legacy-docs.large-file.media is MISSED",
+    "legacy-docs: legacy-docs.superseded-plan.names-it is NOT_BUILT",
+    "legacy-docs: hidden variant #7 (f07) is NOT_BUILT",
+    "legacy-docs: hidden variant #8 (f08) is NOT_BUILT",
+    "legacy-docs: hidden variant #9 (f09) is NOT_BUILT",
+    "legacy-docs: hidden variant #10 (f10) is NOT_BUILT",
+    "legacy-docs: legacy-docs.control.current-spec-looks-old is FLAGGED",
+    "legacy-docs: legacy-docs.control.live-file-in-legacy-folder is FLAGGED",
+    "legacy-docs: stage VERDICT is NOT_BUILT",
+    "legacy-docs: stage findings is NOT_BUILT",
+    "legacy-docs: the end-to-end figure is 60, below its bar of 95",
+    "secret-history: secret-history.misleading-name.live-under-old-name is NOT_BUILT",
+    "secret-history: secret-history.misleading-name.dead-under-current-name is NOT_BUILT",
+    "secret-history: secret-history.secret.key-in-config is NOT_BUILT",
+    "secret-history: hidden variant #11 (f11) is NOT_BUILT",
+    "secret-history: hidden variant #12 (f12) is NOT_BUILT",
+    "secret-history: hidden variant #13 (f13) is NOT_BUILT",
+    "secret-history: secret-history.control.current-spec-looks-old is FLAGGED",
+    "secret-history: secret-history.control.live-file-in-legacy-folder is FLAGGED",
+    "secret-history: stage VERDICT is NOT_BUILT",
+    "secret-history: stage findings is NOT_BUILT",
+    "secret-history: the end-to-end figure is 80, below its bar of 95",
+    "python-app-clean: stage VERDICT is NOT_BUILT",
+    "python-app-clean: stage findings is NOT_BUILT",
+    "python-app: gov queue pa-smko ended with exit 3",
+    "rust-workspace: gov queue rw-vyk3 ended with exit 3",
+    "typescript-monorepo: gov queue tm-4kpa ended with exit 3",
+    "legacy-docs: gov queue ld-mj6i ended with exit 3",
+    "secret-history: gov queue sh-e15w ended with exit 3",
+    "python-app-clean: gov queue pac-73p5 ended with exit 3"
+  ],
+  "release": "0.1.4",
+  "repositories": {
+    "legacy-docs": {
+      "figures": {
+        "bar": 95.0,
+        "diagnostic": {
+          "hit_at_5": 55.0,
+          "stacked_share": 55.0
+        },
+        "end_to_end": 60.0,
+        "met": false,
+        "per_question": [
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 4,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "legacy-docs-v01",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "legacy-docs-v02",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-v03",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-v04",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "wrong",
+            "id": "legacy-docs-v05",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "the grade is not correct",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-v06",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-v07",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-v08",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-v09",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "not_found",
+            "id": "legacy-docs-v10",
+            "part": "visible",
+            "reader": "not_found",
+            "reason": "reader not found",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-h01",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 4,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "legacy-docs-h02",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "legacy-docs-h03",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "legacy-docs-h04",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "legacy-docs-h05",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-h06",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-h07",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-h08",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-h09",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "legacy-docs-h10",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          }
+        ],
+        "questions": 20,
+        "right": 12
+      },
+      "hidden_half": {
+        "asked": 10,
+        "needed": 10,
+        "present": true,
+        "questions": 10
+      },
+      "judgement": {
+        "adoption_verdict": null,
+        "controls": [
+          {
+            "evidence": [
+              {
+                "record": "governance/adoption/A2-classification.md",
+                "said": "docs/specs/draft-rostering-record-format.md is mapped to no namespace the path map holds"
+              }
+            ],
+            "id": "legacy-docs.control.current-spec-looks-old",
+            "kind": "current-spec-looks-old",
+            "status": "FLAGGED"
+          },
+          {
+            "evidence": [
+              {
+                "record": "governance/adoption/A2-classification.md",
+                "said": "historic/export_ledger.py is mapped to no namespace the path map holds"
+              }
+            ],
+            "id": "legacy-docs.control.live-file-in-legacy-folder",
+            "kind": "live-file-in-legacy-folder",
+            "status": "FLAGGED"
+          }
+        ],
+        "not_built": [
+          "A2-content-class",
+          "A8-documents",
+          "VERDICT",
+          "findings"
+        ],
+        "not_measured": [
+          "large-file: `within the budget`: no budget for the index is stated in the path map (its schema has no such field), in the index's records or in the Contract, so the judge has none to read; the clause is not measured today"
+        ],
+        "planted": [
+          {
+            "evidence": [
+              {
+                "field": "A8-documents",
+                "record": null,
+                "said": "A8-documents (CAP-44.e): A8 retires rule files, memory stores and chat databases only (legacy.KINDS); it extracts or retires no legacy document",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "legacy-docs.legacy-document.extract",
+            "kind": "legacy-document",
+            "status": "NOT_BUILT",
+            "variant": "extract"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A8-documents",
+                "record": null,
+                "said": "A8-documents (CAP-44.e): A8 retires rule files, memory stores and chat databases only (legacy.KINDS); it extracts or retires no legacy document",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "legacy-docs.legacy-document.retire",
+            "kind": "legacy-document",
+            "status": "NOT_BUILT",
+            "variant": "retire"
+          },
+          {
+            "evidence": [
+              {
+                "field": "artefacts[].namespace",
+                "record": "governance/adoption/A2-classification.md",
+                "said": "data/rostering-2009.bin is not classed",
+                "status": "MISSED"
+              }
+            ],
+            "id": "legacy-docs.large-file.dataset",
+            "kind": "large-file",
+            "status": "MISSED",
+            "variant": "dataset"
+          },
+          {
+            "evidence": [
+              {
+                "field": "artefacts[].namespace",
+                "record": "governance/adoption/A2-classification.md",
+                "said": "media/payroll-briefing-2009.wav is not classed",
+                "status": "MISSED"
+              }
+            ],
+            "id": "legacy-docs.large-file.media",
+            "kind": "large-file",
+            "status": "MISSED",
+            "variant": "media"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "legacy-docs.superseded-plan.names-it",
+            "kind": "superseded-plan",
+            "status": "NOT_BUILT",
+            "variant": "names-it"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              },
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #7 (f07)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #8 (f08)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #9 (f09)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #10 (f10)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          }
+        ],
+        "repository": "legacy-docs",
+        "seed": 7429927,
+        "stages": {
+          "A0": {
+            "record": "governance/adoption/A0-safety-baseline.md",
+            "status": "PRESENT"
+          },
+          "A1": {
+            "record": "governance/adoption/A1-inventory.md",
+            "status": "PRESENT"
+          },
+          "A10": {
+            "record": "governance/adoption/A10-independent-memory-verification.md",
+            "status": "PRESENT"
+          },
+          "A2": {
+            "record": "governance/adoption/A2-classification.md",
+            "status": "PRESENT"
+          },
+          "A3": {
+            "record": "governance/adoption/A3-target-path-map.md",
+            "status": "PRESENT"
+          },
+          "A4": {
+            "record": "governance/adoption/A4-batched-plan.md",
+            "status": "PRESENT"
+          },
+          "A5": {
+            "record": "governance/adoption/A5-independent-review-of-the-path-map.md",
+            "status": "PRESENT"
+          },
+          "A6": {
+            "record": "governance/adoption/A6-controlled-migration.md",
+            "status": "PRESENT"
+          },
+          "A7": {
+            "record": "governance/adoption/A7-independent-migration-verification.md",
+            "status": "PRESENT"
+          },
+          "A8": {
+            "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+            "status": "PRESENT"
+          },
+          "VERDICT": {
+            "capability": "CAP-44.h",
+            "record": "governance/adoption/VERDICT-lite.md",
+            "status": "NOT_BUILT"
+          },
+          "findings": {
+            "capability": "CAP-44.g",
+            "record": "governance/adoption/findings",
+            "status": "NOT_BUILT"
+          }
+        }
+      },
+      "not_built": [
+        "A2-content-class",
+        "A8-documents",
+        "VERDICT",
+        "findings"
+      ],
+      "queue": {
+        "exit": 3,
+        "run": true,
+        "ticket": "ld-mj6i"
+      },
+      "stages_run": []
+    },
+    "python-app": {
+      "figures": {
+        "bar": 95.0,
+        "diagnostic": {
+          "hit_at_5": 57.1,
+          "stacked_share": 66.7
+        },
+        "end_to_end": 80.95238095238095,
+        "met": false,
+        "per_question": [
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 4,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "python-app-v01",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "python-app-v02",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "python-app-v03",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 4,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "python-app-v04",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v05",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 6,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v06",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v07",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v08",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v09",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v10",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-v11",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h01",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h02",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 7,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h03",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h04",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h05",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h06",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h07",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h08",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h09",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-h10",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          }
+        ],
+        "questions": 21,
+        "right": 17
+      },
+      "hidden_half": {
+        "asked": 10,
+        "needed": 10,
+        "present": true,
+        "questions": 10
+      },
+      "judgement": {
+        "adoption_verdict": null,
+        "controls": [
+          {
+            "evidence": [],
+            "id": "python-app.control.current-spec-looks-old",
+            "kind": "current-spec-looks-old",
+            "status": "CLEAN"
+          },
+          {
+            "evidence": [],
+            "id": "python-app.control.live-file-in-legacy-folder",
+            "kind": "live-file-in-legacy-folder",
+            "status": "CLEAN"
+          }
+        ],
+        "not_built": [
+          "A2-content-class",
+          "VERDICT",
+          "findings"
+        ],
+        "not_measured": [],
+        "planted": [
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "python-app.misleading-name.live-under-old-name",
+            "kind": "misleading-name",
+            "status": "NOT_BUILT",
+            "variant": "live-under-old-name"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "python-app.misleading-name.dead-under-current-name",
+            "kind": "misleading-name",
+            "status": "NOT_BUILT",
+            "variant": "dead-under-current-name"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "python-app.orphaned-test.module-removed",
+            "kind": "orphaned-test",
+            "status": "NOT_BUILT",
+            "variant": "module-removed"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "python-app.superseded-plan.names-it",
+            "kind": "superseded-plan",
+            "status": "NOT_BUILT",
+            "variant": "names-it"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              },
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "python-app.stale-spec.newer-version",
+            "kind": "stale-spec",
+            "status": "NOT_BUILT",
+            "variant": "newer-version"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #1 (f01)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          }
+        ],
+        "repository": "python-app",
+        "seed": 7429927,
+        "stages": {
+          "A0": {
+            "record": "governance/adoption/A0-safety-baseline.md",
+            "status": "PRESENT"
+          },
+          "A1": {
+            "record": "governance/adoption/A1-inventory.md",
+            "status": "PRESENT"
+          },
+          "A10": {
+            "record": "governance/adoption/A10-independent-memory-verification.md",
+            "status": "PRESENT"
+          },
+          "A2": {
+            "record": "governance/adoption/A2-classification.md",
+            "status": "PRESENT"
+          },
+          "A3": {
+            "record": "governance/adoption/A3-target-path-map.md",
+            "status": "PRESENT"
+          },
+          "A4": {
+            "record": "governance/adoption/A4-batched-plan.md",
+            "status": "PRESENT"
+          },
+          "A5": {
+            "record": "governance/adoption/A5-independent-review-of-the-path-map.md",
+            "status": "PRESENT"
+          },
+          "A6": {
+            "record": "governance/adoption/A6-controlled-migration.md",
+            "status": "PRESENT"
+          },
+          "A7": {
+            "record": "governance/adoption/A7-independent-migration-verification.md",
+            "status": "PRESENT"
+          },
+          "A8": {
+            "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+            "status": "PRESENT"
+          },
+          "VERDICT": {
+            "capability": "CAP-44.h",
+            "record": "governance/adoption/VERDICT-lite.md",
+            "status": "NOT_BUILT"
+          },
+          "findings": {
+            "capability": "CAP-44.g",
+            "record": "governance/adoption/findings",
+            "status": "NOT_BUILT"
+          }
+        }
+      },
+      "not_built": [
+        "A2-content-class",
+        "VERDICT",
+        "findings"
+      ],
+      "queue": {
+        "exit": 3,
+        "run": true,
+        "ticket": "pa-smko"
+      },
+      "stages_run": []
+    },
+    "python-app-clean": {
+      "figures": {
+        "bar": 95.0,
+        "diagnostic": {
+          "hit_at_5": 80.0,
+          "stacked_share": 85.0
+        },
+        "end_to_end": 95.0,
+        "met": true,
+        "per_question": [
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v01",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v02",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v03",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v04",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v05",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 9,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v06",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v07",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v08",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v09",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-v10",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h01",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h02",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 7,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h03",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h04",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h05",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h06",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "wrong",
+            "id": "python-app-clean-h07",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "the grade is not correct",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h08",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h09",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 4,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "python-app-clean-h10",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          }
+        ],
+        "questions": 20,
+        "right": 19
+      },
+      "hidden_half": {
+        "asked": 10,
+        "needed": 10,
+        "present": true,
+        "questions": 10
+      },
+      "judgement": {
+        "adoption_verdict": null,
+        "controls": [
+          {
+            "evidence": [],
+            "id": "python-app-clean.control.current-spec-looks-old",
+            "kind": "current-spec-looks-old",
+            "status": "CLEAN"
+          },
+          {
+            "evidence": [],
+            "id": "python-app-clean.control.live-file-in-legacy-folder",
+            "kind": "live-file-in-legacy-folder",
+            "status": "CLEAN"
+          }
+        ],
+        "not_built": [
+          "VERDICT",
+          "findings"
+        ],
+        "not_measured": [],
+        "planted": [],
+        "repository": "python-app-clean",
+        "seed": 7429927,
+        "stages": {
+          "A0": {
+            "record": "governance/adoption/A0-safety-baseline.md",
+            "status": "PRESENT"
+          },
+          "A1": {
+            "record": "governance/adoption/A1-inventory.md",
+            "status": "PRESENT"
+          },
+          "A10": {
+            "record": "governance/adoption/A10-independent-memory-verification.md",
+            "status": "PRESENT"
+          },
+          "A2": {
+            "record": "governance/adoption/A2-classification.md",
+            "status": "PRESENT"
+          },
+          "A3": {
+            "record": "governance/adoption/A3-target-path-map.md",
+            "status": "PRESENT"
+          },
+          "A4": {
+            "record": "governance/adoption/A4-batched-plan.md",
+            "status": "PRESENT"
+          },
+          "A5": {
+            "record": "governance/adoption/A5-independent-review-of-the-path-map.md",
+            "status": "PRESENT"
+          },
+          "A6": {
+            "record": "governance/adoption/A6-controlled-migration.md",
+            "status": "PRESENT"
+          },
+          "A7": {
+            "record": "governance/adoption/A7-independent-migration-verification.md",
+            "status": "PRESENT"
+          },
+          "A8": {
+            "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+            "status": "PRESENT"
+          },
+          "VERDICT": {
+            "capability": "CAP-44.h",
+            "record": "governance/adoption/VERDICT-lite.md",
+            "status": "NOT_BUILT"
+          },
+          "findings": {
+            "capability": "CAP-44.g",
+            "record": "governance/adoption/findings",
+            "status": "NOT_BUILT"
+          }
+        }
+      },
+      "not_built": [
+        "VERDICT",
+        "findings"
+      ],
+      "queue": {
+        "exit": 3,
+        "run": true,
+        "ticket": "pac-73p5"
+      },
+      "stages_run": []
+    },
+    "rust-workspace": {
+      "figures": {
+        "bar": 95.0,
+        "diagnostic": {
+          "hit_at_5": 55.0,
+          "stacked_share": 70.0
+        },
+        "end_to_end": 75.0,
+        "met": false,
+        "per_question": [
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "rust-workspace-v01",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v02",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "rust-workspace-v03",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 5,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v04",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v05",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v06",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 12,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v07",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 6,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v08",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v09",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-v10",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h01",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h02",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "rust-workspace-h03",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h04",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "rust-workspace-h05",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "rust-workspace-h06",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h07",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h08",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 6,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h09",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "rust-workspace-h10",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          }
+        ],
+        "questions": 20,
+        "right": 15
+      },
+      "hidden_half": {
+        "asked": 10,
+        "needed": 10,
+        "present": true,
+        "questions": 10
+      },
+      "judgement": {
+        "adoption_verdict": null,
+        "controls": [
+          {
+            "evidence": [
+              {
+                "record": "governance/adoption/A2-classification.md",
+                "said": "rfcs/draft-0000-payroll-table.md is mapped to no namespace the path map holds"
+              }
+            ],
+            "id": "rust-workspace.control.current-spec-looks-old",
+            "kind": "current-spec-looks-old",
+            "status": "FLAGGED"
+          },
+          {
+            "evidence": [
+              {
+                "record": "governance/adoption/A2-classification.md",
+                "said": "crates/wire/src/historic/mod.rs is mapped to no namespace the path map holds"
+              }
+            ],
+            "id": "rust-workspace.control.live-file-in-legacy-folder",
+            "kind": "live-file-in-legacy-folder",
+            "status": "FLAGGED"
+          }
+        ],
+        "not_built": [
+          "A2-content-class",
+          "A8-documents",
+          "VERDICT",
+          "findings"
+        ],
+        "not_measured": [],
+        "planted": [
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "rust-workspace.orphaned-test.function-removed",
+            "kind": "orphaned-test",
+            "status": "NOT_BUILT",
+            "variant": "function-removed"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "rust-workspace.superseded-plan.by-version",
+            "kind": "superseded-plan",
+            "status": "NOT_BUILT",
+            "variant": "by-version"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              },
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "rust-workspace.stale-spec.newer-rfc",
+            "kind": "stale-spec",
+            "status": "NOT_BUILT",
+            "variant": "newer-rfc"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #2 (f02)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #3 (f03)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A8-documents",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #4 (f04)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          }
+        ],
+        "repository": "rust-workspace",
+        "seed": 7429927,
+        "stages": {
+          "A0": {
+            "record": "governance/adoption/A0-safety-baseline.md",
+            "status": "PRESENT"
+          },
+          "A1": {
+            "record": "governance/adoption/A1-inventory.md",
+            "status": "PRESENT"
+          },
+          "A10": {
+            "record": "governance/adoption/A10-independent-memory-verification.md",
+            "status": "ABSENT"
+          },
+          "A2": {
+            "record": "governance/adoption/A2-classification.md",
+            "status": "PRESENT"
+          },
+          "A3": {
+            "record": "governance/adoption/A3-target-path-map.md",
+            "status": "PRESENT"
+          },
+          "A4": {
+            "record": "governance/adoption/A4-batched-plan.md",
+            "status": "PRESENT"
+          },
+          "A5": {
+            "record": "governance/adoption/A5-independent-review-of-the-path-map.md",
+            "status": "PRESENT"
+          },
+          "A6": {
+            "record": "governance/adoption/A6-controlled-migration.md",
+            "status": "PRESENT"
+          },
+          "A7": {
+            "record": "governance/adoption/A7-independent-migration-verification.md",
+            "status": "PRESENT"
+          },
+          "A8": {
+            "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+            "status": "PRESENT"
+          },
+          "VERDICT": {
+            "capability": "CAP-44.h",
+            "record": "governance/adoption/VERDICT-lite.md",
+            "status": "NOT_BUILT"
+          },
+          "findings": {
+            "capability": "CAP-44.g",
+            "record": "governance/adoption/findings",
+            "status": "NOT_BUILT"
+          }
+        }
+      },
+      "not_built": [
+        "A2-content-class",
+        "A8-documents",
+        "VERDICT",
+        "findings"
+      ],
+      "queue": {
+        "exit": 3,
+        "run": true,
+        "ticket": "rw-vyk3"
+      },
+      "stages_run": []
+    },
+    "secret-history": {
+      "figures": {
+        "bar": 95.0,
+        "diagnostic": {
+          "hit_at_5": 70.0,
+          "stacked_share": 75.0
+        },
+        "end_to_end": 80.0,
+        "met": false,
+        "per_question": [
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v01",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v02",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v03",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "secret-history-v04",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v05",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v06",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v07",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 7,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v08",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v09",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-v10",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h01",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h02",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 5,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "secret-history-h03",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 5,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h04",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h05",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h06",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "secret-history-h07",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h08",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "secret-history-h09",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "secret-history-h10",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          }
+        ],
+        "questions": 20,
+        "right": 16
+      },
+      "hidden_half": {
+        "asked": 10,
+        "needed": 10,
+        "present": true,
+        "questions": 10
+      },
+      "judgement": {
+        "adoption_verdict": null,
+        "controls": [
+          {
+            "evidence": [
+              {
+                "record": "governance/adoption/A2-classification.md",
+                "said": "docs/specs/draft-lending-retries.md is mapped to no namespace the path map holds"
+              }
+            ],
+            "id": "secret-history.control.current-spec-looks-old",
+            "kind": "current-spec-looks-old",
+            "status": "FLAGGED"
+          },
+          {
+            "evidence": [
+              {
+                "record": "governance/adoption/A2-classification.md",
+                "said": "internal/archive/codes.go is mapped to no namespace the path map holds"
+              }
+            ],
+            "id": "secret-history.control.live-file-in-legacy-folder",
+            "kind": "live-file-in-legacy-folder",
+            "status": "FLAGGED"
+          }
+        ],
+        "not_built": [
+          "A2-content-class",
+          "VERDICT",
+          "findings"
+        ],
+        "not_measured": [],
+        "planted": [
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "secret-history.misleading-name.live-under-old-name",
+            "kind": "misleading-name",
+            "status": "NOT_BUILT",
+            "variant": "live-under-old-name"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "secret-history.misleading-name.dead-under-current-name",
+            "kind": "misleading-name",
+            "status": "NOT_BUILT",
+            "variant": "dead-under-current-name"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "secret-history.secret.key-in-config",
+            "kind": "secret",
+            "status": "NOT_BUILT",
+            "variant": "key-in-config"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              },
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #11 (f11)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #12 (f12)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #13 (f13)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          }
+        ],
+        "repository": "secret-history",
+        "seed": 7429927,
+        "stages": {
+          "A0": {
+            "record": "governance/adoption/A0-safety-baseline.md",
+            "status": "PRESENT"
+          },
+          "A1": {
+            "record": "governance/adoption/A1-inventory.md",
+            "status": "PRESENT"
+          },
+          "A10": {
+            "record": "governance/adoption/A10-independent-memory-verification.md",
+            "status": "PRESENT"
+          },
+          "A2": {
+            "record": "governance/adoption/A2-classification.md",
+            "status": "PRESENT"
+          },
+          "A3": {
+            "record": "governance/adoption/A3-target-path-map.md",
+            "status": "PRESENT"
+          },
+          "A4": {
+            "record": "governance/adoption/A4-batched-plan.md",
+            "status": "PRESENT"
+          },
+          "A5": {
+            "record": "governance/adoption/A5-independent-review-of-the-path-map.md",
+            "status": "PRESENT"
+          },
+          "A6": {
+            "record": "governance/adoption/A6-controlled-migration.md",
+            "status": "PRESENT"
+          },
+          "A7": {
+            "record": "governance/adoption/A7-independent-migration-verification.md",
+            "status": "PRESENT"
+          },
+          "A8": {
+            "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+            "status": "PRESENT"
+          },
+          "VERDICT": {
+            "capability": "CAP-44.h",
+            "record": "governance/adoption/VERDICT-lite.md",
+            "status": "NOT_BUILT"
+          },
+          "findings": {
+            "capability": "CAP-44.g",
+            "record": "governance/adoption/findings",
+            "status": "NOT_BUILT"
+          }
+        }
+      },
+      "not_built": [
+        "A2-content-class",
+        "VERDICT",
+        "findings"
+      ],
+      "queue": {
+        "exit": 3,
+        "run": true,
+        "ticket": "sh-e15w"
+      },
+      "stages_run": []
+    },
+    "typescript-monorepo": {
+      "figures": {
+        "bar": 95.0,
+        "diagnostic": {
+          "hit_at_5": 40.0,
+          "stacked_share": 50.0
+        },
+        "end_to_end": 60.0,
+        "met": false,
+        "per_question": [
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "typescript-monorepo-v01",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "typescript-monorepo-v02",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 4,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "wrong",
+            "id": "typescript-monorepo-v03",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "the grade is not correct",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v04",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v05",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v06",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 50,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v07",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v08",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v09",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 7,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-v10",
+            "part": "visible",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-h01",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 2,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "typescript-monorepo-h02",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-h03",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "citation misses the gold sources",
+            "right": false
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 3,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "typescript-monorepo-h04",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-h05",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": false,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": true,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": true,
+            "grade": "correct",
+            "id": "typescript-monorepo-h06",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "forbidden citation",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-h07",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-h08",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": null,
+              "forbidden_in_top_5": false,
+              "full_evidence": false,
+              "hit_at_5": false
+            },
+            "forbidden_cited": false,
+            "grade": "wrong",
+            "id": "typescript-monorepo-h09",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "the grade is not correct",
+            "right": false
+          },
+          {
+            "citation_right": true,
+            "diagnostic": {
+              "answered": true,
+              "first_gold_rank": 1,
+              "forbidden_in_top_5": false,
+              "full_evidence": true,
+              "hit_at_5": true
+            },
+            "forbidden_cited": false,
+            "grade": "correct",
+            "id": "typescript-monorepo-h10",
+            "part": "hidden",
+            "reader": "answer",
+            "reason": "right",
+            "right": true
+          }
+        ],
+        "questions": 20,
+        "right": 12
+      },
+      "hidden_half": {
+        "asked": 10,
+        "needed": 10,
+        "present": true,
+        "questions": 10
+      },
+      "judgement": {
+        "adoption_verdict": null,
+        "controls": [
+          {
+            "evidence": [],
+            "id": "typescript-monorepo.control.current-spec-looks-old",
+            "kind": "current-spec-looks-old",
+            "status": "CLEAN"
+          },
+          {
+            "evidence": [],
+            "id": "typescript-monorepo.control.live-file-in-legacy-folder",
+            "kind": "live-file-in-legacy-folder",
+            "status": "CLEAN"
+          }
+        ],
+        "not_built": [
+          "A2-content-class",
+          "VERDICT",
+          "findings"
+        ],
+        "not_measured": [],
+        "planted": [
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "typescript-monorepo.misleading-name.live-under-old-name",
+            "kind": "misleading-name",
+            "status": "NOT_BUILT",
+            "variant": "live-under-old-name"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "typescript-monorepo.misleading-name.dead-under-current-name",
+            "kind": "misleading-name",
+            "status": "NOT_BUILT",
+            "variant": "dead-under-current-name"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "typescript-monorepo.secret.token-in-script",
+            "kind": "secret",
+            "status": "NOT_BUILT",
+            "variant": "token-in-script"
+          },
+          {
+            "evidence": [
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "typescript-monorepo.orphaned-test.file-removed",
+            "kind": "orphaned-test",
+            "status": "NOT_BUILT",
+            "variant": "file-removed"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "A2-content-class (CAP-44.b): A2 classes by path-map namespace only and reads no content: no class current, historical, superseded, live or dead, no successor or newer source, is recorded",
+                "status": "NOT_BUILT"
+              },
+              {
+                "field": "findings",
+                "record": null,
+                "said": "findings (CAP-44.g): finding states and human gates: no stage scans the history for secrets or records a finding (a secret, an orphaned test, drift) with a state and a gate",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "typescript-monorepo.stale-spec.newer-adr",
+            "kind": "stale-spec",
+            "status": "NOT_BUILT",
+            "variant": "newer-adr"
+          },
+          {
+            "evidence": [
+              {
+                "field": "A2-content-class",
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "NOT_BUILT"
+              }
+            ],
+            "id": "hidden variant #5 (f05)",
+            "kind": "hidden",
+            "status": "NOT_BUILT",
+            "variant": "hidden"
+          },
+          {
+            "evidence": [
+              {
+                "field": null,
+                "record": null,
+                "said": "withheld: a hidden variant",
+                "status": "FOUND_AND_HANDLED"
+              }
+            ],
+            "id": "hidden variant #6 (f06)",
+            "kind": "hidden",
+            "status": "FOUND_AND_HANDLED",
+            "variant": "hidden"
+          }
+        ],
+        "repository": "typescript-monorepo",
+        "seed": 7429927,
+        "stages": {
+          "A0": {
+            "record": "governance/adoption/A0-safety-baseline.md",
+            "status": "PRESENT"
+          },
+          "A1": {
+            "record": "governance/adoption/A1-inventory.md",
+            "status": "PRESENT"
+          },
+          "A10": {
+            "record": "governance/adoption/A10-independent-memory-verification.md",
+            "status": "PRESENT"
+          },
+          "A2": {
+            "record": "governance/adoption/A2-classification.md",
+            "status": "PRESENT"
+          },
+          "A3": {
+            "record": "governance/adoption/A3-target-path-map.md",
+            "status": "PRESENT"
+          },
+          "A4": {
+            "record": "governance/adoption/A4-batched-plan.md",
+            "status": "PRESENT"
+          },
+          "A5": {
+            "record": "governance/adoption/A5-independent-review-of-the-path-map.md",
+            "status": "PRESENT"
+          },
+          "A6": {
+            "record": "governance/adoption/A6-controlled-migration.md",
+            "status": "PRESENT"
+          },
+          "A7": {
+            "record": "governance/adoption/A7-independent-migration-verification.md",
+            "status": "PRESENT"
+          },
+          "A8": {
+            "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+            "status": "PRESENT"
+          },
+          "VERDICT": {
+            "capability": "CAP-44.h",
+            "record": "governance/adoption/VERDICT-lite.md",
+            "status": "NOT_BUILT"
+          },
+          "findings": {
+            "capability": "CAP-44.g",
+            "record": "governance/adoption/findings",
+            "status": "NOT_BUILT"
+          }
+        }
+      },
+      "not_built": [
+        "A2-content-class",
+        "VERDICT",
+        "findings"
+      ],
+      "queue": {
+        "exit": 3,
+        "run": true,
+        "ticket": "tm-4kpa"
+      },
+      "stages_run": []
+    }
+  },
+  "seed": 7429927,
+  "verdict": "NOT_READY"
+}

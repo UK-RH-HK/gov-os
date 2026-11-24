@@ -150,3 +150,67 @@ added to `conftest.py` and `w2_17_support.py`.
 Run the fixes alone: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_pending.py
 tests/acceptance/W2-17/test_w2_17_session_start.py tests/acceptance/W2-17/test_w2_17_rollback_command.py -n auto
 --dist loadfile` (each file's session fixtures built once on its worker; the rollback file builds the update twice).
+
+## The fix S8 (F4): `gov update` never registers a hook a second time (EXAMIN report 28)
+
+Written by the independent test designer from the fix line (`gov update` never adds a hook entry already present, and
+an update of a repository that has `context_watch.py` twice leaves it once) and EXAMIN's report 28
+(`.claude/settings.json` held `context_watch.py` twice, in two groups under `hooks.PostToolUse`, matcher `Bash`, whose
+command strings differ: an older and a newer generation of the same hook). "Already present" is read as: an entry of
+the same event and matcher that runs the same hook program (`governance/kernel/hooks/context_watch.py`), whatever its
+command text and position. The ticket line S8 is for the lead to record; S8 here is this fix.
+
+Fixtures: a copy of the project adopted at A, its `.claude/settings.json` planted (the project's own hook entries
+first: a PreToolUse `Agent|Task` entry, two PostToolUse `Bash` entries, one a look-alike `tools/context_watch.py`, a
+Stop entry; then the `PostToolUse` groups of the case), committed, then `gov update B --json`. Read: the settings file
+(JSON) after the update, public. Every case asserts that the update exited 0, that every kernel hook the project at A
+runs is registered exactly once, and that the project's own hook entries are the planted ones in their order. Which
+form of the command survives is not asserted.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| S8 | `test_w2_17_fix_hook_once.py::test_an_entry_present_once_is_still_once_after_the_update`, `test_w2_17_fix_hook_once.py::test_an_entry_present_twice_is_left_once`, `test_w2_17_fix_hook_once.py::test_an_entry_twice_in_one_group_is_left_once`, `test_w2_17_fix_hook_once.py::test_an_absent_entry_is_added_once`, `test_w2_17_fix_hook_once.py::test_the_older_form_of_the_entry_is_not_registered_beside_the_new_one`, `test_w2_17_fix_hook_once.py::test_two_forms_of_the_entry_are_left_as_one`, `test_w2_17_fix_hook_once.py::test_the_projects_own_hooks_stay_beside_the_collapsed_entry`, `test_w2_17_fix_hook_once.py::test_a_second_update_is_refused_and_the_settings_stay_as_they_were`, `test_w2_17_fix_hook_once.py::test_a_rollback_leaves_the_hook_once` | After `gov update` the settings hold `context_watch.py` twice: the older form that the update cannot unmerge stays and the generated one is added beside it (cases older-form, two-forms: 2 entries), and the identical command twice in one group gets a third (3 entries). Green on the base, as guards: once stays once, the identical entry in two groups (the unmerge removes both and one is regenerated), the absent entry added once, the rollback restoring the planted settings |
+
+Red on the base: `test_an_entry_twice_in_one_group_is_left_once`,
+`test_the_older_form_of_the_entry_is_not_registered_beside_the_new_one`, `test_two_forms_of_the_entry_are_left_as_one`,
+`test_the_projects_own_hooks_stay_beside_the_collapsed_entry`,
+`test_a_second_update_is_refused_and_the_settings_stay_as_they_were` (the last two share the two-forms state, so
+they fail at its duplicate). Green guards: the other four.
+
+Run: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_fix_hook_once.py` (nine cases, six
+updates, about a minute).
+
+## The fix S9 (F6): `gov update` leaves `gov doctor` as green as it was (G3 run of 2026-11-22)
+
+Written by the independent test designer from the fix line (`gov update` classifies `governance/updates/**` in an
+adopted repository's path map as a merge, so `gov doctor`'s exit is equal before and after the update; the kit's path
+map classifies it) and the G3 run's record (`unclassified: ["governance/updates/0.1.5.json"]`, doctor exit 0 before and
+3 after, in all six kept repositories). The ticket line S9 is for the lead to record; S9 here is this fix.
+
+Fixture (`previous`): a project adopted at A without local changes (the lock matches), then made what an earlier kit
+adopted: every line naming `governance/updates` taken out of `governance/project/path-map.yaml`, and a namespace
+`fixture-rest` of directory patterns (the project's own) classifying every other tracked path, so that doctor's
+`path_map` part passes before the update (checked by the fixture) and only the update's own files can fail it
+afterwards. The doctor is run with `gov doctor --json`; the full doctor is green before in this fixture (exit 0), so
+its exit code is compared whole, and the `path_map` part by its `status`, `unclassified_count` and `unclassified`.
+Read: the path map file (YAML, and its lines for the merge cases), the template's path map, `gov update B --json`,
+`gov doctor --json`.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| S9 | `test_w2_17_fix_updates_path_map.py::test_the_kits_path_map_template_classifies_governance_updates`, `test_w2_17_fix_updates_path_map.py::test_a_freshly_adopted_repository_already_classifies_governance_updates`, `test_w2_17_fix_updates_path_map.py::test_the_update_adds_the_line_to_a_path_map_without_it_once`, `test_w2_17_fix_updates_path_map.py::test_doctors_path_map_part_has_no_unclassified_update_record_after_the_update`, `test_w2_17_fix_updates_path_map.py::test_doctors_exit_code_is_the_same_before_and_after_the_update`, `test_w2_17_fix_updates_path_map.py::test_the_update_merges_the_line_and_keeps_the_projects_own_lines`, `test_w2_17_fix_updates_path_map.py::test_the_update_of_a_path_map_that_has_the_line_leaves_it_once` | The template `template/governance/project/path-map.yaml` and a freshly adopted repository's path map hold no `governance/updates/**` line (0, not one); after `gov update` the path map still holds none, and doctor's `path_map` part fails with `unclassified: ["governance/updates/0.9.1.json"]`, doctor's exit 0 before and 3 after. Green on the base, as a guard: the map that already has the line stays at one line after the update |
+
+Red on the base: the first six; green guard: `test_the_update_of_a_path_map_that_has_the_line_leaves_it_once`.
+
+The merge case keeps every line of a path map the project edited (an extra pattern in a kit namespace, an own
+namespace, its own comment) in its order and asserts no conflict is reported for the path map and no conflict marker
+is written; the update must succeed (exit 0). Not asserted: the namespace the line lands in, or its position.
+
+Run: `TMPDIR=$(mktemp -d) python3 -m pytest tests/acceptance/W2-17/test_w2_17_fix_updates_path_map.py` (seven cases,
+three updates, about a minute).
+
+## The fix F1 (a): the connectors key in the adopted repository's settings (fixes-015a)
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| F1 | `test_w2_17_fix_connectors_key.py::test_the_kits_settings_carry_the_key`; `test_w2_17_fix_connectors_key.py::test_a_freshly_adopted_repository_has_the_key`; `test_w2_17_fix_connectors_key.py::test_gov_update_adds_the_key_to_settings_that_lack_it` | `template/governance/kernel/settings.json` has no `disableClaudeAiConnectors`; the adopted project's and the updated project's `.claude/settings.json` lack it. Guard, green: `test_gov_update_keeps_every_other_key_of_the_settings` |

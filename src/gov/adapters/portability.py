@@ -56,6 +56,12 @@ LIFTED_HOOK = "posttooluse.py"
 GENERATE = ("generate", "--targets", "claudecode,agentsmd",
             "--features", "rules,hooks,permissions,subagents,commands,skills", "--input-roots")
 GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")  # rulesync alone writes here (DEC-471)
+# A slot of a kernel template ({KEY}, {KEY: description}, {CMD:name}, {STEP:name}); a brace a shell's $ opens is none.
+# The brief builder fills a slot from a ticket; a role file is written for no ticket, so generation fills or drops it.
+SLOT = re.compile(r"(?<!\$)\{([A-Z][A-Z0-9_]*)(?::([^{}\n]*))?\}")
+SLOT_WORDS = {"ID": "the ticket's id", "TREE": "your worktree", "WRITE_TREE": "your worktree",
+              "TESTS_TREE": "the tests worktree", "TESTS_READY": "the TESTS-READY file", "BASE": "the base commit",
+              "UNIT_TEST_PATH": "your unit-test folder"}
 TOOLS = frozenset("Agent Bash Edit Glob Grep NotebookEdit Read Skill Task TodoWrite WebFetch WebSearch Write".split())
 TOOLS_FIELD = re.compile(r"^[-*]\s+\*\*Tools:?\*\*:?(.*(?:\n[ \t]+\S.*)*)", re.MULTILINE)
 # Seconds, for each of the two rulesync calls (W2-57). Measured beside a 40-worker parallel run at loads up to 48:
@@ -191,6 +197,19 @@ def _front_block(text: str) -> str:
     return "" if end < 0 else text[:end + 4] + text[end + 4:].partition("\n")[0] + "\n"
 
 
+def fill_slots(text: str) -> str:
+    """A template's slots made text for a role file (F11): ``{CMD:name}`` is "the ``name`` command of your brief",
+    a key with a wording of ``SLOT_WORDS`` is that wording, any other key is ``<key in lower case>``. No brace slot
+    is left."""
+    def one(match: re.Match) -> str:
+        key, rest = match.group(1), match.group(2)
+        if key in ("CMD", "STEP") and rest is not None:
+            return f"the `{rest.strip()}` {'command' if key == 'CMD' else 'step'} of your brief"
+        return SLOT_WORDS.get(key) or "<" + key.lower().replace("_", " ") + ">"
+
+    return SLOT.sub(one, text)
+
+
 def compose(root: Path | str, role: str) -> str:
     """The full text a role's rulesync source must have (W2-153 S3 amended, DEC-1112 (3)): the source's own rulesync
     front matter as written (with ``claudecode.skills``), one blank line, the kernel role template's body, one blank
@@ -204,7 +223,7 @@ def compose(root: Path | str, role: str) -> str:
     role_body = _split(kernel / "roles" / f"{role}.md")[1]
     front = _front_block((root / SOURCES / "subagents" / f"{role}.md").read_text(encoding="utf-8"))
     template = _role_template(kernel, role)
-    body = role_body if template is None else _split(template)[1].rstrip("\n") + "\n\n" + role_body
+    body = role_body if template is None else fill_slots(_split(template)[1]).rstrip("\n") + "\n\n" + role_body
     return front + "\n" + body if front else body
 
 
@@ -423,6 +442,24 @@ def kit_text_findings(root: Path) -> list[dict]:
     return findings
 
 
+def _same_generated(path: Path, rel: str, content: bytes) -> bool:
+    """The project's file is what rulesync generated: its bytes equal, or (settings) equal but for the
+    ``disableClaudeAiConnectors`` key that ``gov adapters generate`` merges in (fixes-015a F1)."""
+    held = path.read_bytes()
+    if held == content:
+        return True
+    if rel != ".claude/settings.json":
+        return False
+    try:
+        own, generated = json.loads(held.decode("utf-8")), json.loads(content.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return False
+    if not (isinstance(own, dict) and isinstance(generated, dict)):
+        return False
+    key = "disableClaudeAiConnectors"
+    return {k: v for k, v in own.items() if k != key} == {k: v for k, v in generated.items() if k != key}
+
+
 def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
     """Comparison 3: ``(findings, number of files compared)``. rulesync generates from the project's
     sources into an empty temporary folder; each file it writes there is compared byte for byte with the
@@ -441,7 +478,11 @@ def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
         return [_finding("RULESYNC_FAILED", f"rulesync generate: {reason}")], 0
     findings = [_finding("GENERATED_DIFFERS", "is not what rulesync generates from its sources", rel)
                 for rel, content in made.items()
-                if not (root / rel).is_file() or (root / rel).read_bytes() != content]
+                if not (root / rel).is_file() or not _same_generated(root / rel, rel, content)]
+    for path in sorted((root / ".claude/agents").glob("*.md")):
+        if slots := sorted({m.group(0) for m in SLOT.finditer(path.read_text(encoding="utf-8"))}):
+            findings.append(_finding("GENERATED_SLOT", f"holds an unfilled slot: {', '.join(slots)}",
+                                     str(path.relative_to(root))))
     held = sorted(str(path.relative_to(root)) for folder in GENERATED_FOLDERS
                   for path in (root / folder).rglob("*") if path.is_file())
     findings += [_finding("GENERATED_WITHOUT_SOURCE", "rulesync generates no such file from its sources", rel)

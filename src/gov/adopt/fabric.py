@@ -444,12 +444,13 @@ def check_digests(record: dict) -> None:
 
 
 def check_coverage(record: dict, tracked) -> None:
-    """``FABRIC_INCOMPLETE`` (``details["missing"]``: the sorted paths) for a tracked file in neither the indexed list
-    nor the refused list of the store that judges it. The lexical store judges every tracked file; the vector store
-    and the code graph judge theirs, and name their own lists (a store whose ``judged`` is more than its two lists hold
-    leaves files unnamed)."""
+    """``FABRIC_INCOMPLETE`` for a tracked file in neither the indexed list nor the refused list of the store that
+    judges it, or in both. The message names each such file, and ``details`` carries them: ``missing`` (the sorted
+    paths in neither list, over every store) and ``both`` (the sorted paths in two lists). The lexical store judges
+    every tracked file; the vector store and the code graph judge theirs and name them in ``judged_files`` (a block
+    without it, an older record, says only how many files are left out: ``short``)."""
     stores = record.get("stores") if isinstance(record.get("stores"), dict) else {}
-    tracked, missing, short, not_built, errors = set(tracked), set(), [], [], []
+    tracked, missing, both, said, short, not_built, errors = set(tracked), set(), set(), [], [], [], []
     for name in JUDGING:
         store = stores.get(name)
         if isinstance(store, dict) and store.get("requested") is False:
@@ -460,21 +461,27 @@ def check_coverage(record: dict, tracked) -> None:
             if isinstance(store, dict) and store.get("error"):
                 errors.append(f"{name}: {store['error']}")
             continue
-        named = set(store.get("indexed") or []) | {item.get("path") for item in store.get("refused") or []
-                                                  if isinstance(item, dict)}
-        if name == "lexical":
-            missing |= tracked - named
-        else:
-            gap = (store.get("judged") or 0) - len(named)
-            if gap > 0:
-                short.append(f"{name}: {gap} file(s) judged and in neither list")
-    if missing or short or not_built:
-        said = ([f"{len(missing)} tracked file(s) are in neither the indexed list nor the refused list of the store "
-                 "that judges them"] if missing else []) + short \
-            + ([f"a store the path map calls for was not built: {', '.join(not_built)}"
-                + (f" ({'; '.join(errors)})" if errors else "")] if not_built else [])
+        indexed = set(store.get("indexed") or [])
+        reasoned = {item.get("path") for item in store.get("refused") or [] if isinstance(item, dict)}
+        judged_files = store.get("judged_files")
+        gone = tracked - (indexed | reasoned) if name == "lexical" else \
+            set(judged_files) - (indexed | reasoned) if isinstance(judged_files, list) else set()
+        twice = indexed & reasoned
+        missing |= gone
+        both |= twice
+        if gone:
+            said.append(f"{name}: {len(gone)} file(s) judged and in neither list: {', '.join(sorted(gone))}")
+        if twice:
+            said.append(f"{name}: {len(twice)} file(s) in both the indexed list and the refused list: "
+                        f"{', '.join(sorted(twice))}")
+        gap = (store.get("judged") or 0) - len(indexed | reasoned)
+        if name != "lexical" and not isinstance(judged_files, list) and gap > 0:  # an older record: the count only
+            short.append(f"{name}: {gap} file(s) judged and in neither list")
+    if said or short or not_built:
+        said += short + ([f"a store the path map calls for was not built: {', '.join(not_built)}"
+                          + (f" ({'; '.join(errors)})" if errors else "")] if not_built else [])
         raise GovError("FABRIC_INCOMPLETE", "; ".join(said),
-                       {"missing": sorted(missing), "short": short, "not_built": not_built})
+                       {"missing": sorted(missing), "both": sorted(both), "short": short, "not_built": not_built})
 
 
 # ---- the stores' lists, read from the stores the rebuild built
@@ -620,16 +627,19 @@ def _stores(run, result: dict) -> dict:
             raise runtime_too_long(exc) from exc
         except Exception as exc:  # noqa: BLE001 - a graph that cannot be read is named, never shown as 0 nodes and edges
             unreadable = f"{type(exc).__name__}: {' '.join(str(exc).split())}"
+    vector_judged = sorted(rel for rel in lexical_i if rel in chunked)  # the files the vectors store judged
     held = sorted(records & set(paths))  # the record store judges the files that carry records (a plain file is none)
     return {
         "record": {**base, "judged": len(held), "indexed": held, "nodes": n_records, "edges": n_edges, "refused": [],
                    "seconds": timing.get("record_s", 0.0)},
         "lexical": {**base, "judged": len(lexical_i) + len(lexical_r), "indexed": lexical_i, "refused": lexical_r, "chunks": n_chunks,
                     "binary_held": [rel for rel in lexical_i if rel in binary_files], "seconds": timing.get("lexical_s", 0.0)},
-        "vectors": {**base, "judged": len([rel for rel in lexical_i if rel in chunked]), "indexed": vec_i, "refused": vec_r,
+        "vectors": {**base, "judged": len(vector_judged), "judged_files": vector_judged, "indexed": vec_i, "refused": vec_r,
                     "chunks": n_chunks, "vectors": n_vectors, "binary_held": [rel for rel in vec_i if rel in binary_files],
                     "seconds": timing.get("semantic_s", 0.0)},
-        "codegraph": {**base, "judged": len(code_i) + len(code_r), "indexed": code_i, "refused": code_r, "nodes": nodes,
+        "codegraph": {**base, "judged": len(code_i) + len(code_r),
+                      "judged_files": sorted([*code_i, *(item["path"] for item in code_r)]),
+                      "indexed": code_i, "refused": code_r, "nodes": nodes,
                       "edges": edges, "seconds": timing.get("codeintel_s", 0.0), **read,
                       **({} if called_for else {"requested": False}),
                       **({"built": False, "error": unreadable} if unreadable else {})},
@@ -830,7 +840,7 @@ def _stage(run, out: Path, standard: dict, copies: dict) -> dict:
                        {**exc.details, "not_built": sorted({*exc.details["not_built"], *not_built})}) from None
     if not_built:
         raise GovError("FABRIC_INCOMPLETE", "a store the path map calls for was not built: " + ", ".join(not_built),
-                       {"missing": [], "not_built": not_built, "reasons": built.get("not_built")})
+                       {"missing": [], "both": [], "not_built": not_built, "reasons": built.get("not_built")})
     questions, cause = load_questions(getattr(args, "questions", None))
     found_scale = scale(root, stores["codegraph"]["nodes"], stores["codegraph"]["edges"], budget)
     said = over(found_scale)

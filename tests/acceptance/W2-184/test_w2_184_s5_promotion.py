@@ -1,5 +1,11 @@
 """W2-184, KPI success 5 -- a ticket whose review records show two failed reviews or a fail-open finding launches its next
-round on Opus at the table's effort, recorded as ``promotion``; a lower model is refused.
+round at the table's effort, recorded as ``promotion``; another model is refused.
+
+Rewrite-Reason: DEC-1225: these cases pinned a promotion on Opus (``criticality.yaml``'s ``opus``, in the interface
+text below) and a lower model refused. R2: a promotion keeps its record (``promotion``: reason and record), its effort
+rule and its refusals but no longer chooses Opus; its model is the table's (this fixture's engineer C2 entry: Sonnet),
+the key ``opus`` of the criticality file names no promotion's model, and the model's source word is left open
+(``w2_184_support.ANY``).
 
 KPI success-5 [DEC-1120 (3)]. Verify: planted review records: one with two failed reviews, one with a fail-open
 finding, one with neither.
@@ -18,11 +24,13 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
 TK = "DAEO-pr01"
-PROMOTED = dict(model_source="promotion", effort_source="by criticality")
+PROMOTED = dict(model_source=s.ANY, effort_source="by criticality")
 
 
 @pytest.fixture()
@@ -32,7 +40,7 @@ def tk(project):
 
 
 def _promoted(launch, tk, reason, record, **kw):
-    return s.assert_session(launch(ENG, tk, **kw), s.OPUS, "high", criticality="C2",
+    return s.assert_session(launch(ENG, tk, **kw), s.TABLES[ENG]["C2"][0], "high", criticality="C2",
                             promotion={"reason": reason, "record": record}, **PROMOTED)
 
 
@@ -46,7 +54,7 @@ def _not_promoted(launch, tk):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("first,second", [("fail", "fail"), ("fail", "failed"), ("failed", "failed")])
-def test_s5_two_failed_reviews_promote_the_next_round_to_opus_at_the_table_s_effort(
+def test_s5_two_failed_reviews_promote_the_next_round_at_the_table_s_model_and_effort(
         project, launch, tk, first, second):
     s.plant_probe(project, tk, "00-pass.md", "pass")
     s.plant_probe(project, tk, "01-review.md", first)
@@ -111,7 +119,7 @@ def test_s5_what_is_not_this_ticket_s_probe_record_is_skipped(project, launch, t
 
 
 # --------------------------------------------------------------------------
-# Every worker role; the Opus model is the criticality file's
+# Every worker role; the model is the table's, not the criticality file's Opus
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("role,cls", [(s.ENGINEER, "C2"), (s.TEST_DESIGNER, "C1"), (s.AUDITOR, "C1"),
@@ -119,21 +127,23 @@ def test_s5_what_is_not_this_ticket_s_probe_record_is_skipped(project, launch, t
 def test_s5_a_promotion_applies_to_every_worker_role_at_the_table_s_effort(project, launch, role, cls):
     tk = s.ticket(project, role, cls)
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(role, tk), s.OPUS, s.TABLES[role][cls][1], criticality=cls,
+    s.assert_session(launch(role, tk), s.TABLES[role][cls][0], s.TABLES[role][cls][1], criticality=cls,
                      promotion={"reason": "two failed reviews", "record": record}, **PROMOTED)
 
 
-def test_s5_the_promoted_model_is_the_one_the_criticality_file_names(project, launch, tk):
+def test_s5_the_promoted_model_is_the_tables_whatever_the_criticality_file_s_opus_key_names(project, launch, tk):
+    """Was: the promoted model is the one the criticality file's ``opus`` names (here ``claude-opus-9-9``). Now the key
+    names no promotion's model."""
     s.write_criticality(project, s.crit_text(opus="claude-opus-9-9"))
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk), "claude-opus-9-9", "high", criticality="C2",
-                     promotion={"reason": "two failed reviews", "record": record}, **PROMOTED)
+    _promoted(launch, tk, "two failed reviews", record)
 
 
-def test_s5_a_ticket_already_on_opus_is_still_recorded_as_promoted(project, launch):
+def test_s5_a_ticket_whose_table_model_is_opus_is_still_recorded_as_promoted(project, launch):
+    """The fixture's engineer C3 entry is Sonnet now (a mechanism fixture: the real role files have no table)."""
     tk = s.ticket(project, ENG, "C3")
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk), s.OPUS, "high", criticality="C3",
+    s.assert_session(launch(ENG, tk), s.SONNET, "high", criticality="C3",
                      promotion={"reason": "two failed reviews", "record": record}, **PROMOTED)
 
 
@@ -151,23 +161,24 @@ def test_s5_with_no_criticality_file_two_failed_reviews_promote_nothing(project,
 # After a promotion: a lower model, a trial; the effort
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("given", [s.SONNET, s.HAIKU5, "opus"])
-def test_s5_a_lower_model_after_the_double_dash_on_a_promoted_ticket_is_refused_naming_both(
+@pytest.mark.parametrize("given", [s.OPUS, s.HAIKU5, "opus"])
+def test_s5_another_model_after_the_double_dash_on_a_promoted_ticket_is_refused_naming_both(
         project, launch, tk, given):
+    """Was: Sonnet, Haiku and ``opus`` refused naming Opus (the promoted model). Now the promoted model is Sonnet."""
     s.promote_two_failed(project, tk)
-    s.refused(launch(ENG, tk, "--model", given), "--model", given, s.OPUS)
+    s.refused(launch(ENG, tk, "--model", given), "--model", given, s.SONNET)
 
 
 def test_s5_the_promoted_model_after_the_double_dash_is_accepted(project, launch, tk):
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk, "--model", s.OPUS), s.OPUS, "high", criticality="C2",
+    s.assert_session(launch(ENG, tk, "--model", s.SONNET), s.SONNET, "high", criticality="C2",
                      promotion={"reason": "two failed reviews", "record": record}, **PROMOTED)
 
 
 def test_s5_an_effort_after_the_double_dash_applies_on_a_promoted_ticket_down_to_the_floor(project, launch, tk):
     record = s.promote_two_failed(project, tk)
-    s.assert_session(launch(ENG, tk, "--effort", "xhigh"), s.OPUS, "xhigh", criticality="C2",
-                     promotion={"reason": "two failed reviews", "record": record}, model_source="promotion",
+    s.assert_session(launch(ENG, tk, "--effort", "xhigh"), s.SONNET, "xhigh", criticality="C2",
+                     promotion={"reason": "two failed reviews", "record": record}, model_source=s.ANY,
                      effort_source="after --")
     s.refused(launch(ENG, tk, "--effort", "medium"), "effort", "medium", "high")
 
@@ -182,10 +193,11 @@ def test_s5_a_promoted_full_ticket_s_second_review_is_still_the_probe(project, l
     tk = s.ticket(project, ENG, "C2", "FULL", tk="DAEO-pr02")
     record = s.promote_two_failed(project, tk)
     promotion = {"reason": "two failed reviews", "record": record}
-    s.assert_session(launch(AUD, tk), s.OPUS, "high", criticality="C2", promotion=promotion, review_round=1,
+    model = s.TABLES[AUD]["C2"][0]  # the fixture's auditor C2 entry (Opus; the real role file has none)
+    s.assert_session(launch(AUD, tk), model, "high", criticality="C2", promotion=promotion, review_round=1,
                      **PROMOTED)
-    s.assert_session(launch(AUD, tk), s.OPUS, "max", criticality="C2", promotion=promotion, review_round=2,
-                     model_source="promotion", effort_source="probe")
+    s.assert_session(launch(AUD, tk), model, "max", criticality="C2", promotion=promotion, review_round=2,
+                     model_source=s.ANY, effort_source="probe")
 
 
 # --------------------------------------------------------------------------

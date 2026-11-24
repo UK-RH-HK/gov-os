@@ -1,13 +1,17 @@
-# The owner's exceptions to the model rule (audit 09 decision 2; DEC-1212 (2)); each:
-# {subagent_type, model, decided, class?}. `model` is the alias `opus` or a model id; an entry that names Opus covers
-# every claude-opus-* model. `class: C3` limits the entry to C3 tickets.
+# The owner's exceptions to the model rule (audit 09 decision 2; DEC-1212 (2); DEC-1225); each:
+# {subagent_type, model, decided, class?, task?, decision?}. `model` is the alias `opus` or a model id; an entry that
+# names Opus covers every claude-opus-* model. Three keys limit an entry, and every one it carries must be met by the
+# spawn or the launch: `class: C3` (the ticket's class), `task: <id or list>` (the spawn prompt's one line
+# `Task: <id>`, or the launch's ticket) and `decision: <DEC-id or list>` (a prompt line `Decision: <DEC-id>`, or the
+# launch's `--owner-named <DEC-id>`). An entry that names Opus and carries none of the three lifts nothing. No entry
+# covers Fable: no session runs it (DEC-1225 (3)).
 # The owner, 2026-11-22 (DEC-1225): Opus only for the orchestrating sessions (each app's CTO and the senior engineer,
-# started by their own start lines, not as helpers); every helper runs Sonnet, C3 work included; no Fable. One
-# exception: a wide, comprehensive audit the owner asks for runs on Opus (DEC-1225 (2), DEC-1230): the entry below.
-# A reviewer called after a failed landing or for a bug runs Sonnet.
-# Read by one rule in two places (W2-201): the helper hook (.claude/hooks/agent_model.py), which finds the ticket in
-# the spawn prompt's line `Task: <ticket id>` and computes its class from governance/project/criticality.yaml, and
-# gov launch (src/gov/launch/model_exceptions.py) for a caller's `--model`. A fork (`subagent_type: fork`) is refused
-# by the hook unless an entry names `fork` here (DEC-1212 (4)).
+# started by their own start lines, not as helpers); every helper runs Sonnet, C3 work included. One exception: a wide,
+# comprehensive audit the owner asks for runs on Opus (DEC-1225 (2), DEC-1230): the entry below, whose spawn prompt
+# carries `Decision: DEC-1230` or whose launch is given `--owner-named DEC-1230`. A reviewer called after a failed
+# landing or for a bug runs Sonnet.
+# Read by one rule in two places (W2-201): the helper hook (.claude/hooks/agent_model.py) and gov launch
+# (src/gov/launch/model_exceptions.py) for a caller's `--model`. A fork (`subagent_type: fork`) is refused by the hook
+# unless an entry names `fork` here (DEC-1212 (4)).
 exceptions:
-  - {subagent_type: independent-auditor, model: opus, decided: "DEC-1225 (2), DEC-1230 (the owner, 2026-11-22: the comprehensive audits he asks for)"}
+  - {subagent_type: independent-auditor, model: opus, decision: [DEC-1230], decided: "DEC-1225 (2), DEC-1230 (the owner, 2026-11-22: the comprehensive audits he asks for)"}

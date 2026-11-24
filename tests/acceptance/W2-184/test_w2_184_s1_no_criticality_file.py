@@ -25,6 +25,8 @@ import re
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, TD, AUD = s.ENGINEER, s.TEST_DESIGNER, s.AUDITOR
@@ -44,13 +46,16 @@ def bare(project):
 
 
 def _real_lines(role):
-    """The kernel role file's own ``Launch default`` and ``Launch by criticality`` lines (the shape the 76 refused cases
-    of W1-28, W1-32, W1-46 and W1-50 had)."""
+    """The kernel role file's own ``Launch default`` line and ``Launch by criticality`` line, which is ``None`` since
+    DEC-1225 (R1: the role files carry none; it was the shape the 76 refused cases of W1-28, W1-32, W1-46 and W1-50 had).
+
+    Rewrite-Reason: DEC-1225: the helper asserted that the file has a table line. It has none; the line is optional here
+    and the case below launches on the default line, with the table line where the file has one."""
     text = (s.b.REPO_ROOT / s.b.ROLES_REL / f"{role}.md").read_text()
     default = re.search(r"^- \*\*Launch default:\*\* model (\S+), effort (\w+)$", text, re.M)
     table = re.search(r"^- \*\*Launch by criticality:\*\*.*$", text, re.M)
-    assert default and table, f"{role}.md has no default line and table line"
-    return (default.group(1), default.group(2)), table.group(0)
+    assert default, f"{role}.md has no default line"
+    return (default.group(1), default.group(2)), table.group(0) if table else None
 
 
 # --------------------------------------------------------------------------
@@ -67,7 +72,7 @@ def test_nf_a_role_with_a_table_line_launches_on_its_default_line_with_no_critic
 
 
 def test_nf_a_the_full_form_table_line_is_not_applied_either(bare, launch):
-    s.write_role(bare, AUD, full={"C2": ((OPUS, "high"), (HAIKU5, "low"))})
+    s.write_role(bare, AUD, full={"C2": ((SONNET, "high"), (SONNET, "low"))})
     tk = s.ticket(bare, ENG, "C2", "FULL", tk=FULL)
     s.assert_session(launch(AUD, tk), *DEFAULT, **PLAIN, review_round=None)
 
@@ -76,7 +81,7 @@ def test_nf_a_the_full_form_table_line_is_not_applied_either(bare, launch):
 def test_nf_a_the_kernel_role_file_s_own_lines_launch_on_the_default_line(project, launch, role):
     """The regression itself: the kernel engineer and test designer lines, no criticality.yaml, a C3 ticket."""
     default, table_line = _real_lines(role)
-    s.write_role(project, role, table=None, lines=[table_line], default=default)
+    s.write_role(project, role, table=None, lines=[table_line] if table_line else [], default=default)
     s.drop_criticality(project)
     tk = s.ticket(project, role, "C3")
     s.assert_session(launch(role, tk), *default, **PLAIN)
@@ -93,7 +98,7 @@ BAD_LINE = {
     "class-twice": s.HEAD + " " + "; ".join((C3, C3, C1, C0)),
     "out-of-order": s.HEAD + " " + "; ".join((C2, C3, C1, C0)),
     "unknown-effort": s.HEAD + " " + "; ".join((C3, C2, C1.replace("xhigh", "extreme"), C0)),
-    "alias-model": s.HEAD + " " + "; ".join((C3.replace(OPUS, "opus"), C2, C1, C0)),
+    "alias-model": s.HEAD + " " + "; ".join((C3.replace(SONNET, "opus"), C2, C1, C0)),
 }
 
 

@@ -14,6 +14,8 @@
 - **The fix signal** (W2-201 fix X6, DEC-1219 (5)): a branch for a ticket closed at the integration head is a fix
   landing when one of its commits carries both the ticket's ``Task:`` trailer and a non-blank ``Fix:`` trailer; the
   fix's line is the oldest such commit's ``Fix:`` value.
+- **No uncommitted work left behind** (W2-115b fix, audit N-01, DEC-1232): ``dirty_files`` lists what a worktree
+  holding the branch has uncommitted (modified, staged, deleted) or untracked and not ignored by ``.gitignore``.
 - **The acceptance tests are there** (W2-202 A3): a ticket judged on its tests has an acceptance folder that holds a
   test and a README whose KPI map the runner of ``gov accept`` reads; else it is refused before any run.
 """
@@ -150,6 +152,14 @@ def fix_line(root: Path, base: str, tip: str, ticket: str) -> str | None:
         if line:
             return line
     return None
+
+
+def dirty_files(tree: Path) -> list[str]:
+    """The repository-relative paths ``git status`` of the worktree ``tree`` lists: modified, staged, deleted, and
+    untracked files not ignored (each file of an untracked folder, a rename as its two paths); sorted. The
+    worktree's index is not written (``--no-optional-locks``)."""
+    out = _git(tree, "--no-optional-locks", "status", "--porcelain", "-z", "--no-renames", "--untracked-files=all")
+    return sorted({entry[3:] for entry in out.split("\0") if len(entry) > 3})
 
 
 def holds_tests(root: Path, rev: str, folder: str) -> bool:

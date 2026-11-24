@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-01: Authority precedence and hard invariants
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can tell which of two conflicting records governs, by a deterministic precedence (Charter → Contract → ADRs → specifications → tasks → retrieval → inference) and by supersession status.
 - **Acceptance:** Given two conflicting records at different precedence levels, `gov retrieve` returns the higher one as in force and marks the lower one superseded.

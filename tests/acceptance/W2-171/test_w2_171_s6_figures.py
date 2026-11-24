@@ -16,11 +16,14 @@ import pytest
 import w2_171_scenario as S
 import w2_171_world as W
 
-TOP = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend"}
+TOP = {"audit", "n", "n_gold", "bar", "verdict", "beside", "misses", "control", "pool", "classes", "spend",
+       "forbidden_rule",  # DEC-1227 D5
+       # Rewrite-Reason: F15 (W2-204 S17): FIGURES.json also carries the rest of the stamp
+       "release", "commit", "reader_model", "grader_models", "questions_with_forbidden"}
 VERDICT = {"right", "wrong", "passes", "right_ok", "wrong_ok", "target_ok", "interval_exact", "not_run"}
 BESIDE = {"hit5", "hit10", "hit20", "mrr", "in_bundle", "full_evidence", "correct_citation_aside", "not_found",
           "a1_right", "a3_right", "mcnemar_a1_a2", "grader_agree", "graded", "search_failures"}
-MISSES = {"total", "by_outcome", "by_rank", "by_namespace", "by_category", "by_route"}
+MISSES = {"total", "by_outcome", "by_rank", "by_namespace", "by_category", "by_route", "forbidden_cited"}  # DEC-1227 D5
 CLASSES = ("gold_wrong", "question_ambiguous", "out_of_scope", "retrieval_miss", "answer_wrong")
 
 
@@ -42,7 +45,11 @@ def same(want, got, path="figures"):
 @pytest.mark.parametrize("name", ["five", "clean", "below", "five37"])
 def test_s6_figures_json_has_exactly_the_keys_of_item_10_and_the_planted_values(make_world, name):
     world = make_world(f"judged:{name}")
-    figures = world.json_of("FIGURES.json")
+    figures = dict(world.json_of("FIGURES.json"))
+    # Rewrite-Reason: DEC-1225 (R4): FIGURES.json names the reader, grader and checker models (key ``models``), beside
+    # the keys of item 10; its three values are Sonnet. The rest is compared as before.
+    models = figures.pop("models")
+    assert isinstance(models, dict) and len(models) == 3 and set(models.values()) == {"claude-sonnet-5-5"}, models
     assert set(figures) == TOP
     assert set(figures["verdict"]) == VERDICT and set(figures["beside"]) == BESIDE
     assert set(figures["misses"]) == MISSES
@@ -89,7 +96,8 @@ def test_s6_figures_json_holds_no_planted_word_gold_path_or_answer(make_world):
     forbidden += [d["question"] for d in world.docs().values()] + [d["gold_answer"] for d in world.docs().values()]
     found = [w for w in forbidden if w in text]
     assert found == [], found
-    assert set(json.loads(text)) == TOP
+    # Rewrite-Reason: DEC-1225 (R4): FIGURES.json also holds ``models`` (the reader, grader and checker models)
+    assert set(json.loads(text)) - {"models"} == TOP
 
 
 def _plant_classes(world, classes: dict[str, str], reason="reasonwordxyz"):

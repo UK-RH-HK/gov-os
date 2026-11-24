@@ -23,8 +23,18 @@ b, s = t.b, t.s
 ENG = t.ENGINEER
 
 
-def _launched(cli, launch, project, tk):
-    t.set_plan(cli, log=t.rich_log())
+def _logged_on(model):
+    """The rich log with every message of the session's own file stated as made by ``model`` (what the harness's log
+    names is what the tier is derived from; the launcher itself only launches Sonnet now, DEC-1225)."""
+    log = t.rich_log()
+    for line in log.main.lines:
+        if isinstance(line.get("message"), dict) and "model" in line["message"]:
+            line["message"]["model"] = model
+    return log
+
+
+def _launched(cli, launch, project, tk, log=None):
+    t.set_plan(cli, log=log or t.rich_log())
     result = launch(ENG, tk)
     assert result.run.returncode == 0 and len(result.calls) == 1, result.describe()
     sid = result.calls[0]["session_id"]
@@ -38,7 +48,9 @@ def test_s11_a_launch_with_a_promotion_records_the_tier_the_criticality_and_the_
     s.promote_two_failed(project, tk)
     record, launched, model = _launched(cli, launch, project, tk)
     assert launched["promotion"] is not None and launched["criticality"] == "C2", "the fixture made no promotion"
-    assert t.measured(record, "tier") == "opus", f"the tier of {model} is not 'opus'"
+    # Rewrite-Reason: DEC-1225 (R2): a promotion launched on Opus (tier "opus"); it launches the table's model now, here the
+    # engineer's C2 entry, Sonnet (tier "sonnet"): the tier is derived from the model's name as before
+    assert t.measured(record, "tier") == "sonnet", f"the tier of {model} is not 'sonnet'"
     t.copied(record, "criticality", "C2")
     promotion = t.measured(record, "promotion")
     assert promotion in (launched["promotion"], launched["promotion"]["reason"]), (
@@ -54,18 +66,26 @@ def test_s11_a_launch_without_a_promotion_or_a_criticality_has_the_keys_null_and
     assert t.measured(record, "tier") == model.split("-")[1], f"the tier is not the one of {model}'s name"
 
 
-@pytest.mark.parametrize("cls,tier", [("C3", "opus"), ("C2", "sonnet"), ("C0", "haiku")])
-def test_s11_the_tier_is_derived_from_the_model_s_name(cli, launch, project, cls, tier):
+# Rewrite-Reason: DEC-1225 (1), (5) (with fixes-015a F13, F14, F19): the launcher launches Sonnet for every role it
+# launches, C3 work included, and replaces any model the rubric does not give; so a launch no longer runs on Opus, Haiku
+# or another family. What success-11 asks (the tier is derived from the model's NAME, as opus, sonnet, haiku or other)
+# is checked on the name the session's log states: the log is planted with each family's model, the launch itself is
+# on Sonnet. No point is dropped; only the way the model of the name is produced changes.
+@pytest.mark.parametrize("cls,name,tier", [("C3", "claude-opus-5-5", "opus"), ("C2", "claude-sonnet-5-5", "sonnet"),
+                                           ("C0", "claude-haiku-4-5", "haiku")])
+def test_s11_the_tier_is_derived_from_the_model_s_name(cli, launch, project, cls, name, tier):
     tk = s.ticket(project, ENG, cls)
-    record, launched, model = _launched(cli, launch, project, tk)
-    assert t.measured(record, "tier") == tier, f"the tier of {model} is not {tier!r}"
+    record, launched, _ = _launched(cli, launch, project, tk, log=_logged_on(name))
+    assert t.measured(record, "model") == name, f"the fixture's log does not name {name}"
+    assert t.measured(record, "tier") == tier, f"the tier of {name} is not {tier!r}"
     t.copied(record, "criticality", cls)
     t.copied(record, "promotion", None)
 
 
+# Rewrite-Reason: DEC-1225 (3), (5): no session runs Fable and the launcher refuses a model the rubric does not give; the
+# model of another family is therefore the one the session's log names, not the one the launch is given.
 def test_s11_a_model_of_another_family_is_tier_other(cli, launch, project):
     s.drop_criticality(project)
-    s.write_role(project, ENG, table=None, default=("claude-fable-5-2", "high"))
-    record, _, model = _launched(cli, launch, project, b.T.tk)
-    assert model == "claude-fable-5-2", "the fixture's engineer does not run on claude-fable-5-2"
+    record, _, _ = _launched(cli, launch, project, b.T.tk, log=_logged_on("claude-fable-5-2"))
+    assert t.measured(record, "model") == "claude-fable-5-2", "the fixture's log does not name claude-fable-5-2"
     assert t.measured(record, "tier") == "other", "a model that is not opus, sonnet or haiku is tier 'other'"

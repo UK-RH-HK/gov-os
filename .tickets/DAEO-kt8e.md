@@ -102,3 +102,7 @@ Written 2026-11-19 by the kit lead from the CTO's brief `docs/emergency-2/briefs
 
 ## Closed on its record (the owner, DEC-1219 (4))
 W2-208 should not have been a ticket: by the rubric its deny-line work is a fix recorded in `gov update`'s own ticket W2-17 (`DAEO-sdhj`, section "Fix: two deny lines only ...") and its golden-rules head is a chore. The owner's ruling (2026-11-19 about 13:55) did not reach the running lead (a message to a `claude -p` lead is not read), so the work was built and committed here; it is recorded under W2-17 and this ticket is closed on this record. Its acceptance folder `tests/acceptance/W2-208/` stays as the fix's tests.
+
+## Fix: the generated-files check named a freshly generated settings file (F1; fixes-015a)
+
+Found 2026-11-24 in the weekly tier: `test_k3_the_adapter_check_applies_no_held_out_step` (2 cases) red with GENERATED_DIFFERS on `.claude/settings.json`. Cause: a product bug. F1 made `gov adapters generate` merge `disableClaudeAiConnectors: true` into the settings, while the check in `src/gov/adapters/portability.py` compared the raw rulesync bytes, so every generated project failed its own check. Fix: `_same_generated` accepts settings equal to the generated ones but for that key (any other difference still fails). Unit test first: `tests/unit/adapters/test_portability.py::TestGeneratedFindings::test_settings_with_the_connectors_key_the_merge_adds_are_no_finding`. Test unchanged. Commit a1874b977.

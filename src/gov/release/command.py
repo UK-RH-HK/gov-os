@@ -140,6 +140,10 @@ def _patch(root: Path, args) -> dict:
         raise _usage("--patch does not take --lock-from")
     if args.version is None:
         raise _usage("no version given: gov release <version> --patch")
+    from gov.util.freeze import paused_error
+
+    if not args.check and (paused := paused_error(root)) is not None:  # F10: before G0, nothing is cut while paused
+        raise paused
     if args.check:
         given = [flag for flag, value in (("--suite", args.suite), ("--kept", args.kept), ("--push", args.push)) if value]
         if given:

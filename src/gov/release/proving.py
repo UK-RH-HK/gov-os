@@ -7,8 +7,13 @@ for ``version`` (outside ``root`` and ``kept``), and for each of the six reposit
 - ``gov update <version> --check`` lists no conflict;
 - ``gov update <version>`` applies and exits 0;
 - ``gov doctor`` exits as it did before the update;
-- the W2-81 judge over the kept outputs and the copy is READY, as it was over the kept repository;
-- ``gov close`` of the run's queue ticket exits 0 (skipped, and said so, where the kept run holds none).
+- the W2-81 judge over the kept outputs and the copy gives the verdict it gave over the kept repository;
+- ``gov close`` of the run's queue ticket exits as it did in an un-updated copy (skipped, and said so, where the kept
+  run holds none).
+
+Each step passes when the copy after the update is no worse than the kept repository before it: the judge's verdict
+equal (or NOT_READY before and READY after), ``gov close`` exits equal (or non-zero before and 0 after), as ``gov
+doctor`` already did. The report names both values of a step, and so does a failed step's reason.
 
 It starts no session and no model, writes nothing in ``kept`` or in ``root``, and never raises: a missing kept folder,
 a kept run with fewer than the six repositories or a failing step is NOT_READY naming the repository and the step.
@@ -130,11 +135,17 @@ def _rehearse_one(name: str, kept: Path, clone: Path, source: Path, version: str
     def go(step: str, *argv: str):
         return _normal(run(step, name, ["gov", *argv], clone))
 
+    ticket = _queue_ticket(kept, name)
     rc, out = go("check", "update", version, "--check", "--json", *with_source)
     conflicts = _conflicts(out)
     steps["check"] = _step(rc == 0 and conflicts is not None and not conflicts, exit=rc,
                            conflicts=list(conflicts or []) if conflicts is not None else None)
     before_rc, _ = go("doctor_before", "doctor", "--json")
+    close_before = None
+    if ticket is not None:  # `gov close` as it exits on a copy of the kept repository that is not updated
+        plain = clone.with_name(f"{clone.name}-before")
+        shutil.copytree(kept / "repos" / name, plain, symlinks=True)
+        close_before, _ = _normal(run("close_before", name, ["gov", "close", ticket], plain))
     rc, _ = go("update", "update", version, "--json", *with_source)
     steps["update"] = _step(rc == 0, exit=rc)
     after_rc, _ = go("doctor_after", "doctor", "--json")
@@ -145,13 +156,14 @@ def _rehearse_one(name: str, kept: Path, clone: Path, source: Path, version: str
         verdicts = [(over_kept or {}).get("verdict"), (over_clone or {}).get("verdict")]
     except Exception as exc:  # a judge that fails to judge is never READY
         verdicts = [f"{type(exc).__name__}: {exc}"[:200]]
-    steps["judge"] = _step(verdicts == [READY, READY], verdicts=verdicts)
-    ticket = _queue_ticket(kept, name)
+    judged = len(verdicts) == 2 and all(v in (READY, NOT_READY) for v in verdicts)
+    steps["judge"] = _step(judged and (verdicts[0] == verdicts[1] or verdicts[0] == NOT_READY), verdicts=verdicts)
     if ticket is None:
         steps["close"] = {"pass": True, "skipped": True, "reason": "the kept run holds no queue ticket for this repository"}
     else:
         rc, _ = go("close", "close", ticket)
-        steps["close"] = _step(rc == 0, exit=rc, ticket=ticket)
+        steps["close"] = _step(rc == close_before or (close_before != 0 and rc == 0),
+                               before=close_before, after=rc, ticket=ticket)
     failed = next((step for step in STEPS if not steps[step]["pass"]), None)
     return {"steps": steps, "failed": failed}
 
@@ -161,7 +173,7 @@ def rehearse(root, commit: str, version: str, kept, run=None, judge=None) -> dic
     report = {"verdict": NOT_READY, "reasons": [], "repositories": {}}
     scratch = None
     try:
-        root = Path(root)
+        root = Path(root).resolve()
         if kept is None or not str(kept):
             report["reasons"].append("no kept run: the rehearsal needs the folder of a kept W2-81 run")
             return report

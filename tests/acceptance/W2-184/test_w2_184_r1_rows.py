@@ -20,6 +20,8 @@ from pathlib import Path
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
@@ -118,7 +120,7 @@ def full(project):
 
 def _round1(launch):
     result = launch(AUD, FULL)
-    s.assert_session(result, s.OPUS, "high", criticality="C2", model_source="by criticality",
+    s.assert_session(result, s.SONNET, "high", criticality="C2", model_source="by criticality",
                      effort_source="by criticality", review_round=1)
     return result
 
@@ -126,14 +128,14 @@ def _round1(launch):
 def _round2_xhigh(launch):
     """Round 2 launched with ``--effort xhigh`` after ``--``: accepted, round 2, effort xhigh."""
     result = launch(AUD, FULL, "--effort", "xhigh")
-    s.assert_session(result, s.OPUS, "xhigh", criticality="C2", model_source=s.ANY, effort_source="after --",
+    s.assert_session(result, s.SONNET, "xhigh", criticality="C2", model_source=s.ANY, effort_source="after --",
                      review_round=2)
     return result
 
 
 def _round2_probe(launch):
     result = launch(AUD, FULL)
-    s.assert_session(result, s.OPUS, "max", criticality="C2", model_source="by criticality", effort_source="probe",
+    s.assert_session(result, s.SONNET, "max", criticality="C2", model_source="by criticality", effort_source="probe",
                      review_round=2)
     return result
 
@@ -159,7 +161,7 @@ def test_r1_f2_a_refused_third_round_leaves_no_record_so_the_owner_named_one_is_
     _round1(launch)
     _round2_xhigh(launch)
     s.refused(launch(AUD, FULL), "round", "3", "DEC-1010")
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.OPUS, "max", criticality="C2",
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.SONNET, "max", criticality="C2",
                      model_source="by criticality", effort_source="probe", owner_named="DEC-123", review_round=3)
 
 
@@ -167,7 +169,7 @@ def test_r1_f2_a_third_round_the_owner_named_is_accepted_and_recorded_after_a_se
     """Red on the base for want of the option and the keys."""
     _round1(launch)
     _round2_xhigh(launch)
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.OPUS, "max", criticality="C2",
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.SONNET, "max", criticality="C2",
                      model_source="by criticality", effort_source="probe", owner_named="DEC-123", review_round=3)
 
 
@@ -185,14 +187,14 @@ def test_r1_f2_a_third_round_after_the_probe_at_its_max_is_still_refused_without
     which names the second record's session id and the setting."""
     _round1(launch)
     second = _round2_probe(launch)
-    s.refused(launch(AUD, FULL), second.session_id(), s.OPUS, "max")
+    s.refused(launch(AUD, FULL), second.session_id(), s.SONNET, "max")
 
 
 def _round3_xhigh_owner_named(launch):
     """Round 3 repeats round 2's xhigh, with the owner named: accepted (so round 4's probe max is a setting no round
     used)."""
     result = launch(AUD, FULL, "--effort", "xhigh", owner_named="DEC-123")
-    s.assert_session(result, s.OPUS, "xhigh", criticality="C2", model_source=s.ANY, effort_source="after --",
+    s.assert_session(result, s.SONNET, "xhigh", criticality="C2", model_source=s.ANY, effort_source="after --",
                      owner_named="DEC-123", review_round=3)
     return result
 
@@ -210,7 +212,7 @@ def test_r1_f2_the_owner_naming_a_decision_opens_a_fourth_round_too(full, launch
     _round1(launch)
     _round2_xhigh(launch)
     _round3_xhigh_owner_named(launch)
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-124"), s.OPUS, "max", criticality="C2",
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-124"), s.SONNET, "max", criticality="C2",
                      model_source="by criticality", effort_source="probe", owner_named="DEC-124", review_round=4)
 
 
@@ -221,7 +223,7 @@ def test_r1_f2_a_ticket_that_is_not_full_has_no_round_limit(project, launch, pro
     for effort in ("high", "xhigh", "max", "xhigh"):
         extra = {"reason": "an extra deep look"} if effort == "max" else {}
         result = launch(AUD, tk, "--effort", effort, **extra)
-        s.assert_session(result, s.OPUS, effort, criticality="C2", model_source="by criticality",
+        s.assert_session(result, s.SONNET, effort, criticality="C2", model_source="by criticality",
                          effort_source="after --", effort_reason=extra.get("reason"))
 
 

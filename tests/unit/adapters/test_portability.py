@@ -335,6 +335,15 @@ class TestGeneratedFindings:
         assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
             ("GENERATED_DIFFERS", "CLAUDE.md")]
 
+    def test_settings_with_the_connectors_key_the_merge_adds_are_no_finding(self, root, tmp_path):
+        """fixes-015a F1: ``gov adapters generate`` adds ``disableClaudeAiConnectors: true`` to the settings; that
+        key alone is no difference from what rulesync generates (a freshly generated project passes its check)."""
+        path = root / ".claude/settings.json"
+        settings = json.loads(path.read_text(encoding="utf-8"))
+        settings["disableClaudeAiConnectors"] = True
+        _write(path, json.dumps(settings, indent=2, ensure_ascii=False) + "\n")
+        assert portability._generated_findings(root, _binary(tmp_path)) == ([], len(GENERATED))
+
     @pytest.mark.parametrize("settings", [
         '{\n  "permissions": {"deny": ["Bash(sudo *)"], "allow": ["WebFetch(domain:example.com)"]}\n}\n',
         '{\n  "permissions": {"deny": ["Bash(sudo *)"], "defaultMode": "bypassPermissions"}\n}\n',

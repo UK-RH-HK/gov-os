@@ -9,6 +9,7 @@ namespaces:
   project:
     paths:
       - governance/project/**
+      - governance/updates/**
   adapters:
     paths:
       - .rulesync/**

@@ -40,6 +40,9 @@ OWN_REGISTER = support.REPO_ROOT / "docs" / "DECISION_REGISTER.md"
 # entries, three of them held by name: the archive's text where this tree holds it, else the register's.
 OWN_ARCHIVE = support.REPO_ROOT / "docs" / "archive" / "DECISION_REGISTER-2026-11-19.md"
 WORKED_EXAMPLE = OWN_ARCHIVE if OWN_ARCHIVE.is_file() else OWN_REGISTER
+# DEC-1214 (the register's exit): entries the old register was archived with, and holds, without a status line; the archive
+# is history and is not edited. Each is held by name: it must fail for exactly that reason, and no other entry may fail.
+HELD_NO_STATUS = {"DEC-027", "DEC-974"} if OWN_ARCHIVE.is_file() else set()
 
 REGISTER = """\
 # Decisions
@@ -441,8 +444,9 @@ def test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves(api
 
 def test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails(api, tmp_path):
     """The text of ``docs/DECISION_REGISTER.md`` of this checkout (since its move, of the archived old register,
-    ``WORKED_EXAMPLE``), read in place and committed into a temporary project as its named register. Three of its
-    entries are held by name."""
+    ``WORKED_EXAMPLE``), read in place and committed into a temporary project as its named register. Two of its
+    entries, DEC-027 and DEC-974, were archived without a status line (the archive is history and is not edited,
+    DEC-1214) and are held by name; every other entry is one record and none fails."""
     text = WORKED_EXAMPLE.read_text(encoding="utf-8")
     headings = _headings(text)
     assert len(headings) > 500, f"the fixture is wrong: {len(headings)} headings read from {WORKED_EXAMPLE}"
@@ -451,10 +455,17 @@ def test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails
     summary = api.load(root)
 
     records = {record_id: found for record_id, found in _by_id(api, root).items() if record_id.startswith("DEC-")}
-    assert summary["invalid"] == [], f"{len(summary['invalid'])} entries failed: {summary['invalid'][:5]}"
-    assert sorted(records) == sorted(headings), \
-        f"headings without a record: {sorted(set(headings) - set(records))[:10]}; " \
-        f"records without a heading: {sorted(set(records) - set(headings))[:10]}"
+    held_failures = [entry for entry in summary["invalid"]
+                     if any(f"{held} at line" in entry["reason"] and "no status line" in entry["reason"]
+                            for held in HELD_NO_STATUS)]
+    other_failures = [entry for entry in summary["invalid"] if entry not in held_failures]
+    assert other_failures == [], f"{len(other_failures)} entries failed: {other_failures[:5]}"
+    assert len(held_failures) == len(HELD_NO_STATUS), \
+        f"the entries held by name (archived without a status line) do not fail as held: {held_failures}"
+    expected = sorted(set(headings) - HELD_NO_STATUS)
+    assert sorted(records) == expected, \
+        f"headings without a record: {sorted(set(expected) - set(records))[:10]}; " \
+        f"records without a heading: {sorted(set(records) - set(expected))[:10]}"
     twice = sorted(record_id for record_id, found in records.items() if len(found) != 1)
     assert not twice, f"recorded more than once: {twice[:10]}"
     wrong = sorted(record_id for record_id, (record,) in records.items()

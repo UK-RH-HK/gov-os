@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
@@ -65,7 +67,7 @@ def _table(result, **keys):
 
 def _review(result, effort, effort_source, review_round, **keys):
     """An auditor's review of the FULL ticket on Opus (the table's, which the probe keeps)."""
-    return s.assert_session(result, s.OPUS, effort, criticality="C2", model_source="by criticality",
+    return s.assert_session(result, s.SONNET, effort, criticality="C2", model_source="by criticality",
                             effort_source=effort_source, review_round=review_round, **keys)
 
 
@@ -81,7 +83,7 @@ def _plant_two_trials(project, tk):
 def test_cli_owner_named_admits_a_full_ticket_s_review_that_repeats_a_recorded_setting(gov, full):
     first = gov(AUD, full)
     _review(first, "high", "by criticality", 1)
-    s.refused(gov(AUD, full, "--effort", "high"), first.session_id(), s.OPUS, "high")
+    s.refused(gov(AUD, full, "--effort", "high"), first.session_id(), s.SONNET, "high")
     _review(gov(AUD, full, "--effort", "high", options=("--owner-named", OWNER)), "high", "after --", 2,
             owner_named=OWNER)
 
@@ -90,20 +92,24 @@ def test_cli_owner_named_admits_a_third_review(gov, full):
     _review(gov(AUD, full), "high", "by criticality", 1)
     second = gov(AUD, full)
     _review(second, "max", "probe", 2)
-    s.refused(gov(AUD, full), second.session_id(), s.OPUS, "max")
+    s.refused(gov(AUD, full), second.session_id(), s.SONNET, "max")
     _review(gov(AUD, full, options=("--owner-named", OWNER)), "max", "probe", 3, owner_named=OWNER)
 
 
 def test_cli_a_planted_trial_admits_its_model_after_the_double_dash_and_the_record_holds_its_id(project, gov, tk):
+    # Rewrite-Reason: DEC-1225: the trial's model was Haiku, admitted after -- only with the trial. A trial's model is
+    # Sonnet now (R2), so the model after -- that the trial does not admit is another (Haiku), and the trial's own is
+    # accepted with it.
     s.plant_trial(project, TRIAL, tk=tk)
     s.refused(gov(ENG, tk, "--model", s.HAIKU5), "--model", s.HAIKU5, s.SONNET)
-    s.assert_session(gov(ENG, tk, "--model", s.HAIKU5, options=("--trial", TRIAL)), s.HAIKU5, "high",
+    s.refused(gov(ENG, tk, "--model", s.HAIKU5, options=("--trial", TRIAL)), "--model", s.HAIKU5, s.SONNET)
+    s.assert_session(gov(ENG, tk, "--model", s.TRIAL_MODEL, options=("--trial", TRIAL)), s.TRIAL_MODEL, "high",
                      criticality="C2", model_source="trial", effort_source="trial", trial=TRIAL)
 
 
 def test_cli_a_trial_with_nothing_after_the_double_dash_sets_the_session_s_model_and_effort(project, gov, tk):
     s.plant_trial(project, TRIAL, tk=tk)
-    s.assert_session(gov(ENG, tk, options=("--trial", TRIAL)), s.HAIKU5, "high", criticality="C2",
+    s.assert_session(gov(ENG, tk, options=("--trial", TRIAL)), s.TRIAL_MODEL, "high", criticality="C2",
                      model_source="trial", effort_source="trial", trial=TRIAL)
 
 
@@ -130,14 +136,14 @@ def test_cli_reason_is_recorded_whatever_the_effort(gov, tk):
 def test_cli_trial_and_reason_together_admit_a_trial_s_max(project, gov, tk):
     s.plant_trial(project, TRIAL, tk=tk, effort="max")
     s.refused(gov(ENG, tk, options=("--trial", TRIAL)), "max", "reason")
-    s.assert_session(gov(ENG, tk, options=("--trial", TRIAL, "--reason", WHY)), s.HAIKU5, "max", criticality="C2",
+    s.assert_session(gov(ENG, tk, options=("--trial", TRIAL, "--reason", WHY)), s.TRIAL_MODEL, "max", criticality="C2",
                      model_source="trial", effort_source="trial", trial=TRIAL, effort_reason=WHY)
 
 
 def test_cli_the_three_options_together_are_each_recorded(project, gov, tk):
     s.plant_trial(project, TRIAL, tk=tk)
     options = ("--reason", WHY, "--trial", TRIAL, "--owner-named", "DEC-1167")
-    s.assert_session(gov(ENG, tk, *PROMPT, options=options), s.HAIKU5, "high", criticality="C2",
+    s.assert_session(gov(ENG, tk, *PROMPT, options=options), s.TRIAL_MODEL, "high", criticality="C2",
                      model_source="trial", effort_source="trial", trial=TRIAL, effort_reason=WHY,
                      owner_named="DEC-1167")
 
@@ -195,7 +201,7 @@ def test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_
     passed = (*PROMPT, *AFTER[option])
     result = gov(ENG, tk, *passed, options=BEFORE[option])
     if option == "trial":
-        s.assert_session(result, s.HAIKU5, "high", criticality="C2", model_source="trial", effort_source="trial",
+        s.assert_session(result, s.TRIAL_MODEL, "high", criticality="C2", model_source="trial", effort_source="trial",
                          trial=TRIAL)
     else:
         _table(result, **{{"owner-named": "owner_named", "reason": "effort_reason"}[option]: BEFORE[option][1]})
@@ -206,7 +212,7 @@ def test_cli_owner_named_after_the_double_dash_does_not_admit_a_repeated_setting
     """Guard (green at the head)."""
     first = gov(AUD, full)
     _review(first, "high", "by criticality", 1)
-    s.refused(gov(AUD, full, "--effort", "high", "--owner-named", OWNER), first.session_id(), s.OPUS, "high")
+    s.refused(gov(AUD, full, "--effort", "high", "--owner-named", OWNER), first.session_id(), s.SONNET, "high")
 
 
 def test_cli_reason_after_the_double_dash_does_not_admit_max(gov, tk):

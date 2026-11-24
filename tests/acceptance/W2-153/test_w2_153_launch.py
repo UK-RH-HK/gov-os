@@ -18,8 +18,16 @@ import pytest
 import w2_153_support as support
 from w2_153_support import ALL_ROLES, FLAG, REFUSAL, WORKER_ROLES, LaunchBed
 
-ROLE_MODEL = "claude-opus-5-5"
+ROLE_MODEL = "claude-sonnet-5-5"  # Rewrite-Reason: DEC-1225 (every role launches Sonnet; a caller's --model after -- must be it)
 CALLER = ["-p", "--model", ROLE_MODEL, "--output-format", "json"]
+# Rewrite-Reason: DEC-1225 (R2): the caller's arguments carried the fixture role's Opus for every role, a lead included.
+# A lead's model is Sonnet by the launcher and a --model after -- naming another is refused, so a lead's caller names
+# Sonnet (the launcher then adds none: it is not doubled); a worker's names its fixture role file's model as before.
+LEAD_CALLER = ["-p", "--model", "claude-sonnet-5-5", "--output-format", "json"]
+
+
+def caller_of(role):
+    return LEAD_CALLER if role in support.LEAD_ROLES else CALLER
 
 # W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): gov launch refuses a worker without its role file (version line, default line
 # naming a full model id; a model after -- that is not the role's is refused), so the bed plants one per worker role,
@@ -100,10 +108,11 @@ def _started(run: dict) -> list[str]:
 
 @pytest.mark.parametrize("role", ALL_ROLES)
 def test_s1_the_launch_passes_the_role_s_template_after_the_caller_s_arguments(bed, role):
-    run = bed.launch(role, CALLER)
+    run = bed.launch(role, caller_of(role))
     argv = _started(run)
     _assert_appended(bed, role, run, argv)
-    assert argv[-2 - len(CALLER):-2] == CALLER, f"{role}: the caller's arguments must stay as given: {support.shown(argv)}"
+    caller = caller_of(role)
+    assert argv[-2 - len(caller):-2] == caller, f"{role}: the caller's arguments must stay as given: {support.shown(argv)}"
 
 
 @pytest.mark.parametrize("role", ["engineer", "lead"])
@@ -117,7 +126,7 @@ def test_s1_with_no_caller_arguments_the_flag_is_still_passed_last(bed, role):
 def test_f1_a_missing_template_refuses_with_launch_no_template_naming_the_path_and_starts_no_session(bed, role):
     """The role's own copy is missing; the other seven are there, so none of them stands in for it."""
     bed.template(support.ROLE_TEMPLATE[role]).unlink()
-    run = bed.launch(role, CALLER)
+    run = bed.launch(role, caller_of(role))
     error = run["result"].get("error")
     assert error is not None, (f"{role}: the launch was not refused: {run['result']}; the stand-in CLI was called "
                                f"{len(run['calls'])} time(s)")
@@ -131,7 +140,7 @@ def test_f1_guard_a_copy_no_launch_uses_missing_refuses_nothing(bed):
     for stem in ("brief", "role-cto"):
         bed.template(stem).unlink()
     for role in ("engineer", "lead"):
-        _started(bed.launch(role, CALLER))
+        _started(bed.launch(role, caller_of(role)))
 
 
 @pytest.mark.parametrize("role", ALL_ROLES)
@@ -139,19 +148,36 @@ def test_f2_the_built_arguments_are_integrate_s_but_for_the_one_flag(bed, baseli
     """The same fixture, the same caller's arguments, integrate's launcher at the baseline commit beside this tree's:
     with the one flag and its value taken out, the arguments are equal (the session's temp folder and the home are
     replaced by fixed words, as they differ from run to run)."""
-    ours = bed.launch(role, CALLER)
-    theirs = bed.launch(role, CALLER, src=baseline_src)
+    ours = bed.launch(role, caller_of(role))
+    theirs = bed.launch(role, caller_of(role), src=baseline_src)
     _started(ours)
     _started(theirs)
     assert theirs["result"]["module"].startswith(str(baseline_src)), theirs["result"]
     assert ours["result"]["module"].startswith(str(support.SRC)), ours["result"]
-    mine = _without_mode(support.without_flag(bed.normalised(ours["calls"][0])))
+    mine = _without_launcher_own(_without_mode(support.without_flag(bed.normalised(ours["calls"][0]))), role)
     base = bed.normalised(theirs["calls"][0])
     if role in WORKER_ROLES:  # the settings compared as values: the JSON text is rebuilt once W2-60a's are taken out
         mine = _without_cache_ttl(_without_w2_60a(mine, role), role)
         mine, base = [mine[0], _rules_sorted(json.loads(mine[1])), *mine[2:]], [
             base[0], _rules_sorted(_without_emergency_2(json.loads(base[1]))), *base[2:]]
     assert mine == base,f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
+
+
+def _without_launcher_own(argv: list, role: str) -> list:
+    """Rewrite-Reason: fixes-015a F1 (every launch adds ``--strict-mcp-config`` and one ``--mcp-config`` holding the
+    role's MCP servers) and DEC-1225 (a lead runs Sonnet at effort medium, so the launcher adds ``--effort medium``).
+    These launcher-own flags are taken out like the mode pair, each checked present first (a worker's
+    ``--strict-mcp-config`` is W2-60a's switch and is checked by ``_without_w2_60a``); what is left must be integrate's."""
+    argv = list(argv)
+    at = argv.index("--mcp-config")
+    assert json.loads(argv[at + 1]).get("mcpServers") is not None, f"{role}: {argv}"
+    del argv[at:at + 2]
+    if role in support.LEAD_ROLES:
+        argv.remove("--strict-mcp-config")
+        at = argv.index("--effort")
+        assert argv[at + 1] == "medium", f"{role}: a lead's effort is medium: {argv}"
+        del argv[at:at + 2]
+    return argv
 
 
 def _without_mode(argv: list) -> list:
@@ -234,5 +260,5 @@ def _without_w2_60a(argv: list[str], role: str) -> list[str]:
 def test_f2_guard_integrate_s_launcher_starts_on_the_same_fixture_without_the_flag(bed, baseline_src, role):
     """The baseline is what F2 compares against: integrate's launcher starts the stand-in on this fixture, and its
     arguments carry no template flag."""
-    argv = _started(bed.launch(role, CALLER, src=baseline_src))
-    assert support.flag_values(argv) == [] and argv[-len(CALLER):] == CALLER, support.shown(argv)
+    argv = _started(bed.launch(role, caller_of(role), src=baseline_src))
+    assert support.flag_values(argv) == [] and argv[-len(caller_of(role)):] == caller_of(role), support.shown(argv)

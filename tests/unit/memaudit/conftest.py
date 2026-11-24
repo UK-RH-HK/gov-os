@@ -122,7 +122,8 @@ def question(i: int, commit: str) -> dict:
     q = {"id": f"q{i:02d}", "question": f"What does part {i} say about the planted file?",
          "gold_answer": f"It says line {i}.", "sources": [{"path": path, "heading": f"## H{i:02d} of {Path(path).stem}",
                                                            "lines": [2 * i, 2 * i + 1]}],
-         "commit": commit, "category": CATS[i - 1], "drawn": "none"}
+         "commit": commit, "category": CATS[i - 1], "drawn": "none",
+         "forbidden": ["docs/superseded-planted.md"]}  # F15: declare refuses a set with no forbidden list
     if q["category"] == "nonexistent-id":
         q["question"] = "Which ticket is ZZQ-4242 about?"
     return q

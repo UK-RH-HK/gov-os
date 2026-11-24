@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-58.e: Non-goal: the orchestrator's write scope under the guard: there is no guard to except it from
 
-A covers item of CAP-58 (Containment judged at the landing). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority (DEC-614).
+A covers item of CAP-58 (Containment judged at the landing). Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority (DEC-614).
 
 - **Item:** Non-goal: the orchestrator's write scope under the guard: there is no guard to except it from
 - **Wave:** NONE

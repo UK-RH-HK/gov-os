@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-65: Memory by construction
 
-Generated from `docs/contract/contract.yaml` (Contract v5, version 5.0), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v5, version 5.1), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** Every agent uses memory because its brief carries it, not because it remembers to ask.
 - **Acceptance:** Every brief `gov brief` writes holds the ticket's whole retrieval bundle and no unfilled `{…}` placeholder; every role template and every skill says memory first and none forbids `gov retrieve`; the memory-use log has a line for each retrieve.

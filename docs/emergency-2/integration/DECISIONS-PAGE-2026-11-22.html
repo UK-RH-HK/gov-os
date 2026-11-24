@@ -1,0 +1,484 @@
+<title>Integration spec questions, 22 November</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding-block:10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding-block:22px 80px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0;min-width:0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+<header class="bar"><div class="bar-in">
+  <h1>Integration spec questions, 22 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">These are the spec questions found by integration steps one and two (DEC-1238 (10)). None of them stops work tonight. Each card gives what was found, the options with their costs, and the recommendation. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
+<p class="hint" id="batchline"></p>
+
+<section class="state" aria-labelledby="how">
+  <h3 id="how">How to answer</h3>
+  <ul>
+    <li>Tap one option on a card. A card you leave alone is sent as "skip".</li>
+    <li>"Take every recommendation" fills every card with its recommended option; your notes stay.</li>
+    <li>At the end, tap "Copy the answer sheet" and paste it to your advisor, then to the CTO.</li>
+  </ul>
+</section>
+
+<h2>Already decided (no card)</h2>
+<p>Nothing to answer. Shown so you can see why these questions have no card.</p>
+<ul class="decided">
+  <li><b>T-4, and R-7 (the same question)</b> Who cuts a full release. Decided by DEC-1235 (2): the CTO cuts releases whose content you approved. Only the build is left, reusing the patch path. The kernel and kit wording that still says "owner's" (rubric item P1.10, <code>CLAUDE.md</code>) is fixed in the CTO's kernel text sweep.</li>
+  <li><b>T-7</b> When a secrets scan runs. Decided by EMERGENCY-2 §2.11 and DEC-1219 G5-7: only before a repository goes public or is shared.</li>
+</ul>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. A note is sent as one line, 400 characters at most.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const BATCH="B-2026-11-22-integration";
+const SECTIONS = [
+{ title:"The work and the landing",
+  intro:"How a chore, an acceptance test, a red landing and a ticket are told apart and checked.",
+  qs:[
+  { id:"T-2", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-2",
+    title:"Does a chore land through gov queue --direct, or by a plain direct commit listed in the digest?",
+    found:[
+      "The draft workflow (W12) says a chore goes through <code>gov queue --direct</code>. EMERGENCY-2 §4 and <code>CLAUDE.md</code> say a chore is a direct commit, listed in the digest.",
+      "The queue has no <code>--direct</code> today (<code>queue/command.py:85-101</code>).",
+      "The label <code>Class: C</code> on a commit is typed text. Nothing checks that it is true."],
+    opts:[
+      ["a","Build --direct","Medium, about 100 lines: tests chosen by impact, no ticket, a notice when a Class: C commit changes code or tests beyond records. Every landing then goes through the queue."],
+      ["b","Keep the direct commit; add only the notice and the digest listing","Small. A chore never runs a test through code."],
+      ["c","Both: direct commit for records and docs only; --direct carries the rest","Medium, the same build as (a).",1]],
+    reason:"Records and docs cannot fail a test; anything that touches code gets its tests run, so \"tests unchanged and green\" stays a code check.",
+    sources:"GOLDEN-WORKFLOW.md W12; EMERGENCY-2.md §4.6; CLAUDE.md three kinds of work; audit 4 A-16, A-32; tool map row 70.",
+    stops:"Does not stop work; gates plan item A-16 (its order)." },
+  { id:"T-3", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-3",
+    title:"Must every acceptance case be red on the base?",
+    found:[
+      "W9 says the tests \"must be red on the base\". Plan item A-3 would refuse an acceptance folder with a KPI line that is green there, unless the README row says <code>pins: &lt;reason&gt;</code>.",
+      "Practice has guard cases that are green on the base on purpose: \"9 new cases (6 red, 3 guards)\" (commits <code>e57df5b68</code>, <code>38df7bf90</code>).",
+      "No code runs the base today."],
+    opts:[
+      ["a","All cases red (strict); guards live in a separate non-acceptance file","A convention, and some READMEs rewritten."],
+      ["b","At least one red case per KPI line; guard cases allowed when the README row marks them guard","Small: a change to the parse, plus a README column.",1],
+      ["c","The pins: marker as in A-3","Medium."]],
+    reason:"Red-on-base is there so each KPI line has a test that can fail; a marked guard case that must stay green is a legitimate second kind.",
+    sources:"GOLDEN-WORKFLOW.md W9; audit 4 A-3, A-12; fixes-015b commit messages; accept/runner.py:139; tool map row 52.",
+    stops:"Does not stop work; gates plan item A-3 (its design)." },
+  { id:"T-6", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-6",
+    title:"Which commands and library modules that serve no step are retired?",
+    found:[
+      "Commands with no caller: <code>gov skilleval</code> (defaults to Opus), <code>gov session-watch</code> (L2-COMMANDS row 32 already retires it). <code>gov close</code> and <code>gov closure</code> are still listed, and briefs and skills still name them.",
+      "Library code with no caller: <code>retrieval/validate.py</code>, <code>retrieval/synthesis.py</code>, <code>retrieval/supplementary.py</code>, <code>tasks/claims.claim()</code>, <code>tasks/bridge.py</code>, <code>decisions/backfill.py</code>.",
+      "Some of these carry Contract capabilities (CAP-55.a, CAP-57.a, CAP-19.c, CAP-23.a)."],
+    opts:[
+      ["a","Retire all, and re-baseline the capabilities they carry","Contract edits, which are yours to approve."],
+      ["b","Wire each into its step","Medium each; for example claims.claim into gov launch, validate into gov retrieve."],
+      ["c","Retire what the Contract does not carry; wire what it does","Both costs, but only for part of the list.",1]],
+    reason:"No Contract edit is forced, and nothing the Contract promises is dropped.",
+    sources:"audit 4 §1.1 \"library code with no caller\"; L2-COMMANDS.md; tool map rows 93 to 95.",
+    stops:"Does not stop work." },
+  { id:"T-12", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-12",
+    title:"Does a red landing call a quality auditor by code, or does the CTO decide?",
+    found:[
+      "W11 says \"a red calls a quality auditor (Sonnet) to diagnose and an engineer to fix\".",
+      "Golden rule 3 and <code>CLAUDE.md</code> say a review happens for a red, but most causes are found and fixed without review.",
+      "The queue launches nothing on a red today. The diagnosis form (List B, B6) is not built."],
+    opts:[
+      ["a","Code launches the auditor on every red","Medium. Spends a session per red."],
+      ["b","The CTO decides; the queue writes the red's record in B6's form","Small.",1],
+      ["c","Code launches only when the red repeats (a second round)","Small to medium; a session only on a repeat."]],
+    reason:"It matches \"most causes are found and fixed without review\" and keeps the cost off green work; (c) can follow later.",
+    sources:"GOLDEN-WORKFLOW.md W11, rule 3; CLAUDE.md \"When a review happens\"; audit 4 B6; tool map row 58.",
+    stops:"Does not stop work." },
+  { id:"R-1", from:"DECISIONS-HELD SQ-1",
+    title:"What is \"a time box\", so that a quick item that outgrows it becomes a fix or a feature?",
+    found:[
+      "Golden rule 6 (<code>GOLDEN-WORKFLOW.md:31</code>) says a quick item that outgrows its time box becomes a fix or a feature.",
+      "No document defines a time box, a length, or who starts the clock. No code reads one.",
+      "EMERGENCY-2 §4 and <code>CLAUDE.md</code> name only the three kinds of work."],
+    opts:[
+      ["a","A count code can read: a chore stops at N commits or M changed lines beyond records, then the queue refuses Class: C","A number to choose, and a few false refusals."],
+      ["b","Drop the sentence: a chore is whatever changes no behaviour and keeps the tests unchanged and green","A loose item that grows is caught only by the notice on changes to tests or code (A-16).",1],
+      ["c","A stated limit in minutes, for the lead only, judged","Cannot be enforced."]],
+    reason:"The notice from A-16 already catches a growing chore; no new number is needed. Confidence: medium.",
+    sources:"GOLDEN-WORKFLOW.md:29-31; EMERGENCY-2.md §4; audit 4 A-16; src/gov/release/patch.py:237-246.",
+    stops:"Does not stop work." },
+  { id:"R-2", from:"DECISIONS-HELD SQ-2",
+    title:"May the queue refuse a ticket that is not a feature, where DEC-1219 (5) said \"flagged, never refused\"?",
+    found:[
+      "<code>NEW_TICKET_NOT_FEATURE</code> is a notice by decision (DEC-1219 (5)).",
+      "Golden rule 6 and W12 and W7 say the ready check refuses an unfilled item and every plan item is checked before work starts.",
+      "The two disagree for a ticket added in a branch (<code>queue/checks.py:106-139</code>)."],
+    opts:[
+      ["a","Keep the notice; refuse only at planning and launch, where the ready check already refuses","A non-feature ticket can land, then show in the digest."],
+      ["b","Refuse at the landing; DEC-1219 (5) amended","A lead's branch with a draft ticket is sent back."],
+      ["c","Refuse only a ticket that is not in the planned wave's list (P1.2); keep the notice for the rest","Small.",1]],
+    reason:"It refuses what no one planned and leaves a lead's draft alone. Confidence: medium.",
+    sources:"DEC-1219 (5); queue/checks.py:106-139; launcher.py:47-48; GOLDEN-WORKFLOW.md rules 6, 8.",
+    stops:"Does not stop work." },
+  { id:"R-3", from:"DECISIONS-HELD SQ-3",
+    title:"Which ticket field says \"feature\", given that class already means three other things?",
+    found:[
+      "A ticket's <code>class:</code> is a free kind (<code>implementation</code> on 185 of 219 tickets) that the launcher never reads (<code>criticality.py:8</code>).",
+      "The commit trailer <code>Class: F|Q|C</code> is read only by the patch rule. Criticality C0 to C3 is a fourth meaning.",
+      "The brief's example would overload the first one."],
+    opts:[
+      ["a","Add a field <code>kind: feature</code> (the only legal value) and require it in the schema","A one-off script to migrate 219 tickets, run as a chore.",1],
+      ["b","Require <code>class</code> to be one of a fixed list that includes feature","Breaks the 185 existing values and the tests that read them."],
+      ["c","Infer feature from \"has KPIs and a spec\", no field","A draft cannot be told from a mistake."]],
+    reason:"A separate field keeps the old meaning intact and is migrated by a plain script. Confidence: medium.",
+    sources:"ticket.schema.json:44; launch/criticality.py:8; release/patch.py:162; .tickets/*.md.",
+    stops:"Does not stop work." },
+  { id:"R-8", from:"DECISIONS-HELD SQ-8",
+    title:"What is Class: Q in the patch rule?",
+    found:[
+      "<code>release/patch.py:10, 169, 246</code> accepts <code>Class: Q</code> and <code>Class: C</code> beside a <code>Fix:</code> trailer as a non-feature.",
+      "No document defines Q. RELEASE-ON-BEHALF names F, Q and C only in passing.",
+      "The definition of Q may exist in a commit message the author did not read."],
+    opts:[
+      ["a","Define Q as \"a quick fix with no owning ticket\" and make it a chore","None; it is already a chore under the rubric."],
+      ["b","Drop Q; require Fix: or Class: C","A patch of old commits that use Q fails.",1],
+      ["c","Leave it undefined","The gap stays."]],
+    reason:"One fewer label to define, once R-1 settles what a chore is. Confidence: low.",
+    sources:"release/patch.py:10, 162-169, 237-246; RELEASE-ON-BEHALF.md:63-69.",
+    stops:"Does not stop work." }
+  ]},
+{ title:"Models, decisions and sessions",
+  intro:"Who sets a model or effort, how a decision gets its level, and how a fresh session starts.",
+  qs:[
+  { id:"T-1", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-1",
+    title:"What is the first slice of rule 8's decision machinery, and does your push stay Claude Code's own?",
+    found:[
+      "Rule 8 and W5 say each decision is a record whose fields set its level, code refuses a decision below it, owner decisions go to a page, and answers are written into the register.",
+      "Today only <code>basis</code> and <code>in-force</code> exist (<code>decisions/command.py:36-52</code>). The template has no level field. Nothing writes a page or a push; <code>owner-ping</code> appends to a log nobody reads.",
+      "Your phone push is Claude Code's own (<code>agentPushNotifEnabled</code> in <code>~/.claude/settings.json</code>). The page is specified in <code>DECISIONS-BY-PAGE-SPEC.md</code>."],
+    opts:[
+      ["a","Build all of rule 8: three record fields, the level, the refusal, gov decisions answer, a page generator, a push","Large, several tickets."],
+      ["b","First slice only: the three fields, a computed level, the refusal below the level, gov decisions answer; page and push by hand as today","Medium, about 200 lines.",1],
+      ["c","Keep text; add only A-14, A-19 and A-28","Small each. The level stays text."]],
+    reason:"The refusal is what makes the level a code decision; the page is only a rendering of records that then exist. The push stays Claude Code's until a page exists.",
+    sources:"GOLDEN-WORKFLOW.md rule 8, W5; decisions/command.py:36-52; T2-ESCALATION-RUBRIC.md; DECISIONS-BY-PAGE-SPEC.md; audit 4 A-14, A-19, A-28; tool map rows 17 to 21.",
+    stops:"Does not stop work. It is a feature, so a ticket needs your approval." },
+  { id:"T-10", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-10",
+    title:"What is the single source of a session's model and effort?",
+    found:[
+      "Rule 7 says no session chooses its own. <code>gov launch</code> takes the role's model from the table (<code>f6e9e38af</code>).",
+      "But <code>start_cto.sh:10</code>, <code>start_lead.sh:3-6</code> and <code>start_audit.sh</code> pass their own model and effort.",
+      "<code>~/.claude/settings.json</code> sets <code>CLAUDE_CODE_SUBAGENT_MODEL</code> for helpers (read by <code>agent_model.py</code>)."],
+    opts:[
+      ["a","Every start goes through gov launch and the user-level value is removed","Medium; follows W8's plan."],
+      ["b","Keep the user-level value as the default; gov launch overrides per role","Small."],
+      ["c","Leave the scripts until W8 replaces them","None now.",1]],
+    reason:"Do nothing now and take (a) at W8; you remove the user-level value when gov launch orchestrator exists.",
+    sources:"GOLDEN-WORKFLOW.md rule 7; start_cto.sh:10; start_lead.sh:3-6; .claude/hooks/agent_model.py; ~/.claude/settings.json; tool map rows 37 to 40, 57, 87.",
+    stops:"Does not stop work." },
+  { id:"T-13", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-13",
+    title:"What is the handover's form, and who starts a fresh CTO or senior engineer?",
+    found:[
+      "Rule 10 says orchestrators start fresh each morning from a handover.",
+      "<code>start_cto.sh</code> needs a handover file and starts the CTO in tmux on Opus. <code>role-cto.md</code> reaches no session (A-24).",
+      "The senior engineer has no start path, and its hand-off folder does not exist.",
+      "The handover (<code>CTO-HANDOVER.md</code>, <code>HANDOVER.md</code>) is hand-written with no schema."],
+    opts:[
+      ["a","A handover schema, and a check at gov launch orchestrator that refuses a missing or malformed one","Medium."],
+      ["b","The CTO writes the handover in the checkpoint form (gov checkpoint) and the launcher reads that","Small; reuses a form already built.",1],
+      ["c","Leave it as text","None; no check."]],
+    reason:"It reuses a form that already exists and gives the launcher something to read.",
+    sources:"GOLDEN-WORKFLOW.md rule 10; start_cto.sh:11-20; kernel/templates/checkpoint.md; audit 4 §1.3, B14, B15, A-24; tool map row 40.",
+    stops:"Does not stop work; gates plan item W8 (the CTO and senior-engineer start)." },
+  { id:"R-4", from:"DECISIONS-HELD SQ-4",
+    title:"What is the effort of each role (golden rule 7: \"effort is set by role in the rubric\")?",
+    found:[
+      "There is no effort table. Every role file says effort high; leads run medium by DEC-1236 (2).",
+      "<code>launcher.py:176-177, 766</code> refuses a launch's own effort below high.",
+      "DEC-1236 (3) forbids the CTO changing any role's effort before your yes, so the CTO cannot write the table.",
+      "27 % of a day's spend was output at high effort (DEC-1236 basis)."],
+    opts:[
+      ["a","Record today's as the table: CTO and senior engineer high, ticket lead and fix or chore lead medium, every other role high; change only by you","None now. Engineer and test designer stay at the most expensive effort.",1],
+      ["b","You set each role's effort now","Your time; best for usage."],
+      ["c","Effort by criticality, C0 low","An extra axis (see R-5)."]],
+    reason:"It writes down what runs today; (b) can follow as a card after the integration, since any change needs your yes anyway. Confidence: medium.",
+    sources:"template/governance/kernel/roles/*.md (line Launch default); DEC-1236 (2), (3); usage-breakdown-2026-11-22.md.",
+    stops:"Does not stop work. Answer before plan item F14 is filled (leads medium in gov launch needs the floor changed; already approved in DEC-1236 (2))." },
+  { id:"R-5", from:"DECISIONS-HELD SQ-5",
+    title:"Does criticality still vary the model or effort?",
+    found:[
+      "DEC-1225 made every launched role Sonnet at every criticality. After the models-rubric change no role file has a \"Launch by criticality\" line.",
+      "So the class now decides only the promotion and probe Opus (<code>criticality.yaml:6</code>, <code>launcher.py:700-725</code>) and a <code>class: C3</code> exception entry (none exist).",
+      "The brief's own title is still \"by criticality\"."],
+    opts:[
+      ["a","Retire the model axis; keep criticality for review depth and the profile only; rename the rubric \"by role\"","A few lines. Promotion and probe retire with it, as DEC-1225 says, unless you say otherwise.",1],
+      ["b","Keep an effort-by-criticality column","Another table for you to approve."],
+      ["c","Keep promotion and probe on Opus","Conflicts with DEC-1225 (no Opus but two roles and your audit)."]],
+    reason:"It matches DEC-1225 and removes a table nobody uses. Confidence: medium.",
+    sources:"LEAD-models-rubric.md R1; criticality.yaml:6; launcher.py:700-725; DEC-1225; golden rule 7.",
+    stops:"Does not stop work." },
+  { id:"R-6", from:"DECISIONS-HELD SQ-6",
+    title:"Is a decision's level computed from the author's stated facts, or declared by the author and only checked?",
+    found:[
+      "Golden rule 8 and W5 say the record's fields set the level by code.",
+      "The approved page spec (DEC-1236) has a <code>rubric</code> field the author names (P1.1 to P1.10, P2.brought), and the check only tests that it is a rubric line.",
+      "The spec has no <code>touches</code>, <code>reversible</code> or <code>inside</code> fields. As approved, the page cannot refuse a P1 that an author calls P2."],
+    opts:[
+      ["a","Add the fields of §3 to slice (a) and compute the line","About 80 lines and a spec amendment you approve. A lead can still misstate a fact; the digest catches it after.",1],
+      ["b","Keep the declared rubric; add a check that the paths changed force P1","Covers only decisions that change files, not those about a measurement or a spend."],
+      ["c","Leave the judgement to the CTO","\"Code refuses below its level\" stays text."]],
+    reason:"It makes rule 8 a code decision. Confidence: medium.",
+    sources:"GOLDEN-WORKFLOW.md rule 8, W5; DECISIONS-BY-PAGE-SPEC.md \"The record\", PG-1; DEC-1236 (1); T2-ESCALATION-RUBRIC.md §2.",
+    stops:"Does not stop 0.1.5. It shapes slice (a)'s record, so answer before that ticket's spec is filled." }
+  ]},
+{ title:"Schedules, regression and trace",
+  intro:"Where schedules and checks run in an adopted repository, and what triggers the impact trace.",
+  qs:[
+  { id:"T-5", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-5",
+    title:"Where do schedules and git hooks live in an adopted repository?",
+    found:[
+      "W3 (retry), W4 (weekly), W16 and rule 4 all need schedules.",
+      "Gov OS's are crontab lines you and the CTO keep (the minute tick, the hourly backup, <code>@reboot</code>) and one untracked git hook. The kit installs no crontab and no hook.",
+      "An adopted repository such as EXAMIN gets none of them, except through your shared crontab."],
+    opts:[
+      ["a","The product ships one scheduler: gov dispatch pass, run by one cron line, with the schedule in governance/project/ config","Large (W2-207 slice 4).",1],
+      ["b","The kit installs git hooks (a reference-transaction hook) and a crontab fragment","Medium."],
+      ["c","Leave it as your per-machine setup, documented","No code. Contradicts rule 3."]],
+    reason:"(a) with the hook install of (b): one cron line and everything else in config; it also absorbs map rows 11, 12, 15, 43 and 81.",
+    sources:"GOLDEN-WORKFLOW.md W3, W4, W15, W16, rule 4; crontab; .git/hooks/reference-transaction; audit 4 A-10, A-29, A-38; W2-207 (DAEO-rt4s); tool map rows 11, 12, 15, 81, 92.",
+    stops:"Does not stop work; gates every \"scheduled\" plan item in step three." },
+  { id:"T-8", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-8",
+    title:"Where does the full regression run, and who produces the record the patch gate reads?",
+    found:[
+      "The draft has no step for the nightly. The nightly cron lines are commented out, against EMERGENCY-2 A-1 \"keep\".",
+      "The patch release's G2 gate reads \"a nightly record, scope full, verdict green\" for the exact commit (<code>release/gates.py:112</code>).",
+      "<code>gov queue --full</code> (<code>queue/full.py</code>) and <code>close/nightly.py</code> already exist."],
+    opts:[
+      ["a","Restore the nightly with one cron line and add it to W16","Very small, plus the schedule."],
+      ["b","Make the record on demand: gov release --patch calls gov queue --full for the commit","Medium.",1],
+      ["c","Drop G2; rely on the queue's scoped runs plus the proving run","Small; loses the full run."]],
+    reason:"A record made when needed is exact for the commit and needs no schedule; keep (a) as a weekly safety net.",
+    sources:"release/gates.py:1-8,112; queue/full.py; close/nightly.py; crontab lines 1-5; EMERGENCY-2 A-1; tool map rows 66, 73.",
+    stops:"Does not stop work; gates plan item W13 (the patch path)." },
+  { id:"T-9", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-9",
+    title:"Where do the G1, G2 and G3 checks run, given that push is denied and lefthook is not installed?",
+    found:[
+      "G1 and G2 (pre-commit) and the push check run only from lefthook, which is not installed (<code>core.hooksPath</code> unset).",
+      "CI is manual in Gov OS and on push in the kit and EXAMIN, which have no remote and cannot push.",
+      "Audit 4 A-29 leaves the choice to the CTO: notices after a commit, or <code>lefthook install</code>."],
+    opts:[
+      ["a","Reference-transaction notices (non-blocking, matches \"catch and correct, do not prevent\")","Small."],
+      ["b","Install lefthook (blocks at commit)","Against rule 2's \"no guard\"."],
+      ["c","The queue's after-step only (it already runs gov check --structural)","No extra code; nothing at commit.",1]],
+    reason:"(c) plus (a) for G1 and G2, nothing for G3 outside a release; retire the kit's CI and lefthook if you confirm there is no GitHub use.",
+    sources:"lefthook.yml:18-28; queue/after.py; ci.yml:28-30; audit 4 A-29; tool map rows 63 to 65.",
+    stops:"Does not stop work; gates plan item A-29." },
+  { id:"T-11", from:"GOLDEN-WORKFLOW-CORRECTIONS SQ-11",
+    title:"What triggers the impact trace (W6): recording a decision, planning, or the landing?",
+    found:[
+      "The draft says \"one trace, used by planning and by the landing\".",
+      "<code>gov impact</code> is a query nothing calls. INVESTIGATION-1 D-T07 cut it down to the query alone. The landing's test selection is code to tests only.",
+      "The four small fixes in <code>TOOL-MAP.md</code> section 4 give a trace but no trigger."],
+    opts:[
+      ["a","At the landing only: gov impact --changed in the queue's after-step, listing affected tickets and tests into the close record","Small.",1],
+      ["b","Also at a decision's commit, as a notice","Small, but runs on every decision commit."],
+      ["c","Also in gov plan and gov discover, so a plan item shows what it touches","Medium."]],
+    reason:"(a) now and (c) with the plan step; (b) only if you want the notice at record time.",
+    sources:"impact/__init__.py:283; close/select.py; queue/after.py; GOLDEN-WORKFLOW.md W6; INVESTIGATION-1 D-T07; TOOL-MAP.md section 4.",
+    stops:"Does not stop work; gates plan item W6's fix." }
+  ]}
+];
+
+const KEY="govos-integration-"+BATCH;
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* SHA-256 in plain script, so the page needs no secure context */
+function sha256(str){
+  const msg=new TextEncoder().encode(str);
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const len=msg.length, total=((len+9+63)>>6)<<6, buf=new Uint8Array(total);
+  buf.set(msg); buf[len]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(total-8,Math.floor(len/0x20000000),false); dv.setUint32(total-4,(len<<3)>>>0,false);
+  const w=new Uint32Array(64), rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+4*i,false);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&b)^(a&c)^(b&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+function canon(v){
+  if(Array.isArray(v)) return "["+v.map(canon).join(",")+"]";
+  if(v&&typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+canon(v[k])).join(",")+"}";
+  return JSON.stringify(v);
+}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.from}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<p class="src"><b>Sources:</b> ${q.sources}</p><p class="src"><b>Stops work?</b> ${q.stops}</p>`;
+    h+=`<div class="note cto"><span class="who">Recommended</span>${q.reason}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" maxlength="400" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+/* the batch hash: SHA-256 of the batch id and the cards in page order, as JSON with sorted keys and no spaces */
+const HASH=sha256(canon({batch:BATCH,cards:all.map(q=>({id:q.id,question:q.title,found:q.found,options:q.opts.map(o=>({key:o[0],label:o[1],cost:o[2]})),recommendation:{option:(q.opts.find(o=>o[3])||[])[0]||null,reason:q.reason},sources:q.sources,blocks:q.stops}))}));
+document.getElementById("batchline").textContent=`Batch ${BATCH} · hash ${HASH.slice(0,12)} · ${all.length} cards`;
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const stamp=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  const lines=["GOV-ANSWERS 1",`batch: ${BATCH}`,`hash: sha256:${HASH}`,`answered: ${stamp}`,`count: ${all.length}`];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id}: `;
+    if(v){n++; line+=v;} else line+="skip";
+    const note=(state.notes[q.id]||"").replace(/\s*[\r\n]+\s*/g," ").trim().slice(0,400);
+    if(note) line+=` | note: ${note}`;
+    lines.push(line);
+  }
+  lines.push("END");
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+let clearArmed=null;
+document.getElementById("clear").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!clearArmed){b.textContent="Tap again to clear every answer and note"; clearArmed=setTimeout(()=>{clearArmed=null; b.textContent="Clear my answers";},4000); return;}
+  clearTimeout(clearArmed); clearArmed=null; b.textContent="Clear my answers";
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  render();
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>

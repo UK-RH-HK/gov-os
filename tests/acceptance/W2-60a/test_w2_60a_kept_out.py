@@ -26,7 +26,37 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
+# Rewrite-Reason: F1 / DEC-1232 (6): no session loads the owner's claude.ai connectors; each gets only its role's MCP tools.
+# The line keeps --strict-mcp-config and now also carries one --mcp-config whose config holds no server (the list is empty
+# for every role): the connector assertion below asserts exactly that instead of "no --mcp-config".
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the fixture roles' default
+# models were Opus and are Sonnet now, so the model a case expects the launch to carry is Sonnet.
 import w2_60a_support as s
+
+
+_SNIPPET = '''mcp_seen = []
+for value in values("--mcp-config"):
+    entry = {"value": value}
+    try:
+        with open(value, encoding="utf-8") as handle:
+            entry["text"] = handle.read()
+    except OSError:
+        pass
+    mcp_seen.append(entry)
+'''
+
+
+@pytest.fixture()
+def cli(sandbox):
+    """The stand-in CLI, patched to copy what each ``--mcp-config`` file holds when the session starts."""
+    stand_in = s.install_stand_in_cli(sandbox)
+    text = stand_in.path.read_text(encoding="utf-8")
+    head = 'record = {"argv0"'
+    assert head in text, "fixture: the stand-in CLI changed its record line"
+    stand_in.path.write_text(text.replace(head, _SNIPPET + 'record = {"mcp": mcp_seen, "argv0"', 1), encoding="utf-8")
+    return stand_in
 
 
 def test_the_line_keeps_connectors_and_user_level_settings_out(launch):
@@ -34,7 +64,10 @@ def test_the_line_keeps_connectors_and_user_level_settings_out(launch):
     s.assert_launched(result)
     assert s.occurrences(result.args, "--strict-mcp-config") == 1, (
         f"the line does not carry --strict-mcp-config once: {result.args}")
-    assert s.occurrences(result.args, "--mcp-config") == 0, f"the line hands the session a connector: {result.args}"
+    assert s.occurrences(result.args, "--mcp-config") == 1, f"the line does not carry --mcp-config once: {result.args}"
+    entry = result.session()["mcp"][0]
+    config = json.loads(entry.get("text") or entry["value"])
+    assert config.get("mcpServers") == {}, f"the line hands the session a connector: {config}"
     assert result.values("--setting-sources") == ["project,local"], (
         f"the line does not keep the user's settings out with --setting-sources project,local: {result.args}")
 
@@ -76,5 +109,5 @@ def test_the_session_s_values_come_from_the_repository_not_the_user_s_settings(l
     s.assert_launched(result)
     assert (result.one("--model"), result.one("--effort")) == s.DEFAULTS[s.ENGINEER], (
         f"the line's model and effort are not the role's: {result.args}")
-    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.OPUS, (
+    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.SONNET, (
         "the subagent model is not the role's model")

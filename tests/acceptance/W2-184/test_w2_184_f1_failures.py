@@ -10,17 +10,19 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
 
 
 @pytest.mark.parametrize("role,cls,below", [
-    (ENG, "C3", s.SONNET),            # C3's tier is Opus: Sonnet is below it
+    (ENG, "C3", s.OPUS),              # every role's model is the table's Sonnet: another model is refused
     (ENG, "C3", s.HAIKU5),
-    (s.RESEARCH, "C2", s.SONNET),     # C2's tier for research is Opus
-    (AUD, "C2", s.HAIKU_DATED),       # the auditor's tier is Opus
-    (s.TEST_DESIGNER, "C3", s.SONNET),  # the test designer's C3 tier is Opus
+    (s.RESEARCH, "C2", s.OPUS),
+    (AUD, "C2", s.HAIKU_DATED),
+    (s.TEST_DESIGNER, "C3", s.OPUS),
 ])
 def test_f1_a_model_below_its_tier_with_no_trial_is_refused(project, launch, role, cls, below):
     tk = s.ticket(project, role, cls)
@@ -31,9 +33,12 @@ def test_f1_a_promotion_is_recorded_and_applied(project, launch):
     tk = s.ticket(project, ENG, "C2", tk="DAEO-f101")
     record = s.promote_two_failed(project, tk)
     result = launch(ENG, tk)
-    s.assert_session(result, s.OPUS, "high", criticality="C2", model_source="promotion",
+    # Rewrite-Reason: DEC-1225: pinned a promotion applied as Opus. R2: it is recorded and applied as the table's model
+    # (the engineer's C2 entry: Sonnet) at the table's effort; the model's source word is left open.
+    model = s.TABLES[ENG]["C2"][0]
+    s.assert_session(result, model, "high", criticality="C2", model_source=s.ANY,
                      effort_source="by criticality", promotion={"reason": "two failed reviews", "record": record})
-    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.OPUS
+    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == model
 
 
 @pytest.mark.parametrize("given", ["low", "medium"])

@@ -26,6 +26,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the fixture roles' default
+# models were Opus and are Sonnet now, so the model a case expects the launch to carry is Sonnet.
 import w2_60a_support as s
 
 
@@ -56,7 +58,7 @@ def test_an_effort_after_the_double_dash_is_applied_and_recorded_as_the_launch_s
         f"{record.get('effort_source')!r}")
 
 
-@pytest.mark.parametrize("passed", (("--model", s.OPUS), (f"--model={s.OPUS}",)), ids=("spaced", "joined"))
+@pytest.mark.parametrize("passed", (("--model", s.SONNET), (f"--model={s.SONNET}",)), ids=("spaced", "joined"))
 def test_the_role_s_own_model_after_the_double_dash_is_passed_once(launch, passed):
     arguments = ("-p", "Do the ticket's work.", *passed)
     result = launch(s.ENGINEER, None, *arguments)
@@ -64,7 +66,7 @@ def test_the_role_s_own_model_after_the_double_dash_is_passed_once(launch, passe
     s.assert_passed_through(result, arguments)
     assert s.occurrences(result.args, "--model") == 1, f"--model is passed more than once: {result.args}"
     record = result.record()
-    assert (record.get("model"), record.get("model_source")) == (s.OPUS, "after --"), (
+    assert (record.get("model"), record.get("model_source")) == (s.SONNET, "after --"), (
         f"the record's model: {record.get('model')!r}, {record.get('model_source')!r}")
 
 
@@ -104,7 +106,7 @@ def test_a_malformed_default_line_is_refused(project, launch, case):
 NOT_THE_ROLES = {
     "alias-spaced": (s.ENGINEER, ("--model", "haiku"), "haiku"),
     "alias-of-the-same-model": (s.ENGINEER, ("--model", "opus"), "opus"),
-    "another-model-spaced": (s.ENGINEER, ("--model", s.SONNET), s.SONNET),
+    "another-model-spaced": (s.ENGINEER, ("--model", s.OPUS), s.OPUS),
     "another-model-joined": (s.ENGINEER, (f"--model={s.HAIKU}",), s.HAIKU),
     "research-given-opus": (s.RESEARCH, ("--model", s.OPUS), s.OPUS),
 }
@@ -154,5 +156,5 @@ def test_the_subagent_model_is_the_session_s_model_and_recorded(launch, role):
 def test_a_subagent_model_in_the_caller_s_environment_does_not_reach_the_settings(launch):
     result = launch(s.ENGINEER, extra_env={"CLAUDE_CODE_SUBAGENT_MODEL": s.HAIKU})
     s.assert_launched(result)
-    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.OPUS, (
+    assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == s.SONNET, (
         f"the settings' subagent model is not the session's: {result.env_block().get('CLAUDE_CODE_SUBAGENT_MODEL')!r}")

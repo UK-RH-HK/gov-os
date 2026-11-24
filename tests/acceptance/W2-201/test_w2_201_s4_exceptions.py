@@ -21,10 +21,12 @@ DECIDED = "the owner, 2026-11-18 (W2-201 fixture entry)"
 ASK_OPUS = ("--model", k.OPUS)
 
 
-def _entry(role=ENG, model="opus", cls=None, decided=DECIDED):
+def _entry(role=ENG, model="opus", cls=None, decided=DECIDED, task=None):
     entry = {"subagent_type": role, "model": model, "decided": decided}
     if cls is not None:
         entry["class"] = cls
+    if task is not None:
+        entry["task"] = [task]
     return entry
 
 
@@ -59,8 +61,11 @@ def test_s4_an_exceptions_file_with_no_entry_for_the_role_still_refuses(project,
 
 @pytest.mark.parametrize("model", ["opus", k.OPUS], ids=["alias-opus", "model-id"])
 def test_s4_an_entry_for_the_engineer_and_opus_starts_it_on_opus_and_records_the_exception(project, launch, model):
-    k.write_exceptions(project, {"exceptions": [_entry(model=model)]})
+    """Rewrite-Reason: DEC-1225: the entry had no limiter and lifted the refusal. R3: an Opus entry lifts it only with
+    a limiter the launch meets; this one carries ``task: [<the ticket>]``, which the launch's ticket is. (The same entry
+    with no limiter is refused: the R3 file.)"""
     tk = s.ticket(project, ENG, "C2")
+    k.write_exceptions(project, {"exceptions": [_entry(model=model, task=tk)]})
     _on_exception(launch(ENG, tk, *ASK_OPUS))
 
 

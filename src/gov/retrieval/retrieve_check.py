@@ -1,7 +1,8 @@
 """The retrieval-regression family check (DEC-425, CAP-38.b).
 
 Run by ``sh -c`` in the project root (DEC-285). Exit 0 is green. When ``GOV_DEV_TIERS`` is not configured, the
-check reports "unmeasured" and is never green.
+check reports "unmeasured" and is never green. hit@5 is printed as a diagnostic only and never fails the check
+(EMERGENCY-2 5.2, DEC-1210, DEC-1233); forbidden citations over their baseline do.
 """
 
 from __future__ import annotations
@@ -42,7 +43,6 @@ def main():
 
     baseline_path = Path(__file__).parent / "retrieve_baseline.yaml"
     baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
-    hit_at_5_threshold = float(baseline.get("hit_at_5", 80))
     forbidden_threshold = int(baseline.get("forbidden_citations", 2))
 
     tiers_map = {"A": "a-dev", "B": "b-dev"}
@@ -122,12 +122,12 @@ def main():
     per_class = {name: 100.0 * sum(hits) / len(hits) for name, hits in scored.items()}
     hit_at_5 = sum(per_class.values()) / len(per_class)
 
-    print(f"hit@5: {hit_at_5:.1f} (baseline: {hit_at_5_threshold})")
+    print(f"hit@5: {hit_at_5:.1f}")
     print(f"forbidden: {forbidden_count} (baseline: {forbidden_threshold})")
     for name, pct in sorted(per_class.items()):
         print(f"  {name}: {pct:.1f}%")
 
-    if hit_at_5 < hit_at_5_threshold or forbidden_count > forbidden_threshold:
+    if forbidden_count > forbidden_threshold:
         sys.exit(1)
 
 

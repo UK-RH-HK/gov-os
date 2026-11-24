@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gov OS decisions, 18 November</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding:22px 18px 80px}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <h1>Gov OS decisions, 18 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">Every decision the nine audits need from you, in one place: what the audit found, the options and what each costs, the CTO's recommendation and my view. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
+
+<section class="state" aria-labelledby="where">
+  <h3 id="where">Where things stand</h3>
+  <ul>
+    <li><b>Landed overnight and closed at their landing, no reviews:</b> the run-time tool's first slice (inboxes, one watch, machine-aware slots, the stall check), <code>gov update</code> with pinned install, <code>gov discover</code>, memory by construction (every brief carries its memory results; every memory call is logged), the fixed product close, the thin <code>gov queue</code>, hourly backups, the hidden-set transcript scan, and the guard and sandbox removed from the product.</li>
+    <li><b>Release 0.1.3 is live</b> (pin-1d4e6a875a5d), cut and pushed by you tonight. The EXAMIN CTO moves onto it by <code>gov update</code>.</li>
+    <li><b>Tests:</b> this morning's 115 reds were fixed for about $11; the last full run on C had 6 reds, 5 of them W2-49, cleared by your Q-CAP44 yes.</li>
+    <li><b>Usage:</b> 76 % of the week, rising about a point every three hours since the Sonnet rule; 10 points reserved for the two fresh-80 measures and the proving run.</li>
+    <li><b>EXAMIN:</b> the fresh EXAMIN CTO re-did the spec audit and found EXAMIN's memory graph has no links (you chose option A to convert its records). Its own 18 decisions are on its page.</li>
+    <li><b>Open checks with the CTO:</b> the shared reranker was not found running at the re-pin; swap stood at 68 %.</li>
+  </ul>
+</section>
+
+<h2>Already decided</h2>
+<p>Recorded as DEC-1212 or sent today. Shown for completeness; nothing to answer.</p>
+<ul class="decided">
+  <li><b>U1</b> The CTO's context: no cap, the full window; a fresh CTO each morning, no lead or worker stopped, a smooth handover.</li>
+  <li><b>U2</b> Models and effort by the rubric only, enforced by code; helpers default to Sonnet; exceptions come to you.</li>
+  <li><b>U3, U4</b> Your operator, every lead, every helper and the C2 engineers, test designers and auditors on Sonnet; C3 roles and the CTO on Opus.</li>
+  <li><b>L4</b> The proving runs on Sonnet, acceptance included.</li>
+  <li><b>Q-CAP44</b> W2-192's Contract line approved: the spec-audit adoption stage, Contract 4.4.</li>
+</ul>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every CTO recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. My notes on a card are not added for you: copy any you agree with into that card's note box.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const SECTIONS = [
+{ title:"Open: the decisions that unblock the most",
+  intro:"The rubric, the register and the re-baseline decide how all further work is planned and what every agent reads as the rules. EXAMIN's three decide whether its refactor starts tonight.",
+  qs:[
+  { id:"K1", title:"The ticket rubric: what is a feature, a fix or a chore, and which model does each role run", src:"Audit 4, Table 3",
+    found:[
+      "141 worked tickets and 1,988 direct commits from the last month were classed. Tickets: 45 % features, 35 % fixes, 19 % chores. Direct commits: 97 % chores (mostly records), but 30 were feature work done without any ticket.",
+      "25 tickets ($1,024, a quarter of ticket spend) built things now retired. Under this table, 82 % of last month's tickets would have been routed differently.",
+      "The table, first match wins: 0 your own steps (release, push, sudo); 1 records, docs, configuration or kernel text only → a chore, committed directly; 2 a refactor with tests unchanged → a chore through the landing; 3 a known bug a KPI, spec or decision already describes → a fix recorded in the owning ticket, no new ticket and no review (3a: about 50 lines, one area, 30 minutes → the CTO, a senior engineer or the engineer fixes it directly, failing test first; 3b: otherwise a launched fix); 4 new behaviour → a feature ticket: spec and KPIs, the test designer's red tests, the engineer until green, the landing closes it.",
+      "Guardrails: a quick item that passes 30 minutes, needs a second commit or turns a test red stops and is re-routed; code at the landing flags misroutes but never refuses; review only for red work.",
+      "It also sets model and effort for every role by criticality (C3: the kernel, Contract, landing and close, memory measure, release and update; C2: other product code; C1: records and docs)."],
+    opts:[["a","Approve Table 3 with its model and effort table","Nothing; the CTO puts it in its skill.",1],["b","As (a), plus a size gate: a fix over 150 product lines or more than one area becomes a feature ticket","About 10 of the month's 50 fixes go back into tickets."],["c","Keep the provisional rubric for now","The 82 % misrouting goes on."]],
+    cto:"(a), with your Sonnet decisions of today taking priority wherever its model table still says Opus (leads, C2 test designers and engineers).",
+    me:"Agree with (a) and the CTO's reading. It is your own rule, written down: a ticket is a feature with KPIs; a known bug is a fix in its ticket's record. The size gate in (b) adds nothing, because rows 3a and 3b already route fixes by size." },
+  { id:"K2", title:"Does every feature ticket still need your approval?", src:"Audit 4; DEC-974",
+    found:["Today every new ticket needs your line (DEC-974). The release's build list (EMERGENCY-2 §6.1) is already approved as a list."],
+    opts:[["a","Yes, per ticket","One line from you per ticket."],["b","One approval per batch","One line per batch."],["c","None for the build list already approved; you approve only new features outside it","Nothing for the release.",1]],
+    cto:"(c).", me:"Agree. It keeps your approval for what is genuinely new, and nothing else." },
+  { id:"G4", title:"The decision register: approve its new classes by group", src:"Audit 8",
+    found:["1,206 decisions read: 153 kept (the new in-force list), 185 superseded, 34 retired, 834 history. 128 were settled by code from their change marks; the rest by theme, in parallel, then checked by the CTO.",
+      "They fall into 33 groups (theme × class), for example 'guard, superseded: 140', 'memory, kept: 26', 'tickets, history: 268'. Estimated error rate 3 to 5 % (13 of a random 14 clearly right).",
+      "After approval the old register is archived read-only and taken out of memory's index, so retired rules stop being found as answers."],
+    opts:[["a","Approve all 33 groups as listed; the CTO settles the 48 doubtful rows inside them","A few minutes.",1],["b","Approve the superseded, retired and history groups; read the 9 kept groups (153 decisions) first","About 30 to 45 minutes."],["c","Group by group, with changes","An hour or more, and a second pass."]],
+    cto:"(a).", me:"Agree with (a), with one correction: the kept 'releases' group still holds DEC-027, 'signed tags as the root of trust'. If you answer L3 (a), no signing, DEC-027 should move to superseded. Worth a note here." },
+  { id:"G5", title:"Re-baselining the Contract and the Charter", src:"Audit 7",
+    found:["The Contract (v4.3) outranks every decision, yet still requires the guard, the sandbox, hit@5 85 %, three review loops, gitleaks before indexing, a 6,000-token context packet; the Charter still promises a signed v1.0.0.",
+      "It was stale even before Emergency 2: the wave moves you decided on 19 October never reached its text.",
+      "Audit 7 gives every clause a disposition (kept, changed with its new wording, dropped, moved to the release, moved to friction) and the checks the release would run against it."],
+    opts:[["a","The CTO writes Charter v6 and Contract v5 from audit 7's tables in one change; you approve by group (kept, changed, dropped, moved, new)","One sitting of yours; about a day of CTO work.",1],["b","Contract v5 only; the Charter stays overridden by EMERGENCY-2","The top text keeps saying 'guard' and 'signed v1.0.0', and agents read it."],["c","After the release","The release acceptance has no text to check against."]],
+    cto:"(a).", me:"Agree. Until it is rewritten, every agent keeps meeting the old rules at the top of the hierarchy." },
+  { id:"E1", title:"EXAMIN: how you approve its dispositions", src:"Audit 6",
+    found:["EXAMIN's audit classed every file: keep 577, relocate 829, archive 2,030; plus 13 places for the trial data. The EXAMIN CTO sat idle 28 hours waiting for approval."],
+    opts:[["a","Group by group, lowest risk first, each group one reversible commit, so the refactor starts tonight","Several short approvals (your EXAMIN page covers them).",1],["b","All at once, after you read everything","EXAMIN idles until then."],["c","After the release","The refactor waits; memory is built on the old layout."]],
+    cto:"(a).", me:"Agree. Your answers on the EXAMIN page are exactly this, group by group." },
+  { id:"E2", title:"EXAMIN: what 'tests kept green' means during the refactor", src:"Audit 6",
+    found:["EXAMIN's red baseline is mostly its environment: 167 reds because Tesseract and Poppler aren't installed (needs sudo), 119 harness reds, 73 real reds that cleared once the trial data was present."],
+    opts:[["a","Now: no new red against the last run, compared by test id, plus green characterization tests; and before the merge back: you install Tesseract and Poppler (sudo, one minute)","One minute of yours before the merge back.",1],["b","You install Tesseract and Poppler now as well","One minute now; a cleaner bar from the start."],["c","The whole product suite green before any file moves","Days of test fixing first."]],
+    cto:"(a) now, and the install before the merge back.", me:"Agree." },
+  { id:"E3", title:"EXAMIN: the amended Wave 0 brief", src:"Audit 6; DEC-1210 (5)",
+    found:["The approved brief (2ec48c78) still says the measure is 'hit@5 95 % on the hidden half, run by your operator'. Under EMERGENCY-2 it is a fresh 80 judged end to end at 95 %, and the operator role is gone.",
+      "Who runs EXAMIN's measure is written nowhere. Only the Gov OS CTO has the evaluation sets."],
+    opts:[["a","EMERGENCY-2 §7 plus a one-page addendum from the CTO to the EXAMIN CTO; no new sha for you to approve","Nothing.",1],["b","A full amended brief for your yes","One more round of reading."],["c","After the release","The wrong measure line stays meanwhile."]],
+    cto:"(a).", me:"Agree, and the addendum should say plainly that the Gov OS CTO runs EXAMIN's fresh-80 measure, end to end." },
+  { id:"NIGHT", title:"The nightly full run and the morning check", src:"Audit 3; your switch-off of 16–17 Nov",
+    found:["Both have been commented out of the crontab since the night of 16 November, when you said you would decide from the progress.",
+      "Today's suite went from 115 reds to 6, and those 6 are cleared or explained. A green nightly is what gives the landing its green base for gov queue.",
+      "Audit 3 recommends restoring them; the CTO now runs full suites alone so they don't overload the machine."],
+    opts:[["a","Restore both tonight","None; it runs alone at 04:00.",1],["b","Restore the nightly only","No morning summary of it."],["c","Keep both off another day","No green base for the landing yet."]],
+    cto:"Audit 3: restore them.", me:"Restore both. The condition you set (progress) is met." }
+  ]},
+{ title:"Open: memory, the repository and the rules of work",
+  intro:"Each of these removes friction or old weight. None blocks tonight's work, but all shape the release.",
+  qs:[
+  { id:"M1", title:"gov context: switched off; retire the command too?", src:"Audit 2",
+    found:["gov context refused 38 % of the leads' calls (143 of 373) on its 6,000-token ceiling. It is switched off in Gov OS itself, but the product still turns it on for every newly adopted repository, gov close and gov check still depend on its packet, and EXAMIN's copy still calls it.",
+      "Memory by construction (now landed) replaces what it was for."],
+    opts:[["a","Keep it as it is, with nothing calling it","Nothing now; closes can still refuse on the ceiling."],["b","Retire the command, its check and adopt's entry; keep the library only for gov close with its ceiling lifted; --in-force moves to gov decisions","About a day.",1],["c","Retire the module too; the close records decisions from the ticket's sources instead","About two days; touches the close's records."]],
+    cto:"(b).", me:"Agree." },
+  { id:"G1", title:"How retired code and history leave the repository", src:"Audit 5",
+    found:["The retired guard, gov context, ACT bundles, operator folder, retired tests and the October assessment are still in the tree. Your tag pre-emergency-2 (pushed on 16 Nov) keeps all of it reachable.",
+      "Tests make up 60.5 % of memory's keyword index, and the register, ACT bundles and the October assessment 36.7 % of what is embedded. Cleaning that matters more to the 95 % memory measure than any scratch tidy-up, so it should happen before the first fresh 80.",
+      "Six worktrees hold commits that exist nowhere else, and the scratch area is not in the hourly backup."],
+    opts:[["a","Keep it all in the tree, out of the index","No risk; the tree stays noisy for grep."],["b","git rm the retired code, tests, ACT bundles and prompts, reachable from the tag; closed-ticket records stay, unindexed","A clean tree and index; history a git show away.",1],["c","Move it to an archive branch","As (b), plus one more branch."]],
+    cto:"(b).", me:"Agree with (b), on three conditions worth a note: bundle the six worktrees' unique commits and tar the live scratch tools before anything is removed; and do the index clean-up before the first fresh 80, not between two measures." },
+  { id:"G6", title:"When a fresh independent audit runs", src:"Audit 7, D-2",
+    found:["The Contract still asks for independent audits in many places. Your rule is review only for red work."],
+    opts:[["a","At the release acceptance and adoption stages A5, AS, A7, A10; otherwise only for a red, a failed landing or a feature not working","Nothing new.",1],["b","Also at every STANDARD or FULL spec closure","One auditor per closure."],["c","Only at the release","Adoption loses its independent path-map check."]],
+    cto:"(a).", me:"Agree. It is your review rule, plus the adoption checkpoints that proved useful." },
+  { id:"G7", title:"Installing tools", src:"Audit 7, D-3",
+    found:["The old rules asked before installs. Without the guard, nothing refuses them."],
+    opts:[["a","Free in repositories, worktrees and virtual environments; user-level installs free and recorded in the tool registry; sudo stays yours","An unrecorded install is caught later, not stopped.",1],["b","You approve each install by message","Relays to you again."],["c","The CTO approves and records","One more CTO duty."]],
+    cto:"(a).", me:"Agree." },
+  { id:"L3", title:"How releases prove they are genuine", src:"Audit 7, D-4",
+    found:["Releases are pinned and hash-checked today (the re-pin compares the wheel with the release record, twice). The Charter still promises an SSH-signed v1.0.0."],
+    opts:[["a","Pinned and hash-checked; no signing until friction asks for it","No tag signature.",1],["b","An SSH-signed tag that gov doctor verifies","A signing key and a git tag -s step for you, plus a small check to build."],["c","As (b), named v1.0.0","As (b), plus the naming."]],
+    cto:"(a).", me:"Agree. If (a), DEC-027 (signed tags as the root of trust) should move to superseded in the register (see G4)." },
+  { id:"G2", title:"The old branch origin/record/w2", src:"Audit 5",
+    found:["367 commits of the old 'commit all context' regime, still being synced."],
+    opts:[["a","Keep it, stop syncing, remove its worktree","One stale branch.",1],["b","Delete it on GitHub (a push, yours)","Saves nothing measurable."],["c","Keep syncing","The ceremony continues."]],
+    cto:"(a).", me:"Agree." },
+  { id:"G3", title:"The two folders beside the repository (43 GB)", src:"Audit 5",
+    found:["~/gov-os-archive (32 GB) and ~/gov-os-workbench (11 GB), not audited. The disk is 43 % used."],
+    opts:[["a","Leave them","Nothing.",1],["b","A later audit lists them","One audit."],["c","Delete what you name","Your time."]],
+    cto:"(a).", me:"Agree." },
+  { id:"Q-CLOSE", title:"The close and a repository's first, untrailered commit", src:"Morning CTO",
+    found:["When a repository's first commit carries no trailer, the close's new default base excuses a red that comes from it. The red is still recorded."],
+    opts:[["a","Accept it; refusing such a close becomes a Wave 3 row","Nothing.",1],["b","Refuse such a close now","A small change, and adopters' first closes may refuse."]],
+    cto:"(a).", me:"Agree; it fails closed in the record, not silently." }
+  ]},
+{ title:"Confirm: built tonight on your working assumptions",
+  intro:"You told the CTO to build these on the audits' recommendations and amend if you decided otherwise. Confirm, or pick 'change' and say what in the note.",
+  qs:[
+  { id:"L1", title:"gov queue: a thin queue on the product's own pieces", src:"Audit 1",
+    found:["Built: about 300 to 500 lines on batch.isolate, select.scoped and the close, instead of porting the 1,400-line Gov OS merge queue. Gov OS's own landing moves onto it once a nightly is green."],
+    opts:[["ok","Confirm","",1],["change","Change (say what in the note)",""]], cto:"Confirm.", me:"Confirm." },
+  { id:"L2", title:"DONE is the green landing itself", src:"Audit 1",
+    found:["Built: a ticket is done when gov accept is green, the landing's checks are green and the close is written. The two definition-of-done lines that conflicted with your rules are gone."],
+    opts:[["ok","Confirm","",1],["change","Change (say what in the note)",""]], cto:"Confirm.", me:"Confirm." },
+  { id:"T1", title:"The stall check runs from the dispatcher's cron pass", src:"Audit 3",
+    found:["Built: no sentinel session; the dispatcher's one-minute pass notices a stalled CTO and writes to its inbox."],
+    opts:[["ok","Confirm","",1],["change","Change (say what in the note)",""]], cto:"Confirm.", me:"Confirm." },
+  { id:"T2", title:"A phone push only when the CTO stalls", src:"Audit 3",
+    found:["Built: a push after 60 minutes of CTO stall by day, two hours at night. Nothing else pushes."],
+    opts:[["ok","Confirm","",1],["change","Change (say what in the note)",""]], cto:"Confirm.", me:"Confirm." },
+  { id:"T3", title:"No GPU means memory is unavailable on that machine", src:"Audit 3",
+    found:["Built for the release: on a machine with no GPU, embedding and reranking refuse and say memory is unavailable (your 'no CPU fallback'). Allowing the CPU there is a Wave 3 row."],
+    opts:[["ok","Confirm","",1],["change","Change (say what in the note)",""]], cto:"Confirm.", me:"Confirm; both Gov OS and EXAMIN run on this GPU machine." },
+  { id:"Q-UPD", title:"gov update meeting your own edit to a shipped file", src:"Morning CTO",
+    found:["Built: a three-way merge that keeps your file, and on a conflict writes the release's copy beside it instead of overwriting."],
+    opts:[["ok","Confirm","",1],["change","Change (say what in the note)",""]], cto:"Confirm.", me:"Confirm." }
+  ]}
+];
+
+const KEY="govos-decisions-20261118";
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.src}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<div class="note cto"><span class="who">The CTO recommends</span>${q.cto}</div>`;
+    h+=`<div class="note me"><span class="who">My view</span>${q.me}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">${q.opts.length>2||k.length===1?`(${k}) `:""}${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const lines=["Gov OS decisions, 18 Nov 2026: my answers"];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id} ${q.title}: `;
+    if(v){n++; const o=q.opts.find(o=>o[0]===v); line+=(o[0].length===1?`(${o[0]}) `:"")+o[1]+(o[3]?" (recommended)":"");}
+    else line+="(no answer yet)";
+    lines.push(line);
+    const note=(state.notes[q.id]||"").trim();
+    if(note) lines.push(`   Note: ${note}`);
+  }
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+document.getElementById("clear").addEventListener("click",()=>{
+  if(!confirm("Clear every answer and note on this page?")) return;
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
+</body>
+</html>

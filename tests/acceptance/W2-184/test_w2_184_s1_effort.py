@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, TD = s.ENGINEER, s.TEST_DESIGNER
@@ -113,13 +115,13 @@ def test_s1_a_reason_is_recorded_whatever_the_effort(project, launch):
 
 def test_s1_a_max_the_table_names_needs_no_reason(project, launch):
     tk = s.ticket(project, TD, "C3")
-    s.assert_session(launch(TD, tk), s.OPUS, "max", criticality="C3", model_source="by criticality",
+    s.assert_session(launch(TD, tk), s.SONNET, "max", criticality="C3", model_source="by criticality",
                      effort_source="by criticality")
 
 
 def test_s1_a_max_the_role_default_names_needs_no_reason(project, launch):
     """Existing fixtures whose role default is max still launch (interface 3.2, settled)."""
-    s.write_role(project, ENG, table=None, default=(s.OPUS, "max"))
+    s.write_role(project, ENG, table=None, default=(s.SONNET, "max"))
     tk = s.ticket(project, ENG, "C2")
-    s.assert_session(launch(ENG, tk), s.OPUS, "max", criticality="C2", model_source="role default",
+    s.assert_session(launch(ENG, tk), s.SONNET, "max", criticality="C2", model_source="role default",
                      effort_source="role default")

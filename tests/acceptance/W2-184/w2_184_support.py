@@ -47,15 +47,17 @@ HEAD = "- **Launch by criticality:**"
 # the line the launcher chose.
 DEFAULT = (SONNET, "medium")
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; these tables planted Opus
+# and Haiku entries, and every entry is now Sonnet (the efforts tell the entries apart).
 # The fixture role files' tables: (model, effort) for C3, C2, C1, C0. Research and product-spec are launched on a ticket
 # whose own folder or kind the role needs; the others on any in_progress ticket.
 TABLES = {
-    ENGINEER: {"C3": (OPUS, "high"), "C2": (SONNET, "high"), "C1": (SONNET, "xhigh"), "C0": (HAIKU5, "low")},
-    TEST_DESIGNER: {"C3": (OPUS, "max"), "C2": (SONNET, "xhigh"), "C1": (HAIKU5, "high"), "C0": (HAIKU5, "low")},
-    AUDITOR: {"C3": (OPUS, "high"), "C2": (OPUS, "high"), "C1": (SONNET, "high"), "C0": (HAIKU_DATED, "medium")},
-    PRODUCT_SPEC: {"C3": (OPUS, "xhigh"), "C2": (SONNET, "xhigh"), "C1": (HAIKU5, "medium"),
-                   "C0": (HAIKU_DATED, "low")},
-    RESEARCH: {"C3": (OPUS, "xhigh"), "C2": (OPUS, "high"), "C1": (SONNET, "high"), "C0": (HAIKU5, "low")},
+    ENGINEER: {"C3": (SONNET, "high"), "C2": (SONNET, "high"), "C1": (SONNET, "xhigh"), "C0": (SONNET, "low")},
+    TEST_DESIGNER: {"C3": (SONNET, "max"), "C2": (SONNET, "xhigh"), "C1": (SONNET, "high"), "C0": (SONNET, "low")},
+    AUDITOR: {"C3": (SONNET, "high"), "C2": (SONNET, "high"), "C1": (SONNET, "high"), "C0": (SONNET, "medium")},
+    PRODUCT_SPEC: {"C3": (SONNET, "xhigh"), "C2": (SONNET, "xhigh"), "C1": (SONNET, "medium"),
+                   "C0": (SONNET, "low")},
+    RESEARCH: {"C3": (SONNET, "xhigh"), "C2": (SONNET, "high"), "C1": (SONNET, "high"), "C0": (SONNET, "low")},
 }
 
 # Where each class's ticket works: the fixture criticality file's rules match these folders; C0 is the default.
@@ -158,7 +160,13 @@ def make_project(sandbox, tables=True, criticality=True):
 # Trial and probe records
 # --------------------------------------------------------------------------
 
-def trial_data(tk, role=ENGINEER, criticality="C2", model=HAIKU5, effort="high", tickets=None, reviewer=OPUS):
+# Rewrite-Reason: DEC-1225: the fixture trial's model was Haiku (a model below the table's). R2: a trial's model is the
+# table's, Sonnet, unless an exceptions entry covers another; the trial mechanism (id, role, criticality, effort, tickets,
+# reviewer, the record) is what these cases pin, shown with a Sonnet trial. The reviewer stays Opus (the trial file's form).
+TRIAL_MODEL = SONNET
+
+
+def trial_data(tk, role=ENGINEER, criticality="C2", model=TRIAL_MODEL, effort="high", tickets=None, reviewer=OPUS):
     return {"role": role, "criticality": criticality, "model": model, "effort": effort,
             "tickets": tickets if tickets is not None else ["DAEO-aaaa", tk], "reviewer": {"model": reviewer}}
 

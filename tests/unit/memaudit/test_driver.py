@@ -188,6 +188,17 @@ def test_figures_gives_null_for_a_missing_file_and_exits_ok(tmp_path):
     assert line["verdict"] is None and line["kept"] is None and line["pool"] is None
 
 
+def test_figures_line_carries_the_stamp_keys_the_file_has_and_omits_the_rest(tmp_path):
+    run = tmp_path / "runs" / "memory-audit-20261112"
+    run.mkdir(parents=True)
+    (run / "FIGURES.json").write_text(json.dumps({"n": 3, "release": "0.1.5", "commit": "abc", "forbidden_rule": "v2"}))
+    said = []
+    digest.figures(str(tmp_path), "memory-audit-20261112", said.append)
+    line = json.loads(said[0])
+    assert (line["release"], line["commit"], line["forbidden_rule"]) == ("0.1.5", "abc", "v2")
+    assert "reader_model" not in line and "questions_with_forbidden" not in line
+
+
 # ---- W2-187: a fresh run beside a live standing set (I7, I12), and the state per repository (I2)
 
 def test_a_fresh_digest_beside_a_live_set_has_the_twelve_lines_then_drift_and_the_latest_maintain_line():

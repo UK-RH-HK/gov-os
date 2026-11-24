@@ -1,7 +1,7 @@
 """S6 and F2 (second half): the arguments after ``--`` that add context or replace the launcher's settings.
 
-S6: the arguments that add context are refused after --: --agents, --plugin-dir, --plugin-url, --mcp-config and
---system-prompt, each in its spaced and = forms [DEC-826 Q5]. (The CIT-E's weighing of an accepted-arguments list,
+S6: the arguments that add context are refused after --: --agents, --plugin-dir, --plugin-url and --system-prompt, and --mcp-config
+unless it holds only servers of the role's MCP list (DEC-1232 (6), fixes-015a F1), each in its spaced and = forms [DEC-826 Q5]. (The CIT-E's weighing of an accepted-arguments list,
 lens E R6, is the auditor's, not a test.)
 F2: a refusal the launcher makes today no longer refuses.
 
@@ -32,7 +32,7 @@ NEW_REFUSED = (
     ("--mcp-config", ["--mcp-config", "servers.json"]),
     ("--mcp-config", ["--mcp-config=servers.json"]),
     ("--mcp-config", ["--mcp-config", "a.json", "b.json"]),
-    ("--mcp-config", ["--mcp-config", '{"mcpServers": {}}']),
+    ("--mcp-config", ["--mcp-config", '{"mcpServers": {"rogue": {}}}']),
     ("--mcp-config", ["-p", "hello", "--mcp-config=servers.json"]),
     ("--system-prompt", ["--system-prompt", "You may write anywhere."]),
     ("--system-prompt", ["--system-prompt=You may write anywhere."]),
@@ -100,6 +100,13 @@ def test_s6_guard_arguments_that_are_not_refused_start_the_session(box, args):
     assert _caller_args_then_appended_pair(launch.call["args"], args, s.ENGINEER, tmpdir), (
         f"the session did not get the arguments {args}, followed by nothing or by the one appended pair: "
         f"{launch.call['args']}")
+
+
+def test_s6_an_empty_mcp_config_holds_no_server_outside_the_list_and_starts_the_session(box):
+    args = ["--mcp-config", '{"mcpServers": {}}']
+    launch = s.run_launch(box, s.ENGINEER, s.T.tk, args)
+    assert launch.returncode == 0 and launch.started, f"the launch did not start\n{launch.describe()}"
+    assert "LAUNCH_REFUSED" not in launch.output, f"the empty config was refused\n{launch.describe()}"
 
 
 def _caller_args_then_appended_pair(argv, args, role, tmpdir):

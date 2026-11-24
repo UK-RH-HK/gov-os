@@ -116,13 +116,14 @@ def test_the_launcher_refuses_the_same_forms(project, role, tid, keywords):
 
 @pytest.mark.parametrize("status", ["closed", "open", "in_progress"])
 def test_a_fix_starts_on_its_ticket_whatever_its_status(project, status):
+    # Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give (the table's C3 was Opus)
     project.ticket(allowed=["src/guard/a.py"])
     _status(project, "T-1", status)
     argv = project.launch(fix=FIX)
     last = project.last()
     assert (last["kind"], last["kind_line"], last["ticket"]) == ("fix", FIX, "T-1")
-    assert (last["model"], last["model_source"], last["criticality"]) == (OPUS, "by criticality", "C3")
-    assert _flag(argv, "--model") == OPUS and _settings(argv)["env"]["GOV_TICKET"] == "T-1"
+    assert (last["model"], last["model_source"], last["criticality"]) == (SONNET, "by criticality", "C3")
+    assert _flag(argv, "--model") == SONNET and _settings(argv)["env"]["GOV_TICKET"] == "T-1"
 
 
 def test_without_fix_a_closed_ticket_is_refused_and_an_unknown_one_with_it(project):
@@ -173,7 +174,9 @@ def test_a_chore_starts_with_no_ticket_on_the_role_default(project, monkeypatch)
     assert project.envs[-1]["GOV_MSG_ADDRESS"].startswith("engineer:chore-")
 
 
-def test_a_chore_s_other_model_needs_an_exception_with_no_class(project):
+def test_a_chore_s_other_model_needs_an_exception_whose_limiter_it_meets(project):
+    """DEC-1225 (R3): a chore has no ticket and no class, so a class or task limiter is unmet; an Opus entry with no
+    limiter lifts nothing; one limited by ``decision`` lifts it when the launch is given ``--owner-named``."""
     path = project.root / "governance/project/model-exceptions.yaml"
     project.refused(args=["--model", OPUS], tid=None, chore=CHORE)
     path.write_text(yaml.safe_dump({"exceptions": [{"subagent_type": "engineer", "model": "opus", "class": "C3",
@@ -181,8 +184,11 @@ def test_a_chore_s_other_model_needs_an_exception_with_no_class(project):
     project.refused("none (a chore has no ticket)", args=["--model", OPUS], tid=None, chore=CHORE)
     path.write_text(yaml.safe_dump({"exceptions": [{"subagent_type": "engineer", "model": "opus", "decided": "K2"}]}),
                     encoding="utf-8")
-    project.launch(args=["--model", OPUS], tid=None, chore=CHORE)
-    assert (project.last()["model_source"], project.last()["exception"]) == ("exception", "K2")
+    project.refused("limiter", args=["--model", OPUS], tid=None, chore=CHORE)
+    path.write_text(yaml.safe_dump({"exceptions": [{"subagent_type": "engineer", "model": "opus",
+                                                    "decision": ["DEC-1230"], "decided": "K3"}]}), encoding="utf-8")
+    project.launch(args=["--model", OPUS], tid=None, chore=CHORE, owner_named="DEC-1230")
+    assert (project.last()["model_source"], project.last()["exception"]) == ("exception", "K3")
 
 
 def test_a_chore_takes_no_trial(project):
