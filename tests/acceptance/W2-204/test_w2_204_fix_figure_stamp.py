@@ -3,7 +3,7 @@
 
 * S17: ``FIGURES.json`` stamps ``release``, ``commit``, ``reader_model``, ``grader_models``, ``forbidden_rule`` and
   ``questions_with_forbidden`` (a count), and the printed verdict says the stamp too.
-* S18: ``declare`` refuses the strict rule when no question carries a ``forbidden`` list.
+* S18: ``declare`` never refuses a set with no ``forbidden`` list: one NOTICE line, exit 0, ``forbidden_lists`` counted.
 * S19: a figure without the stamp is never compared with one that has it; the comparison reports the two are not
   comparable and names the missing stamp (the one comparison the measure has: the standing set's check against fitting).
 
@@ -98,18 +98,31 @@ def _declare(world, specs):
     return world.step("declare", HIDDEN)
 
 
-def test_s18_declare_refuses_the_strict_rule_when_no_question_carries_a_list(world):
+NOTICE = ("NOTICE DC-FORBIDDEN-NONE: no question carries a forbidden list; "
+          "the strict rule grades as the lenient rule would")
+
+
+def _declaration(world) -> dict:
+    path = world.run_dir(HIDDEN) / "DECLARATION.json"
+    assert path.is_file(), "no DECLARATION.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def test_s18_declare_notices_and_goes_on_when_no_question_carries_a_list(world):
     run = _declare(world, K.clean_specs())
-    assert run.code == 1 and "DC-FORBIDDEN" in run.lines, run
-    set_dir = world.run_dir(HIDDEN)
-    assert not (set_dir / "USED").exists() and not (set_dir / "DECLARATION.json").exists(), \
-        "a refused declaration wrote USED or DECLARATION.json"
+    assert run.code == 0, run
+    assert run.lines.count(NOTICE) == 1, f"the notice is not exactly one line: {run.text!r}"
+    assert "DC-FORBIDDEN:" not in run.text and "DC-FORBIDDEN " not in run.text.replace(NOTICE, ""), run.text
+    assert (world.run_dir(HIDDEN) / "USED").exists(), "a noticed declaration wrote no USED"
+    assert _declaration(world).get("forbidden_lists") == 0
 
 
 def test_s18_declare_goes_on_when_one_question_carries_a_list(world):
     run = _declare(world, _with_lists(K.clean_specs(), ("q05",)))
-    assert run.code == 0 and "DC-FORBIDDEN" not in run.lines, run
+    assert run.code == 0 and "DC-FORBIDDEN" not in run.text, run
+    assert not [x for x in run.lines if "NOTICE" in x], f"a notice with a list present: {run.text!r}"
     assert (world.run_dir(HIDDEN) / "USED").exists()
+    assert _declaration(world).get("forbidden_lists") == 1
 
 
 # -- S19 ------------------------------------------------------------------------------------------------------------
