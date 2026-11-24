@@ -475,6 +475,20 @@ acceptance_exemptions:
     decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): Emergency 2 step 3: W2-55's backfill case checks each lands-in place
   - commit: "bddad45b25077c907cbd92d68ece757decdb0639"
     decision: DEC-1211  # the outgoing CTO's fix of 2026-11-17/18 updating tests to what EMERGENCY-2 retired or changed (6.1 "update or retire with what they assert", 4.2): Emergency 2 step 3: the old start-up documents archived
+  - commit: "76677f4eb08590cedccc93fb42f3d6dce7d4a4f3"
+    decision: DEC-1243  # fixes-015a F19's engineer commit changed W2-201 x1's acceptance case; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "dc9d10f858b1f69b76744e7731043fb6664a7511"
+    decision: DEC-1243  # fixes-015a F19's engineer commit changed W2-60a's live-session case; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "4c95fcc08ffbf987220443d46a42fc544e798a2c"
+    decision: DEC-1243  # fixes-015a F14/F19's engineer commit changed W2-184, W2-33 and W2-60a fixtures to Sonnet; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "e8838fa97a20c5b33bc90ba937f981e61ca06e08"
+    decision: DEC-1243  # fixes-015a F15's engineer commit added the stamp to W2-171 and W2-204 fixtures; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "461c214a560c1e6a0075c7e786803709b14e1639"
+    decision: DEC-1243  # the merge of e2/fixes-015a into w2/integrate that carries the four; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "0747e362c4af66b354acd63937bf2d82febd2e76"
+    decision: DEC-1243  # the merge of e2/fixes-015a-sa into e2/fixes-015a that carries three of them and settled two README maps; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "8e0b222f0722ecd7896858ac046829055ea97612"
+    decision: DEC-1243  # the stream merge into e2/fixes-015a that carries e8838fa97; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200

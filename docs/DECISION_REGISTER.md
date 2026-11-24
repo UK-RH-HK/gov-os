@@ -2193,6 +2193,16 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's answer sheet of 2026-11-24; the spec questions of integration steps one and two.
 - **Governing sources:** docs/emergency-2/integration/DECISIONS-PAGE-2026-11-22.html; docs/emergency-2/integration/GOLDEN-WORKFLOW-CORRECTIONS.md §4; docs/emergency-2/integration/DECISIONS-HELD.md §4; DEC-1238; DEC-1241.
 
+### DEC-1243 — Seven acceptance exemptions for fixes-015a's four engineer commits and the three merges that carry them (the freeze stays for everything else); briefs never ask an engineer to touch tests/acceptance/; P-2 first in Phase 1; a stall push after 3 hours with nothing moving
+- **Status:** ACCEPTED (owner, 2026-11-24 about 10:45, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-906, DEC-1052 Q-10 (the freeze, lifted for these seven only), DEC-1239, DEC-1241 P-2 · **Changes:** `governance/project/path-map.yaml` `acceptance_exemptions` (seven entries); the integration plan (P-2 first in Phase 1; an interim stall push)
+- **Decision:**
+  - (1) "The seven exemption entries: (a), approved for these seven commits only, recorded as DEC-1243: 76677f4eb, dc9d10f85, 4c95fcc08, e8838fa97 and the three merges 461c214a5, 0747e362c, 8e0b222f0, citing the test designer's review in 0d01d006a. You add them; the freeze stays for everything else."
+  - (2) "Briefs never ask an engineer to touch tests/acceptance/ again (I-12)."
+  - (3) "A branch as broad as fixes-015a runs the full regression before it lands (P-2, first in Phase 1)."
+  - (4) "The 30 hours lost to a stopped watcher is exactly the stall detector G-9 says we lack: until W2-207's run-time tool holds it, if nothing has moved for 3 hours, push me." Carried by `tools/stall_check.sh` from cron every 15 minutes: when no landing, lead return, full-suite record or test run has moved for 3 hours, it wakes the CTO's session to push the owner, once per stall.
+- **Basis:** the owner's message of 2026-11-24; W1-01's red in the 0.1.5 full run (the four engineer commits, I-12); the 30 hours 0.1.5 stood still (I-13); the 95 reds of the straight-through run after fixes-015a (I-14).
+- **Governing sources:** governance/project/path-map.yaml; docs/emergency-2/integration/FINDINGS.md; docs/emergency-2/integration/COMPETITIVE-ANALYSIS.md (the stall detector); DEC-906; DEC-1052; DEC-1241.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
