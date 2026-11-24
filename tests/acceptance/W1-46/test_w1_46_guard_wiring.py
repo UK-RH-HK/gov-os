@@ -35,9 +35,9 @@ import w1_46_support as support
 ENGINEER, RESEARCH = support.ENGINEER, support.RESEARCH
 
 # What a ticket lead gives a headless worker (DEC-183, DEC-232). The prompt names two arguments as words. Since
-# W2-60a a model after -- must be the role's (DEC-839 item 1).
+# W2-60a a model after -- must be the session's. Rewrite-Reason: DEC-1225 (every role launches Sonnet).
 HEADLESS = ("-p", "Do the ticket's work. Do not use --bare or --add-dir.", "--output-format", "json",
-            "--permission-mode", "acceptEdits", "--allowedTools", "Bash,Write", "--model", "claude-opus-5-5",
+            "--permission-mode", "acceptEdits", "--allowedTools", "Bash,Write", "--model", "claude-sonnet-5-5",
             "--max-turns", "8")
 
 
