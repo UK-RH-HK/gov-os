@@ -283,3 +283,37 @@ Gov OS's live store is the CTO's chore, not this fix.
   and HEAD and writes no declaration (`DECLARATION.json` absent); a store at HEAD passes the check as before.
   Failure: the pre-flight passes (or a declaration is written) while the store is behind HEAD.
   Tests: `tests/acceptance/W2-204/test_w2_204_p0_2_store_behind.py`.
+
+## Fix: the fresh 80's writer loop (I-23 with EF-9, I-18, I-19; fix-memaudit, 2026-11-24)
+
+Found by EXAMIN's memory measure on 0.1.5 (FINDINGS I-18, I-19, I-23; EF-9): 5 of 11 halves were refused at pre-flight 1, a pair
+was lost at the final pre-flight, three clean re-rolls were each refused on a different code. Causes confirmed in the code:
+`deliver.py` `_writer` checks only `result.json`'s sums and the `q<nn>.yaml` names and count (`DL-RESULT`, `DL-SET`), never the
+per-question checks of `preflight.run`, and the writer has no shell; `brief.py` `run` copies only `XCHECK-r1.md` into the round-2
+writer's `input/notes.md` and renders the same template for round 2, so `PREFLIGHT.json`'s refusals never reach either round-2
+brief; `fresh.py` `half` runs the void step only when its half is reached in turn, and `stop`/`__main__.main` print a bare code or
+`ERROR: UsageError`. Kind: a fix, no new ticket; the ticket stays closed.
+
+- **FM-1 Every writer's questions are form-checked by code before its session ends, and a refused question goes back to the same
+  writer to fix** (the owner, 2026-11-24, Q-7). `gov memaudit brief --kind writer` writes into the session folder a Claude Code
+  `Stop` hook (`.claude/settings.json`) that runs `gov memaudit writer-check`; the hook runs, by `preflight.py`'s own functions, every
+  per-question check (`form_ok`, `PF-COMMIT`, `PF-DRAWN`, `PF-SOURCE`, `PF-EVALNS`, `PF-DUPPOOL`, `PF-IDEXISTS`) on `out/set/`, and the
+  set-level ones (`PF-COUNT`, `PF-QUOTA`, `PF-SPREAD`) once the half is complete, and blocks the stop with a reason that names each
+  refused id and its code only (never a question's text, gold or sources). The session ends when the files pass, or after 3 returns,
+  when it ends and the refused ids are recorded (`out/` is not written; the sets root's run folder holds `WRITER-CHECK.json`).
+  `gov memaudit deliver --kind writer` runs the same checks and refuses with `DL-PREFLIGHT` and codes only. A half that passes the
+  writer's check passes pre-flight 1 on the same files. Verify: planted sets, one refused case per plantable code through the hook and
+  through deliver; a clean set ends at once; the fourth stop is allowed; delivered then `preflight` ok on the same files.
+- **FM-2 Round 2 sees pre-flight 1's refusals (I-23).** When `PREFLIGHT.json` records a refusal, `gov memaudit brief --round 2`
+  (writer and checker) appends a section `## Pre-flight 1 refusals` listing each refused id with its code (a set-level code on its own
+  line), and the writer's section tells it to repair or replace exactly those. Codes and ids only. A round 2 after a clean pre-flight 1
+  carries no such section. Verify: planted half refused at pre-flight 1, both round-2 briefs.
+- **FM-3 A void is said at once (I-18).** `gov memaudit fresh` runs both halves' void count as soon as the last checker notes are there,
+  before any measure or judge of either half; a half that cannot keep the minimum prints
+  `VOID <audit> <VOID-COUNT|VOID-DOMAIN> kept <k> dropped <d> need <min>` and `STOPPED <audit> void 2`, exit 2, no measure. Verify:
+  planted pair, visible clean and hidden void: no measure of the visible half is started.
+- **FM-4 A stop names its cause (I-19).** Every `STOPPED` line of `fresh` is preceded by `CAUSE <audit> <step> <CODE>: <reason>`; an
+  `FR-*` refusal is followed by a `CAUSE` line; a usage fault prints `CAUSE fresh FR-USAGE-<NAME>: <reason>` before `ERROR: UsageError`.
+  Codes, ids and counts only. Verify: one planted stop per kind (final pre-flight refusal, void, measure used-marker, bad tag).
+
+Hidden-set protections unchanged (EMERGENCY-2 §2.7): nothing printed or logged names a hidden question's text, gold or sources.

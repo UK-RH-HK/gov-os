@@ -260,5 +260,25 @@ non-zero exit with `STORE_BEHIND` and the first 12 hex digits of both commits in
 
 | KPI line | tests | expected red reason |
 |---|---|---|
-| P0-2 | `test_w2_204_p0_2_store_behind.py::test_p0_2_preflight_refuses_store_behind_naming_both_commits_and_writes_no_declaration` | the pre-flight does not read the store: exit 0, `PRE-FLIGHT: every check as expected`, no `STORE_BEHIND` |
-| P0-2 | `test_w2_204_p0_2_store_behind.py::test_p0_2_a_store_at_head_passes_and_the_next_commit_makes_it_behind` | the store at HEAD passes (as before), then after a new commit the pre-flight still exits 0 with no `STORE_BEHIND` |
+| success-24 (P0-2) | `test_w2_204_p0_2_store_behind.py::test_p0_2_preflight_refuses_store_behind_naming_both_commits_and_writes_no_declaration` | the pre-flight does not read the store: exit 0, `PRE-FLIGHT: every check as expected`, no `STORE_BEHIND` |
+| success-24 (P0-2) | `test_w2_204_p0_2_store_behind.py::test_p0_2_a_store_at_head_passes_and_the_next_commit_makes_it_behind` | the store at HEAD passes (as before), then after a new commit the pre-flight still exits 0 with no `STORE_BEHIND` |
+
+### Fix: the fresh 80's writer loop (FM-1 to FM-4)
+
+Tests in `test_w2_204_fix_writer_loop.py` (helpers `w2_204_writer_loop_support.py`), planted sets only, the tool driven as child
+processes. The Stop hook is run as Claude Code runs it: its `command` read from `DIR/.claude/settings.json`, `shell=True`,
+cwd the brief's folder, `{"stop_hook_active": false}` on stdin. Faults planted: PF-FORM, PF-COMMIT, PF-DRAWN, PF-SOURCE,
+PF-EVALNS, PF-DUPPOOL, PF-IDEXISTS, PF-COUNT, PF-QUOTA, PF-SPREAD (each through the hook and through deliver). Equivalence is
+tested by moving the checked files into `hidden/` and comparing the hook's reason lines with pre-flight 1's refusal lines.
+`WRITER-CHECK.json` is read at `<sets-root>/runs/<audit>/`.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-20 (FM-1) | `test_w2_204_fix_writer_loop.py::test_fm1_deliver_refuses_a_set_the_pre_flight_would_refuse_then_accepts_it_repaired`, `test_w2_204_fix_writer_loop.py::test_fm1_a_round_2_delivery_is_checked_the_same_way_and_the_round_1_files_stay`, `test_w2_204_fix_writer_loop.py::test_fm1_guard_a_clean_writer_set_is_delivered_and_passes_pre_flight_1`, `test_w2_204_fix_writer_loop.py::test_fm1_guard_the_existing_deliver_refusals_stay`, `test_w2_204_fix_writer_loop.py::test_fm1_the_writer_brief_writes_a_stop_hook_that_runs_writer_check`, `test_w2_204_fix_writer_loop.py::test_fm1_a_round_2_writer_brief_writes_the_hook_too`, `test_w2_204_fix_writer_loop.py::test_fm1_a_checker_brief_writes_no_hook`, `test_w2_204_fix_writer_loop.py::test_fm1_the_hook_blocks_the_stop_naming_ids_and_codes_only`, `test_w2_204_fix_writer_loop.py::test_fm1_a_clean_set_ends_at_once_and_passes_pre_flight_1_and_deliver`, `test_w2_204_fix_writer_loop.py::test_fm1_a_repaired_set_ends_the_loop_after_one_return`, `test_w2_204_fix_writer_loop.py::test_fm1_the_fourth_stop_is_allowed_and_the_refused_ids_are_recorded`, `test_w2_204_fix_writer_loop.py::test_fm1_a_missing_or_empty_set_is_refused_as_pf_count`, `test_w2_204_fix_writer_loop.py::test_fm1_one_reason_names_every_refused_code_once` | no `.claude/settings.json` is written (`AssertionError`/`FileNotFoundError`); `writer-check` is an unknown subcommand; `deliver --kind writer` accepts the faulty sets (exit 0, no `DL-PREFLIGHT`) |
+| success-21 (FM-2) | `test_w2_204_fix_writer_loop.py::test_fm2_the_round_2_brief_lists_pre_flight_1_s_refusals_by_id_and_code`, `test_w2_204_fix_writer_loop.py::test_fm2_the_writer_s_section_says_to_repair_or_replace_exactly_those`, `test_w2_204_fix_writer_loop.py::test_fm2_guard_a_round_2_after_a_clean_pre_flight_1_has_no_such_section` | no `## Pre-flight 1 refusals` section in the round-2 briefs |
+| success-22 (FM-3) | `test_w2_204_fix_writer_loop.py::test_fm3_a_hidden_half_under_the_minimum_is_void_at_once_and_the_visible_half_is_not_measured`, `test_w2_204_fix_writer_loop.py::test_fm3_a_hidden_half_still_thin_in_a_domain_says_void_domain_and_the_visible_half_is_not_measured` | the visible half is measured first (gov/claude calls, `COUNTS`), no `VOID ...` line, no stop on the hidden half's void |
+| success-23 (FM-4) | `test_w2_204_fix_writer_loop.py::test_fm4_a_preflight_final_refusal_names_its_pf_codes`, `test_w2_204_fix_writer_loop.py::test_fm4_a_void_stop_names_its_cause`, `test_w2_204_fix_writer_loop.py::test_fm4_a_measure_stop_after_a_used_marker_names_its_cause`, `test_w2_204_fix_writer_loop.py::test_fm4_a_busy_gate_stop_names_its_cause`, `test_w2_204_fix_writer_loop.py::test_fm4_an_fr_refusal_is_beside_a_cause_line`, `test_w2_204_fix_writer_loop.py::test_fm4_a_bad_tag_prints_its_cause_before_the_usage_error`, `test_w2_204_fix_writer_loop.py::test_fm4_a_flag_inside_the_sets_root_prints_a_usage_cause_before_the_usage_error` | `STOPPED` has no `CAUSE` line before it; no `CAUSE` after an `FR-*` refusal or before `ERROR: UsageError` |
+
+**Green on the base by design (guards):** `test_fm1_guard_a_clean_writer_set_is_delivered_and_passes_pre_flight_1`,
+`test_fm1_guard_the_existing_deliver_refusals_stay`, `test_fm2_guard_a_round_2_after_a_clean_pre_flight_1_has_no_such_section`,
+`test_fm1_a_checker_brief_writes_no_hook`.

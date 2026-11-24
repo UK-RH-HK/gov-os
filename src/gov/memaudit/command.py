@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HELP = ("memory audit tools: the measure's steps (preflight, void, declare, measure, judge, figures, brief, deliver, "
-        "check, fresh) and the transcript scan for a hidden set's path, question text or ids")
+        "check, fresh, writer-check) and the transcript scan for a hidden set's path, question text or ids")
 STEPS = {
     "preflight": "the checks of a delivered half before any search",
     "void": "the drop and void rule after the checker's last pass",
@@ -33,6 +33,7 @@ STEPS = {
     "deliver": "take a writer's set or a checker's notes into the sets root",
     "check": "the repository's memory-audit configuration: ok, or its first fault",
     "fresh": "a whole fresh pair of halves on a pinned snapshot it builds",
+    "writer-check": "the Stop hook of a writer's session: the pre-flight's checks on out/set, blocking the stop on a refusal",
 }
 CLASS = "read"
 CHILD_EXIT_CODE = True
