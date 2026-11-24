@@ -44,7 +44,7 @@ def test_the_declaration_holds_every_key_and_the_bar_scaled_to_n(plant):
     assert plant.cli(*plant.declare_args()).returncode == 0
     decl = json.loads((plant.run_dir / "DECLARATION.json").read_text())
     assert set(decl) == {"audit", "audit_commit", "store_commit", "store_sha256", "gov_pin", "retrieval_yaml_sha256",
-                         "set_digest", "n", "settings", "nonstandard", "decision", "ok", "bar", "rounding",
+                         "set_digest", "n", "forbidden_lists", "settings", "nonstandard", "decision", "ok", "bar", "rounding",
                          "declared_at"}
     assert decl["audit_commit"] == decl["store_commit"] == plant.repo["head"]
     assert decl["gov_pin"] == "pin-0123456789ab"

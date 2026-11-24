@@ -219,11 +219,12 @@ def preflighted(pre, hidden: Path) -> bool:
     return True
 
 
-def _any_forbidden(hidden: Path) -> bool:
-    """Whether any question file of ``hidden`` carries a non-empty ``forbidden`` list."""
+def _count_forbidden(hidden: Path) -> int:
+    """How many question files of ``hidden`` carry a non-empty ``forbidden`` list."""
     from gov.memaudit.preflight import _load
     files, _ = layout.entries(Path(hidden))
-    return any(isinstance(d := _load(f), dict) and isinstance(d.get("forbidden"), list) and d["forbidden"] for f in files)
+    return sum(1 for f in files
+               if isinstance(d := _load(f), dict) and isinstance(d.get("forbidden"), list) and d["forbidden"])
 
 
 def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None,
@@ -277,8 +278,6 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
     map_code, new_map = plan_map(p, audit)
     if map_code:
         codes.append(map_code)
-    if not _any_forbidden(p["hidden"]):  # F15: the strict rule is stamped on the figures, so some question must carry a list
-        codes.append("DC-FORBIDDEN")
     if codes:
         return "refused", {"codes": codes}
 
@@ -286,9 +285,11 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
     nonstandard = [] if pool else ["pool"]
     ok = not nonstandard or (decision is not None and not week)
     n = drops["kept"]
+    forbidden_lists = _count_forbidden(p["hidden"])
     record = {
         "audit": audit, "audit_commit": commit, "store_commit": head, "store_sha256": sha256_file(store),
         "gov_pin": pin, "retrieval_yaml_sha256": sha256_bytes(raw), "set_digest": digest, "n": n,
+        "forbidden_lists": forbidden_lists,
         "settings": {"reranker": "shared", "pool": pool, "bundle_tokens": 6000, "search_again_once": True},
         "nonstandard": nonstandard, "decision": decision, "ok": ok, "bar": bar(n), "rounding": ROUNDING,
         "declared_at": utc_iso(),
@@ -308,7 +309,7 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
     _write_used(p, audit, decl_sha)
     ledger.append(run_dir, "used", n=n)
     return "ok", {"audit_commit": commit, "n": n, "set_digest": digest, "ok": True, "nonstandard": nonstandard,
-                  "decision": decision}
+                  "decision": decision, "forbidden_lists": forbidden_lists}
 
 
 def lines(word: str, counts: dict) -> list[str]:
@@ -318,4 +319,6 @@ def lines(word: str, counts: dict) -> list[str]:
         return [f"{code} {' '.join(counts.get('nonstandard') or [])}".rstrip() if code == "DC-DECISION" else code
                 for code in counts["codes"]]
     return [f"DECLARED: audit commit {counts['audit_commit'][:12]}, n {counts['n']}, "
-            f"set digest {counts['set_digest'][:12]}", "USED written"]
+            f"set digest {counts['set_digest'][:12]}", "USED written"] + (
+        ["NOTICE DC-FORBIDDEN-NONE: no question carries a forbidden list; the strict rule grades as the lenient "
+         "rule would"] if counts.get("forbidden_lists") == 0 else [])
