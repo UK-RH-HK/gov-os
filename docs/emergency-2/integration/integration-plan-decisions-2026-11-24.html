@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Integration plan decisions, 24 November</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding:22px 18px 80px}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <h1>Integration plan decisions, 24 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">The integration plan, the corrected golden workflow (v2) and the questions they raise, in one place. The plan has 73 items in seven phases, about 19 working days, and puts 15 of the 16 workflow steps on the path. Every card is selected with my recommendation; change anything, then copy the answer sheet at the end.</p>
+<section class="state">
+  <h3>The plan at a glance</h3>
+  <ul>
+    <li><b>Phases:</b> 0 memory first and the git hook; 1 the landing (gov land); 2 the brief and the launch; 3 the schedule; 4 the tools outside the product; 5 the forms, decisions and the rule; 6 the test on a scratch repository and the exit.</li>
+    <li><b>Steps on the path:</b> 1 of 16 today; 2 after Phase 0; 4 after Phase 1; 7 after Phase 2; 11 after Phase 3; 15 after Phase 5. The exit needs 15 or more, judged by what each step produced, W2-81's re-run passing, and EXAMIN's planning running on the integrated workflow.</li>
+    <li><b>Cost and time:</b> about $910 at list prices over about 19 working days, roughly 13 to 15 % of a week's plan each week; up to three streams at once (landing, brief and launch, memory and schedule), a fourth for forms and decisions from the end of Phase 3.</li>
+    <li><b>Emergency mode holds:</b> Gov OS's own work lands by the plain path until you decide (Day M); the tools are proven on the scratch repository and in EXAMIN.</li>
+  </ul>
+</section>
+<div id="sections"></div>
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Your answers and notes are kept on this device as you go.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+<script>
+const SECTIONS = [{"title": "The plan and the workflow", "intro": "The two documents for your yes.", "qs": [{"id": "WF", "title": "The golden workflow v2 becomes the spine", "src": "GOLDEN-WORKFLOW-v2.md (46 changes in its change log)", "found": ["Your draft with every correction and decision since: 46 changes, each traced to its source (a card, a correction or a decision). Your words are kept wherever the code agreed with them.", "Notable: on a red the landing writes the record and the CTO decides (your T-12 over the draft's \"a quality auditor is called\"); gov land with gov queue as an alias; the 90 % floor is 15 of 16 steps; the test for \"outside the product\" and what ships."], "opts": [["a", "Approve v2 as the spine", "", 1], ["b", "Approve, with changes in my note", ""]], "cto": "Proposed for your yes.", "me": "(a). I checked the change log: every change traces to something you decided or the code showed."}, {"id": "PLAN", "title": "The integration plan", "src": "INTEGRATION-PLAN.md", "found": ["73 items in seven phases, each a fix or chore under its owning ticket, with a verify that says what the step must produce; three new tickets only, all features you approved (the enforcement field, rule 8's first slice, decisions by page).", "Up to three streams by code area so their paths never meet; about 19 working days and about $910 at list prices; the exit needs 15 of 16 steps held by code on a scratch run, W2-81's re-run and EXAMIN's planning on the integrated workflow."], "opts": [["a", "Approve, with my amendments X-1 to X-5 and my answers below", "", 1], ["b", "Approve as written", ""], ["c", "Not yet: changes in my note", ""]], "cto": "Drafted for your yes.", "me": "(a). It is thorough and honest about its margins; the amendments fix two lessons from this week and shorten EXAMIN's wait."}]}, {"title": "My amendments to the plan", "intro": "Five changes I recommend, each from something this week showed.", "qs": [{"id": "X-1", "title": "Every landing runs the impact-selected tests, never a hand-picked set; a trustworthy selection first in Phase 1", "src": "This week's fixes-015a fallout; your comment; DEC-1241 P-2, DEC-1242 T-8", "found": ["fixes-015a was merged by hand and tested on its own folders only: the product's impact selection never ran, so the tests its launcher changes touched elsewhere (about 85) were never chosen. The cause was the hand-picked test set, not the absence of a full run.", "The pieces exist: the landing's selection from changed code to the tests that exercise it, the path map, and gov impact (which nothing calls today). Making them trustworthy is integration work: the path map complete (G-8), the code and test graph current, gov impact triggered at the landing (T-11).", "As you decided: no full run per landing. The whole suite (about 18,000 tests, about 90 minutes of machine time) runs only on demand for a release and weekly as the safety net (P-2, T-8). A red the selection missed, found by the weekly or release run, is logged as a selection bug and fixed."], "opts": [["a", "Every landing, Gov OS's hand merges included, runs the tests the product's impact selection picks, never a hand-picked set; making the selection trustworthy (path map, code and test graph, gov impact at the landing) comes first in Phase 1; the full suite runs only for a release and weekly, as decided; a red the selection missed is a selection bug", "", 1], ["b", "A full regression before any broad landing (my first suggestion)", ""]], "cto": "After fixes-015a it proposed the full run before broad landings.", "me": "(a). You are right: the full run per landing is what you rejected, and the real gap was that the selection never ran. Fix the selection, and keep the full run as the weekly and release net."}, {"id": "X-2", "title": "Stall detection by code, with no wakers: push me after 3 hours with nothing moving", "src": "Your rule to the CTO; your comment; plan item 5-15", "found": ["Your rule: if nothing has moved for 3 hours, push you. The pause of 22 to 24 November was mostly work waiting on you, not a fault in the work.", "Agents waking to check for stalls cost thousands of tokens for nothing. The check should be code: the scheduler reads when anything last moved (a commit, a lead's end, a landing) and sends the push itself; no agent wakes, no usage.", "The push says what is waiting and on whom: on you (a decision, a cut, a push), or on stuck work (a session that has stopped). The plan's 5-15 adds the finer stall thresholds for a session that loops, in Phase 5."], "opts": [["a", "Yes: the 3-hour stall push sent by code, not by any waking agent, saying what waits and on whom; built with the scheduler in Phase 3, the CTO's own rule meanwhile; 5-15's finer thresholds stay in Phase 5", "", 1], ["b", "Leave it to the CTO's watcher", ""]], "cto": "Its watcher is now restarted after every event.", "me": "(a). Your 3 hours, held by code instead of by an agent remembering to look."}, {"id": "X-3", "title": "The imports feature inside the plan, once EXAMIN's fresh 80 passes", "src": "Plan §3; DEC-1222 (1)", "found": ["The exit needs 15 of 16 steps; W1 (adoption) stays partly only because the imports step waits for EXAMIN's fresh 80, so the margin over the floor is exactly one step.", "EXAMIN's fresh 80 runs as soon as 0.1.5 is out, early in the plan's first week."], "opts": [["a", "Yes: when the fresh 80 passes, the imports feature (already approved) joins the plan as a fourth stream, so W1 is fully on by the exit", "", 1], ["b", "Keep it after the plan", ""]], "cto": "Not in this plan (it says why).", "me": "(a). It turns a one-step margin into two, with a feature you already approved."}, {"id": "X-4", "title": "EXAMIN measures, writes its Contract and plans now; only executing the plan waits", "src": "DEC-1238 (4); your comment; the plan's exit", "found": ["Your clarification: measuring the memory, writing the Contract and planning (the WBS, the waves, the tickets) go ahead now. Only executing the plan (starting leads, building, landing) waits, because it needs the integrated Gov OS, not just memory.", "So EXAMIN does not stand still for about four weeks: its fresh 80 runs as soon as 0.1.5 is out, then its CTO writes the Contract from the 26 sources already inventoried and plans from it, each for your yes.", "The planning records are written in the forms this page settles (a feature ticket names its spec, KPI lines with stable ids copied word for word, the wave file form), so the integrated tools read them unchanged when execution starts. Executing the plan is then the trial of the integrated workflow.", "This changes part of your DEC-1238 (4), so it is recorded as such."], "opts": [["a", "Yes: EXAMIN's memory measure, Contract and planning (WBS, waves, tickets, in the forms this page settles) go ahead now, each for my yes; only executing the plan waits for integrated Gov OS, and is its trial", "", 1], ["b", "No: planning waits whole, as decided", ""]], "cto": "Not raised.", "me": "(a). Value first: the product's Contract and plan are the work that matters most, and only the execution needs the integration."}, {"id": "X-5", "title": "A fourth or fifth stream if the machine allows", "src": "Plan §4; DEC-1234", "found": ["The plan runs up to three streams on today's reading (20 cores, 23 GB, three heavy test slots); the capacity assessment comes when W2-207 lands."], "opts": [["a", "Yes: after the capacity assessment, run as many streams as the machine holds, within the load gate", "", 1], ["b", "Three at most", ""]], "cto": "Up to three, pending the assessment.", "me": "(a). The machine, not a fixed number, sets the pace; the gate protects it."}]}, {"title": "The plan's spec questions and choices", "intro": "Q-1 to Q-11 from the discoveries; Q-12 to Q-14 are choices the plan needs. None stops work in flight.", "qs": [{"id": "Q-1", "title": "At the landing, is a new path the path map does not hold exactly once refused, or a notice?", "src": "Plan §5", "found": ["G-8 says code proves exact coverage at every landing; your I-2 says a record-only document is placed with a notice, never refused. They meet on a brand-new folder no class holds.", "An unmapped path fails open: memory indexes it by default, so a hidden-set file in the wrong place would be indexed."], "opts": [["a", "Refuse, naming the exact line to add to the map", "", 1], ["b", "A notice, and doctor fails", ""], ["c", "Refuse only hidden-set, evaluation or doubled paths", ""]], "cto": "(a).", "me": "(a). It fails open, so your golden rule says block; the refusal names the fix, and a record-only document inside an already-mapped folder still passes with a notice, as I-2 said."}, {"id": "Q-2", "title": "Must a feature ticket name its spec?", "src": "Plan §5", "found": ["Code reads a specification field that no schema states; 0 of 271 tickets carry it."], "opts": [["a", "Required for every feature ticket, old ones migrated", ""], ["b", "Required for new feature tickets; optional on old ones", "", 1], ["c", "Leave it", ""]], "cto": "(b), medium confidence.", "me": "(b)."}, {"id": "Q-3", "title": "Which form is \"the spec\": Gov OS's nine-part K-line form, or OpenSpec?", "src": "Plan §5", "found": ["Both ship; EXAMIN's real specs are OpenSpec; Gov OS's own work uses neither."], "opts": [["a", "The nine-part form is the spec; OpenSpec holds the living behaviour beside it, each K-line naming its requirement", "", 1], ["b", "OpenSpec only", ""], ["c", "The nine-part form only", ""]], "cto": "(a), low confidence.", "me": "(a) for now, and decide it for good when EXAMIN's Contract is drafted: the product with the real specs should settle it."}, {"id": "Q-4", "title": "How is a KPI line identified?", "src": "Plan §5", "found": ["Lines are named by position today; a line inserted later silently renumbers every later one; 37 typed prefixes already disagree with their position."], "opts": [["a", "A stable id as the line's first token for new feature tickets, with a fingerprint of the list to catch drift", "", 1], ["b", "Position plus a fingerprint", ""], ["c", "Both names", ""]], "cto": "(a) with (b) as the drift catch.", "me": "(a)."}, {"id": "Q-5", "title": "Is a ticket's KPI line a copy of the spec's line, or a refinement?", "src": "Plan §5", "found": ["gov discover copies it word for word; EXAMIN's X12 lines name code in the line itself, which the spec form refuses."], "opts": [["a", "A word-for-word copy, with code named only in its verify field", "", 1], ["b", "A refinement carrying the id and fingerprint", ""], ["c", "No relation beyond the id", ""]], "cto": "(a), for new feature tickets.", "me": "(a): the exact copy is what makes the check deterministic."}, {"id": "Q-6", "title": "Does gov accept fail a ticket line that no test map row names?", "src": "Plan §5", "found": ["Today gov accept judges only the lines the map names: 138 lines across 45 closed tickets are proven by nothing."], "opts": [["a", "Fail, for tickets created from the change on; older ones exempt", "", 1], ["b", "Fail for every ticket, re-mapping the 45", ""], ["c", "A notice only", ""]], "cto": "(a), high confidence.", "me": "(a)."}, {"id": "Q-7", "title": "Do the build and fix loops have a cap, and what happens at it?", "src": "Plan §5; your comment", "found": ["W10 says \"build until green\" with no cap; every engine studied caps its loops.", "With a brief generated from the right spec, KPI lines and path map, an agent should rarely fail for the same reason more than twice. A third time means something upstream is wrong, not just the code.", "So at the cap the loop stops, and the CTO finds why: the brief, the spec or KPI lines, the path map, the test, the environment or a tool. It fixes that root, not only the code, and records the cause in the findings log, so the same root cannot fail another agent."], "opts": [["a", "Cost only (the spend brake and the stall watch)", ""], ["b", "A count of fix rounds", ""], ["c", "The same failure three times stops the loop; the CTO finds the root cause (brief, spec or KPIs, path map, test, environment or tool), fixes it at the root, and records it in the findings log", "", 1]], "cto": "(c).", "me": "(c). A third identical failure is a signal about the system, not the agent: fix where it came from."}, {"id": "Q-8", "title": "May work run on API keys or other subscription plans, not only your Claude plan?", "src": "Plan §5; your comment", "found": ["No engine is being adopted (Q-13); whether any could use your plan login is unverified.", "Your answer: API keys and other subscription plans are wanted in time, but using them needs building and trialling (how each session gets its key or plan, how its cost is counted, how a hidden-set run stays on the machine). So for now only your Claude Code plan; the rest becomes a feature in Wave 3."], "opts": [["a", "Only my Claude Code plan now; API keys and other subscription plans become a Wave 3 feature, built and trialled then, each paid service approved by me", "", 1], ["b", "API keys or other subscription plans allowed now", ""], ["c", "Leave it open until an engine is ever chosen", ""]], "cto": "(c).", "me": "(a), as you said: nothing to build now, and the feature waits for Wave 3."}, {"id": "Q-9", "title": "Would a step held by an engine's graph count as held by code?", "src": "Plan §5", "found": ["Only matters if an engine is adopted."], "opts": [["a", "Yes, if the engine is pinned and its behaviour checked by our own test", "", 1], ["b", "A new class", ""], ["c", "No", ""]], "cto": "(a), only if an engine is adopted.", "me": "(a)."}, {"id": "Q-10", "title": "Review by a model from another vendor?", "src": "Plan §5; your comment", "found": ["One competitor reviews with a second vendor's model; your rule 7 is silent on vendors. A second vendor means a paid service and outputs leaving the machine.", "Your answer: very possible, the risk understood; but it needs building (a second vendor's access, which is Q-8's feature, and keeping hidden-set work on the machine), so it waits for Wave 3 with Q-8."], "opts": [["a", "One vendor now; review by a second vendor becomes a Wave 3 feature, built and trialled with Q-8's keys and plans", "", 1], ["b", "A one-wave trial now", ""], ["c", "Never", ""]], "cto": "(a) now, the trial after.", "me": "(a), as you said: it rides on Q-8's feature, so they come together in Wave 3."}, {"id": "Q-11", "title": "Gov OS has no licence file", "src": "Plan §5", "found": ["Neither Gov OS nor the kit states any licence; the kit is copied into every adopted repository."], "opts": [["a", "Leave it; revisit before any share", ""], ["b", "State \"all rights reserved\" in a file, in Gov OS and the kit (a chore)", "", 1], ["c", "Choose a licence now", ""]], "cto": "(a).", "me": "(b). A one-line chore that states your rights plainly in every repository the kit reaches; choosing a licence can wait for any share."}, {"id": "Q-12", "title": "Which approach makes the chain from feature to code deterministic (G-7)?", "src": "Plan §5; your comment", "found": ["The friction sits at one hop: ticket line to test map to test (66 to 72 unreadable maps, 138 unproven lines, 15 phantom lines), plus no comparison of a spec's line with the ticket's.", "A is the right one to try first: smallest, aimed at the measured friction, and B and C would need its parts anyway.", "One refinement I suggest: today the link from a KPI line to its tests lives in a hand-written README table, the very thing that fails to parse in 66 to 72 folders. Put the link in the test itself instead: each acceptance test carries its KPI line's id in code (a marker), code reads the markers, and the README map is generated from them, never written by hand. This is how traceability is usually made reliable: the link sits where it cannot drift from the test.", "Later, if A works, B's best part can be added as one more slice: test stubs generated from the KPI lines, so the test designer starts from the right skeleton."], "opts": [["a", "A, derive and check, with each acceptance test carrying its KPI line's id in code and the README map generated from those markers, never hand-written; in slices, tried first on the scratch repository and EXAMIN; B's stub generation considered as a later slice", "", 1], ["b", "A as the CTO wrote it, with hand-written README maps", ""], ["c", "B, scenario first", ""], ["d", "C, a typed graph", ""]], "cto": "A.", "me": "(a): A, with the link moved into the test, where it cannot drift; that removes the fragile tables behind most of the friction."}, {"id": "Q-13", "title": "Adopt an open-source engine, or finish our own integration (G-9)?", "src": "Plan §5", "found": ["No engine has memory first, a decision register, an independent test designer, an impact-selected landing or adoption; an engine would replace only the launch and run part (about 19 of 102 rows), which Gov OS has built."], "opts": [["a", "Finish our integration and build the five small pieces they do better, and look again only if the scratch test shows a workflow our tools cannot express", "", 1], ["b", "Adopt Archon or Fabro for launching and running", ""], ["c", "Study only", ""]], "cto": "(a), with (c)'s check.", "me": "(a)."}, {"id": "Q-14", "title": "The floor: a baseline you set from what is reached, then never lower without your decision", "src": "Plan §5; your comment", "found": ["Today 1 of 16 steps is fully on, so a floor that refuses would block every release until the exit.", "Your answer: neither refuse nor accept yet; we are finding out whether the target can be hit. Until the exit every release prints the three measures. At the exit you set the baseline, X % (90, 95 or 88, from what was actually reached).", "From then, no release falls below X %: one that would stops for your decision, either an exemption for that release with its reason, or a change to X itself. Code holds the comparison; you hold the exception."], "opts": [["a", "Print only until the exit; at the exit I set the baseline X % from what was reached; from then a release below X % stops for my decision: an exemption with its reason, or a new X", "", 1], ["b", "A fixed 90 % that refuses from the first release after the exit", ""], ["c", "Print only, always", ""]], "cto": "(b).", "me": "(a), as you said: a ratchet that only moves down by your decision."}]}, {"title": "The go-ahead", "intro": "", "qs": [{"id": "GO", "title": "Record, finalise, and start when 0.1.5 is cut", "src": "DEC-1241 GO", "found": ["Record these answers as decisions; finalise the plan and v2 with them; start Phase 0 the moment 0.1.5 is cut, with the WSL restart and the fresh CTO session after your handover; push me at each phase end with the three measures."], "opts": [["a", "Yes", "", 1], ["b", "Wait", ""]], "cto": "Ready.", "me": "(a)."}]}];
+const PREFILL={answers:{},notes:{}};
+for(const s of SECTIONS) for(const q of s.qs){const r=q.opts.find(o=>o[3]); if(r) PREFILL.answers[q.id]=r[0];}
+const KEY="govos-integration-plan-20261124";
+let state=JSON.parse(JSON.stringify(PREFILL));
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers){state=s; state.notes=state.notes||{}; for(const k in PREFILL.answers){ if(!state.answers[k]) state.answers[k]=PREFILL.answers[k]; }}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+const all=[]; const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2>`+(s.intro?`<p>${s.intro}</p>`:"");
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.src}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<div class="note cto"><span class="who">The CTO</span>${q.cto}</div>`;
+    h+=`<div class="note me"><span class="who">My view</span>${q.me}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const lines=["Integration plan decisions, 24 Nov 2026: my answers"];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id} ${q.title}: `;
+    if(v){n++; const o=q.opts.find(o=>o[0]===v); line+=`(${o[0]}) ${o[1]}`;} else line+="(no answer)";
+    lines.push(line);
+    const note=(state.notes[q.id]||"").trim();
+    if(note) lines.push(`   Note: ${note}`);
+  }
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{ if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();} });
+document.addEventListener("input",e=>{ if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();} });
+document.getElementById("take-cto").addEventListener("click",()=>{ for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];} save(); apply(); });
+document.getElementById("clear").addEventListener("click",()=>{ if(!confirm("Clear every answer and note on this page?")) return; state={answers:{},notes:{}}; save(); apply(); });
+document.getElementById("copy").addEventListener("click",async()=>{
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
+</body>
+</html>

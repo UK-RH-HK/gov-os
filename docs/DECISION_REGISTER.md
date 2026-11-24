@@ -2203,6 +2203,35 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-24; W1-01's red in the 0.1.5 full run (the four engineer commits, I-12); the 30 hours 0.1.5 stood still (I-13); the 95 reds of the straight-through run after fixes-015a (I-14).
 - **Governing sources:** governance/project/path-map.yaml; docs/emergency-2/integration/FINDINGS.md; docs/emergency-2/integration/COMPETITIVE-ANALYSIS.md (the stall detector); DEC-906; DEC-1052; DEC-1241.
 
+### DEC-1244 — The integration plan decisions (22 cards, the owner's page of 24 November): golden workflow v2 the spine; the plan approved with X-1 to X-5; Q-1 to Q-14; the go-ahead at the 0.1.5 cut
+- **Status:** ACCEPTED (owner, 2026-11-24 about 11:35, in the chat with his page `docs/emergency-2/integration/integration-plan-decisions-2026-11-24.html` committed as the record of each card's findings, the CTO's view, his and his reasoning; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1238, DEC-1241, DEC-1242, DEC-1243 · **Changes:** DEC-1238 (4) (X-4: EXAMIN's Contract and planning go ahead now; only executing its plan waits); DEC-1243 (3) (X-1 replaces "the full regression before a broad branch lands" with the impact-selected tests at every landing); DEC-1241 P-6's floor (Q-14: a baseline set at the exit); the owner's golden workflow draft (WF: v2 replaces it)
+- **Decision:**
+  - **WF (a):** the golden workflow v2 (`docs/emergency-2/integration/GOLDEN-WORKFLOW-v2.md`) is approved as the spine.
+  - **PLAN (a):** the integration plan is approved, with X-1 to X-5 and the answers below.
+  - **X-1 (a):** every landing, Gov OS's hand merges included, runs the tests the product's impact selection picks, never a hand-picked set; making the selection trustworthy (the path map, the code and test graph, `gov impact` at the landing) comes first in Phase 1; the full suite runs only for a release and weekly, as decided; a red the selection missed is a selection bug.
+  - **X-2 (a):** the 3-hour stall push is sent by code, not by any waking agent, saying what waits and on whom; built with the scheduler in Phase 3, the CTO's own rule meanwhile; 5-15's finer thresholds stay in Phase 5.
+  - **X-3 (a):** when EXAMIN's fresh 80 passes, the imports feature (already approved) joins the plan as a fourth stream, so W1 is fully on by the exit.
+  - **X-4 (a):** EXAMIN's memory measure, Contract and planning (WBS, waves, tickets, in the forms this page settles) go ahead now, each for the owner's yes; only executing the plan waits for integrated Gov OS, and is its trial. (Changes DEC-1238 (4).)
+  - **X-5 (a):** after the capacity assessment, run as many streams as the machine holds, within the load gate.
+  - **Q-1 (a):** a new path the path map does not hold exactly once is refused at the landing, naming the exact line to add (a record-only document inside an already-mapped folder still passes with a notice, DEC-1239 (2)).
+  - **Q-2 (b):** a feature ticket names its spec: required for new feature tickets, optional on old ones.
+  - **Q-3 (a):** the nine-part form is the spec; OpenSpec holds the living behaviour beside it, each K-line naming its requirement (to be settled for good when EXAMIN's Contract is drafted, the owner's note on the card).
+  - **Q-4 (a):** a stable id as a KPI line's first token for new feature tickets, with a fingerprint of the list to catch drift.
+  - **Q-5 (a):** a ticket's KPI line is a word-for-word copy of the spec's line, with code named only in its verify field.
+  - **Q-6 (a):** `gov accept` fails a ticket line no map row names, for tickets created from the change on; older ones exempt.
+  - **Q-7 (c):** the same failure three times stops the loop; the CTO finds the root cause (brief, spec or KPIs, path map, test, environment or tool), fixes it at the root, and records it in the findings log.
+  - **Q-8 (a):** only the owner's Claude Code plan now; API keys and other subscription plans become a Wave 3 feature, built and trialled then, each paid service approved by the owner.
+  - **Q-9 (a):** a step held by an engine's graph counts only if the engine is pinned and its behaviour checked by Gov OS's own test.
+  - **Q-10 (a):** one vendor now; review by a second vendor becomes a Wave 3 feature, built and trialled with Q-8's keys and plans.
+  - **Q-11 (b):** state "all rights reserved" in a file, in Gov OS and the kit (a chore).
+  - **Q-12 (a):** approach A, derive and check, with each acceptance test carrying its KPI line's id in code and the README map generated from those markers, never hand-written; in slices, tried first on the scratch repository and EXAMIN; B's stub generation considered as a later slice.
+  - **Q-13 (a):** finish the integration and build the five small pieces they do better; look again only if the scratch test shows a workflow Gov OS's tools cannot express.
+  - **Q-14 (a):** print only until the exit; at the exit the owner sets the baseline X % from what was reached; from then a release below X % stops for his decision: an exemption with its reason, or a new X.
+  - **GO (a):** record these, finalise the plan and v2 with them, and start Phase 0 the moment 0.1.5 is cut, with the WSL restart and the fresh CTO session after the handover; push the owner at each phase end with the three measures.
+  - **EXAMIN's order** (the owner's message): its fresh 80 as soon as 0.1.5 is out; then its Contract and its planning, each for the owner's yes; only executing the plan waits.
+- **Basis:** the owner's message of 2026-11-24 and his page; the week's incidents behind X-1 (fixes-015a tested on a hand-picked set, I-14) and X-2 (0.1.5 still for 30 hours, I-13).
+- **Governing sources:** docs/emergency-2/integration/integration-plan-decisions-2026-11-24.html; docs/emergency-2/integration/INTEGRATION-PLAN.md; docs/emergency-2/integration/GOLDEN-WORKFLOW-v2.md; DEC-1238; DEC-1243.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
