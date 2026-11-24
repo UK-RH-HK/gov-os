@@ -174,7 +174,12 @@ def test_s6_rulesync_subagent_equals_its_composition(role):
 
     text = (REPO / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8")
     assert text == compose(REPO, role), f".rulesync/subagents/{role}.md is not compose(root, {role!r})"
-    assert s.MEMORY_LINE in text, f".rulesync/subagents/{role}.md lacks the shared memory line"
+    # Rewrite-Reason: F11 (fixes-015a, DEC-1236): a generated role file holds no unfilled slot, so the shared line
+    # appears with {CMD:retrieve} as "the `retrieve` command of your brief" (the wording written out here, not taken
+    # from the product's fill function); the line's own wording is asserted as before.
+    filled = s.MEMORY_LINE.replace("{CMD:retrieve}", "the `retrieve` command of your brief")
+    assert filled in text, f".rulesync/subagents/{role}.md lacks the shared memory line"
+    assert "{CMD:" not in text, f".rulesync/subagents/{role}.md holds an unfilled slot"
 
 
 # --- S7: facts, keys and the adopted facts ---------------------------------------------------------------------------
