@@ -65,8 +65,15 @@ def figures(sets_root, audit, emit, week=None) -> str:
         "dropped": _pick(drops, "dropped"),
         "by_code": _pick(drops, "by_code"),
     }
+    if isinstance(fig, dict):
+        line.update({k: fig[k] for k in figures_stamp_keys() if k in fig})
     emit(json.dumps(line, sort_keys=True))
     return "ok"
+
+
+def figures_stamp_keys():
+    from gov.memaudit.figures import STAMP_KEYS
+    return STAMP_KEYS
 
 
 def _word(value) -> str:

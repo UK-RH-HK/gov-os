@@ -394,7 +394,10 @@ class SW(W172.World):
                 "at": "2026-11-02T21:00:00Z", "mode": "weekly", "churn": 0.01, "retrieval_28d": False,
                 "passes": word == "pass", "pool_regression": False, "measured": True, "used": True, "n": n,
                 "right": right, "wrong": 0, "not_found": n - right, "dropped": 0, "pct": pct, "word": word,
-                "gov_pin": W171.PIN, **self.digests_now()}
+                "gov_pin": W171.PIN, **self.digests_now(),
+                # F15's stamp: a figure without it is never compared, so a planted line carries it
+                "release": "0.1.5", "reader_model": "claude-sonnet-5-5", "grader_models": ["claude-sonnet-5-5"],
+                "forbidden_rule": "strict", "questions_with_forbidden": 0}
         line.update(over)
         return line
 

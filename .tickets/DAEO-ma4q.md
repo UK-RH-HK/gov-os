@@ -261,3 +261,14 @@ not when a case passes its own specs to `prepare`, so S18's case stays red-to-gr
 `test_standing.py` (each marked `# Rewrite-Reason:`). Verified: `tests/unit/memaudit`, W2-171, W2-204: 738 passed, 1 skipped,
 1 failed (`test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files`, red on the base: it diffs against
 `2f0c07bcb`, and `w2/integrate` holds the models-rubric merge after it).
+
+## Fix: declare notices, never refuses, a set with no forbidden list (fix-dc-forbidden, 2026-11-24)
+
+F15 made `gov memaudit declare` refuse (`DC-FORBIDDEN`) a set where no hidden question carries a `forbidden` list; W2-187's
+standing sets have none, so 42 cases failed in the 0.1.5 full suite. The CTO's ruling: a set with no forbidden list is
+legitimate. `declare` now never refuses for it: it prints `NOTICE DC-FORBIDDEN-NONE: no question carries a forbidden list;
+the strict rule grades as the lenient rule would`, and `DECLARATION.json` carries `forbidden_lists: <count>`; verdict and
+exit code unchanged. Two further causes of the remaining W2-187 reds, found on the way: the fresh figures line printed by
+`digest.figures` omitted the six stamp keys, so `standing.drift` never compared a real fresh run ("DRIFT not yet"), now
+copied from FIGURES.json; and W2-187's planted standing lines carried no stamp (fixture stamped). Tests: W2-204 S18 revised
+(Rewrite-Reason in its commit), W2-187 `std_line` stamped.
