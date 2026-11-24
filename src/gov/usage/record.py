@@ -122,7 +122,7 @@ def _files(day: str):
                 mtime = path.stat().st_mtime
             except OSError:
                 continue
-            if mtime >= start:  # last written before the day starts: it cannot hold that day's messages
+            if mtime >= start or start > datetime.now(timezone.utc).timestamp():  # last written before the day starts: it cannot hold that day's messages
                 found.append((mtime, str(path), path))
     return [p for _, _, p in sorted(found)]
 
@@ -136,6 +136,7 @@ def collect(root: Path, day: str):
     cache: dict = {}
     seen: dict = {}      # (repo, session, message id) -> (model, tokens, helper meta role)
     skipped = 0
+    nousage: set = set()  # a usage-less assistant line repeated in a resumed file counts once
     for path in _files(day):
         helper = path.parent.name == "subagents"
         meta = _meta(path) if helper else {}
@@ -162,7 +163,10 @@ def collect(root: Path, day: str):
                 stamp = _day_of(obj.get("timestamp"))
                 if not isinstance(usage, dict):
                     if stamp in ("", day):
-                        skipped += 1
+                        key = (obj.get("cwd"), obj.get("sessionId") or path.stem, message.get("id") or obj.get("uuid") or (str(path), n))
+                        if key not in nousage:
+                            nousage.add(key)
+                            skipped += 1
                     continue
                 if stamp != day:
                     continue
@@ -188,15 +192,15 @@ def collect(root: Path, day: str):
             if role is None and session in cto:
                 role, source = "cto", "cto-session.txt"
             if role is None:
-                role, source = "unknown", "none"
+                role, source = "unknown", "unknown (no launch record, helper meta or cto-session.txt names a role)"
             row = groups[(repo, session, model)] = {
                 "repository": repo, "session": session, "role": role, "role_source": source, "model": model,
-                "input_tokens": 0, "output_tokens": 0, "cache_read_tokens": 0, "cache_creation_tokens": 0,
+                "input": 0, "output": 0, "cache_read": 0, "cache_creation": 0,
                 "context_peak": 0}
-        row["input_tokens"] += tokens[0]
-        row["output_tokens"] += tokens[1]
-        row["cache_read_tokens"] += tokens[2]
-        row["cache_creation_tokens"] += tokens[3]
+        row["input"] += tokens[0]
+        row["output"] += tokens[1]
+        row["cache_read"] += tokens[2]
+        row["cache_creation"] += tokens[3]
         row["context_peak"] = max(row["context_peak"], tokens[0] + tokens[2] + tokens[3])
     return sorted(groups.values(), key=lambda r: (r["repository"], r["session"], r["model"])), skipped
 
@@ -205,7 +209,7 @@ def _cost(row: dict, prices: dict):
     price = prices["models"].get(row["model"])
     if price is None:
         return None
-    counts = (row["input_tokens"], row["output_tokens"], row["cache_read_tokens"], row["cache_creation_tokens"])
+    counts = (row["input"], row["output"], row["cache_read"], row["cache_creation"])
     return sum(c * price[f] for c, f in zip(counts, FIELDS)) / 1_000_000
 
 
@@ -213,9 +217,9 @@ def _sum_by(rows, key) -> dict:
     out: dict = {}
     for row in rows:
         name = key(row)
-        t = out.setdefault(name, {"input_tokens": 0, "output_tokens": 0, "cache_read_tokens": 0,
-                                  "cache_creation_tokens": 0, "cost_usd": 0.0, "sessions": 0})
-        for k in ("input_tokens", "output_tokens", "cache_read_tokens", "cache_creation_tokens"):
+        t = out.setdefault(name, {"input": 0, "output": 0, "cache_read": 0,
+                                  "cache_creation": 0, "cost_usd": 0.0, "sessions": 0})
+        for k in ("input", "output", "cache_read", "cache_creation"):
             t[k] += row[k]
         t["cost_usd"] += row["cost_usd"] or 0.0
         t["sessions"] += 1
@@ -247,7 +251,7 @@ def build(root: Path, day: str) -> dict:
         cost = _cost(row, prices)
         row["cost_usd"] = None if cost is None else round(cost, 6)
     return {
-        "date": day, "price_table": {"path": str(PRICES), "date": prices["date"],
+        "date": day, "timezone": "UTC", "price_table": {"path": str(PRICES), "date": prices["date"],
                                      "note": "dollars are a list-price estimate"},
         "rows": rows, "unpriced_models": unpriced, "skipped_lines": skipped,
         "totals": {
@@ -285,8 +289,10 @@ def show_lines(root: Path, day: str, days: int) -> list:
             repos = rec["totals"]["by_repository"]
             if not repos:
                 lines.append(f"{d} no usage; plan: {rec['plan_reading']}")
+            all_cost = rec["totals"]["all"].get("cost_usd", 0.0)
             for repo, t in sorted(repos.items(), key=lambda kv: -kv[1]["cost_usd"]):
-                lines.append(f"{d} {repo} ${t['cost_usd']:.2f} list-price estimate; plan: {rec['plan_reading']}")
+                share = (100.0 * t["cost_usd"] / all_cost) if all_cost else 0.0
+                lines.append(f"{d} {repo} ${t['cost_usd']:.2f} {share:.0f}% list-price estimate; plan: {rec['plan_reading']}")
         return lines
     rec = _day_record(root, day)
     total = rec["totals"]["all"].get("cost_usd", 0.0) if rec["rows"] else 0.0
