@@ -66,9 +66,6 @@ PERMISSION_KINDS = ("deny", "allow")
 LEGACY = {"deny": ("Edit(.tickets/**)",), "allow": ("Bash(gov launch:*)",)}
 OUTCOMES = ("updated", "added", "removed", "merged", "kept", "conflicts", "overlay")
 OVERLAY = "governance/project/"
-# MR-4 (DEC-1246 (3)(b)): kit files that are the release's, not the project's: a differing copy (an older release's, or
-# one a repository was given by hand) is replaced byte for byte by release B's.
-KIT_OWNED = (".claude/hooks/agent_model.py",)
 UPDATES_REL = "governance/updates"
 SOURCES = ".rulesync"
 
@@ -148,8 +145,6 @@ def classify(rel: str, old, own, new):
         return (kind, entry[1], entry[2], entry[0] == "link")
     if own == new:
         return None, None
-    if rel in KIT_OWNED and new is not None:
-        return ("added" if own is None else "updated"), write("write", new)
     if rel.startswith(OVERLAY):  # the overlay is the project's: an existing file is never written
         if own is not None:
             return ("overlay", None) if new != old else (None, None)

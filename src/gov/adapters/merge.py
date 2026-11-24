@@ -196,6 +196,24 @@ def _template_copies(root: Path) -> tuple[dict[str, bytes], list[str], list[str]
     return writes, sorted(written), sorted(replaced)
 
 
+HOOK_KERNEL, HOOK_COPY = "governance/kernel/hooks/agent_model.py", ".claude/hooks/agent_model.py"
+
+
+def _hook_copy(root: Path) -> tuple[bytes, bool] | None:
+    """MR-4: in an adopted repository the helper-model hook is also at ``.claude/hooks/agent_model.py``, written byte for
+    byte from the kit's ``governance/kernel/hooks/agent_model.py`` (an absent copy written, a differing one replaced, an
+    equal one left alone); ``(bytes, replaced)`` where a write is due, else None. Gov OS's own tree keeps its own copy."""
+    kernel = root / HOOK_KERNEL
+    if _is_source_tree(root) or not kernel.is_file():
+        return None
+    data, copy = kernel.read_bytes(), root / HOOK_COPY
+    if os.path.lexists(copy) and not copy.is_file():
+        raise _refuse("HOOK_COPY_UNWRITABLE", f"{HOOK_COPY} exists and is not a file: nothing is written")
+    if copy.is_file() and copy.read_bytes() == data:
+        return None
+    return data, copy.is_file()
+
+
 def generate(root: Path) -> dict:
     """Generate, merge, write. Everything is merged before anything is written."""
     with tempfile.TemporaryDirectory(prefix="gov-adapters-") as fresh:
@@ -229,6 +247,9 @@ def generate(root: Path) -> dict:
     copies = _template_copies(root)
     if copies is not None:
         writes.update(copies[0])
+    hook = _hook_copy(root)
+    if hook is not None:
+        writes[HOOK_COPY] = hook[0]
     for rel, content in writes.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         if isinstance(content, bytes):
@@ -236,6 +257,8 @@ def generate(root: Path) -> dict:
         else:
             (root / rel).write_text(content, encoding="utf-8")
     result = {"merged": merged, "written": sorted(written), "kept": sorted(kept)}
+    if hook is not None:
+        result["hooks"] = {"replaced" if hook[1] else "written": [HOOK_COPY]}
     if copies is not None:
         result["templates"] = {"written": copies[1], "replaced": copies[2]}
     return result

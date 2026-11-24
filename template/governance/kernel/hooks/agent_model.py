@@ -151,18 +151,33 @@ def refuse(text: str) -> int:
     return 2
 
 
+def _own_table_model(root: str, kind: str) -> str:
+    data = _yaml(os.path.join(root, TABLE_REL), TABLE_REL)
+    for row in data["rows"]:
+        if row["role"] == kind:
+            model = row["model"]
+            return model if isinstance(model, str) and model.startswith("claude-sonnet-") else "sonnet"
+    return "sonnet"
+
+
 def table_model(root: str, kind: str) -> str:
     """The model of the role table's row for ``kind`` when the row exists and is Sonnet; else "sonnet" (the table
-    unreadable, no row, or a row of another model)."""
+    unreadable, no row, or a row of another model). Read through the pinned gov package's reader when the interpreter
+    has it (the kit's hook line starts the pin's interpreter), else by the same rule here, so the hook runs alone."""
     try:
-        data = _yaml(os.path.join(root, TABLE_REL), TABLE_REL)
-        for row in data["rows"]:
-            if row["role"] == kind:
-                model = row["model"]
-                return model if isinstance(model, str) and model.startswith("claude-sonnet-") else "sonnet"
-    except Exception:
+        import gov  # noqa: F401  the pin's package, when this runs under it
+        from gov.launch import role_table
+        row = role_table.row_for(root, kind)
+        model = row["model"] if row else None
+        return model if isinstance(model, str) and model.startswith("claude-sonnet-") else "sonnet"
+    except ImportError:
         pass
-    return "sonnet"
+    except Exception:
+        return "sonnet"
+    try:
+        return _own_table_model(root, kind)
+    except Exception:
+        return "sonnet"
 
 
 def write_model(args: dict, root: str = "") -> int:

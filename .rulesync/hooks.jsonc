@@ -9,6 +9,14 @@
         "timeout": 10
       }
     ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "Agent|Task",
+        "command": "h=\"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/agent_model.py\"; c=\"$(git -C \"$CLAUDE_PROJECT_DIR\" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)\"; g=\"$c/gov/bin/gov\"; [ -n \"$c\" ] && [ -f \"$g\" ] || g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no gov at ${c:-(no git repository)}/gov/bin/gov, $HOME/.local/bin/gov or on PATH, so $h was not run\" >&2; exit 0; }; { read -r p; read -r q; } < \"$g\"; p=\"${p#'#!'}\"; [ \"$p\" != /bin/sh ] || { q=\"${q#\"'''exec' \"}\"; q=\"${q%' \"$0\" \"$@\"'}\"; q=\"${q#\\\"}\"; p=\"${q%\\\"}\"; }; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p, so $h was not run\" >&2; exit 0; }; exec \"$p\" -E \"$h\"",
+        "timeout": 10
+      }
+    ],
     "preCompact": [
       {
         "type": "command",

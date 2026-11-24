@@ -53,4 +53,4 @@ def test_the_refusal_rules_are_unchanged(tmp_path):
 
 
 def test_the_kit_copy_is_byte_equal():
-    assert HOOK.read_bytes() == (REPO / "template/.claude/hooks/agent_model.py").read_bytes()
+    assert HOOK.read_bytes() == (REPO / "template/governance/kernel/hooks/agent_model.py").read_bytes()
