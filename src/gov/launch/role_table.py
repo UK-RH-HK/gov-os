@@ -8,11 +8,11 @@ model that is Fable or that the launcher does not know, or an effort it does not
 
 Three checks stand here and run as ``python3 -m gov.launch.role_table`` (``gov launch --table-check``):
 
-* no argument: each role file's ``Launch default`` line equals its row (``check_roles``);
+* no argument, or ``--roles``: each role file's ``Launch default`` line equals its row (``check_roles``);
 * ``--check <range>``: a commit of the range that changes a row without the trailer ``Decided-by: owner`` is reported
   with the role and its old and new value (``check_range``);
 * ``--scripts <dir>``: ``start_lead.sh``, ``start_cto.sh`` and ``start_audit.sh`` each print their ``--model`` and
-  ``--effort`` beside the row they must equal (``check_scripts``); a script naming the Fable substitution reader, or
+  ``--effort`` beside the row they must equal (``check_scripts(directory, root)``); a script naming the Fable substitution reader, or
   holding no ``--model`` or no ``--effort``, is reported.
 
 Exit 0 when nothing is reported, 1 when something is, 2 for a usage error.
@@ -173,7 +173,8 @@ def _owner_trailer(root: Path, commit: str) -> bool:
 
 def check_range(root: Path, rng: str) -> list[dict]:
     """The commits of ``rng`` that change a row of the table without the trailer ``Decided-by: owner``, as findings
-    ``{"code": "ROLE_TABLE_CHANGED", "commit", "role", "old", "new", "message"}``, one per changed role. A range that
+    ``{"code": "ROLE_TABLE_CHANGED", "commit", "role", "field", "old", "new", "message"}``, one per changed field of a
+    role (``model``, ``effort``, or ``row`` for a row added or taken out). A range that
     does not touch the file reports nothing; one git cannot read refuses."""
     listed = _git(root, "log", "--reverse", "--format=%H", rng, "--", REL)
     if listed.returncode != 0:
@@ -185,20 +186,22 @@ def check_range(root: Path, rng: str) -> list[dict]:
         before, after = _table_at(root, f"{commit}^"), _table_at(root, commit)
         for role in sorted(set(before) | set(after)):
             old, new = before.get(role), after.get(role)
-            pick = lambda row: None if row is None else {"model": row["model"], "effort": row["effort"]}  # noqa: E731
-            if pick(old) == pick(new):
-                continue
-            show = lambda row: "no row" if row is None else f"model {row['model']}, effort {row['effort']}"  # noqa: E731
-            findings.append({"code": "ROLE_TABLE_CHANGED", "commit": commit, "role": role, "old": pick(old),
-                             "new": pick(new),
-                             "message": f"{commit[:12]}: the row for {role} changed from {show(old)} to {show(new)} "
-                                        f"with no trailer '{OWNER_TRAILER}'"})
+            if old is None or new is None:  # a row added or taken out
+                fields = [("row", None if old is None else f"model {old['model']}, effort {old['effort']}",
+                           None if new is None else f"model {new['model']}, effort {new['effort']}")]
+            else:
+                fields = [(key, old[key], new[key]) for key in ("model", "effort") if old[key] != new[key]]
+            for field, was, now in fields:
+                findings.append({"code": "ROLE_TABLE_CHANGED", "commit": commit, "role": role, "field": field,
+                                 "old": was, "new": now,
+                                 "message": f"{commit[:12]}: the {field} of the row for {role} changed from {was} to "
+                                            f"{now} with no trailer '{OWNER_TRAILER}'"})
     return findings
 
 
 # --- MR-3: the start scripts equal their rows ------------------------------------------------------------------------
 
-_ASSIGN = re.compile(r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=([^\s#]*)", re.MULTILINE)
+_ASSIGN = re.compile(r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=([^\s#;]*)", re.MULTILINE)
 _DEFAULTING = re.compile(r':\s*"?\$\{([A-Za-z_][A-Za-z0-9_]*):=([^}]*)\}"?')
 
 
@@ -216,6 +219,8 @@ def _resolve(value: str, variables: dict[str, str]) -> str | None:
     if match is None:
         return value if value and "$" not in value else None
     name = match.group(1) or match.group(3)
+    if match.group(2):  # ${x:-d}: an option read from the environment counts as its default
+        return _resolve(match.group(2), variables)
     if name in variables:
         return _resolve(variables[name], {k: v for k, v in variables.items() if k != name})
     return match.group(2) if match.group(2) else None
@@ -229,7 +234,7 @@ def _option(text: str, flag: str, variables: dict[str, str]) -> tuple[bool, str 
     return True, _resolve(found.group(1), variables)
 
 
-def check_scripts(root: Path, directory: Path | str) -> tuple[list[str], bool]:
+def check_scripts(directory: Path | str, root: Path | str) -> tuple[list[str], bool]:
     """``(lines, ok)``: one line for each of the three start scripts in ``directory`` with its ``--model`` and
     ``--effort`` beside the row it must equal, then a line for each fault (a disagreement, a script with no ``--model``
     or no ``--effort``, one that is missing, one that names the Fable substitution reader). ``ok`` is True when no fault
@@ -271,6 +276,8 @@ def check_scripts(root: Path, directory: Path | str) -> tuple[list[str], bool]:
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--check", metavar="<range>", help="report the commits of a git range that change a row "
                         "without the trailer 'Decided-by: owner'")
+    parser.add_argument("--roles", action="store_true", help="the default: each role file's Launch default line "
+                        "equals its row")
     parser.add_argument("--scripts", metavar="<dir>", help="compare start_lead.sh, start_cto.sh and start_audit.sh "
                         "in <dir> with the table")
     parser.add_argument("--root", metavar="<dir>", default=None, help="the project (default: the working folder)")
@@ -280,7 +287,7 @@ def run(args, root: Path | None = None) -> int:
     root = Path(args.root or root or os.getcwd())
     try:
         if args.scripts:
-            lines, ok = check_scripts(root, args.scripts)
+            lines, ok = check_scripts(args.scripts, root)
             for line in lines:
                 print(line)
             return 0 if ok else 1

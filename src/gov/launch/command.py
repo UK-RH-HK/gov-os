@@ -112,7 +112,7 @@ def _kind_error(ticket: str | None, fix: str | None, chore: str | None, tests_wo
 
 def _table_check(root: Path, args) -> int:
     from gov.launch import role_table
-    namespace = type("Args", (), {"check": args.table_check or None, "scripts": getattr(args, "scripts", None),
+    namespace = type("Args", (), {"check": args.table_check or None, "scripts": getattr(args, "scripts", None), "roles": False,
                                   "root": None})
     return role_table.run(namespace, root)
 
