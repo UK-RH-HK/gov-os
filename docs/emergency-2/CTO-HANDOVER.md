@@ -67,7 +67,7 @@ awake and answers in the chat; he restarts WSL after this handover (`autoMemoryR
   in three streams after Phase 0; Phase 1's first items (making the impact selection trustworthy) stay first.
 
 ## 3. NEXT ACTIONS, in order
-1. Write your session id and tmux name (the start prompt says where); start the watcher; start `usage_log.sh`.
+1. Write your session id and tmux name (the start prompt says where); start the watcher; start `usage_log.sh`. Re-run the post-landing check the restart cut off (it follows the owner's registry commit): `bash .gov-runtime/scratch/orchestrator/tools/landing_select.sh 8b892a2d4 8346b9a30`.
 2. **Start the EXAMIN CTO fresh from its handover** (its copy: `/home/usain/gov-os-runs/W2-27/examin`, its latest
    `FRESH-START-*.md`): a tmux session `examin-cto-<MMDD-HHMM>`, `cd` there, `env -u CLAUDECODE claude --remote-control
    'EXAMIN CTO' --model claude-opus-5-5 --effort high --permission-mode bypassPermissions "<a prompt to read its
