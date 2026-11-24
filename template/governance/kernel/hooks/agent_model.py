@@ -29,6 +29,11 @@ import os
 import re
 import sys
 
+try:  # the pin's gov package, when the kit's line starts the pin's interpreter; this file runs without it too
+    import gov  # noqa: F401
+except ImportError:
+    pass
+
 EXCEPTIONS_REL = "governance/project/model-exceptions.yaml"
 CRITICALITY_REL = "governance/project/criticality.yaml"
 TABLE_REL = "governance/project/role-table.yaml"
@@ -165,7 +170,6 @@ def table_model(root: str, kind: str) -> str:
     unreadable, no row, or a row of another model). Read through the pinned gov package's reader when the interpreter
     has it (the kit's hook line starts the pin's interpreter), else by the same rule here, so the hook runs alone."""
     try:
-        import gov  # noqa: F401  the pin's package, when this runs under it
         from gov.launch import role_table
         row = role_table.row_for(root, kind)
         model = row["model"] if row else None
