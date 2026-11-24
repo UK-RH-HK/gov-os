@@ -279,3 +279,42 @@ def test_fm5_writer_run_a_never_fixing_writer_gets_three_returns_then_ends_limit
     doc = L.record(world)
     assert doc["returns"] == 3 and doc["ended"] == "limit" and doc["refused"] == {"PF-FORM": ["q07"]}, doc
     assert L.landed(world) == {}, "writer-run wrote into hidden/"
+
+
+# -- the writer's own folder permissions (from the real session: Edit and Write into out/ were denied) --------------------
+def _folder_settings(world):
+    out, run = _launch(world, name="perm")
+    _, tokens = _launch_tokens(out, run)
+    return out, tokens, json.loads((out / ".claude" / "settings.json").read_text(encoding="utf-8"))
+
+
+def _forms(out, tail):
+    """The wall's form is ``/`` + the absolute path (so ``//home/...``); the single-slash form is taken too."""
+    return {f"/{out}/{tail}", f"{out}/{tail}"}
+
+
+def test_fm5_the_writer_settings_allow_write_and_edit_into_out_only(world):
+    out, _, doc = _folder_settings(world)
+    allow = set(doc.get("permissions", {}).get("allow", []))
+    for tool in ("Write", "Edit"):
+        assert any(f"{tool}({x})" in allow for x in _forms(out, "out/**")), (tool, sorted(allow))
+    assert not any(a.startswith(("Write(", "Edit(")) and "/out/**" not in a for a in allow), sorted(allow)
+
+
+def test_fm5_the_writer_settings_deny_edits_to_its_own_config_input_and_brief(world):
+    out, _, doc = _folder_settings(world)
+    deny = set(doc.get("permissions", {}).get("deny", []))
+    for tail in (".claude/**", "input/**", "brief.md"):
+        assert any(f"Edit({x})" in deny for x in _forms(out, tail)), (tail, sorted(deny))
+
+
+def test_fm5_the_stop_hook_block_is_unchanged_beside_the_permissions(world):
+    out, _, doc = _folder_settings(world)
+    assert list(doc["hooks"]) == ["Stop"] and len(doc["hooks"]["Stop"]) == 1, doc["hooks"]
+    assert "writer-check" in doc["hooks"]["Stop"][0]["hooks"][0]["command"]
+    assert doc["hooks"]["Stop"][0]["hooks"][0]["type"] == "command"
+
+
+def test_fm5_the_launch_line_asks_no_permission_prompts(world):
+    _, tokens, _ = _folder_settings(world)
+    assert _value(tokens, "--permission-prompts") == "none", tokens
