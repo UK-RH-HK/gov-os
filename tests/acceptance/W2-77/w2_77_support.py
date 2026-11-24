@@ -57,10 +57,12 @@ FULL = "full"
 # The night's record as it is today (``src/gov/close/nightly.py`` on the base, without ``--coverage``): every key,
 # and no other; ``secrets_full_scan`` is one of them (the nightly rebuilds its stores with the full secrets scan and
 # its record says so). The ``cleanup`` key is added only when the clone's removal by its path did not succeed.
+# ``optin`` lists the suites the run opted in to (the nightly's weekly option).
 # Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+# Rewrite-Reason: W2-209 slice (a) added the record's optin key (DEC-1223; DAEO-a2h5).
 RECORD_KEYS = frozenset({"branch", "head", "tree", "base", "scope", "verdict", "junit_xml", "failures", "packages",
                          "tests_run", "findings", "per_test_timeout", "distribution", "tmp_path_retention_policy",
-                         "created", "secrets_full_scan"})
+                         "created", "secrets_full_scan", "optin"})
 CLEANUP_KEY = "cleanup"
 CLEANUP_FIELDS = ("ok", "clone", "entry", "entry_removed", "error")
 
