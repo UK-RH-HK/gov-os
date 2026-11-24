@@ -30,10 +30,10 @@ def _settings_hook_entries(settings):
     return [e for e in entries if "agent_model.py" in json.dumps(e)]
 
 
-def _hook_run(project, model, tasks=("DAEO-aaaa",)):
+def _hook_run(project, model, tasks=("DAEO-aaaa",), kind="engineer"):
     """The project's own hook, as the settings run it, on one spawn of a helper."""
     tool_input = {"description": "helper", "prompt": "Do the work.\n\n" + "\n".join(f"Task: {t}" for t in tasks),
-                  "subagent_type": "engineer"}
+                  "subagent_type": kind}
     if model is not None:
         tool_input["model"] = model
     event = {"session_id": "00000000-0000-4000-8000-000000000208", "hook_event_name": "PreToolUse",
@@ -134,11 +134,15 @@ def test_mr4_the_adopted_hook_lets_a_sonnet_helper_through_with_exit_0(adopted_a
     assert done.returncode == 0, f"exit {done.returncode}\n{done.stdout}\n{done.stderr}"
 
 
-def test_mr4_the_adopted_hook_writes_sonnet_into_a_spawn_with_no_model(adopted_at_b):
-    done = _hook_run(adopted_at_b, None)
+@pytest.mark.parametrize("kind,written", [("engineer", "claude-sonnet-5-5"), ("Explore", "sonnet")],
+                         ids=["a-type-with-a-table-row", "a-type-without-a-row"])
+def test_mr4_the_adopted_hook_writes_the_rows_model_into_a_spawn_with_no_model(adopted_at_b, kind, written):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4, ruling: the rule wins. The hook writes the table row's model for a
+    # subagent_type that has a row, and `sonnet` only where there is no usable row.
+    done = _hook_run(adopted_at_b, None, kind=kind)
     assert done.returncode == 0, f"exit {done.returncode}\n{done.stderr}"
     out = json.loads(done.stdout)["hookSpecificOutput"]
-    assert out["updatedInput"]["model"] == "sonnet"
+    assert out["updatedInput"]["model"] == written
 
 
 def test_mr4_a_generation_in_a_scratch_repository_holds_the_hook_line_exactly_once_and_no_edit_deny(tmp_path, sandbox):
