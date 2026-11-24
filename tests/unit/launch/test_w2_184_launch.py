@@ -35,7 +35,8 @@ def pair(model, effort):
 # the kernel engineer's table
 # Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
 ENGINEER_TABLE = table(pair(SONNET, "high"), pair(SONNET, "high"), pair(SONNET, "high"), pair(SONNET, "low"))
-CRITICALITY = {"version": 1, "default": "C2", "opus": OPUS, "rules": [
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: criticality.yaml has no `opus` key (a file that carries one is refused).
+CRITICALITY = {"version": 1, "default": "C2", "rules": [
     {"class": "C3", "paths": ["src/guard/*"]}, {"class": "C1", "paths": ["docs/*"]},
     {"class": "C0", "paths": ["notes/*"]}, {"class": "C2", "profile": "FULL"}]}
 

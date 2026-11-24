@@ -29,7 +29,8 @@ def test_f1_a_model_below_its_tier_with_no_trial_is_refused(project, launch, rol
     s.refused(launch(role, tk, "--model", below), "--model", below, s.TABLES[role][cls][0])
 
 
-def test_f1_a_promotion_is_recorded_and_applied(project, launch):
+def test_f1_a_planted_promotion_is_neither_recorded_nor_applied(project, launch):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the promotion is retired; planted failed reviews change nothing and the record's `promotion` is null.
     tk = s.ticket(project, ENG, "C2", tk="DAEO-f101")
     record = s.promote_two_failed(project, tk)
     result = launch(ENG, tk)
@@ -37,7 +38,7 @@ def test_f1_a_promotion_is_recorded_and_applied(project, launch):
     # (the engineer's C2 entry: Sonnet) at the table's effort; the model's source word is left open.
     model = s.TABLES[ENG]["C2"][0]
     s.assert_session(result, model, "high", criticality="C2", model_source=s.ANY,
-                     effort_source="by criticality", promotion={"reason": "two failed reviews", "record": record})
+                     effort_source="by criticality", promotion=None)
     assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == model
 
 

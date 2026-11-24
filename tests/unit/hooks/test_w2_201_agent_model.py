@@ -17,7 +17,8 @@ from gov.launch import criticality as crit
 REPO = Path(__file__).resolve().parents[3]
 HOOK = REPO / ".claude" / "hooks" / "agent_model.py"
 OPUS, SONNET, FABLE = "claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-2"
-RUBRIC = {"version": 1, "default": "C2", "opus": OPUS, "rules": [
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: criticality.yaml has no `opus` key (a file that carries one is refused).
+RUBRIC = {"version": 1, "default": "C2", "rules": [
     {"class": "C3", "paths": ["src/gov/close/**"]}, {"class": "C1", "paths": ["docs/*"]},
     {"class": "C2", "profile": "FULL"}]}
 K1 = [{"subagent_type": role, "model": "opus", "class": "C3", "decided": "DEC-1214 K1"}

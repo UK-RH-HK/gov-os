@@ -169,6 +169,7 @@ def test_r2_a_trial_naming_opus_starts_when_an_exceptions_entry_covers_it(projec
 # --------------------------------------------------------------------------
 
 def test_r2_a_promotion_on_an_auditor_launches_sonnet_and_keeps_its_record(project, launch):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the promotion is retired; the planted records change nothing and `promotion` is null.
     """Two failed probe records: the next round is a promotion. It keeps its record (``promotion``: the reason and the
     second failed record) and the table's effort (high); the model is the table's, Sonnet, and no longer
     ``criticality.yaml``'s Opus. Red on the base: it launches Opus."""
@@ -180,26 +181,27 @@ def test_r2_a_promotion_on_an_auditor_launches_sonnet_and_keeps_its_record(proje
     assert {"--model": result.values("--model"), "--effort": result.values("--effort")} == {
         "--model": [k.SONNET], "--effort": ["high"]}, f"the line is not Sonnet, high\n{result.args}"
     got = k.record_values(result, "model", "effort", "promotion", "criticality")
-    want = {"model": k.SONNET, "effort": "high", "promotion": {"reason": "two failed reviews", "record": record},
+    want = {"model": k.SONNET, "effort": "high", "promotion": None,
             "criticality": "C2"}
     assert got == want, f"the launch record states {got}, not {want}"
 
 
 def test_r2_the_second_review_of_a_full_ticket_is_the_probe_on_sonnet_at_max(project, launch):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the probe is retired; round 2 is Sonnet at the table's high (round 1 ran on xhigh so no setting repeats).
     """The probe keeps its effort rule (max, source ``probe``, round 2) and its review-round rule; the model is the
     table's, Sonnet. Red on the base: round 2 launches Opus."""
     k.plant_real_role(project, AUD)
     tk = s.ticket(project, ENG, "C2", "FULL", tk="DAEO-pb01")
-    first = launch(AUD, tk)
+    first = launch(AUD, tk, "--effort", "xhigh")
     s.b.assert_launched(first)
     assert k.record_values(first, "model", "effort", "review_round") == {
-        "model": k.SONNET, "effort": "high", "review_round": 1}
+        "model": k.SONNET, "effort": "xhigh", "review_round": 1}
     second = launch(AUD, tk)
     s.b.assert_launched(second)
     assert {"--model": second.values("--model"), "--effort": second.values("--effort")} == {
-        "--model": [k.SONNET], "--effort": ["max"]}, f"round 2's line is not Sonnet, max\n{second.args}"
+        "--model": [k.SONNET], "--effort": ["high"]}, f"round 2's line is not Sonnet, high\n{second.args}"
     assert k.record_values(second, "model", "effort", "effort_source", "review_round") == {
-        "model": k.SONNET, "effort": "max", "effort_source": "probe", "review_round": 2}
+        "model": k.SONNET, "effort": "high", "effort_source": "by criticality", "review_round": 2}
 
 
 # --------------------------------------------------------------------------
