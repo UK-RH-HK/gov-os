@@ -170,7 +170,7 @@ def refusals_section(p: dict, kind: str) -> str:
 
 def writer_permissions(out) -> dict:
     """What lets a writer's session write its set and nothing else (FM-5), in the wall template's own slash form."""
-    o = "/" + os.path.abspath(os.path.expanduser(str(out))).lstrip("/")
+    o = "//" + os.path.abspath(os.path.expanduser(str(out))).lstrip("/")  # `//` = an absolute path in a rule
     return {"allow": [f"Write({o}/out/**)", f"Edit({o}/out/**)"],
             "deny": [f"Edit({o}/.claude/**)", f"Edit({o}/input/**)", f"Edit({o}/brief.md)"]}
 
