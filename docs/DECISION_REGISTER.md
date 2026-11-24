@@ -2259,6 +2259,17 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-24; one 32 GB machine shared by Windows' apps and a 24 GB WSL running three repositories' work (DEC-1246 (3)(a)).
 - **Governing sources:** docs/emergency-2/briefs/LEAD-w2-207-runtime.md; DEC-1232; DEC-1234; DEC-1246.
 
+### DEC-1248 — EXAMIN's measure fixed at the root (each writer's questions form-checked by code before its session ends; round 2 gets the pre-flight refusals), cut as its own patch release 0.1.6 by code; the bundle planned for 0.1.6 becomes 0.1.7; D3 on its own in 0.1.7; ASMO OS's kit findings with I-16
+- **Status:** ACCEPTED (owner, 2026-11-24 about 19:15 and 19:40, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1223, DEC-1227 D3, DEC-1235 (2), DEC-1244 Q-7, DEC-1245, DEC-1246 (3) · **Changes:** DEC-1245 (2) and DEC-1246 (3) (their "0.1.6" is now 0.1.7); DEC-1228 (1) (D3's route no longer waits for the imports feature)
+- **Decision:**
+  - (1) "EXAMIN's measure is blocked: four void attempts, all at writing. Fix it at the root (Q-7): every writer's questions are form-checked by code before its session ends, with any refused question returned to it to fix, and the round-2 writer and checker get the pre-flight refusals (I-23). Start that lead the moment phase0-memory returns; it comes before anything else on gov memaudit. Do not wait for 0.1.6: cut it as its own patch release ... by code under the authority file, as soon as it is green, push me, and tell the EXAMIN CTO to run gov update and measure."
+  - (2) The number: "The patch release is 0.1.6; the bundle planned for 0.1.6 becomes 0.1.7." (The release code takes strict semver only, so 0.1.5.1 was refused.)
+  - (3) "Build the route that keeps stale and superseded documents out of default memory (D3) now, on its own, in 0.1.6 [now 0.1.7], not waiting for the imports feature." After the EXAMIN CTO's correction (its two visible-half misses were not stale citations): "keep D3 for W2-81, and I-26 and I-27 wait for the measure."
+  - (4) "From ASMO OS's adoption: the kit puts its generated block at the end of CLAUDE.md and AGENTS.md, not the head, still says gov queue lands tickets and does not point to the golden workflow v2; and there is no guide for adopting an existing repository. Log both and fix them with I-16" (I-24, I-25; in 0.1.7).
+- **The CTO's calls inside it (P2):** the patch takes fixes and chores only, so the features already green (W2-210) land after its cut; the memaudit lead started at 19:10 was stopped and restarts on the owner's spec when the Phase 0 lead returns.
+- **Basis:** the owner's messages of 2026-11-24; EXAMIN's void attempts (I-18, I-23, EF-9), the release code's semver check (`src/gov/release/__init__.py:40`), ASMO OS's adoption.
+- **Governing sources:** docs/emergency-2/integration/FINDINGS.md; docs/emergency-2/briefs/LEAD-fix-memaudit.md; docs/emergency-2/briefs/LEAD-d3-stale-route.md; DEC-1227; DEC-1244; DEC-1245; DEC-1246.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
