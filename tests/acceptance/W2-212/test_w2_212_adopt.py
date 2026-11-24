@@ -12,9 +12,10 @@ GOOD = {"lexical_policy": "not indexed", "embedding_policy": "not embedded"}
 
 
 def refused(root, conf):
-    head = git(root, "rev-parse", "HEAD")
+    heads = []
     with pytest.raises(GovError) as caught:
-        a3(root, conf)
+        a3(root, conf, before_a3=lambda: heads.append(git(root, "rev-parse", "HEAD")))
+    head = heads[0]
     assert git(root, "rev-parse", "HEAD") == head and not (root / project.record_path("A3")).exists()
     return caught.value
 

@@ -153,12 +153,14 @@ def stage(root, name, conf, **more):
     return result
 
 
-def a3(root, conf):
+def a3(root, conf, before_a3=None):
     """A0 to A2 (and AS), then A3 with a proposal that keeps README.md; the result, or the GovError raised."""
     for name in ("A0", "A1", "A2"):
         stage(root, name, conf)
     proposal = root.parent / "proposal.yaml"
     proposal.write_text(yaml.safe_dump({"artefacts": [{"path": "README.md", "action": "KEEP"}]}), encoding="utf-8")
+    if before_a3:
+        before_a3()
     return stage(root, "A3", conf, map=str(proposal))
 
 
