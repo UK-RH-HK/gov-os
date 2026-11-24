@@ -371,3 +371,28 @@ promotion, probe, trial and substitution rules:
 | S21 (R4) | `test_w2_201_r4_memaudit_models.py::test_r4_the_reader_the_grader_and_the_check_are_sonnet`; `test_w2_201_r4_memaudit_models.py::test_r4_no_file_of_src_gov_memaudit_names_claude_opus`; `test_w2_201_r4_memaudit_models.py::test_r4_no_shipped_brief_and_no_shipped_kinds_file_names_claude_opus`; `test_w2_201_r4_memaudit_models.py::test_r4_the_shipped_kinds_models_are_sonnet` | 1 + 38 + 4 + 1 | `READER` and `GRADER` are Opus (1); `src/gov/memaudit/judge.py` (1), the shipped briefs `auditor.md` and `checker.md` and the shipped `kinds.yaml` (3) name `claude-opus-5-5`, and the kinds' models are not Sonnet (1): 6 red on the base; the other 38 cases of the file are guards. The call-level and `FIGURES.json` cases are listed under the table as extra evidence (they are outside this folder, so `gov accept W2-201` does not run them) |
 
 Extra evidence for S21 (R4), outside this folder and not in the map: `tests/unit/memaudit/test_judge.py::test_each_call_is_the_fresh_80s_argv_with_no_tools_and_the_models_of_item_7` and `::test_figures_json_holds_exactly_item_10s_keys_and_counts` (run with `--optin=lifted`), and W2-171's `test_s3_the_calls_carry_the_fresh_80s_prompts_models_budgets_and_flags` and `test_s6_figures_json_has_exactly_the_keys_of_item_10_and_the_planted_values` (with `--optin=lifted`): the reader, grader and check calls carry `--model claude-sonnet-5-5`, and `FIGURES.json` holds `models` with the three. W2-171's `tests/acceptance/W2-171/fake_claude.py` tells the check from the grader by call order, as `tests/unit/memaudit/fakes.py` does, since the model no longer does.
+
+## Fix F13 (success-22): the hook writes the model into the spawn (fixes-015a; owner W2-201)
+
+| KPI | Tests | Today (base), and why |
+|---|---|---|
+| success-22 | `test_w2_201_fix_f13_model_written.py::test_a_spawn_naming_no_model_comes_back_with_sonnet_and_every_other_key` (Explore, Plan, general-purpose, engineer, no type; tools Agent and Task) | **red**: the hook prints nothing for a spawn naming no model, so no `updatedInput` carries `model` sonnet |
+| success-22 | `test_w2_201_fix_f13_model_written.py::test_an_opus_auditor_under_an_exception_keeps_its_model`, `test_fable_is_refused`, `test_a_spawn_already_naming_sonnet_passes_with_its_model`, `test_another_tool_is_left_alone` | green today (guards) |
+
+## Fixes of fixes-015a (F1 launch side, F14, F19)
+
+Known bugs in this closed feature; no new ticket. Written before the fix, red on the base. Map in the form `gov accept`
+reads; the KPI column names the fix line.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| F1 | `test_w2_201_fix_f1_connectors.py::test_a_worker_has_strict_mcp_an_empty_config_and_the_connectors_off`; `test_w2_201_fix_f1_connectors.py::test_a_lead_has_strict_mcp_an_empty_config_and_the_connectors_off`; `test_w2_201_fix_f1_connectors.py::test_a_role_with_mcp_tools_listed_gets_exactly_them`; `test_w2_201_fix_f1_connectors.py::test_the_list_of_one_role_does_not_reach_another`; `test_w2_201_fix_f1_connectors.py::test_a_caller_config_inside_the_roles_list_is_accepted`; `test_w2_201_fix_f1_connectors.py::test_a_caller_config_outside_the_roles_list_is_refused` | no `--mcp-config` is passed and `ENABLE_CLAUDEAI_MCP_SERVERS` is not set for any session; a lead has no `--strict-mcp-config` either; `--mcp-config` after `--` is refused whatever it holds (the refusal does not name the server). Guard, green: `test_a_caller_config_for_a_role_with_no_list_is_refused` |
+| F14 | `test_w2_201_fix_f14_lead_effort.py::test_a_lead_runs_sonnet_at_effort_medium`; `test_w2_201_fix_f14_lead_effort.py::test_the_ticket_lead_role_file_gives_sonnet_medium`; `test_w2_201_s1_role_files.py::test_s1_each_role_file_and_copy_gives_the_table_s_model_and_effort_per_class` (the `ticket-lead` cases; `w2_201_support.TABLE` now says medium) | a lead gets no `--effort`; `ticket-lead.md` and its copies say effort high. Guards, green: `test_a_worker_keeps_the_effort_its_table_gives`, `test_every_other_role_file_keeps_its_launch_default` |
+| F19 | `test_w2_201_fix_f19_rubric_model.py::test_a_table_naming_a_model_the_rubric_does_not_give_launches_sonnet`; `test_w2_201_fix_f19_rubric_model.py::test_a_role_default_line_naming_another_model_launches_sonnet` | the launcher starts the Opus or Haiku the role file's table or default line names. Guard, green: `test_a_table_naming_sonnet_is_unchanged` |
+
+Interface assumed (for the engineer): the role's MCP list is one line of the role file, `- **MCP tools:** <name>, <name>`;
+`--mcp-config` carries `{"mcpServers": {<name>: ...}}`, inline or as a file path, one server per listed name and none for
+an empty list; `ENABLE_CLAUDEAI_MCP_SERVERS=false` is in the CLI process environment; a refused `--mcp-config` is
+`LAUNCH_REFUSED` naming `--mcp-config` and the offending server. F19 replaces the model (record `model` Sonnet, effort
+the table's, nothing on stdout or stderr); `model_source` is not pinned. Older planted fixtures that expect Opus or Haiku
+from a table (W2-184's `TABLES`, W2-201 S3/X1) are the engineer's to move to Sonnet.

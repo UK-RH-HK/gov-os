@@ -18,6 +18,8 @@ TWELVE_FIELDS = (
     "recommended_next_action",
 )
 
+_ANY_FIELD = "|".join(TWELVE_FIELDS)
+
 
 def _find_fields(message: str) -> set[str]:
     found: set[str] = set()
@@ -30,8 +32,10 @@ def _find_fields(message: str) -> set[str]:
     for field in TWELVE_FIELDS:
         if field in found:
             continue
+        # The value is on the label's line, or on the next non-blank line when that line is not itself a label.
         pattern = re.compile(
-            rf'(?:^|\n)\s*(?:#+\s*)?[\*_]*{re.escape(field)}[\*_]*\s*[:=][ \t]*\S',
+            rf'(?:^|\n)\s*(?:#+\s*)?[\*_]*{re.escape(field)}[\*_]*\s*[:=]'
+            rf'(?:[ \t]*\S|[ \t]*\n\s*(?!(?:#+\s*)?[\*_]*(?:{_ANY_FIELD})[\*_]*\s*[:=])\S)',
             re.IGNORECASE,
         )
         if pattern.search(message):
@@ -41,6 +45,8 @@ def _find_fields(message: str) -> set[str]:
 
 def main() -> None:
     data = json.loads(sys.stdin.read())
+    if isinstance(data, dict) and data.get("stop_hook_active"):
+        sys.exit(0)  # the turn already continued once for this hook: never block twice
     message = data.get("last_assistant_message", "")
     found = _find_fields(message)
     missing = [f for f in TWELVE_FIELDS if f not in found]

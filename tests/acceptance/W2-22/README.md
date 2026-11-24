@@ -93,3 +93,27 @@ Red run on the base (17 red, 13 green): `17 failed, 13 passed`.
   record still ends doctor with exit 3 (W1-27's `test_cli_newer_than_registry_is_drift` keeps its `drift` section).
   If the owner meant every drift in the section to stop counting, this one case changes.
 - "Named in the plain output" is read as: one line of the output holds both versions, and the word drift appears.
+
+## Fix F18: `gov doctor` checks Python packages as packages (fixes-015a, release 0.1.5)
+
+pytest-xdist, pytest-timeout and pytest-testmon (registry entries with no binary) read `ok: false` as missing tools. Fix
+lines, numbered after F2's success-3 to success-7: **success-8** a package at the installed version reads `ok: true` with
+that version; **success-9** at a different version it reads the drift as pyyaml's rule does (`ok: false`, `found_version`
+the installed one, a reason naming both versions); **success-10** a missing package reads `ok: false`, `found_version` null.
+The installed package is planted as a `.dist-info` folder on the `PYTHONPATH` of `gov` (HOME is the case's own).
+
+| KPI | Tests | Today (base), and why |
+|---|---|---|
+| success-8 | `test_w2_22_fix_python_packages.py::test_a_package_at_the_installed_version_reads_ok_with_that_version` | **red**: `ok` false, `found_version` null (no binary found) |
+| success-9 | `test_w2_22_fix_python_packages.py::test_a_package_at_another_version_reads_the_drift` | **red**: `found_version` null, not the installed version |
+| success-10 | `test_w2_22_fix_python_packages.py::test_a_missing_package_reads_not_ok` | green today (guard) |
+
+Red run on the base: 2 failed, 1 passed.
+
+## The fix F1 (c): doctor reports settings without the connectors key as drift (fixes-015a)
+
+The doctor's part of F1 is kept here (W2-22's drift cases).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| F1 | `test_w2_22_fix_connectors_drift.py::test_settings_without_the_key_are_a_drift_line_and_doctor_exits_0`; `test_w2_22_fix_connectors_drift.py::test_the_drift_line_is_in_the_plain_output_too` | doctor's output never names `disableClaudeAiConnectors` (exit 0 already). Guard, green: `test_settings_with_the_key_have_no_drift_line` |

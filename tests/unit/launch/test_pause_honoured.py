@@ -42,7 +42,7 @@ def test_the_main_checkouts_flag_refuses_a_launch_in_a_worktree(repo):
     _freeze(main)
     with pytest.raises(GovError) as refused:
         launcher._check_not_paused(tree)
-    assert refused.value.code == "LAUNCH_REFUSED" and "paused" in refused.value.message
+    assert refused.value.code == "PAUSED" and "paused" in refused.value.message
 
 
 def test_the_worktrees_own_flag_refuses(repo):

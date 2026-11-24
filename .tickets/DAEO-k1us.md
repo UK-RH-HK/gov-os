@@ -313,3 +313,28 @@ run holds `models` with the three; no `claude-opus` in `src/gov/memaudit/` or th
 table: its kernel role files and copies (reached by `gov update` to 0.1.5), its `.claude/hooks/agent_model.py` and
 `governance/project/model-exceptions.yaml`, its start scripts; for what the kit does not carry, the exact change for the EXAMIN
 CTO. Verify: the list in the lead's return, each item with its path, the line and the change; no file of that folder is written.
+
+## Fix: the hook writes the model into the spawn (F13, fixes-015a)
+
+Found 2026-11-22: a spawn that named no model relied on CLAUDE_CODE_SUBAGENT_MODEL, which the harness does not always read, so such a helper could run the session's model. No test caught it. Required: `.claude/hooks/agent_model.py` writes model `sonnet` into every Agent spawn that names no model, through PreToolUse `updatedInput` with the full input kept; an Opus spawn the exceptions file allows keeps its model; Fable stays refused; no kit copy of the hook exists and none is added. Kind: a fix, no new ticket; the ticket stays closed. Failing test first: `tests/acceptance/W2-201/test_w2_201_fix_f13_model_written.py` (15 cases); code `.claude/hooks/agent_model.py` (`write_model`; a non-object `tool_input` is left alone); units `tests/unit/hooks/test_w2_201_agent_model.py` (`written`, the no-model cases for Agent and Task). Result: the 15 cases and the units are green. Four older acceptance files of this ticket still assert that a no-model spawn prints nothing (`test_w2_201_f1_hook_unreadable.py`, `test_w2_201_s5_hook_class.py` cases `*-no-model`, `test_w2_201_s6_hook_fork.py::..[no-model]`: 11 cases) and are red against the line this fix states: they need the test designer's revision (the builder never edits them).
+
+## Fix: connectors off in every launched session; leads run Sonnet at medium; a role file's other model never launches (F1 launch side, F14, F19; fixes-015a; DEC-1232, DEC-1233, DEC-1236 (2))
+
+Found by the E2 audits (3: claude.ai connectors reach a launched session; the rubric audit: leads at high, a role file's
+Opus table still launches Opus in an adopted repository). No test caught them. Required. F1: `gov launch` starts every
+role, leads included, with `--strict-mcp-config` and an `--mcp-config` built from the role file's `- **MCP tools:** a, b`
+line (no line is an empty list; every role's is empty today), sets `ENABLE_CLAUDEAI_MCP_SERVERS=false` in the CLI process's
+environment, and accepts a caller's `--mcp-config` after `--` only when every server it holds is in that list (named
+refusal otherwise). F14: a ticket, fix or chore lead runs Sonnet at `--effort medium`; no other role's model or effort
+changes. F19: `_rubric` replaces any model that is not Sonnet, from a table or a default line, with the rubric's Sonnet
+whatever the role file says; only an exceptions entry runs another model. Kind: fixes; the ticket stays closed. Failing
+tests first: `tests/acceptance/W2-201/test_w2_201_fix_f1_connectors.py`, `..._fix_f14_lead_effort.py`,
+`..._fix_f19_rubric_model.py` (README "Fixes of fixes-015a"), `361802ceb`; code `src/gov/launch/launcher.py`
+(`_mcp_args`, `_lead_effort_args`, the rubric clamp), `src/gov/launch/role.py` (`mcp_tools`), `83b73ba96` (F1) and `4c95fcc08`
+(F14, F19: `ticket-lead.md` and its three copies say medium; `criticality.yaml`'s comment; the dispatcher's dead-man push
+and `deadman.py` launch Sonnet, not Haiku; `LEAD-w2-common.md`'s `--model claude-opus-5-5` lines follow the rubric); the
+planted Opus and Haiku role tables of `tests/unit/launch` and of W2-184, W2-33 and W2-60a moved to Sonnet, each file under
+a `# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19` comment; units `tests/unit/launch/test_fixes_015a_connectors.py`.
+Open: `tests/acceptance/W2-60a/test_w2_60a_kept_out.py::test_the_line_keeps_connectors_and_user_level_settings_out`
+asserts the launch line carries no `--mcp-config`, which F1 now requires (an empty one); it is the old reading of "no
+connector" and needs the designer's revision (not edited here).

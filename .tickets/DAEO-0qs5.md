@@ -46,3 +46,11 @@ acceptance_tests:
 
 DEC-153 ticket 3. The spike saw 2.1.284 on the CLI; the test designer saw 2.1.286. Strict sandbox mode needs 2.1.285 or
 later (`spike-sandbox/EVIDENCE.md` §5.5).
+
+## Fix: the KPI map of W1-48 in the form `gov accept` reads (F17)
+
+Found 2026-11-22 (fixes-015a): `gov accept W1-48` stopped with `ACCEPT_MAP_UNREADABLE`. Kind: a fix, no new ticket; the ticket
+stays closed. The README's map was rewritten in the form `gov accept` reads (`1771c4283`); no test changed. It now reads the map;
+lines that still read fail name tests of files retired by TI-6, not found: see the next paragraph.
+
+Left on the base: `success-3` and `failure-2` name `test_w1_48_sandbox_prereqs.py`'s cases (retired, TI-6 `ba3e86bce`), and `success-1`'s one failure is `test_every_node_22_command_of_the_registry_carries_the_path_prefix` (the registry's `rea-agents` install carries the v22.23.5 prefix).

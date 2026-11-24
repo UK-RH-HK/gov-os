@@ -57,6 +57,14 @@ def passes(done):
     assert (done.returncode, done.stdout, done.stderr) == (0, "", ""), done
 
 
+def written(done, **kept):
+    """Let through with Sonnet written into the spawn (PreToolUse updatedInput), every other key kept (F13)."""
+    assert (done.returncode, done.stderr) == (0, ""), done
+    out = json.loads(done.stdout)["hookSpecificOutput"]
+    assert out["hookEventName"] == "PreToolUse" and out["permissionDecision"] == "allow", out
+    assert out["updatedInput"]["model"] == "sonnet" and {k: out["updatedInput"][k] for k in kept} == kept, out
+
+
 def refuses(done, *needles):
     assert done.returncode == 2 and done.stdout == "", done
     for needle in needles:
@@ -103,8 +111,8 @@ def test_an_unlisted_type_is_refused_naming_the_exceptions_file(bed):
 
 @pytest.mark.parametrize("model", ("sonnet", SONNET, None))
 def test_sonnet_or_no_model_passes_whatever_the_ticket(bed, model):
-    passes(run(bed, "engineer", model, "Task: DAEO-c2aa"))
-    passes(run(bed, "engineer", model))
+    for done in (run(bed, "engineer", model, "Task: DAEO-c2aa"), run(bed, "engineer", model)):
+        passes(done) if model else written(done, subagent_type="engineer")
 
 
 def test_an_entry_with_no_class_needs_no_task_line(bed):
@@ -124,11 +132,11 @@ def test_only_a_fork_entry_lifts_the_fork_refusal(bed):
     plant(bed, "model-exceptions", {"exceptions": [{"subagent_type": "*", "model": "sonnet"}]})
     refuses(run(bed, "fork"), "a fresh helper from a written brief")
     plant(bed, "model-exceptions", {"exceptions": [{"subagent_type": "fork", "model": "sonnet"}]})
-    passes(run(bed, "fork"))
+    written(run(bed, "fork"), subagent_type="fork")
 
 
 def test_a_general_purpose_spawn_with_no_model_passes(bed):
-    passes(run(bed, "general-purpose"))
+    written(run(bed, "general-purpose"), subagent_type="general-purpose")
 
 
 # --- S9 (DEC-1215's substitution) is gone (DEC-1225, R3) -----------------------------------------------------------
@@ -195,7 +203,7 @@ def test_unreadable_means_sonnet(bed, fault):
     refuses(done)
     assert done.stderr.strip() and "Traceback" not in done.stderr
     passes(run(bed, "engineer", "sonnet", "Task: DAEO-c3aa"))
-    passes(run(bed, "engineer", None, "Task: DAEO-c3aa"))
+    written(run(bed, "engineer", None, "Task: DAEO-c3aa"), prompt="Task: DAEO-c3aa", subagent_type="engineer")
 
 
 def test_an_event_that_is_not_json_or_is_for_another_tool_exits_0(bed):
@@ -203,6 +211,18 @@ def test_an_event_that_is_not_json_or_is_for_another_tool_exits_0(bed):
     passes(run(bed, raw="[1, 2]"))
     passes(run(bed, raw=json.dumps({"tool_name": "Agent", "tool_input": "text"})))
     passes(run(bed, "fork", "opus", tool="Bash"))
+
+
+@pytest.mark.parametrize("kind", (None, "Explore", "Plan", "general-purpose", "engineer"))
+@pytest.mark.parametrize("tool", ("Agent", "Task"))
+def test_a_spawn_naming_no_model_gets_sonnet_written_and_keeps_every_other_key(bed, kind, tool):
+    done = run(bed, kind, None, "Brief.", tool=tool)
+    written(done, prompt="Brief.", **({"subagent_type": kind} if kind else {}))
+
+
+def test_a_spawn_naming_sonnet_or_a_permitted_opus_is_not_rewritten(bed):
+    passes(run(bed, "engineer", "sonnet", "Task: DAEO-c3aa"))
+    passes(run(bed, "engineer", "opus", "Task: DAEO-c3aa"))
 
 
 # --- one rule for the launcher and the hook -------------------------------------------------------------------------

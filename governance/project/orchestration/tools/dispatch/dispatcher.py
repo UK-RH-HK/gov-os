@@ -1423,7 +1423,7 @@ def watch_stall(dry):
         if cmd:
             argv = shlex.split(cmd) + [line]
         elif _live():  # the dead-man's push: a headless claude -p call to PushNotification
-            argv = [str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-haiku-5-5", "--output-format",
+            argv = [str(Path.home() / ".local/bin/claude"), "-p", "--model", "claude-sonnet-5-5", "--output-format",
                     "json", "Load the PushNotification tool (ToolSearch select:PushNotification if deferred) and call "
                     "it once, status proactive, with exactly this message: " + line[:190]
                     + " . Then reply with only the tool's result text."]

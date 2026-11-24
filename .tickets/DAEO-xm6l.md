@@ -112,3 +112,23 @@ first run after the engineer's commit; `tests/unit/doctor`, W1-27, W1-06, W1-48,
 `gov doctor --json` now reads `node` v22.23.3, `node-22.23.5` v22.23.5 and `rea-agents` 6.10.1, all `ok: true`; the
 `pytest-xdist`, `pytest-timeout` and `pytest-testmon` entries (Python packages with no binary, not in `NO_BINARY_TOOLS`)
 still read `ok: false`, as on the base: not this fix's.
+
+## Fix: `gov doctor` checks pytest plugins as Python packages (fixes-015a, F18)
+
+Found 2026-11-22: `pytest-xdist`, `pytest-timeout` and `pytest-testmon` read `ok: false` in doctor's `tools` part because
+doctor looked for a binary of each; they are Python packages (left open by the own-folder fix above). Required
+(success-8 to success-10): installed at the pin `ok: true` with its version; another version the drift as pyyaml's rule
+reads it (`ok: false`, `found_version` the installed one, a reason naming both); missing `ok: false`, `found_version`
+null. Kind: a fix, no new ticket; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-22/test_w2_22_fix_python_packages.py` (2 red, 1 guard), `de2cc13db`; code
+`src/gov/doctor/command.py` (`PYTHON_PACKAGES`, in `NO_BINARY_TOOLS`, read by `importlib.metadata.version`); units
+`tests/unit/doctor/test_f18_python_packages.py`. Lead `fixes-015a-sc` (Sonnet), branch `e2/fixes-015a-sc`.
+
+## Fix: `gov doctor` reports settings without the connectors key as a drift line (F1 (c); fixes-015a; DEC-1232, DEC-1233)
+
+Found by the E2 audit 3. Required: a repository whose `.claude/settings.json` lacks `disableClaudeAiConnectors: true` (or
+has no readable settings) is reported by `gov doctor` as a drift line that does not block (exit 0), naming the key and
+`gov update`. Kind: a fix; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-22/test_w2_22_fix_connectors_drift.py` (README "The fix F1 (c)"), `361802ceb`; code
+`src/gov/doctor/command.py` (the `connectors` section, `_check_connectors`: status `drift`, `drift_blocking` false), `83b73ba96`;
+unit `tests/unit/launch/test_fixes_015a_connectors.py`. Lead `fixes-015a`, branch `e2/fixes-015a`.

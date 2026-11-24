@@ -10,17 +10,19 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG, AUD = s.ENGINEER, s.AUDITOR
 
 
 @pytest.mark.parametrize("role,cls,below", [
-    (ENG, "C3", s.SONNET),            # C3's tier is Opus: Sonnet is below it
+    (ENG, "C3", s.OPUS),              # every role's model is the table's Sonnet: another model is refused
     (ENG, "C3", s.HAIKU5),
-    (s.RESEARCH, "C2", s.SONNET),     # C2's tier for research is Opus
-    (AUD, "C2", s.HAIKU_DATED),       # the auditor's tier is Opus
-    (s.TEST_DESIGNER, "C3", s.SONNET),  # the test designer's C3 tier is Opus
+    (s.RESEARCH, "C2", s.OPUS),
+    (AUD, "C2", s.HAIKU_DATED),
+    (s.TEST_DESIGNER, "C3", s.OPUS),
 ])
 def test_f1_a_model_below_its_tier_with_no_trial_is_refused(project, launch, role, cls, below):
     tk = s.ticket(project, role, cls)

@@ -46,6 +46,12 @@ def tick(root: Path, now=None) -> tuple[int, dict | None]:
         data = {"ok": True, "time": states.stamp(moment), "outcome": "OFF", "exit_code": EXIT_OK}
         status.write(state, data)
         return EXIT_OK, data
+    from gov.util.freeze import paused_error
+    if (paused := paused_error(root)) is not None:  # F10: a paused project starts nothing; the pass says PAUSED
+        data = {"ok": True, "time": states.stamp(moment), "outcome": "PAUSED", "message": paused.message,
+                "exit_code": EXIT_OK}
+        status.write(state, data)
+        return EXIT_OK, data
     lock = state.lock()
     if lock is None:
         return EXIT_LOCKED, None

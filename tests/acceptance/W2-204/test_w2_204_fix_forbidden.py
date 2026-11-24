@@ -13,10 +13,10 @@ the fix names: ``gov.memaudit.preflight.form_ok``, ``gov.memaudit.matcher.questi
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import re
-import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -441,16 +441,27 @@ def test_fix_s3_the_checker_brief_names_the_optional_forbidden_field_in_its_inpu
     assert re.search(r"`forbidden`", text), "the field is not named as a field"
 
 
-def test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files():
-    """Guard (green on the base): ``template/``, ``prompts.py`` and ``claude.py`` differ from the merge-base with
-    ``w2/integrate`` in no committed or working-tree file."""
-    def git(*args):
-        return subprocess.run(["git", "-C", str(K.TREE), *args], capture_output=True, text=True, timeout=60)
-    base = git("merge-base", "w2/integrate", "HEAD")
-    assert base.returncode == 0 and base.stdout.strip(), base
-    diff = git("diff", "--name-only", base.stdout.strip(), "--", "template", "src/gov/memaudit/prompts.py",
-               "src/gov/memaudit/claude.py")
-    assert diff.returncode == 0 and diff.stdout.strip() == "", f"the fix touches: {diff.stdout.split()}"
+# Rewrite-Reason: DEC-1227 D5 and DEC-1232 (6): the guard is D5's, that D5's own change left the pinned prompts and the
+# model-call wrapper alone. It compared the whole ``template/`` tree with the merge base, so any other fix that changes
+# ``template/`` legitimately (F1's connectors, F11, F14's lead role file) turned it red. It now pins the two files D5
+# must not change, found through their modules, by sha256: both are byte for byte what they were before D5's first commit.
+D5_UNTOUCHED = {
+    "gov.memaudit.prompts": "086b7da4634c457fe042c2719db618fdcf4b940ef1317b519991455ed1bfa85d",
+    "gov.memaudit.claude": "5521803fc544cccc0c525edfbc7434101ec5591b75560704866ab123e683f27a",
+}
+
+
+@pytest.mark.parametrize("module", sorted(D5_UNTOUCHED))
+def test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files(module):
+    """Guard (green on the base): the pinned prompts (``gov.memaudit.prompts``) and the model-call wrapper
+    (``gov.memaudit.claude``), found through their modules, are byte for byte the files D5 was told not to change.
+    ``template/`` as a whole is no part of the guard: other fixes change it."""
+    spec = importlib.util.find_spec(module)
+    assert spec is not None and spec.origin, f"{module} is not importable"
+    digest = hashlib.sha256(Path(spec.origin).read_bytes()).hexdigest()
+    assert digest == D5_UNTOUCHED[module], (
+        f"{module} ({spec.origin}) is not the file D5 left alone: sha256 {digest}; a change to it belongs to its own "
+        f"ticket, which moves this pin")
 
 
 # ==== S4: the record says it ==========================================================================================

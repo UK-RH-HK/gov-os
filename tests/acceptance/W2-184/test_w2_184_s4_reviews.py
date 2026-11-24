@@ -19,6 +19,8 @@ import json
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 AUD, ENG, TD = s.AUDITOR, s.ENGINEER, s.TEST_DESIGNER
@@ -33,14 +35,14 @@ def full(project):
 
 def _first(launch, tk=FULL, **kw):
     result = launch(AUD, tk, **kw)
-    s.assert_session(result, s.OPUS, "high", criticality="C2", model_source="by criticality",
+    s.assert_session(result, s.SONNET, "high", criticality="C2", model_source="by criticality",
                      effort_source="by criticality", review_round=1)
     return result
 
 
 def _second(launch, tk=FULL):
     result = launch(AUD, tk)
-    s.assert_session(result, s.OPUS, "max", criticality="C2", model_source="by criticality", effort_source="probe",
+    s.assert_session(result, s.SONNET, "max", criticality="C2", model_source="by criticality", effort_source="probe",
                      review_round=2)
     return result
 
@@ -83,12 +85,12 @@ def test_s4_the_criticality_file_s_opus_key_is_no_probe_model(project, full, lau
 
 def test_s4_the_same_setting_twice_is_refused_naming_the_first_record_and_the_setting(full, launch):
     first = _first(launch)
-    s.refused(launch(AUD, FULL, "--effort", "high"), first.session_id(), s.OPUS, "high")
+    s.refused(launch(AUD, FULL, "--effort", "high"), first.session_id(), s.SONNET, "high")
 
 
 def test_s4_the_owner_naming_a_decision_admits_the_same_setting_twice(full, launch):
     _first(launch)
-    s.assert_session(launch(AUD, FULL, "--effort", "high", owner_named="DEC-1010"), s.OPUS, "high",
+    s.assert_session(launch(AUD, FULL, "--effort", "high", owner_named="DEC-1010"), s.SONNET, "high",
                      criticality="C2", model_source="by criticality", effort_source="after --",
                      owner_named="DEC-1010", review_round=2)
 
@@ -96,13 +98,13 @@ def test_s4_the_owner_naming_a_decision_admits_the_same_setting_twice(full, laun
 def test_s4_a_third_review_repeats_the_probe_and_is_refused_without_the_owner(full, launch):
     _first(launch)
     second = _second(launch)
-    s.refused(launch(AUD, FULL), second.session_id(), s.OPUS, "max")
+    s.refused(launch(AUD, FULL), second.session_id(), s.SONNET, "max")
 
 
 def test_s4_a_third_review_the_owner_named_is_admitted_and_recorded(full, launch):
     _first(launch)
     _second(launch)
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-1010"), s.OPUS, "max", criticality="C2",
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-1010"), s.SONNET, "max", criticality="C2",
                      model_source="by criticality", effort_source="probe", owner_named="DEC-1010", review_round=3)
 
 
@@ -131,7 +133,7 @@ def test_s4_a_well_formed_owner_named_is_recorded_on_any_launch(project, launch)
 def test_s4_max_on_a_first_review_needs_a_reason(full, launch):
     s.refused(launch(AUD, FULL, "--effort", "max"), "max", "reason")
     text = "the owner asked for the deepest first look"
-    s.assert_session(launch(AUD, FULL, "--effort", "max", reason=text), s.OPUS, "max", criticality="C2",
+    s.assert_session(launch(AUD, FULL, "--effort", "max", reason=text), s.SONNET, "max", criticality="C2",
                      model_source="by criticality", effort_source="after --", effort_reason=text, review_round=1)
 
 
@@ -139,7 +141,7 @@ def test_s4_max_on_a_review_that_is_not_the_probe_needs_a_reason(project, launch
     standard = s.ticket(project, ENG, "C2", "STANDARD", tk="DAEO-rv03")
     s.refused(launch(AUD, standard, "--effort", "max"), "max", "reason")
     text = "an extra deep look at a STANDARD ticket"
-    s.assert_session(launch(AUD, standard, "--effort", "max", reason=text), s.OPUS, "max", criticality="C2",
+    s.assert_session(launch(AUD, standard, "--effort", "max", reason=text), s.SONNET, "max", criticality="C2",
                      model_source="by criticality", effort_source="after --", effort_reason=text)
 
 
@@ -151,7 +153,7 @@ def test_s4_max_on_a_review_that_is_not_the_probe_needs_a_reason(project, launch
 def test_s4_a_ticket_that_is_not_full_has_no_review_round_no_probe_and_no_refusal(project, launch, profile):
     tk = s.ticket(project, ENG, "C2", profile, tk="DAEO-rv04")
     for _ in range(3):
-        s.assert_session(launch(AUD, tk), s.OPUS, "high", criticality="C2", model_source="by criticality",
+        s.assert_session(launch(AUD, tk), s.SONNET, "high", criticality="C2", model_source="by criticality",
                          effort_source="by criticality")
 
 
@@ -188,7 +190,7 @@ def test_s4_a_record_that_is_not_a_launch_record_is_not_counted(project, full, l
 def test_s4_a_resumed_review_is_not_a_second_review(full, launch):
     first = _first(launch)
     resumed = launch(AUD, FULL, "--resume", first.session_id())
-    s.assert_session(resumed, s.OPUS, "high", criticality="C2", model_source="by criticality",
+    s.assert_session(resumed, s.SONNET, "high", criticality="C2", model_source="by criticality",
                      effort_source="by criticality", review_round=1)
     _second(launch)
 

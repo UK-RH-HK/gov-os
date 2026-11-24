@@ -49,7 +49,8 @@ def _open_gate(home: Path, monkeypatch) -> None:
 # default line). The worker roles' default model is the one the cases pass after ``--`` (a model not the role's is
 # refused since W2-60a). Since W2-60a (P-4 (A)) a worker is handed ONE appended file, ``<TMPDIR>/role-<role>.md``: the
 # role file's bytes, one blank line, then the role template's bytes.
-ROLE_MODEL = "claude-opus-5-5"
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
+ROLE_MODEL = "claude-sonnet-5-5"
 ROLES_REL = Path("template/governance/kernel/roles")
 appended: list[dict] = []  # per started session: its TMPDIR and the bytes of each appended file, read at its start
 
@@ -185,13 +186,18 @@ def test_the_launch_is_otherwise_what_it_was(project, role):
     if role in launcher.WORKER_ROLES:
         # Emergency 2 (2.3): the launcher's own no-prompt mode, the caller naming none
         assert between.pop("--permission-mode", None) == "bypassPermissions", argv
-        assert set(between) == {"--model", "--effort", "--session-id", "--strict-mcp-config", "--setting-sources"}, argv
+        assert set(between) == {"--model", "--effort", "--session-id", "--strict-mcp-config", "--setting-sources",
+                                "--mcp-config"}, argv  # fixes-015a F1: the role's (empty) MCP config
+        assert json.loads(between["--mcp-config"]) == {"mcpServers": {}}, argv
         assert (between["--model"], between["--effort"]) == (ROLE_MODEL, "high"), argv
         assert between["--strict-mcp-config"] is None and between["--setting-sources"] == "project,local", argv
         assert re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", between["--session-id"])
     else:
         # Emergency 2 (2.3): a lead's too; DEC-1225 (R2): and the launcher adds the lead's model, Sonnet
-        assert between == {"--permission-mode": "bypassPermissions", "--model": launcher.LEAD_MODEL}, argv
+        # fixes-015a F1, F14: and strict MCP with the role's (empty) config, and Sonnet at medium
+        assert json.loads(between.pop("--mcp-config")) == {"mcpServers": {}}, argv
+        assert between == {"--permission-mode": "bypassPermissions", "--model": launcher.LEAD_MODEL,
+                           "--effort": "medium", "--strict-mcp-config": None}, argv
 
 
 def _options(items: list[str]) -> dict:

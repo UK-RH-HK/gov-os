@@ -10,27 +10,27 @@ import pytest
 
 import w1_21_support as support
 
-# Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16): the one rerank over the merged set is sent in
-# requests of at most 16 texts, its scores combined in order. "One pass" is read as one rerank of the merged set as a
-# whole: the requests each carry at most 16 texts, together score the set once (each candidate once), and are no more
-# than the cap needs; one load, and the order is still the reranker's.
-RERANK_CAP = 16
+# Rewrite-Reason: DEC-1090 (2) (W2-137): DEC-1067 (f)'s cap of 16 texts a request is retired. A request is bounded by
+# count (MAX_REQUEST_TEXTS) and by padded size (MAX_REQUEST_CHARS), both read from the module. "One pass" stays one
+# rerank of the merged set as a whole: each candidate scored once, one load, the order the reranker's.
+from gov.retrieval import rerank as rerank_module
 
 
 def one_rerank(outcome):
     """The texts the one rerank scored across its requests; fails unless they are one rerank of the merged set."""
-    sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
-    texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
-    assert sizes, "the reranker was given nothing to score"
-    assert max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts (DEC-1067 (f)): {sizes}"
-    assert len(sizes) == -(-len(texts) // RERANK_CAP), \
-        f"{len(sizes)} rerank requests for {len(texts)} texts: more than the cap of {RERANK_CAP} needs ({sizes})"
+    passes = outcome.passes
+    texts = [text for rerank_pass in passes for text in rerank_pass["texts"]]
+    assert passes, "the reranker was given nothing to score"
+    for rerank_pass in passes:
+        count = len(rerank_pass["texts"])
+        assert count <= rerank_module.MAX_REQUEST_TEXTS, \
+            f"a rerank request carried {count} texts, above MAX_REQUEST_TEXTS (DEC-1090 (2))"
+        longest = max((len(rerank_pass["query"]) + len(text) for text in rerank_pass["texts"]), default=0)
+        assert count == 1 or count * longest <= rerank_module.MAX_REQUEST_CHARS, \
+            f"a rerank request of {count} texts padded to {count * longest} characters, above MAX_REQUEST_CHARS"
     assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
-    # The round-2 review's R2-F3: the merged set is cut into requests of 16, every one but the last full (two
-    # rerank passes of their own, one per route, would also pass a count of requests).
-    assert all(size == RERANK_CAP for size in sizes[:-1]) and sizes[-1] <= RERANK_CAP, \
-        f"the rerank requests are not the merged set cut into requests of {RERANK_CAP}: {sizes}"
     return texts
+
 
 pytestmark = pytest.mark.needs("gitleaks", "sqlite_vec")
 
@@ -88,7 +88,7 @@ def test_several_batches_are_reranked_in_one_pass_over_the_merged_set(api, proje
     evidence = bundle[support.K_EVIDENCE]
     assert len(bundle[support.K_BATCHES]) > 1 and bundle[support.K_CONTINUATION] is None
     assert outcome.loads == 1, f"the reranker was loaded {outcome.loads} times"
-    texts = one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank in requests of at most 16
+    texts = one_rerank(outcome)
     assert len(texts) >= len(evidence) > 3, \
         f"the one rerank scored {len(texts)} texts and the bundle cites {len(evidence)} chunks"
     assert evidence[0][support.E_PATH] == support.FAVOURED_PAGE, \
@@ -100,7 +100,7 @@ def test_a_continued_bundle_is_reranked_once_too(api, project, ollama):
     _, first = reranked(api, project, ollama, batch_size=2, radius=support.RADIUS_LITE)
     outcome, _ = reranked(api, project, ollama, batch_size=2, radius=support.RADIUS_LITE,
                           continuation=first[support.K_CONTINUATION])
-    one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank, in requests of at most 16, for a continued bundle
+    one_rerank(outcome)
 
 
 def test_without_a_reranker_the_bundle_says_nothing_was_reranked(api, project, ollama):
@@ -147,6 +147,6 @@ def test_a_rerank_over_more_than_thirty_candidates(api, ollama, tmp_path):
     assert merge.get(support.M_RERANKED) is True, f"the bundle was not reranked: {merge!r}"
     assert type(merge.get(support.M_CANDIDATES)) is int and merge[support.M_CANDIDATES] > 30, \
         f"the merged candidate set is at most 30: {merge.get(support.M_CANDIDATES)!r}"
-    texts = one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank, in requests of at most 16
+    texts = one_rerank(outcome)
     assert outcome.loads == 1, f"the reranker was loaded {outcome.loads} times for one bundle"
     assert len(texts) > 30, f"the one rerank scored {len(texts)} texts, not more than 30"

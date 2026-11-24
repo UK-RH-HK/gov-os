@@ -186,3 +186,14 @@ ticket stays closed. Failing tests first: `tests/acceptance/W2-17/test_w2_17_fix
 the overlay check, and skipped when an existing pattern already classifies the path. Lead `fixes-015b` (Sonnet), branch
 `e2/fixes-015b`. `gov accept W2-17` green on the first run after the engineer's commits (12 lines pass, 70 passed);
 `tests/unit/update`, `tests/unit/doctor`, `tests/unit/adopt`, W1-06, W1-48: 529 passed.
+
+## Fix: `gov update` and `gov adopt` carry `disableClaudeAiConnectors` into the adopted settings (F1; fixes-015a; DEC-1232, DEC-1233)
+
+Found by the E2 audit 3: an adopted repository's `.claude/settings.json` did not turn the claude.ai connectors off, so a
+session started by hand there loaded them (Gov OS's own settings already had the key). Required: the kit's
+`template/governance/kernel/settings.json` carries `"disableClaudeAiConnectors": true`, and `gov adopt` and `gov update`
+(both through `gov adapters generate`) merge it into the adopted settings, keeping every other key and any value the
+project already holds. Kind: a fix; the ticket stays closed. Failing tests first:
+`tests/acceptance/W2-17/test_w2_17_fix_connectors_key.py` (README "The fix F1 (a)"), `361802ceb`; code
+`src/gov/adapters/merge.py` (`CONNECTORS_KEY`, added by `merge_settings` where the key is absent) and the kit settings
+file, `83b73ba96`; units `tests/unit/launch/test_fixes_015a_connectors.py`. Lead `fixes-015a`, branch `e2/fixes-015a`.

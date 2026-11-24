@@ -127,6 +127,9 @@ def _hash(path: Path) -> str | None:
     return hashlib.sha256(data).hexdigest()
 
 
+BUILD_INFO = "_build_info.py"  # written into the wheel's package by ``_wheel``; read by ``gov --version``
+
+
 def _wheel(repo: Path, commit: str, keep: Path | None = None) -> dict:
     """Build the gov wheel from ``commit`` in a temporary folder; its name and sha256. With ``keep`` (a folder), the
     built file is kept there too and its ``path`` given: the one route for ``gov release``, ``gov install`` and
@@ -139,6 +142,10 @@ def _wheel(repo: Path, commit: str, keep: Path | None = None) -> dict:
         source, out = Path(folder) / "source", Path(folder) / "wheel"
         with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
             tar.extractall(source, filter="data")
+        sha = _git(repo, "rev-parse", "--verify", f"{commit}^{{commit}}").strip()
+        # F3: the wheel names the commit it is built from, for ``gov --version`` where no git checkout is around it
+        if (source / "src" / "gov").is_dir():
+            (source / "src" / "gov" / BUILD_INFO).write_text(f'COMMIT = "{sha}"\n', encoding="utf-8")
         epoch = _git(repo, "show", "-s", "--format=%ct", commit).strip()
         built = subprocess.run([sys.executable, "-c", "import sys; from setuptools import build_meta; "
                                 "print(build_meta.build_wheel(sys.argv[1]))", str(out)],

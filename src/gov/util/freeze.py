@@ -138,3 +138,18 @@ def freeze_state(project_root: str) -> str:
     return "unmarked"
 
 
+
+
+PAUSED = "PAUSED"
+
+
+def paused_error(*roots):
+    """F10 (fixes-015a, CAP-05.a): the ``PAUSED`` error naming the pause when the freeze flag of any of ``roots`` is
+    frozen, else None. One reading for ``gov launch``, the dispatch pass and ``gov release --patch``."""
+    from gov.cli.errors import GovError
+
+    for each in sorted({str(r) for r in roots}):
+        if freeze_state(each) == "frozen":
+            return GovError(PAUSED, f"the project is paused (gov pause set {each}/{FREEZE_FLAG}): nothing starts until "
+                            f"the owner lifts it with gov pause --off (CAP-05)", {"path": f"{each}/{FREEZE_FLAG}"})
+    return None

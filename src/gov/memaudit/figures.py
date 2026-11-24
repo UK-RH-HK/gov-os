@@ -19,7 +19,22 @@ from gov.memaudit.common import write_whole
 CLASSES = ("gold_wrong", "question_ambiguous", "out_of_scope", "retrieval_miss", "answer_wrong")
 OUTCOMES = ("wrong", "incomplete", "not_found")
 ROUTES = ("lexical", "semantic", "both", "other", "none")
+STAMP_KEYS = ("release", "commit", "reader_model", "grader_models", "forbidden_rule", "questions_with_forbidden")
 MISS_KEYS = ("id", "question", "gold_answer", "gold_sources", "answer", "outcome", "evidence_in_bundle")
+
+
+def release() -> str:
+    """The code's own release: the ``pyproject.toml`` version of the source tree it runs from, else the installed one."""
+    import tomllib
+    tree = Path(__file__).resolve().parents[3]
+    try:
+        return tomllib.loads((tree / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    except (OSError, KeyError, ValueError):
+        from importlib.metadata import PackageNotFoundError, version
+        try:
+            return version("gov")
+        except PackageNotFoundError:
+            return "unknown"
 
 
 def route_of(routes) -> str:
@@ -117,6 +132,8 @@ def build(audit: str, decl: dict, questions: list[dict], rows: dict, counting_fo
         by_route[first_route(counting_folder, q, *where[i]) if i in where else "none"] += 1
     figures = {
         "audit": audit, "n": n, "n_gold": ret["n"], "forbidden_rule": "strict",
+        "release": release(), "commit": decl.get("audit_commit"),
+        "questions_with_forbidden": sum(1 for q in questions if q.get("forbidden")),
         "bar": {k: bar[k] for k in ("need_right", "max_wrong", "target_right")},
         "verdict": {"right": right, "wrong": wrong, "passes": right >= bar["need_right"] and wrong <= bar["max_wrong"],
                     "right_ok": right >= bar["need_right"], "wrong_ok": wrong <= bar["max_wrong"],
@@ -154,12 +171,22 @@ def write_figures(run, figures: dict) -> None:
     write_whole(Path(run), "FIGURES.json", figures)
 
 
+def stamp_lines(f: dict) -> list[str]:
+    """The printed stamp (F15): one line, empty when the figures lack any stamp key."""
+    if any(k not in f for k in STAMP_KEYS):
+        return []
+    return [f"STAMP release {f['release']}; commit {f['commit']}; reader {f['reader_model']}; graders "
+            f"{', '.join(f['grader_models'])}; forbidden rule {f['forbidden_rule']}; "
+            f"questions_with_forbidden: {f['questions_with_forbidden']}"]
+
+
 def verdict_lines(f: dict, retried: int) -> list[str]:
-    """The five printed lines of item 8."""
+    """The five printed lines of item 8, then the stamp line (F15) when the figures carry the stamp."""
     n, v, b, be, sp = f["n"], f["verdict"], f["bar"], f["beside"], f["spend"]
     lo, hi = scores.exact_interval(v["right"], n)  # from the counts, rounded once: FIGURES.json's 4 places are not reused
     mc = be["mcnemar_a1_a2"]
     word = {True: "met", False: "NOT met"}
+    stamp = stamp_lines(f)
     return [
         f"VERDICT right end to end {v['right']} of {n} ({scores.pct(v['right'], n)}; exact 95 % interval "
         f"{100 * lo:.1f} to {100 * hi:.1f} %); wrong claims {v['wrong']} of {n} ({scores.pct(v['wrong'], n)})",
@@ -174,4 +201,4 @@ def verdict_lines(f: dict, retried: int) -> list[str]:
         f"BESIDE grader agreement {be['grader_agree']} of {be['graded']}; search failures {be['search_failures']}; "
         f"calls run once more {retried}; spent {sp['usd']:.2f} USD (projection {sp['projection']:.2f}, "
         f"brake {sp['brake']:.2f})",
-    ]
+    ] + stamp

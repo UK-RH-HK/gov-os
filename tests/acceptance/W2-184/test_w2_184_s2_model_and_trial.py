@@ -17,6 +17,8 @@ from __future__ import annotations
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the planted tables and
+# the launch models expected below were Opus or Haiku and are Sonnet now (the efforts and records still tell the cases apart).
 import w2_184_support as s
 
 ENG = s.ENGINEER
@@ -41,12 +43,11 @@ def test_s2_the_resolved_model_after_the_double_dash_is_accepted_and_recorded_as
 
 
 @pytest.mark.parametrize("role,cls,given", [
-    (ENG, "C3", s.SONNET), (ENG, "C3", s.HAIKU5), (ENG, "C0", s.SONNET), (ENG, "C0", s.OPUS),
-    (s.AUDITOR, "C2", s.SONNET), (s.RESEARCH, "C3", "opus"), (s.PRODUCT_SPEC, "C1", s.SONNET)])
+    (ENG, "C3", s.OPUS), (ENG, "C3", s.HAIKU5), (ENG, "C0", s.HAIKU5), (ENG, "C0", s.OPUS),
+    (s.AUDITOR, "C2", s.OPUS), (s.RESEARCH, "C3", "opus"), (s.PRODUCT_SPEC, "C1", s.HAIKU5)])
 def test_s2_a_model_after_the_double_dash_that_is_not_the_resolved_one_is_refused_naming_both(
         project, launch, role, cls, given):
-    """C3's table says Opus, so Sonnet (the role's default line) is below its tier; C0's says Haiku, so any other is
-    refused: the model is the one of the criticality, not of the default line."""
+    """The model is the rubric's Sonnet at every class: any other model after the double dash is refused."""
     tk = s.ticket(project, role, cls)
     resolved = s.TABLES[role][cls][0]
     s.refused(launch(role, tk, "-p", "Do the work.", "--model", given), "--model", given, resolved)

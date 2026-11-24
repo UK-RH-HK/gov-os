@@ -97,12 +97,14 @@ EFFORTS = ("low", "medium", "high", "xhigh", "max")
 
 # The fixture roles' default lines and versions. Research's model is not Opus, so a test can tell that the value
 # is read from the role file and not written into the launcher.
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the defaults named Opus
+# for four roles and are now Sonnet (the efforts still tell the roles apart).
 DEFAULTS = {
-    ENGINEER: (OPUS, "high"),
-    TEST_DESIGNER: (OPUS, "high"),
-    AUDITOR: (OPUS, "max"),
+    ENGINEER: (SONNET, "high"),
+    TEST_DESIGNER: (SONNET, "high"),
+    AUDITOR: (SONNET, "max"),
     RESEARCH: (SONNET, "medium"),
-    PRODUCT_SPEC: (OPUS, "low"),
+    PRODUCT_SPEC: (SONNET, "low"),
 }
 VERSIONS = {ENGINEER: "1.4.2", TEST_DESIGNER: "2.0.0", AUDITOR: "1.0.7", RESEARCH: "3.1.0", PRODUCT_SPEC: "0.9.1"}
 
@@ -198,7 +200,7 @@ def skills_line(names):
 def role_text(role, version=None, default=None, skills=None, word=ROLE_WORD):
     """A fixture role file. ``version`` / ``default`` / ``skills``: a whole line to use, ``""`` for none, or None
     for the role's fixture value (no skills line by default)."""
-    model, effort = DEFAULTS.get(role, (OPUS, "high"))
+    model, effort = DEFAULTS.get(role, (SONNET, "high"))
     version = version_line(VERSIONS.get(role, "1.0.0")) if version is None else version
     default = default_line(model, effort) if default is None else default
     lines = [

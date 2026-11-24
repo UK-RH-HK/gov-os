@@ -4,8 +4,8 @@ every helper spawned with the Agent tool runs the model the rubric gives helpers
 
 1. A fork (`subagent_type: fork`) is refused: helper work goes to a fresh helper from a written brief (DEC-1212 (4)).
    Only an entry for `subagent_type: fork` in the exceptions file lifts it.
-2. A spawn that names no model takes CLAUDE_CODE_SUBAGENT_MODEL (claude-sonnet-5-5 in the user settings) and passes;
-   so does one that names Sonnet.
+2. A spawn that names no model gets "sonnet" written into it (PreToolUse `updatedInput`, every other key kept) and
+   passes; a spawn that names Sonnet passes unchanged.
 3. Fable (any model whose name has `fable`) is refused for every type: no session runs it (DEC-1225 (3)), and no entry
    covers it.
 4. Any other model is refused unless governance/project/model-exceptions.yaml lists an exception for it
@@ -148,6 +148,17 @@ def refuse(text: str) -> int:
     return 2
 
 
+def write_model(args: dict) -> int:
+    """A spawn that names no model gets Sonnet written into it (PreToolUse `updatedInput`, every other key kept), so
+    its model no longer depends on an environment variable the harness may not read."""
+    print(json.dumps({"hookSpecificOutput": {
+        "hookEventName": "PreToolUse",
+        "permissionDecision": "allow",
+        "updatedInput": {**args, "model": "sonnet"},
+    }}))
+    return 0
+
+
 def judge(args: dict, root: str) -> int:
     kind = str(args.get("subagent_type") or "general-purpose")
     model = str(args.get("model") or "").strip()
@@ -160,7 +171,9 @@ def judge(args: dict, root: str) -> int:
             return refuse("helper rule (the owner's decision, DEC-1212 (4)): no fork for helper work; spawn a fresh "
                           "helper from a written brief (a named subagent type and a brief that stands alone). Only "
                           f"an entry for 'fork' in {EXCEPTIONS_REL} lifts this.")
-    if not model or allowed(model):
+    if not model:
+        return write_model(args)
+    if allowed(model):
         return 0
     said = (f"model rule (the owner's decision, DEC-1225): a helper runs Sonnet; '{model}' for '{kind}' is refused")
     if names_fable(model):
@@ -221,11 +234,13 @@ def main() -> int:
         if not isinstance(event, dict) or event.get("tool_name") not in ("Agent", "Task"):
             return 0
         args = event.get("tool_input")
+        if not isinstance(args, dict):
+            return 0  # nothing to judge or to write into
         root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
     except Exception:
         return 0
     try:
-        return judge(args if isinstance(args, dict) else {}, root)
+        return judge(args, root)
     except Exception as error:  # never a crash: what cannot be judged is refused, with the reason
         return refuse(f"model rule: the spawn cannot be judged ({type(error).__name__}: {error}); unreadable means "
                       f"Sonnet.")

@@ -294,6 +294,11 @@ def drift(state: Path, fresh_fig: dict) -> dict:
     out["F"] = round(100 * right / n, 2)
     if len(mine) < FIGURES_NEEDED:
         return out
+    from gov.memaudit.figures import STAMP_KEYS
+    used = [x for x in measured_lines(lines_of(state, now["set"])) if pct_of(x) is not None][-FIGURES_NEEDED:]
+    missing = [k for k in STAMP_KEYS if k not in (fresh_fig or {}) or any(k not in x for x in used)]
+    if missing:  # F15: a figure without the stamp is never compared with one that has it
+        return {**out, "comparable": False, "missing": missing}
     out["S"] = round(sum(mine[-FIGURES_NEEDED:]) / FIGURES_NEEDED, 2)
     gap = out["S"] - out["F"]
     word = "STANDING_FITTED" if gap >= DRIFT_POINTS - 1e-9 else "STANDING_STALE" if -gap >= DRIFT_POINTS - 1e-9 else "none"

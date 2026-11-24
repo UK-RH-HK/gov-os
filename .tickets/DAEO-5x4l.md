@@ -75,3 +75,9 @@ test_several_batches_are_reranked_in_one_pass_over_the_merged_set` and `::test_a
 ("a rerank request carried more than 16 texts (DEC-1067 (f))") and fail the same on `w2/integrate` (2 failed, 6 passed,
 checked in a scratch worktree at `30d406be2`): not this fix's, so `gov accept W1-21` stays red on them. Lead `fixes-015b`
 (Sonnet), branch `e2/fixes-015b`.
+
+## Fix: two rerank cases take the bounds DEC-1090 (2) gives (F16)
+
+Found 2026-11-22 (fixes-015a): W1-21's two rerank cases pinned a request size the module no longer has; the bounds in force
+are `MAX_REQUEST_TEXTS` and `MAX_REQUEST_CHARS` (DEC-1090 (2)). Kind: a fix, no new ticket; the ticket stays closed. The
+two cases were revised to read the bounds from the module (`13167f939`); no code change.

@@ -32,7 +32,7 @@ plus every ``anthropic-skills:`` skill; the CLI's own built-ins (P-W2-60a-1)
 are not asserted on. The planted test home is the stand-in cases'
 (``test_w2_60a_kept_out.py``).
 
-**Cost and needs.** One headless session on ``claude-opus-5-5`` at the role's
+**Cost and needs.** One headless session on ``claude-sonnet-5-5`` at the role's
 own effort, high (its default line), with no ``--effort`` given (a launch's own
 effort below the role's high is refused, DEC-1120 (3)), at most two turns and
 no tool call. It needs the CLI at ``~/.local/bin/claude``,
@@ -53,6 +53,8 @@ from pathlib import Path
 
 import pytest
 
+# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give; the fixture engineer's
+# default model was Opus and is Sonnet now, so the live session runs on Sonnet.
 import w2_60a_support as s
 
 pytestmark = pytest.mark.local_only
@@ -130,7 +132,7 @@ def session(tmp_path_factory):
            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
     env.update({"PYTHONPATH": s.python_path(), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     argv = s.gov_argv("launch", s.ENGINEER, s.T.tk, "--", "-p", PROMPT, "--output-format", "stream-json",
-                      "--verbose", "--model", s.OPUS, "--max-turns", "2")
+                      "--verbose", "--model", s.SONNET, "--max-turns", "2")
     try:
         done = subprocess.run(argv, cwd=str(project), env=env, capture_output=True, text=True,
                               timeout=SESSION_TIMEOUT_S, stdin=subprocess.DEVNULL)
@@ -181,11 +183,11 @@ def test_the_launch_record_is_keyed_by_the_id_the_session_s_log_gives(session):
     assert session.record is not None, (
         f"no launch record named by the session's own id {session.init.get('session_id')}\n{session.describe()}")
     assert session.record.get("session_id") == session.init.get("session_id")
-    assert (session.record.get("model") == s.OPUS
+    assert (session.record.get("model") == s.SONNET
             and session.record.get("effort") == s.DEFAULTS[s.ENGINEER][1]), (
         f"the record's model and effort are not this launch's: {session.record.get('model')}, "
         f"{session.record.get('effort')}")
-    assert session.init.get("model", "").startswith(s.OPUS), f"the session ran on {session.init.get('model')!r}"
+    assert session.init.get("model", "").startswith(s.SONNET), f"the session ran on {session.init.get('model')!r}"
 
 
 def test_a_launched_session_starts_with_no_connector(session):

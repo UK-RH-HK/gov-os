@@ -48,3 +48,7 @@ acceptance_tests:
 # W1-29 Session hooks
 
 SessionStart, PreCompact, Stop and SubagentStop hook scripts.
+
+## Fix: the SubagentStop hook stops blocking twice (F12, fixes-015a)
+
+Found 2026-11-22: a return whose field value stood on the line after its label (`task:` newline `DAEO-x`, or a heading label) was read as missing, and the hook did not read `stop_hook_active`, so it blocked the same return again after the first block. No test caught it. Required: a value on the next non-blank line counts, unless that line is itself a field label (a label with nothing after it still blocks); `stop_hook_active` set exits 0 even for a return that would block. Kind: a fix, no new ticket; the ticket stays closed. Failing tests first: `tests/acceptance/W1-29/test_w1_29_fix_stop_hook.py`; code `template/governance/kernel/hooks/subagentstop.py` and its byte copy `src/gov/hooks/subagentstop.py` (`_find_fields` pattern, `main`). Result: the fix file is green; `tests/acceptance/W1-29`, W2-65 and `tests/unit/hooks` 283 passed. `gov accept W1-29` refuses with ACCEPT_MAP_UNREADABLE: the README's fix row names `fix-F12`, which is not a `success-N`/`failure-N` cell.
