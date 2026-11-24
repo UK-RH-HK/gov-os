@@ -1,4 +1,4 @@
-<title>Practice first decisions, 24 November</title>
+<title>Practice-first decisions</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -403,7 +403,7 @@ const SECTIONS = [
     "from": "Proposal 1 · TL04, TL16, TL27, TL33, TL40, TL43 to TL46",
     "title": "Nine greens you did not name: keep them?",
     "found": [
-     "Nine more tools qualify by real use: <code>gov backup</code> (hourly), <code>gov checkpoint</code> with its hooks, <code>gov msg</code>, <code>gov install</code> and <code>gov release</code> with the re-pin (0.1.0 to 0.1.4), the helper-return hook, the <code>gov resources</code> gate, <code>gov decisions in-force</code> and <code>gov adapters</code>.",
+     "Nine more tools qualify by real use: <code>gov backup</code> (hourly), <code>gov checkpoint</code> with its hooks, <code>gov msg</code>, <code>gov install</code> and <code>gov release</code> with the re-pin (0.1.0 to 0.1.5), the helper-return hook, the <code>gov resources</code> gate, <code>gov decisions in-force</code> and <code>gov adapters</code>.",
      "Each carries its gap in its row: a 41-hour backup gap nothing noticed; a message to a running <code>claude -p</code> lead is never read; I-16 for adapters.",
      "Without them the hand work grows for tools that work."
     ],
@@ -667,7 +667,7 @@ const SECTIONS = [
     "title": "What release does an old record have?",
     "found": [
      "271 tickets and many older records have no field.",
-     "Each carries a <code>created:</code> date, and <code>docs/releases/&lt;v&gt;/</code> holds 0.1.0 to 0.1.4.",
+     "Each carries a <code>created:</code> date, and <code>docs/releases/&lt;v&gt;/</code> holds 0.1.0 to 0.1.5.",
      "Rewriting 271 closed tickets raises <code>CLOSED_TICKET_EDITED</code> in <code>gov links</code> and changes history."
     ],
     "opts": [
@@ -758,7 +758,7 @@ const SECTIONS = [
  },
  {
   "title": "4. Decisions",
-  "intro": "What is recorded as a decision, what each affects, and which leave agents' reading (190 are in force today).",
+  "intro": "What is recorded as a decision, what each affects, and which leave agents' reading (192 are in force today).",
   "qs": [
    {
     "id": "DE-0",
@@ -768,7 +768,7 @@ const SECTIONS = [
      "Recorded: a standing rule or practice, a choice whose reason matters later, an exception, a measurement period, a rubric. Not recorded: a spec change (it is a change to the spec file; git keeps its history), a one-off instruction, a status report.",
      "Every new decision names what it affects in an <code>Affects:</code> line: paths, specs or steps W1 to W16, or <code>none</code>.",
      "The impact trace (W6) would read it. Today the graph has <code>Under</code>, <code>Changes</code> and <code>Supersedes</code> links only.",
-     "190 decisions are in force today."
+     "192 decisions are in force today (DEC-1246 and DEC-1247 added since the proposal was drafted)."
     ],
     "opts": [
      [
@@ -799,7 +799,7 @@ const SECTIONS = [
     "found": [
      "A-23, which you approved (DEC-1238 (1b)), already adds an <code>Enforced-by:</code> line to a new standing rule.",
      "The in-force digest hides only superseded and done entries.",
-     "Of the 30 decisions that HELD classed (DEC-1209 to DEC-1238): 1 held by code on the path, 6 spent, 3 partial, 20 text only or not built. At least 7 of 190 would leave, at most about 18.",
+     "Of the 30 decisions that HELD classed (DEC-1209 to DEC-1238): 1 held by code on the path, 6 spent, 3 partial, 20 text only or not built. At least 7 of 192 would leave, at most about 18.",
      "About 15 more, DEC-001 to DEC-025, are architecture choices rather than rules."
     ],
     "opts": [
@@ -827,9 +827,9 @@ const SECTIONS = [
    {
     "id": "DE-2",
     "from": "Proposal 4",
-    "title": "Who classes the other 160 decisions?",
+    "title": "Who classes the other 162 decisions?",
     "found": [
-     "HELD read DEC-1209 to DEC-1238 only. 153 older and 7 newer (DEC-1239 to DEC-1245) are not classed.",
+     "HELD read DEC-1209 to DEC-1238 only. 153 older and 9 newer (DEC-1239 to DEC-1247) are not classed.",
      "Audit 4 §1.7 calls 11 of the older ones enforced for their producers: DEC-030, 032 to 037, 091, 815, 409, 772.",
      "The digest is about 6,800 tokens of titles that every CTO reads at each start."
     ],
@@ -843,12 +843,12 @@ const SECTIONS = [
      [
       "b",
       "Class each when it is next touched",
-      "The digest stays near 190 for months."
+      "The digest stays near 192 for months."
      ],
      [
       "c",
       "No pass; only new decisions are marked",
-      "The old 160 never leave."
+      "The old 162 never leave."
      ]
     ],
     "reason": "A finite job with a fixed form is what the golden workflow gives to an agent.",
