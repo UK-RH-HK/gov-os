@@ -37,9 +37,19 @@ against small and large machines."
   and nothing started them (2026-11-22: memory fell to FTS-only until the CTO ran `gov.retrieval.ollama.safe_restart`).
   The pass checks them and starts a down server under its cap through `safe_restart` (never a running or foreign one),
   once per pass, recorded; on a machine with no GPU, MA-2 holds.
+- **MA-6 Memory headroom under WSL's cap and on its Windows host** (the owner, 2026-11-24, DEC-1247). (a) New work is
+  admitted only while WSL's available memory, less the work's own estimate, stays at or above a margin (WSL's cap read
+  as MemTotal, 24 GB here; the margin in the one committed config, default 2 GB), so WSL never reaches its cap. (b) On WSL (detected from the kernel), each pass also reads Windows' own free physical memory
+  (`powershell.exe -NoProfile -Command` over `Win32_OperatingSystem.FreePhysicalMemory`, about 0.6 s; read once per pass)
+  and holds new work while it is under a floor (in the config, default 2 GB): Windows' apps share the same 32 GB. Held
+  means waiting for a slot, never refused, and the hold names the resource, its reading and its floor (for example
+  `RUNTIME_HELD: windows free 1.4 GB < 2 GB`). A failed or timed-out Windows reading on WSL holds new work and names it
+  (`windows memory unread`), never admits blind; off WSL the check is skipped and the reading says so. Running work is
+  never stopped by it. MA-4's planted profiles add: WSL near its cap (held), Windows low (held), Windows unreadable on WSL
+  (held, named), plain Linux (check skipped, named).
 
 ## The flow and green
-Write MA-1 to MA-5 into the ticket's KPIs (the CTO approves them by this brief), each with its verify and a failure
+Write MA-1 to MA-6 into the ticket's KPIs (the CTO approves them by this brief), each with its verify and a failure
 line. Test designer (Sonnet) writes the acceptance tests, red on the base; engineer (Sonnet) to `gov accept W2-207`
 green. Return: branch and head; each KPI line with its tests; the cut-over steps as an ordered runbook for the CTO
 (exact commands, the check after each, the rollback of each), with F1's order; reds not yours; the trial figures.

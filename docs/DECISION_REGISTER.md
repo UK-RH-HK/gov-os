@@ -2252,6 +2252,13 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 - **Basis:** the owner's message of 2026-11-24; three repositories under development at once (Gov OS, EXAMIN, ASMO OS) on one machine and one plan.
 - **Governing sources:** docs/emergency-2/integration/INTEGRATION-PLAN.md; .tickets/DAEO-rt4s.md (W2-207); DEC-1225; DEC-1229; DEC-1245.
 
+### DEC-1247 — W2-207's machine-wide gate keeps 2 GB free below WSL's 24 GB cap and reads Windows' own free memory, holding new work when Windows runs low (MA-6)
+- **Status:** ACCEPTED (owner, 2026-11-24 about 17:25, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1232 (3), DEC-1246 (3)(a) · **Changes:** W2-207's KPI lines (MA-6 added to `docs/emergency-2/briefs/LEAD-w2-207-runtime.md`; W2-207 is held, not closed, so the line joins its ticket)
+- **Decision:** "For W2-207's machine-wide gate: keep a margin of free memory below WSL's 24 GB cap (2 GB), so WSL never reaches it; and read Windows' own free memory too (WSL can query it), holding new work when Windows runs low, since its apps share the same 32 GB."
+- **The CTO's calls inside it (P2, reversible, in the ticket's config):** the Windows floor defaults to 2 GB; a failed or timed-out Windows reading on WSL holds new work with a named reason, never admits blind; held work waits for a slot and running work is never stopped; off WSL the check is skipped and named. Checked feasible at 17:25: `powershell.exe` over `Win32_OperatingSystem` answers in 0.6 s (Windows then had 4.8 GB free of 31.8 GB, with WSL using 3 GB and holding 11 GB of cache).
+- **Basis:** the owner's message of 2026-11-24; one 32 GB machine shared by Windows' apps and a 24 GB WSL running three repositories' work (DEC-1246 (3)(a)).
+- **Governing sources:** docs/emergency-2/briefs/LEAD-w2-207-runtime.md; DEC-1232; DEC-1234; DEC-1246.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
