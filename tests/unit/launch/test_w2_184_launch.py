@@ -367,8 +367,7 @@ def test_no_file_max_needs_a_reason_unless_it_is_the_default_s_own(project):
     project.launch()
     assert (project.last()["effort"], project.last()["effort_reason"], project.last()["effort_source"]) == ("max", None, "role default")
     project.launch(args=["--effort", "max"])  # interface 3.2a: equal to the resolved effort
-    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: an effort after -- equal to the resolved one keeps the table's source
-    assert (project.last()["effort_source"], project.last()["effort_reason"]) == ("role default", None)
+    assert (project.last()["effort_source"], project.last()["effort_reason"]) == ("after --", None)
 
 
 def test_no_file_reason_and_owner_named_are_recorded_and_their_forms_are_checked(project):
@@ -432,9 +431,7 @@ def test_no_floor_where_the_table_s_effort_is_low_or_medium(project):
 def test_an_effort_of_high_or_more_after_the_double_dash_is_the_launch_s_own(project, effort):
     project.ticket()
     argv = project.launch(args=["--effort", effort])
-    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the table's own effort after -- keeps the table's source (not the launch's own)
-    assert (project.last()["effort"], project.last()["effort_source"]) == (
-        effort, "by criticality" if effort == "high" else "after --")
+    assert (project.last()["effort"], project.last()["effort_source"]) == (effort, "after --")
     assert argv.count("--effort") == 1 and _flag(argv, "--model") == SONNET
 
 
@@ -772,12 +769,12 @@ def test_a_max_after_the_double_dash_on_round_two_still_needs_a_reason(full):  #
     assert full.last()["review_round"] == 2 and argv.count("--effort") == 1
 
 
-def test_a_max_after_the_double_dash_equal_to_the_table_s_needs_no_reason_and_keeps_its_source(project):  # interface 3.2a
-    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: an effort after -- equal to the resolved one keeps the table's source
+def test_a_max_after_the_double_dash_equal_to_the_table_s_needs_no_reason_and_is_after_dashes(project):  # interface 3.2a
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the table's max in the fixture is Sonnet's (the Opus entry's model is F19's)
     project.role_file("engineer", pair(SONNET, "max"), table(pair(SONNET, "max"), pair(SONNET, "max"), pair(SONNET, "max"), pair(SONNET, "max")))
     project.ticket()
     project.launch(args=["--effort", "max"])
-    assert (project.last()["effort"], project.last()["effort_source"], project.last()["effort_reason"]) == ("max", "by criticality", None)
+    assert (project.last()["effort"], project.last()["effort_source"], project.last()["effort_reason"]) == ("max", "after --", None)
 
 
 def test_a_max_after_the_double_dash_that_differs_from_the_resolved_effort_still_needs_a_reason(full):  # interface 3.2a

@@ -712,8 +712,8 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
                                     f"{role}'s {table_effort} (DEC-1120 (3))")
         if given["effort"] is not None:
             effort, effort_source = given["effort"], "after --"
-            if effort == table_effort:  # not the launch's own choice: needs no --reason; its source is the table's
-                own, effort_source = False, table_source
+            if effort == table_effort:  # not the launch's own choice: needs no --reason; the source stays `after --`
+                own = False
         else:
             effort, effort_source, own = table_effort, table_source, False
     if effort == "max" and own and reason is None:
