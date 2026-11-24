@@ -243,8 +243,14 @@ def test_the_manifest_leaves_out_the_overlay_and_the_lock_itself(installed):
 def test_doctor_passes_on_a_freshly_created_project(project, sandbox):
     """``gov doctor`` exits 0 on the project, no part of it fails, and its lock part is measured: MATCH."""
     result = support.doctor(project, sandbox)
+    # Rewrite-Reason: DEC-1232 (6) / fixes-015a F1: doctor's connectors part reports a settings file without
+    # disableClaudeAiConnectors (a copy holds no .claude/settings.json until `gov adapters generate`) as drift that
+    # does not block (drift_blocking false, exit 0); every other fail or drift still counts, and the connectors part
+    # may only be that non-blocking drift.
     failed = sorted(name for name, part in result.report.items()
-                    if isinstance(part, dict) and part.get("status") in ("fail", "drift"))
+                    if isinstance(part, dict) and part.get("status") in ("fail", "drift")
+                    and not (name == "connectors" and part.get("status") == "drift"
+                             and part.get("drift_blocking") is False))
     assert result.run.returncode == 0 and result.run.envelope().get("ok") is True and not failed, \
         f"gov doctor does not pass on a freshly created project (failed parts: {failed})\n{result.run.describe()}"
     assert result.claims_match and result.section.get("status") == "pass" and not result.reports_drift, \
