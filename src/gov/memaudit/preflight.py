@@ -300,6 +300,38 @@ def _ids(found: list[str]) -> list[str]:
     return sorted(dict.fromkeys(found))
 
 
+def store_behind(repo) -> dict | None:
+    """P0-2: ``{store, head}`` where the repository names an ``integration_store`` and the store's commit (the head of its
+    fingerprints row) is not the repository's HEAD; ``store`` is ``unreadable`` where the configured store cannot be
+    read (a store that cannot be shown to be at HEAD is not at HEAD). None for a repository that names none."""
+    from gov.launch.store import StoreSettingError, configured
+
+    try:
+        link = configured(Path(repo))
+    except StoreSettingError:
+        link = "unreadable"
+    if link is None:
+        return None
+    try:
+        head = git(repo, "rev-parse", "--verify", "--quiet", "HEAD^{commit}").decode().strip()
+    except Exception:  # noqa: BLE001: a repository with no HEAD has no store at it
+        head = "unreadable"
+    stored = "unreadable"
+    try:
+        if link != "unreadable":
+            import sqlite3
+
+            from gov.store import STORE_REL, loader
+            connection = sqlite3.connect((Path(link) / STORE_REL).resolve().as_uri() + "?mode=ro", uri=True)
+            try:
+                stored = (loader.fingerprints(connection) or {}).get("head") or "unreadable"
+            finally:
+                connection.close()
+    except Exception:  # noqa: BLE001: whatever stops the reading leaves the store unshown
+        stored = "unreadable"
+    return None if stored == head else {"store": stored, "head": head}
+
+
 def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dict]:
     """The ten checks; ``PREFLIGHT.json`` and the ``preflight`` ledger line written. Returns the exit word (``ok``,
     ``refused`` or ``used``) and the counts the subcommand prints. A usage fault raises ``UsageError``."""
@@ -318,6 +350,9 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
     cfg = _config.load(repo, commit)  # before anything is read or written: a repository without its file is refused
     if os.path.lexists(p["used"]):
         return "used", {"used": True}
+    behind = store_behind(repo)
+    if behind is not None:  # P0-2: before any file is read or written; a measure never runs on a store behind HEAD
+        return "refused", {"store_behind": behind}
 
     files, strays = layout.entries(p["hidden"])
     n = len(files)
@@ -417,6 +452,10 @@ def lines(word: str, counts: dict) -> list[str]:
     """What the subcommand prints for ``run``'s result: one line per code, then the closing line."""
     if word == "used":
         return ["USED"]
+    if "store_behind" in counts:
+        behind = counts["store_behind"]
+        return [f"STORE_BEHIND the integration store is at {str(behind['store'])[:12]} and HEAD is "
+                f"{str(behind['head'])[:12]}: rebuild it first, nothing is declared", NOT_OK_WORD]
     out = []
     for code in CODES:
         c = counts["codes"][code]

@@ -90,6 +90,24 @@ def _reasons(branch, branch_head, head, built, settings, verdicts, when) -> tupl
     return holds, unknown
 
 
+def _behind(root: Path, head, branch_head) -> dict:
+    """P0-1: ``behind_by``, the commits of the branch's head the store's commit lacks (``git rev-list --count
+    <store>..<branch head>``; 0 when they are one), and ``behind``, the sentence naming it while it is above 0. A figure
+    that cannot be read is an unread entry, never 0."""
+    from gov.rebuild.integration import _git
+
+    if not _ok(head) or not _ok(branch_head):
+        return {"behind_by": _unread("the store's head or the branch's head was not read")}
+    if head == branch_head:
+        return {"behind_by": 0}
+    done = _git(root, "rev-list", "--count", f"{head}..{branch_head}", check=False)
+    if done.returncode != 0 or not done.stdout.strip().isdigit():
+        # the store's commit is not an ancestor the repository knows: it is behind by what cannot be counted
+        return {"behind_by": _unread(f"git cannot count {head[:12]}..{branch_head[:12]} in {root}")}
+    count = int(done.stdout.strip())
+    return {"behind_by": count, "behind": f"store behind HEAD by {count} commit(s)"} if count else {"behind_by": 0}
+
+
 def read(root: Path) -> dict:
     """The part for the project at ``root`` (module docstring)."""
     from gov.launch.store import StoreSettingError, configured
@@ -126,6 +144,7 @@ def read(root: Path) -> dict:
                 "stale_reason": _unread(why)}
     branch_head = _tried(_branch_head, root, settings.branch)
     verdicts = _tried(integration.verdict_times, root, settings.verdict)
+    part |= _behind(root, head, branch_head)
     holds, unknown = _reasons(settings.branch, branch_head, head, built, settings, verdicts, when)
     part |= {"branch": settings.branch, "branch_head": branch_head}
     if holds:

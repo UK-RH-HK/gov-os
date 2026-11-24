@@ -229,3 +229,27 @@ sketch; no case pins that field.
   reported; running under cron (window 4).
 - **P2b-4. Unquoted times.** `second: 1800` (a number) is planted as "not a string"; an unquoted `18:00` is not, since
   the YAML reader's reading of it is the reader's.
+
+### P0-1 (plan item 0-1): the refresh retried and checked
+
+Tests for the fix `P0-1` of DAEO-f58b, in `test_w2_116_p0_1_refresh_checked.py` (support: `w2_116_p0_support.py`). Each case
+builds a store at the branch head with a refresh recorded at 18:05 (`GOV_NOW`), then lands a merge: the store is behind by
+two commits. A failed refresh is the build's embedder gone (`OLLAMA_HOST` at a closed port). The cron tick is
+`gov rebuild --integration integrate --when-due` (text form), its stdout and stderr appended to a log file the case owns.
+Pinned here, because the interface leaves it open: a store behind the branch head is due by itself (the clock says
+nothing is due); the failed tick exits non-zero and its output holds `REBUILD_FAILED`; the retry tick's output holds the
+word `retry` (any case) and a success line naming the new head's first 12 digits; `gov status --json` has `behind_by` in
+`integration_store` and a top-level `red` (in `result`, else in the envelope; `true` while behind, `false` when equal);
+`gov status` text holds `store behind HEAD by <n> commit(s)` (`<n>` is `git rev-list --count <store>..<branch head>`) and is
+red (exit non-zero, or `status: red` / `"red": true` in the text); `gov retrieve` and `gov brief` (store given by
+`--store`, a store inside the repository, HEAD moved past it) hold `store behind HEAD` and both commits' first 12 digits;
+at equality none of the sentence. Not pinned: a store reached through a link that lags the project's HEAD for retrieve and
+brief (the cases use the repository's own store).
+
+| KPI line | tests | expected red reason |
+|---|---|---|
+| P0-1 | `test_w2_116_p0_1_refresh_checked.py::test_p0_1_a_failed_refresh_is_logged_the_next_tick_retries_and_succeeds` | the tick at 18:10 is `not_due` (a store behind the head is not due on the base): no `REBUILD_FAILED` in the log |
+| P0-1 | `test_w2_116_p0_1_refresh_checked.py::test_p0_1_status_json_gives_behind_by_and_red_while_behind_and_zero_once_equal` | the part has no `behind_by`; no top-level `red` |
+| P0-1 | `test_w2_116_p0_1_refresh_checked.py::test_p0_1_status_text_prints_the_sentence_while_behind_and_nothing_of_it_once_equal` | no `store behind HEAD by 2 commit(s)` line; exit 0, not red |
+| P0-1 | `test_w2_116_p0_1_refresh_checked.py::test_p0_1_gov_retrieve_names_a_store_behind_head_with_both_commits_and_nothing_once_equal` | the store line names the commits but not `store behind HEAD` |
+| P0-1 | `test_w2_116_p0_1_refresh_checked.py::test_p0_1_gov_brief_names_a_store_behind_head_with_both_commits_and_nothing_once_equal` | the memory block names the store's commit, not HEAD, and not `store behind HEAD` |

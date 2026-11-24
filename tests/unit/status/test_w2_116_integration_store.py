@@ -103,7 +103,7 @@ def test_a_fresh_store_names_its_head_age_and_branch_and_is_not_stale(project):
     assert part == {"link": str(project["link"]), "half": str(project["half"]), "head": project["head"],
                     "branch": "integrate", "branch_head": project["head"],
                     "built_at": f"{DAY}T11:00:00+00:00", "age_seconds": 3600,
-                    "stale": False, "stale_reason": None, "last_refresh": None}
+                    "stale": False, "stale_reason": None, "last_refresh": None, "behind_by": 0}
 
 
 def test_the_last_refresh_is_the_record_beside_the_link(project):
@@ -304,3 +304,12 @@ def test_a_project_without_the_store_still_answers_and_names_the_part_in_not_rea
     answer = command.run(root, argparse.Namespace(json=True), {})
     assert _unread(answer["integration_store"])
     assert any(reason.startswith("integration_store:") for reason in answer["not_read"])
+
+
+def test_p0_1_red_is_true_only_while_the_store_is_behind():
+    from gov.status.command import _red
+
+    assert _red({"behind_by": 2, "behind": "store behind HEAD by 2 commit(s)"}) is True
+    assert _red({"behind_by": 0}) is False
+    assert _red({"read": False, "reason": "no store"}) is False
+    assert _red({"behind_by": {"read": False, "reason": "x"}}) is False
