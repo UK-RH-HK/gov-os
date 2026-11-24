@@ -125,3 +125,7 @@ kit's file. In Gov OS the `landing_select.sh` call lives in a local hook file `.
   Failure: an adopted repository without the hook after adopt or update, or a failed refresh with no inbox message, or a
   hook that refreshes only `w2/integrate`.
   Tests: `tests/acceptance/W2-208/test_w2_208_p0_3_*.py`.
+
+As built: `gov adapters generate` (so also adopt's path and `gov update`'s regeneration) installs the hook through
+`gov.adapters.merge.install_hook`; the update record has `hooks`. The hook keeps `PYTHONPATH` (the acceptance rig's `gov`
+shim needs it); it unsets `PYTHONHOME`, `PYTHONSTARTUP` and the git variables.

@@ -153,6 +153,9 @@ nothing said so; both research leads' `gov retrieve` returned only a stale-path 
 retry and the success; `gov status` (part `integration_store`) gives `behind_by` and its text form prints `store behind
 HEAD by n commit(s)` (and exit non-zero / red) while behind, nothing once equal; `gov brief` and `gov retrieve` name a store
 behind HEAD. The git hook (0-3) is a kit file the product installs (see W2-208's fix, P0-3).
+As built: `gov status --json` has a top-level `red` (true while `integration_store.behind_by` is above 0) and the part's
+`behind` sentence; the text form prints the same JSON, so it holds the sentence, and the exit code stays 0. A store behind
+the branch head is due for `--when-due` by itself (reason `behind`; its output says `retry`).
 
 - **P0-1 (success).** A failed refresh is retried and checked. Verify: a planted failed refresh (embedder stopped, a commit
   made) leaves a log with `REBUILD_FAILED`, then a retry at the next `--when-due` tick, then a success line; `gov status`

@@ -190,6 +190,46 @@ def _template_copies(root: Path) -> tuple[dict[str, bytes], list[str], list[str]
     return writes, sorted(written), sorted(replaced)
 
 
+HOOK_KIT = "githooks/reference-transaction"  # under the kit's kernel folder
+HOOK_REL = ".git/hooks/reference-transaction"
+
+
+def install_hook(root: Path) -> str | None:
+    """P0-3: the kit's ``reference-transaction`` written to the repository's hooks folder, executable and byte for byte,
+    where it is not already so; the path as ``.git/hooks/reference-transaction`` where it is there afterwards, else None
+    (Gov OS's own source tree keeps its own hook; a kit without the file, or a folder with no git, installs nothing).
+    A ``.git/hooks/reference-transaction.local`` is the site's own and is never touched."""
+    import subprocess
+
+    from gov.adapters import portability
+    from gov.util.gitenv import git_binary, git_env
+
+    if _is_source_tree(root):
+        return None
+    kernel = portability._kernel(root)
+    kit = kernel / HOOK_KIT if kernel is not None else None
+    if kit is None or not kit.is_file():
+        return None
+    done = subprocess.run([git_binary() or "git", "-C", str(root), "rev-parse", "--git-path",
+                           "hooks/reference-transaction"], capture_output=True, text=True, env=git_env(root))
+    if done.returncode != 0 or not done.stdout.strip():
+        return None
+    target = Path(done.stdout.strip())
+    target = target if target.is_absolute() else root / target
+    data = kit.read_bytes()
+    try:
+        if not (target.is_file() and not target.is_symlink() and target.read_bytes() == data):
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if os.path.lexists(target):
+                target.unlink()
+            target.write_bytes(data)
+        if not os.access(target, os.X_OK):
+            target.chmod(0o755)
+    except OSError as exc:
+        raise _refuse("HOOK_UNWRITABLE", f"{target} cannot be written ({exc}): nothing is written") from None
+    return HOOK_REL
+
+
 def generate(root: Path) -> dict:
     """Generate, merge, write. Everything is merged before anything is written."""
     with tempfile.TemporaryDirectory(prefix="gov-adapters-") as fresh:
@@ -230,6 +270,9 @@ def generate(root: Path) -> dict:
         else:
             (root / rel).write_text(content, encoding="utf-8")
     result = {"merged": merged, "written": sorted(written), "kept": sorted(kept)}
+    hook = install_hook(root)
+    if hook is not None:
+        result["hooks"] = [hook]
     if copies is not None:
         result["templates"] = {"written": copies[1], "replaced": copies[2]}
     return result

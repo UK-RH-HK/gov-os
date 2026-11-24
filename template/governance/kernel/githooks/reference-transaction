@@ -1,0 +1,76 @@
+#!/bin/sh
+# Gov OS kit: refresh the integration store after every commit on the repository's integration branch.
+# The branch is read from governance/project/rebuild.yaml (integration_refresh: branch:). The refresh is
+# `gov rebuild --integration <branch> --when-due` (a store behind the branch head is due), run in the background,
+# retried, logged to .gov-runtime/refresh-hook.log; a refresh that still fails after its retries leaves ONE notice in the
+# CTO's inbox. A site's own additions go in .git/hooks/reference-transaction.local (same arguments, same stdin).
+# The hook never fails the git operation: it always exits 0.
+
+self=$(cd "$(dirname "$0")" 2>/dev/null && pwd)/$(basename "$0")
+
+# The background half: started by the committed state below, under the refresh lock.
+if [ "$1" = --refresh ]; then
+  root=$2 branch=$3 gov=$4
+  cd "$root" 2>/dev/null || exit 0
+  if [ -z "$GOV_REFRESH_HOOK_LOCKED" ] && command -v flock >/dev/null 2>&1; then
+    exec env GOV_REFRESH_HOOK_LOCKED=1 flock -o "$root/.gov-runtime/refresh-hook.lock" \
+      sh "$self" --refresh "$root" "$branch" "$gov"
+  fi
+  tries=3 n=0
+  while [ "$n" -lt "$tries" ]; do
+    n=$((n + 1))
+    echo "refresh-hook: $(date '+%Y-%m-%d %H:%M:%S') try $n of $tries: gov rebuild --integration $branch --when-due"
+    if "$gov" rebuild --integration "$branch" --when-due; then
+      exit 0
+    fi
+    [ "$n" -lt "$tries" ] && sleep $((n * 10))
+  done
+  "$gov" msg send cto notice "the refresh of the integration store for $branch in $root failed $tries times (REBUILD_FAILED); see $root/.gov-runtime/refresh-hook.log" --from refresh-hook
+  exit 0
+fi
+
+state=$1
+input=$(mktemp 2>/dev/null) || input=
+if [ -n "$input" ]; then cat > "$input"; else input=/dev/null; fi
+
+local_hook="$(dirname "$self")/reference-transaction.local"
+if [ -x "$local_hook" ]; then
+  "$local_hook" "$@" < "$input" || true
+fi
+
+[ "$state" = committed ] || { [ "$input" = /dev/null ] || rm -f "$input"; exit 0; }
+
+root=$(git rev-parse --show-toplevel 2>/dev/null)
+branch=
+if [ -n "$root" ] && [ -f "$root/governance/project/rebuild.yaml" ]; then
+  branch=$(awk -v q="'" '
+    /^integration_refresh:/ { in_block = 1; next }
+    in_block && /^[^ \t#]/ { in_block = 0 }
+    in_block && /^[ \t]+branch:/ {
+      sub(/^[ \t]+branch:[ \t]*/, ""); sub(/[ \t]*#.*$/, ""); gsub("^[\"" q "]|[\"" q "]$", ""); print; exit
+    }' "$root/governance/project/rebuild.yaml")
+fi
+
+hit=
+if [ -n "$branch" ]; then
+  while read -r old new ref; do
+    [ "$ref" = "refs/heads/$branch" ] && hit=1
+  done < "$input"
+fi
+[ "$input" = /dev/null ] || rm -f "$input"
+[ -n "$hit" ] || exit 0
+
+gov=$(command -v gov 2>/dev/null)
+[ -n "$gov" ] || { [ -x "$HOME/.local/bin/gov" ] && gov=$HOME/.local/bin/gov; }
+[ -n "$gov" ] || exit 0
+
+mkdir -p "$root/.gov-runtime" 2>/dev/null || exit 0
+log="$root/.gov-runtime/refresh-hook.log"
+if command -v setsid >/dev/null 2>&1; then
+  setsid -f env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u PYTHONHOME -u PYTHONSTARTUP \
+    -u GOV_REBUILD_LOCK sh "$self" --refresh "$root" "$branch" "$gov" >> "$log" 2>&1 < /dev/null
+else
+  nohup env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u PYTHONHOME -u PYTHONSTARTUP \
+    -u GOV_REBUILD_LOCK sh "$self" --refresh "$root" "$branch" "$gov" >> "$log" 2>&1 < /dev/null &
+fi
+exit 0
