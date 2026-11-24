@@ -1,0 +1,1233 @@
+<title>Practice first decisions, 24 November</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding-block:10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding-block:22px 80px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0;min-width:0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+<header class="bar"><div class="bar-in">
+  <h1>Practice first decisions, 24 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">These are the six proposals you asked for in DEC-1245 (4): the tool status list, friction from the repositories, old work under new releases, decisions, the rubrics register, and data in specs. There are 31 cards in six sections. Each card gives what was found, the options with their costs, and one recommendation with its reason. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go. No card stops work in flight; the full text of each proposal is in <code>docs/emergency-2/proposals/PRACTICE-FIRST-PROPOSALS.md</code>.</p>
+<p class="hint" id="batchline"></p>
+
+<section class="state" aria-labelledby="how">
+  <h3 id="how">How to answer</h3>
+  <ul>
+    <li>Tap one option on a card. A card you leave alone is sent as "skip".</li>
+    <li>"Take every recommendation" fills every card with its recommended option; your notes stay.</li>
+    <li>At the end, tap "Copy the answer sheet" and paste it to your advisor, then to the CTO.</li>
+  </ul>
+</section>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. A note is sent as one line, 400 characters at most.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const BATCH="B-2026-11-24-practice";
+const SECTIONS = [
+ {
+  "title": "1. The tool status list",
+  "intro": "52 tools: 17 green, 17 amber, 18 not yet in the product. One approval card, then each call the evidence lets you challenge.",
+  "qs": [
+   {
+    "id": "TL-0",
+    "from": "Proposal 1 · DEC-1245 (1)",
+    "title": "Approve the tool status list as drafted?",
+    "found": [
+     "52 tools in the 16 steps: 17 green, 17 amber, 18 not yet in the product.",
+     "Every green names where it was proven and the record that shows a run worked. Every amber has its hand step. Every \"not yet\" has its equivalent: a cron line or a hand step.",
+     "It keeps every tool in the status you expected. It adds \"not yet\" rows beside four of them and puts a rule on two greens. Cards TL-1 to TL-9 take each call you may want to change.",
+     "Nothing was run to prove a tool; each status rests on a record and the file says which."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve as drafted, with your answers to TL-1 to TL-9 applied",
+      "The CTO re-reads the list at each release until the enforcement field fills it.",
+      1
+     ],
+     [
+      "b",
+      "Approve with the changes in my note",
+      "The CTO applies them before a product uses the list."
+     ],
+     [
+      "c",
+      "Not yet: products use only the tools you named",
+      "No hand steps are written; the greens beyond your list become amber."
+     ]
+    ],
+    "reason": "Each call you could differ on has its own card, so a yes here hides no choice.",
+    "sources": "PRACTICE-FIRST-PROPOSALS.md §1; TOOL-MAP.md §1; DEC-1245 (1).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-1",
+    "from": "Proposal 1 · TL42",
+    "title": "<code>gov update</code>: green, as you expect, or amber?",
+    "found": [
+     "First real updates found two bugs: <code>context_watch.py</code> registered twice in EXAMIN (report 28, F4), and <code>gov doctor</code> red after the update in 6 of 6 W2-81 repositories (22 November, F6).",
+     "Both fixes are merged for 0.1.5 (<code>2cadc0cf8</code>) and tested. Neither was re-run on a real repository.",
+     "A wrong update is caught and undone: doctor after, and <code>gov update --rollback</code> is one revert commit.",
+     "It is the only way a fix reaches a product (DEC-1245 (1))."
+    ],
+    "opts": [
+     [
+      "a",
+      "Green, with the rule: doctor after every update; if worse, roll back and log a finding",
+      "If the fix did not hold, the first product update shows it, and costs one rollback.",
+      1
+     ],
+     [
+      "b",
+      "Amber until 0.1.5's update of EXAMIN passes",
+      "Products wait, or copy fixes by hand."
+     ],
+     [
+      "c",
+      "Green only after the update rehearsal passes on W2-81's six kept repositories",
+      "A day or two of the CTO's time."
+     ]
+    ],
+    "reason": "It loses no work, it is the only road for fixes, and the first update of EXAMIN is the proof.",
+    "sources": "LEAD-fixes-015b.md F4, F6; update/core.py:593; FINDINGS.md; TOOL-MAP.md row 75.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-2",
+    "from": "Proposal 1 · TL51",
+    "title": "<code>gov doctor</code>: green, or amber?",
+    "found": [
+     "It ran on W2-81's six repositories and in every update rehearsal.",
+     "One bug: on a map with a root <code>*</code> namespace (Gov OS's) the <code>path_map</code> part passes with unmapped files. Adopted maps have none, and EXAMIN agrees under every matcher.",
+     "<code>path_compliance</code> fails on EXAMIN for moved-path text (F-009), and one audit run of it did not finish in 280 s."
+    ],
+    "opts": [
+     [
+      "a",
+      "Green, with two rules: trust <code>path_map</code> only for a map with no root <code>*</code>; read <code>path_compliance</code> as a notice",
+      "Two sentences the CTO must follow until plan item 3-6 fixes the glob.",
+      1
+     ],
+     [
+      "b",
+      "Amber until 3-6; check the map by hand with <code>gov check</code> and <code>git ls-files</code>",
+      "A weekly hand check; the sound parts go unused."
+     ],
+     [
+      "c",
+      "Green with no rule",
+      "A pass can hide an unmapped path."
+     ]
+    ],
+    "reason": "The glob bug cannot hit an adopted map, and the two rules name the rest.",
+    "sources": "RECORDS-MAP.md §0 (2), §3.3, §3.4; E2-AUDIT-4; plan 3-6.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-3",
+    "from": "Proposal 1 · TL05, TL06",
+    "title": "The kit's settings: green for all, or split?",
+    "found": [
+     "In the kit and proven: the two deny lines, the five hooks and <code>disableClaudeAiConnectors</code> (in the kit since F1, so in a repository from 0.1.5).",
+     "Not in the kit: <code>defaultMode</code> (no permission prompts) and the model hook <code>agent_model.py</code>. An adopted repository's own sessions prompt, and EXAMIN runs an older hook copy (2,124 bytes).",
+     "Gov OS has both (<code>.claude/settings.json</code>). Plan item 4-2 puts them in the kit."
+    ],
+    "opts": [
+     [
+      "a",
+      "Split: green for the denies, hooks and connectors key; \"not yet\" for <code>defaultMode</code> and the model hook, with a hand step (copy Gov OS's file and line)",
+      "The CTO copies one file and one line per product.",
+      1
+     ],
+     [
+      "b",
+      "The whole kit amber until 4-2",
+      "Hides what already works."
+     ],
+     [
+      "c",
+      "All green",
+      "Says no-prompt mode is in the kit, and it is not."
+     ]
+    ],
+    "reason": "It states what the kit holds today; 4-2 turns the second row green.",
+    "sources": "template/governance/kernel/settings.json:8; TOOL-MAP.md rows 3, 57; GW rule 2; plan 4-2.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-4",
+    "from": "Proposal 1 · TL08 to TL15",
+    "title": "Memory and its measure: green, or split?",
+    "found": [
+     "Build, retrieve and the measure are used daily: the first fresh 80 gave 78 of 79 (DEC-1098), and the stamp and the strict rule are merged for 0.1.5.",
+     "Keeping memory current is not in the product: the git hook is untracked and fires only for <code>w2/integrate</code>; a failed refresh was not retried (I-9: 23 commits behind on 22 November).",
+     "The boot start and the weekly measure are cron lines to scratch scripts.",
+     "DEC-1245 (2) says Phase 0 delivers all three in the first patch after 0.1.5."
+    ],
+    "opts": [
+     [
+      "a",
+      "Green for build, retrieve and the measure; \"not yet\" for the refresh, the boot start and the weekly schedule, each with a cron or hand equivalent",
+      "Three cron lines to write per product; one is untried on a product.",
+      1
+     ],
+     [
+      "b",
+      "All memory amber until Phase 0",
+      "Products get no memory first until the patch release."
+     ],
+     [
+      "c",
+      "All memory green",
+      "A product's store can go stale with nothing to say so."
+     ]
+    ],
+    "reason": "Your expectation holds for what works; the three scheduling gaps get cron lines now and Phase 0 closes them.",
+    "sources": "FINDINGS.md I-7, I-9; TOOL-MAP.md rows 10 to 15; DEC-1098; DEC-1245 (2).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-5",
+    "from": "Proposal 1 · TL01 to TL03",
+    "title": "<code>gov adopt</code>: green, or amber?",
+    "found": [
+     "The stage chain A0 to A10 and AS ran on EXAMIN and on six W2-81 repositories. One of the six has no A10 (a path in two namespaces, A9 stopped); the run's other reds are the verdict, the findings and the test set-up.",
+     "Not at HEAD: the verdict stage (branch <code>e2/d1-verdict</code>) and the imports step (it waits for EXAMIN's fresh 80). A4 (a path in two namespaces) is not refused.",
+     "ASMO OS and UPIM adopt on this tool now."
+    ],
+    "opts": [
+     [
+      "a",
+      "Green for A0 to A10 and AS; the verdict and imports as \"not yet\" rows with hand steps",
+      "The CTO reads the A10 record and writes the verdict; imports are a table by hand.",
+      1
+     ],
+     [
+      "b",
+      "Amber until the verdict stage merges",
+      "Delays ASMO OS and UPIM."
+     ],
+     [
+      "c",
+      "Green for all of adoption",
+      "Hides two missing parts of W1."
+     ]
+    ],
+    "reason": "The stages are proven; the two missing parts are named, not hidden.",
+    "sources": "W2-81-PROVING-RUN-0.1.4-ANALYSIS.md R2 to R8; TOOL-MAP.md row 1; RECORDS-MAP.md §3.4.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-6",
+    "from": "Proposal 1 · TL30 to TL32",
+    "title": "<code>gov accept</code>: green?",
+    "found": [
+     "Typed by every lead and run at the land; W2-209 passed 128 of 128.",
+     "66 of 188 old acceptance folders fail the map parse. They belong to old tickets; new ones parse.",
+     "\"Red on the base\" and a map pre-check (<code>--map-only</code>) are not built."
+    ],
+    "opts": [
+     [
+      "a",
+      "Green; the two missing checks as \"not yet\" rows with hand steps",
+      "The designer pastes the red output on the base; the CTO reads it.",
+      1
+     ],
+     [
+      "b",
+      "Amber until <code>--map-only</code> exists",
+      "Hand work for a tool that works."
+     ]
+    ],
+    "reason": "It judges new tickets correctly; the old maps are not its fault.",
+    "sources": "CTO-HANDOVER.md:53; RECORDS-MAP.md §1.2; plan 1-3, 1-10.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-7",
+    "from": "Proposal 1 · TL35",
+    "title": "The landing: amber, as you expect?",
+    "found": [
+     "One real landing through <code>gov queue</code>, <code>4f779086f</code> (22 November). Two bugs (I-1, I-2) were fixed in 0.1.5 and verified in use.",
+     "Then <code>fixes-015a</code> was merged by hand and tested on a hand-picked set, and 95 reds followed (I-14).",
+     "All six W2-81 repositories stopped with exit 3. Gov OS has no <code>queue.yaml</code>.",
+     "The plain path stays: a hand merge, the selected tests, authors checked, <code>gov check</code>, a record."
+    ],
+    "opts": [
+     [
+      "a",
+      "Amber; the plain path by hand, listed in the row",
+      "Each product's merge is a hand job.",
+      1
+     ],
+     [
+      "b",
+      "Green for the test selection (<code>--select</code>) alone",
+      "Its inputs are not yet trusted (X-1), so it can miss tests, as in I-14."
+     ],
+     [
+      "c",
+      "\"Not yet in the product\"",
+      "Hides a tool that has landed once."
+     ]
+    ],
+    "reason": "One landing and two fixed bugs are not enough proof; X-1 says the selection's inputs come first.",
+    "sources": "FINDINGS.md I-1, I-2, I-14; TOOL-MAP.md rows 58, 25; DEC-1244 X-1; plan 1-0.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-8",
+    "from": "Proposal 1 · TL18, TL24 to TL26",
+    "title": "<code>gov brief</code>, <code>gov launch</code>, <code>gov impact</code>, the dispatcher: amber?",
+    "found": [
+     "<code>gov brief</code>: EXAMIN ran it 3 times, Gov OS none; the bundle in a brief is cut at 6,000 tokens.",
+     "<code>gov launch</code>: no launch record in Gov OS or EXAMIN since 16 November. The dispatcher: the cron runs the old scratch tick, which starts nothing.",
+     "<code>gov impact</code>: no caller, and over 106 s and a 150 s timeout on one decision id (I-5).",
+     "The hand steps are in the rows; the CTO starts leads by hand within the machine's limit."
+    ],
+    "opts": [
+     [
+      "a",
+      "Amber, with the rule: never run <code>gov impact</code> on a record id",
+      "Impact is traced by <code>gov retrieve</code> and <code>grep</code>.",
+      1
+     ],
+     [
+      "b",
+      "<code>gov impact</code> as \"not yet in the product\"",
+      "It fails on its main use; this hides a built tool."
+     ],
+     [
+      "c",
+      "Green for <code>gov brief</code>'s ready check alone",
+      "A prints-only use; its other parts stay amber."
+     ]
+    ],
+    "reason": "Amber is what you expected, and the one rule stops the one use that hangs.",
+    "sources": "TOOL-MAP.md rows 22, 36, 37, 42, 43; FINDINGS.md I-5; plan 1-8.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-9",
+    "from": "Proposal 1 · TL04, TL16, TL27, TL33, TL40, TL43 to TL46",
+    "title": "Nine greens you did not name: keep them?",
+    "found": [
+     "Nine more tools qualify by real use: <code>gov backup</code> (hourly), <code>gov checkpoint</code> with its hooks, <code>gov msg</code>, <code>gov install</code> and <code>gov release</code> with the re-pin (0.1.0 to 0.1.4), the helper-return hook, the <code>gov resources</code> gate, <code>gov decisions in-force</code> and <code>gov adapters</code>.",
+     "Each carries its gap in its row: a 41-hour backup gap nothing noticed; a message to a running <code>claude -p</code> lead is never read; I-16 for adapters.",
+     "Without them the hand work grows for tools that work."
+    ],
+    "opts": [
+     [
+      "a",
+      "Green, each with its note",
+      "Nine more rows a CTO reads.",
+      1
+     ],
+     [
+      "b",
+      "Only your named list green; these nine amber",
+      "Hand work for tools that work."
+     ],
+     [
+      "c",
+      "Leave them off the list",
+      "A product's CTO cannot tell if it may use them."
+     ]
+    ],
+    "reason": "They meet the same test as your six: real use, no open finding that loses work.",
+    "sources": "TOOL-MAP.md rows 2, 17, 45, 55, 72, 74, 76, 78, 80, 81; FINDINGS.md I-16.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-10",
+    "from": "Proposal 1 · where it ships",
+    "title": "Where does the list ship, so adopted repositories get it?",
+    "found": [
+     "DEC-1245 asks one list for each release.",
+     "The project overlay is never overwritten by <code>gov update</code>, so a machine copy must sit in the kernel folder to arrive.",
+     "A patch release cannot add or remove a kit schema (DEC-1223 (7), P5), so the machine copy ships without a schema until the next full release.",
+     "<code>gov doctor</code> already reads the install and the project; a <code>tool_status</code> part would print the list."
+    ],
+    "opts": [
+     [
+      "a",
+      "<code>docs/releases/&lt;v&gt;/TOOL-STATUS.md</code> for people, <code>governance/kernel/tool-status.yaml</code> in the kit for machines, and a doctor part that prints it",
+      "Small code in doctor (W2-22, size S).",
+      1
+     ],
+     [
+      "b",
+      "The markdown only",
+      "A product's agents never see it after adoption."
+     ],
+     [
+      "c",
+      "One list in the head of CLAUDE.md",
+      "The head grows each release."
+     ]
+    ],
+    "reason": "It reaches every repository by the road fixes already use.",
+    "sources": "DEC-1223 (7); LEAD-fixes-015b.md F2; IMPORTS-ADOPTION-SPEC.md line 72; PRACTICE-FIRST-PROPOSALS.md §1.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "TL-11",
+    "from": "Proposal 1 · how a tool moves",
+    "title": "How does a tool move between statuses?",
+    "found": [
+     "DEC-1245 (1): amber to green only once the integration has proven it on the scratch repository; products gain it through <code>gov update</code>.",
+     "Nothing says how a green tool falls back. Two real cases: <code>gov update</code> leaving doctor red in 6 of 6 repositories, and the memory refresh failing with no retry.",
+     "The golden rule lets only a finding that fails open or loses work block."
+    ],
+    "opts": [
+     [
+      "a",
+      "Up by the scratch test as decided; down at once, in a patch release, when a finding marked \"blocks or loses work: yes\" names a green tool",
+      "A rule to keep; a green can fall.",
+      1
+     ],
+     [
+      "b",
+      "Up only; a green never falls",
+      "A broken green stays on the list."
+     ],
+     [
+      "c",
+      "Up also by one real use with no stopper in 7 days",
+      "A faster road; a rule to judge each time."
+     ]
+    ],
+    "reason": "It follows your rule for up and the golden rule for down.",
+    "sources": "DEC-1245 (1); DEC-1204 (2); FINDINGS.md; proposal 2.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "2. Friction from the repositories",
+  "intro": "One findings log in each repository, collected by code, a stopper pushed at once, each kind routed.",
+  "qs": [
+   {
+    "id": "FR-0",
+    "from": "Proposal 2 · DEC-1245 (4)",
+    "title": "Approve the findings log and its routing?",
+    "found": [
+     "One log in each repository: <code>governance/project/findings/FINDINGS.md</code>, in a namespace the kit's path map already holds, never overwritten by an update.",
+     "Eight columns: id, what happened, evidence, Gov OS release, step, blocks or loses work (yes or no), kind, status. Kinds: bug in a green tool (silent ones included), workflow gap, hand-step pain, missing capability.",
+     "Routing: a bug is a fix under its owning ticket in the next patch release; a workflow gap is a change for your yes; hand-step pain orders which amber tool is proven first; a missing capability is a Wave 3 candidate.",
+     "Repository CTOs judge a tool by the record it produces, not its exit code."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve",
+      "A new read-only command, <code>gov findings collect</code>, is a feature for your yes (S to M, about $2.50 to $6.60).",
+      1
+     ],
+     [
+      "b",
+      "Approve with the changes in my note",
+      "The CTO applies them first."
+     ],
+     [
+      "c",
+      "Keep Gov OS's seven-column shape for all repositories",
+      "No <code>kind</code> or <code>blocks</code> column, so code cannot read a stopper."
+     ]
+    ],
+    "reason": "It is the form you asked for in DEC-1245 (4), on a path that needs no map line.",
+    "sources": "PRACTICE-FIRST-PROPOSALS.md §2; FINDINGS.md; template/governance/project/path-map.yaml; DEC-1245 (4).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "FR-1",
+    "from": "Proposal 2",
+    "title": "How are the logs collected into Gov OS?",
+    "found": [
+     "Gov OS must read each repository's log daily, and it can read other repositories (reads are open).",
+     "The scheduler is not built (plan 3-1); a cron line meanwhile.",
+     "The collector would check the form, keep a machine copy and a daily digest under <code>~/.gov-os/findings/</code>, outside every worktree."
+    ],
+    "opts": [
+     [
+      "a",
+      "A daily read-only pull by code: <code>git show</code> of each log at its branch head, a registry of repositories",
+      "A new small command; the form is checked by code.",
+      1
+     ],
+     [
+      "b",
+      "Each CTO sends rows to Gov OS by <code>gov msg</code>",
+      "It relies on goodwill and has no form check."
+     ],
+     [
+      "c",
+      "Gov OS's CTO reads each log by hand",
+      "Today's way; it missed I-9 for a day."
+     ]
+    ],
+    "reason": "A pull needs no goodwill and writes nothing into anyone's repository.",
+    "sources": "PRACTICE-FIRST-PROPOSALS.md §2; FINDINGS.md I-9; plan 3-1.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "FR-2",
+    "from": "Proposal 2",
+    "title": "How does a finding's status get back to its repository's log?",
+    "found": [
+     "You asked for it written back (DEC-1245 (4)).",
+     "<code>gov update</code> never writes the project overlay, where the log sits.",
+     "A write into another repository's worktree makes it dirty, and the landing then refuses (<code>QUEUE_WORKTREE_DIRTY</code>)."
+    ],
+    "opts": [
+     [
+      "a",
+      "By release and <code>gov update</code> only",
+      "Slow for anything that is not a bug."
+     ],
+     [
+      "b",
+      "The collector writes a status file in <code>~/.gov-os/findings/</code>; the product's own session applies it to its log with <code>gov findings sync</code>",
+      "One more command; no cross-repository write.",
+      1
+     ],
+     [
+      "c",
+      "The collector commits into the product's log",
+      "A cross-repository write and dirty-tree refusals."
+     ]
+    ],
+    "reason": "The product's session does the writing in its own repository, so repositories stay apart.",
+    "sources": "LEAD-fixes-015b.md F8; update/core.py:593; DEC-1245 (4).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "FR-3",
+    "from": "Proposal 2",
+    "title": "How does a stopper reach you?",
+    "found": [
+     "A row marked \"blocks or loses work: yes\" is a stopper; you want a push at once.",
+     "A push by code does not exist yet; it comes with plan item 3-13.",
+     "Today your push is Claude Code's own, from a session."
+    ],
+    "opts": [
+     [
+      "a",
+      "The product's CTO pushes at once; the collector also wakes Gov OS's CTO, who pushes if none was seen",
+      "Two paths until 3-13.",
+      1
+     ],
+     [
+      "b",
+      "The collector only",
+      "Up to a day late."
+     ],
+     [
+      "c",
+      "Shown in the morning brief",
+      "Against \"a stopper pushes at once\"."
+     ]
+    ],
+    "reason": "It meets DEC-1245 (4) now, and DEC-1217 (5) already says a stopper pushes.",
+    "sources": "DEC-1217 (5); plan 3-13; TOOL-MAP.md row 20.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "3. Old work under new releases",
+  "intro": "Every record carries its release; closed work is never re-checked; new rules apply to new work.",
+  "qs": [
+   {
+    "id": "OW-0",
+    "from": "Proposal 3 · DEC-1245 (4)",
+    "title": "Approve the rule for old work under new releases?",
+    "found": [
+     "No record carries its release: 0 of 271 tickets have a <code>release:</code> line and no schema names one.",
+     "One rule already works by date: the ready check applies <code>reads</code>, <code>needs</code> and <code>waits_on</code> only to tickets created on or after <code>ready.new_since</code>.",
+     "The rule: a <code>release:</code> field set at creation; closed work accepted and never re-checked; a new rule starts at its release; a reopened ticket moves to the current forms; <code>gov update</code> never rewrites history; doctor shows earlier forms as a notice.",
+     "A rule that stops lost work or a fail-open applies to all work at once."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve",
+      "A property added to four schemas and a <code>since_release</code> key in each check.",
+      1
+     ],
+     [
+      "b",
+      "Approve with the changes in my note",
+      "The CTO applies them first."
+     ],
+     [
+      "c",
+      "Not yet: keep dates only",
+      "Two releases in one day cannot be told apart."
+     ]
+    ],
+    "reason": "It is your rule in DEC-1245 (4), built on a pattern the code already uses.",
+    "sources": "facts.yaml:185-189; brief/build.py:157-186; DEC-1244 Q-6; PRACTICE-FIRST-PROPOSALS.md §3.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "OW-1",
+    "from": "Proposal 3",
+    "title": "What release does an old record have?",
+    "found": [
+     "271 tickets and many older records have no field.",
+     "Each carries a <code>created:</code> date, and <code>docs/releases/&lt;v&gt;/</code> holds 0.1.0 to 0.1.4.",
+     "Rewriting 271 closed tickets raises <code>CLOSED_TICKET_EDITED</code> in <code>gov links</code> and changes history."
+    ],
+    "opts": [
+     [
+      "a",
+      "Derive it from <code>created</code> and the release dates, by code, never written back; doctor lists it as a notice",
+      "Work before 0.1.0 is \"before 0.1.0\".",
+      1
+     ],
+     [
+      "b",
+      "Backfill <code>release:</code> into every old record by a chore",
+      "A chore over 271 closed tickets; history changes."
+     ],
+     [
+      "c",
+      "One bucket, \"before the field\"",
+      "A check cannot say which rule predates which record."
+     ]
+    ],
+    "reason": "It leaves history alone, as you asked.",
+    "sources": "TOOL-MAP.md row 26; DEC-1245 (4).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "OW-2",
+    "from": "Proposal 3",
+    "title": "Who marks a rule \"applies at once\"?",
+    "found": [
+     "Some rules stop lost work or a fail-open, such as the dirty-worktree refusal (015b F8).",
+     "Those must reach old work too; the golden rule says only such findings block.",
+     "Someone must say which rule it is."
+    ],
+    "opts": [
+     [
+      "a",
+      "The decision record carries <code>Applies: at once, &lt;reason&gt;</code>, set by the CTO; you see it on the page",
+      "One more line on a record.",
+      1
+     ],
+     [
+      "b",
+      "A fixed list in kernel text",
+      "A list drifts."
+     ],
+     [
+      "c",
+      "You decide each time",
+      "A stopper for each rule."
+     ]
+    ],
+    "reason": "It puts the judgement where the reason is written, and code reads it.",
+    "sources": "DEC-1204 (2); LEAD-fixes-015b.md F8; PRACTICE-FIRST-PROPOSALS.md §3.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "OW-3",
+    "from": "Proposal 3",
+    "title": "How does a reopened ticket move to the current forms?",
+    "found": [
+     "A reopened ticket moves then, and that ticket only.",
+     "Reopening is rare; no code exists for it.",
+     "A new KPI line on a closed feature is already a new ticket (CLAUDE.md)."
+    ],
+    "opts": [
+     [
+      "a",
+      "The reopening session's first commit does it by hand; <code>gov check</code> then holds the form",
+      "A hand step on a rare event.",
+      1
+     ],
+     [
+      "b",
+      "Build <code>gov reopen</code> now",
+      "A new command for a rare event."
+     ],
+     [
+      "c",
+      "Never reopen; use a new ticket",
+      "A fix to a closed ticket's record still needs the move."
+     ]
+    ],
+    "reason": "A rare event does not earn a command; the check keeps it honest.",
+    "sources": "CLAUDE.md (work rubric); DEC-1245 (4).",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "4. Decisions",
+  "intro": "What is recorded as a decision, what each affects, and which leave agents' reading (190 are in force today).",
+  "qs": [
+   {
+    "id": "DE-0",
+    "from": "Proposal 4 · DEC-1245 (4)",
+    "title": "Approve the rubric for what is a decision, and the <code>Affects:</code> line?",
+    "found": [
+     "Recorded: a standing rule or practice, a choice whose reason matters later, an exception, a measurement period, a rubric. Not recorded: a spec change (it is a change to the spec file; git keeps its history), a one-off instruction, a status report.",
+     "Every new decision names what it affects in an <code>Affects:</code> line: paths, specs or steps W1 to W16, or <code>none</code>.",
+     "The impact trace (W6) would read it. Today the graph has <code>Under</code>, <code>Changes</code> and <code>Supersedes</code> links only.",
+     "190 decisions are in force today."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve both",
+      "One more line on each decision; the basis check requires it from plan 5-4.",
+      1
+     ],
+     [
+      "b",
+      "Approve with the changes in my note",
+      "The CTO applies them first."
+     ],
+     [
+      "c",
+      "The rubric only, no <code>Affects:</code> line",
+      "The impact trace stays blind to a decision's paths and steps."
+     ]
+    ],
+    "reason": "The rubric is in your words, and the line gives W6 the input it lacks.",
+    "sources": "DEC-1245 (4); store/loader.py:410-470; PRACTICE-FIRST-PROPOSALS.md §4.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "DE-1",
+    "from": "Proposal 4",
+    "title": "How is a decision that code holds marked, and does it leave agents' reading?",
+    "found": [
+     "A-23, which you approved (DEC-1238 (1b)), already adds an <code>Enforced-by:</code> line to a new standing rule.",
+     "The in-force digest hides only superseded and done entries.",
+     "Of the 30 decisions that HELD classed (DEC-1209 to DEC-1238): 1 held by code on the path, 6 spent, 3 partial, 20 text only or not built. At least 7 of 190 would leave, at most about 18.",
+     "About 15 more, DEC-001 to DEC-025, are architecture choices rather than rules."
+    ],
+    "opts": [
+     [
+      "a",
+      "Reuse <code>Enforced-by:</code>; an entry whose <code>code</code> marker resolves to a check, and every spent one, leaves the digest",
+      "No new name; the text-only decisions stay.",
+      1
+     ],
+     [
+      "b",
+      "A separate <code>Held-by:</code> line",
+      "Two names for one thing, two checks."
+     ],
+     [
+      "c",
+      "Option a, and a <code>reference</code> class so the 15 architecture choices leave too",
+      "A fourth class to keep; about 8 % more relief."
+     ]
+    ],
+    "reason": "One field, already approved, that the enforcement check will read anyway.",
+    "sources": "DEC-1238 (1b); E2-AUDIT-4 A-23; decisions/command.py:79-86; DECISIONS-HELD.md.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "DE-2",
+    "from": "Proposal 4",
+    "title": "Who classes the other 160 decisions?",
+    "found": [
+     "HELD read DEC-1209 to DEC-1238 only. 153 older and 7 newer (DEC-1239 to DEC-1245) are not classed.",
+     "Audit 4 §1.7 calls 11 of the older ones enforced for their producers: DEC-030, 032 to 037, 091, 815, 409, 772.",
+     "The digest is about 6,800 tokens of titles that every CTO reads at each start."
+    ],
+    "opts": [
+     [
+      "a",
+      "One pass by a read-only research session on Sonnet, in HELD's key; the CTO applies the result in one commit",
+      "About $6.60 at the plan's size M.",
+      1
+     ],
+     [
+      "b",
+      "Class each when it is next touched",
+      "The digest stays near 190 for months."
+     ],
+     [
+      "c",
+      "No pass; only new decisions are marked",
+      "The old 160 never leave."
+     ]
+    ],
+    "reason": "A finite job with a fixed form is what the golden workflow gives to an agent.",
+    "sources": "DECISIONS-HELD.md; E2-AUDIT-4 §1.7; plan §4 unit costs.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "5. The rubrics register",
+  "intro": "Every rubric you decided, with its decisions and its enforcement.",
+  "qs": [
+   {
+    "id": "RG-0",
+    "from": "Proposal 5 · DEC-1245 (4)",
+    "title": "Approve the rubrics register and its 20 rubrics?",
+    "found": [
+     "You listed 12: the golden rule and threat model, the work rubric, models and effort, escalation, criticality, usage, tests, fix loops, releases, the memory standard, imports, data in specs.",
+     "I found 8 more in the register and EMERGENCY-2: review convergence, the three measures and the floor, decision packages and the page, the machine and resource gate, proportionality profiles, secrets scanning, pings and quiet hours, test independence.",
+     "Each row has its decisions and an enforcement field: held by code, checked after, or only an instruction. Most are only an instruction today.",
+     "One file, <code>docs/RUBRICS.md</code>, and a kit copy."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve the register and the 20",
+      "A new or changed rubric is a standing decision and comes to you.",
+      1
+     ],
+     [
+      "b",
+      "Approve with the changes in my note",
+      "The CTO applies them first."
+     ],
+     [
+      "c",
+      "Not yet",
+      "The rubrics stay scattered over many decisions."
+     ]
+    ],
+    "reason": "It collects what you decided into one place with its enforcement, as GW §3 asks.",
+    "sources": "PRACTICE-FIRST-PROPOSALS.md §5; GW §3; DEC-1245 (4).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "RG-1",
+    "from": "Proposal 5",
+    "title": "How is the register kept?",
+    "found": [
+     "A-23's enforcement field is approved (DEC-1238 (1b)) and not built.",
+     "Until it is built, the column can only be written by hand, from HELD and audit 4.",
+     "A G1 check could later compare each row's <code>by:</code> with the field."
+    ],
+    "opts": [
+     [
+      "a",
+      "A hand-written file now; the column filled from A-23's field once it exists",
+      "The CTO re-reads it at each release.",
+      1
+     ],
+     [
+      "b",
+      "Generated from a <code>Rubric:</code> tag on each decision",
+      "Needs plan 5-1 first and tags on 20 decisions."
+     ],
+     [
+      "c",
+      "Leave the rubrics in the register and CLAUDE.md",
+      "The scatter this proposal ends."
+     ]
+    ],
+    "reason": "It gives you the register now and costs nothing that 5-1 later does not replace.",
+    "sources": "E2-AUDIT-4 A-23, §4.2; plan 5-1.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "RG-2",
+    "from": "Proposal 5",
+    "title": "What does the kit's copy carry?",
+    "found": [
+     "Some rubrics bind every repository; others are Gov OS's own: the release authority, the three measures and the floor, the stall scripts, pings.",
+     "<code>gov update</code> carries the kernel folder, so a copy there reaches every product.",
+     "A product's CTO is held to the rubrics it can read."
+    ],
+    "opts": [
+     [
+      "a",
+      "Only the rows marked <code>binds: every repository</code>",
+      "A <code>binds</code> column to keep.",
+      1
+     ],
+     [
+      "b",
+      "Every row",
+      "Gov OS-only rules read as binding a product."
+     ],
+     [
+      "c",
+      "None",
+      "A product's CTO cannot read the rubrics it is held to."
+     ]
+    ],
+    "reason": "A product should read exactly what binds it.",
+    "sources": "PRACTICE-FIRST-PROPOSALS.md §5; GW §4.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "6. Data in specs",
+  "intro": "Every spec declares its data need; the ready check is red when the data is missing.",
+  "qs": [
+   {
+    "id": "DS-0",
+    "from": "Proposal 6 · DEC-1245 (4)",
+    "title": "Approve data declared in the spec?",
+    "found": [
+     "The spec form already has a <code>## Test data</code> table (heading 6) that <code>check_spec.py</code> reads: kind (imported or synthetic), owner, licence or recipe, privacy, secrets, hidden half, secured.",
+     "It is typed and wired into no gate. It has no <code>none</code> or <code>real</code> kind, no path, and does not say which KPI line a row serves.",
+     "The proposal extends it: kinds none, synthetic, imported, real; columns <code>path</code>, <code>serves</code>, <code>import class</code>; a ready check that goes red when the data is not at its path.",
+     "The test designer builds on that data."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve",
+      "A change to <code>check_spec.py</code> and the spec form, kernel text; no ticket schema change.",
+      1
+     ],
+     [
+      "b",
+      "Approve with the changes in my note",
+      "The CTO applies them first."
+     ],
+     [
+      "c",
+      "Not yet",
+      "Tests keep finding data missing."
+     ]
+    ],
+    "reason": "It extends what exists, so no new place is added.",
+    "sources": "spec-form.md:63-81; check_spec.py:146-170; brief/build.py:157-186; plan 2-3.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "DS-1",
+    "from": "Proposal 6",
+    "title": "How fine is the declaration?",
+    "found": [
+     "You asked that every spec and KPI line declare its data need.",
+     "A KPI line's form is fixed by <code>check_spec.py</code> and by Q-5 (a word-for-word copy).",
+     "A <code>serves</code> column names the KPI ids a row feeds."
+    ],
+    "opts": [
+     [
+      "a",
+      "One table in the spec with a <code>serves</code> column naming the KPI ids",
+      "A KPI that needs no data is shown by a <code>none</code> row.",
+      1
+     ],
+     [
+      "b",
+      "A data line under each K-line",
+      "It changes the KPI line's form."
+     ],
+     [
+      "c",
+      "One declaration for the whole spec",
+      "A KPI cannot show it needs none."
+     ]
+    ],
+    "reason": "Each line is covered without touching the KPI form.",
+    "sources": "spec-form.md; DEC-1244 Q-5.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "DS-2",
+    "from": "Proposal 6",
+    "title": "What does a <code>real</code> data row need?",
+    "found": [
+     "EXAMIN DEC-003 allows what leaves the machine while its data is mocked, and says to revisit before real data, a P1.",
+     "Real data is where privacy and leaks arise.",
+     "A <code>real</code> row's data stays outside the tracked tree."
+    ],
+    "opts": [
+     [
+      "a",
+      "The row must name an accepted owner decision id, or the check refuses",
+      "One decision per use of real data.",
+      1
+     ],
+     [
+      "b",
+      "A path only",
+      "No stopper before real data."
+     ],
+     [
+      "c",
+      "No real data in specs",
+      "EXAMIN's real data could not be specified."
+     ]
+    ],
+    "reason": "It turns EXAMIN's \"revisit before real data\" into a check.",
+    "sources": "HELD Table 2 DEC-003; PRACTICE-FIRST-PROPOSALS.md §6.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "DS-3",
+    "from": "Proposal 6",
+    "title": "An imported data source with no licence: red, or a note?",
+    "found": [
+     "Two sources disagree. <code>spec-form.md:79-81</code> refuses an imported test-data row with no licence.",
+     "The imports spec says licence is \"a note, never a gate\" (DEC-1222 (1)).",
+     "The later decision is DEC-1222, and it is about adopting what a repository already holds; the refusal is about data a spec asks to bring in."
+    ],
+    "opts": [
+     [
+      "a",
+      "Red for test data a spec brings in; a note for adoption's imports",
+      "Two cases, one line each in the form.",
+      1
+     ],
+     [
+      "b",
+      "A note everywhere",
+      "Unlicensed data enters a repository as test data."
+     ],
+     [
+      "c",
+      "Red everywhere",
+      "Adoption stops on vendored folders, against DEC-1222."
+     ]
+    ],
+    "reason": "Both sources hold, because they cover different cases.",
+    "sources": "spec-form.md:79-81; IMPORTS-ADOPTION-SPEC.md line 66; DEC-1222 (1).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "DS-4",
+    "from": "Proposal 6 · proposal 3",
+    "title": "Old specs with no data declaration: red, or a notice?",
+    "found": [
+     "Old specs have no <code>serves</code> or <code>path</code>.",
+     "The rule of proposal 3: new rules apply only to work made after them.",
+     "Doctor shows earlier forms as a notice."
+    ],
+    "opts": [
+     [
+      "a",
+      "A notice for old specs; red only for specs created from the release that carries the check",
+      "Old specs stay as they are.",
+      1
+     ],
+     [
+      "b",
+      "Red for all, with a backfill of every spec",
+      "A chore over every closed spec."
+     ],
+     [
+      "c",
+      "Assume synthetic",
+      "The check says nothing."
+     ]
+    ],
+    "reason": "It follows proposal 3 and leaves closed work alone.",
+    "sources": "PRACTICE-FIRST-PROPOSALS.md §3, §6.",
+    "stops": "Does not stop work."
+   }
+  ]
+ }
+];
+
+const KEY="govos-practice-"+BATCH;
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* SHA-256 in plain script, so the page needs no secure context */
+function sha256(str){
+  const msg=new TextEncoder().encode(str);
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const len=msg.length, total=((len+9+63)>>6)<<6, buf=new Uint8Array(total);
+  buf.set(msg); buf[len]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(total-8,Math.floor(len/0x20000000),false); dv.setUint32(total-4,(len<<3)>>>0,false);
+  const w=new Uint32Array(64), rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+4*i,false);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&b)^(a&c)^(b&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+function canon(v){
+  if(Array.isArray(v)) return "["+v.map(canon).join(",")+"]";
+  if(v&&typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+canon(v[k])).join(",")+"}";
+  return JSON.stringify(v);
+}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.from}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<p class="src"><b>Sources:</b> ${q.sources}</p><p class="src"><b>Stops work?</b> ${q.stops}</p>`;
+    h+=`<div class="note cto"><span class="who">Recommended</span>${q.reason}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" maxlength="400" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+/* the batch hash: SHA-256 of the batch id and the cards in page order, as JSON with sorted keys and no spaces */
+const HASH=sha256(canon({batch:BATCH,cards:all.map(q=>({id:q.id,question:q.title,found:q.found,options:q.opts.map(o=>({key:o[0],label:o[1],cost:o[2]})),recommendation:{option:(q.opts.find(o=>o[3])||[])[0]||null,reason:q.reason},sources:q.sources,blocks:q.stops}))}));
+document.getElementById("batchline").textContent=`Batch ${BATCH} · hash ${HASH.slice(0,12)} · ${all.length} cards`;
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const stamp=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  const lines=["GOV-ANSWERS 1",`batch: ${BATCH}`,`hash: sha256:${HASH}`,`answered: ${stamp}`,`count: ${all.length}`];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id}: `;
+    if(v){n++; line+=v;} else line+="skip";
+    const note=(state.notes[q.id]||"").replace(/\s*[\r\n]+\s*/g," ").trim().slice(0,400);
+    if(note) line+=` | note: ${note}`;
+    lines.push(line);
+  }
+  lines.push("END");
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+let clearArmed=null;
+document.getElementById("clear").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!clearArmed){b.textContent="Tap again to clear every answer and note"; clearArmed=setTimeout(()=>{clearArmed=null; b.textContent="Clear my answers";},4000); return;}
+  clearTimeout(clearArmed); clearArmed=null; b.textContent="Clear my answers";
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  render();
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
