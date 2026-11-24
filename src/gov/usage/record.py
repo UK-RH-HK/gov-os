@@ -10,7 +10,10 @@ from pathlib import Path
 
 PRICES = Path("governance/project/usage-prices.yaml")
 LOG = Path(".gov-runtime/scratch/orchestrator/log")
-FIELDS = ("input", "output", "cache_read", "cache_creation")
+SHIPPED = Path(__file__).resolve().parents[1] / "_shipped" / PRICES  # the table shipped with the product (UR-6)
+FIELDS = ("input", "output", "cache_read", "cache_write_5m", "cache_write_1h")
+COUNTS = ("input", "output", "cache_read", "cache_creation_5m", "cache_creation_1h")  # row counts, in FIELDS order
+TEMPORARY_BASES = ("/tmp/", "/var/tmp/")
 USAGE_KEYS = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
 
 
@@ -46,18 +49,44 @@ def record_path(day: str) -> Path:
     return home() / ".gov-os" / "usage" / f"{day}.json"
 
 
+def _price(entry: dict):
+    base = {f: float(entry[f]) for f in ("input", "output", "cache_read")}
+    legacy = entry.get("cache_creation")
+    for kind in ("cache_write_5m", "cache_write_1h"):
+        value = entry.get(kind, legacy)
+        if value is None:
+            return None
+        base[kind] = float(value)
+    return base
+
+
 def load_prices(root: Path) -> dict:
-    path = root / PRICES
-    if not path.is_file():
-        raise UsageError(f"the price table {PRICES} is missing under {root}")
+    """The repository's own table when it has one (wholesale override), else the one shipped with the product."""
+    own = root / PRICES
+    path = own if own.is_file() else SHIPPED
     try:
         import yaml
         data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         models = data["models"] if isinstance(data, dict) and isinstance(data.get("models"), dict) else data
-        table = {str(k): {f: float(v[f]) for f in FIELDS} for k, v in models.items() if isinstance(v, dict) and all(f in v for f in FIELDS)}
+        table = {}
+        for k, v in models.items():
+            if isinstance(v, dict) and all(f in v for f in ("input", "output", "cache_read")):
+                priced = _price(v)
+                if priced is not None:
+                    table[str(k)] = priced
+    except OSError:
+        raise UsageError(f"the price table cannot be read: neither {own} (the repository's own) nor {SHIPPED} "
+                         f"(shipped with the product) is readable") from None
     except Exception as exc:  # a table that cannot be read is named, never guessed
-        raise UsageError(f"the price table {PRICES} cannot be read: {exc}") from None
+        raise UsageError(f"the price table {path} cannot be read: {exc}") from None
     return {"date": str(data.get("date", "")) if isinstance(data, dict) else "", "models": table}
+
+
+def is_temporary(cwd: str) -> bool:
+    """A folder under /tmp/ or /var/tmp/ that is gone or holds no .git (a pytest temporary, a scratch folder)."""
+    if not cwd or not cwd.startswith(TEMPORARY_BASES):
+        return False
+    return not os.path.exists(os.path.join(cwd, ".git"))
 
 
 def _repository(cwd: str, cache: dict) -> str:
@@ -178,6 +207,11 @@ def collect(root: Path, day: str):
                     session = str(obj.get("sessionId") or path.stem)
                 mid = message.get("id") or obj.get("uuid") or f"{path}:{n}"
                 tokens = [_int(usage.get(k)) for k in USAGE_KEYS]
+                split = usage.get("cache_creation") if isinstance(usage.get("cache_creation"), dict) else {}
+                five, hour = _int(split.get("ephemeral_5m_input_tokens")), _int(split.get("ephemeral_1h_input_tokens"))
+                if five + hour != tokens[3]:  # absent or inconsistent: the whole write is 5-minute
+                    five, hour = tokens[3], 0
+                tokens += [five, hour]
                 seen[(repo, session, mid)] = (str(message.get("model") or "unknown"), tokens, cwd,
                                               meta.get("agentType") if helper else None, helper)
     cto = _cto_ids(root)
@@ -196,11 +230,14 @@ def collect(root: Path, day: str):
             row = groups[(repo, session, model)] = {
                 "repository": repo, "session": session, "role": role, "role_source": source, "model": model,
                 "input": 0, "output": 0, "cache_read": 0, "cache_creation": 0,
-                "context_peak": 0}
+                "cache_creation_5m": 0, "cache_creation_1h": 0, "context_peak": 0,
+                "temporary": repo == cwd and is_temporary(cwd)}  # a cwd inside a real repository is never temporary
         row["input"] += tokens[0]
         row["output"] += tokens[1]
         row["cache_read"] += tokens[2]
         row["cache_creation"] += tokens[3]
+        row["cache_creation_5m"] += tokens[4]
+        row["cache_creation_1h"] += tokens[5]
         row["context_peak"] = max(row["context_peak"], tokens[0] + tokens[2] + tokens[3])
     return sorted(groups.values(), key=lambda r: (r["repository"], r["session"], r["model"])), skipped
 
@@ -209,8 +246,7 @@ def _cost(row: dict, prices: dict):
     price = prices["models"].get(row["model"])
     if price is None:
         return None
-    counts = (row["input"], row["output"], row["cache_read"], row["cache_creation"])
-    return sum(c * price[f] for c, f in zip(counts, FIELDS)) / 1_000_000
+    return sum(row[c] * price[f] for c, f in zip(COUNTS, FIELDS)) / 1_000_000
 
 
 def _sum_by(rows, key) -> dict:
@@ -245,9 +281,13 @@ def plan_reading(root: Path, day: str) -> str:
 
 def build(root: Path, day: str) -> dict:
     prices = load_prices(root)
-    rows, skipped = collect(root, day)
+    every, skipped = collect(root, day)
+    rows = [r for r in every if not r["temporary"]]
+    temp = [r for r in every if r["temporary"]]
+    for row in every:
+        del row["temporary"]
     unpriced = sorted({r["model"] for r in rows if r["model"] not in prices["models"]})
-    for row in rows:
+    for row in every:
         cost = _cost(row, prices)
         row["cost_usd"] = None if cost is None else round(cost, 6)
     return {
@@ -261,6 +301,8 @@ def build(root: Path, day: str) -> dict:
             "by_repository_role": _sum_by(rows, lambda r: f"{r['repository']}|{r['role']}"),
             "all": _sum_by(rows, lambda r: "all").get("all", {}),
         },
+        "temporary": _sum_by(temp, lambda r: "temporary").get("temporary") or
+        {"input": 0, "output": 0, "cache_read": 0, "cache_creation": 0, "cost_usd": 0.0, "sessions": 0},
         "plan_reading": plan_reading(root, day),
     }
 
@@ -310,6 +352,9 @@ def show_lines(root: Path, day: str, days: int) -> list:
         big = max(sess.items(), key=lambda kv: kv[1])
         lines.append(f"{repo}: ${t['cost_usd']:.2f} ({share:.0f}% of the day); top roles: {top}; "
                      f"largest session: {big[0]} ${big[1]:.2f}; plan: {rec['plan_reading']}")
+    if rec["temporary"]["sessions"]:
+        t = rec["temporary"]
+        lines.append(f"temporary: {t['sessions']} sessions, ${t['cost_usd']:.2f} list-price estimate (temporary folders, left out above)")
     if rec["unpriced_models"]:
         lines.append("unpriced models: " + ", ".join(rec["unpriced_models"]))
     return lines

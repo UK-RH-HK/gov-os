@@ -1,6 +1,7 @@
 """``gov usage daily [--date D] | show [--date D] [--days N]``: usage and context per repository, role and session
 (W2-207, DEC-1246 (3)(c)). ``daily`` writes ``~/.gov-os/usage/<D>.json``; ``show`` prints and never writes. Dollars are
-a list-price estimate (``governance/project/usage-prices.yaml``)."""
+a list-price estimate (``governance/project/usage-prices.yaml``, else the copy shipped with the product); temporary
+folders are counted on one ``temporary`` line, never as repositories."""
 
 from __future__ import annotations
 

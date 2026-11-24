@@ -26,6 +26,7 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("memory-use", "queue", "backup"
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)  # impact (W2-37, DEC-812 item 6, P-7 (a)): the impact query
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("skilleval",)  # skilleval (W2-104, DEC-747, DEC-1020): the skill evaluation harness
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("spend",)  # spend (W2-156, DEC-1091 (2)): the runaway brake
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("usage",)  # usage (W2-207, DEC-1246 (3)(c)): usage and context per repository
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
 RECORDED_MODULE_COMMANDS = ("lock",)
 

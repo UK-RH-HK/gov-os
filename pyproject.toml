@@ -32,6 +32,7 @@ where = ["src"]
          "_shipped/template/governance/kernel/schemas/ticket.schema.json",
          "_shipped/template/governance/kernel/schemas/common.schema.json",
          "_shipped/governance/project/retrieval.yaml",
+         "_shipped/governance/project/usage-prices.yaml",  # gov usage (W2-207, UR-6): the price table, found from any root
          "_shipped/governance/project/indep-walls/CLAUDE.md.tmpl",
          "_shipped/governance/project/indep-walls/README.md",
          "_shipped/governance/project/indep-walls/kinds.yaml",

@@ -1,0 +1,16 @@
+# List prices in US dollars per million tokens, for `gov usage` (W2-207). Dollars printed from this table are a
+# "list-price estimate": what the tokens cost at these rates, matching the plan's own counting, not what the plan bills.
+# Where the figures come from: claude-opus-5-5 and claude-sonnet-5-5 are exact fits to the leads' own records
+# (`log/leads/*.json` `modelUsage`, to 1e-14). claude-haiku-5-5 is a fit of the 5-minute write price; its 1-hour write
+# price is assumed at 1.6x the 5-minute one. claude-fable-5-2: input, 5-minute write, cache read and output are fits; its
+# 1-hour write price is assumed at 1.6x. A model absent here has cost null and is named unpriced. Change a price, change
+# `date`. A repository's own copy of this file overrides the one shipped with the product, wholesale. The shipped copy
+# (src/gov/_shipped/governance/project/usage-prices.yaml) is byte for byte this file.
+# A legacy single `cache_creation` price, when a model has no cache_write_5m / cache_write_1h, prices both write kinds.
+date: 2026-11-24
+unit: usd per million tokens
+models:
+  claude-opus-5-5:   {input: 4.0,  output: 20.0, cache_read: 0.2,  cache_write_5m: 5.0,   cache_write_1h: 8.0}
+  claude-sonnet-5-5: {input: 2.0,  output: 10.0, cache_read: 0.1,  cache_write_5m: 2.5,   cache_write_1h: 4.0}
+  claude-haiku-5-5:  {input: 0.1,  output: 0.5,  cache_read: 0.01, cache_write_5m: 0.125, cache_write_1h: 0.2}
+  claude-fable-5-2:  {input: 8.0,  output: 40.0, cache_read: 0.2,  cache_write_5m: 10.0,  cache_write_1h: 16.0}
