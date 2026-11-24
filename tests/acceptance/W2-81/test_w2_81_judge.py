@@ -862,8 +862,7 @@ def test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_v
     rows = [line for line in readme.splitlines() if line.startswith("| `VERDICT` |")]
     assert len(rows) == 1, rows
     row = rows[0]
-    assert "no stage or command gives the lite verdict yet (CAP-44.h, W2)" in row, row
-    assert "W2-52 built A7 and A10 only" in row, row
+    assert "W2-210" in row and "gov.adopt.verdict" in row and "built" in row, row
     spec_audit = [line for line in readme.splitlines() if line.startswith("| `AS` |")]
     assert len(spec_audit) == 1, spec_audit
     assert "CAP-44.m" in spec_audit[0] and "| yes |" in spec_audit[0] and "A2" in spec_audit[0] \
