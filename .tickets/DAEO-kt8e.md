@@ -106,3 +106,22 @@ W2-208 should not have been a ticket: by the rubric its deny-line work is a fix 
 ## Fix: the generated-files check named a freshly generated settings file (F1; fixes-015a)
 
 Found 2026-11-24 in the weekly tier: `test_k3_the_adapter_check_applies_no_held_out_step` (2 cases) red with GENERATED_DIFFERS on `.claude/settings.json`. Cause: a product bug. F1 made `gov adapters generate` merge `disableClaudeAiConnectors: true` into the settings, while the check in `src/gov/adapters/portability.py` compared the raw rulesync bytes, so every generated project failed its own check. Fix: `_same_generated` accepts settings equal to the generated ones but for that key (any other difference still fails). Unit test first: `tests/unit/adapters/test_portability.py::TestGeneratedFindings::test_settings_with_the_connectors_key_the_merge_adds_are_no_finding`. Test unchanged. Commit a1874b977.
+
+## Fix: the kit carries the git hook; adopt, adapters and update install it (plan item 0-3; phase0-memory, 2026-11-24)
+
+DEC-1245 (2), DEC-1241 G-4 (a). Gov OS's live hook `.git/hooks/reference-transaction` is untracked and written by hand; an
+adopted repository has none. The kit carries `template/governance/kernel/githooks/reference-transaction`; `gov adopt`,
+`gov adapters generate` and `gov update` write it to `.git/hooks/reference-transaction` (executable), and the update's
+record (`governance/updates/<B>.json`) lists it. It refreshes the integration branch read from
+`integration_refresh.branch` of `governance/project/rebuild.yaml` (never fixed to `w2/integrate`), through P0-1's retry; a
+failed refresh leaves one inbox message (`gov.dispatch.inbox`, kind `notice`). The operator-freeze lines are not in the
+kit's file. In Gov OS the `landing_select.sh` call lives in a local hook file `.git/hooks/reference-transaction.local`
+(untracked, stays until Day M), which the kit's hook runs when present.
+
+- **P0-3 (success).** Verify: in a scratch repository after `gov adopt`, `.git/hooks/reference-transaction` exists and is
+  byte-equal to the kit's file; a commit on its integration branch makes the store's commit equal HEAD within 5 minutes (a
+  log line says so); the hook file deleted and `gov update` run, it is back and the update record lists it; a planted
+  refresh failure leaves exactly one inbox message; the kit's file holds no freeze line and no `w2/integrate`.
+  Failure: an adopted repository without the hook after adopt or update, or a failed refresh with no inbox message, or a
+  hook that refreshes only `w2/integrate`.
+  Tests: `tests/acceptance/W2-208/test_w2_208_p0_3_*.py`.

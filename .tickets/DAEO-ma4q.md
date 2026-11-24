@@ -272,3 +272,14 @@ exit code unchanged. Two further causes of the remaining W2-187 reds, found on t
 `digest.figures` omitted the six stamp keys, so `standing.drift` never compared a real fresh run ("DRIFT not yet"), now
 copied from FIGURES.json; and W2-187's planted standing lines carried no stamp (fixture stamped). Tests: W2-204 S18 revised
 (Rewrite-Reason in its commit), W2-187 `std_line` stamped.
+
+## Fix: the pre-flight refuses a store behind HEAD (plan item 0-2; phase0-memory, 2026-11-24)
+
+Found 2026-11-22 (I-9): a memory measure ran against a store 664 paths stale. DEC-1245 (2), DEC-1241 G-1. The rebuild of
+Gov OS's live store is the CTO's chore, not this fix.
+
+- **P0-2 (success).** `gov memaudit` pre-flight refuses `STORE_BEHIND` when the integration store's commit is not the
+  repository's HEAD. Verify: a planted behind-store makes the pre-flight exit with `STORE_BEHIND` naming the store's commit
+  and HEAD and writes no declaration (`DECLARATION.json` absent); a store at HEAD passes the check as before.
+  Failure: the pre-flight passes (or a declaration is written) while the store is behind HEAD.
+  Tests: `tests/acceptance/W2-204/test_w2_204_p0_2_store_behind.py`.
