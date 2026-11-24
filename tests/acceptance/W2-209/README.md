@@ -3,7 +3,7 @@
 Written by the independent test designer (MR-3) from the ticket's eleven success lines and five failure lines
 (`.tickets/DAEO-a2h5.md`, profile FULL) and the approved spec `docs/emergency-2/proposals/RELEASE-ON-BEHALF.md`
 (DEC-1223, DEC-1224 (3); slice (a) only), before any implementation, on the base 51edaa44d. Every case is of the
-acceptance kind but one, `test_w2_209_authority.py::test_s3_the_authority_file_committed_here_is_off_with_the_decision_and_bake_hours`,
+acceptance kind but one, `test_w2_209_authority.py::test_s3_the_authority_file_committed_here_is_on_with_the_decision_and_bake_hours`,
 which is of the **repository-state** kind (it reads this repository's committed authority file).
 
 The ticket's Interface section and its KPI lines fix what they fix. Every name they leave open is fixed once, below
@@ -263,7 +263,7 @@ section **supersedes** the sentences above that say the judge step "passes when 
 |---|---|---|
 | S1 | `test_w2_209_rule.py::test_s1_check_names_exactly_the_planted_rule_and_writes_nothing`, `test_w2_209_rule.py::test_s1_a_range_of_fixes_and_chores_only_is_a_patch_and_writes_nothing` | `gov release` has no `--patch`: argparse exits 2, "unrecognized arguments: --patch --check", no envelope |
 | S2 | `test_w2_209_cut.py::test_s2_the_cut_writes_kind_json_in_its_form`, `test_w2_209_pending.py::test_s2_pending_reads_the_kind_of_the_release_record` | `gov.release._patch_test` does not exist (the driver reports `missing`); the two pending cases pin W2-17's reading and pass on the base |
-| S3 | `test_w2_209_authority.py::test_s3_the_authority_file_committed_here_is_off_with_the_decision_and_bake_hours`, `test_w2_209_authority.py::test_s3_the_cut_is_refused_at_g0`, `test_w2_209_authority.py::test_s3_an_authority_file_on_and_committed_with_the_owner_trailer_passes_g0`, `test_w2_209_authority.py::test_s3_g0_is_read_first_whatever_the_later_gates_say` | `governance/project/release-authority.yaml` is not in this repository; `gov release` has no `--patch` (argparse, no envelope) |
+| S3 | `test_w2_209_authority.py::test_s3_the_authority_file_committed_here_is_on_with_the_decision_and_bake_hours`, `test_w2_209_authority.py::test_s3_the_cut_is_refused_at_g0`, `test_w2_209_authority.py::test_s3_an_authority_file_on_and_committed_with_the_owner_trailer_passes_g0`, `test_w2_209_authority.py::test_s3_g0_is_read_first_whatever_the_later_gates_say` | `governance/project/release-authority.yaml` is not in this repository; `gov release` has no `--patch` (argparse, no envelope) |
 | S4, F3 | `test_w2_209_suite.py::test_s4_a_record_for_c_full_green_with_the_weekly_tier_passes_g2`, `test_w2_209_suite.py::test_s4_no_suite_record_is_refused`, `test_w2_209_suite.py::test_s4_f3_a_record_not_for_the_exact_commit_or_without_the_weekly_tier_is_refused` | `gov release` has no `--patch` (argparse, no envelope) |
 | F3 | `test_w2_209_suite.py::test_f3_a_record_that_cannot_be_read_is_refused_as_unreadable` | `gov release` has no `--patch` (argparse, no envelope) |
 | S5 | `test_w2_209_proving.py::test_s5_all_steps_passing_is_ready_in_throwaway_clones_of_the_kept_repositories`, `test_w2_209_proving.py::test_s5_the_close_step_lands_the_kept_run_queue_ticket`, `test_w2_209_proving.py::test_s5_one_failing_step_is_not_ready_naming_the_repository_and_the_step`, `test_w2_209_proving.py::test_s5_a_kept_run_with_five_repositories_is_not_ready`, `test_w2_209_proving.py::test_s5_a_missing_kept_folder_is_not_ready` | `gov.release.proving` does not exist (`missing`) |

@@ -1,6 +1,8 @@
 """S3: G0, the owner's standing yes (``governance/project/release-authority.yaml``).
 
-The file as committed in this repository says ``off``. In the planted source, ``gov release 0.1.2 --patch`` is refused
+The file as committed in this repository says ``on`` (the owner turned it on, DEC-1223, DEC-1226, DEC-1235), with the
+owner's trailer on its last commit; the planted repositories below state their own authority file and do not read it.
+In the planted source, ``gov release 0.1.2 --patch`` is refused
 at G0 when the file is absent, unreadable, anything but ``on``, names no decision, or was last committed without a
 ``Decided-by: owner...`` trailer, or is ``on`` only in the working tree; G0 is read before anything else. When G0
 passes, the answer names a later gate (here G2: no suite record given). README, "S3".
@@ -12,19 +14,24 @@ import yaml
 import w2_209_support as support
 
 
-def test_s3_the_authority_file_committed_here_is_off_with_the_decision_and_bake_hours():
+def test_s3_the_authority_file_committed_here_is_on_with_the_decision_and_bake_hours():
     """Repository-state kind: reads this repository's own committed file."""
     path = support.REPO_ROOT / support.AUTHORITY_REL
     assert path.is_file(), f"{support.AUTHORITY_REL} is not in this repository"
     text = path.read_text(encoding="utf-8")
     data = yaml.safe_load(text)
     assert isinstance(data, dict), f"{support.AUTHORITY_REL} is not a map: {text!r}"
-    assert "patch_releases: off" in text and data.get("patch_releases") is False, \
-        f"the committed file does not say patch_releases: off: {text!r}"
+    assert "patch_releases: on" in text and data.get("patch_releases") is True, \
+        f"the committed file does not say patch_releases: on: {text!r}"
     assert data.get("decision") == support.DECISION, f"the decision is not {support.DECISION}: {data}"
     assert data.get("bake_hours") == 4, f"bake_hours is not 4: {data}"
     tracked = support.git(support.REPO_ROOT, "ls-files", "--", support.AUTHORITY_REL).strip()
     assert tracked == support.AUTHORITY_REL, f"{support.AUTHORITY_REL} is not committed"
+    assert not support.git(support.REPO_ROOT, "status", "--porcelain", "--", support.AUTHORITY_REL).strip(), \
+        f"{support.AUTHORITY_REL} differs from its last commit"
+    last = support.git(support.REPO_ROOT, "log", "-1", "--format=%(trailers:key=Decided-by,valueonly)",
+                       "--", support.AUTHORITY_REL)
+    assert last.strip().startswith("owner"), f"the last commit of {support.AUTHORITY_REL} has no Decided-by: owner: {last!r}"
 
 
 def _plant(repo, state):
@@ -32,7 +39,7 @@ def _plant(repo, state):
     if state == "absent":
         support.commit(repo, {support.AUTHORITY_REL: None}, "Remove the authority file", (("Class", "C"),))
     elif state == "off":
-        pass  # as the base committed it, with the owner's trailer
+        pass  # as make_case(authority_on=False) planted it: off, with the owner's trailer; independent of this repository
     elif state == "maybe":
         support.turn_authority_on(repo, text=support.authority("maybe"))
     elif state == "on_without_trailer":
