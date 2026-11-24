@@ -233,7 +233,7 @@ are in `test_w2_204_fix_forbidden.py`.
 - **Green on the base by design (guards):** `test_fix_s1_form_ok_refuses_a_malformed_field[...]` and
   `test_fix_s1_form_ok_accepts_the_field_and_its_absence[absent]` and the pre-flight case with the field absent (the
   base refuses an unknown key and accepts a set without it); `test_fix_s3_guard_kernel_template_prompts_and_claude_are_the_merge_base_s_files`
-  (red if the fix touches `template/`, `prompts.py` or `claude.py`; the `test_prompts.py` hash pin and F2 stand too).
+  (rescoped under DEC-1227 D5 and DEC-1232 (6): it pins the sha256 of `src/gov/memaudit/prompts.py` and `src/gov/memaudit/claude.py`, found through their modules, and no longer compares the whole `template/` tree with the merge base, which other fixes change; the `tests/unit/memaudit/test_prompts.py` hash pin and F2 stand too).
 - **Red on the base, and why:** every case of the planted run `forbidden` stops at `STOPPED`/`WAITING ... writer-2`
   (exit 5): the base's pre-flight refuses a question file with the unknown key `forbidden` (`PF-FORM`), so no judge
   runs. Without the key (probed on the base) the rule is missing: q05 of the hidden half is right, `forbidden_cited`
