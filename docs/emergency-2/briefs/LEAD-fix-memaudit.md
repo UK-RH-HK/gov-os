@@ -16,7 +16,7 @@ Keep the hidden-set protections unchanged (EMERGENCY-2 §2.7): nothing you add p
 Code area: `src/gov/memaudit/` (`deliver.py`, the brief writer, `fresh.py`); call `preflight.py`'s check functions and change that file only if a function must be made importable (another lead adds a `STORE_BEHIND` check there: keep your edits to it minimal). Stay out of every other package.
 
 ## Where
-Worktree `/home/usain/gov-os-worktrees/E2-fix-memaudit`, branch `e2/fix-memaudit` (an earlier lead was stopped there after one commit, `7774fb851`, the old KPI lines: bring the branch up to `w2/integrate` with `git merge w2/integrate` and replace those lines with FM-1 to FM-4 as written here). The Phase 0 lead's `STORE_BEHIND` check is on `w2/integrate` by the time you start.
+Worktree `/home/usain/gov-os-worktrees/E2-fix-memaudit`, branch `e2/fix-memaudit` (an earlier lead was stopped there after one commit, `7774fb851`, the old KPI lines: bring the branch up to `w2/integrate` with `git merge w2/integrate` and replace those lines with FM-1 to FM-4 as written here). The Phase 0 lead's `STORE_BEHIND` check (branch `e2/phase0-memory`, head `b8280265a`) lands on `w2/integrate` while you work: merge `w2/integrate` again before your selected run, and keep your edits to `preflight.py` clear of its check.
 
 ## The release
 The CTO cuts this fix as its own patch release the moment it is green (the owner's order), so finish it whole: every FM line built, tested and green; say plainly if anything is not.
