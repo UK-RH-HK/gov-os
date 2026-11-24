@@ -195,6 +195,11 @@ def build_wheel(repo, commit, out):
     source = out / "source"
     with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
         tar.extractall(source, filter="data")
+    # Rewrite-Reason: F3 (fixes-015a): gov release's one build route writes gov/_build_info.py (the commit) into the
+    # wheel, so the fixture's rebuild does the same or its sha256 can never equal the manifest's.
+    if (source / "src" / "gov").is_dir():
+        full = git(repo, "rev-parse", "--verify", f"{commit}^{{commit}}").strip()
+        (source / "src" / "gov" / "_build_info.py").write_text(f'COMMIT = "{full}"\n', encoding="utf-8")
     epoch = git(repo, "show", "-s", "--format=%ct", commit).strip()
     env = {key: value for key, value in os.environ.items() if not key.startswith("PYTHON")}
     env.update(SOURCE_DATE_EPOCH=epoch, PYTHONUSERBASE=USER_BASE)
