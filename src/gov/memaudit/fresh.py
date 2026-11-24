@@ -136,6 +136,7 @@ class _Fresh:
                 if not ok:
                     shutil.rmtree(self.clone, ignore_errors=True)
                     self.emit("FR-SNAPSHOT")
+                    self.cause("fresh", "snapshot", "FR-SNAPSHOT", "the clone at the commit could not be made")
                     return False
             env = dict(self.env)
             if (self.clone / "src" / "gov" / "__init__.py").is_file():  # the repository's own gov builds its store
@@ -143,6 +144,7 @@ class _Fresh:
             code = driver._spawn(self.rebuild, self.clone, env, self.folder / "rebuild.out", self.folder / "rebuild.err")
             if code != 0 or not store.is_file():
                 self.emit("FR-SNAPSHOT")
+                self.cause("fresh", "snapshot", "FR-SNAPSHOT", "the clone's store could not be built")
                 return False
             self.st["snapshot"] = {"commit": self.commit, "built": True, "store_sha256": sha256_file(store)}
             self.save()
@@ -156,7 +158,15 @@ class _Fresh:
         return driver._spawn(argv, self.clone, self.env, self.folder / f"{audit}.{step}.out",
                              self.folder / f"{audit}.{step}.err")
 
-    def stop(self, audit: str, step: str, code=None, why: str = "") -> tuple[str, str]:
+    def cause(self, audit: str, step: str, code: str, reason: str) -> None:
+        """``CAUSE <audit> <step> <CODE>: <reason>``: a code, a count or a fixed phrase, never a question's text (FM-4)."""
+        self.emit(f"CAUSE {audit} {step} {code}: {reason}")
+
+    def stop(self, audit: str, step: str, code=None, why: str = "", cause=None) -> tuple[str, str]:
+        """One ``CAUSE`` line (``cause`` is ``(CODE, reason)``; a step's child that failed by default), then ``STOPPED``."""
+        if cause is None:
+            cause = (f"FR-CHILD-{step.upper()}", f"the step's process ended with exit {code if code is not None else 'unknown'}")
+        self.cause(audit, step, *cause)
         tail = f" {why}" if why else (f" {code}" if code not in (None, 1) else "")
         self.emit(f"STOPPED {audit} {step}{tail}")
         return "stopped", step
@@ -167,11 +177,10 @@ class _Fresh:
 
     # ---- one half, from what the sets root holds
 
-    def half(self, audit: str) -> tuple[str, str]:
-        """``("done" | "waiting" | "stopped", step)``."""
+    def prepare(self, audit: str) -> tuple[str, str]:
+        """The half's steps up to and with the void count: ``("prepared" | "waiting" | "stopped", step)``."""
         p = layout.paths(self.root, audit)
-        run, at = p["run"], ["--repo", str(self.clone)]
-        gov = ["--gov", self.gov] if self.gov else []
+        at = ["--repo", str(self.clone)]
 
         def events(name):
             return [e for e in ledger.read(p["ledger"]) if e.get("event") == name]
@@ -218,8 +227,21 @@ class _Fresh:
         doc = read_json(p["drops"]) or {}
         if doc.get("void") is not None or "void" not in doc:
             self.note(audit, "void", "void", 2)
-            return self.stop(audit, "void", 2)
+            cause = doc.get("void") if doc.get("void") in ("VOID-COUNT", "VOID-DOMAIN") else None
+            if cause is None:
+                return self.stop(audit, "void", 2, cause=("FR-VOID-RECORD", "the void record is not readable"))
+            need = self.cfg.min_kept if cause == "VOID-COUNT" else doc.get("domain_min")
+            self.emit(f"VOID {audit} {cause} kept {doc.get('kept')} dropped {doc.get('dropped')} need {need}")
+            return self.stop(audit, "void", 2, cause=(cause, f"kept {doc.get('kept')} dropped {doc.get('dropped')} "
+                                                            f"need {need}"))
         self.note(audit, "void", "ok", 0)
+        return "prepared", "void"
+
+    def finish(self, audit: str) -> tuple[str, str]:
+        """The steps after the void count: ``("done" | "stopped", step)``."""
+        p = layout.paths(self.root, audit)
+        run, at = p["run"], ["--repo", str(self.clone)]
+        gov = ["--gov", self.gov] if self.gov else []
 
         # preflight-final, on the kept set: a refusal stops, nothing is spent
         def final():
@@ -234,16 +256,24 @@ class _Fresh:
         last = final()
         if last is not None and last.get("ok") is not True:
             self.note(audit, "preflight-final", "refused", 1)
-            return self.stop(audit, "preflight-final")
+            codes = (read_json(p["preflight"]) or {}).get("codes")
+            refused = [(c, v) for c, v in (codes.items() if isinstance(codes, dict) else ())
+                       if isinstance(v, dict) and not v.get("ok", True)]
+            for code, v in refused[:-1]:
+                self.cause(audit, "preflight-final", code, f"refused {v.get('refused')}")
+            last_code, v = refused[-1] if refused else ("PF-UNKNOWN", {})
+            return self.stop(audit, "preflight-final",
+                             cause=(last_code, f"refused {v.get('refused', 'unknown')}"))
         self.note(audit, "preflight-final", "ok", 0)
 
         # measure, on the clone's own store
         if not os.path.lexists(run / "COUNTS"):
             if os.path.lexists(p["used"]):  # it began and did not count: to the owner, never run again
                 self.note(audit, "measure", "stopped", 2)
-                return self.stop(audit, "measure", 2)
+                return self.stop(audit, "measure", 2, cause=("FR-MEASURE-USED", "the measure began and did not count: "
+                                                                                 "the owner decides"))
             if not driver.gate_open(self.gate, self.clone, self.env):
-                return self.stop(audit, "measure", why="gate busy")
+                return self.stop(audit, "measure", why="gate busy", cause=("FR-GATE-BUSY", "the gate is busy"))
             code = self.child(audit, "measure", "measure", *at, "--commit", self.commit,
                               "--store", str(self.clone / STORE), *gov)
             if code != 0 or not os.path.lexists(run / "COUNTS"):
@@ -258,9 +288,10 @@ class _Fresh:
         if not os.path.lexists(run / "FIGURES.json"):
             if os.path.lexists(run / "reader") or os.path.lexists(run / "STOPPED"):
                 self.note(audit, "judge", "stopped", 2)
-                return self.stop(audit, "judge", 2)
+                return self.stop(audit, "judge", 2, cause=("FR-JUDGE-STOPPED", "the judge began and did not finish: "
+                                                                               "the owner decides"))
             if not driver.gate_open(self.gate, self.clone, self.env):
-                return self.stop(audit, "judge", why="gate busy")
+                return self.stop(audit, "judge", why="gate busy", cause=("FR-GATE-BUSY", "the gate is busy"))
             code = self.child(audit, "judge", "judge", *at, *gov, *(["--claude", self.claude] if self.claude else []))
             if code != 0 or not os.path.lexists(run / "FIGURES.json"):
                 if os.path.lexists(run / "reader"):
@@ -302,6 +333,7 @@ class _Fresh:
                 self.emit(f"MEASURE VOID {audit}")
                 word = "stopped"
             elif found["problems"]:  # a transcript that could not be read is never a clean scan
+                self.cause(audit, "scan", "SCAN-UNREADABLE", f"{len(found['problems'])} transcripts could not be read")
                 self.emit(f"STOPPED {audit} scan 3")
                 word = "stopped"
             else:
@@ -317,6 +349,7 @@ class _Fresh:
         if not (isinstance(n, int) and n > 0 and isinstance(right, int) and isinstance(hid.get("passes"), bool)
                 and isinstance(fig[self.visible].get("n"), int) and isinstance(vis.get("right"), int)):
             self.save()
+            self.cause(self.hidden, "figures", "FIGURES-INCOMPLETE", "the figures lack a count or a verdict")
             self.emit(f"STOPPED {self.hidden} figures")
             return "stopped"
         self.st["verdict"] = {"hidden": {"right": right, "n": n, "passes": hid["passes"]},
@@ -335,8 +368,19 @@ def _default_rebuild() -> list[str]:
     return [sys.executable, "-m", "gov.cli.main", "rebuild"]
 
 
-def run(sets_root, *, repo=None, commit, tag, runs_dir=None, rebuild_cmd=None, gov=None, claude=None, gate_cmd=None,
-        since=None, projects=None, allow=(), emit) -> str:
+def run(sets_root, *, emit, **flags) -> str:
+    """``_run``, with a usage fault named first: ``CAUSE fresh FR-USAGE-<NAME>: <reason>`` (FM-4), then the fault goes on
+    to print ``ERROR: UsageError``."""
+    try:
+        return _run(sets_root, emit=emit, **flags)
+    except UsageError as e:
+        name = re.sub(r"[^A-Z0-9]+", "-", str(e).upper()).strip("-") or "FLAG"
+        emit(f"CAUSE fresh FR-USAGE-{name}: a flag or its value was refused")
+        raise
+
+
+def _run(sets_root, *, repo=None, commit, tag, runs_dir=None, rebuild_cmd=None, gov=None, claude=None, gate_cmd=None,
+         since=None, projects=None, allow=(), emit) -> str:
     """The exit word: ``ok`` (both halves judged, the scan clean, the verdict printed), ``refused`` (the configuration,
     ``FR-NAME``, ``FR-SNAPSHOT``, ``FR-LOCK``), ``stopped`` or ``waiting``."""
     root = layout.root_of(sets_root)
@@ -347,16 +391,17 @@ def run(sets_root, *, repo=None, commit, tag, runs_dir=None, rebuild_cmd=None, g
     folder = runs_dir / "fresh" / tag
     for flag in (repo, runs_dir, folder):
         if layout.inside(flag, root):
-            raise UsageError("flag inside the sets root")
+            raise UsageError("flag inside sets root")
     since = _moment(since) if since else None
     commit = resolve_commit(repo, commit)
-    _config.load(repo, commit)  # before anything is made: a repository without its file is refused
+    cfg = _config.load(repo, commit)  # before anything is made: a repository without its file is refused
 
     held = any(os.path.lexists(layout.paths(root, a)[k]) for a in (visible, hidden) for k in ("set", "run"))
     recorded = read_json(folder / "COUNTS.json")
     known = isinstance(recorded, dict)
     if (known and recorded.get("commit") != commit) or (not known and held):
         emit("FR-NAME")  # this tag's run is of another commit, or its names are taken with no run folder of its own
+        emit("CAUSE fresh start FR-NAME: this tag's run is of another commit, or its names are taken")
         return "refused"
     os.makedirs(folder, mode=0o700, exist_ok=True)
     lock = os.open(folder / "LOCK", os.O_RDWR | os.O_CREAT, 0o600)
@@ -365,20 +410,25 @@ def run(sets_root, *, repo=None, commit, tag, runs_dir=None, rebuild_cmd=None, g
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             emit("FR-LOCK")
+            emit("CAUSE fresh start FR-LOCK: another call of this tag is running")
             return "refused"
         job = _Fresh(root, repo, commit, tag, folder, emit, gov=gov, claude=claude, gate=shlex.split(gate_cmd or ""),
                      rebuild=shlex.split(rebuild_cmd) if rebuild_cmd else _default_rebuild())
+        job.cfg = cfg
         job.begin()
         emit(f"FRESH plan: visible {visible} hidden {hidden} at {commit[:12]}")
         if not job.snapshot():
             return "refused"
         words = []
-        for audit in (visible, hidden):
-            words.append(job.half(audit)[0])
+        for audit in (visible, hidden):  # both halves' void count first: a void is said before any measure (FM-3)
+            words.append(job.prepare(audit)[0])
             if words[-1] == "stopped":  # a stop ends the call: one STOPPED line, the other half is not taken further
                 return "stopped"
         if "waiting" in words:
             return "waiting"
+        for audit in (visible, hidden):
+            if job.finish(audit)[0] == "stopped":
+                return "stopped"
         return job.close(since, projects, list(allow or ()))
     finally:
         os.close(lock)

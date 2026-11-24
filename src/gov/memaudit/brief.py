@@ -17,11 +17,13 @@ import json
 import os
 import random
 import secrets
+import shlex
 import shutil
+import sys
 from pathlib import Path
 
 from gov.memaudit import config as _config
-from gov.memaudit import layout, ledger
+from gov.memaudit import layout, ledger, preflight
 from gov.memaudit.briefs import TEMPLATES
 from gov.memaudit.common import (UsageError, git, read_json, resolve_commit, sha256_bytes, toplevel, z_list)
 
@@ -140,6 +142,40 @@ def _recorded_seed(p: dict, commit: str, since) -> tuple[int, bytes] | None:
     return None
 
 
+def refusals_section(p: dict, kind: str) -> str:
+    """``## Pre-flight 1 refusals`` from ``PREFLIGHT.json`` (FM-2): each refused id with its code, a set-level code on its
+    own line; ids, codes and counts only. Empty when pre-flight 1 passed or left no record."""
+    doc = read_json(p["preflight"])
+    codes = doc.get("codes") if isinstance(doc, dict) and doc.get("ok") is False else None
+    if not isinstance(codes, dict):
+        return ""
+    rows = []
+    for code, c in codes.items():
+        if not isinstance(c, dict) or c.get("ok", True):
+            continue
+        if code in preflight.SET_LEVEL:
+            rows.append(f"- set {code} {'; '.join(c.get('detail') or []) or c.get('refused')}")
+        else:
+            rows += [f"- {qid} {code}" for qid in c.get("ids") or []]
+    if not rows:
+        return ""
+    text = ["", "## Pre-flight 1 refusals", "", "The first pre-flight refused these (an id with its code; a line "
+            "`set` is a code about the whole half):", "", *rows, ""]
+    if kind == "writer":
+        text += ["Repair or replace exactly those questions in this round: a refused id is rewritten or swapped for "
+                 "a new question that passes the same checks, and a `set` line is met by what the half as a whole "
+                 "lacks. Leave every other question as it is.", ""]
+    return "\n".join(text)
+
+
+def stop_hook(p: dict, audit: str, repo, commit: str, out: Path) -> dict:
+    """The writer's ``.claude/settings.json``: a ``Stop`` hook running ``writer-check`` on ``out/set`` (FM-1)."""
+    src = Path(__file__).resolve().parents[2]
+    argv = ["env", f"PYTHONPATH={src}", sys.executable, "-m", "gov.memaudit", "writer-check", "--sets-root", str(p["root"]),
+            "--audit", audit, "--repo", str(Path(repo).resolve()), "--commit", commit, "--folder", str(out)]
+    return {"hooks": {"Stop": [{"hooks": [{"type": "command", "command": shlex.join(argv)}]}]}}
+
+
 def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, emit) -> str:
     """The exit word: ``ok``, or ``refused`` with ``BR-NOSET`` (round 2 or a checker with nothing delivered) or
     ``BR-NONOTES`` (a writer's round 2 without the round-1 notes). Nothing is written before every refusal is past."""
@@ -166,7 +202,7 @@ def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, em
         emit("BR-NONOTES")
         return "refused"
 
-    text = render(kind, cfg, commit, rnd).encode("utf-8")
+    text = (render(kind, cfg, commit, rnd) + (refusals_section(p, kind) if rnd == 2 else "")).encode("utf-8")
     os.makedirs(out / "input", exist_ok=True)
     if kind == "writer" and rnd == 1:
         kept = _recorded_seed(p, commit, since)
@@ -193,6 +229,10 @@ def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, em
             shutil.copyfile(f, target / f.name)
         if kind == "writer":
             shutil.copyfile(notes, out / "input" / "notes.md")
+    if kind == "writer":
+        os.makedirs(out / ".claude", exist_ok=True)
+        _write(out / ".claude" / "settings.json",
+               (json.dumps(stop_hook(p, audit, repo, commit, out), indent=1) + "\n").encode("utf-8"))
     _write(out / "brief.md", text)
     digest = sha256_bytes(text)
     ledger.append(layout.make_run(p), "brief", kind=kind, round=rnd, commit=commit, brief_sha256=digest)

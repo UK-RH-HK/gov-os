@@ -21,8 +21,8 @@ import shutil
 from pathlib import Path
 
 from gov.memaudit import config as _config
-from gov.memaudit import drops, layout, ledger
-from gov.memaudit.common import UsageError, read_json, toplevel
+from gov.memaudit import drops, layout, ledger, preflight, writercheck
+from gov.memaudit.common import UsageError, read_json, resolve_commit, toplevel
 
 DESCRIPTION = ("Takes a session's out/ folder into the sets root: a writer's result.json and set/q*.yaml into the "
                "half's own folder (round 2 moves round 1 aside first), a checker's notes.md into XCHECK-r<n>.md. A "
@@ -87,7 +87,7 @@ def _commit_of(p: dict, repo):
     return None
 
 
-def _writer(p: dict, cfg, source: Path, rnd: int, emit) -> str:
+def _writer(p: dict, cfg, source: Path, rnd: int, emit, repo=None, audit=None) -> str:
     if not result_ok(read_json(source / "result.json"), cfg):
         emit("DL-RESULT")
         return "refused"
@@ -98,6 +98,15 @@ def _writer(p: dict, cfg, source: Path, rnd: int, emit) -> str:
     if len(files) != read_json(source / "result.json")["questions"]:
         emit("DL-RESULT")
         return "refused"
+    commit = _commit_of(p, repo)
+    if commit is not None:  # the pre-flight's own checks on the delivered files, codes only (FM-1)
+        counts, _ = preflight.evaluate(p, source / "set", repo, resolve_commit(repo, commit), cfg,
+                                       writercheck.default_runs_dir(), audit)
+        if not counts["ok"]:
+            emit("DL-PREFLIGHT")
+            for line in preflight.refused_lines(counts):
+                emit(line)
+            return "refused"
     hidden, aside = p["hidden"], p["set"] / "r1"
     held = sorted(os.listdir(hidden)) if hidden.is_dir() else []
     if rnd == 1 and held:
@@ -158,7 +167,7 @@ def run(sets_root, audit, *, kind, repo=None, source, rnd=1, emit) -> str:
             raise UsageError("flag inside the sets root")
     cfg = _config.load(repo, _commit_of(p, repo))
     if kind == "writer":
-        return _writer(p, cfg, source, rnd, emit)
+        return _writer(p, cfg, source, rnd, emit, repo, audit)
     return _checker(p, source, rnd, emit)
 
 
