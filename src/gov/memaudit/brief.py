@@ -176,6 +176,21 @@ def stop_hook(p: dict, audit: str, repo, commit: str, out: Path) -> dict:
     return {"hooks": {"Stop": [{"hooks": [{"type": "command", "command": shlex.join(argv)}]}]}}
 
 
+WRITER_TOOLS = "Read,Grep,Glob,Write,Edit,TodoWrite"
+WRITER_MODEL = "claude-sonnet-5-5"
+LAUNCH_NAME = "LAUNCH.txt"
+
+
+def launch_command(out: Path, repo) -> str:
+    """The one real writer launch (FM-5): the session folder's own settings (the ``Stop`` hook) load through
+    ``--setting-sources project --settings``; no ``--safe-mode`` and no ``--no-session-persistence``. Run with ``out`` as cwd."""
+    prompt = "Read brief.md in this folder and do what it says."
+    argv = ["claude", "-p", "--restricted", "--setting-sources", "project", "--settings",
+            str(out / ".claude" / "settings.json"), "--add-dir", str(Path(repo).resolve()), "--tools", WRITER_TOOLS,
+            "--strict-mcp-config", "--model", WRITER_MODEL, prompt]
+    return shlex.join(argv)
+
+
 def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, emit) -> str:
     """The exit word: ``ok``, or ``refused`` with ``BR-NOSET`` (round 2 or a checker with nothing delivered) or
     ``BR-NONOTES`` (a writer's round 2 without the round-1 notes). Nothing is written before every refusal is past."""
@@ -237,6 +252,10 @@ def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, em
     digest = sha256_bytes(text)
     ledger.append(layout.make_run(p), "brief", kind=kind, round=rnd, commit=commit, brief_sha256=digest)
     emit(f"BRIEF {kind} round {rnd} {digest[:12]}")
+    if kind == "writer":
+        line = launch_command(out, repo)
+        _write(out / LAUNCH_NAME, (line + "\n").encode("utf-8"))
+        emit(f"LAUNCH writer {line}")
     return "ok"
 
 

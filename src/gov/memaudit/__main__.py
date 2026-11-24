@@ -126,13 +126,15 @@ def _adopted(sub):
     ck.add_argument("--commit", metavar="REV", help="the commit whose file and tracked paths are read (default: the "
                                                     "working tree's file, HEAD's tracked paths)")
     ck.add_argument("--sets-root", metavar="ROOT", help=argparse.SUPPRESS)
-    from gov.memaudit import brief, deliver, fresh, writercheck
+    from gov.memaudit import brief, deliver, fresh, writercheck, writerrun
     brief.add_arguments(sub.add_parser("brief", help="a writer's or checker's brief, filled from the configuration",
                                        description=brief.DESCRIPTION))
     deliver.add_arguments(sub.add_parser("deliver", help="take a writer's set or a checker's notes into the sets root",
                                          description=deliver.DESCRIPTION))
     writercheck.add_arguments(sub.add_parser("writer-check", help="the Stop hook of a writer's session",
                                              description=writercheck.DESCRIPTION))
+    writerrun.add_arguments(sub.add_parser("writer-run", help="a writer's session run with its check in the loop",
+                                           description=writerrun.DESCRIPTION))
     fresh.add_arguments(sub.add_parser("fresh", help="a whole fresh pair of halves on a pinned snapshot it builds",
                                        description=fresh.DESCRIPTION))
 
@@ -239,7 +241,7 @@ def _run(args, emit) -> str:
         return _standing(args, emit)
     if cmd == "check":
         return _check(args, emit)
-    if cmd in ("brief", "deliver", "fresh", "writer-check"):
+    if cmd in ("brief", "deliver", "fresh", "writer-check", "writer-run"):
         import importlib
         return importlib.import_module(f"gov.memaudit.{cmd.replace('-', '')}").from_args(args, emit)
     from gov.memaudit import layout
