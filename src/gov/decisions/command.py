@@ -215,11 +215,12 @@ def run(root: Path, args, config: dict) -> int:
     entries = result["entries"]
     lines = []
     for e in entries:
-        lines.append(_check_line(e))
+        line = _check_line(e)
         judged = e.get("level") or {}
         if judged.get("verdict") in ("unstated", "invalid"):
-            lines.append(f"{e['id']} {judged['verdict']}: {judged['reason']}")
-        elif judged.get("verdict") == "fail":
+            line += f" | level {judged['verdict']}: {judged['reason']}"
+        lines.append(line)
+        if judged.get("verdict") == "fail":
             lines.append(f"{e['id']} DECISION_BELOW_LEVEL: {judged['reason']}")
     lines = lines or [f"no new decision entry in {result['range']}"]
     below = [e for e in entries if (e.get("level") or {}).get("verdict") == "fail"]

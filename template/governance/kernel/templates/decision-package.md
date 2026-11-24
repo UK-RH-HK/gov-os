@@ -19,7 +19,7 @@ blocks: nothing      # or what stops until it is answered; 200 at most
 rubric: P1.1         # the escalation rubric line that makes it the owner's: P1.1 to P1.10, or P2.brought
 touches: []          # what it changes: spec, kpi, standing-decision, contract, charter, shared-code, cross-stream,
                      # kernel-text, secret, paid-service, model-effort, release, own-ticket
-reversible: yes      # yes or no
+reversible: "yes"    # yes or no
 inside: repository   # worktree, repository or outside; with `touches` these compute the level (P3, P2, P1)
 # optional: deadline, meanwhile (200), under [DEC-n], raised {by, ticket, date}, replaces DP-n, file_only, spends,
 # rounds, emergency

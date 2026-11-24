@@ -1,7 +1,7 @@
 """The answer sheet: its writer, its parser and the batch hash (W2-211 PG-3; the spec's "The answer sheet").
 
 The sheet is a fixed block (``GOV-ANSWERS 1``, ``batch:``, ``hash:``, ``answered:``, ``count:``, one line per card, ``END``).
-``write_sheet`` and ``template/governance/kernel/templates/decisions-sheet.js`` write it byte for byte alike. ``parse_sheet``
+``write_sheet`` and ``template/governance/kernel/assets/decisions-sheet.js`` write it byte for byte alike. ``parse_sheet``
 reads the first complete block of a text the chat may have wrapped (a code fence, quote marks, CRLF, text around it).
 ``batch_hash`` is the one function that writes the batch's hash into the manifest and checks it on a sheet.
 """
