@@ -192,6 +192,12 @@ def _unread_in(value, where: str = "") -> list[str]:
     return [found for key, item in items for found in _unread_in(item, f"{where}.{key}" if where else str(key))]
 
 
+def _red(part) -> bool:
+    """P0-1: true while the integration store is behind the branch's head (``behind_by`` above 0)."""
+    behind = part.get("behind_by") if isinstance(part, dict) else None
+    return isinstance(behind, int) and behind > 0
+
+
 def run(root: Path, args, config: dict) -> dict:
     root, fault = Path(root), _store_fault(Path(root))
     tickets = _part(_tickets, root, fault)
@@ -205,5 +211,6 @@ def run(root: Path, args, config: dict) -> dict:
         "reranker": _part(_reranker),
         "integration_store": _part(_integration_store, root),
     }
+    answer["red"] = _red(answer["integration_store"])
     # ``root`` and ``config_files`` are W1-07's answer, kept: a builder test of the command line reads them.
     return {"root": str(root), "config_files": sorted(config), **answer, "not_read": _unread_in(answer)}

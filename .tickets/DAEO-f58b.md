@@ -144,3 +144,24 @@ riding along (DEC-802):
 
 [DEC-1087]
 - **W2-60b dropped from deps (CTO, 2026-11-13 16:00, a plan-order P2, DEC-957):** S2 needs no W2-60b code (the session record, the role set, KNOWN_ROLES); with DEC-1167 (3) moving W2-60b after the copy starts, the dependency made a cycle W2-27 -> W2-116 -> W2-60b -> after W2-27's start. W2-33's rule text is delivered (closed). `src/gov/status/**` added for S2's `gov status` line.
+
+## Fix: the refresh retried and checked; the product's git hook (plan items 0-1 and 0-3; phase0-memory, 2026-11-24)
+
+Found 2026-11-22 (I-9, `docs/emergency-2/integration/FINDINGS.md`): the store stood behind HEAD after a failed refresh and
+nothing said so; both research leads' `gov retrieve` returned only a stale-path list. DEC-1245 (2), DEC-1241 G-1. Interface:
+`gov rebuild --integration <branch> --when-due` retries a failed refresh at the next tick and logs `REBUILD_FAILED`, the
+retry and the success; `gov status` (part `integration_store`) gives `behind_by` and its text form prints `store behind
+HEAD by n commit(s)` (and exit non-zero / red) while behind, nothing once equal; `gov brief` and `gov retrieve` name a store
+behind HEAD. The git hook (0-3) is a kit file the product installs (see W2-208's fix, P0-3).
+As built: `gov status --json` has a top-level `red` (true while `integration_store.behind_by` is above 0) and the part's
+`behind` sentence; the text form prints the same JSON, so it holds the sentence, and the exit code stays 0. A store behind
+the branch head is due for `--when-due` by itself (reason `behind`; its output says `retry`).
+
+- **P0-1 (success).** A failed refresh is retried and checked. Verify: a planted failed refresh (embedder stopped, a commit
+  made) leaves a log with `REBUILD_FAILED`, then a retry at the next `--when-due` tick, then a success line; `gov status`
+  prints "store behind HEAD by n commit(s)" and is red while it fails, and prints nothing of it once the store's commit equals
+  HEAD; `gov brief` and `gov retrieve` name the store's commit and HEAD while behind and say nothing once equal.
+  Failure: a failed refresh leaves the store behind HEAD with `gov status` green, or the next tick does not retry.
+  Tests: `tests/acceptance/W2-116/test_w2_116_p0_1_*.py`.
+- **P0-3 (hook refresh part, with W2-208).** The refresh the hook calls is P0-1's, for the integration branch read from
+  configuration. Verify: see P0-3 under W2-208 (DAEO-kt8e).

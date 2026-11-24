@@ -212,6 +212,7 @@ namespaces:
       - "template/governance/kernel/*"
       - "template/governance/kernel/canaries/**"
       - "template/governance/kernel/checks/**"
+      - "template/governance/kernel/githooks/**"
       - "template/governance/kernel/hooks/**"
       - "template/governance/kernel/launch/**"
       - "template/governance/kernel/roles/**"

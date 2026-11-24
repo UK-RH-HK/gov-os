@@ -237,7 +237,8 @@ def store_line(store: dict) -> str:
     line = f"store: {_short(store.get('commit'))} ({store.get('root')})"
     head = store.get("head")
     if head is not None and head != store.get("commit"):
-        line += f", head {_short(head)}, {len(store.get('stale') or ())} stale path(s)"
+        behind = "store behind HEAD, " if store.get("commit") else ""  # P0-1: a store behind HEAD says so
+        line += f", {behind}head {_short(head)}, {len(store.get('stale') or ())} stale path(s)"
     if store.get("stale_walled"):
         line += f"\n{store['stale_walled']} stale path(s) not shown (walled)"
     return line
