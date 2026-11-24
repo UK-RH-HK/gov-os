@@ -35,7 +35,11 @@ DECIDED = "DEC-1242 R-4"
 def table_data(**changes):
     """The table as a map; ``changes`` is ``role=(model, effort)`` (underscores in role names written as ``__``)."""
     values = dict(VALUES)
-    values.update({name.replace("__", "-"): v for name, v in changes.items()})
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-1: a keyword `qa_engineer` (one underscore) never matched the `qa-engineer` row.
+    def _role(name):
+        return name.replace("__", "-") if name.replace("__", "-") in ROLES else name.replace("_", "-")
+    values.update({_role(name): v for name, v in changes.items()})
+    assert set(values) == set(ROLES), f"unknown role in {sorted(changes)}"
     rows = [{"role": r, "model": values[r][0], "effort": values[r][1], "decided": DECIDED} for r in ROLES]
     return {"version": 1, "rows": rows}
 

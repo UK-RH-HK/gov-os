@@ -158,7 +158,7 @@ def test_mr4_a_generation_in_a_scratch_repository_holds_the_hook_line_exactly_on
 # gov update
 # --------------------------------------------------------------------------------------------------------------------
 
-def test_mr4_gov_update_replaces_a_2124_byte_stand_in_byte_for_byte_and_a_second_update_changes_nothing(
+def test_mr4_gov_update_replaces_a_2124_byte_stand_in_byte_for_byte_and_the_hook_line_stays_once(
         examin_013, tmp_path):
     """Red on the base: the update leaves the stand-in and adds no hook line."""
     assert len(STAND_IN) == 2124
@@ -174,8 +174,9 @@ def test_mr4_gov_update_replaces_a_2124_byte_stand_in_byte_for_byte_and_a_second
     assert len(_settings_hook_entries(settings)) == 1 and json.dumps(settings).count("agent_model.py") == 1
     assert settings["permissions"].get("defaultMode") == "bypassPermissions"
     assert (project / TABLE_REL).read_bytes() == (support.REPO_ROOT / TABLE_REL).read_bytes()
-    after_first = support.tree_state(project)
-    second = support.update(project, sandbox)
-    assert second.returncode == 0, second.describe()
-    assert support.tree_state(project) == after_first, "the second update changed the tree"
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: a second `gov update` of the same release refuses by design; the hook line
+    # being added once is shown by a regeneration after the update instead.
+    done = support.generate(project, sandbox)
+    assert done.returncode == 0, done.describe()
     assert json.dumps(support.read_settings(project)).count("agent_model.py") == 1
+    assert (project / HOOK_REL).read_bytes() == (support.REPO_ROOT / HOOK_REL).read_bytes()

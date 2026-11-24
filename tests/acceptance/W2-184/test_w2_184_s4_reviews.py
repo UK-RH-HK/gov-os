@@ -62,7 +62,7 @@ def test_s4_a_ticket_that_is_not_full_launches_the_same_every_time(project, laun
     tk = s.ticket(project, ENG, "C2", profile, tk="DAEO-rv02")
     for effort in ("xhigh", "high"):
         s.assert_session(launch(AUD, tk, "--effort", effort), s.SONNET, effort, criticality="C2",
-                         model_source="by criticality", effort_source="by criticality" if effort == "high" else "after --")
+                         model_source="by criticality", effort_source="after --")  # Rewrite-Reason: DEC-1246 (3)(b): MR-2: an --effort equal to the table's is `after --`
 
 
 def test_s4_max_on_any_review_still_needs_a_reason(full, launch):

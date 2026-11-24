@@ -201,7 +201,7 @@ def test_r2_the_second_review_of_a_full_ticket_is_the_probe_on_sonnet_at_max(pro
     assert {"--model": second.values("--model"), "--effort": second.values("--effort")} == {
         "--model": [k.SONNET], "--effort": ["high"]}, f"round 2's line is not Sonnet, high\n{second.args}"
     assert k.record_values(second, "model", "effort", "effort_source", "review_round") == {
-        "model": k.SONNET, "effort": "high", "effort_source": "by criticality", "review_round": 2}
+        "model": k.SONNET, "effort": "high", "effort_source": "role default", "review_round": 2}  # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the real auditor file has no table line
 
 
 # --------------------------------------------------------------------------

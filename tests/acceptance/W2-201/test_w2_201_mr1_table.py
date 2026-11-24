@@ -114,9 +114,9 @@ def test_mr1_a_ticket_fix_or_chore_lead_takes_the_lead_row_not_the_orchestrator_
     m.write_table(project, lead=(m.SONNET, "low"), orchestrator=(m.OPUS, "xhigh"))
     x.commit(project, "the leads' tickets, the ready list and the table")
     head = {"feature": (LEAD_TK,), "fix": ("DAEO-ldfx", "--fix", x.FIX_LINE), "chore": ("--chore", x.CHORE_LINE)}[kind]
-    result = x.launched(x.launch(sandbox, cli, role, *head, extra_env=CALLER))
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-1: a lead writes no launch record (W2-184 R1), so only the line the stub got is read.
+    result = x.launch(sandbox, cli, role, *head, extra_env=CALLER)
     x.assert_line(result, m.SONNET, "low")
-    _sources(result)
 
 
 def test_mr1_with_no_table_file_the_role_file_default_line_is_used_as_before(project, launch):

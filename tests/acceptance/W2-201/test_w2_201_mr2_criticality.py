@@ -30,7 +30,10 @@ def _records(sandbox):
 def _ready(project):
     m.crit_without_opus(project)
     m.write_table(project)
-    k.plant_real_role(project, k.QA)
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the auditor's fixture role file lacks judging-work (LAUNCH_JUDGING_RULE_MISSING);
+    # every role the cases launch is planted as the real one, with its skills.
+    for role in (k.ENGINEER, k.TEST_DESIGNER, k.AUDITOR, k.QA):
+        k.plant_real_role(project, role)
 
 
 def _sonnet_high(result, cls):
