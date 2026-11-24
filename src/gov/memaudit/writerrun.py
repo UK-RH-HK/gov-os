@@ -4,7 +4,7 @@
 runs the writer's session in ``F`` (``brief --kind writer`` made it) under a kept session id, then ``writercheck.check`` on
 ``F/out/set``. A refusal resumes THE SAME session (``--resume <id>``) with pre-flight's own refusal lines alone (ids and
 codes) as the prompt: at most 3 returns; the fourth stop ends with ``limit``. ``WRITER-CHECK.json`` is written by the check.
-The session is started without the wall's ``Stop`` hook (``--setting-sources local``), so a return is counted once, here.
+The session is started without the wall's ``Stop`` hook (``--setting-sources local``) and with the writer's permissions as inline settings, so a return is counted once, here.
 Printed: ``WRITER-RUN return <n>`` per return and one ``WRITER-RUN <ended> returns <n>``; never a question's text.
 """
 
@@ -35,8 +35,10 @@ def add_arguments(sp) -> None:
     sp.add_argument("--runs-dir", metavar="DIR", help="where indep/ is (default: $GOV_INDEP_RUNS_DIR, else ~/gov-os-runs)")
 
 
-def argv_of(claude: str, repo, id_flag: list[str], prompt: str) -> list[str]:
-    return [*shlex.split(claude), "-p", "--restricted", "--setting-sources", "local", "--add-dir",
+def argv_of(claude: str, repo, folder, id_flag: list[str], prompt: str) -> list[str]:
+    settings = json.dumps({"permissions": brief.writer_permissions(folder)})  # no hook: the check runs here
+    return [*shlex.split(claude), "-p", "--restricted", "--setting-sources", "local", "--settings", settings,
+            "--permission-prompts", "none", "--add-dir",
             str(Path(repo).resolve()), "--tools", brief.WRITER_TOOLS, "--strict-mcp-config", "--model",
             brief.WRITER_MODEL, *id_flag, prompt]
 
@@ -51,7 +53,7 @@ def run(sets_root, audit, *, commit, folder, repo=None, claude="claude", session
     sid = session_id or str(uuid.uuid4())
     from gov.memaudit.common import toplevel
     repo = Path(repo) if repo is not None else toplevel()
-    argv = argv_of(claude, repo, ["--session-id", sid], PROMPT)
+    argv = argv_of(claude, repo, folder, ["--session-id", sid], PROMPT)
     returns = 0
     while True:
         _session(argv, folder)
@@ -65,7 +67,7 @@ def run(sets_root, audit, *, commit, folder, repo=None, claude="claude", session
         returns += 1
         emit(f"WRITER-RUN return {returns}")
         reason = json.loads(line)["reason"]
-        argv = argv_of(claude, repo, ["--resume", sid], reason)
+        argv = argv_of(claude, repo, folder, ["--resume", sid], reason)
     state = read_json(layout.make_run(layout.paths(sets_root, audit)) / writercheck.NAME)
     ended = state.get("ended") if isinstance(state, dict) else None
     emit(f"WRITER-RUN {ended or 'pass'} returns {returns}")
