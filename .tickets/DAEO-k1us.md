@@ -35,6 +35,21 @@ allowed_paths:
 - .claude/skills/orchestration/SKILL.md
 - docs/emergency-2/audits/04-tickets-and-rubric.md
 - docs/emergency-2/briefs/NIGHT-COMMON.md
+- governance/project/role-table.yaml
+- template/governance/project/role-table.yaml
+- template/.claude/hooks/agent_model.py
+- template/.rulesync/hooks.jsonc
+- template/governance/project/path-map.yaml
+- .rulesync/permissions.jsonc
+- src/gov/adapters/**
+- src/gov/update/**
+- tests/acceptance/W2-201/**
+- tests/acceptance/W2-208/**
+- tests/acceptance/W2-184/**
+- tests/acceptance/W2-60b/**
+- tests/unit/adapters/**
+- tests/unit/update/**
+- docs/emergency-2/integration/MODELS-BY-ROLE-DISAGREEMENTS.md
 est_loc: 600
 kpis:
   success:
