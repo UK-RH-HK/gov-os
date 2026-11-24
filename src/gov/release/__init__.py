@@ -130,10 +130,11 @@ def _hash(path: Path) -> str | None:
 BUILD_INFO = "_build_info.py"  # written into the wheel's package by ``_wheel``; read by ``gov --version``
 
 
-def _wheel(repo: Path, commit: str, keep: Path | None = None) -> dict:
+def _wheel(repo: Path, commit: str, keep: Path | None = None, build_info: bool = True) -> dict:
     """Build the gov wheel from ``commit`` in a temporary folder; its name and sha256. With ``keep`` (a folder), the
     built file is kept there too and its ``path`` given: the one route for ``gov release``, ``gov install`` and
-    ``gov update``, so a wheel built for an install reproduces the manifest's sha256."""
+    ``gov update``, so a wheel built for an install reproduces the manifest's sha256. ``build_info=False`` builds the
+    variant a gov older than F3 cut (no ``gov/_build_info.py``): the one difference between builders (I-17)."""
     archive = subprocess.run(["git", "-C", str(repo), "archive", "--format=tar", commit, "pyproject.toml", "src"],
                              capture_output=True)
     if archive.returncode:
@@ -144,7 +145,7 @@ def _wheel(repo: Path, commit: str, keep: Path | None = None) -> dict:
             tar.extractall(source, filter="data")
         sha = _git(repo, "rev-parse", "--verify", f"{commit}^{{commit}}").strip()
         # F3: the wheel names the commit it is built from, for ``gov --version`` where no git checkout is around it
-        if (source / "src" / "gov").is_dir():
+        if build_info and (source / "src" / "gov").is_dir():
             (source / "src" / "gov" / BUILD_INFO).write_text(f'COMMIT = "{sha}"\n', encoding="utf-8")
         epoch = _git(repo, "show", "-s", "--format=%ct", commit).strip()
         built = subprocess.run([sys.executable, "-c", "import sys; from setuptools import build_meta; "
