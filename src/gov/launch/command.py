@@ -49,7 +49,22 @@ def _positive(text: str) -> float:
     return value
 
 
+_PARSER = None  # the parser add_arguments was given, for the usage line of an error found in run()
+
+
 def add_arguments(parser) -> None:
+    global _PARSER
+    _PARSER = parser
+    parse_known_args = parser.parse_known_args
+
+    def checked(args=None, namespace=None):
+        """The role is required as it always was, but for ``--table-check``, which starts no session (MR-1)."""
+        found, rest = parse_known_args(args, namespace)
+        if found.worker_role is None and found.table_check is None:
+            parser.error("the following arguments are required: <role>")
+        return found, rest
+
+    parser.parse_known_args = checked
     parser.usage = ("gov launch <role> <ticket> [--fix <line>] [--plan] [--tests-worktree] [--gate-override DEC-NNN] "
                     "[--gpu-need-mib N] [--reason <text>] [--trial <id>] [--owner-named <DEC-id>] "
                     "[--projection-usd N] [-- <CLI arguments>]\n"
@@ -124,6 +139,8 @@ def run(root: Path, args, config: dict) -> int:
     if getattr(args, "scripts", None) is not None or args.worker_role is None:
         what = ("--scripts goes with --table-check" if args.worker_role is not None or getattr(args, "scripts", None)
                 else "the following arguments are required: <role>")
+        if _PARSER is not None:
+            _PARSER.print_usage(sys.stderr)
         print(f"gov launch: error: {what}", file=sys.stderr)
         return EXIT_USAGE
     ticket, fix, chore = getattr(args, "ticket", None), getattr(args, "fix", None), getattr(args, "chore", None)

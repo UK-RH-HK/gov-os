@@ -1,7 +1,7 @@
 """Builder tests for W2-184's R1-R3 (DEC-1180 (4); the interface's section 10).
 
 Regression evidence only (DEC-136): the lead's three options refused by the CLI (exit 2) and by the launcher; the
-launch record written to a hidden temporary file and linked to its name; every root's copy of a probe record read.
+launch record written to a hidden temporary file and linked to its name; no probe record is read (MR-2).
 """
 from __future__ import annotations
 
@@ -134,74 +134,11 @@ def test_a_leftover_tmp_is_not_read_as_a_record(monkeypatch, tmp_path):
     assert launcher._launch_records(tmp_path) == []
 
 
-# R3: every root's copy of a probe record
+# R3: no root's copy of a probe record is read
 
-
-FAIL_OPEN = ('```verdict\n{"kpis": [{"kpi": "S1", "verdict": "fail", "findings": '
-             '[{"id": "F1", "consequence": "fails open"}]}]}\n```\n')
-
-
-def _probe(base: Path, name: str, judgement: str = "pass", body: str = "") -> str:
-    path = base / "docs" / "probes" / TK / name
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"---\ntype: probe\njudgement: {judgement}\n---\n{body}", encoding="utf-8")
-    return f"docs/probes/{TK}/{name}"
-
-
-@pytest.fixture
-def roots(tmp_path):
-    launch_root, other = tmp_path / "repo", tmp_path / "ticket"
-    launch_root.mkdir()
-    other.mkdir()
-    launches = [("s1", {"record": "gov-launch", "ticket": TK, "root": str(other)})]
-    return launch_root, other, launches
-
-
-def test_another_root_s_copy_with_the_finding_promotes_over_a_stale_launch_root_copy(roots):
-    launch_root, other, launches = roots
-    rel = _probe(launch_root, "01-review.md")
-    _probe(other, "01-review.md", body=FAIL_OPEN)
-    assert launcher._promotion(launch_root, [TK], launches) == {"reason": "a fail-open finding", "record": rel}
-
-
-def test_the_launch_root_s_copy_with_the_finding_promotes_over_another_root_s_without(roots):
-    launch_root, other, launches = roots
-    rel = _probe(launch_root, "01-review.md", body=FAIL_OPEN)
-    _probe(other, "01-review.md")
-    assert launcher._promotion(launch_root, [TK], launches) == {"reason": "a fail-open finding", "record": rel}
-
-
-def test_a_path_failed_in_any_copy_counts_once(roots):
-    launch_root, other, launches = roots
-    _probe(launch_root, "01-review.md", "pass")
-    first = _probe(other, "01-review.md", "fail")
-    assert launcher._promotion(launch_root, [TK], launches) is None  # one failed path is not two failed reviews
-    second = _probe(other, "02-review.md", "failed")
-    assert launcher._promotion(launch_root, [TK], launches) == {"reason": "two failed reviews", "record": second}
-    assert first < second
-
-
-def test_two_differing_failed_copies_of_one_path_are_not_two_failed_reviews(roots):
-    launch_root, other, launches = roots
-    _probe(launch_root, "01-review.md", "fail", "old")
-    _probe(other, "01-review.md", "failed", "new")
-    assert launcher._promotion(launch_root, [TK], launches) is None
-
-
-@pytest.mark.parametrize("bad", ["---\ntype: [probe\n---\n", "---\ntype: probe\n---\n```verdict\nnot json\n```\n"])
-def test_another_root_s_unreadable_copy_refuses_naming_the_file(roots, bad):
-    launch_root, other, launches = roots
-    _probe(launch_root, "01-review.md")
-    path = other / "docs" / "probes" / TK / "01-review.md"
-    path.parent.mkdir(parents=True)
-    path.write_text(bad, encoding="utf-8")
-    with pytest.raises(GovError) as raised:
-        launcher._promotion(launch_root, [TK], launches)
-    assert "01-review.md" in raised.value.message and str(path) in raised.value.message
-
-
-def test_identical_copies_are_one_copy(roots):
-    launch_root, other, launches = roots
-    _probe(launch_root, "01-review.md", "fail")
-    _probe(other, "01-review.md", "fail")
-    assert launcher._promotion(launch_root, [TK], launches) is None
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: the promotion read every root's copy of the ticket's probe records; it is
+# retired with criticality's `opus` key, and the launcher keeps no function that reads one.
+def test_the_launcher_reads_no_probe_record():
+    for name in ("_promotion", "_probe_roots", "_probe_files", "_read_probe", "_probe_record", "_fails_open"):
+        assert not hasattr(launcher, name), name
+    assert not hasattr(launcher, "PROBES_REL")

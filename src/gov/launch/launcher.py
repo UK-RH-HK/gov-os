@@ -700,7 +700,7 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
         exception = str(entry.get("decided"))
 
     # the effort: trial, after --, then the table's
-    own = True
+    own, floor_refusal = True, None
     if trial is not None:
         if given["effort"] is not None and given["effort"] != trial["effort"]:
             raise _refuse(f"the CLI arguments carry --effort {given['effort']}, which is not the trial "
@@ -708,12 +708,12 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
         effort, effort_source = trial["effort"], "trial"
     else:
         if given["effort"] in BELOW_FLOOR and table_effort not in BELOW_FLOOR:
-            raise _refuse(f"the CLI arguments carry --effort {given['effort']}, below the floor '{FLOOR}' of "
-                          f"{role}'s {table_effort} (DEC-1120 (3))")
+            floor_refusal = _refuse(f"the CLI arguments carry --effort {given['effort']}, below the floor '{FLOOR}' of "
+                                    f"{role}'s {table_effort} (DEC-1120 (3))")
         if given["effort"] is not None:
             effort, effort_source = given["effort"], "after --"
-            if effort == table_effort:  # not the launch's own choice: needs no --reason
-                own = False
+            if effort == table_effort:  # not the launch's own choice: needs no --reason; its source is the table's
+                own, effort_source = False, table_source
         else:
             effort, effort_source, own = table_effort, table_source, False
     if effort == "max" and own and reason is None:
@@ -726,6 +726,8 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
                 f"{repeated['session_id']}") if repeated is not None else ""
         raise _refuse(f"review round {review_round} of {ticket_id} is refused: at most two review rounds "
                       f"(DEC-1010){also}; a third or later needs --owner-named <DEC-id>")
+    if floor_refusal is not None:  # after the round limit: a third review is refused whatever its effort
+        raise floor_refusal
     if repeated is not None and owner_named is None:  # DEC-1010: the same setting twice only when the owner named it
         raise _refuse(f"the review of session {repeated['session_id']} ran on model {model}, effort {effort}, "
                       f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
