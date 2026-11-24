@@ -2172,13 +2172,13 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
 ### DEC-1242 — The integration spec questions answered (batch B-2026-11-22-integration, 18 cards)
 - **Status:** ACCEPTED (owner, 2026-11-24T00:10:58Z, the answer sheet of `docs/emergency-2/integration/DECISIONS-PAGE-2026-11-22.html`, hash `sha256:d902d56c80bd385485167722ccac28dbc3f8bc938ae49cf40f59fec622a1935e`; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (page B-2026-11-22-integration)`; standing) · **Under:** DEC-1238 (10), DEC-1241
 - **Decision** (each card's options and costs are on the page):
-  - **T-2 (c):** records and docs commit directly; anything touching code goes through the landing's `--direct` (built).
+  - **T-2 (c):** records and docs commit directly; anything touching code goes through the landing's `--direct` (to be built: it does not exist at HEAD; A-16).
   - **T-3 (b):** at least one red case per KPI line; guard cases allowed when the README row marks them guard.
   - **T-6 (c):** retire what the Contract does not carry, wire what it does; the owner's note: "For what the Contract carries: wire it only if it serves a step of the golden workflow; otherwise retire it and bring me the Contract edit. gov skilleval goes (it defaults to Opus)."
   - **T-12 (b):** on a red landing the CTO decides; the landing writes the red's record in the diagnosis form (List B, B6).
   - **R-1 (b):** no time box: a chore is whatever changes no behaviour and keeps the tests unchanged and green, caught by A-16's notice.
   - **R-2 (c):** the landing refuses only a ticket that is not in the planned wave's list; the notice stays for the rest.
-  - **R-3 (a):** a ticket field `kind: feature`, required by the schema, the 219 tickets migrated by a chore.
+  - **R-3 (a):** a ticket field `kind: feature`, required by the schema, the tickets migrated by a chore (271 at HEAD on 2026-11-24; the card said 219).
   - **R-8 (b):** drop `Class: Q`; a patch requires `Fix:` or `Class: C`.
   - **T-1 (b):** rule 8's first slice: the three record fields, a computed level, the refusal below the level, `gov decisions answer`; page and push by hand meanwhile; the owner's note: "The page itself is already approved as a feature (DEC-1236); it follows as the next slice."
   - **T-10 (c):** the start scripts stay until W8 replaces them; the owner's note: "Until W8, the start scripts' models and efforts must match the rubric exactly."
