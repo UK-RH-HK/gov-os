@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Golden workflow decisions, 23 November</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding:22px 18px 80px}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <h1>Golden workflow decisions, 23 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">The CTO checked your golden workflow against the code (16 corrections, 9 proposed changes) and mapped every tool. This page holds those, your rename, the gaps I found in the tool map, the discoveries you asked for in your comments, and the go-ahead. The 18 spec questions stay on their own page. Every card is selected with my recommendation; change anything, then copy the answer sheet at the end.</p>
+<section class="state">
+  <h3>Where things stand</h3>
+  <ul>
+    <li><b>Steps on the path today:</b> 1 of 16 fully (memory build), 11 partly, 4 off (deciding, launching, fixes and chores, weekly hygiene): about 41 % counting partly as half.</li>
+    <li><b>The tool map:</b> 102 rows; 42 tools have a part outside the product (16 to replace, 11 to absorb, 15 to retire), plus about 255 dead scratch files.</li>
+    <li><b>The trace (W6):</b> <code>gov impact</code> can trace a decision or spec to specs, tickets, tests and code, but nothing calls it and it is slow; four small fixes (about 125 lines) make it one trace, used at the landing and in planning.</li>
+  </ul>
+</section>
+<div id="sections"></div>
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Your answers and notes are kept on this device as you go.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+<script>
+const SECTIONS = [{"title": "The CTO's corrections to the workflow", "intro": "The CTO read the code behind every cell of your golden workflow and every one of its ten rules. These are facts about the code today, not proposals; what matters is what they make the plan fix.", "qs": [{"id": "C-ALL", "title": "Accept the 16 corrections (8 steps, 8 rules), and make each gap they reveal a plan item", "src": "GOLDEN-WORKFLOW-CORRECTIONS §1, §2", "found": ["<b>Deciding (W5, rule 8):</b> only the basis check and the in-force digest exist; no decision level, no refusal of a decision taken below its level, no page, no answer command; the owner-approval check is switched off.", "<b>Launching (W8, rules 7 and 10):</b> leads and the CTO start from scripts that choose their own model and effort; no per-role tool list; no launch record since 16 November; the cron still runs the old dispatcher.", "<b>Landing (W11, rule 3):</b> the first landing through the product's landing happened on 22 November, the next fell back to a hand merge; no auditor is called on a red and the diagnosis has no form; old code still allows a third review round.", "<b>Fixes, chores and releases (W12, W13):</b> --fix and --chore exist but nothing uses them; the chore path (--direct) does not exist; the release gates are for patches only and switched off.", "<b>Memory (W3, rule 5):</b> a failed refresh is not retried; the boot start is a scratch script; the brief's memory bundle is cut at 6,000 tokens, not carried whole.", "<b>Adopted repositories (W1, rule 2):</b> the kit lacks the connectors key, the no-prompt mode and the model hook, so an adopted repository's own sessions would still prompt.", "<b>The machine (rule 9):</b> a too-small machine is refused only at a launch, not at adoption or install."], "opts": [["a", "Accept all 16 as written; every gap becomes an item in the integration plan", "", 1], ["b", "Accept, with changes in my note", ""]], "cto": "16 corrected, 10 verified.", "me": "Accept. They are facts read from the code, and each one is a gap the integration plan must close."}]}, {"title": "The CTO's proposed changes to the workflow", "intro": "Changes to the workflow's text. Several match the spec questions on the other page; P-10 comes from your own comment.", "qs": [{"id": "P-1", "title": "Name the scheduler in W15: one thing in the product runs every schedule", "src": "Proposal 1; spec question T-5", "found": ["The memory retry, the weekly measure, the weekly hygiene and the determinism rule all need something that runs on a schedule; no step holds it; today's crontab is kept by hand and the kit installs nothing."], "opts": [["a", "Yes", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes; it matches T-5 (one scheduler in the product, its schedule in configuration)."}, {"id": "P-2", "title": "Put the full regression run into a step", "src": "Proposal 2; spec question T-8", "found": ["No step produces the full test record that the patch release's gate reads."], "opts": [["a", "Yes: on demand when a release needs it, and weekly in W16 as a safety net", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes; it matches T-8."}, {"id": "P-3", "title": "Make the orchestrators' morning handover a step, in a fixed form", "src": "Proposal 3; spec question T-13", "found": ["Rule 10 says orchestrators start fresh each morning from a handover; no step holds it and nothing checks its form."], "opts": [["a", "Yes, in W15, in the checkpoint form the launcher reads", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes; it matches T-13."}, {"id": "P-4", "title": "One tool column for W2 and W3 (the same tool builds and refreshes memory)", "src": "Proposal 4", "found": ["Presentation only; the numbering stays."], "opts": [["a", "Yes", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes."}, {"id": "P-5", "title": "The workflow's Today column computed from the enforcement field, not typed", "src": "Proposal 5", "found": ["Four of the sixteen cells went out of date within hours of the audit. Once the enforcement field exists, gov status prints the column; until then the CTO re-reads it at each release."], "opts": [["a", "Yes", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes: a typed status goes stale; a computed one cannot."}, {"id": "P-6", "title": "Three measures in every release; as much in code as can be, 90 % of the flow as the floor", "src": "Proposal 6; your comments", "found": ["Three different measures exist: Contract items by class (21 % enforced on the path), steps (1 of 16 fully on, about 41 % counting partly as half), and tools (29 % on the path).", "The aim is not 90 %: it is everything that can be code, even 100 % of the flow. 90 % is the minimum a release must show. What cannot be code is the creative content (writing code, tests and specs, judging, planning), which stays with agents inside fixed forms that code checks."], "opts": [["a", "Print all three each release; the aim is as much in code as can be, with at least 90 % of the steps (the flow) held by code as the floor, not the ceiling", "", 1], ["b", "Print all three; the floor is set on the Contract-items view", ""], ["c", "Print all three; the floor is set on the tools view", ""]], "cto": "(a).", "me": "(a). The steps are the flow; the other two show the detail behind it."}, {"id": "P-7", "title": "A test for \"outside the product\": whatever gov update would not carry to an adopted repository", "src": "Proposal 7; your comment", "found": ["Today outside the product: Gov OS's one live git hook (untracked), every cron line, the start scripts, the model hook and the scratch folder.", "\"Absorbed\" means the release carries the knowledge of a tool, not always its files. Third-party programs (Ollama and its models, Claude Code, Python, git, node) are not shipped: the release pins their versions, checks them in gov doctor, starts them when needed and refuses with a reason if one is missing. What the release does carry: the git hook, the scheduler and its one cron line, the model hook, the project settings, the start of every session.", "Left out on purpose: the owner's user-level settings, keys and secrets; Gov OS's own development records (its register, briefs, audits); the hidden question sets; the dead scratch files and duplicated tools."], "opts": [["a", "Yes", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes: it makes rule 3 checkable by code, and it says plainly what ships."}, {"id": "P-8", "title": "A machine too small is refused at adoption and at install too, not only at a launch", "src": "Proposal 8", "found": ["Today only a launch is refused, when the resource gate is shut."], "opts": [["a", "Refuse at adoption and at install too, with the reason", "", 1], ["b", "Soften the rule to match the code", ""]], "cto": "Either.", "me": "(a). It is your W2-207 requirement: a machine too small to operate is refused with an error that says why."}, {"id": "P-9", "title": "Name gov close's retirement in W11, and two review rounds in code", "src": "Proposal 9", "found": ["Old code still allows a third review round (ESCALATION_AT = 3), against your two-round rule.", "On 19 November you decided gov close merges into the landing (L2-1) and kept the landing's name gov queue (L2-5); P-10 now proposes renaming it gov land."], "opts": [["a", "Yes", "", 1], ["b", "No", ""]], "cto": "Yes.", "me": "Yes; it finishes a decision you already took."}, {"id": "P-10", "title": "Rename the landing command gov land; keep \"queue\" for the dispatcher's work queue", "src": "Your comment on P-9; changes L2-5 of 19 November", "found": ["The landing merges, tests and closes tickets and fixes; the dispatcher and load balancer hold the real queue of work waiting to run, so the two names cross.", "The rename touches the command, the docs, the workflow, the Contract, the kit and the tests; nothing else. Scripts and EXAMIN's copy call gov queue today, so the old name stays as an alias for one release and then retires."], "opts": [["a", "Rename the landing to gov land, gov queue kept as an alias for one release; the word queue stays with the dispatcher's work queue", "", 1], ["b", "Keep gov queue, as decided on 19 November", ""]], "cto": "Not raised; L2-5 recommended keeping the name to avoid churn.", "me": "(a). One name per job; the alias keeps the cost to a rename, with nothing breaking."}]}, {"title": "Gaps and requests: from the tool map and your comments", "intro": "Things the plan must not miss (G-1 to G-5), and three discoveries you asked for (G-6, G-7, G-9) plus the path map (G-8). The discoveries are read-only and report to you; nothing stops for them unless you say so.", "qs": [{"id": "G-1", "title": "Memory is stale: make its refresh reliable first", "src": "TOOL-MAP header; finding I-9; your comment", "found": ["The tool map's author could not use memory at all: the store was behind the code by 561 stale paths, so it read files instead.", "The refresh is already code: after every landing a git hook runs gov rebuild, which re-indexes only what changed. No agent, no model, nothing from the usage plan; a little machine work (the embedder re-reads the changed files on the GPU, usually about a minute). What is missing is a retry when a refresh fails, and a check that the store is current.", "The weekly part is different: the memory measure (a fresh 80 questions), which checks that memory still answers well; it does use agents and usage."], "opts": [["a", "First in the integration plan: the refresh retried and checked, the store current, before anything relies on memory", "", 1], ["b", "In its normal place in the plan", ""]], "cto": "Not raised as a decision (logged as I-9).", "me": "(a). Every agent's first step is memory; a stale store sends the whole workflow back to reading files."}, {"id": "G-2", "title": "72 of 189 acceptance folders fail their test-map check", "src": "TOOL-MAP rule 1, hand-off 5", "found": ["gov accept reads each folder's README map from KPI lines to tests; 72 of 189 folders fail that parse.", "Once every landing runs through the product's landing, its acceptance step reads these maps, so these folders would fail, or pass for the wrong reason: a silent-bug risk."], "opts": [["a", "Fix or retire them (with the test-suite cuts) before landings run through the product's landing in the test", "", 1], ["b", "Leave them", ""]], "cto": "Not raised as a decision.", "me": "(a). It is exactly the kind of silent bug you asked the test to catch."}, {"id": "G-3", "title": "Briefs generated by code, never by hand: plan, brief, launch and landing read one ticket", "src": "TOOL-MAP rule 2; your comment", "found": ["Briefs still name gov close, gov relaunch (not a command) and gov context (retired); about 40 briefs only mention commands, and only three give an exact one.", "The chain exists in pieces: a ticket declares its KPIs, its spec link, the paths it may write and read, and what it waits on; gov plan orders tickets; gov brief builds a brief from the ticket, its template, the path map, memory and a commands map, and refuses an unfilled slot; the landing checks the same paths and test map. But Gov OS writes briefs by hand, so the chain is broken in the middle.", "The key to \"updated everywhere\": a brief is never a stored document to keep in sync. It is generated at launch from its sources, so when a template, the path map or a decision changes, the next brief simply carries it."], "opts": [["a", "Every brief, for a ticket, a fix or any agent, is generated by code at launch from its sources (the ticket's KPIs, spec and read and write paths, its template, the path map, memory, the commands map), never written or edited by hand; a new brief is refused if a link is missing or broken; plan, brief, launch and landing all read the same ticket fields; retired commands are swept out of skills and old briefs", "", 1], ["b", "Sweep the retired names only", ""]], "cto": "Rule 2's fix, in the map.", "me": "(a). One chain, gov plan to gov brief to gov launch to the landing, each reading the same ticket; a brief built at launch cannot go stale."}, {"id": "G-4", "title": "Gov OS's one live git hook lives in no repository", "src": "TOOL-MAP rule 3; P-7", "found": ["The hook that refreshes memory after every landing is untracked in .git/hooks, so neither Gov OS's repository nor the kit carries it; an adopted repository never gets it."], "opts": [["a", "The product installs it, in Gov OS and through the kit", "", 1], ["b", "Leave it", ""]], "cto": "Absorb, in the map.", "me": "(a). Without it, an adopted repository's memory never refreshes by itself."}, {"id": "G-5", "title": "Duplicated tools retire the day the product's own take over", "src": "TOOL-MAP rule 4", "found": ["Two start_lead.sh, two heavy_slot.sh, four landing tools against the product's landing, the old dispatcher against gov dispatch, the nightly scripts against the product's nightly, lefthook plus the kit CI plus the git hook all running the same checks."], "opts": [["a", "Each retires on the day its product tool takes over, listed in the plan with that day", "", 1], ["b", "Retire them all at the end", ""]], "cto": "Replace or retire, in the map.", "me": "(a). Two paths for one job is how Gov OS ended up bypassing its own tools."}, {"id": "G-6", "title": "A records and forms map: templates, briefs, specs, KPIs and data, end to end", "src": "Your comments on P-6 and G-3", "found": ["The tool map covers the tools; the same is needed for what they pass along: the spec and its KPI lines, the ticket, the brief and its template, the test map, the decision record, the close record, the memory measure's records, the usage figures.", "For each: its form (template or schema), the tool that writes it, the tool that checks it, the tool that reads it next, and what is missing. The audits found pieces built but not joined: nothing checks that a ticket's KPIs match its spec, briefs are written by hand, seven hand-offs have no form at all."], "opts": [["a", "Yes: map every record end to end, as the tool map did for tools, as part of step one, before the plan", "", 1], ["b", "No", ""]], "cto": "Not raised.", "me": "(a). This is where you expect the friction, so it is discovered and scoped before the plan, not found later in EXAMIN."}, {"id": "G-7", "title": "Discovery: three ways to make the chain from feature to code deterministic", "src": "Your comments on P-6", "found": ["How a feature becomes a spec, the spec becomes KPI lines, the KPI lines become tickets and tests, and the tests reach the code: today each link is written by hand and checked, if at all, after the fact.", "Good teams link these deterministically in a few known ways, for example: one id carried end to end, with the whole trace (feature to spec to KPI to ticket to test to code) generated by code and refused when a link breaks; specs written as executable scenarios, so each KPI line is already the skeleton of its acceptance test; every spec, KPI and ticket a typed record checked by a schema, its links edges in the graph that the landing and the impact trace read.", "A separate audit and discovery, read-only: how each link is made today; how it is usually made deterministic; three different approaches for Gov OS, each with what it would build, its size, what it makes code and what stays with agents, and the friction it removes; and a recommendation. Often the answer is not new machinery but a smarter way of linking what already exists."], "opts": [["a", "Yes: a separate audit and discovery, its three approaches reported to me before the integration plan is final", "", 1], ["b", "No", ""]], "cto": "Not raised.", "me": "(a). The three approaches show whether the gap needs building or only linking."}, {"id": "G-8", "title": "The path map: where it lives, who relies on it, and making it the one source briefs read", "src": "Your comment", "found": ["It lives in each repository: governance/project/path-map.yaml in Gov OS; an adopted repository gets its own at adoption (stage A3). It classes every path: code, tests, records, specs, legacy, the hidden question sets.", "Code already reads it: the landing (allowed paths, which tests a change selects, which documents are records), memory (what is indexed and how), gov doctor (path compliance), the hidden-set scan, and gov brief when it is used.", "It has shown cracks: documents no class covered refused landings (I-2); a path classed in two places (W2-81's A4); new release folders with no class turned tests red (18 November); EXAMIN's doctor fails its path check. And because briefs are written by hand, the read and write paths it could give each agent never reach them."], "opts": [["a", "Make it the one source: code proves it covers every tracked file exactly once, at every landing and in doctor; a ticket's read and write paths are checked against it when planned; gov brief takes each job's paths from the ticket and the map; the landing checks the same; adoption and gov update keep it current; it is part of the records map (G-6)", "", 1], ["b", "Leave it as it is", ""]], "cto": "Not raised as a decision; its cracks are logged (I-2, A4).", "me": "(a). Briefs, the landing and memory can rely on the path map only once code proves it complete and consistent."}, {"id": "G-9", "title": "Competitive analysis: Gov OS against open-source AI software factories", "src": "Your comment", "found": ["<b>Fabro</b> (github.com/fabro-sh/fabro, MIT, Rust): workflows as version-controlled graphs whose stages are agents, prompts, shell commands, conditions, human approvals and parallel branches; model routing; sandboxes; git checkpoints; build and test gates with automatic fix loops; a board and event streams to watch runs.", "<b>Ona</b> (formerly Gitpod) and its <b>memo</b> repository (github.com/gitpod-io/memo): agents started by automations, for example an incident responder that reads new error reports, judges their severity, fixes the serious ones with a test and opens a pull request, and files an issue for the rest, guided by AGENTS.md and convention files.", "Also: Software Factory (software-factory.dev), Vercel's AI SDK factory, and any comparable open-source factory the research finds online.", "Compared on: triggers and orchestration; gates and fix loops held by code; human checkpoints against \"dark\" running; memory; context use; usage and cost; model routing; how agents' decisions and escalations are automated; adopting an existing repository; their licences.", "Reported back: what Gov OS has that they lack; what they have that Gov OS lacks; for each useful piece, whether to use it, absorb it, study it (your imports rule) or build it ourselves; and plainly, whether adopting one of their engines would serve better than finishing our own integration."], "opts": [["a", "Yes: a read-only research and analysis, run in parallel, nothing stops for it; the full analysis comes to me, and the decision is mine", "", 1], ["b", "No", ""]], "cto": "Not raised.", "me": "(a). It may save months: some of what Gov OS is integrating (gates with fix loops, workflows as graphs, run observability) already exists, MIT-licensed. One caution: sandboxes are their default and you retired them in Gov OS on purpose, so they are compared, not assumed."}]}, {"title": "The go-ahead", "intro": "", "qs": [{"id": "GO", "title": "Record these answers, start the discoveries, and write the integration plan", "src": "DEC-1238 (7)", "found": ["Record both pages' answers as decisions.", "Start the read-only discoveries: the records and forms map with the path map (G-6, G-8) and the three approaches (G-7), all reported before the plan is final; the competitive analysis (G-9) in parallel, reported when ready.", "Then write the integration plan from all of it, for my yes: every step on the path, the tools outside the product absorbed, replaced or retired, the test with its planted cases, and the exit; and bring the corrected golden workflow with it.", "0.1.5 stays first; nothing else stops for the discoveries."], "opts": [["a", "Yes", "", 1], ["b", "Wait", ""]], "cto": "Ready after your answers.", "me": "(a)."}]}];
+const PREFILL={answers:{},notes:{}};
+for(const s of SECTIONS) for(const q of s.qs){const r=q.opts.find(o=>o[3]); if(r) PREFILL.answers[q.id]=r[0];}
+const KEY="govos-golden-workflow-20261123";
+let state=JSON.parse(JSON.stringify(PREFILL));
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers){state=s; state.notes=state.notes||{}; for(const k in PREFILL.answers){ if(!state.answers[k]) state.answers[k]=PREFILL.answers[k]; }}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+const all=[]; const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2>`+(s.intro?`<p>${s.intro}</p>`:"");
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.src}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<div class="note cto"><span class="who">The CTO</span>${q.cto}</div>`;
+    h+=`<div class="note me"><span class="who">My view</span>${q.me}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const lines=["Golden workflow decisions, 23 Nov 2026: my answers"];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id} ${q.title}: `;
+    if(v){n++; const o=q.opts.find(o=>o[0]===v); line+=`(${o[0]}) ${o[1]}`;} else line+="(no answer)";
+    lines.push(line);
+    const note=(state.notes[q.id]||"").trim();
+    if(note) lines.push(`   Note: ${note}`);
+  }
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{ if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();} });
+document.addEventListener("input",e=>{ if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();} });
+document.getElementById("take-cto").addEventListener("click",()=>{ for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];} save(); apply(); });
+document.getElementById("clear").addEventListener("click",()=>{ if(!confirm("Clear every answer and note on this page?")) return; state={answers:{},notes:{}}; save(); apply(); });
+document.getElementById("copy").addEventListener("click",async()=>{
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
+</body>
+</html>
