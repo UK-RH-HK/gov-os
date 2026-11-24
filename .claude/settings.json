@@ -76,7 +76,12 @@
       "Bash(git push:*)",
       "Bash(git push *)",
       "Bash(sudo:*)",
-      "Bash(sudo *)"
+      "Bash(sudo *)",
+      "Read(//home/usain/examin-eval/**)",
+      "Edit(//home/usain/examin-eval/**)",
+      "Read(//home/usain/gov-os-eval/**)",
+      "Edit(//home/usain/gov-os-eval/**)",
+      "Bash(*examin-eval*)"
     ],
     "defaultMode": "bypassPermissions"
   },
