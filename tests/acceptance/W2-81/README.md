@@ -236,10 +236,9 @@ repository. `judge_repository` judges one repository. The judge writes and print
 - each planted problem is **FOUND_AND_HANDLED**, **MISSED**, **MISHANDLED** or **NOT_BUILT**, with the evidence it read
   (`record`, `field`, `said`);
 - each control is **CLEAN** or **FLAGGED**;
-- each stage (A0 to A6, A8, A7, A10, the lite verdict, and the findings) is **PRESENT**, **ABSENT**, **UNREADABLE**,
+- each stage (A0 to A6, AS, A8, A7, A10, the lite verdict, and the findings) is **PRESENT**, **ABSENT**, **UNREADABLE**,
   **MALFORMED** or **NOT_BUILT**. A lite A7 or A10 record is PRESENT only when its front matter's `result` is exactly
-  `pass` (the gate's own word); one that says otherwise (`fail`, no `result`, any other value) is MALFORMED. The lite
-  verdict record is PRESENT only when well formed (W2-210 V5; below); a missing one is ABSENT, a malformed one MALFORMED.
+  `pass` (the gate's own word); one that says otherwise (`fail`, no `result`, any other value) is MALFORMED.
 
 Where several apply to one problem, MISHANDLED comes first, then NOT_BUILT, then MISSED. A secret's value found in
 an output is MISHANDLED even if its stage is not built.
@@ -259,7 +258,8 @@ an output is MISHANDLED even if its stage is not built.
 hit@5 and the stacked share may sit beside the figure as diagnostics (EMERGENCY-2 5.2): the judge never reads them,
 so low or absent they make nothing NOT_READY, and there is no floor constant for either (`FLOORS`, `HIT_AT_5_FLOOR`
 and `STACKED_SHARE_TARGET` are removed). The old text of KPI line 6 ("every question figure meets its floor") is
-checked by the end-to-end bar in its place. Anything else is NOT_READY, naming each reason.
+checked by the end-to-end bar in its place. Anything else is NOT_READY, naming each reason. Every reason has a stable
+id, and an owner's exceptions that name every reason give READY_WITH_EXCEPTIONS (`FIXES-0.1.4.md`, Fix T3).
 
 **It fails closed:**
 
@@ -279,7 +279,7 @@ its Contract id. It is never passed. A handling whose capability is built, but w
 MISSED.
 
 **Today's list.** I read it myself in `src/gov/adopt/` (`command.py`, `project.py`, `stages.py`, `legacy.py`; the same
-on `w2/integrate`) on 2026-10-31, and A7 and A10 again on 2026-11-16 (`lite_gates.py`; S-STAGES, DEC-1197 (2)).
+on `w2/integrate`) on 2026-10-31, A7 and A10 again on 2026-11-16 (`lite_gates.py`; S-STAGES, DEC-1197 (2)), the table on 2026-11-20 (AS).
 `w2_81_judge.CAPABILITIES` holds it. **`built_today()` counts A7 and A10 as built from the adoption command's own stage
 list, `gov.adopt.command.STAGES`** (the list `gov adopt --lite --stage` accepts: A0 to A10 and MA), **never from
 `gov.adopt.project.STAGES`** (A0 to A6, A8, A9: the stages whose records `project.record_path` names). Each is built
@@ -306,9 +306,10 @@ never reaches READY on a failed A7 or A10 gate. The judge holds A7's and A10's o
 | `findings` | CAP-44.g | **no** | no stage scans the history for secrets or records a finding with a state and a human gate (Contract: W3) |
 | `A8-documents` | CAP-44.e | **no** | A8 retires `rule-file`, `memory-store` and `chat-database` only (`legacy.KINDS`, `stages.KINDS`); it extracts or retires no legacy document, and A4 refuses EXTRACT as a content change |
 | `index` | CAP-44.d | yes | `gov rebuild` after A6 and A8 recreates `.gov-runtime/store.db`: `lexical_chunk.path`, and `semantic_vector.chunk_id` only for namespaces whose `embedding_policy` is `embedded` |
+| `AS` | CAP-44.m | yes | the spec audit (`gov.adopt.spec_audit`): `gov adopt --lite --stage AS`, between A2 and A3, commits `governance/adoption/AS-spec-audit.md`; the judge requires it (stage AS) |
 | `A3`, `A5`, `A6` | CAP-44.b, .c, .d | yes | the A3 path map, the A5 review (`path_map_hash` = the sha256 of A3's record), the A6 batches |
 | `A7`, `A10` | CAP-44.f | **yes**, built, from `command.STAGES` | the lite gates (W2-52, `gov.adopt.lite_gates`): `gov.adopt.command.STAGES` lists A7 and A10, and `built_today()` reads that list (not `project.STAGES`) |
-| `VERDICT` | CAP-44.h | **yes**, built, from `command.STAGES` | the lite verdict (W2-210, `gov.adopt.verdict`): `gov.adopt.command.STAGES` lists `VERDICT`, and `built_today()` reads that list, as for A7 and A10 |
+| `VERDICT` | CAP-44.h | **no** | no stage or command gives the lite verdict yet (CAP-44.h, W2); W2-52 built A7 and A10 only |
 
 **On an adoption that ran nothing, at today's code and seed 8128,** every repository is NOT_READY:
 
@@ -322,8 +323,7 @@ never reaches READY on a failed A7 or A10 gate. The judge holds A7's and A10's o
 | python-app-clean | none | 2 CLEAN |
 
 In every repository the stages are ABSENT (A7 and A10 included: built today, so measured, and their absent records
-named; the verdict too once `gov.adopt.command.STAGES` lists `VERDICT`), or NOT_BUILT for the findings (and for the
-verdict while that list does not name it).
+named), or NOT_BUILT for the verdict and the findings.
 
 ### What the judge reads, per kind
 
@@ -377,10 +377,9 @@ judge) must stay as the build left it:
 | large file | classed and kept out of the semantic index, **where the file now is** | in its place: A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db`. **Moved by a reviewed MOVE or RENAME** (its target holding it as built): the same three facts read **at the target**, its namespace being the one the path map's `namespaces[].paths` patterns give the target now (the adoption tool's own matcher, `gov.adopt.project.classify`), and its presence in the lexical index named in the evidence | it has semantic vectors, or its namespace is embedded, **at the target when it moved** (the evidence names the target) | **built**: judged today |
 
 **The verdict with accepted exceptions (CAP-44.h).** CAP-44.h allows ADOPTED_WITH_ACCEPTED_EXCEPTIONS only when each
-unmet condition is accepted by name in an owner decision (`Role: owner`). The lite verdict stage (W2-210) reads the
-owner's exceptions file and records each accepted condition; the judge does not read the owner's acceptance itself (its
-own owner-exceptions input stays T3's). With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY is
-MISHANDLED, whichever well-formed record says it (a record that is not well formed is MALFORMED and gives no verdict).
+unmet condition is accepted by name in an owner decision (`Role: owner`). The record that acceptance would be read
+from does not exist today: the lite verdict and its owner acceptance arrive with W2-52. So it is NOT_BUILT and not
+read. With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY is MISHANDLED.
 
 | Control | FLAGGED when |
 |---|---|
@@ -423,13 +422,8 @@ real forms when those land:
   the judge reads them as any built stage's record, with one rule of its own: a lite record counts as found
   (PRESENT) only when its `result` is exactly `pass`, the gate's own word (a gate commits its record when it fails
   too, with `result: fail`); MALFORMED names one that says otherwise (`fail`, no `result`, any other value). The verdict
-  (built since W2-210: `VERDICT` is in `command.STAGES`, so `built_today()` counts it) is **PRESENT only when well
-  formed**: `verdict` one of `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS`, `NOT_ADOPTED_HEALTHY`; `lite: true`;
-  `conditions` a list of mappings with a `name` and a `state` (`met`, `not met` or `accepted`); `conditions_not_checked`
-  a list; and the verdict the one its conditions give (CAP-44.h, W2-210 V2: ADOPTED_HEALTHY only over conditions all
-  met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS only over conditions all met or accepted, one accepted; NOT_ADOPTED_HEALTHY
-  otherwise, `w2_81_judge.derived_verdict`). A missing record is ABSENT; one that is not well formed is MALFORMED and
-  gives the judge no verdict to read. The stand-in writes such a record (`w2_81_standin.verdict_conditions`).
+  holds `verdict` (one of `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS`, `NOT_ADOPTED_HEALTHY`), `lite: true`
+  and `conditions_not_checked`.
 
 ## The mutation self-tests (`test_w2_81_judge.py`)
 
@@ -437,8 +431,8 @@ real forms when those land:
 with the end-to-end figure exactly at the bar. `render` writes it into a temporary copy of the built repository's
 working tree (no `.git`) and a folder beside it. On it, with every capability counted as built, the judge says
 READY. On today's code it says NOT_BUILT for each handling not built, and FOUND_AND_HANDLED for the large files;
-the stages A7, A10 and the verdict are PRESENT (built today, from `gov.adopt.command.STAGES`; the verdict's stand-in
-record is well formed), the findings NOT_BUILT.
+the stages A7 and A10 are PRESENT (built today, from `gov.adopt.command.STAGES`), the verdict and the findings
+NOT_BUILT.
 
 **One killed mutant per planted problem (21).** `standin.miss` removes exactly one handling. The judge must say
 NOT_READY with exactly one reason, `<repository>: <id> is MISSED`:
@@ -478,9 +472,7 @@ finding, is FLAGGED too.
   class outside the vocabulary: each is MISSED for every problem that needs A2.
 - An unreadable A3 record flags the controls.
 - An unreadable finding, an unreadable output (a symbolic link), or no held value: each makes the secret MISSED.
-- A7's record absent is named; a verdict outside the vocabulary is MALFORMED, and so is a lite verdict record that is
-  not well formed (W2-210 V5: `lite` not true, no `conditions` mappings, no `conditions_not_checked` list, or a verdict
-  its conditions do not give).
+- A7's record absent is named; a verdict outside the vocabulary is MALFORMED.
 - **S-STAGES, on today's code (`built=None`):** A7 and A10 count as built exactly when `gov.adopt.command.STAGES`
   lists them, whatever `project.STAGES` says; either lite record absent is ABSENT, and either one without front
   matter, with front matter that is not a mapping, or with bad YAML is UNREADABLE, and either one whose front matter
@@ -771,7 +763,7 @@ PYTHONPATH=<the release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.
     [--gov <gov to adopt and retrieve with>] [--pinned-gov <the pinned install's gov>] \
     [--adopter-model <id>] [--claude <the model CLI, default claude>] \
     [--queue-ticket [<repository>=]<id>]... [--hidden <dir> | --sets-root <root>] [--manifests <dir>] \
-    [--large-size <bytes>] [--stages A0,A1,A2]
+    [--large-size <bytes>] [--stages A0,A1,A2] [--notify <address>] [--exceptions <file>]
 ```
 
 **The real run (S-RERUN, DEC-1221 (1)), the CTO's, on the release candidate.** The adopting sessions run first (each
@@ -787,7 +779,8 @@ PYTHONPATH=<release candidate>/src python3 tests/acceptance/W2-81/w2_81_run.py \
 
 (`--mode build` comes first, with `--seed` if wanted, to build the repositories the adopting sessions adopt.) Its
 verdict line is `READY (seed N; hidden half: ...)` and exit 0, or `NOT_READY` and exit 1 with every reason in
-`report.json` and `report.md`; a refusal is exit 2.
+`report.json` and `report.md`; a refusal is exit 2. `--notify`, `--exceptions`, the landing's `HOME` and the report's
+ranks (the fixes of the run on 0.1.4) are in `FIXES-0.1.4.md`.
 
 **The run folder.** `--folder` is given by literal path: a temporary folder, or `~/gov-os-runs/W2-81/<run>`
 (DEC-728). The runner refuses:
@@ -944,3 +937,18 @@ folder.
 | **S4, S5, S6, S7, S10, F2, F3, F4, F5** Round 2b (DEC-997), items 1 to 7 of "The third review's findings": 1 (S10, F5: no flaky case), 2 (S4, F3), 3 (S6, S7, F2), 4 and 5 (S7, F4), 6 (S5, S6), 7 (S7, F4) | `test_w2_81_runner.py` (the cases named there), `test_w2_81_round2.py` (the store and template cases) |
 | **S3, S5, S6, S7, S9, S10, F1, F4, F5** Round 2 (DEC-993), items 1 to 7 above: 1 and 2 (S3, S6, F1), 3 (S3, F1), 4 (S10, F5), 5 (S3, S9), 6 (S7, F4), 7 (S5) | `test_w2_81_round2.py` (all), and in `test_w2_81_runner.py` the `_removed_after` fixture, `test_the_markdown_report_says_what_the_json_says_is_not_measured` and `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` |
 | **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |
+
+## Fix: W2-81's test code, six defects (W2-81's proving run on 0.1.4)
+
+Fixes under `DAEO-l78m`, each with its red tests first and the support change after (`FIXES-0.1.4.md`: the red runs,
+the KPI wording, the case rewritten, what the wording left open). A **guard** is green on the base by design.
+
+| KPI line | Tests | Expected red reason |
+|---|---|---|
+| **S9, S11** Fix T1: `gov queue` runs with the operator's HOME | `test_gov_queue_runs_with_the_operators_home_and_every_other_variable_as_before` | queue sees the run's scrubbed HOME |
+| **S9** Fix T10: every process the run starts carries the starter's address (`GOV_MSG_ADDRESS`, or --notify) | `test_every_process_the_run_starts_carries_the_address_of_whoever_started_it` (3; "neither" is a guard), `test_the_address_is_restored_after_the_run_even_when_a_session_falls_over` (2), `test_the_adoption_stages_carry_the_address_too_and_keep_the_runs_own_home`, `test_notify_is_an_option_of_the_command_and_names_no_default` | no address set; --notify unknown |
+| **S7, S9, F4** Fix T6: each report row holds the ranked bundle and the forbidden and gold ranks, no text | `test_a_row_holds_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source`, `test_a_row_names_no_rank_where_the_bundle_holds_no_such_item_and_no_bundle_where_none_was_given`, `test_the_forbidden_rank_is_by_path_over_any_forbidden_source_and_ranks_start_at_1`, `test_the_gold_rank_is_by_the_gold_sources_path_where_the_first_gold_rank_is_by_its_line`, `test_the_new_fields_hold_paths_line_numbers_and_ranks_only`, `test_the_report_records_the_ranked_bundle_and_the_ranks_of_the_forbidden_and_the_gold_source` (2), `test_a_question_whose_retrieval_failed_has_no_bundle_and_no_rank`, `test_the_ranks_and_the_bundle_hold_no_question_answer_or_item_text_hidden_rows_included` | no `bundle` in a row (`KeyError`) |
+| **S6, S13, F2** Fix T2: stage AS is a required stage of the judge | `test_stage_as_is_in_the_stage_list_between_a2_and_a3_and_in_the_capability_table`, `test_a_present_as_record_is_present_and_gives_no_reason`, `test_an_as_record_that_is_absent_or_unreadable_is_named_and_the_run_is_not_ready` (8), `test_an_adoption_that_ran_nothing_names_stage_as_absent` | no AS in the stages (`KeyError`) |
+| **S6, S14, F2** Fix T3: reason ids and an owner's exceptions in `overall`; READY_WITH_EXCEPTIONS | `test_every_reason_has_a_stable_id_in_step_with_its_text_and_the_texts_are_unchanged`, `test_each_kind_of_reason_has_its_code_and_subject`, `test_with_no_exceptions_ready_and_not_ready_are_as_before_and_ready_needs_no_reason`, `test_every_reason_named_is_ready_with_exceptions_and_the_reasons_stay_reasons`, `test_one_reason_not_named_keeps_not_ready_and_the_result_names_it` (7), `test_an_id_that_matches_no_reason_is_reported_as_unused_and_is_never_an_error`, `test_a_reasons_text_or_another_repositorys_id_names_nothing`, `test_overall_reads_the_exceptions_from_a_json_or_yaml_file` (2), `test_the_reasons_of_a_real_judgement_carry_ids_and_are_named_one_by_one` | `overall` takes no `exceptions`; no `reason_ids` |
+| **S9, S14** Fix T3: `--exceptions <file>` in the runner; its own reasons never excusable; faults refused | `test_every_judge_reason_named_in_the_owners_file_is_ready_with_exceptions_naming_the_decision` (2), `test_one_reason_the_owners_file_does_not_name_keeps_the_run_not_ready_and_is_named`, `test_the_runners_own_reasons_are_never_excusable_by_the_owners_file` (3), `test_a_failing_adoption_stage_is_never_excusable_by_the_owners_file`, `test_exceptions_where_there_is_no_reason_leave_a_ready_run_ready`, `test_the_command_exits_0_for_ready_with_exceptions_and_1_for_not_ready`, `test_a_faulty_exceptions_file_is_refused_before_any_work_naming_the_file_and_the_fault` (16), `test_exceptions_is_an_option_of_the_command_and_has_no_default` | --exceptions unknown |
+| **S3, S13** Fix T5: CAPABILITIES and the README's VERDICT and AS rows are current | `test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_verdict_stage_is` | the comment says 2026-10-31 |
