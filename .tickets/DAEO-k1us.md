@@ -338,3 +338,13 @@ a `# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19` comment; units `tests/unit/la
 Open: `tests/acceptance/W2-60a/test_w2_60a_kept_out.py::test_the_line_keeps_connectors_and_user_level_settings_out`
 asserts the launch line carries no `--mcp-config`, which F1 now requires (an empty one); it is the old reading of "no
 connector" and needs the designer's revision (not edited here).
+
+## Fix: fix-w2-56 (W2-56's S5 and S6 cases after DEC-1225 and DEC-1232 (6))
+Seven of W2-56's 154 cases were red in the third run of the 0.1.5 full suite. No product bug: the launcher behaves as
+DEC-1225 and F1 say; the two test files held the old readings. S5 (`test_w2_56_environment.py`, `1c8eb1ff8`): the
+session's `CLAUDE_CODE_SUBAGENT_MODEL` is the launcher's own Sonnet helper model (DEC-1225), never the parent's planted
+value, which differs from it, so a leak stays detectable (six cases). S6 (`test_w2_56_refused_arguments.py`,
+`e0a84c16c`): `--mcp-config` is refused when it names a server outside the role's list (case `rogue`); an empty
+`{"mcpServers": {}}` holds none outside the list, F1 accepts it, and a new case pins that (DEC-1232 (6)). Both commits
+by the independent test designer, each with a `Rewrite-Reason`. Green: `tests/acceptance/W2-56` (weekly),
+`tests/acceptance/W2-201`, `tests/unit/launch`, `tests/unit/optin`: 1828 passed; `gov accept W2-201` exit 0, 649 passed.

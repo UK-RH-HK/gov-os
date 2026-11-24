@@ -36,18 +36,19 @@ def box(tmp_path):
     return box
 
 
-# W2-60a (DAEO-cv58, KPI success 4, DEC-839 item 3): the launcher sets CLAUDE_CODE_SUBAGENT_MODEL itself, to the
-# session's model (the planted role's default): like LAUNCHER_OWNED's names it may be there, never with the parent's
-# value. Every other planted name is judged by w2_56_support.leaks as before (and a parent's value under any name,
-# this one included, is still caught by its mark).
-SESSION_OWNED = {"CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5"}
+# W2-60a (DAEO-cv58, KPI success 4, DEC-839 item 3; DEC-1225): the launcher sets CLAUDE_CODE_SUBAGENT_MODEL itself.
+# Since DEC-1225 every worker role launches Sonnet whatever its role file says, so the helper model is
+# 'claude-sonnet-5-5', never the parent's planted value (which differs from it and holds the mark). Like LAUNCHER_OWNED's
+# names it may be there, never with the parent's value. Every other planted name is judged by w2_56_support.leaks as
+# before (and a parent's value under any name, this one included, is still caught by its mark).
+SESSION_OWNED = {"CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5"}
 
 
 def _leaks(env: dict, planted: dict) -> list[str]:
     found = s.leaks(env, {name: value for name, value in planted.items() if name not in SESSION_OWNED})
     for name, own in SESSION_OWNED.items():
         if name in planted and name in env and env[name] != own:
-            found.append(f"{name}={env[name]!r} (not the session's {own!r})")
+            found.append(f"{name}={env[name]!r} (not the DEC-1225 helper model {own!r}, the parent's value leaked)")
     return found
 
 
