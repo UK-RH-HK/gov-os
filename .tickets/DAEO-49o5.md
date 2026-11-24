@@ -94,3 +94,9 @@ to exist; the existing prose stays. Commit `69263d2c9` (`tests/acceptance/W2-16/
 outcome pass, 141 passed, 0 failed, 1 skipped; one case
 (`test_w2_16_last_round.py::test_the_suite_runs_gov_and_copier_with_gov_role_unset`) maps to no line and is counted
 unmapped. Other D-4-regenerated READMEs may have the same header fault; not checked.
+
+## Fix: `gov.release._wheel` can build the pre-F3 variant (I-17; recorded under W2-17, DAEO-sdhj)
+
+`_wheel(repo, commit, keep, build_info=True)`: `build_info=False` builds the wheel without `gov/_build_info.py`, the wheel a
+gov older than F3 cut (0.1.5's). The default is unchanged; `gov release` still writes the build info. Used by
+`gov.install.pin.wheel_for` to reproduce such a release's manifest sha256. Fix: I-17 gov update refuses its own release's wheel.
