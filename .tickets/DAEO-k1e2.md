@@ -212,3 +212,7 @@ Inside one `measure` call, as `run_measure.sh`: ready check (probe, then `contro
 `64.4 to 90.9 %`), an engineer for F-1 and F-2 (a faulted attempt's figures never printed by `measure --kept`), rebuild, verify,
 review round 2 (the last, DEC-1010). F-3 (the --repo tree not checked against audit_commit) is a Wave 3 row; F-4 (an unexpected
 worker error leaves reader/ with no STOPPED) is recorded, the hand ACT of ruling 5 covers it.
+
+## Fix: the verdict-lines case counts the stamp line (F15, fixes-015a; W2-204 S17; DEC-1225 (4))
+- **Cause:** stale test, not a product bug. `figures.verdict_lines` prints the figure's stamp as one `STAMP ...` line after the five lines of item 8 (F15, recorded under DAEO-ma4q); `test_the_verdict_lines_show_the_planted_right_wrong_interval_and_the_bar` still asserted `len(out) == 5`.
+- **Fix:** it asserts six lines: the five of item 8 first and unchanged, nothing before them, the stamp line last. Commit: see `git log -- tests/unit/memaudit/test_judge.py` (Rewrite-Reason: F15).

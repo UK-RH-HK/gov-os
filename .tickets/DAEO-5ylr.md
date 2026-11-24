@@ -53,3 +53,7 @@ acceptance_tests:
 # W1-39 Copier kernel template and lock
 
 Distribution: template, answers, overlay list, lock and manifest.
+
+## Fix: doctor on a fresh project counted non-blocking connectors drift as a failure (F1; fixes-015a)
+
+Found 2026-11-24 in the weekly tier: `test_doctor_passes_on_a_freshly_created_project` red (reproduced; it passed in one earlier run only). Cause: a stale test. F1 added doctor's `connectors` part: a settings file without `disableClaudeAiConnectors: true`, or none (a copy holds none until `gov adapters generate`), is drift with `drift_blocking: false`, exit 0, by design (DEC-1232 (6)). The test counted every drift as failed. It now exempts only that part in that form; any other fail or drift still fails. Commit f2257a8c5 (Rewrite-Reason: DEC-1232 (6), F1); the test designer role should endorse it.

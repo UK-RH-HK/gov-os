@@ -26,7 +26,7 @@ ENGINEER, RESEARCH = support.ENGINEER, support.RESEARCH
 
 # A headless worker's ordinary arguments (DEC-183), without a permission mode.
 ORDINARY = ("-p", "Do the ticket's work.", "--output-format", "json", "--allowedTools", "Bash,Write", "--model",
-            "claude-opus-5-5", "--max-turns", "8")   # W2-60a: a model after -- must be the role's (DEC-839 item 1)
+            "claude-sonnet-5-5", "--max-turns", "8")   # Rewrite-Reason: DEC-1225 (every role launches Sonnet; a model after -- must be it)
 ADDED_DIRECTORY = "/w1-46-added-directory"
 
 FORMERLY_REFUSED = {

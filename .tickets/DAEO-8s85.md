@@ -138,3 +138,10 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
 **Reopened 2026-11-16 by the owner (DEC-1192 (2), P-ADOPT-TEMPLATES (a)):** release 0.1.0's `gov launch` refuses every worker in an adopted repository (LAUNCH_NO_TEMPLATE): it reads `.claude/templates/`, which nothing writes outside Gov OS's own repository (where an ACT does, DEC-315). S-ADOPTED has `gov adapters generate` write the copies from the kit's templates in an adopted repository, and `gov doctor` name a missing one. For release 0.1.1.
 
 **Reopened 2026-11-16 by the CTO within purpose (DEC-1157 (12); DEC-1207 (b), DEC-1205 (2)(iii)): ACT-BOX-LAUNCH-1 follow-up.** ACT-BOX-LAUNCH-1 changes the dispatcher's lead line (`launch_now.sh`, this ticket's S2): each lead starts inside the session box from the owner's pinned copy (`~/.gov-os-owner/box/session_start.sh`, `--scope tree`) with `--permission-mode bypassPermissions` inside the box, and a launch with no pinned box is refused (`LAUNCH_NO_BOX`). Its acceptance cases S2 and F2 (`tests/acceptance/W2-153/test_w2_153_dispatch.py`, the bed in `w2_153_support.py`) run the line in a temporary home with no pinned box, so they would go red on the after copy. An independent test designer plants a stub pinned box in the bed and lets F2 compare the boxed line's CLI arguments with the permission mode as decided; the cases hold on today's line and on the boxed one. The unit file `tests/unit/launch/test_w2_153_template.py` follows by the CTO's path case (DEC-1156 (7)). No KPI changes; closed again after the merge. Listed for the owner's reading.
+
+## Fix: caller model and launcher-own flags (DEC-1225, fixes-015a F1)
+
+Cause: stale tests. The bed role/caller model was Opus, refused since DEC-1225; and F2 comparison to the baseline
+launcher saw the launcher own `--mcp-config`, `--strict-mcp-config` and a lead `--effort medium` (fixes-015a F1,
+DEC-1225), now taken out like the mode pair, each checked present first. No product change. Commit: the one carrying
+`Rewrite-Reason: DEC-1225` for tests/acceptance/W2-153 (`git log -1 -- tests/acceptance/W2-153`).
