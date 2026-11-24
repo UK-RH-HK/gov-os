@@ -72,6 +72,7 @@ class Env:
     def repo(self, name) -> Path:
         p = self.repos / name
         p.mkdir(parents=True, exist_ok=True)
+        (p / ".git").mkdir(exist_ok=True)  # a real repository, so UR-7 never counts it temporary
         return p
 
     def launch(self, repo: Path, session, role):

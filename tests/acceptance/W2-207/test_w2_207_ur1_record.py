@@ -91,13 +91,13 @@ def test_ur1_a_session_with_two_models_gives_two_rows(env):
     assert rows["m-a"]["cost_usd"] == 0.000036
 
 
-def test_ur1_a_missing_price_table_exits_2_naming_it(env):
+def test_ur1_a_bare_root_succeeds_with_the_shipped_table(env):
+    # supersedes "a missing price table exits 2" (UR-6: the table ships with the product)
     plant_scenario(env)
     (env.root / "governance" / "project" / "usage-prices.yaml").unlink()
     r = env.daily(DAY)
-    assert r.returncode == 2, r.stdout + r.stderr
-    assert "usage-prices" in r.stdout + r.stderr
-    assert not (env.usage_dir / f"{DAY}.json").exists()
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert (env.usage_dir / f"{DAY}.json").is_file()
 
 
 def test_ur1_a_model_with_no_price_has_cost_null_and_is_named_unpriced(env):

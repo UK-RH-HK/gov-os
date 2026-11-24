@@ -23,7 +23,7 @@ absent.
 | S1 (UR-1) | `test_w2_207_ur1_record.py::test_ur1_the_record_is_machine_state_nothing_is_written_under_the_root_or_repositories` | no record under HOME/.gov-os/usage |
 | S1 (UR-1) | `test_w2_207_ur1_record.py::test_ur1_rerunning_a_day_rewrites_the_same_rows` | no `usage` command |
 | S1 (UR-1) | `test_w2_207_ur1_record.py::test_ur1_a_session_with_two_models_gives_two_rows` | no `usage` command |
-| S1 (UR-1) | `test_w2_207_ur1_record.py::test_ur1_a_missing_price_table_exits_2_naming_it` | exit is the CLI's usage error, not 2 naming `usage-prices` |
+| S1 (UR-1) | `test_w2_207_ur1_record.py::test_ur1_a_bare_root_succeeds_with_the_shipped_table` | supersedes the missing-table exit-2 case (UR-6): bare root exits 2 on the base; `Env.repo` now creates `.git` |
 | S1 (UR-1) | `test_w2_207_ur1_record.py::test_ur1_a_model_with_no_price_has_cost_null_and_is_named_unpriced` | no `usage` command |
 | S2 (UR-2) | `test_w2_207_ur2_totals.py::test_ur2_every_total_equals_the_sum_of_its_rows` | no `usage` command, no record |
 | S2 (UR-2) | `test_w2_207_ur2_totals.py::test_ur2_the_plan_reading_is_the_last_line_of_that_day` | no `usage` command, no record |
