@@ -75,7 +75,7 @@ from subprocess import SubprocessError
 import yaml
 
 from gov.cli.errors import GovError
-from gov.launch import criticality as crit, environ, model_exceptions, record, role as roles, session_record
+from gov.launch import criticality as crit, environ, model_exceptions, record, role as roles, role_table, session_record
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
 from gov.spend import brake as spend_brake
@@ -172,13 +172,10 @@ COMPACT_ENV, COMPACT_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW", "autoCompactWindow
 # W2-60a: the other names under env by which the CLI takes a compaction threshold.
 COMPACT_ENVS = (COMPACT_ENV, "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS")
 _UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
-# W2-184 (RUBRIC-2 at launch, DEC-1120): the options' forms, the trial and probe records' places, the effort floor.
+# W2-184 (RUBRIC-2 at launch, DEC-1120): the options' forms, the trial records' place, the effort floor.
 _TRIAL_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 _DECISION = re.compile(r"DEC-\d+")
-_PROBE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
-_VERDICT = re.compile(r"^```verdict[ \t]*\n(.*?)^```[ \t]*$", re.MULTILINE | re.DOTALL)
 TRIALS_REL = "governance/project/trials"
-PROBES_REL = "docs/probes"
 TRIAL_KEYS = frozenset({"role", "criticality", "model", "effort", "tickets", "reviewer"})
 FLOOR = "high"  # DEC-1120 (3): when the table's effort is high or above, the launch's own choice is not below it
 BELOW_FLOOR = ("low", "medium")
@@ -543,137 +540,19 @@ def _ticket_names(ticket_id: str, ticket: dict) -> list[str]:
 
 
 def _launch_records(root: Path) -> list[tuple[str, dict]]:
-    """The shared record folder's launch records (``record: gov-launch``), read once for the probe records' roots
-    (W2-184 5.1a) and the review count (6.1). A file there that cannot be read as JSON refuses: a skipped record could
-    hide a promotion or a review (P-td5-1, fail closed). Each is returned as ``(file stem, record)``."""
+    """The shared record folder's launch records (``record: gov-launch``), read once for the review count (6.1). A file
+    there that cannot be read as JSON refuses: a skipped record could hide a review (P-td5-1, fail closed). Each is
+    returned as ``(file stem, record)``."""
     found = []
     for path in sorted(record.folder(root).glob("*.json")):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            raise _refuse(f"the launch record {path.name} cannot be read as JSON, so the roots of the ticket's probe "
-                          f"records cannot be found and its reviews cannot be counted") from None
+            raise _refuse(f"the launch record {path.name} cannot be read as JSON, so the ticket's reviews cannot be "
+                          f"counted") from None
         if isinstance(data, dict) and data.get("record") == "gov-launch":
             found.append((path.stem, data))
     return found
-
-
-def _probe_roots(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> list[Path]:
-    """W2-184 5.1a (P-W2-184-1 (a), DEC-1010): the launch root, then, in sorted order, every other folder that a
-    launch record of this ticket (under any of its names, any role) gives as its ``root``. A named root that is not
-    there, or is not a folder, is skipped."""
-    others = set()
-    for _, data in launches:
-        named = data.get("root")
-        if not isinstance(data.get("ticket"), str) or data["ticket"] not in names or not isinstance(named, str) \
-                or not os.path.isabs(named) or not os.path.isdir(named):
-            continue
-        real = Path(os.path.realpath(named))
-        if real != root:
-            others.add(real)
-    return [root, *sorted(others, key=str)]
-
-
-def _probe_files(roots: list[Path], names: list[str]) -> list[tuple[str, list[tuple[Path, Path]]]]:
-    """The ticket's probe records (W2-184 5.1, 5.1a): the ``.md`` files under ``docs/probes/<ticket id>/`` of each root,
-    at any depth, as ``(root-relative path, [(file, root), ...])`` in sorted path order. Every root's copy of a path is
-    kept (R3, interface 10.3, revising P-td5-2), the launch root's first, then the others in sorted order."""
-    copies: dict[str, list[tuple[Path, Path]]] = {}
-    for base in roots:
-        for name in names:
-            folder = base / PROBES_REL / name
-            if not _PROBE_NAME.fullmatch(name) or not folder.is_dir():
-                continue
-            for path in sorted(folder.rglob("*.md")):
-                if path.is_file():
-                    found = copies.setdefault(path.relative_to(base).as_posix(), [])
-                    if all(path != seen for seen, _ in found):
-                        found.append((path, base))
-    return sorted(copies.items())
-
-
-def _read_probe(rel: str, path: Path) -> bytes:
-    try:
-        return path.read_bytes()
-    except OSError:
-        raise _refuse(f"the probe record {rel} cannot be read, so the ticket's promotion cannot be judged") from None
-
-
-def _probe_record(rel: str, data: bytes) -> tuple[dict, str] | None:
-    """One probe record's front matter and the text after it, from the file's bytes; ``None`` when it has none, or it
-    is not a map with ``type: probe`` (skipped). A front matter that is not YAML, or bytes that are not UTF-8, refuse,
-    naming the file as ``rel`` (its root-relative path, with the file's own path when it lies under another root)."""
-    try:
-        lines = data.decode("utf-8").splitlines()
-    except UnicodeDecodeError:
-        raise _refuse(f"the probe record {rel} cannot be read, so the ticket's promotion cannot be judged") from None
-    if not lines or lines[0].strip() != "---":
-        return None
-    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
-    if end is None:
-        return None
-    try:
-        front = load_yaml_unique("\n".join(lines[1:end]))
-    except yaml.YAMLError:
-        raise _refuse(f"the probe record {rel} has a front matter that is not YAML") from None
-    if not isinstance(front, dict) or front.get("type") != "probe":
-        return None
-    return front, "\n".join(lines[end + 1:])
-
-
-def _fails_open(rel: str, body: str) -> bool:
-    """True when a ``verdict`` block of the record holds a finding whose consequence is ``fails open``; a block that
-    is not JSON of JUDGEMENT.md's shape refuses."""
-    found = False
-    for block in _VERDICT.finditer(body):
-        try:
-            data = json.loads(block.group(1))
-            kpis = data["kpis"]
-            findings = [finding for kpi in kpis for finding in kpi["findings"]]
-            if not isinstance(kpis, list) or not all(isinstance(finding, dict) for finding in findings) \
-                    or not all(isinstance(kpi["findings"], list) for kpi in kpis):
-                raise TypeError
-        except (ValueError, KeyError, TypeError):
-            raise _refuse(f"the probe record {rel} has a verdict block that is not JSON of the form "
-                          f'{{"kpis": [{{"kpi": ..., "verdict": ..., "findings": [{{"id": ..., "consequence": ...}}]}}]}}'
-                          ) from None
-        found = found or any(finding.get("consequence") == "fails open" for finding in findings)
-    return found
-
-
-def _promotion(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> dict | None:
-    """W2-184 5.2: ``{"reason", "record"}`` when the ticket's probe records, under the launch root and every root the
-    ticket's launch records name (5.1a), hold a fail-open finding (checked first), or two or more of them have
-    ``judgement`` fail or failed; ``None`` when neither. The record is named by its root-relative path.
-
-    R3 (interface 10.3): every root's copy of a path is read (identical bytes are one copy), and each copy that
-    refuses refuses the launch; the path is one review: it holds a fail-open finding, or has failed, when any of its
-    copies does, and counts as one failed record at most."""
-    failed, fail_open = [], None
-    for rel, copies in _probe_files(_probe_roots(root, names, launches), names):
-        read: list[bytes] = []
-        path_fails_open = path_failed = False
-        for path, base in copies:
-            shown = rel if base == root else f"{rel} ({path})"
-            data = _read_probe(shown, path)
-            if data in read:
-                continue
-            read.append(data)
-            loaded = _probe_record(shown, data)
-            if loaded is None:
-                continue
-            front, body = loaded
-            path_fails_open = _fails_open(shown, body) or path_fails_open
-            path_failed = path_failed or front.get("judgement") in ("fail", "failed")
-        if path_fails_open and fail_open is None:
-            fail_open = rel
-        if path_failed:
-            failed.append(rel)
-    if fail_open is not None:
-        return {"reason": "a fail-open finding", "record": fail_open}
-    if len(failed) >= 2:
-        return {"reason": "two failed reviews", "record": failed[1]}
-    return None
 
 
 def _counted_reviews(launches: list[tuple[str, dict]], names: list[str], resume: str | None) -> list[dict]:
@@ -732,67 +611,53 @@ def _trial(root: Path, trial_id: str, role: str, ticket_class: str, names: list[
 def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: dict, given: dict, reason: str | None,
             trial_id: str | None, owner_named: str | None, chore: bool = False) -> dict:
     """W2-184, RUBRIC-2 at launch (DEC-1120): the session's model and effort and where each came from, the ticket's
-    criticality, the promotion, the review round and the other record keys. Every refusal comes here, before the gate
+    criticality, the review round and the other record keys. Every refusal comes here, before the gate
     and before any record or session is made. A chore (W2-201 X2) has no ticket, so no class: the role file's default
-    line, no promotion, no review count, no trial, and an exception only where the entry names no class."""
+    line, no review count, no trial, and an exception only where the entry names no class."""
     table, profile = loaded["by_criticality"], ticket.get("profile")
     names = _ticket_names(ticket_id, ticket) if ticket_id is not None else []
+    row = role_table.row_for(root, role)  # MR-1: the role table's row where the project has the file; else as before
+    if row is not None:
+        table = None
     if chore:
         if trial_id is not None:
             raise _refuse(f"--trial {trial_id} is refused: a trial needs the ticket's criticality, and a chore has no "
                           f"ticket")
-        counted, review_round, probe, promotion, opus, ticket_class = [], None, False, None, None, None
+        counted, review_round, ticket_class = [], None, None
         table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
     elif not crit.exists(root):
         # 1.4 (amended 2026-11-14): no criticality.yaml, the launch as before W2-184 (DEC-1167 (2)): the role's default
-        # line for every class; no promotion, no review count, no probe, no same-setting refusal; a trial needs the file
+        # line for every class; no review count, no same-setting refusal; a trial needs the file
         if trial_id is not None:
             raise _refuse(f"--trial {trial_id} is refused: a trial needs the ticket's criticality, and {crit.REL} is "
                           f"not there")
-        counted, review_round, probe, promotion, opus, ticket_class = [], None, False, None, None, None
+        counted, review_round, ticket_class = [], None, None
         table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
     else:  # the file is read on every worker launch; one that cannot be read or is malformed refuses (1.3)
         ticket_class = crit.ticket_criticality(root, ticket)
-        launches = _launch_records(root)  # every launch reads the folder, for 5.1a's roots and 6.1's count (P-td5-1)
-        promotion = _promotion(root, names, launches)
-        if promotion is not None and trial_id is not None:
-            raise _refuse(f"--trial {trial_id} is refused: a promotion applies to {ticket_id} ({promotion['reason']}, "
-                          f"{promotion['record']}), and a lower model is refused (DEC-1120 (3))")
+        launches = _launch_records(root)  # every launch reads the folder, for 6.1's count (P-td5-1)
         counted, review_round = [], None
         if role == AUDITOR and profile == "FULL":
             counted = _counted_reviews(launches, names, given["resume"])
             review_round = len(counted) + 1
-        probe = review_round is not None and review_round >= 2
-        opus = crit.opus_model(root) if promotion is not None or probe else None
         if table is not None:
             table_model, table_effort = table[ticket_class]["full" if profile == "FULL" else "other"]
             table_source = "by criticality"
         else:
             table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    if row is not None:  # DEC-1246 (3)(b): one row per role, whatever the class or the review round
+        table_model, table_effort, table_source = row["model"], row["effort"], "role table"
     if not model_exceptions.is_sonnet(table_model):
         # fixes-015a F19 (DEC-1225): the rubric gives every launched role Sonnet; a role file's table or default line
         # naming another model never starts it, whatever the file says. Only an exceptions entry runs another model.
         table_model = LEAD_MODEL
     trial = _trial(root, trial_id, role, ticket_class, names) if trial_id is not None else None
 
-    # the model (DEC-1225): the table's, or the trial's; a promotion's or probe's Opus only where an exceptions entry for
-    # this role, ticket and --owner-named covers it (resolved after the table's model is known)
+    # the model (DEC-1225): the table's, or the trial's; no promotion or probe on Opus exists (DEC-1246 (3)(b))
     exception = None
-    if promotion is not None or probe:
-        entry = None  # an exceptions file that is missing or unreadable covers nothing: the model stays the table's
-        if opus != table_model:
-            try:
-                entry, _ = model_exceptions.find(root, role, opus, ticket_class, ticket_id, owner_named)
-            except GovError:
-                pass
-        if entry is not None:
-            model, exception = opus, str(entry.get("decided"))
-            model_source = "promotion" if promotion is not None else "probe"
-            why = (f"a promotion applies ({promotion['reason']})" if promotion is not None
-                   else f"the second review is the probe ({opus})")
-    if exception is None and trial is not None:
+    if trial is not None:
         model, model_source, why = trial["model"], "trial", f"the trial {trial_id}'s"
-    elif exception is None:
+    else:
         model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
     shown = ticket_class if ticket_class is not None else \
         "none (a chore has no ticket)" if chore else f"none (no {crit.REL})"
@@ -821,7 +686,7 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
             # limiters this launch meets, and only where the table decides: a trial stays as it is
             said = (f"the CLI arguments carry --model {given['model']}, which is not the session's model {model} "
                     f"({why}; the ticket's class is {shown}) (DEC-839 item 1, DEC-1120 (3), DEC-1225)")
-            if (promotion is not None or probe or trial is not None) and exception is None:
+            if trial is not None and exception is None:
                 raise _refuse(f"{said}; another model comes only from an exception in {model_exceptions.REL} "
                               f"(DEC-1225)")
             entry = lifted(given["model"], said)
@@ -834,7 +699,7 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
                               f"(DEC-1225)")
         exception = str(entry.get("decided"))
 
-    # the effort: trial, after --, probe, then the table's
+    # the effort: trial, after --, then the table's
     own = True
     if trial is not None:
         if given["effort"] is not None and given["effort"] != trial["effort"]:
@@ -845,15 +710,10 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
         if given["effort"] in BELOW_FLOOR and table_effort not in BELOW_FLOOR:
             raise _refuse(f"the CLI arguments carry --effort {given['effort']}, below the floor '{FLOOR}' of "
                           f"{role}'s {table_effort} (DEC-1120 (3))")
-        resolved = "max" if probe else table_effort  # interface 3.2a: the effort already resolved for this launch
         if given["effort"] is not None:
             effort, effort_source = given["effort"], "after --"
-            if effort == resolved:  # not the launch's own choice: needs no --reason; the probe's max stays `probe`
+            if effort == table_effort:  # not the launch's own choice: needs no --reason
                 own = False
-                if probe:
-                    effort_source = "probe"
-        elif probe:
-            effort, effort_source, own = "max", "probe", False
         else:
             effort, effort_source, own = table_effort, table_source, False
     if effort == "max" and own and reason is None:
@@ -873,7 +733,7 @@ def _rubric(root: Path, role: str, ticket_id: str | None, ticket: dict, loaded: 
             "tier": (model.split("-") + [model])[1], "criticality": ticket_class, "exception": exception,
             # W2-121c RT-8: the file the choice came from; a chore's came from none (W2-201 X2)
             "rubric": crit.REL if not chore and crit.exists(root) else None,
-            "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
+            "trial": trial_id, "promotion": None, "effort_reason": reason, "owner_named": owner_named,
             "review_round": review_round}
 
 
@@ -918,12 +778,22 @@ def _worker_plan(root: Path, role: str, ticket_id: str | None, given: dict, temp
             "composed": composed, "projection_usd": projection_usd, "kind": kind}
 
 
+def _lead_setting(root: Path) -> tuple[str, str]:
+    """A lead's model and effort: the role table's ``lead`` row where the project has the file (a table that cannot be
+    read refuses), else the launcher's own Sonnet at medium (MR-1)."""
+    row = role_table.row_for(root, "lead")
+    if row is None:
+        return LEAD_MODEL, LEAD_EFFORT
+    return (row["model"] if model_exceptions.is_sonnet(row["model"]) else LEAD_MODEL), row["effort"]
+
+
 def _lead_model_args(root: Path, role: str, ticket_id: str | None, cli_args: list[str]) -> list[str]:
     """DEC-1225 (R2): the arguments that give a lead its model: ``--model <LEAD_MODEL>`` added by the launcher (the CLI's
     own default, the CTO's Opus, is never a lead's model), or none when the caller's ``--model`` is that model (not
     doubled). Any other ``--model`` refuses (``LAUNCH_REFUSED``) unless an entry of the exceptions file for this role
     and model has every limiter met by this launch; a lead takes no ``--owner-named``, so no decision limiter is met.
     Fable is refused whatever the file holds."""
+    lead_model = _lead_setting(root)[0]
     asked: dict = {}
     for arg, value in zip(cli_args, [*cli_args[1:], None]):
         found = _given_value("--model", arg, value, asked)
@@ -931,10 +801,10 @@ def _lead_model_args(root: Path, role: str, ticket_id: str | None, cli_args: lis
             asked["--model"] = found
     model = asked.get("--model")
     if model is None:
-        return ["--model", LEAD_MODEL]
-    if model == LEAD_MODEL:
+        return ["--model", lead_model]
+    if model == lead_model:
         return []
-    said = (f"the CLI arguments carry --model {model} for a lead ({role}): a lead runs {LEAD_MODEL} (DEC-1225); "
+    said = (f"the CLI arguments carry --model {model} for a lead ({role}): a lead runs {lead_model} (DEC-1225); "
             f"another model comes only from an entry of {model_exceptions.REL}")
     if model_exceptions.names_fable(model):
         raise _refuse(f"{said}; no session runs Fable, whatever the file holds (DEC-1225 (3))")
@@ -955,10 +825,11 @@ def _lead_model_args(root: Path, role: str, ticket_id: str | None, cli_args: lis
     return []
 
 
-def _lead_effort_args(cli_args: list[str]) -> list[str]:
-    """fixes-015a F14: ``--effort medium`` for a lead, or none when the caller's own ``--effort`` stands (not doubled)."""
+def _lead_effort_args(cli_args: list[str], root: Path | None = None) -> list[str]:
+    """fixes-015a F14: the lead's effort (medium; the role table's ``lead`` row where there is one), or none when the
+    caller's own ``--effort`` stands (not doubled)."""
     given = any(arg == "--effort" or arg.startswith("--effort=") for arg in cli_args)
-    return [] if given else ["--effort", LEAD_EFFORT]
+    return [] if given else ["--effort", LEAD_EFFORT if root is None else _lead_setting(root)[1]]
 
 
 def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
@@ -1190,6 +1061,9 @@ def plan(root: Path, role: str, ticket_id: str | None, *, fix: str | None = None
     if kind != CHORE:
         _check_ticket(root, role, ticket_id, fix=kind == FIX)
     model, effort = roles.launch_default(root, role)
+    row = role_table.row_for(root, role)  # MR-1: the table's row replaces the role file's line where the project has one
+    if row is not None:
+        model, effort = row["model"], row["effort"]
     print(f"model {model}, effort {effort}")
     return 0
 
@@ -1240,7 +1114,7 @@ def launch(root: Path, role: str, ticket_id: str | None, cli_args: list[str], ga
             raise _refuse(f"unknown ticket '{ticket_id}'")
         _check_cli_args(cli_args)
         model_args = _lead_model_args(root, role, ticket_id, cli_args)  # DEC-1225: before anything is read or started
-        model_args += _lead_effort_args(cli_args)  # fixes-015a F14: Sonnet at medium
+        model_args += _lead_effort_args(cli_args, root)  # fixes-015a F14: Sonnet at medium
         model_args += [OWN_SWITCHES[-1], *_mcp_args(root, role, cli_args)]  # fixes-015a F1: strict, own config
         _check_repository_settings(root, False)
         template = template_args(root, role)
