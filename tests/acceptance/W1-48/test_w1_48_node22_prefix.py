@@ -7,6 +7,10 @@ first ``node`` on ``PATH``. … Every future Node 22 install uses the prefix."
 DEC-207: "W1-48's test designer adds a check that every Node 22 install command
 in the registry carries the prefix ``PATH=~/.nvm/versions/node/v22.23.3/bin:$PATH``."
 
+DEC-1228 (the REA study's second Node 22, recorded as ``node-22.23.5``; DEC-1214 G7): the prefix is that of a Node 22 the
+registry itself records, v22.23.3 for the stack's tools or v22.23.5 for the REA study; the nvm default v18 and any Node
+the registry does not record are no prefix. No npm command runs under the default node.
+
 The registry's commands spell the home directory ``$HOME``; ``~`` and
 ``${HOME}`` are the same directory and are accepted.
 
@@ -22,6 +26,8 @@ import pytest
 import w1_48_support as support
 
 PREFIXED = "PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH "
+PREFIXED_REA = "PATH=$HOME/.nvm/versions/node/v22.23.5/bin:$PATH "
+RECORDED = ["22.23.3", "22.23.5"]   # what the registry records today; the check's own cases fix them
 
 
 def _node_22_commands(registry):
@@ -31,13 +37,30 @@ def _node_22_commands(registry):
             if support.is_node_22_command(str(entry.get(key, "")))]
 
 
+# Rewrite-Reason: DEC-1228: the prefix may be that of any Node 22 the registry records (v22.23.3 or v22.23.5), not only v22.23.3.
 def test_every_node_22_command_of_the_registry_carries_the_path_prefix(registry):
+    recorded = support.recorded_node_22_versions(registry)
     wrong = [f"{tool}.{key}: {command!r}" for tool, key, command in _node_22_commands(registry)
-             if not support.carries_node_22_prefix(command)]
+             if not support.carries_node_22_prefix(command, recorded)]
     assert wrong == [], (
-        "Node 22 commands of the registry without the prefix PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH "
-        f"before the package manager (DEC-202, DEC-207): {wrong}"
+        "Node 22 commands of the registry without the prefix PATH=$HOME/.nvm/versions/node/v<recorded>/bin:$PATH "
+        f"of a Node 22 the registry records ({recorded}) before the package manager (DEC-202, DEC-207, DEC-1228): {wrong}"
     )
+
+
+def test_the_registry_records_the_stack_s_node_22_and_the_rea_study_s(registry):
+    """The prefixes the check takes are the registry's own: v22.23.3 (``node``) and v22.23.5 (``node-22.23.5``)."""
+    assert {"22.23.3", "22.23.5"} <= set(support.recorded_node_22_versions(registry)), (
+        f"recorded Node 22 versions: {support.recorded_node_22_versions(registry)}")
+
+
+def test_the_rea_install_runs_npm_under_the_rea_study_s_node(registry):
+    """DEC-1228: the ``rea-agents`` install is a Node 22 command under v22.23.5 and not under the default node or the stack's."""
+    entry = support.one(registry, ["rea-agents"])
+    install = str(entry.get("install", ""))
+    assert support.is_node_22_command(install), f"not taken for a Node 22 command: {install!r}"
+    assert support.node_22_path_prefix(["22.23.5"]).search(install), f"no v22.23.5 prefix in {install!r}"
+    assert support.carries_node_22_prefix(install, support.recorded_node_22_versions(registry))
 
 
 @pytest.mark.parametrize("tool", ["openspec", "ccusage"])
@@ -59,10 +82,14 @@ def test_the_check_sees_the_node_22_commands_the_registry_has(registry, tool):
     "PATH=$HOME/.nvm/versions/node/v22.23.3/bin npm install -g x@1",
     "npm install -g x@1 && PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH npm ls -g",
     "MYPATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH npm install -g x@1",
+    # Rewrite-Reason: DEC-1228: a Node 22 the registry does not record, and the REA node's bin without its prefix, are no prefix
+    "PATH=$HOME/.nvm/versions/node/v22.23.4/bin:$PATH npm install -g x@1",
+    "$HOME/.nvm/versions/node/v22.23.5/bin/npm install --save-exact rea-agents@6.10.1",
+    "cd /tmp/study && PATH=$HOME/.nvm/versions/node/v18.20.8/bin:$PATH npm install rea-agents@6.10.1",
 ])
 def test_the_check_refuses_a_node_22_command_without_the_prefix(command):
     assert support.is_node_22_command(command), f"not taken for a Node 22 command: {command!r}"
-    assert not support.carries_node_22_prefix(command), f"passes as prefixed: {command!r}"
+    assert not support.carries_node_22_prefix(command, RECORDED), f"passes as prefixed: {command!r}"
 
 
 @pytest.mark.parametrize("command", [
@@ -71,10 +98,13 @@ def test_the_check_refuses_a_node_22_command_without_the_prefix(command):
     "PATH=~/.nvm/versions/node/v22.23.3/bin:$PATH npm install -g x@1",
     "PATH=${HOME}/.nvm/versions/node/v22.23.3/bin:${PATH} npx x@1",
     'PATH="$HOME/.nvm/versions/node/v22.23.3/bin:$PATH" npm install -g x@1',
+    # Rewrite-Reason: DEC-1228: the prefix of the REA study's recorded Node 22
+    PREFIXED_REA + "npm install --save-exact --omit=optional --ignore-scripts rea-agents@6.10.1",
+    "cd ~/gov-os-runs/study-startup-launchpad/tool && " + PREFIXED_REA + "npm install rea-agents@6.10.1",
 ])
 def test_the_check_accepts_a_node_22_command_with_the_prefix(command):
     assert support.is_node_22_command(command), f"not taken for a Node 22 command: {command!r}"
-    assert support.carries_node_22_prefix(command), f"refused although prefixed: {command!r}"
+    assert support.carries_node_22_prefix(command, RECORDED), f"refused although prefixed: {command!r}"
 
 
 @pytest.mark.parametrize("command", [
