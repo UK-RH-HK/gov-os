@@ -1,0 +1,23 @@
+# The escalation rubric's level table (W2-211 EL-1; DEC-1246 (3)(b); docs/emergency-2/T2-ESCALATION-RUBRIC.md section 2).
+# A decision record states three facts: `touches`, `reversible`, `inside`. Its level is the highest of the touches
+# level and the place level; `emergency: yes` makes it `emergency`; `rounds` of `rounds_p1_at` or more and `spends: yes`
+# make it P1. Deciders rank owner > CTO > lead; one at or above the level passes. No file: the code's default, the same.
+touches:
+  spec: P1
+  kpi: P1
+  standing-decision: P1
+  contract: P1
+  charter: P1
+  secret: P1
+  paid-service: P1
+  model-effort: P1
+  release: P1
+  shared-code: P2
+  cross-stream: P2
+  kernel-text: P2
+  own-ticket: P3
+place:
+  "yes": {worktree: P3, repository: P2, outside: P2}
+  "no": {worktree: P2, repository: P1, outside: P1}
+rounds_p1_at: 3
+spends: P1

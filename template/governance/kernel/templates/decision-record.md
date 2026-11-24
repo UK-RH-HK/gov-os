@@ -21,6 +21,12 @@ constrains: []
 - Then run `gov links --since HEAD~1`, or the structural pass, and fix its findings before the next commit [DEC-1073].
 - The record's commit carries `Task: decision-record`, `Implements: DEC-new`, `Role: orchestrator` and
   `Decided-by: owner (chat, YYYY-MM-DD)` [DEC-861].
+- A record states three facts, as bullets of its entry: `- **Touches:** spec, kpi` (what it changes: spec, kpi,
+  standing-decision, contract, charter, shared-code, cross-stream, kernel-text, secret, paid-service, model-effort,
+  release, own-ticket), `- **Reversible:** yes|no` and `- **Inside:** worktree|repository|outside`; `**Spends:**`,
+  `**Rounds:**` and `**Emergency:**` when they hold. Code computes the level from them (`governance/project/escalation.yaml`,
+  `gov decisions level`) and `gov decisions basis --range` refuses a `Decided-by` below it with `DECISION_BELOW_LEVEL`
+  (P1 the owner, P2 the CTO, P3 a lead). An entry that states no facts is listed `unstated`, not judged.
 - A rule the decision adopts is written here, never only in a scratch file this points to [DEC-1073].
 -->
 

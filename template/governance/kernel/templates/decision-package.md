@@ -7,6 +7,22 @@ title: The question, in one line
 rank: P2             # P1, P2 or P3, by critical path and irreversibility
 cit: CIT-0000        # the CIT this gate belongs to; it authorises nothing in another CIT
 constrains: []       # the tickets that wait on this package (DEC-308)
+# The structured form `gov decisions page` reads (all optional in the schema; the page takes a package only when all hold):
+question: ""         # one or two sentences, 300 characters at most
+found: ""            # what was found, in plain words, 900 at most
+options:             # 2 to 6, keys a, b, c in order; label 80, cost 240, consequence 240 characters at most
+  - {key: a, label: "", cost: "", consequence: ""}
+  - {key: b, label: "", cost: "", consequence: ""}
+recommendation: {option: a, reason: "", confidence: medium}   # one key of options; reason 400; low, medium or high
+sources: []          # files, decision ids and commits; each must exist; 12 at most
+blocks: nothing      # or what stops until it is answered; 200 at most
+rubric: P1.1         # the escalation rubric line that makes it the owner's: P1.1 to P1.10, or P2.brought
+touches: []          # what it changes: spec, kpi, standing-decision, contract, charter, shared-code, cross-stream,
+                     # kernel-text, secret, paid-service, model-effort, release, own-ticket
+reversible: yes      # yes or no
+inside: repository   # worktree, repository or outside; with `touches` these compute the level (P3, P2, P1)
+# optional: deadline, meanwhile (200), under [DEC-n], raised {by, ticket, date}, replaces DP-n, file_only, spends,
+# rounds, emergency
 ---
 
 # DP-0000 — The question, in one line

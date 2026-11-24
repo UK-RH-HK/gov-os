@@ -136,6 +136,16 @@ def _record(entry: dict, exists) -> dict:
             "verdict": verdict, "reason": reason}
 
 
+def _with_level(root: Path, record: dict, entry: dict, decided_by: str | None, table: dict) -> dict:
+    """``record`` and the level verdict (W2-211 EL-2): ``level`` is ``gov.decisions.level.judge_entry``'s."""
+    from gov.decisions import level
+
+    facts = level.entry_facts(_fields(entry["lines"]))
+    record["decided_by"] = decided_by
+    record["level"] = level.judge_entry(facts, decided_by, table)
+    return record
+
+
 # --- git objects ---------------------------------------------------------------------------------------------------
 
 def _run(root: Path, *args: str) -> subprocess.CompletedProcess:
@@ -212,7 +222,35 @@ def check_range(root: Path, range_: str | None, register: str) -> dict:
     if after is None:
         raise BasisError("BASIS_REGISTER_MISSING", f"{path} is not in the tree of {end[:12]}")
     exists = _exists_in(root, end)
-    return {"range": label, "entries": [_record(e, exists) for e in _new_entries(_text_at(root, start, path), after)]}
+    new = _new_entries(_text_at(root, start, path), after)
+    from gov.decisions import level
+
+    try:
+        table = level.load_table(root)
+    except level.LevelError as error:
+        raise BasisError(error.code, error.message) from None
+    deciders = _deciders(root, start, end, path, {e["id"] for e in new})
+    return {"range": label, "entries": [_with_level(root, _record(e, exists), e, deciders.get(e["id"]), table)
+                                        for e in new]}
+
+
+def _deciders(root: Path, start: str | None, end: str, path: str, wanted: set) -> dict:
+    """The ``Decided-by`` trailer of the first commit of the range that has each wanted entry in the register."""
+    found: dict = {}
+    if not wanted:
+        return found
+    log = _out(root, "log", "--reverse", "--format=%H", *([f"{start}..{end}"] if start else [end]), "--", path)
+    for commit in log.split():
+        if wanted <= set(found):
+            break
+        text = _text_at(root, commit, path) or ""
+        here = {m.group(1) for m in re.finditer(r"^###[ \t]+(DEC-\d+)[ \t]", text, re.MULTILINE)}
+        fresh = (wanted & here) - set(found)
+        if fresh:
+            trailer = _out(root, "show", "-s", "--format=%(trailers:key=Decided-by,valueonly,unfold)", commit).strip()
+            for entry_id in fresh:
+                found[entry_id] = trailer.splitlines()[0].strip() if trailer else None
+    return found
 
 
 def week(root: Path, since: str | None, register: str, now: datetime | None = None) -> dict:
