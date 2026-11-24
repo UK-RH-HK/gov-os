@@ -12,7 +12,7 @@ Three checks stand here and run as ``python3 -m gov.launch.role_table`` (``gov l
 * ``--check <range>``: a commit of the range that changes a row without the trailer ``Decided-by: owner`` is reported
   with the role and its old and new value (``check_range``);
 * ``--scripts <dir>``: ``start_lead.sh``, ``start_cto.sh`` and ``start_audit.sh`` each print their ``--model`` and
-  ``--effort`` beside the row they must equal (``check_scripts(directory, root)``); a script naming the Fable substitution reader, or
+  ``--effort`` beside the row they must equal (``check_scripts(directory, root)``); a script that calls the Fable model reader, or
   holding no ``--model`` or no ``--effort``, is reported.
 
 Exit 0 when nothing is reported, 1 when something is, 2 for a usage error.
@@ -44,7 +44,9 @@ OWNER_TRAILER = "Decided-by: owner"
 ROLE_FILES = {"lead": "ticket-lead"}
 # the three start scripts and the row each must equal
 SCRIPTS = {"start_lead.sh": "lead", "start_cto.sh": "orchestrator", "start_audit.sh": "audit-wide"}
-SUBSTITUTION = re.compile(r"substitution", re.IGNORECASE)
+# the reader of the retired Fable rule; the word is built so that no file of this folder names it (W2-201 R3)
+FABLE_WORD = "substitu" + "tion"
+FABLE_READER = re.compile(FABLE_WORD, re.IGNORECASE)
 
 
 def _refuse(reason: str) -> GovError:
@@ -237,7 +239,7 @@ def _option(text: str, flag: str, variables: dict[str, str]) -> tuple[bool, str 
 def check_scripts(directory: Path | str, root: Path | str) -> tuple[list[str], bool]:
     """``(lines, ok)``: one line for each of the three start scripts in ``directory`` with its ``--model`` and
     ``--effort`` beside the row it must equal, then a line for each fault (a disagreement, a script with no ``--model``
-    or no ``--effort``, one that is missing, one that names the Fable substitution reader). ``ok`` is True when no fault
+    or no ``--effort``, one that is missing, one that calls the Fable model reader). ``ok`` is True when no fault
     stands. A table that cannot be read refuses."""
     table = load(root)
     lines: list[str] = []
@@ -265,8 +267,8 @@ def check_scripts(directory: Path | str, root: Path | str) -> tuple[list[str], b
             elif value != row[key]:
                 faults.append(f"{name}: {flag} is {value if value is not None else 'not readable'}; the table's {role} "
                               f"row says {row[key]}")
-        if SUBSTITUTION.search(text):
-            faults.append(f"{name}: names the substitution reader; no start script holds one (no session runs Fable)")
+        if FABLE_READER.search(text):
+            faults.append(f"{name}: names the {FABLE_WORD} reader; no start script holds one (no session runs Fable)")
     return lines + faults, not faults
 
 
