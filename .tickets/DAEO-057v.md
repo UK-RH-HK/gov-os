@@ -91,3 +91,9 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-18), as approved (DEC-729). The list row
 - **No guard, no sandbox, no ACTs (§2):** `gov install` is an ordinary command; the hook command lines change by an ordinary commit (2.10).
 
 **Closed at the land 2026-11-18 by the CTO (EMERGENCY-2 4.3 step 5):** merged into w2/integrate with gov accept green on the merged tree; no review (3.6).
+
+## Fix: the fixture's wheel rebuild lacked the F3 build-info file (fixes-015a fallout)
+
+Found 2026-11-24: 25 ERRORS at setup of `releases` in `tests/acceptance/W2-18/`: `release 0.9.0: the wheel built again from 75a550ec... is gov-0.9.0-py3-none-any.whl 18fed316..., the manifest names ... b3af4aec...: the build is not reproducible on this machine`. Cause: stale test fixture, not environment and not a product bug. F3 (`0a0985216`, DAEO-kh9l) made `gov.release._wheel`, the one build route, write `gov/_build_info.py` (the commit) into the wheel; `w2_18_support.build_wheel` rebuilds the wheel on its own and did not, so its sha256 could never equal the manifest's. Fix: the fixture writes the same file before building (`Rewrite-Reason: F3`). Result: 25 passed. Commit: see `git log --grep "W2-18 fixture"`.
+
+Re-made by the independent test designer on `e2/fix-015a-fallout-clean` (`b0723cbbe`, landed in `4f973c1a0`), because the first commit was written by an engineer helper under the test designer's trailer (I-15; DEC-1243 (2)).
