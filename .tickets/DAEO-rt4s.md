@@ -60,3 +60,12 @@ Written 2026-11-19 by the slice 3 lead at the end of W2-205 (the night's brief: 
 **Largest part and a split option.** RT-1 across tickets (the first KPI line) is the biggest item (the rest of audit 3 D2 and D9); if it runs long, split it into its own ticket ahead of the cut-over, which then carries RT-3, RT-5, RT-6, RT-7, D8 and F1.
 
 **Open questions for the owner (one line each).** (a) When the cut-over runs (recommended: a day, not a night, so that the CTO watches the first passes). (b) Whether `relaunch` ships on (recommended: yes after one day of the new pass).
+
+## Fix: usage and context per repository, per role, per session, daily (DEC-1246 (3)(c); plan item 3-10; RT-7)
+
+Approved by the CTO's brief of 2026-11-24 (`docs/emergency-2/briefs/LEAD-usage-per-repo.md`). New module `src/gov/usage/` (command `gov usage daily | show`); price table `governance/project/usage-prices.yaml`. Scratch tools stay until Phase 4.
+
+- UR-1 One daily record. `gov usage daily [--date D]` writes `~/.gov-os/usage/<D>.json` (machine state, in no repository): one row per session that day with repository, session id, role (from the launch record, else the subagent's `agentType`, else the CTO's session id file, else `unknown` named), model, tokens in, out, cache read, cache creation, the context peak (largest single request's input plus cache read plus cache creation) and cost at list price (the price table is one committed file with its date). Verify: `tests/acceptance/W2-207/` UR-1 cases on planted transcripts.
+- UR-2 Totals that add up. The record totals by repository, by role, by model and by repository and role; each total equals the sum of its rows (a test recomputes them); beside them the plan's reading for that day from `usage.txt` (the last line of the day, or `unread` named). Verify: UR-2 cases.
+- UR-3 Readable in one screen. `gov usage show [--date D] [--days N]` prints, per repository, the day's cost, its share of the day's total, its top three roles and its largest session, and the plan's reading; N days print one line per day per repository. Verify: UR-3 cases.
+- UR-4 Proved on planted transcripts. Planted transcript folders for three repositories (with helpers, a resumed session and a session spanning midnight) give the expected rows and totals; a transcript line that is not JSON or has no usage is skipped and counted, never fatal. Verify: UR-4 cases.
