@@ -197,3 +197,17 @@ project already holds. Kind: a fix; the ticket stays closed. Failing tests first
 `tests/acceptance/W2-17/test_w2_17_fix_connectors_key.py` (README "The fix F1 (a)"), `361802ceb`; code
 `src/gov/adapters/merge.py` (`CONNECTORS_KEY`, added by `merge_settings` where the key is absent) and the kit settings
 file, `83b73ba96`; units `tests/unit/launch/test_fixes_015a_connectors.py`. Lead `fixes-015a`, branch `e2/fixes-015a`.
+
+## Fix: `gov update` refuses its own release's wheel (I-17; EXAMIN EF-4)
+
+`gov update <version>` without `--wheel` rebuilt the wheel from the manifest's commit and refused: for 0.1.5 it got
+`e07845c9...`, the manifest records `9d129a12...`. Cause: the only difference between the two wheels is
+`gov/_build_info.py`, which the builder (`gov.release._wheel`, F3) writes into the wheel and which is not in the commit; the
+0.1.5 wheel was cut by a gov older than F3, so it has no such file, and a rebuild by today's builder adds it (RECORD and file
+list differ; every other file, mode and timestamp is equal). Fix: `gov.install.pin.wheel_for` (the route `gov update` and
+`gov install` share) takes the cut wheel kept at `~/.local/share/gov-os/wheels/<commit12>/<name>` when its sha256 is the
+manifest's, else rebuilds from the commit with the build info and, if that hashes otherwise, without it (the pre-F3
+variant); the cut wheel covers any later builder drift on a machine that has it, the variant rebuild covers a machine that
+does not. The hash check is unchanged: a wheel whose sha256 is not the manifest's is refused. Checked on the real 0.1.5
+record: both routes return the wheel with `9d129a12...`. Failing tests first: `tests/unit/install/test_fix_i17_rebuilt_wheel.py`
+(3, red on the base). Branch `e2/fix-update-wheel`. Also recorded under W2-16 (the build switch).

@@ -59,6 +59,35 @@ def verified(source: Path, version: str, files: bool = False) -> tuple[bytes, st
         raise InstallRefused(exc.reason or "manifest", str(exc)) from None
 
 
+def _sha256(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _cut_or_rebuilt(source: Path, version: str, manifest: dict, folder: Path, expected: dict) -> tuple[Path, str]:
+    """The release's own wheel (I-17): the cut wheel kept at ``~/.local/share/gov-os/wheels/<commit12>/`` when its
+    sha256 is the manifest's; else a rebuild from the manifest's commit, with the build info a gov since F3 writes
+    and, if that hashes otherwise, without it (the wheel an older gov cut). The caller still refuses any hash that is
+    not the manifest's."""
+    commit = str(manifest.get("commit"))
+    kept = Path.home() / ".local/share/gov-os/wheels" / commit[:12] / str(expected.get("name"))
+    if len(commit) >= 12 and kept.is_file() and _sha256(kept) == expected.get("sha256"):
+        return kept, expected["sha256"]
+    first = None
+    for build_info in (True, False):
+        try:
+            built = release._wheel(source, commit, keep=folder, build_info=build_info)
+        except release.ReleaseError as exc:
+            raise InstallRefused("wheel", f"the wheel of release {version} could not be built from its commit "
+                                          f"{manifest.get('commit')}: {exc}") from None
+        first = first or built
+        if built["sha256"] == expected.get("sha256"):
+            return Path(built["path"]), built["sha256"]
+    return Path(first["path"]), first["sha256"]
+
+
 def wheel_for(source: Path, version: str, manifest: dict, wheel, folder: Path) -> Path:
     """The wheel file to install: ``wheel``, else built from the manifest's commit into ``folder``; refused unless its
     name and sha256 are the manifest's."""
@@ -70,12 +99,7 @@ def wheel_for(source: Path, version: str, manifest: dict, wheel, folder: Path) -
         except OSError as exc:
             raise InstallRefused("wheel", f"the wheel {path} cannot be read: {exc}") from None
     else:
-        try:
-            built = release._wheel(source, str(manifest.get("commit")), keep=folder)
-        except release.ReleaseError as exc:
-            raise InstallRefused("wheel", f"the wheel of release {version} could not be built from its commit "
-                                          f"{manifest.get('commit')}: {exc}") from None
-        path, digest = Path(built["path"]), built["sha256"]
+        path, digest = _cut_or_rebuilt(source, version, manifest, folder, expected)
     if path.name != expected.get("name") or digest != expected.get("sha256"):
         raise InstallRefused("wheel", f"the wheel {path.name} has sha256 {digest}, not the manifest's sha256 "
                                       f"{expected.get('sha256')} (release {version} names {expected.get('name')}): "
