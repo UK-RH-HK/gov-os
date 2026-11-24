@@ -1,9 +1,7 @@
 {
   "permission": {
     "bash": {
-      "git push:*": "deny",
       "git push *": "deny",
-      "sudo:*": "deny",
       "sudo *": "deny"
     }
   }

@@ -10,7 +10,7 @@ writes (the held-out step that wrote a ``Read`` deny per held-out path is retire
 - ``.claude/settings.json``: merged key by key, the programme's keys and list entries first and in their order, the
   generated keys and entries (hooks among them) after, and an ``env`` block merged the same way (no ``env`` key is
   added when neither side holds one); ``disableClaudeAiConnectors: true`` is added when the project's file has no such
-  key (fixes-015a F1);
+  key (fixes-015a F1), and ``permissions.defaultMode: bypassPermissions`` likewise (MR-4);
 - every other generated file is written where the project has none; one that differs from the project's own is
   kept as it is and named (``kept``);
 - in an adopted repository (not Gov OS's own source tree) whose kernel holds a ``templates/`` folder, the eight role
@@ -42,6 +42,9 @@ AUTO_COMPACT = {}
 # fixes-015a F1: no claude.ai connector loads in a session of the project; the kit's settings carry the key and the merge
 # adds it to a project's settings that lack it (a value the project already holds, either way, stays).
 CONNECTORS_KEY = "disableClaudeAiConnectors"
+# MR-4 (DEC-1246 (3)(b)): the kit's settings carry the no-prompt mode (EMERGENCY-2 2.2); rulesync has no key for it, so the
+# merge adds it, as it does the connectors key, when the project's file holds no mode (a value the project holds stays).
+DEFAULT_MODE = "bypassPermissions"
 
 
 def _refuse(code: str, message: str, **details) -> GovError:
@@ -142,6 +145,9 @@ def forget_generated(root: Path, previous: dict[str, bytes], write, delete) -> l
 def merge_settings(own: dict | None, generated: dict) -> dict:
     merged = merge_value(own or {}, generated)
     merged.setdefault(CONNECTORS_KEY, True)
+    permissions = merged.setdefault("permissions", {})
+    if isinstance(permissions, dict):
+        permissions.setdefault("defaultMode", DEFAULT_MODE)
     env = merged.get("env") if isinstance(merged.get("env"), dict) else {}
     extra = {key: value for key, value in AUTO_COMPACT.items() if key not in env}
     if extra:  # an empty block carries nothing: no env key is added for it
