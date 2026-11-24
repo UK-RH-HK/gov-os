@@ -74,7 +74,7 @@ UNCHANGED, SWITCHED = "unchanged", "switched"
 REFRESH_KEY = "integration_refresh"
 RECORD_SUFFIX = ".refresh.json"
 NOW_ENV = "GOV_NOW"
-AFTER_NIGHTLY, SECOND, NOT_DUE = "after_nightly", "second", "not_due"
+AFTER_NIGHTLY, SECOND, NOT_DUE, BEHIND = "after_nightly", "second", "not_due", "behind"
 DEFAULT_VERDICT = "docs/close/nightly/NR-*.json"
 _TIME = re.compile(r"([01]\d|2[0-3]):([0-5]\d)")
 _VERDICT_LINE = re.compile(r"^verdict:", re.MULTILINE)
@@ -527,6 +527,21 @@ def _write_record(link: Path, record: dict) -> None:
                       {"record": str(path)}) from None
 
 
+def store_behind(root: Path, link: Path, branch: str) -> tuple[str, str] | None:
+    """``(the store's commit, the branch's head)`` where the link leads to a store at another commit than the branch's
+    head (P0-1); None where they are one, or where either cannot be read (the clock then decides alone)."""
+    try:
+        ready = _ready(link)
+        done = _git(root, "rev-parse", "--verify", "-q", f"{branch}^{{commit}}", check=False)
+        head = done.stdout.strip()
+        stored = _head(ready) if ready is not None else None
+    except GovError:
+        return None
+    if ready is None or stored is None or done.returncode != 0 or not head or stored == head:
+        return None
+    return stored, head
+
+
 def refresh_when_due(root: Path, branch: str) -> dict:
     """``gov rebuild --integration <branch> --when-due`` (module docstring): the refresh where one is due, its result with
     ``integration.reason`` and the record written; else ``integration.status`` ``not_due`` and nothing built or written."""
@@ -536,8 +551,13 @@ def refresh_when_due(root: Path, branch: str) -> dict:
     link = place(root)
     record = read_record(link)
     reason = due_reason(settings, when, record, verdict_times(root, settings.verdict))
-    if reason is None:
+    behind = store_behind(root, link, branch)
+    if reason is None and behind is None:
         return {"integration": {"status": NOT_DUE, "branch": branch, "link": str(link), "last_refresh": record}}
+    if behind is not None:  # P0-1: a store behind the branch head is due by itself, a failed refresh is retried
+        reason = reason or BEHIND
+        print(f"rebuild --integration: retry: the store is at {behind[0][:12]} and {branch} is at {behind[1][:12]}: "
+              f"refreshing", file=sys.stderr, flush=True)
     result = refresh(root, branch)
     result["integration"]["reason"] = reason
     nightly = when.isoformat() if reason == AFTER_NIGHTLY else _after_nightly_text(record)
