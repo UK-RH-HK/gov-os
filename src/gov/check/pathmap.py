@@ -67,7 +67,7 @@ def _namespaces(data) -> list[tuple[str, list[str]]] | str:
             return f"namespace {name!r} is not a named entry whose paths are a non-empty list of patterns"
         fault = lexical_policy_fault(entry)
         if fault:
-            return f"namespace {name!r} states {LEXICAL_POLICY} {entry[LEXICAL_POLICY]!r}: {fault}"
+            return f"namespace {name!r} states {LEXICAL_POLICY} {entry.get(LEXICAL_POLICY)!r}: {fault}"
         result.append((name, paths))
     return result
 
