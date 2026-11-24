@@ -100,7 +100,7 @@ def _dirty_case(planted, make, files):
     return p, wt
 
 
-# -- success-14: a worktree holding the branch with uncommitted work refuses the queue ------------------------------
+# -- success-17: a worktree holding the branch with uncommitted work refuses the queue ------------------------------
 
 def test_a_modified_tracked_file_in_the_branch_s_worktree_refuses(planted):
     _dirty_case(planted, _modify, [HELPER])
@@ -134,7 +134,7 @@ def test_the_main_tree_holding_the_branch_dirty_refuses(planted):
     assert_refused_dirty(p, run, p.root, [HELPER], before)
 
 
-# -- success-14: the entry is not poisoned by the refusal ------------------------------------------------------------
+# -- success-17: the entry is not poisoned by the refusal ------------------------------------------------------------
 
 def test_after_the_change_is_discarded_the_same_entry_lands(planted):
     p, wt = _dirty_case(planted, _modify, [HELPER])
@@ -162,7 +162,7 @@ def test_after_the_change_is_committed_the_same_entry_lands_with_it(planted):
     support.assert_closed_iff_merged(p, "main")
 
 
-# -- failure-4: honest work is not refused (controls) -----------------------------------------------------------------
+# -- failure-5: honest work is not refused (controls) -----------------------------------------------------------------
 
 def _lands(p, *args):
     support.self_check(p, {p.tips[A.id]: {A.node: "passed", support.USES_WIDGET_NODE: "passed"}})

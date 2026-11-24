@@ -739,10 +739,24 @@ def _bookkeeping(root: Path, ticket: str, paths: list[str]) -> bool:
     return all(p == f"{TICKETS_REL}/{ticket}.md" or p.startswith(own) or p in green for p in paths)
 
 
+RECORD_DOCUMENT_EXCLUDED = ("src/", "tests/", "template/", "governance/kernel/", ".claude/", ".rulesync/")
+
+
+def _is_record_document(path: str) -> bool:
+    """I-2: a Markdown path outside the places that hold code, tests, the kernel and the agents' instructions."""
+    return path.endswith(".md") and not path.startswith(RECORD_DOCUMENT_EXCLUDED)
+
+
+def _head_files(root: Path) -> set[str]:
+    """The files the tree at ``HEAD`` holds."""
+    return set(filter(None, _git(root, "-c", "core.quotePath=false", "ls-tree", "-r", "-z", "--name-only",
+                                 "HEAD").split("\0")))
+
+
 def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
-    "base_from", "head"}`` (``base``: the head without the change, ``head_without_change``; ``unplaced_base`` too
-    when ``change`` is given); ``SelectionRefused``
+    "base_from", "head"}`` (``base``: the head without the change, ``head_without_change``; ``unplaced_base``,
+    ``deleted``, ``records`` and ``notices`` too when ``change`` is given); ``SelectionRefused``
     with its reason where it cannot be made. ``change``: paths counted in the change beside the ticket's own commits
     (``gov queue``: a work branch's changed paths, untrailered commits among them)."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter
@@ -779,9 +793,13 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     if not records_only:
         if has_suite(root, own):
             select(own, "OWN")
-    records, code, placed, modules = [], [], {}, {}
+    records, code, placed, modules, deleted = [], [], {}, {}, []
+    # I-1 (DEC-1239 (1)): with ``change`` given, a path the head does not hold was deleted by the change: it is no
+    # selected target (``deleted`` lists it); its suite folder still runs where the folder remains
+    at_head = _head_files(root) if change is not None else None
     for p in paths:
         hit = False
+        removed = at_head is not None and p not in at_head
         for c in couplings:
             if _any(p, c.get("paths")):
                 for suite in c.get("suites") or []:
@@ -793,8 +811,15 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
         if p.startswith(GOVERNANCE_OVERLAY):
             continue
         code.append(p)
+        if removed:
+            deleted.append(p)
         if suite_of(p) is not None or p.startswith(FULL_TARGET + "/"):
-            if _is_test_file(p):
+            if removed:
+                folder = p.rsplit("/", 1)[0]
+                if folder not in (FULL_TARGET, ACCEPTANCE) and any(f.startswith(folder + "/") for f in at_head):
+                    select(folder + "/", f"TEST_FOLDER {p}")
+                hit = True
+            elif _is_test_file(p):
                 select(p, "TEST_CHANGED")
                 hit = True
             elif p.rsplit("/", 1)[0] not in (FULL_TARGET, ACCEPTANCE):
@@ -815,11 +840,15 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
             for rel in reach.get(module, ()):
                 select(rel, f"IMPORTS {p}")
                 placed[p] = True
-    unplaced = [p for p, hit in placed.items() if not hit]
+    unplaced = [p for p, hit in placed.items() if not hit and p not in deleted]
     # L2-4 (DAEO-j9z6): with ``change`` given, a path only the green range counted (neither the ticket's own commits
     # nor ``change`` wrote it) is the base's, not this landing's to refuse: it is listed, and what it reaches stays
     unplaced_base = sorted(set(unplaced) - set(own_paths) - set(change)) if change is not None else []
     unplaced = [p for p in unplaced if p not in unplaced_base]
+    # I-2 (DEC-1239 (2)): with ``change`` given, a Markdown document outside the code, test and kernel places that
+    # nothing places is a record, placed with a notice; code and tests that nothing places still refuse
+    placed_records = [p for p in unplaced if change is not None and _is_record_document(p)]
+    unplaced = [p for p in unplaced if p not in placed_records]
     if unplaced:
         raise SelectionRefused(f"{len(unplaced)} changed path(s) nothing maps to a suite (no coupling, no ticket "
                                f"with a suite holds them, no test imports them): {', '.join(sorted(unplaced))}")
@@ -828,6 +857,9 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
         # S2: governance files select nothing by themselves; the ticket's own bookkeeping beside them (its ticket
         # file, its close record and checkpoint, the green records the change is counted from) is no record change
         records = []
+    # the landing's own records: the green records and the base's other commits are counted, not listed
+    found_records = sorted((set(records) & (set(own_paths) | set(change or ()))) | set(placed_records))
+    records = records + placed_records
     if records:
         for target in test_map.get("record_reading") or []:
             select(target, "RECORD_READING")
@@ -848,7 +880,8 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
             "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only,
             "why": {t: why[t] for t in suites}, "base": judged_at, "base_from": judged_from,
             "head": _git(root, "rev-parse", "HEAD").strip(),
-            **({"unplaced_base": unplaced_base} if change is not None else {})}
+            **({"unplaced_base": unplaced_base, "deleted": sorted(deleted), "records": found_records,
+                "notices": [f"RECORD_PLACED {p}" for p in sorted(placed_records)]} if change is not None else {})}
 
 
 def pytest_options(test_map: dict | None) -> list[str]:

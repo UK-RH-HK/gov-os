@@ -468,7 +468,7 @@ def _move(root: Path, clone: Path, onto: str, base: str, last: str, result: dict
 def _write(root: Path, result: dict, error: GovError | None = None) -> None:
     path = root / result["record"]
     path.parent.mkdir(parents=True, exist_ok=True)
-    held = {"ok": error is None, "result": result}
+    held = {"ok": error is None, "result": result, "notices": list(result.get("notices") or [])}
     if error is not None:
         held["error"] = {"code": error.code, "message": error.message}
     path.write_text(json.dumps(held, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
@@ -511,13 +511,13 @@ def _merged(clone: Path, base: str, left: list[dict], alone: dict | None) -> str
     return merged
 
 
-def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lands") -> tuple[list[str], list[str], list[str]]:
+def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lands") -> tuple[list[str], list[str], dict]:
     """The union of the candidates' ``select.scoped`` selections in the clone at the tested merge, each branch's
-    changed paths counted in its change: ``(suites, pytest options, unplaced_base)``; ``SELECTION_REFUSED`` for a
+    changed paths counted in its change: ``(suites, pytest options, found)``, ``found``: ``unplaced_base``, ``deleted``, ``records``, ``notices``; ``SELECTION_REFUSED`` for a
     path the branch wrote that the test map does not map (the base's own, ``unplaced_base``, are only listed)."""
     from gov.close import select
 
-    suites, options, unplaced = [], None, []
+    suites, options, found = [], None, {k: [] for k in ("unplaced_base", "deleted", "records", "notices")}
     for cand in left:
         try:
             chosen = select.scoped(clone, cand["ticket"], change=_changed(root, cand["since"], cand["tip"]))
@@ -525,9 +525,10 @@ def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lan
             _refuse(select.SELECTION_REFUSED, f"{cand['ticket']}: {refused.reason}{said}",
                     {"candidate": cand["ticket"]}, EXIT_RED)
         suites += chosen["suites"]
-        unplaced += chosen["unplaced_base"]
+        for key in found:
+            found[key] += chosen[key]
         options = chosen["pytest_options"]
-    return sorted(dict.fromkeys(suites)), options or [], sorted(dict.fromkeys(unplaced))
+    return sorted(dict.fromkeys(suites)), options or [], {k: sorted(dict.fromkeys(v)) for k, v in found.items()}
 
 
 def select(root: Path, given: list[str], onto: str | None = None, full: bool = False) -> int:
@@ -549,9 +550,9 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
         if full:
             chosen = whole.selection(clone, [f for f in (_acceptance(c["at_tip"]) or _acceptance(c["front"])
                                                          for c in cands) if f])
-            suites, options, unplaced = chosen["suites"], chosen["pytest_options"], None
+            suites, options, found = chosen["suites"], chosen["pytest_options"], None
         else:
-            suites, options, unplaced = _union(root, clone, cands, "")
+            suites, options, found = _union(root, clone, cands, "")
     except GovError as refused:
         if refused.code != SELECTION_REFUSED:
             raise
@@ -559,7 +560,7 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
         return EXIT_SELECT_REFUSED
     finally:
         _back_to(clone, base)
-    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options, unplaced)))
+    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options, found)))
     return 0
 
 
@@ -619,7 +620,7 @@ def land(root: Path, given: list[str], onto: str | None = None,
     result = {"onto": onto, "base": base, "candidates": [c["ticket"] for c in cands], "landed": [], "culprits": [],
               "refused": [], "reds": [], "base_reds": [], "flaky": [], "tested": None, "head": None, "closes": [],
               "selection": {"suites": [], "pytest_options": []}, "runs": [], "acceptance": [], "path_notices": [],
-              "ticket_notices": [], "seconds": seconds, "record": f"{QUEUE_DIR}/{stamp}/queue.json"}
+              "ticket_notices": [], "notices": [], "seconds": seconds, "record": f"{QUEUE_DIR}/{stamp}/queue.json"}
 
     def finish(code: int, error: GovError | None = None):
         seconds["total"] = round(time.monotonic() - start, 3)
@@ -676,14 +677,15 @@ def land(root: Path, given: list[str], onto: str | None = None,
             limit = whole.cap(root)
             result["selection"] = whole.selection(clone, own)
             result["full"] = {"runs": [], **limit}
-            union, unplaced = result["selection"]["suites"], None  # no selection is computed: no unplaced_base
+            union, found = result["selection"]["suites"], None  # no selection is computed: no unplaced_base
         else:
-            union, options, unplaced = _union(root, clone, left)
+            union, options, found = _union(root, clone, left)
+            result["notices"] = found["notices"]
             result["selection"] = {"suites": [s for s in union if not checks._under(s, own)],
                                    "pytest_options": options}
         if dry is not None:
             dry.selection(_dry.selection_object([c["ticket"] for c in left], union,
-                                                result["selection"]["pytest_options"], unplaced))
+                                                result["selection"]["pytest_options"], found))
         timed("selection", began)
         began, before = time.monotonic(), seconds["acceptance"]
         workers = limit["workers"] if limit else 1
