@@ -234,14 +234,13 @@ tools:
     approved_by: "DEC-843"
     note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/coverage, installed by the owner through the operator with pytest-testmon (DEC-843 item 3, package P-W2-54); sha256 of its wheel coverage-7.16.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl from PyPI, verified by the orchestrator. The pinned judge's interpreter imports it from the user site too (checked 2026-10-20). Its subprocess measurement (DEC-852 item 1) is configured by W2-48. Unused since DEC-880 (owner, 2026-10-21): W2-48's cache was withdrawn; kept installed until the owner removes it with the uninstall command above."
   - name: gov
-    version: "0.1.4"
-    sha256: "5dfc18281995734587bf57e2e7dd2f4bb446e70eed587ba86fe2d16234b1cf49"
-    install: "python3 -m venv --system-site-packages ~/.local/share/gov-os/pin-961db6546490 && ~/.local/share/gov-os/pin-961db6546490/bin/python -m pip install --no-deps --no-index ~/.local/share/gov-os/wheels/961db6546490/gov-0.1.4-py3-none-any.whl && ln -s ~/.local/share/gov-os/pin-961db6546490/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov"
-    uninstall: "ln -s ~/.local/share/gov-os/pin-1d4e6a875a5d/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov && rm -rf ~/.local/share/gov-os/pin-961db6546490"
-    date: "2026-11-20"
+    version: "0.1.5"
+    sha256: "9d129a129459ca06e1c171ee0cb8da8821f67f9614228632f4cf6856aefe0051"
+    install: "python3 -m venv --system-site-packages ~/.local/share/gov-os/pin-ba09214f2024 && ~/.local/share/gov-os/pin-ba09214f2024/bin/python -m pip install --no-deps --no-index ~/.local/share/gov-os/wheels/ba09214f2024/gov-0.1.5-py3-none-any.whl && ln -s ~/.local/share/gov-os/pin-ba09214f2024/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov"
+    uninstall: "ln -s ~/.local/share/gov-os/pin-961db6546490/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov && rm -rf ~/.local/share/gov-os/pin-ba09214f2024"
+    date: "2026-11-24"
     approved_by: "DEC-1209"
-    note: "Re-pin from release 0.1.4 (EMERGENCY-2.md 6.1, 8.3; the owner's act): the wheel of the numbered release 0.1.4, tag v0.1.4 on the record commit whose parent is 961db6546490; built twice from 961db6546490 with SOURCE_DATE_EPOCH, equal to the record's sha256; its own environment ~/.local/share/gov-os/pin-961db6546490; linked from ~/.local/bin/gov by an atomic rename (script sha256 e9b59406687bf34f9a66e807b742b5cf7df6b59e54259734153f00e1ad7443bf). Replaces the entry of pin-1d4e6a875a5d, kept for a one-command rollback (the uninstall line)."
-  # --- Imports: MCP tools for study work (the owner, DEC-1228 (2); approved by the CTO under DEC-1214 G7) ---
+    note: "Re-pin from release 0.1.5 (EMERGENCY-2.md 6.1, 8.3; the owner's act): the wheel of the numbered release 0.1.5, tag v0.1.5 on the record commit whose parent is ba09214f2024; built twice from ba09214f2024 with SOURCE_DATE_EPOCH, equal to the record's sha256; its own environment ~/.local/share/gov-os/pin-ba09214f2024; linked from ~/.local/bin/gov by an atomic rename (script sha256 f3a6437a0f2389720712b6179308fd5c539400026744382156f70c73461c31ee). Replaces the entry of pin-961db6546490, kept for a one-command rollback (the uninstall line)."
   - name: node-22.23.5
     version: "v22.23.5"
     sha256: "2f822d544601dfff107f57d945b649d15c5bf6302595735a6bd9cdc7ee9669bd"
