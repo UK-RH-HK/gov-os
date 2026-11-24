@@ -18,7 +18,7 @@ import pytest
 import w2_153_support as support
 from w2_153_support import ALL_ROLES, FLAG, REFUSAL, WORKER_ROLES, LaunchBed
 
-ROLE_MODEL = "claude-opus-5-5"
+ROLE_MODEL = "claude-sonnet-5-5"  # Rewrite-Reason: DEC-1225 (every role launches Sonnet; a caller's --model after -- must be it)
 CALLER = ["-p", "--model", ROLE_MODEL, "--output-format", "json"]
 # Rewrite-Reason: DEC-1225 (R2): the caller's arguments carried the fixture role's Opus for every role, a lead included.
 # A lead's model is Sonnet by the launcher and a --model after -- naming another is refused, so a lead's caller names
@@ -154,13 +154,30 @@ def test_f2_the_built_arguments_are_integrate_s_but_for_the_one_flag(bed, baseli
     _started(theirs)
     assert theirs["result"]["module"].startswith(str(baseline_src)), theirs["result"]
     assert ours["result"]["module"].startswith(str(support.SRC)), ours["result"]
-    mine = _without_mode(support.without_flag(bed.normalised(ours["calls"][0])))
+    mine = _without_launcher_own(_without_mode(support.without_flag(bed.normalised(ours["calls"][0]))), role)
     base = bed.normalised(theirs["calls"][0])
     if role in WORKER_ROLES:  # the settings compared as values: the JSON text is rebuilt once W2-60a's are taken out
         mine = _without_cache_ttl(_without_w2_60a(mine, role), role)
         mine, base = [mine[0], _rules_sorted(json.loads(mine[1])), *mine[2:]], [
             base[0], _rules_sorted(_without_emergency_2(json.loads(base[1]))), *base[2:]]
     assert mine == base,f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
+
+
+def _without_launcher_own(argv: list, role: str) -> list:
+    """Rewrite-Reason: fixes-015a F1 (every launch adds ``--strict-mcp-config`` and one ``--mcp-config`` holding the
+    role's MCP servers) and DEC-1225 (a lead runs Sonnet at effort medium, so the launcher adds ``--effort medium``).
+    These launcher-own flags are taken out like the mode pair, each checked present first (a worker's
+    ``--strict-mcp-config`` is W2-60a's switch and is checked by ``_without_w2_60a``); what is left must be integrate's."""
+    argv = list(argv)
+    at = argv.index("--mcp-config")
+    assert json.loads(argv[at + 1]).get("mcpServers") is not None, f"{role}: {argv}"
+    del argv[at:at + 2]
+    if role in support.LEAD_ROLES:
+        argv.remove("--strict-mcp-config")
+        at = argv.index("--effort")
+        assert argv[at + 1] == "medium", f"{role}: a lead's effort is medium: {argv}"
+        del argv[at:at + 2]
+    return argv
 
 
 def _without_mode(argv: list) -> list:
