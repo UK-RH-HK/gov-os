@@ -57,6 +57,24 @@ DECIDED_CHANGES = {
 }
 
 
+# Rewrite-Reason: DEC-1210 (1), EMERGENCY-2 5.2, DEC-1233 (N-14): hit@k is a diagnostic and never a floor or a block, so
+# the retrieval-regression check lost its hard block in 23573ca4c (W1-21 F9): severity ``warning``, the header and its
+# command re-worded, nothing else. That one declaration is accepted as exactly these bytes; any other change to it fails.
+_RETRIEVAL_REGRESSION_DECIDED = (
+    b"# The retrieval-regression family check (CAP-38.b, W1-21, DEC-425): runs the dev query set and reports hit@5 as a\n"
+    b"# diagnostic only (EMERGENCY-2 5.2, DEC-1210, DEC-1233); it blocks on no hit@k figure. Forbidden citations over their\n"
+    b"# baseline and an unmeasured set (GOV_DEV_TIERS not configured) are reported under the same non-blocking severity:\n"
+    b"# warning. The command is run by `sh -c` in the project root; exit 0 is green (DEC-285).\n"
+    b"id: retrieval-regression\n"
+    b"family: retrieval-regression\n"
+    b"tier: G1\n"
+    b"severity: warning\n"
+    b"command: python3 -m gov.retrieval.retrieve_check\n"
+    b"timeout-seconds: 600\n")
+DECIDED_REPLACEMENTS = {f"{S.CHECKS_REL}/retrieval-regression.yaml": ("DEC-1210 / EMERGENCY-2 5.2 / DEC-1233",
+                                                                      _RETRIEVAL_REGRESSION_DECIDED)}
+
+
 # The owner's decided removals: a declaration retired by a decision, gone with what it checked (not weakened).
 DECIDED_REMOVALS = {f"{S.CHECKS_REL}/context-reproducibility.yaml": "DEC-1214 M1"}   # retired by DEC-1214 M1
 
@@ -72,7 +90,10 @@ def test_no_hard_block_check_is_weakened():
     Rewrite-Reason: DEC-1214 M1 (W2-200): the context check is retired with the context command, so its declaration
     is removed by decision (``DECIDED_REMOVALS``): the folder holds the base's declarations less that one, and no
     other is removed, added or changed. The exception that let the context check's one added line through is gone
-    with it."""
+    with it.
+
+    Rewrite-Reason: DEC-1210 (1), EMERGENCY-2 5.2, DEC-1233 (N-14): the retrieval-regression check is a warning, not a
+    hard block (``DECIDED_REPLACEMENTS``, its exact bytes); no other declaration changes."""
     for folder in (S.CHECKS_REL, S.INSTALLED_CHECKS_REL):
         before = S.listed(S.BASE_COMMIT, folder)
         here = S.REPO_ROOT / folder
@@ -87,6 +108,10 @@ def test_no_hard_block_check_is_weakened():
                 decision, lines = DECIDED_CHANGES[rel]
                 assert now == base + lines, \
                     f"{rel} is changed beyond {decision}'s lines (only those, appended to the base, are accepted)"
+                continue
+            if rel in DECIDED_REPLACEMENTS and now != base:
+                decision, content = DECIDED_REPLACEMENTS[rel]
+                assert now == content, f"{rel} is changed beyond {decision}'s (hit@k is a warning, nothing else)"
                 continue
             assert now == base, f"{rel} is changed"
 
