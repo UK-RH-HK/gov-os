@@ -6,6 +6,7 @@ Nothing real is read: HOME, the Gov OS root and the repositories all live under 
 from __future__ import annotations
 
 import json
+from datetime import datetime
 import os
 import subprocess
 import sys
@@ -95,6 +96,10 @@ class Env:
         else:
             path = d / f"{file or session}.jsonl"
         path.write_text("\n".join(x if isinstance(x, str) else json.dumps(x) for x in lines) + "\n")
+        stamps = [x["timestamp"] for x in lines if isinstance(x, dict) and "timestamp" in x]
+        if stamps:  # the file's mtime is the planted day's last message, so a prune by mtime agrees with the clock
+            when = datetime.fromisoformat(max(stamps).replace("Z", "+00:00")).timestamp()
+            os.utime(path, (when, when))
         return path
 
     @staticmethod
