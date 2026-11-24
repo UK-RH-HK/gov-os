@@ -123,6 +123,33 @@ class Env:
             },
         }
 
+    # -- additions for UR-5 to UR-7 -----------------------------------------------------------------
+    def bare_root(self):
+        """The root with no price table of its own: the shipped table must serve."""
+        f = self.root / "governance" / "project" / "usage-prices.yaml"
+        if f.exists():
+            f.unlink()
+
+    def git_repo(self, name) -> Path:
+        p = self.repo(name)
+        (p / ".git").mkdir(exist_ok=True)
+        return p
+
+    @staticmethod
+    def msg_split(repo, session, mid, when, model, i, o, cr, c5, c1, sidechain=False):
+        m = Env.msg(repo, session, mid, when, model, i, o, cr, c5 + c1, sidechain)
+        m["message"]["usage"]["cache_creation"] = {
+            "ephemeral_5m_input_tokens": c5,
+            "ephemeral_1h_input_tokens": c1,
+        }
+        return m
+
+    def lead_record(self, name, total, model_usage):
+        p = self._log("leads") / f"{name}.json"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"name": name, "total_cost_usd": total, "modelUsage": model_usage}))
+        return p
+
     # -- running --------------------------------------------------------------------------------
     def run(self, *args, root=True):
         env = dict(os.environ)

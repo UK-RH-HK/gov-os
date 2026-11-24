@@ -40,3 +40,23 @@ absent.
 - Role names after `top roles:` are asserted as `<role> $N.NN`; the repository is matched by its folder name in `show`.
 - `skipped_lines` is asserted exactly (3) only for the day whose files hold two non-JSON lines and one usage-less
   assistant line; transcript lines that are plain user lines are never planted.
+
+## Fix UR-5 to UR-7 (prices, shipped table, temporary folders)
+
+Red on the branch head: the table has one cache-creation price, no shipped copy, no `cache_creation_5m`/`_1h` row
+fields, no `temporary` record key. Planted repositories of these cases carry a `.git` folder (`Env.git_repo`).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| UR-5 | `test_w2_207_ur5_prices.py::test_ur5_a_lead_session_costs_what_its_record_says_within_one_percent` | bare root: exit 2 (no table), or cost off by more than 1 % |
+| UR-5 | `test_w2_207_ur5_prices.py::test_ur5_one_hour_writes_are_not_priced_as_five_minute_writes` | no bare-root table; no 5m/1h fields |
+| UR-5 | `test_w2_207_ur5_prices.py::test_ur5_without_the_split_all_cache_creation_is_five_minute` | no bare-root table; no 5m/1h fields |
+| UR-5 | `test_w2_207_ur5_prices.py::test_ur5_a_table_with_separate_write_prices_prices_each_kind` | `cache_write_5m/1h` keys unknown: cost wrong |
+| UR-5 | `test_w2_207_ur5_prices.py::test_ur5_the_old_single_cache_creation_key_prices_both_write_kinds` | green on the base by design: a regression guard that the legacy key prices both kinds |
+| UR-6 | `test_w2_207_ur6_table.py::test_ur6_a_bare_root_works_with_the_shipped_table_for_the_real_models` | exit 2: no price table under the bare root |
+| UR-6 | `test_w2_207_ur6_table.py::test_ur6_the_shipped_file_holds_the_figures_and_equals_the_committed_table` | no `src/gov/_shipped/.../usage-prices.yaml` |
+| UR-6 | `test_w2_207_ur6_table.py::test_ur6_a_repository_table_overrides_the_shipped_one` | `claude-opus-5-5` cost 1.0 with the root table: green on the base by design: a regression guard of the override order |
+| UR-7 | `test_w2_207_ur7_temporary.py::test_ur7_temporary_transcripts_are_counted_on_one_line_of_the_record` | no `temporary` key; /tmp folders appear as repositories |
+| UR-7 | `test_w2_207_ur7_temporary.py::test_ur7_a_git_repository_under_tmp_stays_a_repository_row` | no `temporary` key |
+| UR-7 | `test_w2_207_ur7_temporary.py::test_ur7_show_prints_one_temporary_line_and_no_temporary_repository` | no `temporary` line; temporary names printed |
+
