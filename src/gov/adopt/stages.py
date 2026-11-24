@@ -176,8 +176,7 @@ def a0(run: Run) -> dict:
 def a1(run: Run) -> dict:
     artefacts = [{"path": rel, "blob": blob} for rel, blob in sorted(run.tracked.items())
                  if not rel.startswith(FOLDER + "/")]
-    return run.finish({"commit": resolve(run.root, "HEAD"), "excluded": [FOLDER + "/**"], "artefacts": artefacts},
-                      **({"notices": notices} if notices else {}))
+    return run.finish({"commit": resolve(run.root, "HEAD"), "excluded": [FOLDER + "/**"], "artefacts": artefacts})
 
 
 def a2(run: Run) -> dict:
@@ -541,7 +540,8 @@ def a3(run: Run) -> dict:
     artefacts = [entries.get(rel, {"path": rel, "action": "KEEP"}) for rel in inventory]
     return run.finish({"proposal_sha256": project.sha256(Path(run.args.map).read_bytes()), **cited,
                        "spec_audit": audited,
-                       "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts})
+                       "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts},
+                      **({"notices": notices} if notices else {}))
 
 
 def _plan(run: Run) -> dict:
