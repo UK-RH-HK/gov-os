@@ -10,7 +10,7 @@ import pytest
 
 import w2_211_support as S
 
-JS = S.REPO_ROOT / "template/governance/kernel/templates/decisions-sheet.js"
+JS = S.REPO_ROOT / "template/governance/kernel/assets/decisions-sheet.js"
 BATCH, HASH, ANSWERED = "B-20261123-1", "sha256:" + "9f2c" * 16, "2026-11-23T06:41:00Z"
 PICK_SETS = {
     "plain": [["DP-0042", "b", "only for the first week | then ask me again"], ["DP-0043", "a", None],

@@ -25,7 +25,7 @@ No network, no model; every repository is built under `tmp_path` with its own `g
   batch: ...`, `DP-0042 already recorded as DEC-1251`. The stored sheet is `<batch>.sheet-<8 hex>.txt`.
 - **Sheet writer**: `gov.decisions.sheet.write_sheet(batch, hash, answered, picks)` with picks a list of
   `(id, letter|"skip", note|None)`; returns the sheet text. A note's line breaks become spaces (no extra lines).
-- **JS twin contract** (`template/governance/kernel/templates/decisions-sheet.js`): runnable as `node decisions-sheet.js`,
+- **JS twin contract** (`template/governance/kernel/assets/decisions-sheet.js`): runnable as `node decisions-sheet.js`,
   reading JSON `{batch, hash, answered, picks:[[id, letter|"skip", note|null],...]}` on stdin and printing the sheet
   to stdout; stdout equals the Python sheet byte for byte, one trailing newline more or less allowed.
 - **Parser** is judged through `answer --dry-run` (same stdout for a wrapped sheet as for the plain one, nothing written).
