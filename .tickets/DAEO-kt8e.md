@@ -106,3 +106,18 @@ W2-208 should not have been a ticket: by the rubric its deny-line work is a fix 
 ## Fix: the generated-files check named a freshly generated settings file (F1; fixes-015a)
 
 Found 2026-11-24 in the weekly tier: `test_k3_the_adapter_check_applies_no_held_out_step` (2 cases) red with GENERATED_DIFFERS on `.claude/settings.json`. Cause: a product bug. F1 made `gov adapters generate` merge `disableClaudeAiConnectors: true` into the settings, while the check in `src/gov/adapters/portability.py` compared the raw rulesync bytes, so every generated project failed its own check. Fix: `_same_generated` accepts settings equal to the generated ones but for that key (any other difference still fails). Unit test first: `tests/unit/adapters/test_portability.py::TestGeneratedFindings::test_settings_with_the_connectors_key_the_merge_adds_are_no_finding`. Test unchanged. Commit a1874b977.
+
+## Fix: the kit holds the model hook, the table and `defaultMode`; the root permission source matches the live deny lines (MR-4; INTEGRATION-PLAN row 4-2; A-27; lead `models-by-role`, 2026-11-24)
+
+Found by the integration plan: EXAMIN runs an older copy of the helper hook and the kit ships none, `defaultMode` is not in the kit's settings, and the root
+`.rulesync/permissions.jsonc` spells the deny lines differently from the two live ones. Required; the ticket stays closed. I-16
+(`gov adapters generate` duplicates the head in hand-written CLAUDE.md and AGENTS.md) is not touched: generation is only run in a scratch repository.
+
+**MR-4 The kit complete (4-2).** The kit holds `.claude/hooks/agent_model.py` (`template/.claude/hooks/agent_model.py`, byte-equal to Gov OS's own, which reads
+`governance/project/role-table.yaml` by the same rule as the launcher: a spawn of a helper naming a model other than Sonnet is refused, a spawn with no model has Sonnet written
+in, unreadable means Sonnet), its hook line `PreToolUse`, matcher `Agent|Task`, in `template/.rulesync/hooks.jsonc` (`python3 -I "$CLAUDE_PROJECT_DIR/.claude/hooks/agent_model.py"`), the
+kit's generated settings carry `permissions.defaultMode: bypassPermissions`, and the root `.rulesync/permissions.jsonc` holds the same two denies, `git push` and `sudo`, as the kit's. `gov update` replaces an older
+copy of the hook file in an adopted repository with the kit's, byte for byte, and adds the hook line once. Verify: a repository adopted into a scratch folder has
+the hook file byte-equal to Gov OS's, the `PreToolUse` line once, `defaultMode`, the two deny commands (`Bash(git push *)`, `Bash(sudo *)`; the `:*` forms too) and the table; `gov update` on a copy holding a 2,124-byte stand-in replaces it and the second update
+changes nothing; a planted spawn of a non-Sonnet helper in the adopted copy exits 2, a Sonnet one 0. Failure: after generation in a scratch repository the settings hold the hook line exactly once and no
+`Edit(...)` deny; Gov OS's own `.claude/settings.json` is not changed by this change.
