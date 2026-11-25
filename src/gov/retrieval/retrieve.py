@@ -37,7 +37,7 @@ from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
 from gov.util import role_paths
-from gov.retrieval import authority, code_route, graph_route, lexical, pool, reverse_edges, routing, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, pool, reverse_edges, routing, semantic, stale
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import loader
@@ -404,11 +404,13 @@ def role_filter(root, role=None):
 
 
 def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bundle_budget=None, continuation=None,
-             reranker=None, role=None, store=None) -> dict:
+             reranker=None, role=None, store=None, include_stale=False) -> dict:
     """The evidence bundle for ``query``; ``ticket`` and ``ids`` are closed over to the depth of ``radius``. Every
     route's hits are filtered by the caller's role paths (``role_filter``; ``role`` is a ``--role`` given), and what
     is withheld is counted in the bundle's ``role_filter``. ``root`` is resolved once (W2-138 S2); ``store`` is its
-    ``store_of``, read here when not given, and its commit goes in the token (S3)."""
+    ``store_of``, read here when not given, and its commit goes in the token (S3). A path of a namespace the path map gives
+    a ``stale_class`` is left out of every route, indexed or not (W2-212); the bundle's ``stale`` lists such files, read
+    from disk, when ``include_stale`` or the question names their path."""
     root = resolved(root)
     store = store_of(root, role) if store is None else store
     if batch_size is None:
@@ -466,6 +468,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     # lexical index lags the tracked files by, and those the commits since the store's name (never a stale path's old text)
     left_out = set(store.get("stale") or ()) | set(lexical.served(root)[1]) \
         if facets[lexical.FACET]["available"] else set()
+    classed = stale.classifier(root)  # W2-212: a stale-class path is out of every route, even if indexed before the class
+    if classed is not None:
+        left_out |= {rel for rel in {chunk["path"] for chunk in lexical.chunks(root)} if classed(rel)} \
+            if facets[lexical.FACET]["available"] else set()
+        routes = {name: [hit for hit in hits if not classed(hit["path"])] for name, hits in routes.items()}
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)
               if chunk["path"] not in left_out} if facets[lexical.FACET]["available"] else {}
     closure_gaps, start = [], [*([ticket] if ticket else []), *ids]
@@ -821,6 +828,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
               "continuation": token}
+    listed = stale.find(root, query, include_stale, withhold.denied if withhold is not None else None)
+    if listed:
+        bundle["stale"] = listed
     if any(route_settings.values()):  # W2-32 S8: what the routing moved ahead, per half that is on
         bundle["routing"] = {**{half: [] for half, key in ((routing.CODE, "code_first"), (routing.NAMED, "named_first"))
                                 if route_settings[key]}, **routed,
