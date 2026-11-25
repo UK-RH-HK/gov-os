@@ -1,0 +1,15 @@
+GOV-ANSWERS 1
+batch: B-2026-11-25-cto
+hash: sha256:28e6ddabf3aab90e676d1008326acfee640b3bbc18f0bee5fb16f1c379457628
+answered: 2026-11-25T21:55:15Z
+count: 8
+D-01: a | note: Then make releases by code again: build the rule for approved bigger releases (I-34), and settle W2-209 so a fix like RP-1 can ride a patch.
+D-03: a | note: Use (b) to carry the next release until (a) lands.
+D-02: a | note: Give me the exact command line to paste.
+D-04: a | note: And a fresh CTO session every morning (rule 10), once I approve the handover method.
+D-05: a
+D-06: b
+D-07: a
+D-08: a
+END
+The owner, with the sheet: "D-06 (b) means: every recommendation on the practice-first page, all 31 cards, including gov findings collect and the one pass classing the 162 older decisions. For D-01: tell me when to run the 0.1.7 re-pin, and commit nothing while it runs."
