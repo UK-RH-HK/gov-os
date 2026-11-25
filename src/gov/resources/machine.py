@@ -349,8 +349,9 @@ def _sample_servers(folder: Path, values: dict):
         return [s for s in samples if s["server"] == name and s["pid"] == pid and 0 < at - s["time"] <= KEEP_S]
 
     first, at = cpu_now()
-    pending = [n for n, (pid, cpu) in first.items() if pid is not None and cpu is not None and not kept(n, pid, at)]
-    if pending:  # no kept sample of this server's process (new, or every one expired): a short fresh one first
+    pending = [n for n, (pid, cpu) in first.items() if pid is not None and cpu is not None
+               and not [s for s in kept(n, pid, at) if s["cpu_seconds"] <= cpu]]
+    if pending:  # no kept sample to measure from (new, every one expired, or the tree's sum fell: a child exited)
         time.sleep(SHORT_S)
         second, later = cpu_now()
         samples += [{"time": at, "server": n, "pid": first[n][0], "cpu_seconds": first[n][1]} for n in pending]

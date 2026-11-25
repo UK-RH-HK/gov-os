@@ -156,3 +156,7 @@ Now a KPI line, with `plan_check.py` in the paths [added, DEC-1088 (5)(b); DEC-1
   `test_w2_136_plan_check.py`) plant an open gate in their fixtures only (unit tests, the engineer's; in the paths).
   (3) The interface the acceptance cases assume (the designer's README, "The interface these tests assume") is the
   spec the engineer builds to: the CTO hands that section to the engineer in its brief.
+
+## Fix: the resource gate shut on cpu: reading null when an embedding server's process tree changed
+
+Cause: `machine._sample_servers` sums an embedding server's CPU over its process tree. When the model runner child exits, the sum falls below the kept samples of the same pid; `_window_rate` keeps only samples with `cpu_seconds <= cpu`, finds none and returns None, so `embedding_cpu_now` was null and the gate shut on `cpu`. Fix: a server with no kept sample at or below its current reading (a fall is a reset) is sampled afresh like a new pid. An unreadable or absent process still reads null. Tests: `tests/unit/resources/test_w2_20_gate_null.py` (G-NULL-1). W2-184, W2-156 and W2-60a keep reading the real gate: the product null is gone.
