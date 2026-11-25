@@ -78,6 +78,17 @@ def make(spec):
             return {"status": "ok", "version": version, "standin": True}
         return repin
 
+    if name == "registry_check":
+        repo, fail = Path(spec["repo"]), spec.get("fail")
+
+        def registry_check(link, *args, **kwargs):
+            """A post-pin check that records what the repository's registry file and HEAD are while it runs."""
+            head = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"], capture_output=True, text=True)
+            _log(log, {"registry": (repo / "governance/project/tool-registry.yaml").read_text(encoding="utf-8"),
+                       "head": head.stdout.strip(), "link": str(link)})
+            return fail
+        return registry_check
+
     if name == "runner":
         fail_repo, fail_step = spec.get("fail_repo"), spec.get("fail_step")
 
