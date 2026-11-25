@@ -388,6 +388,11 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
         failing = None
         if os.path.realpath(link) != os.path.realpath(pin / "bin" / "gov"):
             failing = ("link", f"{link} does not name {pin.name}")
+        else:
+            # the new entry is in the working tree before the checks, so gov doctor's tools part reads the new pin
+            failing = _write_registry(repo, version, cli, c12, sha, old_pin.name, pin, state)
+        if failing is not None:
+            pass
         elif check is not None:
             name = check(link)
             failing = (str(name), f"the check {name} failed") if name else None
@@ -395,8 +400,9 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
             failing = _post_pin(link, pin, repo, before)
         if failing is None:
             # E. the registry entry, committed as the orchestrator under the owner's standing yes
-            failing = _commit_registry(repo, version, cli, c12, sha, old_pin.name, pin, answer)
+            failing = _commit_registry(repo, version, c12, old_pin.name, state)
         if failing is not None:
+            _restore_registry(repo, state)
             made.clear()
             return _roll_back(answer, link, share, home, push, failing)
         gates_json = _read_json(repo, record, f"{folder_rel}/gates.json")
@@ -417,6 +423,7 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
         return answer
     except Exception as exc:  # before the switch: a stop, nothing switched; after it: the link goes back
         if state["switched"]:
+            _restore_registry(repo, state)
             made.clear()
             return _roll_back(answer, link, share, home, push, ("error", f"{type(exc).__name__}: {exc}"))
         return stop("error", f"{type(exc).__name__}: {exc}")
@@ -450,21 +457,46 @@ def _write_json(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
 
 
-def _commit_registry(repo: Path, version: str, cli: str, c12: str, sha: str, old_name: str, pin: Path,
-                     answer: dict) -> tuple[str, str] | None:
-    """Replace the registry's gov entry and commit it alone; ``(check, detail)`` when that cannot be done."""
+def _write_registry(repo: Path, version: str, cli: str, c12: str, sha: str, old_name: str, pin: Path,
+                    state: dict) -> tuple[str, str] | None:
+    """Write the registry's new gov entry into the working tree (not committed), keeping the original bytes."""
     try:
         decision = _decision(repo)
         script = hashlib.sha256((pin / "bin" / "gov").read_bytes()).hexdigest()
         path = repo / REGISTRY_REL
-        path.write_text(_registry(path.read_text(encoding="utf-8"), version, cli, c12, sha, old_name, script, decision),
+        original = path.read_bytes()
+        state["registry_original"] = original
+        state["decision"] = decision
+        path.write_text(_registry(original.decode("utf-8"), version, cli, c12, sha, old_name, script, decision),
                         encoding="utf-8")
-        message = (f"Re-pin from release {version}: gov from the release's wheel (tag v{version}, commit {c12})\n\n"
-                   f"The wheel built twice from {c12} equals the release record's sha256; {old_name} kept for the "
-                   f"rollback.\n\nRole: orchestrator\nDecided-by: owner (standing, {decision})\nTask: release\n")
-        done = _git(repo, "-c", "commit.gpgSign=false", "commit", "-q", "-F", "-", "--", REGISTRY_REL, stdin=message)
-        if done.returncode:
-            return "registry", f"the registry commit failed: {(done.stderr or done.stdout).strip()[:200]}"
-    except OSError as exc:
+    except (OSError, ValueError) as exc:
         return "registry", f"the registry entry could not be written: {exc}"
+    return None
+
+
+def _restore_registry(repo: Path, state: dict) -> None:
+    """Put the original registry bytes back and unstage the file, so the working tree and HEAD read as before."""
+    original = state.pop("registry_original", None)
+    if original is None:
+        return
+    try:
+        _git(repo, "reset", "-q", "--", REGISTRY_REL)
+    except Exception:
+        pass
+    try:
+        (repo / REGISTRY_REL).write_bytes(original)
+    except OSError:
+        pass
+
+
+def _commit_registry(repo: Path, version: str, c12: str, old_name: str, state: dict) -> tuple[str, str] | None:
+    """Commit the written registry entry alone; ``(check, detail)`` when that cannot be done."""
+    decision = state["decision"]
+    message = (f"Re-pin from release {version}: gov from the release's wheel (tag v{version}, commit {c12})\n\n"
+               f"The wheel built twice from {c12} equals the release record's sha256; {old_name} kept for the "
+               f"rollback.\n\nRole: orchestrator\nDecided-by: owner (standing, {decision})\nTask: release\n")
+    done = _git(repo, "-c", "commit.gpgSign=false", "commit", "-q", "-F", "-", "--", REGISTRY_REL, stdin=message)
+    if done.returncode:
+        return "registry", f"the registry commit failed: {(done.stderr or done.stdout).strip()[:200]}"
+    state.pop("registry_original", None)
     return None
