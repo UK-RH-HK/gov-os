@@ -105,6 +105,8 @@ def test_a_stand_in_that_handles_everything_is_ready(ground, tmp_path):
 
 
 def test_on_todays_code_the_handlings_not_built_are_named_and_never_passed(ground, tmp_path):
+    from gov.adopt import command
+
     cases = []
     for name, built_repo in ground.items():
         root, beside = standin.render(standin.perfect(built_repo), built_repo, tmp_path / name / "adopted",
@@ -120,14 +122,19 @@ def test_on_todays_code_the_handlings_not_built_are_named_and_never_passed(groun
                 assert problem["status"] == judge.NOT_BUILT, problem
                 named = [s["field"] for s in problem["evidence"] if s["status"] == judge.NOT_BUILT]
                 assert set(named) <= set(judge.NEEDS[problem["kind"]]) and named, problem
-        for stage in ("VERDICT", "findings"):
-            assert repository["stages"][stage]["status"] == judge.NOT_BUILT, (repository["repository"], stage)
+        assert repository["stages"]["findings"]["status"] == judge.NOT_BUILT, repository["repository"]
         for stage in LITE:  # S-STAGES: built today (gov.adopt.command.STAGES), so measured: the stand-in's record
             assert repository["stages"][stage]["status"] == "PRESENT", (repository["repository"], stage)
-        assert {"VERDICT", "findings"} <= set(repository["not_built"])
+        # W2-210 V5: the verdict is built exactly when the command's stage list names it; built, the stand-in's
+        # well-formed record is PRESENT, not built it is NOT_BUILT (the judge never guesses)
+        want = "PRESENT" if "VERDICT" in command.STAGES else judge.NOT_BUILT
+        assert repository["stages"]["VERDICT"]["status"] == want, (repository["repository"], want)
+        assert ("VERDICT" in repository["not_built"]) == ("VERDICT" not in command.STAGES)
+        assert "findings" in repository["not_built"]
         assert not set(LITE) & set(repository["not_built"]), repository["repository"]
-    assert any("stage VERDICT is NOT_BUILT" in r for r in result["reasons"])
-    assert not [r for r in result["reasons"] for s in LITE if f"stage {s} is" in r], result["reasons"]
+    assert ("stage VERDICT is NOT_BUILT" in " ".join(result["reasons"])) == ("VERDICT" not in command.STAGES)
+    assert not [r for r in result["reasons"] for s in (*LITE, "VERDICT") if f"stage {s} is" in r
+                and (s in LITE or "VERDICT" in command.STAGES)], result["reasons"]
 
 
 def test_todays_built_capabilities_follow_the_code():
@@ -135,7 +142,8 @@ def test_todays_built_capabilities_follow_the_code():
 
     today = judge.built_today()
     assert {"A2-namespace", "index", "A3", "A5", "A6"} <= today
-    assert not today & {"A2-content-class", "findings", "A8-documents", "VERDICT"}
+    assert not today & {"A2-content-class", "findings", "A8-documents"}
+    assert ("VERDICT" in today) == ("VERDICT" in command.STAGES)  # W2-210 V5: built exactly when the command lists it
     for stage in LITE:  # S-STAGES: the adoption command's own stage list decides, not project.STAGES
         assert (stage in today) == (stage in command.STAGES), stage
         assert stage in command.STAGES and stage not in project.STAGES, f"{stage}: today's code has moved"
@@ -244,8 +252,9 @@ def test_the_secret_reported_with_more_than_path_commit_and_rule_is_mishandled(g
 
 
 def test_adopted_healthy_with_the_secret_open_is_mishandled(ground, tmp_path):
-    def change(model, entry, built_repo):
+    def change(model, entry, built_repo):  # a well-formed record (W2-210 V5): healthy over conditions all met
         model["records"]["VERDICT"]["verdict"] = "ADOPTED_HEALTHY"
+        model["records"]["VERDICT"]["conditions"] = standin.verdict_conditions("met")
     _mishandled(ground, tmp_path, "secret", change, "healthy")
 
 
@@ -853,8 +862,7 @@ def test_the_capability_table_is_dated_2026_11_20_and_the_readme_says_what_the_v
     rows = [line for line in readme.splitlines() if line.startswith("| `VERDICT` |")]
     assert len(rows) == 1, rows
     row = rows[0]
-    assert "no stage or command gives the lite verdict yet (CAP-44.h, W2)" in row, row
-    assert "W2-52 built A7 and A10 only" in row, row
+    assert "W2-210" in row and "gov.adopt.verdict" in row and "built" in row, row
     spec_audit = [line for line in readme.splitlines() if line.startswith("| `AS` |")]
     assert len(spec_audit) == 1, spec_audit
     assert "CAP-44.m" in spec_audit[0] and "| yes |" in spec_audit[0] and "A2" in spec_audit[0] \
