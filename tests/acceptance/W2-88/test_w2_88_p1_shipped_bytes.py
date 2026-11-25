@@ -55,6 +55,9 @@ ITEMS = {
     "the-common-schema": "template/governance/kernel/schemas/common.schema.json",
     # W2-195 (DAEO-d8df; DEC-1204 (5), S4): the judging-work kernel skill ships in the wheel.
     "the-judging-work-skill": "template/governance/kernel/skills/judging-work",
+    # DAEO-rt4s (fix UR-6; a recorded rewrite by the independent test designer, DEC-491): ``gov usage`` finds its price table from any root,
+    # so the committed table ships as a copy.
+    "the-usage-price-table": "governance/project/usage-prices.yaml",
 }
 
 
