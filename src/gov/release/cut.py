@@ -1,4 +1,4 @@
-"""The cut of a patch release (W2-209, RELEASE-ON-BEHALF "The cut"): the record committed on a side branch whose only
+"""The cut of a release by code, a patch or an approved one (W2-209, RELEASE-ON-BEHALF "The cut"): the record committed on a side branch whose only
 parent is C, tagged ``v<version>`` (annotated, unsigned, local) and merged into ``w2/integrate`` with an ordinary merge.
 
 The record is built by ``gov.release.build`` exactly as ``gov release`` builds it; ``kind.json``, ``gates.json``,
@@ -98,7 +98,7 @@ def merge_into_integration(root: Path, record: str, version: str) -> None:
     _git(root, "update-ref", f"refs/heads/{branch}", new, old, env=env)
 
 
-def cut(root: Path, version: str, c: str, extras: dict[str, bytes], decision: str) -> dict:
+def cut(root: Path, version: str, c: str, extras: dict[str, bytes], decision: str, kind: str) -> dict:
     """Build the record at ``c`` (the work tree's HEAD), add ``extras`` (name -> bytes), commit it on the side branch,
     tag it and merge it into ``w2/integrate``; ``{"record", "record_commit", "tag"}``. ``extras`` holds the files
     that need the build's manifest: they are given as a callable's result by the caller, see ``release._cut``."""
@@ -111,7 +111,7 @@ def cut(root: Path, version: str, c: str, extras: dict[str, bytes], decision: st
         record_files = {path.name: path.read_bytes() for path in sorted(built.iterdir())}
         record_files.update(extras(record_files) if callable(extras) else extras)
         shutil.rmtree(built)
-        message = (f"Record of release {version} (patch release, cut under the owner's standing yes)\n\n"
+        message = (f"Record of release {version} ({kind} release, cut under the owner's standing yes)\n\n"
                    f"The record of {version} built at {c}: its manifest, kind, gates, suite record and note.\n\n"
                    f"Role: orchestrator\nDecided-by: owner (standing, {decision})\nTask: release\n")
         commit = commit_record(root, version, c, record_files, message)

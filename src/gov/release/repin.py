@@ -66,17 +66,19 @@ def _burn(home, version: str) -> None:
             handle.write(f"{version}\n")
 
 
-def push_text(version: str, fixes: int, head: str, verdict: str) -> str:
+def push_text(version: str, fixes: int, head: str, verdict: str, kind: str = "patch") -> str:
     """The push of a pinned release: the version, the fixes, the suite and proving-run evidence, the rollback line."""
     noun = "fix" if fixes == 1 else "fixes"
-    text = (f"Gov OS {version} released (patch, {fixes} {noun}). Suite green on {str(head)[:8]}, proving run "
+    text = (f"Gov OS {version} released ({kind}, {fixes} {noun}). Suite green on {str(head)[:8]}, proving run "
             f"{verdict}, pin live. Roll back: {ROLLBACK_LINE}")
     return text[:PUSH_LIMIT]
 
 
-def failure_text(version: str, check: str) -> str:
+def failure_text(version: str, check: str, kind: str = "patch") -> str:
     """The push of a failed re-pin, cut to 190 characters by shortening the check's text; version and ``burned`` stay."""
-    def build(shown: str, tail: str = " CTO cuts the next patch.") -> str:
+    following = "patch" if kind == "patch" else "release"
+
+    def build(shown: str, tail: str = f" CTO cuts the next {following}.") -> str:
         return (f"Gov OS {version} NOT pinned: post-pin check failed ({shown}). Rolled back, old gov live, nothing "
                 f"for you to do. Release burned;{tail}")
     check = " ".join(str(check).split())
@@ -101,18 +103,23 @@ def rollback_script(old_pin, home, version: str) -> str:
             f"echo \"rolled back: {link} -> $(readlink -f {link}); release {version} burned\"\n")
 
 
-def note_text(version: str, n: str, fixes: list[str], chores: list[str], evidence: dict, repositories: list[str]) -> str:
-    """``docs/releases/<version>/NOTE.md``: the version, each fix in plain words, the gate evidence, the rollback line
-    and which repositories update next."""
-    lines = [f"# Gov OS {version}", "", f"Patch release from {n}: {len(fixes)} fixes, {len(chores)} chores.", "",
+def note_text(version: str, n: str, fixes: list[str], chores: list[str], evidence: dict, repositories: list[str],
+              approvals: list[dict] = ()) -> str:
+    """``docs/releases/<version>/NOTE.md``: the version, each fix in plain words, an approved release's items with their
+    decisions, the gate evidence, the rollback line and which repositories update next."""
+    title = "Patch" if evidence["kind"] == "patch" else "Approved"
+    lines = [f"# Gov OS {version}", "", f"{title} release from {n}: {len(fixes)} fixes, {len(chores)} chores.", "",
              "## What changed", ""]
     lines += [f"- Fix: {text}" for text in fixes] + [f"- Chore: {text}" for text in chores]
     if not fixes and not chores:
         lines.append("- nothing listed")
+    if approvals:
+        lines += ["", "## Approvals", ""]
+        lines += [f"- {item['item']}: {', '.join(item['decisions'])}" for item in approvals]
     lines += ["", "## Gate evidence", "",
               f"- Suite record {evidence['record']}: green on {evidence['head']} (full, weekly tier included)",
               f"- Proving run (update rehearsal): {evidence['verdict']}",
-              f"- Patch rule: {evidence['kind']}", "",
+              f"- Release rule: {evidence['kind']}", "",
               "## Roll back", "", f"`{ROLLBACK_LINE}`", "",
               "## Repositories that update next", ""]
     lines += [f"- {path}" for path in repositories] or ["- none listed"]
@@ -348,6 +355,8 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
         if not named:
             return stop("manifest", f"the manifest does not name version {version}, commit {c} and a wheel with its sha256")
         sha = wheel_info["sha256"]
+        kind = _read_json(repo, record, f"{folder_rel}/kind.json")
+        released = "approved" if kind.get("kind") == "approved" else "patch"
         # A. the wheel of C, built twice, checked against the record
         built = _wheel_twice(repo, c)
         if built is None:
@@ -404,13 +413,12 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
         if failing is not None:
             _restore_registry(repo, state)
             made.clear()
-            return _roll_back(answer, link, share, home, push, failing)
+            return _roll_back(answer, link, share, home, push, failing, released)
         gates_json = _read_json(repo, record, f"{folder_rel}/gates.json")
-        kind = _read_json(repo, record, f"{folder_rel}/kind.json")
         fixes = patch.count_fixes(repo, kind["from"], c) if isinstance(kind.get("from"), str) else 0
         head = (gates_json.get("suite") or {}).get("head") or c
         verdict = (gates_json.get("proving") or {}).get("verdict") or "unknown"
-        text = push_text(version, fixes, head, verdict)
+        text = push_text(version, fixes, head, verdict, released)
         _write_json(share / "repin.json", {"status": "ok", "version": version, "commit": c, "pin": str(pin),
                                           "old_pin": str(old_pin), "check": None, "at": _now()})
         (share / "rollback.sh").write_text(rollback_script(old_pin, home, version), encoding="utf-8")
@@ -425,19 +433,19 @@ def repin(repo, version: str, home, *, push=None, check=None) -> dict:
         if state["switched"]:
             _restore_registry(repo, state)
             made.clear()
-            return _roll_back(answer, link, share, home, push, ("error", f"{type(exc).__name__}: {exc}"))
+            return _roll_back(answer, link, share, home, push, ("error", f"{type(exc).__name__}: {exc}"), released)
         return stop("error", f"{type(exc).__name__}: {exc}")
     finally:
         for folder in scratch:
             shutil.rmtree(folder, ignore_errors=True)
 
 
-def _roll_back(answer: dict, link: Path, share: Path, home: Path, push, failing: tuple[str, str]) -> dict:
+def _roll_back(answer: dict, link: Path, share: Path, home: Path, push, failing: tuple[str, str], kind: str) -> dict:
     """The link back onto the old pin by one rename, the release burned, ``repin.json`` and the failure push."""
     version, old_pin = answer["version"], Path(answer["old_pin"])
     _switch(link, old_pin / "bin" / "gov")
     _burn(home, version)
-    text = failure_text(version, failing[0])
+    text = failure_text(version, failing[0], kind)
     _write_json(share / "repin.json", {"status": "rolled_back", "version": version, "commit": answer["commit"],
                                       "pin": answer["pin"], "old_pin": answer["old_pin"], "check": failing[0],
                                       "detail": failing[1], "at": _now()})

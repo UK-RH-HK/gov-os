@@ -60,11 +60,13 @@ Let N be the newest release tag whose record is in `docs/releases/`, and C the r
 |---|---|---|
 | P1 version | `pyproject.toml` at C | it is not N's version with only the last number raised, or has a pre-release part |
 | P2 owner's text | `git diff --name-only N C -- docs/contract docs/charter docs/emergency-2/EMERGENCY-2.md` | any path changed |
-| P3 no feature | `.tickets/*.md` at N and at C; the non-merge commits N..C that touch `src/gov` or `template` | a ticket is closed at C and was not at N; or such a commit carries neither `Fix:` (with a `Task:` ticket closed at N) nor `Class: Q` nor `Class: C` |
+| P3 no feature | `.tickets/*.md` at N and at C; the non-merge commits N..C that touch `src/gov` or `template` | a ticket is closed at C and was not at N; or such a commit carries neither `Fix:` (with a `Task:` ticket closed at N) nor `Class: C` |
 | P4 no new command | the command names the CLI knows at N and at C | the sets differ |
 | P5 no new record kind | the files under `template/governance/kernel/schemas` | one added or removed |
 
-P2's third path and P5 are mine; you may drop them (RB-7). `Class:` alone cannot tell a feature from a fix: `F` is on 263 commits since `v0.1.2`, ticket merges and test-only commits alike. So P3 reads the ticket status and the `Fix:` trailer (which `gov queue` already uses for fixes, W2-201 X6), and uses `Class: Q` and `C` only for the CTO's direct work.
+P2's third path and P5 are mine; you may drop them (RB-7). `Class:` alone cannot tell a feature from a fix: `F` is on 263 commits since `v0.1.2`, ticket merges and test-only commits alike. So P3 reads the ticket status and the `Fix:` trailer (which `gov queue` already uses for fixes, W2-201 X6), and uses `Class: C` only for the CTO's direct work.
+
+**The `approved` kind (DEC-1235 (2); W2-209 RR-1, RR-2).** A range that fails a rule is `approved`, and the CTO cuts it by the same path and gates, when the version at C is a plain semantic version above N's, something in it needs approval, and each such item names the owner's approving decision: a ticket closed since N in its front matter (`approved_by: DEC-<n>`, or a list); a commit P3 rejects, one that changes a P2 path and one that adds or removes a command module or a kit schema in its own `Approved-by: DEC-<n>` trailer or its `Task:` ticket's `approved_by`. A decision counts only when the register at C holds it with a Status beginning `ACCEPTED (owner`, and every id of one name must count. Anything else stays `bigger`, the refusal naming each item and what it lacks; adopted repositories read `approved` as bigger.
 
 **What it says today.** Run on `v0.1.3` to the head: P2 fails (320 paths under `docs/contract`, the Charter), P3 fails (15 tickets closed; 47 ticket commits touch code, none carries `Fix:`), P5 fails (`memory-audit.schema.json` added), P4 passes. So 0.1.4 is a bigger release in content, and stays yours. From then on a bigger release is a minor number (0.2.0); only fixes and chores move the last number.
 

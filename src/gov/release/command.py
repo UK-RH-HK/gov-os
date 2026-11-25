@@ -43,9 +43,10 @@ def add_arguments(parser) -> None:
     parser.add_argument("--lock-from", metavar="<template>",
                         help="the template's Copier task: verify the installed release and write framework.lock")
     parser.add_argument("--patch", action="store_true",
-                        help="the patch release, the CTO's (GOV_ROLE=orchestrator) after the five gates G0 to G4")
+                        help="the release by code, a patch or content the owner approved, the CTO's "
+                             "(GOV_ROLE=orchestrator) after the five gates G0 to G4")
     parser.add_argument("--check", action="store_true",
-                        help="with --patch: print the patch rule's result (kind, P1 to P5) and write nothing")
+                        help="with --patch: print the release rule's result (kind, P1 to P5, approvals) and write nothing")
     parser.add_argument("--suite", metavar="<record file>", help="with --patch: the nightly record of the release commit (G2)")
     parser.add_argument("--kept", metavar="<run folder>", help="with --patch: the kept W2-81 run the update rehearsal reads (G3)")
     parser.add_argument("--push", metavar="<command>", help="with --patch: the command that pushes the owner's one text "
@@ -130,7 +131,7 @@ def _usage(why: str):
 
 
 def _patch(root: Path, args) -> dict:
-    """``gov release <X> --patch [--check]``: the CTO's patch release. The caller comes first, before anything is read;
+    """``gov release <X> --patch [--check]``: the CTO's release by code, a patch or an approved one. The caller comes first, before anything is read;
     no flag or environment variable stands in for a gate, the rehearsal, the re-pin or the push (``release._patch_test``
     is the seam, never reached from here)."""
     from gov import release as releases

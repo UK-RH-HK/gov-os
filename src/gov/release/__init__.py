@@ -383,7 +383,7 @@ def lock_from(project: Path, source: Path) -> tuple[Path, str | None]:
 
 
 # ---------------------------------------------------------------------------
-# The patch release (W2-209, RELEASE-ON-BEHALF slice (a); DEC-1223)
+# The release by code: a patch or an approved one (W2-209, RELEASE-ON-BEHALF slice (a); DEC-1223, DEC-1235 (2))
 # ---------------------------------------------------------------------------
 
 PATCH_CALLER = "orchestrator"
@@ -415,11 +415,9 @@ def _patch_check(root: Path, version: str, caller=_UNSET) -> dict:
         result = patch.evaluate(Path(root), version)
     except ReleaseError as exc:
         raise _refuse(f"the patch rule cannot be read: {exc}", {"gate": "G1", "reason": str(exc)}) from None
-    if result["kind"] != "patch":
-        named = "; ".join(f"{rule}: {result['rules'][rule]['detail']}" for rule in result["failed"])
-        raise _refuse(f"this is a bigger release ({named}): only the owner builds it, gov release {version}",
-                      {"kind": "bigger", "from": result["from"], "commit": result["commit"], "rules": result["rules"],
-                       "failed": result["failed"]})
+    if result["kind"] == "bigger":
+        raise _refuse(f"this is a bigger release ({patch.bigger_reason(result)}): only the owner builds it, "
+                      f"gov release {version}", patch.bigger_details(result))
     return result
 
 
@@ -441,7 +439,7 @@ def _cut(root: Path, version: str, *, suite=None, kept=None, rehearse=None, repi
         report = gates.g3(root, commit, version, lambda: rehearse(root, commit, version, kept))
         gates.g4(root, commit, version, result["from"])
     except gates.GateRefused as red:
-        raise _refuse(f"patch release {version} refused at {red.gate}: {red.reason}", red.details) from None
+        raise _refuse(f"release {version} refused at {red.gate}: {red.reason}", red.details) from None
     decision = authority["decision"]
     kind = patch.kind_record(result)
 
@@ -458,12 +456,13 @@ def _cut(root: Path, version: str, *, suite=None, kept=None, rehearse=None, repi
                       "rule": {"kind": kind["kind"], "rules": kind["rules"]}}
         return {"kind.json": patch.dumps(kind).encode("utf-8"), "gates.json": patch.dumps(gates_json).encode("utf-8"),
                 "suite.json": evidence["raw"],
-                "NOTE.md": repinning.note_text(version, result["from"], fixes, chores, shown, repositories).encode("utf-8")}
+                "NOTE.md": repinning.note_text(version, result["from"], fixes, chores, shown, repositories,
+                                               kind.get("approvals", ())).encode("utf-8")}
 
     try:
-        made = cut.cut(root, version, commit, extras, decision)
+        made = cut.cut(root, version, commit, extras, decision, kind["kind"])
     except ReleaseError as exc:
-        raise _refuse(f"patch release {version} not cut: {exc}", {"gate": "G4", "reason": str(exc)}) from None
+        raise _refuse(f"release {version} not cut: {exc}", {"gate": "G4", "reason": str(exc)}) from None
     pinned = repin(root, version, Path.home(), push=push)
     return {"version": version, "commit": commit, "tag": made["tag"], "record": made["record"],
             "record_commit": made["record_commit"], "kind": kind, "repin": pinned}
