@@ -1,21 +1,12 @@
 #!/usr/bin/env bash
-# start_cto.sh: the morning's fresh Gov OS CTO (DEC-1212 (1)), in tmux `cto-<yyyymmdd>` with Remote Control "Gov OS CTO",
-# on Opus (claude-opus-5-5: the app's CTO is one of the two orchestrating roles that run Opus, DEC-1225 (1)) at high
-# effort, in the no-prompt mode, the full window (no cap). No session runs Fable (DEC-1225 (3)).
-# Run by the outgoing CTO at the handover, after it has written docs/emergency-2/CTO-HANDOVER.md; leads started with
-# start_lead.sh keep running (their returns reach the CTO's inbox, ~/.gov-os/inbox/cto, read with `gov msg read cto`).
-set -euo pipefail
-REPO=/home/usain/Dynamic-Agentic-Engineering-OS
-name=cto-$(date +%Y%m%d-%H%M)
-model=claude-opus-5-5
-tmux has-session -t "$name" 2>/dev/null && { echo "tmux $name already runs" >&2; exit 2; }
-[ -s "$REPO/docs/emergency-2/CTO-HANDOVER.md" ] || { echo "no handover at docs/emergency-2/CTO-HANDOVER.md" >&2; exit 2; }
-first="You are the Gov OS CTO, starting fresh (a handover; the outgoing CTO retires once you have taken over). Read in full, in this order: docs/emergency-2/EMERGENCY-2.md \
-(the strategy in force), then docs/emergency-2/CTO-HANDOVER.md (the outgoing CTO's handover: what is landed, what runs, \
-what is next), then the owner's latest decisions it names. Then write your session id to \
-.gov-runtime/scratch/orchestrator/log/cto-session.txt, read your inbox with \
-'PYTHONPATH=src python3 -m gov.cli.main msg read cto', and carry on from the handover's next steps."
-tmux new-session -d -s "$name" -c "$REPO" \
-  "env -u GOV_ROLE -u GOV_TICKET GOV_MSG_ADDRESS=cto ~/.local/bin/claude --remote-control 'Gov OS CTO' \
-   --model $model --effort high --permission-mode bypassPermissions \"$first\""
-echo "started the fresh CTO in tmux $name on $model (Remote Control: Gov OS CTO)"
+# start_cto.sh: the morning's FRESH Gov OS CTO (golden workflow rule 10; DEC-1253: the handover method), Opus at high effort
+# (the role table, DEC-1225, DEC-1242 R-4), in its own tmux session with Remote Control and bypassPermissions, from the
+# outgoing CTO's handover. No old session is resumed. The one start script: the scratch copy calls this file.
+# Run by the outgoing CTO after it wrote and recorded the handover, or by the owner in a plain WSL terminal.
+set -eu
+R=/home/usain/Dynamic-Agentic-Engineering-OS; S=cto-$(date +%m%d-%H%M)
+H=$R/docs/emergency-2/CTO-HANDOVER.md
+[ -f "$H" ] || { echo "no handover at $H"; exit 1; }
+P="You are the Gov OS CTO, starting fresh this morning from the outgoing CTO's handover (no old session is resumed). First read, whole and never cut (long files in consecutive pages with the Read tool, never head, tail or a pipe), in this order: template/governance/kernel/templates/role-cto.md (your operating card), docs/emergency-2/GOLDEN-WORKFLOW.md, docs/emergency-2/EMERGENCY-2.md with its section 13, docs/emergency-2/CTO-HANDOVER.md and every decision it names by id in docs/DECISION_REGISTER.md, then from docs/emergency-2/integration/INTEGRATION-PLAN.md the current and the next phase the handover names (the rest on demand), docs/emergency-2/integration/FINDINGS.md and the latest decisions page with its answer sheet. Then take over exactly as the card's 'Take over' section says (the checkpoint's hash, HEAD, the live gov, tmux, the tracked watcher with no heartbeat, everything the handover lists as running, your inbox, your session id and your tmux name $S written to .gov-runtime/scratch/orchestrator/log/cto-session.txt and cto-tmux.txt), send the owner one takeover message (the progress block, what you checked and its result, your first action), and only then carry on from the handover's NEXT ACTIONS."
+tmux new-session -d -s "$S" -c "$R" "env -u CLAUDECODE GOV_ROLE=orchestrator $HOME/.local/bin/claude --remote-control 'Gov OS CTO' --model claude-opus-5-5 --effort high --permission-mode bypassPermissions \"$P\""
+echo "started $S (tmux attach -t =$S)"
