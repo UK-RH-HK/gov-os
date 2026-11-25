@@ -95,13 +95,26 @@ def test_mr4_the_kit_s_hook_source_has_one_pretooluse_entry_for_the_model_hook()
     assert not command.startswith("python3 -I"), "the line is not the wrapper that starts the pin's interpreter"
 
 
-def test_mr4_the_root_permission_source_holds_the_kit_s_two_denies_and_nothing_else():
-    """Red on the base: the root file also spells the ``:*`` forms."""
+def test_mr4_the_root_permission_source_holds_the_kit_s_two_denies_and_no_legacy_edit_deny():
+    """The root's bash denies include the kit's two (`git push *`, `sudo *`) and nothing else but their `:*` forms and
+    the owner's interim eval-root entries; no legacy `Edit(.tickets...)`-style deny.
+
+    Rewrite-Reason: DEC-1246 (3)(b): MR-4, with DEC-1249 (2): the integration branch's root file also carries the
+    owner's interim denies (read and edit of two eval roots, `*examin-eval*` for bash), which are allowed here.
+    """
     root = support.jsonc((support.REPO_ROOT / support.PERMS_REL).read_text(encoding="utf-8"))
     kit = support.jsonc((support.TEMPLATE / support.PERMS_REL).read_text(encoding="utf-8"))
     rules = {key: value for key, value in root.items() if key != "$schema"}
-    assert rules == {"permission": {"bash": {"git push *": "deny", "sudo *": "deny"}}}, json.dumps(root)
-    assert root == kit
+    assert set(rules) == {"permission"} and set(rules["permission"]) <= {"bash", "read", "edit"}, json.dumps(root)
+    bash = rules["permission"]["bash"]
+    for line, verdict in kit["permission"]["bash"].items():
+        assert bash.get(line) == verdict == "deny", f"the kit's {line!r} is not denied at the root: {bash}"
+    allowed_bash = set(kit["permission"]["bash"]) | {"git push:*", "sudo:*", "*examin-eval*"}   # DEC-1249 (2): the last
+    assert set(bash) <= allowed_bash and set(bash.values()) == {"deny"}, bash
+    for kind in ("read", "edit"):   # DEC-1249 (2): the interim eval-root entries only
+        entries = rules["permission"].get(kind, {})
+        assert all("eval" in path and verdict == "deny" for path, verdict in entries.items()), entries
+    assert ".tickets" not in json.dumps(root), "a legacy `.tickets` edit deny is back at the root"
 
 
 def test_mr4_gov_os_s_own_settings_are_not_changed_by_this_change():
