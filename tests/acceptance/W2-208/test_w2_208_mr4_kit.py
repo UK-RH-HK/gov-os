@@ -8,6 +8,7 @@ generate``), ``gov update`` on a copy holding an older hook, and the hook run as
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import subprocess
 import sys
 
@@ -16,6 +17,7 @@ import pytest
 import w2_208_support as support
 
 HOOK_REL = ".claude/hooks/agent_model.py"
+KERNEL_HOOK_REL = "governance/kernel/hooks/agent_model.py"   # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the kit holds the hook with the kernel hooks
 TABLE_REL = "governance/project/role-table.yaml"
 HOOKS_JSONC_REL = ".rulesync/hooks.jsonc"
 MATCHER = "Agent|Task"
@@ -30,17 +32,36 @@ def _settings_hook_entries(settings):
     return [e for e in entries if "agent_model.py" in json.dumps(e)]
 
 
+def _hook_command(project):
+    entries = _settings_hook_entries(support.read_settings(project))
+    assert len(entries) == 1, f"PreToolUse entries naming the hook: {entries}"
+    return entries[0]["hooks"][0]["command"] if "hooks" in entries[0] else entries[0]["command"]
+
+
 def _hook_run(project, model, tasks=("DAEO-aaaa",), kind="engineer"):
-    """The project's own hook, as the settings run it, on one spawn of a helper."""
+    """The settings' own hook command, through `sh -c` as the harness runs it, with a stand-in `gov` at
+    `<HOME>/.local/bin/gov` whose first line names the interpreter (the kit's line is the pin-interpreter wrapper:
+    it needs a gov and exits 0 when none is found).
+
+    Rewrite-Reason: DEC-1246 (3)(b): MR-4.
+    """
+    import tempfile
     tool_input = {"description": "helper", "prompt": "Do the work.\n\n" + "\n".join(f"Task: {t}" for t in tasks),
                   "subagent_type": kind}
     if model is not None:
         tool_input["model"] = model
     event = {"session_id": "00000000-0000-4000-8000-000000000208", "hook_event_name": "PreToolUse",
              "tool_name": "Agent", "tool_input": tool_input}
-    env = {"PATH": "/usr/bin:/bin", "HOME": str(project), "LANG": "C.UTF-8", "CLAUDE_PROJECT_DIR": str(project)}
-    return subprocess.run([sys.executable, "-I", str(project / HOOK_REL)], input=json.dumps(event), env=env,
-                          capture_output=True, text=True, cwd=str(project.parent), timeout=60)
+    command = _hook_command(project)
+    with tempfile.TemporaryDirectory(prefix="w208") as home:
+        local_bin = Path(home) / ".local" / "bin"
+        local_bin.mkdir(parents=True)
+        pin = local_bin / "gov"
+        pin.write_text(f"#!{sys.executable}\nraise SystemExit(0)\n", encoding="utf-8")
+        pin.chmod(0o755)
+        env = {"PATH": "/usr/bin:/bin", "HOME": home, "LANG": "C.UTF-8", "CLAUDE_PROJECT_DIR": str(project)}
+        return subprocess.run(["sh", "-c", command], input=json.dumps(event), env=env, capture_output=True,
+                              text=True, cwd=str(project), timeout=60)
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -48,9 +69,11 @@ def _hook_run(project, model, tasks=("DAEO-aaaa",), kind="engineer"):
 # --------------------------------------------------------------------------------------------------------------------
 
 def test_mr4_the_kit_holds_the_hook_file_byte_equal_to_gov_os_s_own():
-    """Red on the base: the kit holds no ``.claude/hooks/agent_model.py``."""
-    kit = support.TEMPLATE / HOOK_REL
-    assert kit.is_file(), f"template/{HOOK_REL} is absent"
+    """Red on the base: the kit holds no model hook."""
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the kit's copy is a kernel hook, `template/governance/kernel/hooks/agent_model.py`; the adopted
+    # project's `.claude/hooks/agent_model.py` is written from it by `gov adapters generate` and `gov update`.
+    kit = support.TEMPLATE / KERNEL_HOOK_REL
+    assert kit.is_file(), f"template/{KERNEL_HOOK_REL} is absent"
     assert kit.read_bytes() == (support.REPO_ROOT / HOOK_REL).read_bytes()
 
 
@@ -62,12 +85,14 @@ def test_mr4_the_kit_holds_the_table_byte_equal_to_gov_os_s_own():
 
 def test_mr4_the_kit_s_hook_source_has_one_pretooluse_entry_for_the_model_hook():
     """Red on the base: ``template/.rulesync/hooks.jsonc`` has no preToolUse entry."""
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the line is the pin-interpreter wrapper naming the kernel hook (no `python3 -I` line).
     data = support.jsonc((support.TEMPLATE / HOOKS_JSONC_REL).read_text(encoding="utf-8"))
     entries = [e for e in data["hooks"].get("preToolUse", []) if "agent_model.py" in e.get("command", "")]
     assert len(entries) == 1, f"preToolUse entries naming the hook: {entries}"
     assert entries[0].get("matcher") == MATCHER
-    assert '$CLAUDE_PROJECT_DIR/.claude/hooks/agent_model.py' in entries[0]["command"]
-    assert entries[0]["command"].startswith("python3 -I ")
+    command = entries[0]["command"]
+    assert command.count("governance/kernel/hooks/agent_model.py") == 1 and command.count("agent_model.py") == 1
+    assert not command.startswith("python3 -I"), "the line is not the wrapper that starts the pin's interpreter"
 
 
 def test_mr4_the_root_permission_source_holds_the_kit_s_two_denies_and_nothing_else():
@@ -80,14 +105,18 @@ def test_mr4_the_root_permission_source_holds_the_kit_s_two_denies_and_nothing_e
 
 
 def test_mr4_gov_os_s_own_settings_are_not_changed_by_this_change():
-    """Guard (green on the base): ``.claude/settings.json`` equals the integration branch's."""
-    base = subprocess.run(["git", "rev-parse", "--verify", "-q", "w2/integrate"], cwd=str(support.REPO_ROOT),
+    """Guard (green on the base): ``.claude/settings.json`` equals the integration branch's at the point this branch
+    left it (the merge base: the integration branch moves on without this change).
+
+    Rewrite-Reason: DEC-1246 (3)(b): MR-4: the comparison was against the moving tip of ``w2/integrate``.
+    """
+    base = subprocess.run(["git", "merge-base", "w2/integrate", "HEAD"], cwd=str(support.REPO_ROOT),
                           capture_output=True, text=True)
     if base.returncode != 0:
         pytest.skip("no w2/integrate ref here")
-    done = subprocess.run(["git", "diff", "--quiet", "w2/integrate", "--", ".claude/settings.json"],
+    done = subprocess.run(["git", "diff", "--quiet", base.stdout.strip(), "--", ".claude/settings.json"],
                           cwd=str(support.REPO_ROOT))
-    assert done.returncode == 0, ".claude/settings.json differs from w2/integrate"
+    assert done.returncode == 0, ".claude/settings.json differs from the merge base with w2/integrate"
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -96,6 +125,7 @@ def test_mr4_gov_os_s_own_settings_are_not_changed_by_this_change():
 
 def test_mr4_an_adopted_project_has_the_hook_byte_equal_and_the_table(adopted_at_b):
     """Red on the base: neither file is in the kit."""
+    assert (adopted_at_b / KERNEL_HOOK_REL).read_bytes() == (support.REPO_ROOT / HOOK_REL).read_bytes()
     assert (adopted_at_b / HOOK_REL).read_bytes() == (support.REPO_ROOT / HOOK_REL).read_bytes()
     assert (adopted_at_b / TABLE_REL).read_bytes() == (support.REPO_ROOT / TABLE_REL).read_bytes()
 
@@ -170,10 +200,15 @@ def test_mr4_gov_update_replaces_a_2124_byte_stand_in_byte_for_byte_and_the_hook
     project = support.w216.clone_folder(examin_013, tmp_path / "product")
     support.write(project, HOOK_REL, "")
     (project / HOOK_REL).write_bytes(STAND_IN)
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the older copy is the adopted one at `.claude/hooks/` (as EXAMIN holds it);
+    # a file already at the kernel path is the project's own and `gov update` keeps it, so none is planted there.
     support.w216.commit_all(project, "an older copy of the hook")
     first = support.update(project, sandbox)
     assert first.returncode == 0, first.describe()
-    assert (project / HOOK_REL).read_bytes() == (support.REPO_ROOT / HOOK_REL).read_bytes()
+    own = (support.REPO_ROOT / HOOK_REL).read_bytes()
+    state = {"kernel copy replaced": (project / KERNEL_HOOK_REL).read_bytes() == own,
+             "adopted copy replaced": (project / HOOK_REL).read_bytes() == own}
+    assert all(state.values()), f"{state}\n{first.stdout[-1500:]}"
     settings = support.read_settings(project)
     assert len(_settings_hook_entries(settings)) == 1 and json.dumps(settings).count("agent_model.py") == 1
     assert settings["permissions"].get("defaultMode") == "bypassPermissions"
