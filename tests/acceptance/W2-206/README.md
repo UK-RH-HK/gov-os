@@ -158,3 +158,40 @@ red again with its branch alone); the line's other planted form, the mapped test
 - "The existing W2-202 and `tests/unit/accept` cases stay green" (success-7's last clause): the lead's green run.
 - A `--full` run that cannot complete by a crash or a missing runner (failure-2 names the time limit in its Verify).
 - A time limit as the unnamed failure of an acceptance run (failure-4's Verify names the two forms planted).
+
+## Fix: one selection for many branches, SEL-4 (plan item 1-0)
+
+Written by the independent test designer from the ticket's section "Fix: one selection for many branches, SEL-4", before
+any implementation, in `test_w2_206_sel4.py`. The line is numbered after the ticket's own (success-8; failure-5, the line's
+refusal half; the ids are labels of this table). Public interface: `python3 -m gov.cli.main queue <T>=<branch> ... --select
+--root <project>` (without `--json`): one JSON object on stdout, or the refusal on stderr; the planted repository's state and
+the planted tests' run logs. Each planted project is built once per session (a file lock in pytest's shared folder); the
+fixture checks that every branch forks at the green head and that the conflicting pair really conflicts (`fixture: ...`).
+
+**What is planted:** a green nightly record naming the first commit, then direct commits of the base that no branch has (a
+moved `src/app/gizmo.py`, which `tests/unit/test_gizmo.py` imports; `repin.sh`; a document outside `record_only`); branches
+forked at the green head:
+
+| project | branches | commands |
+|---|---|---|
+| pair | A changes the widget (`topic/aa`), B the gadget (`topic/bb`) | `A=topic/aa B=topic/bb --select`; each alone |
+| conflict | A and B each rewrite the widget differently | `A=topic/aa B=topic/bb --select` |
+| same | A, closed, with two fix branches (the widget; the helper), each commit with `Task:`, `Role:` and `Fix:` | `A=fix/one A=fix/two --select`; each alone |
+| merge | A's branch `topic/merged` merges two branches (the widget; the helper) | `A=topic/merged --select`; each part alone |
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-8 (SEL-4: one object, one union, the same ticket twice, a merge) | `test_w2_206_sel4.py::test_sel4_two_branches_print_one_object_naming_both_tickets`, `test_w2_206_sel4.py::test_sel4_suites_are_the_union_of_each_branch_s_own_selection_and_none_of_the_base_s`, `test_w2_206_sel4.py::test_sel4_the_same_ticket_given_twice_with_two_branches_is_accepted_and_gives_one_list`, `test_w2_206_sel4.py::test_sel4_a_branch_that_is_the_merge_of_several_gives_one_list` | `tests/unit/test_gizmo.py`, which only the base's commit reaches, is among the suites (each branch counts the base's range): the first case is a guard, green on the base (one object naming both tickets exists); the same ticket twice is accepted on the base too, its case is red for the gizmo alone |
+| failure-5 (SEL-4: branches that do not merge together are refused as a whole, nothing run) | `test_w2_206_sel4.py::test_sel4_a_pair_that_conflicts_is_refused_as_a_whole`, `test_w2_206_sel4.py::test_sel4_the_refused_pair_runs_nothing_and_moves_nothing` | none: guards, green on the base (the refusal exists); they must stay green |
+
+**Readings this fix's cases take.**
+
+1. **"The union, never the sum of two ranges"** is the explicit list the planted branches reach (each ticket's own suite and
+   the importers of the module it changes) and equal to the union of each branch's `--select` alone; the base's gizmo suite
+   is in neither.
+2. **The same ticket twice** (`A=fix/one A=fix/two`, a closed ticket landed as fixes) is accepted by the current code, so the
+   case pins it: exit 0, one object, `tickets` holding A (once or twice is not fixed), `suites` the union of each branch alone.
+3. **A branch that is the merge of several** is one branch whose change is its diff from the merge base to its tip; its
+   `suites` equal the union of its parts' alone.
+4. **A refused pair** exits non-zero with `CANDIDATE_NOT_ISOLATED` on stderr and no object on stdout; every ref, `HEAD`, the
+   status and the tracked files are as before, and no planted test ran (the exit code is not fixed here).
