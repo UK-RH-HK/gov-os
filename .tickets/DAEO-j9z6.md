@@ -187,3 +187,32 @@ are not gitignored (stray tool folders) now refuses: intended.
   something a suite could test. Code and tests nothing places still refuse. `gov close` (no `change`) unchanged.
 - **Tests:** `tests/acceptance/W2-115b/test_w2_115b_select_fixes.py` (9 cases, 8 red on the base), unit
   `tests/unit/queue/test_queue_select_deleted_records.py`. Also fixed the ticket's YAML escaping of the new KPI lines.
+
+## Fix: a trustworthy impact selection, SEL-1 to SEL-3 (2026-11-25; plan item 1-0; DEC-1244 X-1; FINDINGS I-11, I-14, I-20, I-21, I-29)
+
+- **The cause (found by reading, confirmed by the landing records of 24-25 Nov):** `select.scoped` counts the change as the
+  branch's `change` plus the ticket's own trailered commits plus `changed(root, green)`, everything the merged tree holds
+  since the newest green record (`src/gov/close/select.py:775-778`). `gov queue` runs it on the merged tree, so every
+  branch carries every commit of the base since that record (0.1.5's `0bd2945b0`): 139 to 404 suites per landing, about the
+  whole suite, 50 to 90 minutes each. The base's paths are neither this landing's change nor its to test (W2-115b success 1:
+  "the branch's own commits since the integration head").
+- **SEL-1 The branch's own change.** With `change` given, `select.scoped` counts only `change` (the branch's diff from the
+  merge base to its tip, `gov.queue` passes it); neither the green range nor the ticket's earlier landed commits are added.
+  A planted branch that changes one file of one package selects that package's suites and the suites the test map couples to
+  that file, and nothing else; paths the base added after the green record select nothing. `unplaced_base` stays in the
+  object, always empty for a queue selection. Without `change` (`gov close`) nothing changes. Verify: planted project, green
+  record, two later base commits that touch other packages, a branch changing one module: `gov queue <T>=<branch> --select`
+  lists that module's importers and its ticket suite only, none of the base's. The before/after counts of the landings of 24-25
+  Nov are in the lead's return.
+- **SEL-2 The missing edges.** The live `governance/project/test-map.yaml` holds, each with a failing case first (a planted
+  change to the file selects the suite that went red): `governance/project/release-authority.yaml` -> `tests/acceptance/W2-209/`
+  (I-21); `governance/project/indep-walls/**` and `governance/project/orchestration/tools/indep_launch.py` ->
+  `tests/acceptance/W2-178/`, `tests/acceptance/W2-149/` (I-29); `src/gov/rebuild/**` and `governance/project/rebuild.yaml` ->
+  `tests/acceptance/W2-116/` (I-29's due rule); and the kit-wide rule `template/**` -> `tests/acceptance/W2-16/`,
+  `tests/acceptance/W2-208/`, `tests/unit/update` (I-20). Verify: the live map, read by `select.scoped` on a planted tree, gives
+  each suite for each path.
+- **SEL-3 Coverage named.** With `change` given, a changed path the selection places nowhere is listed under `unplaced` in
+  the object and refuses the landing (`SELECTION_REFUSED`), its message naming each path and the line to add (a coupling in
+  `governance/project/test-map.yaml`); a record-only document (I-2's rule, `RECORD_PLACED`) passes with its notice. Verify: a
+  branch adding `src/app/unmapped_script.sh` is refused naming it and the line to add; a branch adding `docs/x/note.md` lands
+  with `RECORD_PLACED docs/x/note.md`.

@@ -1,5 +1,6 @@
-"""The queue's selection refuses only the landing's own unplaced paths (W2-115b's fix, L2-4; README, "Fix: the
-base's unplaced paths").
+"""The queue's selection counts the branch's own change alone: the base's unplaced paths are neither refused nor
+listed nor counted (W2-115b's fix, L2-4, rewritten by SEL-1, plan item 1-0, DEC-1244 X-1; README, "Fix: the base's
+unplaced paths", "Fix: a trustworthy impact selection").
 
 Each case plants a project (``w2_115b_support.Planted``: A and B on ``main``), a green nightly record naming its
 first commit, then direct commits on ``main`` by no ticket (a document outside ``record_only``, a shell script, or a
@@ -66,20 +67,21 @@ BASE = {DOC: "# a lead brief\n", SCRIPT: "#!/bin/sh\necho repin\n"}
 
 # -- the base's unplaced paths: listed, not refused -------------------------------------------------------------------
 
-def test_select_lists_the_base_s_unplaced_paths_under_unplaced_base_and_exits_0(planted):
+def test_select_does_not_count_the_base_s_unplaced_paths_and_exits_0(planted):
     p = _plant(planted, BASE)
     chosen = _object(_select(p))
-    assert chosen.get("unplaced_base") == sorted([DOC, SCRIPT]), f"unplaced_base: {chosen.get('unplaced_base')!r}"
+    assert chosen.get("unplaced_base") == [], f"unplaced_base: {chosen.get('unplaced_base')!r}"
     assert A.acceptance in chosen.get("suites", []), f"A's own suite is not selected: {chosen.get('suites')}"
     assert support.USES_WIDGET[0] in chosen["suites"], f"the widget's importer is not selected: {chosen['suites']}"
 
 
-def test_a_base_side_path_a_test_imports_still_selects_that_test(planted):
+def test_a_base_side_path_a_test_imports_is_not_counted_so_that_test_is_not_selected(planted):
     gizmo = module_rel("gizmo")
     p = _plant(planted, {gizmo: "# the gizmo, moved on the base\nVALUE = 1\n", DOC: "# a lead brief\n"})
-    chosen = _object(_select(p))
-    assert support.GIZMO[0] in chosen.get("suites", []), f"the gizmo's importer is not selected: {chosen}"
-    assert chosen.get("unplaced_base") == [DOC], f"unplaced_base: {chosen.get('unplaced_base')!r}"
+    run = _select(p)
+    chosen = _object(run)
+    assert support.GIZMO[0] not in chosen.get("suites", []), f"the base's gizmo selects its importer: {chosen}"
+    assert chosen.get("unplaced_base") == [], f"unplaced_base: {chosen.get('unplaced_base')!r}"
 
 
 def test_the_landing_beside_the_base_s_unplaced_paths_lands_and_closes(planted):

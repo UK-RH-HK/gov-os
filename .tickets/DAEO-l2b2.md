@@ -72,3 +72,12 @@ leaves the candidates' own acceptance folders out of its run (W2-202 A3 F1: no t
 second case plants no number in the path map.
 
 **Closed at the land, 2026-11-19 04:34 (the CTO; EMERGENCY-2 4.3 step 5):** merged as 8e27b6248 (branch `e2/l2-build-2` at 6192547a7). On the merged tree, through the slot with workers: `tests/unit/queue`, `close`, `accept`, `optin` and `tests/acceptance/W2-115`, `W2-115b`, `W2-193`, `W2-194`, `W2-202`, `W2-206`: 724 passed; `gov accept W2-206`: 45 passed, 0 failed. The CTO's rulings on the lead's lines: `--full`'s path-map worker number is also capped by one slot's size (with the A2 ticket); the lead brief's line telling the engineer to read the acceptance folder is corrected (the engineer role's text holds). Not built here: A2 (after W2-200), A7 (the owner's L2-6), the B items (the owner's yes).
+
+## Fix: one selection for many branches, SEL-4 (2026-11-25; plan item 1-0; the owner's order of 25 Nov)
+
+- **SEL-4 One run for many branches.** `gov queue <T1>=<b1> <T2>=<b2> ... --select`, and a batch branch's several branches
+  (`--select` accepts the same ticket twice with different branches, and a branch that is the merge of several), print one
+  object for the merged tree of all of them: one `suites` list (the union, each branch's own change counted alone, never the
+  sum of two ranges), `tickets` naming each, and the merge's refusal (`CANDIDATE_NOT_ISOLATED`) where the branches do not merge
+  together. Held branches land in one run. Verify: two planted branches under two tickets: one object, `suites` equal to the union
+  of each branch's selection alone; a planted pair that conflicts is refused as a whole, nothing run.

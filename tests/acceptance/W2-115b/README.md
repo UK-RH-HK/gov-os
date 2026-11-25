@@ -169,11 +169,11 @@ changing the widget (mapped: A's suite holds it, `tests/unit/test_uses_widget.py
 
 | KPI id | tests | expected red reason |
 |---|---|---|
-| success-10 (the fix's clause 1: the base's two paths under `unplaced_base`, exit 0) | `test_w2_115b_unwritten_paths.py::test_select_lists_the_base_s_unplaced_paths_under_unplaced_base_and_exits_0`, `test_w2_115b_unwritten_paths.py::test_the_landing_beside_the_base_s_unplaced_paths_lands_and_closes` | `--select` exits 2, `SELECTION_REFUSED: PROJ-aaaa: 2 changed path(s) nothing maps to a suite ...: docs/emergency-2/briefs/LEAD-plan.md, repin.sh`; the landing is refused the same way (`ok: false`, exit 3, "nothing lands") |
-| success-11 (clause 2: the branch's own unplaced path refused, naming it and not the base's) | `test_w2_115b_unwritten_paths.py::test_a_branch_that_writes_an_unplaced_path_is_refused_naming_it_and_not_the_base_s` | the refusal (exit 2) names the base's two paths beside `tools/stray.sh` |
-| success-12 (clause 3: a base-side path a test imports still selects that test) | `test_w2_115b_unwritten_paths.py::test_a_base_side_path_a_test_imports_still_selects_that_test` | `--select` exits 2, refused for the base's document |
+| success-10 (the fix's clause 1, rewritten by SEL-1: the base's two paths are not counted, `unplaced_base` empty, exit 0) | `test_w2_115b_unwritten_paths.py::test_select_does_not_count_the_base_s_unplaced_paths_and_exits_0`, `test_w2_115b_unwritten_paths.py::test_the_landing_beside_the_base_s_unplaced_paths_lands_and_closes` | `--select` lists the base's two paths under `unplaced_base`; the landing case is a guard, green on the base |
+| success-11 (clause 2: the branch's own unplaced path refused, naming it and not the base's) | `test_w2_115b_unwritten_paths.py::test_a_branch_that_writes_an_unplaced_path_is_refused_naming_it_and_not_the_base_s` | none after SEL-1: a guard, green on the base (the base's paths are no longer counted at all; it was red when the refusal named them beside `tools/stray.sh`) |
+| success-12 (clause 3, rewritten by SEL-1: a base-side path a test imports does not select that test) | `test_w2_115b_unwritten_paths.py::test_a_base_side_path_a_test_imports_is_not_counted_so_that_test_is_not_selected` | the base's gizmo selects `tests/unit/test_gizmo.py`, and `unplaced_base` lists the document |
 | success-13 (clause 4: without `change` the base-side path is still refused) | `test_w2_115b_unwritten_paths.py::test_gov_close_select_without_a_change_still_refuses_the_base_s_unplaced_paths` | none: a guard, green on the base; it must stay green (`gov close` does not change) |
-| failure-3 (a path the landing wrote that nothing places is no longer refused, or without `change` the base's unmapped path stops being refused) | `test_w2_115b_unwritten_paths.py::test_a_branch_that_writes_an_unplaced_path_is_refused_naming_it_and_not_the_base_s`, `test_w2_115b_unwritten_paths.py::test_gov_close_select_without_a_change_still_refuses_the_base_s_unplaced_paths` | the first as success-11; the second a guard, green on the base |
+| failure-3 (a path the landing wrote that nothing places is no longer refused, or without `change` the base's unmapped path stops being refused) | `test_w2_115b_unwritten_paths.py::test_a_branch_that_writes_an_unplaced_path_is_refused_naming_it_and_not_the_base_s`, `test_w2_115b_unwritten_paths.py::test_gov_close_select_without_a_change_still_refuses_the_base_s_unplaced_paths` | both guards, green on the base |
 
 **Unit tests beside them** (not run by `gov accept`; `tests/unit/queue/test_queue_select_unwritten.py`, the
 fix's `select.scoped` with and without `change`, on `queue_support`'s planted project, its map placing
@@ -319,3 +319,57 @@ for the widget's path.
 equals the answer's result, reading 5 above). `records` is asserted equal to the one planted document; `notices` by
 membership. The refusal cases write `docs/x.md` beside the offending path so each is red on the base (the base names
 both).
+
+## Fix: a trustworthy impact selection, SEL-1 to SEL-3 (plan item 1-0; DEC-1244 X-1)
+
+Written by the independent test designer from the ticket's section "Fix: a trustworthy impact selection, SEL-1 to
+SEL-3", before any implementation. The three lines are numbered after the earlier fixes' (success 22 to 24, and failure 6,
+the line SEL-3 refuses a landing by; the ids are labels of this table). Acceptance cases in `test_w2_115b_sel.py` (support:
+`w2_115b_sel_support.py`); public interfaces: `gov queue PROJ-aaaa=topic/aa --select` (one JSON object on stdout, or
+`SELECTION_REFUSED` on stderr, exit 2), the landing (`--json`), and, for SEL-2, `gov.close.select.scoped(root, ticket,
+change=[path])` in the test's process on a planted tree. A fixture that is not what the case needs fails with `fixture: ...`
+(the branch forks at the green head, `main` has moved on, every map-named target resolves), never as a red.
+
+**What is planted (SEL-1, SEL-3):** A and B on `main`; a green nightly record naming the first commit; direct commits on
+`main` after it by no ticket (`src/app/gizmo.py`, which `test_gizmo.py` imports; `src/app/gadget.py`, which B's suite imports;
+a document outside `record_only`; `repin.sh`), or by A's `Task:` (an earlier landing of the ticket: the helper, or an unplaced
+`tools/earlier.sh`); A's branch `topic/aa` forked at the green head with one commit changing the widget (and, by case, an
+unmapped `src/app/unmapped_script.sh`, `tools/second_unmapped.sh` or the document `docs/x/note.md`).
+**SEL-2 plants** one project holding this repository's live `governance/project/test-map.yaml` (read at test time, so the
+cases follow the engineer's edit) and a stub for every target the map names; one case per (path, suite) edge; paths:
+`release-authority.yaml`; two files under `indep-walls/` and `indep_launch.py`; two files under `src/gov/rebuild/` and
+`rebuild.yaml`; three files under `template/` (two existing kit files, one new).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-22 (SEL-1: the branch's own change alone) | `test_w2_115b_sel.py::test_sel1_what_the_base_added_after_the_green_record_selects_nothing`, `test_w2_115b_sel.py::test_sel1_the_base_s_unplaced_paths_are_neither_refused_nor_listed`, `test_w2_115b_sel.py::test_sel1_the_ticket_s_earlier_landed_commit_is_not_counted`, `test_w2_115b_sel.py::test_sel1_an_unplaced_path_of_the_ticket_s_earlier_commit_does_not_refuse` | the suites hold `tests/unit/test_gizmo.py` and B's suite (the base's range), or the helper's importer (the ticket's earlier commit); `unplaced_base` lists the base's paths; the earlier commit's unplaced path refuses (exit 2) |
+| success-23 (SEL-2: the live map's edges) | `test_w2_115b_sel.py::test_sel2_a_change_to_the_path_selects_the_suite_the_live_map_couples_to_it` (19 cases: one per path and suite) | the suite is not among the selected (`[]` for a path under `governance/project/`, which nothing places and nothing refuses; for `template/` the path is placed nowhere and refused; `src/gov/rebuild/` selects `W1-26` only) |
+| success-24 (SEL-3: coverage named; a record passes) | `test_w2_115b_sel.py::test_sel3_a_selection_that_places_every_path_holds_unplaced_as_an_empty_list`, `test_w2_115b_sel.py::test_sel3_a_record_only_document_passes_with_its_notice` | the object has no `unplaced` key |
+| failure-6 (SEL-3: an unplaced path of the branch is refused naming it and the line to add) | `test_w2_115b_sel.py::test_sel3_a_branch_adding_an_unmapped_script_is_refused_naming_it_and_the_line_to_add`, `test_w2_115b_sel.py::test_sel3_every_unplaced_path_is_named`, `test_w2_115b_sel.py::test_sel3_the_landing_is_refused_with_the_same_line_and_moves_nothing` | the refusal (exit 2, or the landing's exit 3) names the path but neither `governance/project/test-map.yaml` nor a coupling |
+
+**Unit tests beside them** (not run by `gov accept`; `tests/unit/queue/test_queue_select_sel.py`, on `queue_support`'s
+planted project): `select.scoped` with `change` counts it alone (`changed` equals it; the base's module and the ticket's
+earlier commit select nothing; `unplaced_base` empty; an empty `change` counts nothing); without `change` the green range is
+still counted (a guard); `unplaced` is `[]` when all is placed; a path nothing places is named with the map and a coupling;
+a record document passes with `RECORD_PLACED`. Red on the base: all but the guards.
+
+**Rewritten by SEL-1 (Rewrite-Reason: the queue counts only the branch's own change):** this folder's
+`test_w2_115b_unwritten_paths.py` (success-10 and success-12 above: the base's paths are no longer listed under
+`unplaced_base` nor selected) and `tests/unit/queue/test_queue_select_unwritten.py` (the six cases that pinned the base's
+range; the ticket's earlier-commit case is now "not counted, not refused"). The guards of that fix (a branch's own unplaced
+path refused naming only itself; `gov close --select` without `change` still refuses the base's paths; the landing beside
+the base's paths lands) are unchanged and stay green.
+
+**Readings this fix's cases take.**
+
+1. **"Counts only `change`"** is read from the answer's public keys: `changed` equals the sorted `change`, and a suite only
+   the base's or the ticket's earlier commits reach is not selected. A `change` given as an empty list counts nothing (the
+   unit case; the same reading as the earlier fix's `change=[]`).
+2. **`unplaced`** is a sorted list, present in `select.scoped`'s answer and in `--select`'s object whenever `change` is given,
+   `[]` when none. A path the selection places nowhere refuses the landing; whether `select.scoped` raises (as today) or
+   returns it under `unplaced` for the queue to refuse is not fixed: the unit case accepts either, the acceptance cases read
+   the refusal on stderr (exit 2) and the landing's.
+3. **"The line to add"** is read as the refusal naming `governance/project/test-map.yaml` and a coupling (the word,
+   any case); its exact wording is not fixed.
+4. **SEL-2's "selects the suite"**: a selected suite equal to the named folder or file, or inside it (a narrower file target is
+   accepted); a refusal naming the path is a red, a refusal that the head does not hold a target is a `fixture:` failure.
