@@ -17,7 +17,9 @@ make the two manifests differ for that alone, not for anything the launch script
 from __future__ import annotations
 
 import io
+import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -187,6 +189,47 @@ def differences(a: dict, b: dict) -> dict:
     for k in sorted(set(a) | set(b)):
         if a.get(k) != b.get(k):
             out[k] = "only in the first" if k not in b else "only in the second" if k not in a else "differs"
+    return out
+
+
+STOP_BLOCK = re.compile(rb'    "Stop": \[\n.*?\n    \],\n', re.S)
+
+
+def _cut_stop(snap: dict):
+    """(the snapshot with the settings' ``Stop`` block cut out and WALL.json's settings hash following that cut, the
+    block's bytes or None)."""
+    out = dict(snap)
+    mode, settings = out[".claude/settings.json"]
+    block = STOP_BLOCK.search(settings)
+    cut = STOP_BLOCK.sub(b"", settings, count=1)
+    out[".claude/settings.json"] = (mode, cut)
+    wmode, manifest = out["WALL.json"]
+    old, new = support.sha256(settings).encode(), support.sha256(cut).encode()
+    assert old in manifest, "WALL.json's settings_sha256 is not the hash of the settings in the snapshot"
+    out["WALL.json"] = (wmode, manifest.replace(old, new))
+    return out, (block.group(0) if block else None)
+
+
+def walls_differ(world, base_snap: dict, head_snap: dict, head_line: dict, kind: str) -> dict:
+    """The differences between the base build's wall and the head's, the one allowed difference stated (FM-5, DEC-1248):
+    the ``Stop`` hook of the settings. The base script fills none of it, so every base wall carries the block with its
+    tokens unfilled; the head fills it for the writer (its own set, commit, repository, gov source, wall, sets root:
+    ``World.expected_settings``) and cuts it out for every other kind. Both settings are compared with the block cut
+    out, and WALL.json with its settings hash following that cut (the hash is the only consequence); every other entry,
+    mode and byte is compared as before. A wrong or missing head block is reported under ``Stop hook``."""
+    base_cut, base_block = _cut_stop(base_snap)
+    head_cut, head_block = _cut_stop(head_snap)
+    out = differences(base_cut, head_cut)
+    assert base_block is not None, "the base build's settings carry no Stop block (the allowed difference is not there)"
+    if kind == "writer":
+        want = world.expected_settings(world.wall(head_line), world.tree(head_line), kind=kind, set_name=SET)["hooks"]["Stop"]
+        got = json.loads(b"{" + head_block.rstrip().rstrip(b",") + b"}")["Stop"] if head_block else None
+        want = json.loads(json.dumps(want).replace(head_line["run"], RUN_MARK.decode()))
+        got = json.loads(json.dumps(got).replace(head_line["run"], RUN_MARK.decode())) if got else got
+        if got != want:
+            out["Stop hook"] = f"head's {got!r} is not the filled hook {want!r}"
+    elif head_block is not None:
+        out["Stop hook"] = "the head's wall carries a Stop hook, only the writer's does"
     return out
 
 

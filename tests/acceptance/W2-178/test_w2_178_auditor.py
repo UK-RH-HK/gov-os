@@ -99,7 +99,7 @@ def test_s1_the_auditor_s_wall_differs_from_the_base_build_only_by_the_dropped_s
     head_line = s.build(world, None, "auditor")
     base_snap, head_snap = s.snapshot(world, base_line), s.snapshot(world, head_line)
     assert any(k.startswith("input/set/dropped/") for k in base_snap), "the base build carries no dropped files"
-    diff = s.differences(s.without_dropped(base_snap), head_snap)
+    diff = s.walls_differ(world, s.without_dropped(base_snap), head_snap, head_line, "auditor")
     assert diff == {}, f"the head's auditor wall differs from the base's beyond the dropped subtree: {diff}"
 
 
@@ -108,7 +108,7 @@ def test_s1_a_set_with_no_dropped_folder_builds_the_same_auditor_wall_as_before(
     entry (a script that changed anything else for the auditor would differ)."""
     base_line = s.build(world, base_script, "auditor")
     head_line = s.build(world, None, "auditor")
-    diff = s.differences(s.snapshot(world, base_line), s.snapshot(world, head_line))
+    diff = s.walls_differ(world, s.snapshot(world, base_line), s.snapshot(world, head_line), head_line, "auditor")
     assert diff == {}, f"the head's auditor wall differs from the base's: {diff}"
     assert {"q01.yaml", "q02.yaml", "sub/q03.yaml"} <= set(s.input_set(s.snapshot(world, head_line)))
 
