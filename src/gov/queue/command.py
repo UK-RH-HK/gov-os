@@ -513,11 +513,12 @@ def _merged(clone: Path, base: str, left: list[dict], alone: dict | None) -> str
 
 def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lands") -> tuple[list[str], list[str], dict]:
     """The union of the candidates' ``select.scoped`` selections in the clone at the tested merge, each branch's
-    changed paths counted in its change: ``(suites, pytest options, found)``, ``found``: ``unplaced_base``, ``deleted``, ``records``, ``notices``; ``SELECTION_REFUSED`` for a
-    path the branch wrote that the test map does not map (the base's own, ``unplaced_base``, are only listed)."""
+    changed paths counted in its change: ``(suites, pytest options, found)``, ``found``: ``unplaced_base``, ``unplaced`` (both always empty: the change is the branch's diff alone, and a
+    path of it nothing places refuses), ``deleted``, ``records``, ``notices``; ``SELECTION_REFUSED`` for a path the
+    branch wrote that the test map does not map, naming the coupling to add (plan item 1-0, SEL-1, SEL-3)."""
     from gov.close import select
 
-    suites, options, found = [], None, {k: [] for k in ("unplaced_base", "deleted", "records", "notices")}
+    suites, options, found = [], None, {k: [] for k in ("unplaced_base", "unplaced", "deleted", "records", "notices")}
     for cand in left:
         try:
             chosen = select.scoped(clone, cand["ticket"], change=_changed(root, cand["since"], cand["tip"]))

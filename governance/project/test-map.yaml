@@ -182,6 +182,19 @@ couplings:
   - paths: ["tests/acceptance/**"]
     suites: ["tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass"]
     why: "history rule: W1-01 judges every merge that touches tests/acceptance/ (DEC-253, DEC-912; P-SELECT-FIXES-1 (i), K6)"
+  # Plan item 1-0 (SEL-2): the edges the landings' selections missed (FINDINGS I-20, I-21, I-29)
+  - paths: ["governance/project/release-authority.yaml"]
+    suites: ["tests/acceptance/W2-209/"]
+    why: "plan item 1-0, I-21: W2-209 S3 reads the release authority file; a change to it ran no test"
+  - paths: ["governance/project/indep-walls/**", "governance/project/orchestration/tools/indep_launch.py"]
+    suites: ["tests/acceptance/W2-178/", "tests/acceptance/W2-149/"]
+    why: "plan item 1-0, I-29: the independence walls and the launcher that writes their settings are what W2-178 and W2-149 S8 test"
+  - paths: ["src/gov/rebuild/**", "governance/project/rebuild.yaml"]
+    suites: ["tests/acceptance/W2-116/"]
+    why: "plan item 1-0, I-29: W2-116 tests the rebuild's due rule (P0-1 changed it, no selection ran it)"
+  - paths: ["template/**"]
+    suites: ["tests/acceptance/W2-16/", "tests/acceptance/W2-208/", "tests/unit/update"]
+    why: "plan item 1-0, I-20: every file of the kit is rendered into a project by install and update; W2-16, W2-208 and the update unit tests run on it"
 
 # Moved from the path map (DEC-876 item 2, DEC-896 item 2).
 test_inputs:

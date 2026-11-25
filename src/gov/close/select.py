@@ -756,9 +756,10 @@ def _head_files(root: Path) -> set[str]:
 def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
     "base_from", "head"}`` (``base``: the head without the change, ``head_without_change``; ``unplaced_base``,
-    ``deleted``, ``records`` and ``notices`` too when ``change`` is given); ``SelectionRefused``
-    with its reason where it cannot be made. ``change``: paths counted in the change beside the ticket's own commits
-    (``gov queue``: a work branch's changed paths, untrailered commits among them)."""
+    ``unplaced`` (both ``[]``: a path nothing places refuses), ``deleted``, ``records`` and ``notices`` too when ``change`` is given); ``SelectionRefused``
+    with its reason where it cannot be made. ``change``: the change itself when given (``gov queue``: the branch's diff, merge base to tip, untrailered
+    commits among them); neither the ticket's own commits nor the range since the green record are added to it.
+    A path of it nothing places refuses, naming the coupling to add."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter
 
     root = Path(root)
@@ -770,12 +771,15 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
     if test_map is None:
         raise SelectionRefused(f"the test map {MAP_REL} cannot be read ({why_not}): no selection is made blind")
     own_paths, parent = ticket_change(root, ticket)
-    # the change is what the head holds that no green record has tested: everything since the newest green record
-    # (the strict close's base), with the ticket's own commits; a ticket's own commits alone without a green record
+    # ``gov close`` (no ``change``): the change is what the head holds that no green record has tested, everything
+    # since the newest green record (the strict close's base) with the ticket's own commits; a ticket's own commits
+    # alone without a green record. ``gov queue`` (``change`` given, plan item 1-0, SEL-1): the change is exactly the
+    # branch's diff, merge base to tip; the base's commits since the last green record are not this landing's
     green = base(root)
-    paths = sorted(set(own_paths) | set(changed(root, green))) if green else own_paths
-    if change:
-        paths = sorted(set(paths) | set(change))
+    if change is not None:
+        paths = sorted(set(change))
+    else:
+        paths = sorted(set(own_paths) | set(changed(root, green))) if green else own_paths
     tickets = _tickets(root)
     couplings = test_map.get("couplings") or []
     why: dict[str, list[str]] = {}
@@ -841,17 +845,16 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
                 select(rel, f"IMPORTS {p}")
                 placed[p] = True
     unplaced = [p for p, hit in placed.items() if not hit and p not in deleted]
-    # L2-4 (DAEO-j9z6): with ``change`` given, a path only the green range counted (neither the ticket's own commits
-    # nor ``change`` wrote it) is the base's, not this landing's to refuse: it is listed, and what it reaches stays
-    unplaced_base = sorted(set(unplaced) - set(own_paths) - set(change)) if change is not None else []
-    unplaced = [p for p in unplaced if p not in unplaced_base]
+    unplaced_base: list[str] = []  # kept in the answer: with ``change`` given the green range is not counted
     # I-2 (DEC-1239 (2)): with ``change`` given, a Markdown document outside the code, test and kernel places that
     # nothing places is a record, placed with a notice; code and tests that nothing places still refuse
     placed_records = [p for p in unplaced if change is not None and _is_record_document(p)]
     unplaced = [p for p in unplaced if p not in placed_records]
     if unplaced:
+        hint = ("; add a coupling for it to governance/project/test-map.yaml (paths: [...], suites: [...], why: ...)"
+                if change is not None else "")
         raise SelectionRefused(f"{len(unplaced)} changed path(s) nothing maps to a suite (no coupling, no ticket "
-                               f"with a suite holds them, no test imports them): {', '.join(sorted(unplaced))}")
+                               f"with a suite holds them, no test imports them): {', '.join(sorted(unplaced))}{hint}")
     governance = [p for p in paths if p.startswith(GOVERNANCE_OVERLAY) and not _any(p, test_map.get("record_only"))]
     if records and not code and governance and _bookkeeping(root, ticket, records):
         # S2: governance files select nothing by themselves; the ticket's own bookkeeping beside them (its ticket
@@ -880,7 +883,7 @@ def scoped(root: Path, ticket: str, change: list[str] | None = None) -> dict:
             "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only,
             "why": {t: why[t] for t in suites}, "base": judged_at, "base_from": judged_from,
             "head": _git(root, "rev-parse", "HEAD").strip(),
-            **({"unplaced_base": unplaced_base, "deleted": sorted(deleted), "records": found_records,
+            **({"unplaced_base": unplaced_base, "unplaced": [], "deleted": sorted(deleted), "records": found_records,
                 "notices": [f"RECORD_PLACED {p}" for p in sorted(placed_records)]} if change is not None else {})}
 
 
