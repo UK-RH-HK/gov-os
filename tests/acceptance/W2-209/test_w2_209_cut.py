@@ -124,6 +124,13 @@ def test_s2_the_cut_writes_kind_json_in_its_form(cut):
                                            and isinstance(rules[r].get("detail"), str) for r in support.RULES), rules
 
 
+def test_rr1_a_patch_cut_writes_kind_json_without_approvals(cut):
+    """Pins the patch release's ``kind.json`` (passes on the base)."""
+    repo, _ = _tagged(cut)
+    kind = json.loads(_at_tag(repo, "kind.json"))
+    assert set(kind) == {"version", "kind", "from", "commit", "rules"} and kind["kind"] == "patch", kind
+
+
 def test_s7_gates_json_and_suite_json_hold_the_evidence(cut):
     repo, _ = _tagged(cut)
     gates = json.loads(_at_tag(repo, "gates.json"))

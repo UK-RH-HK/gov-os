@@ -6,6 +6,11 @@ Written by the independent test designer (MR-3) from the ticket's eleven success
 acceptance kind but one, `test_w2_209_authority.py::test_s3_the_authority_file_committed_here_is_on_with_the_decision_and_bake_hours`,
 which is of the **repository-state** kind (it reads this repository's committed authority file).
 
+The lines **RR-1 to RR-4** (approved releases by code, `Class: Q` dropped, the ticket settled; DEC-1235 (2), DEC-1251
+D-01) were added on the base 46e49fe7b, with their cases in `test_w2_209_approved.py` and `test_w2_209_class_q.py`
+(and one case each in `test_w2_209_cut.py` and `test_w2_209_pending.py`). In `gov accept`'s names they are
+success-12 (RR-1), success-13 (RR-3), success-14 (RR-4) and failure-6 (RR-2), by their place in the ticket's lists.
+
 The ticket's Interface section and its KPI lines fix what they fix. Every name they leave open is fixed once, below
 ("Interface"); the engineer follows it.
 
@@ -37,10 +42,23 @@ The ticket's Interface section and its KPI lines fix what they fix. Every name t
   `Class: F` and no `Fix:`), `fix_open_ticket` (a `Fix:` commit whose `Task:` ticket is open at N) (P3), `command`
   (a new `src/gov/w2209probe/command.py`, `Class: C`) (P4), `schema_added`, `schema_removed` (P5), `minor` (0.2.0)
   and `prerelease` (0.1.2-rc.1) (P1); and `clean`: two `Fix:` commits with `Task: PLNT-aaaa` (closed at N; one
-  merged with `--no-ff`, its merge commit carrying no trailer), a `Class: Q` chore under `src/gov`, a `Class: C`
-  chore under `docs/emergency-2/proposals/` (not P2's path) and the version commit.
+  merged with `--no-ff`, its merge commit carrying no trailer), a `Class: C` chore under `src/gov` (RR-4; it was
+  `Class: Q` before), a `Class: C` chore under `docs/emergency-2/proposals/` (not P2's path) and the version commit.
+- **The planted register** (`docs/DECISION_REGISTER.md`, there from the first commit): DEC-9001 and DEC-9002
+  `ACCEPTED (owner, ...)`; DEC-9003 `ACCEPTED (orchestrator, delegated ...)`, its text mentioning the owner's words;
+  DEC-9004 `PROPOSED`; DEC-900 only mentioned, never an entry (and a prefix of the others). An open ticket
+  `PLNT-cccc` (`W9-03`) names DEC-9003.
+- **The ranges of RR-1, RR-2 and RR-4** (`w2_209_support._build_class_q`, `_build_approvals`, branches of the same
+  form): `q_src` (the clean range with its code chore `Class: Q`), `q_template`, `q_fix`, `q_docs`; the approved
+  ranges `ok_mixed` (minor version; a ticket naming one id, a Contract commit with `Approved-by`, a feature commit
+  under the ticket, a fix and a chore), `ok_front` (a block list in the ticket's front matter added after the closing
+  commit, commits naming it by `Task:` id, `wbs_id` and `external-ref`), `ok_trailer` (trailers alone, one decision
+  added to the register inside the range) and `ok_rollback`; seventeen ranges each with one lack beside approved
+  items (`lack_*`); five whose items are all approved and whose version is not above N or not plain (`ver_*`); and
+  `patch_with_approvals` (all five rules pass, with approving names present).
 - **A case's copy** (`make_case`) puts HEAD on `w2/integrate` at the case's tip and, unless the case says otherwise,
-  turns the authority file on by a commit carrying `Decided-by: owner (standing, DEC-1223)` (C is then that commit).
+  turns the authority file on by a `Class: C` commit carrying `Decided-by: owner (standing, DEC-1223)` (C is then that
+  commit).
 - **Suite records** are written outside the tree in the nightly's form (`branch`, `head`, `tree`, `scope`,
   `verdict`, `optin`, ...).
 - **The scratch home** (`make_home`): `~/.local/share/gov-os/pin-<12 hex>/bin/gov`, a stand-in gov script of
@@ -88,9 +106,9 @@ Run: `TMPDIR=$(mktemp -d) PYTHONPATH=$PWD/src python3 -m pytest tests/acceptance
 - **P2**: `git diff --name-only N C -- docs/contract docs/charter docs/emergency-2/EMERGENCY-2.md` is empty. The
   detail names each path.
 - **P3**: no `.tickets/*.md` has front-matter `status: closed` at C without having it at N (the detail names its
-  `id`); and every non-merge commit of N..C touching `src/gov` or `template` carries `Class: Q`, or `Class: C`, or
-  a `Fix:` trailer together with a `Task:` trailer naming a ticket (by its `id`) closed at N. The detail names each
-  failing commit by at least its first 12 characters.
+  `id`); and every non-merge commit of N..C touching `src/gov` or `template` carries `Class: C`, or a `Fix:` trailer
+  together with a `Task:` trailer naming a ticket (by its `id`) closed at N (RR-4: `Class: Q` is accepted nowhere).
+  The detail names each failing commit by at least its first 12 characters.
 - **P4**: the command names at a commit, read from git objects: every `src/gov/<folder>/command.py` (named
   `<folder>` with `_` read as `-`) and every `src/gov/cli/commands/<name>.py` but `__init__.py`. The detail names
   the names added and removed.
@@ -193,7 +211,7 @@ section **supersedes** the sentences above that say the judge step "passes when 
 - **`gates.json`**: `{"suite": {"record": <the record file's name>, "head", "tree", "optin"}, "proving": <G3's
   report>, "rule": {"kind", "rules"}}`. **`suite.json`**: the suite record's content.
 - **`NOTE.md`**: the version; one line per `Fix:` value of the non-merge commits N..C and per subject of the
-  non-merge commits N..C carrying `Class: Q` or `Class: C`; the gate evidence (the suite record's name, its head, the
+  non-merge commits N..C carrying `Class: C` (RR-4); the gate evidence (the suite record's name, its head, the
   word `weekly`, G3's verdict, the rule's kind); the rollback line `bash ~/.local/share/gov-os/rollback.sh`; each
   path listed in `$HOME/.gov-os/update/repositories` (or "none listed").
 
@@ -246,6 +264,38 @@ section **supersedes** the sentences above that say the judge step "passes when 
   kept. The re-pin counts the fixes as the `Fix:` commits (non-merge) of N..C, N being `kind.json`'s `from`, and takes
   the head and the verdict from `gates.json` (`suite.head`, `proving.verdict`) at the tag.
 
+### Approved releases (RR-1, RR-2; no new command, flag, gate or schema)
+
+- `gov release <X> --patch [--check]` as above. `--check` for an approved range: `ok: true`, exit 0, `result =
+  {"version", "kind": "approved", "from", "commit", "rules", "failed": [...], "approvals": [...]}`. A patch result
+  stays exactly as before (no `approvals` key; `kind.json` unchanged in form). A range with all of P1 to P5 passing
+  is `patch`, whatever names a decision.
+- **Approved** needs: the version at C a semantic version with no pre-release or build part and above N's (a minor
+  raise is fine); at least one item; every item `ok`. Otherwise a range with a failed rule is `bigger`.
+- **Bigger:** `RELEASE_REFUSED`, the details as before plus `approvals` (the same list; `[]` with no item); the
+  message names each lacking item (its ticket id or sha12; its path or name where no commit accounts for it). The cut
+  refuses at G1 (`kind: bigger`) and changes nothing.
+- **`approvals`**: a list of `{"item": str, "decisions": [the DEC ids found], "ok": bool, "lacks": str | null}`.
+  `item` contains the ticket id (a ticket closed at C and not at N) or the commit's first 12 characters (a commit
+  that P3 rejects, that changes a P2 path, or that adds or removes a command module or a kit schema file); for a P2,
+  P4 or P5 change no non-merge commit accounts for, it contains the path or name. `lacks` is `null` when `ok`, else a
+  sentence naming what is missing, with the id when one is named but does not count. The tests read ids, shas, paths
+  and names in `item`, never wording; one thing may have several entries, and every entry is of an expected item.
+- **Names:** the ticket's front-matter key `approved_by` (one id, or a YAML list inline or as a block), read at C.
+  The commit trailer `Approved-by: DEC-<n>[, DEC-<m>]` in the final trailer paragraph. A commit is covered by its own
+  trailer or by a `Task:` ticket (`id`, `wbs_id` or `external-ref`) whose `approved_by` counts. A ticket item is
+  covered only by the ticket's `approved_by`.
+- **A decision counts** only when `docs/DECISION_REGISTER.md` at C (the committed file, never the working tree) has an
+  entry `### DEC-<n> — <title>` whose `- **Status:**` field begins `ACCEPTED (owner`. Every id one `approved_by` or one
+  trailer names must count. `Decided-by:` alone never counts.
+- **The cut** of an approved range: as a patch's (G0, G2, G3, G4, the record, the re-pin and its rollback, the push);
+  `kind.json` is `{"version", "kind": "approved", "from", "commit", "rules", "approvals"}`. The record commit's
+  message, `NOTE.md` and the push text say `approved` and never `patch release` or `(patch,`. `NOTE.md` holds, for
+  each approval item, a line with its ticket id or sha12 and its decision ids.
+- **The push:** `gov.release.repin.push_text(version, fixes, head, verdict, kind="patch")`; at most 190 characters
+  with `kind="approved"` for 99.99.99 and eight fixes.
+- `gov.update.pending.pending` answers kind `bigger` for a release whose `kind.json` says `approved`.
+
 ### Updates and the nightly
 
 - `gov.update.pending.pending` reads `burned` at `Path.home() / ".local/share/gov-os/burned"`; burned versions are
@@ -267,10 +317,10 @@ section **supersedes** the sentences above that say the judge step "passes when 
 | S4, F3 | `test_w2_209_suite.py::test_s4_a_record_for_c_full_green_with_the_weekly_tier_passes_g2`, `test_w2_209_suite.py::test_s4_no_suite_record_is_refused`, `test_w2_209_suite.py::test_s4_f3_a_record_not_for_the_exact_commit_or_without_the_weekly_tier_is_refused` | `gov release` has no `--patch` (argparse, no envelope) |
 | F3 | `test_w2_209_suite.py::test_f3_a_record_that_cannot_be_read_is_refused_as_unreadable` | `gov release` has no `--patch` (argparse, no envelope) |
 | S5 | `test_w2_209_proving.py::test_s5_all_steps_passing_is_ready_in_throwaway_clones_of_the_kept_repositories`, `test_w2_209_proving.py::test_s5_the_close_step_lands_the_kept_run_queue_ticket`, `test_w2_209_proving.py::test_s5_one_failing_step_is_not_ready_naming_the_repository_and_the_step`, `test_w2_209_proving.py::test_s5_a_kept_run_with_five_repositories_is_not_ready`, `test_w2_209_proving.py::test_s5_a_missing_kept_folder_is_not_ready` | `gov.release.proving` does not exist (`missing`) |
-| S12 | `test_w2_209_regression.py::test_s12_a_not_ready_kept_run_and_an_equally_not_ready_copy_with_equal_doctor_and_close_is_ready`, `test_w2_209_regression.py::test_s12_ready_before_and_not_ready_after_is_a_regression_naming_the_repository_the_step_and_both_values`, `test_w2_209_regression.py::test_s12_not_ready_before_and_ready_after_is_not_worse_and_passes_the_judge_step`, `test_w2_209_regression.py::test_s12_a_judge_that_raises_or_returns_no_verdict_is_never_a_pass` | the judge step passes only on READY and READY: NOT_READY and NOT_READY, and NOT_READY then READY, fail it; the regression and no-verdict cases pin today's refusal and pass on the base |
-| S13 | `test_w2_209_regression.py::test_s13_a_close_that_refuses_before_the_update_and_refuses_the_same_after_it_passes`, `test_w2_209_regression.py::test_s13_gov_close_runs_as_close_before_in_an_unupdated_throwaway_copy_before_the_update_and_as_close_after_it`, `test_w2_209_regression.py::test_s13_a_close_that_exits_0_before_the_update_and_not_after_it_fails_naming_close_and_both_exit_codes`, `test_w2_209_regression.py::test_s13_a_close_that_refuses_before_the_update_and_exits_0_after_it_passes`, `test_w2_209_regression.py::test_s13_with_no_queue_ticket_the_close_step_is_skipped_and_no_close_runs_at_all` | no `close_before` call is made and the close step passes only on exit 0 (a close refusing the same before and after fails it); its entry and reason hold no `before` exit code; the no-ticket case pins today's skip and passes on the base |
-| S14 | `test_w2_209_regression.py::test_s14_each_judge_and_close_entry_holds_both_values` | the close step's entry holds only `exit` and `ticket`, no `before` and `after` |
-| S15 | `test_w2_209_regression.py::test_s15_a_relative_root_behaves_as_the_absolute_one` | `root` is not resolved: the scratch clone fails with `fatal: repository '.' does not exist`, NOT_READY "the rehearsal could not run" |
+| S5 | `test_w2_209_regression.py::test_s12_a_not_ready_kept_run_and_an_equally_not_ready_copy_with_equal_doctor_and_close_is_ready`, `test_w2_209_regression.py::test_s12_ready_before_and_not_ready_after_is_a_regression_naming_the_repository_the_step_and_both_values`, `test_w2_209_regression.py::test_s12_not_ready_before_and_ready_after_is_not_worse_and_passes_the_judge_step`, `test_w2_209_regression.py::test_s12_a_judge_that_raises_or_returns_no_verdict_is_never_a_pass` | the judge step passes only on READY and READY: NOT_READY and NOT_READY, and NOT_READY then READY, fail it; the regression and no-verdict cases pin today's refusal and pass on the base |
+| S5 | `test_w2_209_regression.py::test_s13_a_close_that_refuses_before_the_update_and_refuses_the_same_after_it_passes`, `test_w2_209_regression.py::test_s13_gov_close_runs_as_close_before_in_an_unupdated_throwaway_copy_before_the_update_and_as_close_after_it`, `test_w2_209_regression.py::test_s13_a_close_that_exits_0_before_the_update_and_not_after_it_fails_naming_close_and_both_exit_codes`, `test_w2_209_regression.py::test_s13_a_close_that_refuses_before_the_update_and_exits_0_after_it_passes`, `test_w2_209_regression.py::test_s13_with_no_queue_ticket_the_close_step_is_skipped_and_no_close_runs_at_all` | no `close_before` call is made and the close step passes only on exit 0 (a close refusing the same before and after fails it); its entry and reason hold no `before` exit code; the no-ticket case pins today's skip and passes on the base |
+| S5 | `test_w2_209_regression.py::test_s14_each_judge_and_close_entry_holds_both_values` | the close step's entry holds only `exit` and `ticket`, no `before` and `after` |
+| S5 | `test_w2_209_regression.py::test_s15_a_relative_root_behaves_as_the_absolute_one` | `root` is not resolved: the scratch clone fails with `fatal: repository '.' does not exist`, NOT_READY "the rehearsal could not run" |
 | S6 | `test_w2_209_state.py::test_s6_each_state_condition_alone_is_refused_at_g4_after_g3`, `test_w2_209_state.py::test_s6_two_reds_at_once_name_the_earlier_gate_g2_before_g4`, `test_w2_209_state.py::test_s6_two_reds_at_once_name_the_earlier_gate_g3_before_g4_on_the_command_line`, `test_w2_209_state.py::test_s6_two_reds_at_once_name_the_earlier_gate_g3_before_g4_through_the_seam` | `gov.release._patch_test` does not exist (`missing`); `gov release` has no `--patch` (argparse, no envelope) |
 | S7 | `test_w2_209_cut.py::test_s7_the_cut_tags_the_record_commit_annotated_unsigned_with_c_its_parent`, `test_w2_209_cut.py::test_s7_the_record_commit_adds_the_record_files_only`, `test_w2_209_cut.py::test_s7_the_record_commit_carries_the_orchestrator_the_standing_decision_and_task_release`, `test_w2_209_cut.py::test_s7_w2_integrate_holds_the_record_commit_by_an_ordinary_merge`, `test_w2_209_cut.py::test_s7_the_manifest_is_built_as_gov_release_builds_it_and_verifies`, `test_w2_209_cut.py::test_s7_gates_json_and_suite_json_hold_the_evidence`, `test_w2_209_cut.py::test_s7_g3_ran_once_on_c_and_the_re_pin_after_the_tag`, `test_w2_209_cut.py::test_s7_every_caller_but_the_orchestrator_is_refused_before_anything_is_read`, `test_w2_209_cut.py::test_s7_a_role_flag_does_not_make_an_orchestrator`, `test_w2_209_cut.py::test_s7_the_owner_plain_terminal_is_refused_and_never_asked_the_typed_code`, `test_w2_209_cut.py::test_s7_the_plain_form_from_an_orchestrator_session_is_refused_as_today`, `test_w2_209_cut.py::test_s7_gov_release_has_the_patch_flags_and_no_stand_in_flag`, `test_w2_209_cut.py::test_s7_the_command_line_runs_the_real_rehearsal_whatever_the_environment_says` | `gov.release._patch_test` does not exist (`missing`); `gov release` has no `--patch` (argparse, no envelope; `--help` lacks `--patch`, `--check`, `--suite`, `--kept`, `--push`); the plain-form case pins DEC-772 and passes on the base |
 | S8 | `test_w2_209_repin.py::test_s8_a_green_re_pin_switches_the_link_to_the_new_pin`, `test_w2_209_repin.py::test_s8_a_green_re_pin_commits_the_registry_entry_with_the_orchestrator_and_the_standing_decision`, `test_w2_209_repin.py::test_s8_a_green_re_pin_writes_repin_json_ok_and_rollback_sh`, `test_w2_209_repin.py::test_s8_each_early_stop_changes_nothing` | `gov.release.repin` does not exist (`missing`) |
@@ -281,7 +331,16 @@ section **supersedes** the sentences above that say the judge step "passes when 
 | F1 | `test_w2_209_state.py::test_f1_a_red_gate_leaves_the_record_folder_tags_branches_pins_and_link_as_they_were` | `gov release` has no `--patch` (argparse, no envelope); `gov.release._patch_test` does not exist (`missing`) |
 | F2 | `test_w2_209_rule.py::test_f2_a_bigger_range_is_refused_at_g1_with_every_other_gate_green`, `test_w2_209_rule.py::test_f2_a_bigger_range_with_the_authority_file_off_is_refused_at_g0`, `test_w2_209_rule.py::test_f2_g1_is_named_before_a_red_g2` | `gov.release._patch_test` does not exist (`missing`) |
 | F5 | `test_w2_209_remote.py::test_f5_the_plain_form_is_refused_from_an_orchestrator_session`, `test_w2_209_remote.py::test_f5_the_plain_form_is_refused_without_a_terminal_and_without_a_role`, `test_w2_209_remote.py::test_f5_a_full_cut_and_re_pin_contacts_no_remote`, `test_w2_209_remote.py::test_f5_the_authority_file_is_not_written_by_a_cut_or_a_re_pin` | `gov.release._patch_test` does not exist (`missing`); the two plain-form cases pin DEC-772 and pass on the base |
-| RP-1 | `test_w2_209_rp1.py::test_rp1_the_check_sees_the_new_gov_entry_in_the_working_tree_before_anything_is_committed`, `test_w2_209_rp1.py::test_rp1_a_green_re_pin_through_the_planted_doctor_commits_the_entry_alone`, `test_w2_209_rp1.py::test_rp1_a_failing_check_that_had_seen_the_new_entry_leaves_registry_head_and_link_as_they_were`, `test_w2_209_rp1.py::test_rp1_a_genuine_mismatch_in_another_tools_entry_still_rolls_back_with_the_registry_as_it_was`, `test_w2_209_rp1.py::test_rp1_a_failed_registry_commit_rolls_back_and_restores_the_registry_bytes` | the gov entry is written and committed only after the post-pin checks: the check sees the old 0.1.1 entry; the planted doctor (tools part reads the working-tree entry) rolls the green re-pin back (`newly unhealthy: tools`); a failing check had seen the old entry; a refused commit (passing check) leaves the written registry changed. The genuine-mismatch case is a guard and passes on the base |
+| S8 | `test_w2_209_rp1.py::test_rp1_the_check_sees_the_new_gov_entry_in_the_working_tree_before_anything_is_committed`, `test_w2_209_rp1.py::test_rp1_a_green_re_pin_through_the_planted_doctor_commits_the_entry_alone`, `test_w2_209_rp1.py::test_rp1_a_failing_check_that_had_seen_the_new_entry_leaves_registry_head_and_link_as_they_were`, `test_w2_209_rp1.py::test_rp1_a_genuine_mismatch_in_another_tools_entry_still_rolls_back_with_the_registry_as_it_was`, `test_w2_209_rp1.py::test_rp1_a_failed_registry_commit_rolls_back_and_restores_the_registry_bytes` | the gov entry is written and committed only after the post-pin checks: the check sees the old 0.1.1 entry; the planted doctor (tools part reads the working-tree entry) rolls the green re-pin back (`newly unhealthy: tools`); a failing check had seen the old entry; a refused commit (passing check) leaves the written registry changed. The genuine-mismatch case is a guard and passes on the base |
+| success-12 [RR-1] | `test_w2_209_approved.py::test_rr1_a_range_whose_every_item_names_the_owners_decision_is_checked_approved`, `test_w2_209_approved.py::test_rr1_the_cut_of_a_range_approved_by_front_matter_or_trailers_alone_builds_tags_merges_and_re_pins`, `test_w2_209_approved.py::test_rr1_the_cut_of_an_approved_range_builds_tags_merges_and_writes_kind_approved_with_its_approvals`, `test_w2_209_approved.py::test_rr1_the_record_commit_names_the_kind_approved_never_patch`, `test_w2_209_approved.py::test_rr1_note_md_says_approved_and_names_each_approval_with_its_decision`, `test_w2_209_approved.py::test_rr1_an_approved_release_is_re_pinned_and_pushed_once_as_approved`, `test_w2_209_approved.py::test_rr1_a_failed_check_after_an_approved_release_rolls_the_pin_back`, `test_w2_209_approved.py::test_rr1_the_push_text_of_an_approved_release_fits_190_characters`, `test_w2_209_approved.py::test_rr1_an_approved_range_is_still_held_by_the_other_gates`, `test_w2_209_approved.py::test_rr1_pending_offers_an_approved_release_as_bigger`, `test_w2_209_approved.py::test_rr1_a_range_with_all_five_rules_passing_stays_a_patch_without_approvals`, `test_w2_209_cut.py::test_rr1_a_patch_cut_writes_kind_json_without_approvals`, `test_w2_209_pending.py::test_rr1_pending_reads_a_record_of_kind_approved_as_bigger` | the rule has no third kind: `--check` refuses an approved range as `bigger`, the cut is refused at G1 (so no record, re-pin or push, and G2 to G4 are never reached); `push_text` takes no `kind` (TypeError) |
+| failure-6 [RR-2] | `test_w2_209_approved.py::test_rr2_the_check_refuses_as_bigger_naming_each_item_and_what_it_lacks`, `test_w2_209_approved.py::test_rr2_the_cut_refuses_at_g1_as_bigger_and_changes_nothing`, `test_w2_209_approved.py::test_rr2_a_minor_bump_with_nothing_to_approve_is_bigger_not_approved`, `test_w2_209_approved.py::test_rr2_a_decision_added_to_the_register_but_not_committed_does_not_count` | the refusal carries no `approvals`: no item is named with what it lacks |
+| success-13 [RR-3] | `test_w2_209_rule.py::test_s1_a_range_of_fixes_and_chores_only_is_a_patch_and_writes_nothing` | green on the base: a guard (two `Fix:` commits whose `Task:` ticket was closed at N answer `patch`) |
+| success-14 [RR-4] | `test_w2_209_class_q.py::test_rr4_a_class_q_commit_without_a_fix_is_not_a_patch_naming_the_commit`, `test_w2_209_class_q.py::test_rr4_the_cut_of_a_range_with_a_class_q_code_commit_is_refused_at_g1`, `test_w2_209_class_q.py::test_rr4_note_md_lists_class_c_chores_only`, `test_w2_209_class_q.py::test_rr4_class_q_beside_a_fix_under_a_ticket_closed_at_n_rides_the_fix`, `test_w2_209_rule.py::test_s1_a_range_of_fixes_and_chores_only_is_a_patch_and_writes_nothing` | `Class: Q` is still a chore: the range answers `patch`, the cut goes through, and `NOTE.md` lists the `Class: Q` subject |
+
+**RR-1 to RR-4, green on the base by design** (guards): `test_rr1_a_range_with_all_five_rules_passing_stays_a_patch_without_approvals`,
+`test_rr1_a_patch_cut_writes_kind_json_without_approvals`, `test_rr1_pending_reads_a_record_of_kind_approved_as_bigger`,
+the G0 case of `test_rr1_an_approved_range_is_still_held_by_the_other_gates`,
+`test_rr4_class_q_beside_a_fix_under_a_ticket_closed_at_n_rides_the_fix` and RR-3's case.
 
 **Green on the base, by design** (they pin today's behaviour the ticket says stays): the two
 `test_s2_pending_reads_the_kind_of_the_release_record` rows, `test_s7_the_plain_form_from_an_orchestrator_session_is_refused_as_today`,
@@ -293,6 +352,18 @@ cases that are red on the base. W2-16's owner-terminal cases (`tests/acceptance/
 stay in W2-16's folder; the landing selects them for any change under `src/gov/release`.
 
 ## How the lines are read, and what could not be tested as worded
+
+- **The map's line names**: the cases and prose that say S12 to S15 (the regression fix) and RP-1 are fix-local names,
+  mapped under the ticket lines they fix (S5 and S8): success-12 to success-14 are now RR-1, RR-3 and RR-4.
+- **RR-3**: only the planted check is a test, and S1's clean case already is it, so it is not written twice. "`gov
+  accept W2-209` green", the ticket's `closed` status and its evidence section are the lead's records, not a test.
+- **RR-4**: "no `Class: Q` is accepted by `src`" is checked by behaviour (the check, the cut, `NOTE.md`). "Written in
+  the rule's documents" is not tested: the line names no document (`RELEASE-ON-BEHALF.md` still has it in P3's row and
+  is outside the ticket's paths).
+- **RR-1, the failure push**: its text ("CTO cuts the next patch.") names no release kind; the rolled-back case asks
+  only that it holds neither `patch release` nor `(patch,`.
+- **RR-2**: "a `Decided-by:` or `Approved-by:` trailer's word alone" is the `lack_decided_by` and `lack_trailer_*`
+  ranges.
 
 - **S1**: "names exactly that rule" is the set of rules with `pass: false` equal to the planted one, `failed` equal
   to it, and its detail holding the planted path, ticket id, commit (first 12 characters), command name, schema

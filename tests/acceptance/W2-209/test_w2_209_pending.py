@@ -1,6 +1,6 @@
 """S2 (what reads kind.json) and S9 (a burned release is never offered): ``gov.update.pending.pending``.
 
-A planted source holds 0.1.1 and a release 0.1.2 whose record carries ``kind.json`` (``patch`` or ``bigger``); a
+A planted source holds 0.1.1 and a release 0.1.2 whose record carries ``kind.json`` (``patch``, ``bigger`` or ``approved``); a
 project holds 0.1.1 (its lock). ``pending(project, source=...)`` runs in a child process whose ``HOME`` is a scratch
 home, whose ``~/.local/share/gov-os/burned`` lists 0.1.2 in the burned case. README, "S2, S9".
 """
@@ -24,7 +24,7 @@ def sources(base, tmp_path_factory):
     builder = folder / "builder"
     (builder / "tmp").mkdir(parents=True)
     found = {}
-    for kind in ("patch", "bigger"):
+    for kind in ("patch", "bigger", "approved"):
         repo = support.make_case(base, folder / f"source-{kind}", "clean", authority_on=False)
         support.record(repo, builder, support.X, extra={"kind.json": _kind(kind)})
         found[kind] = repo
@@ -49,6 +49,16 @@ def test_s2_pending_reads_the_kind_of_the_release_record(sources, tmp_path, kind
     report = _pending(home, project, found[kind])
     assert report.get("pending") is True and report.get("newest") == support.X, report
     assert report.get("kind") == kind, f"the kind read is {report.get('kind')!r}, not {kind}: {report}"
+
+
+def test_rr1_pending_reads_a_record_of_kind_approved_as_bigger(sources, tmp_path):
+    """Pins that only ``patch`` waits for the quiet point (passes on the base): the owner decides an approved one."""
+    found, project = sources
+    home = tmp_path / "home"
+    (home / "tmp").mkdir(parents=True)
+    report = _pending(home, project, found["approved"])
+    assert report.get("pending") is True and report.get("newest") == support.X, report
+    assert report.get("kind") == "bigger", f"an approved release is not offered as bigger: {report}"
 
 
 def test_s9_a_burned_patch_release_is_never_offered(sources, tmp_path):
