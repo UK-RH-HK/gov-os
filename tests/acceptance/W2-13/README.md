@@ -558,3 +558,40 @@ confidence medium.
 
 The context command is retired (DEC-1214 M1, W2-200): `test_w2_13_role_separation.py::test_engineer_context_supplementary_holds_none_of_its_own_tickets_acceptance_tests`
 and the support's context reader are deleted; S5's other cases (every `gov retrieve` route) are unchanged and map it.
+
+## Fix TT-2: the warm-latency judgement is taken against the machine's reading (I-32; DEC-979 item 1 D2)
+
+The two cases of `test_w2_13_latency.py` timed each question on the wall clock, so a machine whose processors are all taken read as a slow retrieval. The cases below plant readings (each latency case is run whole, a stand-in answering for the child processes; the real child is timed on `time.sleep` with this machine's file, a planted one and none).
+
+Each timed call records three readings, all in the timed process and around the call alone: its wall time
+(`time.perf_counter`), the time its calling thread waited on a run queue for a CPU (`run_delay`: the change of the
+second field of `/proc/thread-self/schedstat`, in nanoseconds) and the thread's CPU time (`cpu`,
+`time.thread_time`). The judged time (`judged_seconds` in `w2_13_support.py`) is
+
+    judged = max(wall - min(max(run_delay, 0), wall), cpu)
+
+where an unreadable file counts as `run_delay = 0`, so the judgement is then the wall time (fail closed). With no wait
+for a CPU the judged time is the wall time, as before. **The budget is unchanged: p95 at most 0.5 s.** A run prints
+the judged p95 (`-rP` shows it).
+
+The lexical case stays in the serial list (`serial: latency`), because the readings do not take every effect of load out (below) and running it alone costs about a minute. The real-model case stays `nightly: real-model`: it gets no serial entry, which would pull real models into the release suite.
+
+**Known limit.** `run_delay` is the calling thread's alone. A wait inside another process (the reranker service,
+Ollama, the GPU's queue), on another thread of the call, on a lock or on the disk is not taken out, and neither is the
+slower work of a core whose sibling thread is busy. The real-model cases therefore stay on the `nightly: real-model`
+route. A wait for a CPU that overlapped a wait the code was making anyway is taken out whole.
+
+Seen 2026-11-25 with the real models, each warm case run alone at a load of 4 to 12: the wait for a CPU was under 5 ms
+in every question, so judged and wall times were the same, and the p95 was over the budget (W1-19 0.571 to 0.599 s;
+W2-13 0.621 to 0.907 s). That is the latency already open against these cases, not taken out and not excused.
+
+| Line | Test | Expected red reason on the base |
+|---|---|---|
+| TT-2: on an idle reading a 2x slow-down over the budget fails the case (guard) | `test_w2_13_judged_time.py::test_on_an_idle_reading_a_two_times_slow_down_over_the_budget_fails_the_case` | guard: green on the base |
+| TT-2: a busy reading whose excess is all wait for a CPU passes | `test_w2_13_judged_time.py::test_on_a_busy_reading_whose_excess_is_all_wait_for_a_cpu_the_case_passes` | the wall time is judged: warm p95 2.000 s |
+| TT-2: own work over the budget fails under a busy reading too (guard) | `test_w2_13_judged_time.py::test_own_work_over_the_budget_fails_the_case_under_a_busy_reading_too` | guard: green on the base |
+| TT-2: an unreadable reading leaves the wall time judged (guard) | `test_w2_13_judged_time.py::test_an_unreadable_reading_leaves_the_wall_time_judged` | guard: green on the base |
+| TT-2: the formula, its clamp and its CPU floor | `test_w2_13_judged_time.py::test_the_judged_time_is_the_wall_less_the_wait_for_a_cpu_and_never_under_the_threads_cpu` | rows `waited`, `clamped-high`, `cpu-floor`: the wall time is judged; rows `idle`, `clamped-low`, `unreadable`: guard: green on the base |
+| TT-2: the real child records the reading and credits no wait of its own | `test_w2_13_judged_time.py::test_the_timed_child_records_this_machines_reading_and_never_credits_a_wait_of_its_own` | the timed call records no wait for a CPU and no CPU time |
+| TT-2: the real child takes a planted wait out | `test_w2_13_judged_time.py::test_the_timed_child_takes_the_wait_for_a_cpu_it_reads_out_of_the_judged_time` | the timed call records no wait for a CPU and no CPU time |
+| TT-2: the real child judges the wall time where the file cannot be read | `test_w2_13_judged_time.py::test_the_timed_child_judges_the_wall_time_where_the_reading_cannot_be_read` | the timed call records no wait for a CPU and no CPU time |
