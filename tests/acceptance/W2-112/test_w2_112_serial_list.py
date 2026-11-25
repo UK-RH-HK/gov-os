@@ -5,7 +5,7 @@ slot wait plus ``NO_WAIT_S``. It went red in the release suite's parallel run (`
 which runs ``gov.close.command``'s test run: that reads ``tests/acceptance/serial-only.txt``, leaves every entry out
 of its parallel run and runs each ``serial:`` entry afterwards, alone.
 
-The first case reads this repository's list. The second (a guard) runs the release runner's test run itself on a
+The cases that read this repository's list name each entry of this folder's time bounds. The last one (a guard) runs the release runner's test run itself on a
 planted project with a planted list: small stand-in tests that tell in which worker, and how often, they ran.
 """
 
@@ -22,6 +22,7 @@ import w2_112_support as support
 REPO_ROOT = Path(__file__).resolve().parents[3]
 LIST_REL = "tests/acceptance/serial-only.txt"
 SLOTS_REL = "tests/acceptance/W2-112/test_w2_112_slots.py"
+CLOCK_REL = "tests/acceptance/W2-112/test_w2_112_clock.py"
 CASE = "test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded"
 ENTRY = f"{SLOTS_REL}::{CASE}"
 SIBLING = f"{CASE}_and_more"  # a name that merely begins with the listed one: not named by the entry
@@ -57,6 +58,16 @@ def test_the_list_names_the_both_slots_held_case_on_the_serial_route_as_a_latenc
         f"the entry's comment is to read `serial: latency: <reason in words>`: {named[0][1]!r}"
     assert f"\ndef {CASE}(" in (REPO_ROOT / SLOTS_REL).read_text(encoding="utf-8"), \
         f"{SLOTS_REL} defines no {CASE}"
+
+
+def test_the_list_names_the_whole_clock_file_on_the_serial_route_as_a_latency_entry():
+    """Both cases of ``test_w2_112_clock.py`` run the slots case whole, its time bound included: they run alone too."""
+    named = [(entry, comment) for entry, comment in _lines() if entry == CLOCK_REL]
+    assert len(named) == 1, f"{LIST_REL} holds {len(named)} entries for {CLOCK_REL}: one is expected"
+    parts = [part.strip() for part in named[0][1].split(":", 2)]
+    assert len(parts) == 3 and parts[:2] == ["serial", "latency"] and len(parts[2].split()) >= 3, \
+        f"the entry's comment is to read `serial: latency: <reason in words>`: {named[0][1]!r}"
+    assert (REPO_ROOT / CLOCK_REL).is_file(), f"there is no {CLOCK_REL}"
 
 
 def _stand_in(name: str, told: Path) -> str:

@@ -378,9 +378,11 @@ so a loaded machine still lengthens it; running it alone costs seconds.
 
 Both cases below run the slots case whole, with a `sitecustomize.py` on the session process's `PYTHONPATH`: one steps
 the process's wall clock 3.5 s forward between the two wall stamps, one makes the product's `rerank` take twice its
-time. They carry the case's own 7 s bound against about 4.1 s of real search time.
+time. They carry the case's own 7 s bound against about 4.1 s of real search time, so by TT-1's rule they run alone: the
+whole file is one `serial: latency` entry of `tests/acceptance/serial-only.txt`.
 
 | Line | Test | Expected red reason on the base |
 |---|---|---|
 | TT-2: a forward wall-clock step of 3.5 s during the search does not change `seconds` | `test_w2_112_clock.py::test_a_forward_step_of_the_wall_clock_during_the_search_does_not_change_its_seconds` | `seconds` is the wall difference, 7.6 s, the planted step in it |
+| TT-2: the list names the clock file on the serial route | `test_w2_112_serial_list.py::test_the_list_names_the_whole_clock_file_on_the_serial_route_as_a_latency_entry` | before the entry (head `60ac1fe94`): the list holds 0 entries for the file |
 | TT-2: a real 2x slow-down still fails the case's bound (guard) | `test_w2_112_clock.py::test_a_search_that_really_takes_twice_its_time_still_fails_the_cases_bound` | guard: green on the base |
