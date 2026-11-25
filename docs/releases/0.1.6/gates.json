@@ -1,0 +1,263 @@
+{
+  "suite": {
+    "record": "NR-20261125T065916Z-b8a04194a337.json",
+    "head": "b8a04194a3370ce4e629563921f49e25533cd290",
+    "tree": "e6decce7af59c27569e0b1795a8cdfb2be25bacd",
+    "optin": [
+      "weekly"
+    ]
+  },
+  "proving": {
+    "verdict": "READY",
+    "reasons": [],
+    "repositories": {
+      "python-app": {
+        "steps": {
+          "check": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0,
+            "conflicts": []
+          },
+          "update": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0
+          },
+          "doctor": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0
+          },
+          "judge": {
+            "pass": true,
+            "skipped": false,
+            "verdicts": [
+              "NOT_READY",
+              "NOT_READY"
+            ]
+          },
+          "close": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0,
+            "ticket": "pa-smko"
+          }
+        },
+        "failed": null
+      },
+      "rust-workspace": {
+        "steps": {
+          "check": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0,
+            "conflicts": []
+          },
+          "update": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0
+          },
+          "doctor": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0
+          },
+          "judge": {
+            "pass": true,
+            "skipped": false,
+            "verdicts": [
+              "NOT_READY",
+              "NOT_READY"
+            ]
+          },
+          "close": {
+            "pass": true,
+            "skipped": false,
+            "before": 3,
+            "after": 3,
+            "ticket": "rw-vyk3"
+          }
+        },
+        "failed": null
+      },
+      "typescript-monorepo": {
+        "steps": {
+          "check": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0,
+            "conflicts": []
+          },
+          "update": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0
+          },
+          "doctor": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0
+          },
+          "judge": {
+            "pass": true,
+            "skipped": false,
+            "verdicts": [
+              "NOT_READY",
+              "NOT_READY"
+            ]
+          },
+          "close": {
+            "pass": true,
+            "skipped": false,
+            "before": 3,
+            "after": 3,
+            "ticket": "tm-4kpa"
+          }
+        },
+        "failed": null
+      },
+      "legacy-docs": {
+        "steps": {
+          "check": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0,
+            "conflicts": []
+          },
+          "update": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0
+          },
+          "doctor": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0
+          },
+          "judge": {
+            "pass": true,
+            "skipped": false,
+            "verdicts": [
+              "NOT_READY",
+              "NOT_READY"
+            ]
+          },
+          "close": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0,
+            "ticket": "ld-mj6i"
+          }
+        },
+        "failed": null
+      },
+      "secret-history": {
+        "steps": {
+          "check": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0,
+            "conflicts": []
+          },
+          "update": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0
+          },
+          "doctor": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0
+          },
+          "judge": {
+            "pass": true,
+            "skipped": false,
+            "verdicts": [
+              "NOT_READY",
+              "NOT_READY"
+            ]
+          },
+          "close": {
+            "pass": true,
+            "skipped": false,
+            "before": 3,
+            "after": 3,
+            "ticket": "sh-e15w"
+          }
+        },
+        "failed": null
+      },
+      "python-app-clean": {
+        "steps": {
+          "check": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0,
+            "conflicts": []
+          },
+          "update": {
+            "pass": true,
+            "skipped": false,
+            "exit": 0
+          },
+          "doctor": {
+            "pass": true,
+            "skipped": false,
+            "before": 0,
+            "after": 0
+          },
+          "judge": {
+            "pass": true,
+            "skipped": false,
+            "verdicts": [
+              "NOT_READY",
+              "NOT_READY"
+            ]
+          },
+          "close": {
+            "pass": true,
+            "skipped": false,
+            "before": 3,
+            "after": 3,
+            "ticket": "pac-73p5"
+          }
+        },
+        "failed": null
+      }
+    }
+  },
+  "rule": {
+    "kind": "patch",
+    "rules": {
+      "P1": {
+        "pass": true,
+        "detail": "version 0.1.6 is 0.1.5 with the last number raised"
+      },
+      "P2": {
+        "pass": true,
+        "detail": "no path of the Contract, the Charter or EMERGENCY-2 changed"
+      },
+      "P3": {
+        "pass": true,
+        "detail": "no ticket closed; every code commit is a fix or a chore"
+      },
+      "P4": {
+        "pass": true,
+        "detail": "the same 36 commands"
+      },
+      "P5": {
+        "pass": true,
+        "detail": "no kit schema added or removed"
+      }
+    }
+  }
+}

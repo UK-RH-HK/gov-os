@@ -1,0 +1,29 @@
+{
+  "branch": "w2/integrate",
+  "head": "b8a04194a3370ce4e629563921f49e25533cd290",
+  "tree": "e6decce7af59c27569e0b1795a8cdfb2be25bacd",
+  "base": "0bd2945b04fe3811caac493256a15569f1411321",
+  "scope": "full",
+  "verdict": "green",
+  "secrets_full_scan": true,
+  "optin": [
+    "weekly"
+  ],
+  "junit_xml": [
+    ".gov-runtime/nightly/20261125T065916Z-b8a04194a337/01-acceptance-parallel.xml",
+    ".gov-runtime/nightly/20261125T065916Z-b8a04194a337/02-acceptance-serial-afterwards.xml"
+  ],
+  "failures": [],
+  "packages": [],
+  "tests_run": {
+    "passed": 19173,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 93
+  },
+  "findings": [],
+  "per_test_timeout": 900,
+  "distribution": "load",
+  "tmp_path_retention_policy": "failed",
+  "created": "2026-11-25T08:30:58Z"
+}
