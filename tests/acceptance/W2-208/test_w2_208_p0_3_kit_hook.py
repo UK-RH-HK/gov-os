@@ -145,7 +145,9 @@ def test_p0_3_only_the_state_committed_refreshes(rig):
         assert p0.run_hook(rig, state, p0.ref_line(rig.branch)) == 0
     assert p0.stays_false(lambda: not p0.no_store_built(rig) or rig.embedder.requests > 0), (
         f"a state other than `committed` started a refresh\n{rig.log_text()[-800:]}")
-    assert p0.run_hook(rig, "committed", p0.ref_line(rig.branch)) == 0
+    # no store and no record: the clock decides, so plant it past `latest` (10:00) and before `second` (18:00)
+    noon = {**rig.child_env(), "GOV_NOW": p0.s2.at(p0.s2.DAY1, "12:00").isoformat()}
+    assert p0.run_hook(rig, "committed", p0.ref_line(rig.branch), env=noon) == 0
     assert p0.wait_for(lambda: rig.store_head() == rig.head()), (
         f"the state `committed` on {rig.branch!r} refreshed nothing\nlog:\n{rig.log_text()[-800:]}")
 

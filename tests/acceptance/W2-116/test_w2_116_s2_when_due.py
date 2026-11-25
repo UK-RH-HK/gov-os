@@ -98,14 +98,24 @@ def test_s2_success_second_is_due_once_after_its_time_and_brings_the_store_to_th
     s2.first_refresh(box, env, project, at(DAY1, "10:05"))
     ready = support.assert_link(box)
     h2 = support.land_h2(project)
-    # a merge landed, but no refresh is due at noon: the scheduled tick does not follow the merge
+    # a merge landed: the store is behind the branch head, which is due at any time (P0-1, reason `behind`)
     noon = s2.when_due(project, env, at(DAY1, "12:00"))
-    s2.assert_not_due(noon, box, support.BRANCH, "noon, after a merge, between the two times")
-    assert support.target(box) == ready, "a tick that was not due moved the link"
+    s2.assert_due(noon, "behind", "noon, after a merge: the store is behind the branch head")
+    assert noon.result["integration"]["status"] == "switched", f"the behind refresh did not switch\n{noon.describe()}"
+    s2.assert_record(box, at(DAY1, "12:00"), "behind", h2, "switched", "the refresh at noon")
+    assert support.worktrees(project).get(support.assert_link(box), {}).get("head") == h2
+    assert support.target(box) != ready, "the behind refresh did not move the link"
+    # with the store at the branch head, a tick between the two times is not due and moves nothing
+    moved = support.target(box)
+    kept = s2.record_bytes(box)
+    middle = s2.when_due(project, env, at(DAY1, "12:30"))
+    s2.assert_not_due(middle, box, support.BRANCH, "12:30, store at the head, between the two times")
+    assert support.target(box) == moved, "a tick that was not due moved the link"
+    assert s2.record_bytes(box) == kept, "a tick that was not due rewrote the record"
     run = s2.when_due(project, env, at(DAY1, "18:05"))
     s2.assert_due(run, "second", "past second 18:00")
-    assert run.result["integration"]["status"] == "switched", f"the second refresh did not switch\n{run.describe()}"
-    s2.assert_record(box, at(DAY1, "18:05"), "second", h2, "switched", "the refresh at second")
+    assert run.result["integration"]["status"] == "unchanged", f"the store was at the head already\n{run.describe()}"
+    s2.assert_record(box, at(DAY1, "18:05"), "second", h2, "unchanged", "the refresh at second")
     assert support.worktrees(project).get(support.assert_link(box), {}).get("head") == h2
     once = s2.when_due(project, env, at(DAY1, "18:10"))
     s2.assert_not_due(once, box, support.BRANCH, "the next tick, after the second refresh")
