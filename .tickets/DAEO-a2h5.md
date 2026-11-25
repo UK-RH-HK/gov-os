@@ -124,3 +124,19 @@ kept repository and NOT_READY over the copy; it also had a `parts[-3]` check tha
 (Sonnet), branch `e2/fixes-015b`. `gov accept W2-209` green on the first run (144 passed); `tests/unit/release`: 41 passed.
 Open: unequal nonzero close exits (1 before, 2 after) are not covered by the ruling; the code treats them as not worse only
 when equal or 0 after. The real G3 against the kept 0.1.4 run is the CTO's to run.
+
+## Fix: the automatic re-pin writes gov's tool-registry entry before its post-pin checks (RP-1; I-31 corrected; the CTO's brief of 2026-11-25)
+
+Found 2026-11-25: `gov release <v> --patch` cut 0.1.6 and 0.1.7 and each re-pin rolled back (`newly unhealthy: tools`):
+`repin.py` wrote and committed the `gov` entry of `governance/project/tool-registry.yaml` (step E) only after the post-pin
+checks passed, so `gov doctor`'s `tools` part found the new gov against the entry still pinning 0.1.5. The owner's manual
+re-pin of 0.1.5 (`8346b9a30`) wrote that entry itself, so it passed.
+
+- **RP-1** The re-pin writes the new pin's `gov` entry (version, sha256 of the release wheel, install and uninstall lines in
+  the form of the 0.1.5 entry, date, approving decision) into the repository's `tool-registry.yaml` after the switch and
+  before the post-pin checks, so `gov doctor`'s `tools` part reads the new gov as pinned; on a pass the entry is committed
+  with the re-pin's record (`Role: orchestrator`, `Decided-by: owner (standing, <decision>)`); on any failing check, a failed
+  commit or an error the file is restored to its previous bytes and nothing is committed. Verify: on a planted machine (a
+  temporary HOME, a planted registry, two planted pins) the switch passes the doctor check with the entry written, the
+  registry commit holds the entry, and a planted genuine tool mismatch (another tool's entry) still rolls back with the
+  registry file byte-equal to before and HEAD unchanged. Failing test first (`tests/acceptance/W2-209/test_w2_209_rp1.py`).
