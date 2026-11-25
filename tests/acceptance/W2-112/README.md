@@ -351,3 +351,15 @@ memory-release cases, in no opt-in list, are mapped to success 6 in that section
 | F1: A search that fails, hangs, or returns another session's scores because of the service. | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
 | F2: Two services started at once, or a socket another user can open. | `test_w2_112_service.py::test_two_searches_starting_together_start_one_service`, `test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
 | F3: Answers that differ from a private reranker's on the same inputs and device. | `test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
+
+## Fix TT-1: the case that bounds a search's time runs alone (D-03 (b), I-32)
+
+`test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` is listed in
+`tests/acceptance/serial-only.txt` (`serial: latency`): the release suite (`python3 -m gov.close.nightly`, through
+`gov.close.command`'s test run) and `gov close` leave it out of their parallel run and run it afterwards, alone. No
+bound changed. The cases below are fix lines, not ticket KPI lines.
+
+| Line | Test | Expected red reason on the base |
+|---|---|---|
+| TT-1: the list names the case on the serial route | `test_w2_112_serial_list.py::test_the_list_names_the_both_slots_held_case_on_the_serial_route_as_a_latency_case` | the list holds 0 entries for the case |
+| TT-1: the release runner leaves a listed case out of the parallel run and runs it exactly once, alone (guard) | `test_w2_112_serial_list.py::test_the_release_runner_leaves_the_listed_case_out_of_its_parallel_run_and_runs_it_once_alone` | guard: green on the base (the runner already reads the list; the planted project holds the entry) |
