@@ -2,7 +2,9 @@
 
 A line holds ids, counts, codes and digests only. ``say`` refuses, before anything is printed, a line that holds the
 sets root's path followed by a slash or one of the folder words below, and prints in its place the fixed refusal; the
-subcommand then exits 4. Standard error, when a line goes there too, carries the same single line.
+subcommand then exits 4. Standard error, when a line goes there too, carries the same single line. A session's launch
+line (``LAUNCH writer|checker claude -p ...``) holds the caller's own folders, so it is judged by the sets root's path
+alone (W2-204 ML-1).
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ HALF_LINES = (
     re.compile(r"FRESH plan: visible memory-audit-[0-9]{8} hidden memory-audit-[0-9]{8} at [0-9a-f]{12}"),
     re.compile(r"FRESH VERDICT hidden right [0-9]+ of [0-9]+ \([0-9]+\.[0-9] %\): (passes|misses)"),
 )
+LAUNCH_LINE = re.compile(r"LAUNCH (writer|checker) claude -p ")
 
 
 def _roots(sets_root) -> list[str]:
@@ -33,7 +36,7 @@ def refused(line: str, sets_root=None) -> bool:
     """Whether ``line`` names a sets-root folder."""
     if any(rx.fullmatch(line) for rx in HALF_LINES):
         return False
-    if any(word in line for word in FOLDER_WORDS):
+    if not LAUNCH_LINE.match(line) and any(word in line for word in FOLDER_WORDS):
         return True
     return any(root.rstrip("/") + "/" in line for root in _roots(sets_root))
 

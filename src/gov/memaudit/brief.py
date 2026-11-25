@@ -7,8 +7,11 @@ I5; S9, F-2 of P-FRESH-80-1).
 the configuration's ``exclude``; a copy is the set's ``selection.json`` in the sets root, the record the pre-flight's
 draw check reads); for round 2 and for the checker ``DIR/input/set/`` (the delivered questions, copied byte for byte and
 never opened as text); for the writer's round 2 ``DIR/input/notes.md`` (the round-1 notes). The product starts no
-session: the repository's CTO does, with this folder. One line is printed, ``BRIEF <kind> round <n> <12 hex>`` (the
-brief's sha256), and a ``brief`` event is appended to the audit's ledger.
+session: the repository's CTO does, with this folder, by the launch command written to ``DIR/LAUNCH.txt`` (run with
+``DIR`` as the working directory). The writer's folder also gets ``DIR/.claude/settings.json`` (its ``Stop`` hook); the
+checker's command carries its permissions inline and loads no hook, so a writer's settings file left in ``DIR`` is
+removed. Two lines are printed, ``BRIEF <kind> round <n> <12 hex>`` (the brief's sha256) and ``LAUNCH <kind>
+<command>``, and a ``brief`` event is appended to the audit's ledger.
 """
 
 from __future__ import annotations
@@ -169,7 +172,8 @@ def refusals_section(p: dict, kind: str) -> str:
 
 
 def writer_permissions(out) -> dict:
-    """What lets a writer's session write its set and nothing else (FM-5), in the wall template's own slash form."""
+    """What lets a writer's session (and a checker's, ML-2) write into ``out/out/`` and nothing else (FM-5), in the
+    wall template's own slash form."""
     o = "//" + os.path.abspath(os.path.expanduser(str(out))).lstrip("/")  # `//` = an absolute path in a rule
     return {"allow": [f"Write({o}/out/**)", f"Edit({o}/out/**)"],
             "deny": [f"Edit({o}/.claude/**)", f"Edit({o}/input/**)", f"Edit({o}/brief.md)"]}
@@ -189,12 +193,25 @@ WRITER_MODEL = "claude-sonnet-5-5"
 LAUNCH_NAME = "LAUNCH.txt"
 
 
-def launch_command(out: Path, repo) -> str:
-    """The one real writer launch (FM-5): the session folder's own settings (the ``Stop`` hook) load through
-    ``--setting-sources project --settings``; no ``--safe-mode`` and no ``--no-session-persistence``. Run with ``out`` as cwd."""
+def drop_writer_hook(out: Path) -> None:
+    """Removes ``out/.claude/settings.json`` when its ``Stop`` hook is the writer's, so that a checker's session in a
+    folder a writer used loads no such hook (ML-2). Any other settings file is left as it is."""
+    path = out / ".claude" / "settings.json"
+    doc = read_json(path)
+    hooks = doc.get("hooks") if isinstance(doc, dict) else None
+    if isinstance(hooks, dict) and "gov.memaudit writer-check" in json.dumps(hooks.get("Stop")):
+        path.unlink()
+
+
+def launch_command(kind: str, out: Path, repo) -> str:
+    """The one real launch of a writer's or a checker's session (FM-5, ML-2), run with ``out`` as cwd; no ``--safe-mode``
+    and no ``--no-session-persistence``. The writer's settings are its folder's own file (the ``Stop`` hook); the
+    checker's are its permissions alone, inline. Both write into ``out/out/`` only."""
     prompt = "Read brief.md in this folder and do what it says."
+    settings = (str(out / ".claude" / "settings.json") if kind == "writer"
+                else json.dumps({"permissions": writer_permissions(out)}))
     argv = ["claude", "-p", "--restricted", "--setting-sources", "project", "--settings",
-            str(out / ".claude" / "settings.json"), "--add-dir", str(Path(repo).resolve()), "--tools", WRITER_TOOLS,
+            settings, "--add-dir", str(Path(repo).resolve()), "--tools", WRITER_TOOLS,
             "--strict-mcp-config", "--permission-prompts", "none", "--model", WRITER_MODEL, prompt]
     return shlex.join(argv)
 
@@ -256,14 +273,15 @@ def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, em
         os.makedirs(out / ".claude", exist_ok=True)
         _write(out / ".claude" / "settings.json",
                (json.dumps(stop_hook(p, audit, repo, commit, out), indent=1) + "\n").encode("utf-8"))
+    else:
+        drop_writer_hook(out)
     _write(out / "brief.md", text)
     digest = sha256_bytes(text)
     ledger.append(layout.make_run(p), "brief", kind=kind, round=rnd, commit=commit, brief_sha256=digest)
     emit(f"BRIEF {kind} round {rnd} {digest[:12]}")
-    if kind == "writer":
-        line = launch_command(out, repo)
-        _write(out / LAUNCH_NAME, (line + "\n").encode("utf-8"))
-        emit(f"LAUNCH writer {line}")
+    line = launch_command(kind, out, repo)
+    _write(out / LAUNCH_NAME, (line + "\n").encode("utf-8"))
+    emit(f"LAUNCH {kind} {line}")
     return "ok"
 
 
