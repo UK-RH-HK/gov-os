@@ -93,9 +93,12 @@ def _generated_ctx(settings):
 def _plant(settings, post_groups):
     """The settings at A with the project's own hook entries and ``post_groups`` as PostToolUse."""
     planted = copy.deepcopy(settings)
-    hooks = {"PreToolUse": [copy.deepcopy(OWN_PRE)]}
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the adopted settings now hold the kit's PreToolUse entry; the own group goes
+    # before it, as the own PostToolUse and Stop groups do, instead of being overwritten by the generated groups.
+    hooks = {}
     for event, groups in planted["hooks"].items():
         hooks[event] = groups
+    hooks["PreToolUse"] = [copy.deepcopy(OWN_PRE), *hooks.get("PreToolUse", [])]
     hooks["PostToolUse"] = [copy.deepcopy(OWN_POST_1), copy.deepcopy(OWN_POST_2), *copy.deepcopy(post_groups)]
     hooks["Stop"] = [copy.deepcopy(OWN_STOP), *hooks["Stop"]]
     planted["hooks"] = hooks
