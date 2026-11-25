@@ -152,3 +152,41 @@ Written before the fix, red on the base (DEC-1246 (3)(b)). Map in the form `gov 
 | failure-44 | `test_w2_208_mr4_kit.py::test_mr4_a_generation_in_a_scratch_repository_holds_the_hook_line_exactly_once_and_no_edit_deny` | no hook line and no `defaultMode` after generation in a scratch repository |
 
 Uses the shared fixtures of this folder's `conftest.py` (`adopted_at_b`, `examin_013`) and `support.template_project`; never `gov adapters generate` on this repository's own tree (I-16).
+
+### P0-3 (plan item 0-3): the kit carries the git hook
+
+Tests for the fix `P0-3` of DAEO-kt8e, in `test_w2_208_p0_3_kit_hook.py` (support: `w2_208_p0_support.py`; it borrows
+W2-116's stand-in embedder and project builder). The kit's file is `template/governance/kernel/githooks/reference-transaction`.
+Installers: the project adopted (`copier copy` then `gov adapters generate`, W2-17's adoption path; `gov adopt --lite`'s
+stages are not driven, since which stage writes the hook is not fixed), `gov adapters generate` on a project whose hook was
+deleted, and `gov update B` on a project (adopted at A1) whose hook was deleted: `.git/hooks/reference-transaction`
+executable and byte-equal to the kit's file; the update record `governance/updates/B.json` holds the string
+`.git/hooks/reference-transaction` anywhere in it. The runtime cases put the kit's file in a built project whose
+`integration_refresh.branch` is `trunk` (and again `main`), with a fake `HOME`. Names chosen here for the engineer to read:
+`gov` is found by `command -v gov` or at `$HOME/.local/bin/gov` (a python shim at both); the hook's log is
+`<repo>/.gov-runtime/refresh-hook.log` (it must contain the new head's first 12 digits after a successful refresh and
+`REBUILD_FAILED` after a failed one; the refresh's own output appended is enough); the CTO's address is `cto`
+(`$HOME/.gov-os/inbox/cto/messages.jsonl`), and across a failed refresh, its retries and a later successful one the inbox
+holds exactly one message in all, kind `notice`; the hook returns at once while the refresh runs (a commit returns within
+30 s while the build's embedder is held); a refresh is not started by a commit on another branch (`feature`,
+`w2/integrate` when the configured branch is another), nor by the states `prepared` and `aborted`; the `.local` file is
+run with the same arguments (`prepared`) and the same stdin bytes; a `.local` file that exits 7, or no `gov` at all, still
+gives exit 0. The kit's text: first line a POSIX sh shebang, `sh -n` clean, holds `committed` and reads
+`integration_refresh` or `rebuild.yaml`, no `act-in-progress`, no `freeze` (any case), no `w2/integrate`.
+
+| KPI line | tests | expected red reason |
+|---|---|---|
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_the_kit_file_is_a_posix_sh_script_with_no_freeze_line_and_no_w2_integrate` | the kit has no `githooks/reference-transaction` |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_a_project_adopted_from_the_kit_holds_the_hook_equal_to_the_kits_file` | no `.git/hooks/reference-transaction` in the adopted project |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_gov_adapters_generate_writes_the_hook_back_when_it_is_gone` | `gov adapters generate` writes no hook |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_gov_update_writes_the_hook_back_when_it_is_gone` | `gov update B` writes no hook |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_the_update_record_lists_the_hook` | the record does not list `.git/hooks/reference-transaction` |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_a_commit_on_the_integration_branch_refreshes_the_store_in_the_background[trunk]`, `...[main]` | the kit has no file to install (`the kit has no template/governance/kernel/githooks/reference-transaction`) |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_a_commit_on_another_branch_refreshes_nothing[trunk]`, `...[main]` | as above |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_only_the_state_committed_refreshes[trunk]`, `...[main]` | as above |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_a_planted_refresh_failure_leaves_exactly_one_inbox_message_across_its_retries[trunk]`, `...[main]` | as above |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_a_local_hook_file_runs_with_the_same_arguments_and_stdin[trunk]`, `...[main]` | as above |
+| P0-3 | `test_w2_208_p0_3_kit_hook.py::test_p0_3_the_hook_never_fails_the_git_operation[trunk]`, `...[main]` | as above |
+
+The runtime cases were checked green against a trial hook written for the purpose (not committed), so a failure after the
+kit's file exists is the hook's own.

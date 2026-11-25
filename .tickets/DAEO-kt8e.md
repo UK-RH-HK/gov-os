@@ -121,3 +121,26 @@ copy of the hook file in an adopted repository with the kit's, byte for byte, an
 the hook file byte-equal to Gov OS's, the `PreToolUse` line once, `defaultMode`, the two deny commands (`Bash(git push *)`, `Bash(sudo *)`; the `:*` forms too) and the table; `gov update` on a copy holding a 2,124-byte stand-in replaces it and the second update
 changes nothing; a planted spawn of a non-Sonnet helper in the adopted copy exits 2, a Sonnet one 0. Failure: after generation in a scratch repository the settings hold the hook line exactly once and no
 `Edit(...)` deny; Gov OS's own `.claude/settings.json` is not changed by this change.
+
+## Fix: the kit carries the git hook; adopt, adapters and update install it (plan item 0-3; phase0-memory, 2026-11-24)
+
+DEC-1245 (2), DEC-1241 G-4 (a). Gov OS's live hook `.git/hooks/reference-transaction` is untracked and written by hand; an
+adopted repository has none. The kit carries `template/governance/kernel/githooks/reference-transaction`; `gov adopt`,
+`gov adapters generate` and `gov update` write it to `.git/hooks/reference-transaction` (executable), and the update's
+record (`governance/updates/<B>.json`) lists it. It refreshes the integration branch read from
+`integration_refresh.branch` of `governance/project/rebuild.yaml` (never fixed to `w2/integrate`), through P0-1's retry; a
+failed refresh leaves one inbox message (`gov.dispatch.inbox`, kind `notice`). The operator-freeze lines are not in the
+kit's file. In Gov OS the `landing_select.sh` call lives in a local hook file `.git/hooks/reference-transaction.local`
+(untracked, stays until Day M), which the kit's hook runs when present.
+
+- **P0-3 (success).** Verify: in a scratch repository after `gov adopt`, `.git/hooks/reference-transaction` exists and is
+  byte-equal to the kit's file; a commit on its integration branch makes the store's commit equal HEAD within 5 minutes (a
+  log line says so); the hook file deleted and `gov update` run, it is back and the update record lists it; a planted
+  refresh failure leaves exactly one inbox message; the kit's file holds no freeze line and no `w2/integrate`.
+  Failure: an adopted repository without the hook after adopt or update, or a failed refresh with no inbox message, or a
+  hook that refreshes only `w2/integrate`.
+  Tests: `tests/acceptance/W2-208/test_w2_208_p0_3_*.py`.
+
+As built: `gov adapters generate` (so also adopt's path and `gov update`'s regeneration) installs the hook through
+`gov.adapters.merge.install_hook`; the update record has `hooks`. The hook keeps `PYTHONPATH` (the acceptance rig's `gov`
+shim needs it); it unsets `PYTHONHOME`, `PYTHONSTARTUP` and the git variables.

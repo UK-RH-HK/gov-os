@@ -66,7 +66,8 @@ def gather(store: Path, query: str, ticket: str, role: str) -> dict:
 
     folder = resolved(store)
     found = {"store": str(folder), "commit": None, "query": query, "stop_reason": None, "reranked": False,
-             "refusal": None, "detail": None, "rerank_reason": None, "items": [], "characters": 0, "latency_ms": 0}
+             "refusal": None, "detail": None, "rerank_reason": None, "items": [], "characters": 0, "latency_ms": 0,
+             "head": None}
     saved = {name: os.environ.get(name) for name in ("GOV_ROLE", "GOV_TICKET")}
     started = time.monotonic()
     try:
@@ -82,7 +83,7 @@ def gather(store: Path, query: str, ticket: str, role: str) -> dict:
     else:
         evidence = bundle.get("evidence") or []
         found.update({
-            "commit": store_named.get("commit"),
+            "commit": store_named.get("commit"), "head": store_named.get("head"),
             "stop_reason": bundle.get("stopping_reason"),
             "reranked": bool((bundle.get("merge") or {}).get("reranked")),
             "rerank_reason": (bundle.get("rerank") or {}).get("reason"),
@@ -123,6 +124,9 @@ def block(found: dict, ticket: str) -> str:
             f"stop {found['stop_reason']}; reranked {'true' if found['reranked'] else 'false'}.")
     index = [f"{item['rank']}. {item['path']}:{item['start_line']}-{item['end_line']} {item['id']} {item['line']}"
              .rstrip() for item in found["items"]]
+    moved = found.get("head")
+    if moved and found.get("commit") and moved != found["commit"]:  # P0-1: the brief says a store is behind HEAD
+        head += f" This is a store behind HEAD: the store is at {commit}, HEAD is {str(moved)[:12]}."
     return "\n".join([head, "```", *index, "```", *commands])
 
 

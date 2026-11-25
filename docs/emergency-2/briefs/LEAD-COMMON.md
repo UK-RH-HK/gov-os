@@ -18,8 +18,12 @@ Written by the CTO for the ticket leads of the build list (EMERGENCY-2 §6.1, §
 ## Read first
 `docs/emergency-2/EMERGENCY-2.md` §3, §4, §5 and the rows of §6 your brief names; your ticket file(s) in `.tickets/`; the audit tables your brief names under `docs/emergency-2/audits/`.
 
-## Memory first (§5.4)
-Before grepping for a concept: `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "<question>"`; read the whole bundle, search once more in your own words. Tell your workers the same in their briefs.
+## Memory first (§5.4; the owner, DEC-1249 (1))
+- **Your brief carries your memory bundle, uncut**, chosen for your role: decisions, history and plans for orchestrators, senior engineers, spec writers and planners; code locations, conventions and earlier fixes and findings for engineers; the spec, KPIs and existing test patterns for test designers; similar past failures and their root causes for a reviewer on a red. Read it whole. Give each helper the bundle of its own role in its brief, uncut (run `gov retrieve` for it).
+- Before grepping for a concept: `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "<question>"`; read the whole result, then search once more in your own words. You may search as much more as you need.
+- **Never cut a `gov retrieve` result with `head`, `tail`, `grep` or any pipe.** If it is long, write it to a file and read the file whole.
+- **Your return lists every `gov retrieve` call you and your helpers made** (the count and each query) **and the records you used** from them, so the CTO can measure whether memory reduces reds and fix loops.
+- **Never open a hidden question-set root** (`/home/usain/examin-eval`, `/home/usain/gov-os-eval`, or any folder named for evaluation sets), and never glob `/home/usain/*` or another repository's root to find a file: use the exact path your brief gives (DEC-1249 (2), I-28).
 
 ## The flow (§4.3); no review (§3.6)
 1. **Spec and KPIs.** From the ticket. Where EMERGENCY-2 changes what the ticket must do, rewrite its KPI lines in your branch's ticket file (each line observable, each with its verify); the CTO approves them by this brief. A ticket that is deferred becomes `in_progress` in your branch.

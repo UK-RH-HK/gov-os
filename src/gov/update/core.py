@@ -596,6 +596,9 @@ def _apply(project, version, held, src, data, digest, manifest, files, actions, 
                   "wheel": {"name": manifest["wheel"]["name"], "sha256": manifest["wheel"]["sha256"]},
                   "files": files, "settings": report["settings"], "commit_before": head,
                   "pin_before": pin_before(state)}
+        hooks = _hooks(project)
+        if hooks:  # P0-3: the git hooks the regeneration installed from the kit (untracked: the record lists them)
+            record["hooks"] = hooks
         journal.write(report["record"], (json.dumps(record, indent=2) + "\n").encode())
         _git(project, "add", "-A")
         _git(project, "-c", "commit.gpgsign=false", "commit", "--no-verify", "-q", "-m",
@@ -616,6 +619,12 @@ def _apply(project, version, held, src, data, digest, manifest, files, actions, 
                           report)
     report["store"] = "refreshed"
     return report
+
+
+def _hooks(project: Path) -> list[str]:
+    """P0-3: the git hooks of the kit that stand in the project, byte for byte, as ``.git/hooks/<name>``."""
+    from gov.adapters import merge
+    return [merge.HOOK_REL] if merge.install_hook(project) else []
 
 
 def _rollback(project: Path, head: str, journal: Journal, root: Path, version: str, state: dict) -> None:

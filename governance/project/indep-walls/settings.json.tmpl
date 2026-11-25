@@ -45,6 +45,16 @@
     ]
   },
   "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env PYTHONPATH=@GOVSRC@ python3 -m gov.memaudit writer-check --sets-root @SETS_ROOT@ --audit @SET@ --repo @REPO@ --commit @COMMIT@ --folder @WALL@"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "*",

@@ -1,8 +1,19 @@
 {
   "permission": {
     "bash": {
+      "git push:*": "deny",
       "git push *": "deny",
-      "sudo *": "deny"
+      "sudo:*": "deny",
+      "sudo *": "deny",
+      "*examin-eval*": "deny"
+    },
+    "read": {
+      "//home/usain/examin-eval/**": "deny",
+      "//home/usain/gov-os-eval/**": "deny"
+    },
+    "edit": {
+      "//home/usain/examin-eval/**": "deny",
+      "//home/usain/gov-os-eval/**": "deny"
     }
   }
 }

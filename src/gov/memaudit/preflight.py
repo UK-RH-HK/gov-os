@@ -300,26 +300,43 @@ def _ids(found: list[str]) -> list[str]:
     return sorted(dict.fromkeys(found))
 
 
-def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dict]:
-    """The ten checks; ``PREFLIGHT.json`` and the ``preflight`` ledger line written. Returns the exit word (``ok``,
-    ``refused`` or ``used``) and the counts the subcommand prints. A usage fault raises ``UsageError``."""
-    p = layout.paths(sets_root, audit)
-    repo = Path(repo) if repo is not None else toplevel()
-    for flag in (repo, runs_dir):
-        if flag is not None and layout.inside(flag, p["root"]):
-            raise UsageError("flag inside the sets root")
-    if runs_dir is None:
-        env = os.environ.get("GOV_INDEP_RUNS_DIR")
-        runs_dir = Path(os.path.expanduser(env if env else "~/gov-os-runs"))
-        if layout.inside(runs_dir, p["root"]):
-            raise UsageError("runs-dir")
-    runs_dir = Path(os.path.expanduser(str(runs_dir)))
-    commit = resolve_commit(repo, commit)
-    cfg = _config.load(repo, commit)  # before anything is read or written: a repository without its file is refused
-    if os.path.lexists(p["used"]):
-        return "used", {"used": True}
+def store_behind(repo) -> dict | None:
+    """P0-2: ``{store, head}`` where the repository names an ``integration_store`` and the store's commit (the head of its
+    fingerprints row) is not the repository's HEAD; ``store`` is ``unreadable`` where the configured store cannot be
+    read (a store that cannot be shown to be at HEAD is not at HEAD). None for a repository that names none."""
+    from gov.launch.store import StoreSettingError, configured
 
-    files, strays = layout.entries(p["hidden"])
+    try:
+        link = configured(Path(repo))
+    except StoreSettingError:
+        link = "unreadable"
+    if link is None:
+        return None
+    try:
+        head = git(repo, "rev-parse", "--verify", "--quiet", "HEAD^{commit}").decode().strip()
+    except Exception:  # noqa: BLE001: a repository with no HEAD has no store at it
+        head = "unreadable"
+    stored = "unreadable"
+    try:
+        if link != "unreadable":
+            import sqlite3
+
+            from gov.store import STORE_REL, loader
+            connection = sqlite3.connect((Path(link) / STORE_REL).resolve().as_uri() + "?mode=ro", uri=True)
+            try:
+                stored = (loader.fingerprints(connection) or {}).get("head") or "unreadable"
+            finally:
+                connection.close()
+    except Exception:  # noqa: BLE001: whatever stops the reading leaves the store unshown
+        stored = "unreadable"
+    return None if stored == head else {"store": stored, "head": head}
+
+
+def evaluate(p: dict, folder: Path, repo, commit: str, cfg, runs_dir, audit: str) -> tuple[dict, list[Path]]:
+    """The ten checks on the question files of ``folder`` (the half's ``hidden/``, or a writer's ``out/set/``); nothing is
+    written. ``commit`` is resolved and ``cfg`` loaded at it; ``runs_dir`` is a path. Returns the counts (``ok``, ``codes``
+    and what ``run`` records beside them) and the files read."""
+    files, strays = layout.entries(folder)
     n = len(files)
     found = {code: [] for code in CODES}
     detail = {code: [] for code in SET_LEVEL}
@@ -397,11 +414,40 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
             ids = _ids(found[code])
             codes[code] = {"ok": not ids, "refused": len(ids), "ids": ids}
     ok = all(c["ok"] for c in codes.values())
-    counts = {
-        "audit": audit, "audit_commit": commit, "at": utc_iso(), "ok": ok, "n": n, "strays": strays,
+    return {
+        "ok": ok, "n": n, "strays": strays,
         "in_form": len(good), "codes": codes, "categories": categories, "domains": domains,
         "subsystems": subsystems, "domain_min": cfg.domain_min(n), "subsystem_max": cfg.subsystem_max(n),
         "selection": lists_from, "re_anchored": re_anchored, "no_token": no_token, "pool": len(pool),
+    }, files
+
+
+def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dict]:
+    """The ten checks; ``PREFLIGHT.json`` and the ``preflight`` ledger line written. Returns the exit word (``ok``,
+    ``refused`` or ``used``) and the counts the subcommand prints. A usage fault raises ``UsageError``."""
+    p = layout.paths(sets_root, audit)
+    repo = Path(repo) if repo is not None else toplevel()
+    for flag in (repo, runs_dir):
+        if flag is not None and layout.inside(flag, p["root"]):
+            raise UsageError("flag inside the sets root")
+    if runs_dir is None:
+        env = os.environ.get("GOV_INDEP_RUNS_DIR")
+        runs_dir = Path(os.path.expanduser(env if env else "~/gov-os-runs"))
+        if layout.inside(runs_dir, p["root"]):
+            raise UsageError("runs-dir")
+    runs_dir = Path(os.path.expanduser(str(runs_dir)))
+    commit = resolve_commit(repo, commit)
+    cfg = _config.load(repo, commit)  # before anything is read or written: a repository without its file is refused
+    if os.path.lexists(p["used"]):
+        return "used", {"used": True}
+    behind = store_behind(repo)
+    if behind is not None:  # P0-2: before any file is read or written; a measure never runs on a store behind HEAD
+        return "refused", {"store_behind": behind}
+
+    found, files = evaluate(p, p["hidden"], repo, commit, cfg, runs_dir, audit)
+    ok = found["ok"]
+    counts = {
+        "audit": audit, "audit_commit": commit, "at": utc_iso(), **found,
         "set_digest": set_digest(p["hidden"]),
         # every delivered file's sha256 by id, a refused one too: declare's DC-PREFLIGHT declares only these bytes
         # (Interface section 10 item 9)
@@ -409,7 +455,7 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
     }
     run_dir = layout.make_run(p)
     write_whole(run_dir, "PREFLIGHT.json", counts)
-    ledger.append(run_dir, "preflight", ok=ok, n=n, refused=[c for c in CODES if not codes[c]["ok"]])
+    ledger.append(run_dir, "preflight", ok=ok, n=found["n"], refused=[c for c in CODES if not found["codes"][c]["ok"]])
     return ("ok" if ok else "refused"), counts
 
 
@@ -417,16 +463,27 @@ def lines(word: str, counts: dict) -> list[str]:
     """What the subcommand prints for ``run``'s result: one line per code, then the closing line."""
     if word == "used":
         return ["USED"]
+    if "store_behind" in counts:
+        behind = counts["store_behind"]
+        return [f"STORE_BEHIND the integration store is at {str(behind['store'])[:12]} and HEAD is "
+                f"{str(behind['head'])[:12]}: rebuild it first, nothing is declared", NOT_OK_WORD]
     out = []
     for code in CODES:
         c = counts["codes"][code]
-        if c["ok"]:
-            out.append(f"{code} ok")
-        else:
-            tail = c.get("detail") or c["ids"][:MAX_IDS]
-            out.append(" ".join([code, "refused", str(c["refused"]), *tail]))
+        out.append(f"{code} ok" if c["ok"] else refused_line(code, c))
     out.append(OK_WORD if word == "ok" else NOT_OK_WORD)
     return out
+
+
+def refused_line(code: str, c: dict) -> str:
+    """The one line of a refused code: its count and ids (or a set-level code's detail)."""
+    tail = c.get("detail") or c["ids"][:MAX_IDS]
+    return " ".join([code, "refused", str(c["refused"]), *tail])
+
+
+def refused_lines(counts: dict) -> list[str]:
+    """The refused codes' lines alone, in the check order."""
+    return [refused_line(code, counts["codes"][code]) for code in CODES if not counts["codes"][code]["ok"]]
 
 
 # ---- the standing pre-flight (W2-187 I6; S6, F2)

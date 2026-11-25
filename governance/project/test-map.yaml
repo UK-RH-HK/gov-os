@@ -122,6 +122,9 @@ couplings:
   - paths: ["template/governance/kernel/hooks/**", "src/gov/hooks/**"]
     suites: ["tests/acceptance/W1-29/", "tests/acceptance/W1-49/", "tests/acceptance/W2-62/", "tests/unit/hooks"]
     why: "the two hook copies, run as separate processes (I3 §4.1 item 5)"
+  - paths: ["template/governance/kernel/githooks/**"]
+    suites: ["tests/acceptance/W2-208/test_w2_208_p0_3_kit_hook.py", "tests/acceptance/W2-17/", "tests/unit/adapters"]
+    why: "the git hook the kit carries, installed by gov adopt, gov adapters and gov update and run by git as its own process (plan item 0-3)"
   - paths: ["template/governance/kernel/hooks/sessionstart.py", "template/governance/kernel/hooks/precompact.py"]
     suites: ["tests/acceptance/W1-31/", "tests/acceptance/W1-37/", "tests/acceptance/W1-38/", "tests/unit/telemetry"]
     why: "the session-start and PreCompact hooks are also run by these suites (I3 §4.1 item 5)"

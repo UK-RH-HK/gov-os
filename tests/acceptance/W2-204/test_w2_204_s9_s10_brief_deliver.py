@@ -76,9 +76,14 @@ def briefs(tmp_path_factory) -> Briefs:
 def test_s9_brief_prints_one_line_with_the_brief_s_sha256_and_no_path(briefs, name, kind, round_no):
     call = getattr(briefs, name)
     text = briefs.text(name.replace("_", "-"))
-    assert call.code == 0 and call.lines == [f"BRIEF {kind} round {round_no} "
-                                             f"{hashlib.sha256(text.encode('utf-8')).hexdigest()[:12]}"], call
-    assert "/" not in call.out and text.strip() and text[:200] not in call.text
+    brief_line = f"BRIEF {kind} round {round_no} {hashlib.sha256(text.encode('utf-8')).hexdigest()[:12]}"
+    lines = call.lines
+    assert call.code == 0 and lines and lines[0] == brief_line, call
+    if kind == "writer":  # FM-5: the BRIEF line, then exactly one LAUNCH writer line (it may carry the CTO's own --out folder)
+        assert len(lines) == 2 and lines[1].startswith("LAUNCH writer "), call
+    else:
+        assert lines == [brief_line], call
+    assert "/" not in brief_line and text.strip() and text[:200] not in call.text
 
 
 def test_s9_the_second_repository_s_writer_brief_is_filled_from_its_file(briefs):

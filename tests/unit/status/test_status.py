@@ -170,7 +170,7 @@ def test_a_status_with_a_part_not_read_names_every_such_place(project, monkeypat
 
     monkeypatch.setattr(doctor, "run", lambda *args: {"healthy": True, "tools": {"status": "unmeasured"}})
     answer = command.run(project, ARGS, {})
-    assert tuple(answer) == ("root", "config_files", *PARTS, "not_read") and answer["not_read"] == [
+    assert tuple(answer) == ("root", "config_files", *PARTS, "red", "not_read") and answer["not_read"] == [
         # W2-116 S2: a project whose rebuild.yaml names no integration_store has no integration store
         "integration_store: governance/project/rebuild.yaml names no integration_store: there is no integration store"]
     assert answer["doctor"]["parts"] == {"tools": "unmeasured"}
