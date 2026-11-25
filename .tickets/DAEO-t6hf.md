@@ -45,3 +45,9 @@ acceptance_tests:
 # W1-19 Semantic retrieval, RRF and rerank
 
 Semantic route and fusion of R1 (moved to W1 by DEC-074 and DEC-080).
+
+## Fix: timing cases that fail under the release suite's own load (I-32; DEC-1251 D-03: (b) now, then (a))
+
+Found 2026-11-25 (I-32). Kind: a fix; the ticket stays closed. Lines approved by the CTO's brief `docs/emergency-2/briefs/LEAD-timing-tests.md`. No change to `src/` and no bound raised.
+
+- TT-2: the warm p95 case judges `max(wall - run_delay, thread CPU)` per question, `run_delay` being the calling thread's wait on a run queue (`/proc/thread-self/schedstat`), clamped to `[0, wall]`; unreadable counts as 0. The 0.5 s p95 budget is unchanged. A planted 2x slow-down fails the case; a planted busy reading whose excess is all queue wait does not. Not taken out: waits inside the reranker service, Ollama or the GPU; the file stays on the nightly route. Measured 2026-11-25 (load 4 to 12): judged p95 0.599 s and 0.571 s, over the budget. Verify: `tests/acceptance/W1-19/test_w1_19_judged_time.py`.
