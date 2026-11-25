@@ -329,3 +329,31 @@ brief; `fresh.py` `half` runs the void step only when its half is reached in tur
   accepted, and `WRITER-CHECK.json` shows `returns` 1 and `ended` pass.
 
 Hidden-set protections unchanged (EMERGENCY-2 §2.7): nothing printed or logged names a hidden question's text, gold or sources.
+
+## Fix: the fresh 80's launch lines and the writer check's visible record (I-33, I-37, I-38; memaudit-launch, 2026-11-26)
+
+Found by EXAMIN's fresh 80 on 0.1.7 (EF-13; FINDINGS I-33, I-37, I-38). Causes confirmed in the code: `say.py` `refused` refuses any
+line holding a folder word (`fixtures/`, `runs/`, `indep-walls/`, `hidden`) as a substring, and `brief.py`'s `LAUNCH writer` line holds
+the CTO's own `--out` and `--repo` paths (both already checked to lie outside the sets root), so an `--out` under e.g. `gov-os-runs/`
+or in a folder named `hidden-writer` is refused (exit 4, the refusal on both streams) after `LAUNCH.txt` is written; `brief.py` `run`
+writes and prints the launch only `if kind == "writer"`; `writercheck.check` writes `WRITER-CHECK.json` only in the audit's run folder
+on the sets-root side and a clean pass prints nothing. Kind: a fix under W2-204, no new ticket; the ticket stays closed. Approved by
+the CTO in the lead's brief (`docs/emergency-2/briefs/LEAD-memaudit-launch.md`).
+
+- **ML-1 (I-33) The writer brief prints its launch line and exits 0.** `gov memaudit brief --kind writer` prints one `LAUNCH writer
+  <command>` line after its `BRIEF` line and exits 0 wherever `--out` and `--repo` lie outside the sets root, a path holding a folder
+  word included; the line never holds the sets root's path. The refusal to print a line naming the sets root's path, or any other line
+  holding a folder word, stays. Verify: planted `--out` under `gov-os-runs/` and in a `hidden-writer` folder, and a `--repo` under such
+  a path: exit 0, no `REFUSED`; `say` still refuses a line naming the sets root, a `LAUNCH` line holding it included.
+  Failure: exit 4 or `REFUSED` where nothing of the sets root is named; a line holding the sets root's path is printed.
+- **ML-2 (I-38) Every kind has its launch line.** `brief --kind writer` and `--kind checker`, round 1 and 2, print exactly one
+  `LAUNCH <kind> <command>` line and write `<out>/LAUNCH.txt`, whose content is the printed command byte for byte (plus one newline).
+  The checker's command loads no `Stop` hook, carries the checker's tools (read, search, write: `Read,Grep,Glob,Write,Edit,TodoWrite`;
+  no shell, web or subagent), asks no permission prompts and grants Write and Edit into `<out>/out/` only. Verify: the four planted
+  briefs. Failure: a kind or round without the line or the file, the two differing, or a checker session that loads the writer's hook.
+- **ML-3 (I-37) The writer's session folder shows the check ran.** `gov memaudit writer-check` also writes `<folder>/WRITER-CHECK.json`
+  with exactly `returns`, `ended` and `refused` (each refused code with question ids only, never a question's text, gold answer or
+  source), at every call (a clean pass, each return, the limit); the run folder's record stays as it is. A folder record that cannot be
+  written changes neither the hook's block nor the run folder's record. Verify: planted pass, refusal and limit through the hook
+  command; one real `claude -p` Sonnet writer launched from a planted `LAUNCH.txt`: `<out>/WRITER-CHECK.json` exists with `ended` set.
+  Failure: no record in the session folder after the hook ran, or a record holding more than counts, codes and ids.
