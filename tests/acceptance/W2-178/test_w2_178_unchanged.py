@@ -46,7 +46,7 @@ def test_s1_the_wall_equals_the_base_build_byte_for_byte_with_the_dropped_files_
     for name, snap in (("base", base_snap), ("head", head_snap)):
         for rel, data in s.DROPPED.items():
             assert snap.get("input/set/" + rel, (None, None))[1] == data, f"the {name}'s {kind} wall lacks input/set/{rel}"
-    diff = s.differences(base_snap, head_snap)
+    diff = s.walls_differ(world, base_snap, head_snap, head_line, kind)
     assert diff == {}, f"the head's {kind} wall differs from the base's: {diff}"
 
 
@@ -56,7 +56,7 @@ def test_s1_the_wall_of_a_set_without_a_dropped_folder_equals_the_base_build(wor
     s.plant(world, xcheck=True)
     base_line = s.build(world, base_script, kind, round_)
     head_line = s.build(world, None, kind, round_)
-    diff = s.differences(s.snapshot(world, base_line), s.snapshot(world, head_line))
+    diff = s.walls_differ(world, s.snapshot(world, base_line), s.snapshot(world, head_line), head_line, kind)
     assert diff == {}, f"the head's {kind} wall differs from the base's: {diff}"
 
 
@@ -136,3 +136,22 @@ def test_f3_the_branch_changes_only_the_ticket_s_paths():
     allowed = ticket_allowed_paths() + [f"tests/acceptance/{s.W2}/**"] + list(OWN_RECORDS)
     outside = [n for n in names if not matched(n, allowed)]
     assert outside == [], f"the branch (against {base[:12]}) changes paths outside the ticket's: {outside}"
+
+
+# -- the allowed difference (FM-5, DEC-1248) is the Stop block only ---------------------------------------------------
+
+def _synthetic(settings: bytes, claude_md: bytes = b"note") -> dict:
+    manifest = b'{"settings_sha256": "' + s.support.sha256(settings).encode() + b'"}'
+    return {".claude/settings.json": (0o444, settings), "WALL.json": (0o444, manifest), "CLAUDE.md": (0o444, claude_md)}
+
+
+def test_s1_the_helper_allows_the_stop_block_alone_and_catches_any_other_difference():
+    """Unit check of ``walls_differ`` (no world needed for a non-writer kind): a base wall with the Stop block and a
+    head wall without it are equal; one more byte elsewhere, or a head that still carries the block, is reported."""
+    stop = b'    "Stop": [\n      {"x": "@SET@"}\n    ],\n'
+    base = _synthetic(b'{\n  "hooks": {\n' + stop + b'    "PreToolUse": []\n  }\n}\n')
+    head = _synthetic(b'{\n  "hooks": {\n    "PreToolUse": []\n  }\n}\n')
+    assert s.walls_differ(None, base, head, {}, "checker") == {}
+    assert s.walls_differ(None, base, _synthetic(head[".claude/settings.json"][1], b"note+"), {}, "checker") == {"CLAUDE.md": "differs"}
+    assert s.walls_differ(None, base, _synthetic(head[".claude/settings.json"][1] + b" "), {}, "checker").keys() >= {".claude/settings.json"}
+    assert "Stop hook" in s.walls_differ(None, base, base, {}, "checker")

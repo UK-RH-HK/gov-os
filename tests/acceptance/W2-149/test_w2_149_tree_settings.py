@@ -70,7 +70,7 @@ def test_s8_the_settings_are_the_template_filled_for_this_wall(world):
     assert run.code == 0, run.why()
     wall, tree = world.wall(run.line), world.tree(run.line)
     built = json.loads((wall / ".claude/settings.json").read_text())
-    want = world.expected_settings(wall, tree)
+    want = world.expected_settings(wall, tree, kind="writer")
     deny = built["permissions"]["deny"]
     extras = [x for x in deny if x not in want["permissions"]["deny"]]
     assert [x for x in deny if x not in extras] == want["permissions"]["deny"], "the template's deny entries differ"

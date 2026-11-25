@@ -1345,12 +1345,18 @@ class World:
                 probs.append(f"{rel}: not the commit's bytes")
         return probs
 
-    def expected_settings(self, wall: Path, tree: Path, model=STUB_MODEL, commit="B"):
+    def expected_settings(self, wall: Path, tree: Path, model=STUB_MODEL, commit="B", kind="writer", set_name=None):
         """The template filled for this wall, as a JSON value; the ``@OTHER_WALLS@`` entry left out (the caller checks
-        those entries apart)."""
+        those entries apart). FM-5 / DEC-1248: the ``Stop`` hook (writer-check) is the writer's only: filled for the
+        writer (set name, commit, repository, the gov source as the launcher takes it from this checkout, wall, sets
+        root), absent for every other kind."""
         subs = {"@WALL@": str(wall), "@TREE@": str(tree), "@REPO@": os.path.realpath(self.repo_path),
                 "@WORKTREES@": str(self.home / "gov-os-worktrees"), "@RUNS@": str(self.runs_root),
                 "@HOME@": str(self.home), "@SETS_ROOT@": str(self.sr), "@WALLS@": str(self.walls), "@MODEL@": model}
+        if kind == "writer":
+            # the launcher's gov source: $GOV_SRC (not planted here), else the checkout's src (this file is run from it)
+            subs.update({"@SET@": set_name or DEFAULT_SET[kind], "@COMMIT@": self.sha(commit),
+                         "@GOVSRC@": os.path.realpath(TREE / "src")})
 
         def fill(x):
             if isinstance(x, str):
@@ -1363,7 +1369,10 @@ class World:
                 return {k: fill(v) for k, v in x.items()}
             return x
 
-        return fill(json.loads(self.blob(commit, f"{TEMPLATE_REL}/settings.json.tmpl")))
+        tmpl = json.loads(self.blob(commit, f"{TEMPLATE_REL}/settings.json.tmpl"))
+        if kind != "writer":
+            tmpl["hooks"].pop("Stop", None)
+        return fill(tmpl)
 
     def expected_claude_md(self, line, brief="writer", commit="B"):
         text = self.blob(commit, f"{TEMPLATE_REL}/CLAUDE.md.tmpl").decode()
