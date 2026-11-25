@@ -80,8 +80,9 @@ def test_fm5_a_round_2_writer_brief_prints_the_launch_line_too(world):
 def test_fm5_the_checker_brief_prints_no_launch_writer_line(world):
     world.write_half(HIDDEN, K.clean_specs())
     out, run = _launch(world, "checker", "c1")
-    assert not any(x.startswith("LAUNCH") for x in run.lines), run.lines
-    assert not (out / "LAUNCH.txt").exists()
+    assert not any(x.startswith("LAUNCH writer") for x in run.lines), run.lines
+    assert len([x for x in run.lines if x.startswith("LAUNCH checker ")]) == 1, run.lines  # ML-2: its own line
+    assert "writer-check" not in (out / "LAUNCH.txt").read_text(encoding="utf-8")
 
 
 def test_fm5_nothing_the_brief_prints_or_writes_names_a_question(world):
