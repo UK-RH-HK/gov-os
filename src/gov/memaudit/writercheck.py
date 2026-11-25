@@ -5,7 +5,9 @@ command of the ``Stop`` hook ``brief --kind writer`` writes into the writer's se
 JSON on standard input and ignores it, and runs ``preflight.evaluate`` (the pre-flight's own checks, no copy) on ``F/out/set``.
 Clean: nothing is printed and the end is recorded as ``pass``. Refused, with fewer than 3 returns so far: one JSON line
 ``{"decision": "block", "reason": ...}`` whose reason is pre-flight's own refusal lines (codes, counts and ids only), one return
-counted. The fourth stop is allowed (``ended`` is ``limit``). The record is ``WRITER-CHECK.json`` in the audit's run folder.
+counted. The fourth stop is allowed (``ended`` is ``limit``). The record (``returns``, ``ended``, ``refused``: codes with
+question ids only) is ``WRITER-CHECK.json`` in the audit's run folder, and a copy of it in ``F`` so that the writer's
+session folder shows the check ran (ML-3); a copy that cannot be written changes nothing else.
 Exit 0 always: a fault of the check itself lets the session end, and ``deliver`` runs the same checks again.
 """
 
@@ -40,6 +42,19 @@ def default_runs_dir(runs_dir=None) -> Path:
     return Path(os.path.expanduser(str(runs_dir) if runs_dir else (env if env else "~/gov-os-runs")))
 
 
+def record(run_dir: Path, folder: Path, state: dict) -> None:
+    """``state`` written to the run folder, then to the session folder (ML-3). The second write's failure is passed
+    over: the run folder's record is the one ``writer-run`` reads, and the hook's answer must not depend on a copy."""
+    write_whole(run_dir, NAME, state)
+    try:
+        write_whole(folder, NAME, state)
+    except OSError:
+        try:
+            (folder / f".{NAME}.tmp").unlink()
+        except OSError:
+            pass
+
+
 def check(sets_root, audit, *, repo=None, commit, folder, runs_dir=None) -> str | None:
     """The hook's line (JSON) or None. Raises on a fault of the check itself."""
     p = layout.paths(sets_root, audit)
@@ -54,12 +69,12 @@ def check(sets_root, audit, *, repo=None, commit, folder, runs_dir=None) -> str 
     if any(ids for ids in refused.values()):  # a set-level count off beside refused questions is their consequence
         refused = {c: ids for c, ids in refused.items() if ids}
     if not refused:
-        write_whole(run_dir, NAME, {"returns": returns, "ended": "pass", "refused": {}})
+        record(run_dir, Path(folder), {"returns": returns, "ended": "pass", "refused": {}})
         return None
     if returns >= MAX_RETURNS:
-        write_whole(run_dir, NAME, {"returns": returns, "ended": "limit", "refused": refused})
+        record(run_dir, Path(folder), {"returns": returns, "ended": "limit", "refused": refused})
         return None
-    write_whole(run_dir, NAME, {"returns": returns + 1, "ended": None, "refused": refused})
+    record(run_dir, Path(folder), {"returns": returns + 1, "ended": None, "refused": refused})
     return json.dumps({"decision": "block", "reason": "\n".join(preflight.refused_lines(counts))})
 
 

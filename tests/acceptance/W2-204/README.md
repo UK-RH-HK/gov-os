@@ -303,3 +303,33 @@ The real session denied the writer's Edit and Write into `out/`; the writer's ow
 | KPI id | tests | expected red reason |
 |---|---|---|
 | success-29 (FM-5 e) | `test_w2_204_fm5_launch.py::test_fm5_the_writer_settings_allow_write_and_edit_into_out_only`, `test_w2_204_fm5_launch.py::test_fm5_the_writer_settings_deny_edits_to_its_own_config_input_and_brief`, `test_w2_204_fm5_launch.py::test_fm5_the_stop_hook_block_is_unchanged_beside_the_permissions`, `test_w2_204_fm5_launch.py::test_fm5_the_launch_line_asks_no_permission_prompts` | `.claude/settings.json` has no `permissions` block; the launch line has no `--permission-prompts` (the Stop-hook-unchanged case is green on the base by design) |
+
+### Fix: the fresh 80's launch lines and the writer check's visible record (ML-1 to ML-3; I-33, I-37, I-38)
+
+Written by the independent test designer from the ticket's lines ML-1 to ML-3, before any implementation. Tests in
+`test_w2_204_ml_launch.py` (support: `w2_204_support.py`, `w2_204_writer_loop_support.py`); planted sets under pytest's temporary folder
+only; `gov memaudit brief` and the planted writer's `Stop` hook run as child processes; the printer's guard calls
+`gov.memaudit.say.say` in process. The real-session proof of ML-3 is the lead's, not a case here.
+
+- **The checker's launch** is judged by what it can load, however the engineer passes it: the `--settings` value (a file or
+  inline JSON) and `<out>/.claude/settings.json` or `settings.local.json` when present; its editing rules (settings and
+  `--allowedTools`) are `Write` and `Edit` on `<out>/out/**` (the forms of the FM-5 cases) and no other, with no
+  `acceptEdits` or `bypassPermissions` mode. Its prompt, `--add-dir` and other flags the line does not state are not tested.
+- **The sets root's path** is looked for in what every brief prints as a whole path (a sibling folder that only begins
+  with the same letters is not it).
+- **The folder record** equals the run folder's record in its three keys; a set-level code holds an empty id list there,
+  as in the run folder's record on the base. `writer-run` is not tested for the folder record (ML-3 names `writer-check`).
+- **Existing cases rewritten** (a separate commit, trailer `Rewrite-Reason`: ML-2), names kept:
+  `test_w2_204_fm5_launch.py::test_fm5_the_checker_brief_prints_no_launch_writer_line` (one `LAUNCH checker` line and a
+  `LAUNCH.txt` without the writer's check, no `LAUNCH writer` line) and
+  `test_w2_204_s9_s10_brief_deliver.py::test_s9_brief_prints_one_line_with_the_brief_s_sha256_and_no_path` (the checker
+  prints `BRIEF` and one `LAUNCH checker` line). Their rows under success-25 and success-9 stand; the checker case of each
+  is red on the base (the checker prints the `BRIEF` line only).
+- **Green on the base by design (guards):** every `test_ml1_guard_...` and `test_ml3_guard_...` case, and the two writer
+  cases of `test_ml2_every_kind_and_round_prints_one_launch_line_and_writes_launch_txt` (`writer-1`, `writer-2`).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-30 (ML-1) | `test_w2_204_ml_launch.py::test_ml1_a_writer_out_under_a_folder_word_prints_its_launch_line`, `test_w2_204_ml_launch.py::test_ml1_a_round_2_writer_out_under_a_folder_word_prints_its_launch_line`, `test_w2_204_ml_launch.py::test_ml1_a_writer_repo_under_a_folder_word_prints_its_launch_line`, `test_w2_204_ml_launch.py::test_ml1_guard_a_writer_out_beside_the_sets_root_with_no_folder_word_prints_its_launch_line`, `test_w2_204_ml_launch.py::test_ml1_guard_say_refuses_a_line_naming_the_sets_root`, `test_w2_204_ml_launch.py::test_ml1_guard_say_refuses_a_launch_line_naming_a_linked_sets_root_either_way`, `test_w2_204_ml_launch.py::test_ml1_guard_say_refuses_any_other_line_holding_a_folder_word` | a writer brief whose `--out` or `--repo` holds a folder word exits 4 after its `BRIEF` line with `REFUSED: a line that names a sets-root folder was not printed` and no `LAUNCH writer` line (the guards are green on the base) |
+| success-31 (ML-2) | `test_w2_204_ml_launch.py::test_ml2_every_kind_and_round_prints_one_launch_line_and_writes_launch_txt`, `test_w2_204_ml_launch.py::test_ml2_a_checker_out_under_a_folder_word_prints_its_launch_line`, `test_w2_204_ml_launch.py::test_ml2_the_checker_launch_carries_the_checker_s_tools_and_model`, `test_w2_204_ml_launch.py::test_ml2_the_checker_session_loads_no_stop_hook`, `test_w2_204_ml_launch.py::test_ml2_the_checker_may_write_and_edit_into_out_only`, `test_w2_204_ml_launch.py::test_ml2_the_checker_s_launch_and_settings_name_no_question` | the checker brief, round 1 and 2, exits 0 with the `BRIEF` line only: no `LAUNCH checker` line, no `LAUNCH.txt` (the writer cases are green on the base) |
+| success-32 (ML-3) | `test_w2_204_ml_launch.py::test_ml3_a_clean_pass_writes_the_record_into_the_session_folder`, `test_w2_204_ml_launch.py::test_ml3_each_return_and_the_limit_are_written_into_the_session_folder`, `test_w2_204_ml_launch.py::test_ml3_a_repair_after_a_return_ends_pass_in_the_session_folder`, `test_w2_204_ml_launch.py::test_ml3_the_session_folder_s_record_holds_codes_and_ids_only_for_every_fault`, `test_w2_204_ml_launch.py::test_ml3_guard_the_run_folder_s_record_stays_as_it_is`, `test_w2_204_ml_launch.py::test_ml3_guard_a_folder_record_that_cannot_be_written_changes_neither_the_block_nor_the_run_record`, `test_w2_204_ml_launch.py::test_ml3_guard_a_clean_pass_with_an_unwritable_folder_record_still_ends_pass` | `writer-check` writes no `<folder>/WRITER-CHECK.json` (the guards are green on the base) |
