@@ -229,6 +229,12 @@ FACET_UNAVAILABLE            # index stale/down; NOT_FOUND ≠ absent
   pre-push gate (G3) and produce an evidence record bound to the head commit; CI checks that it exists and matches the
   head commit. The carrier of that record (for example a git note or a commit) is left to the CI ticket's design.
 
+### DEC-1250 — The patch release that replaces the burned 0.1.6 is 0.1.7; the bundle planned as 0.1.7 becomes 0.1.8
+- **Status:** ACCEPTED (owner, 2026-11-25 about 12:05, in the chat; recorded by the orchestrator with `Role: orchestrator`, `Decided-by: owner (chat)`; standing) · **Under:** DEC-1248 · **Changes:** DEC-1248 (2) (the bundle's number: 0.1.8); DEC-1245 (2) and DEC-1246 (3)'s release (0.1.8)
+- **Decision:** "Yes no problem: call the patch 0.1.7, and the bundle we'd planned as 0.1.7 becomes 0.1.8."
+- **Basis:** 0.1.6 was cut (record `deeeb8b1d`, tag `v0.1.6`) but its re-pin rolled back on a `gov doctor` probe that ran out of its shared time budget (I-31); the release code then burns the version and takes only a new one for the same content.
+- **Governing sources:** docs/emergency-2/integration/FINDINGS.md (I-31); DEC-1248.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.13 | 2026-09-30 | S1 round 1: DEC-083 (ratification; DEC-040 amended), DEC-084 (MR-3 bootstrap), DEC-085 (readiness profiles; spines at FULL), DEC-086 (governance share), DEC-087 (CI scope). |
