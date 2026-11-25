@@ -489,9 +489,11 @@ class Session:
         except (OSError, ValueError):
             pytest.fail(f"session {self.name} ended without a report (exit {self.process.returncode}); "
                         f"stderr: {self.stderr()[-2000:]}", pytrace=False)
-        # The search's own time: the call, from just before it to just after it, in the session's process.
-        both = isinstance(report.get("started"), (int, float)) and isinstance(report.get("ended"), (int, float))
-        report["seconds"] = report["ended"] - report["started"] if both else self.seconds
+        # The search's own time: the call, from just before it to just after it, in the session's process, on the
+        # monotonic clock (``t0``, ``t1``): this machine's wall clock steps. ``started``/``ended`` stay wall-clock,
+        # for comparisons across processes. A report without the pair is timed from the launch, monotonic too.
+        both = isinstance(report.get("t0"), (int, float)) and isinstance(report.get("t1"), (int, float))
+        report["seconds"] = report["t1"] - report["t0"] if both else self.seconds
         report["stderr"] = self.stderr()
         return report
 

@@ -363,3 +363,24 @@ bound changed. The cases below are fix lines, not ticket KPI lines.
 |---|---|---|
 | TT-1: the list names the case on the serial route | `test_w2_112_serial_list.py::test_the_list_names_the_both_slots_held_case_on_the_serial_route_as_a_latency_case` | the list holds 0 entries for the case |
 | TT-1: the release runner leaves a listed case out of the parallel run and runs it exactly once, alone (guard) | `test_w2_112_serial_list.py::test_the_release_runner_leaves_the_listed_case_out_of_its_parallel_run_and_runs_it_once_alone` | guard: green on the base (the runner already reads the list; the planted project holds the entry) |
+
+## Fix TT-2: a search's time is taken on the monotonic clock (I-32; DEC-979 item 1 D2)
+
+This machine's wall clock steps forward (WSL2: +0.7 s about every 32 s, seen 2026-11-25), and the release suite's red
+of the case above read 7.6 s for a search inside a test that took 4.15 s in all. The session now stamps the call on
+`time.monotonic()` too (`t0`, `t1`), and `Session.wait` reports `seconds = t1 - t0`; without the pair it reports the
+time from the session's launch, monotonic as well. `started`/`ended` stay wall-clock, for comparisons across
+processes (`test_a_service_killed_mid_run_leaves_every_search_answered` compares `ended` with the test's own wall
+stamp, so that one comparison can still read a step; its bound is 10 s). No bound changed.
+
+The case stays in the serial list: `seconds` takes no wait for a CPU out, and its time holds a service process's start,
+so a loaded machine still lengthens it; running it alone costs seconds.
+
+Both cases below run the slots case whole, with a `sitecustomize.py` on the session process's `PYTHONPATH`: one steps
+the process's wall clock 3.5 s forward between the two wall stamps, one makes the product's `rerank` take twice its
+time. They carry the case's own 7 s bound against about 4.1 s of real search time.
+
+| Line | Test | Expected red reason on the base |
+|---|---|---|
+| TT-2: a forward wall-clock step of 3.5 s during the search does not change `seconds` | `test_w2_112_clock.py::test_a_forward_step_of_the_wall_clock_during_the_search_does_not_change_its_seconds` | `seconds` is the wall difference, 7.6 s, the planted step in it |
+| TT-2: a real 2x slow-down still fails the case's bound (guard) | `test_w2_112_clock.py::test_a_search_that_really_takes_twice_its_time_still_fails_the_cases_bound` | guard: green on the base |
