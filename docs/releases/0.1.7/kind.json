@@ -1,0 +1,28 @@
+{
+  "version": "0.1.7",
+  "kind": "patch",
+  "from": "0.1.6",
+  "commit": "3d039a8fb6d3c8f863e64d1cd95a5ba8c0cc268c",
+  "rules": {
+    "P1": {
+      "pass": true,
+      "detail": "version 0.1.7 is 0.1.6 with the last number raised"
+    },
+    "P2": {
+      "pass": true,
+      "detail": "no path of the Contract, the Charter or EMERGENCY-2 changed"
+    },
+    "P3": {
+      "pass": true,
+      "detail": "no ticket closed; every code commit is a fix or a chore"
+    },
+    "P4": {
+      "pass": true,
+      "detail": "the same 36 commands"
+    },
+    "P5": {
+      "pass": true,
+      "detail": "no kit schema added or removed"
+    }
+  }
+}
