@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # start_lead.sh <name> <brief file>: one ticket lead as its own headless session, independent of the CTO's session, so
-# a CTO handover (a fresh CTO each morning, DEC-1212 (1)) never stops it. Sonnet at effort high, the rubric's lead line
+# a CTO handover (a fresh CTO each morning, DEC-1212 (1)) never stops it. Sonnet at effort medium, the rubric's lead line (DEC-1236 (2))
 # (DEC-1212 (3)); the no-prompt mode (EMERGENCY-2 2.3). Its return is log/leads/<name>.json (the CLI's JSON result);
 # when it ends, one wake message goes to the CTO's inbox (gov msg, the run-time tool's RT-2), naming the file.
 #   bash governance/project/orchestration/tools/start_lead.sh gov-queue-2 /path/to/brief.md
@@ -16,7 +16,7 @@ mkdir -p "$L"
 cd "$REPO"
 setsid nohup bash -c '
   env -u CLAUDECODE GOV_ROLE=orchestrator GOV_MSG_ADDRESS="lead:$1" CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-5-5 CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 \
-    "$HOME/.local/bin/claude" -p --model claude-sonnet-5-5 --effort high --permission-mode bypassPermissions \
+    "$HOME/.local/bin/claude" -p --model claude-sonnet-5-5 --effort medium --permission-mode bypassPermissions \
     --output-format json < "$2" > "$3/$1.json" 2> "$3/$1.err"
   echo $? > "$3/$1.exit"
   env PYTHONPATH="$4/src" python3 -m gov.cli.main msg send --from "lead:$1" --id "lead-$1-end" cto wake \
