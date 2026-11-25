@@ -285,5 +285,8 @@ def test_a_rulesync_regeneration_of_the_template_keeps_the_allow_rule(tmp_path):
     generated = json.loads((tmp_path / ".claude" / "settings.json").read_text(encoding="utf-8"))
     kernel = json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8"))
     assert list((generated.get("permissions") or {}).get("allow") or []) == _kernel_allow() == []
-    # The guard's PreToolUse line left both with the guard (EMERGENCY-2 6.1, DAEO-gr7t).
-    assert "PreToolUse" not in generated.get("hooks", {}) and "hooks" not in kernel
+    # The guard's PreToolUse line left both with the guard (EMERGENCY-2 6.1, DAEO-gr7t). Rewrite-Reason: DEC-1246 (3)(b):
+    # MR-4: the kit's generated settings carry one PreToolUse entry, the helper-model hook, and the kernel settings none.
+    pre = generated.get("hooks", {}).get("PreToolUse", [])
+    assert len(pre) == 1 and pre[0].get("matcher") == "Agent|Task" and "hooks/agent_model.py" in json.dumps(pre), pre
+    assert "hooks" not in kernel

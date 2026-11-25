@@ -142,6 +142,17 @@ Run on the base, those six files: **19 failed, 93 passed** (12.4 s); every failu
 held-out step, the allow rule, the ticket-folder rule or the 1.1.0 skill still there). The cases that stay as they
 were are green.
 
+## Fix MR-4 (the kit holds the model hook, the table and `defaultMode`; the root permission source matches; DEC-1246 (3)(b); under W2-208)
+
+Written before the fix, red on the base (DEC-1246 (3)(b)). Map in the form `gov accept` reads; the KPI column is `success-4N` / `failure-4N` for fix line MR-N (`gov accept` reads a KPI cell only in that form: an id such as `MR-1` refuses the whole map).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-44 | `test_w2_208_mr4_kit.py::test_mr4_the_kit_holds_the_hook_file_byte_equal_to_gov_os_s_own`; `test_w2_208_mr4_kit.py::test_mr4_the_kit_holds_the_table_byte_equal_to_gov_os_s_own`; `test_w2_208_mr4_kit.py::test_mr4_the_kit_s_hook_source_has_one_pretooluse_entry_for_the_model_hook`; `test_w2_208_mr4_kit.py::test_mr4_the_root_permission_source_holds_the_kit_s_two_denies_and_no_legacy_edit_deny`; `test_w2_208_mr4_kit.py::test_mr4_an_adopted_project_has_the_hook_byte_equal_and_the_table`; `test_w2_208_mr4_kit.py::test_mr4_an_adopted_project_s_settings_hold_the_hook_line_once_and_default_mode`; `test_w2_208_mr4_kit.py::test_mr4_an_adopted_project_has_the_two_denies_and_no_edit_deny`; `test_w2_208_mr4_kit.py::test_mr4_the_adopted_hook_refuses_a_non_sonnet_helper_with_exit_2`; `test_w2_208_mr4_kit.py::test_mr4_the_adopted_hook_lets_a_sonnet_helper_through_with_exit_0`; `test_w2_208_mr4_kit.py::test_mr4_the_adopted_hook_writes_the_rows_model_into_a_spawn_with_no_model`; `test_w2_208_mr4_kit.py::test_mr4_gov_update_replaces_a_2124_byte_stand_in_byte_for_byte_and_the_hook_line_stays_once` | the kit holds no hook file, table, `preToolUse` entry or `defaultMode` in the kit; the root permission source spells four forms; `gov update` leaves the stand-in. Guard, green: `test_mr4_gov_os_s_own_settings_are_not_changed_by_this_change` |
+| failure-44 | `test_w2_208_mr4_kit.py::test_mr4_a_generation_in_a_scratch_repository_holds_the_hook_line_exactly_once_and_no_edit_deny` | no hook line and no `defaultMode` after generation in a scratch repository |
+
+Uses the shared fixtures of this folder's `conftest.py` (`adopted_at_b`, `examin_013`) and `support.template_project`; never `gov adapters generate` on this repository's own tree (I-16).
+
 ### P0-3 (plan item 0-3): the kit carries the git hook
 
 Tests for the fix `P0-3` of DAEO-kt8e, in `test_w2_208_p0_3_kit_hook.py` (support: `w2_208_p0_support.py`; it borrows

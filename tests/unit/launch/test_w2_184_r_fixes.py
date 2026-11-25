@@ -485,9 +485,10 @@ def _bring(repo, source_branch="w2/W2-r3aa"):
 
 
 def _promoted(result, table, reason, record):
-    # Rewrite-Reason: DEC-1225: a promotion launched on Opus; it launches the table's model now (R2), the source word open
-    return s.assert_session(result, table[0], table[1], criticality="C2", model_source=s.ANY,
-                            effort_source="by criticality", promotion={"reason": reason, "record": record})
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: a promotion is retired; whatever the probe records hold, the launch is the
+    # table's and its record names no promotion (``reason`` and ``record`` are what the retired rule would have said)
+    return s.assert_session(result, table[0], table[1], criticality="C2", model_source="by criticality",
+                            effort_source="by criticality", promotion=None)
 
 
 def _on_table(result, table=TD_C2):
@@ -495,7 +496,7 @@ def _on_table(result, table=TD_C2):
                             effort_source="by criticality", promotion=None)
 
 
-def test_r3_a_stale_launch_root_copy_and_a_newer_ticket_copy_with_the_finding_promote_the_test_designer(
+def test_r3_a_stale_launch_root_copy_and_a_newer_ticket_copy_with_the_finding_promote_nothing(
         repo, launch):
     """F3's case: the record is brought into the tests branch, then edited in place on the ticket branch to add a
     fail-open finding; the test designer launched from the tests worktree is promoted, naming the root-relative
@@ -511,7 +512,7 @@ def test_r3_a_stale_launch_root_copy_and_a_newer_ticket_copy_with_the_finding_pr
     s.refused(launch(TD, R3_TK, "--model", s.OPUS, cwd=repo.tests), s.OPUS, TD_C2[0])  # DEC-1225: was the reverse
 
 
-def test_r3_the_reverse_a_launch_root_copy_with_the_finding_and_another_root_s_copy_without_it_promote(repo, launch):
+def test_r3_the_reverse_a_launch_root_copy_with_the_finding_and_another_root_s_copy_without_it_promote_nothing(repo, launch):
     """The tests branch's copy holds the finding, the ticket branch's not. The test designer launched from the tests
     worktree is promoted (its own copy: green at the head); then the engineer launched from the ticket worktree, whose
     own copy lacks it, is promoted too (the tests root is named by the test designer's launch record)."""
@@ -575,7 +576,7 @@ UNREADABLE = {
 
 
 @pytest.mark.parametrize("case", sorted(UNREADABLE))
-def test_r3_another_root_s_unreadable_copy_of_a_path_the_launch_root_also_holds_refuses_naming_the_file(
+def test_r3_another_root_s_unreadable_copy_of_a_path_the_launch_root_also_holds_refuses_nothing(
         repo, launch, case):
     """The launch root's copy of ``01-review.md`` is well formed; the ticket worktree's copy of the same path is
     not: that copy is read too, so the test designer's launch from the tests worktree is refused, naming the file."""
@@ -584,4 +585,5 @@ def test_r3_another_root_s_unreadable_copy_of_a_path_the_launch_root_also_holds_
     s.commit_all(repo.tests, "the tests branch's copy, well formed")
     s.plant_probe(repo.ticket, R3_TK, "01-review.md", raw=UNREADABLE[case])
     s.commit_all(repo.ticket, "the ticket branch's copy, unreadable, after the engineer's launch")
-    s.refused(launch(TD, R3_TK, cwd=repo.tests), "01-review.md")
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, so an unreadable copy refuses nothing
+    _on_table(launch(TD, R3_TK, cwd=repo.tests))

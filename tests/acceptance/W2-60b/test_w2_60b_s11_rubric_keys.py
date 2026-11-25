@@ -43,18 +43,16 @@ def _launched(cli, launch, project, tk, log=None):
     return record, t.launch_record(project, sid), b.option_values(result.calls[0]["args"], "--model")[0]
 
 
-def test_s11_a_launch_with_a_promotion_records_the_tier_the_criticality_and_the_promotion(cli, launch, project):
+def test_s11_a_launch_after_failed_reviews_records_no_promotion_the_tier_and_the_criticality(cli, launch, project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: promotion is retired; planted failed reviews change nothing, the launch
+    # record's and the session record's `promotion` are null, the tier is Sonnet's and the criticality stays C2.
     tk = s.ticket(project, ENG, "C2", tk="DAEO-zq11")
     s.promote_two_failed(project, tk)
     record, launched, model = _launched(cli, launch, project, tk)
-    assert launched["promotion"] is not None and launched["criticality"] == "C2", "the fixture made no promotion"
-    # Rewrite-Reason: DEC-1225 (R2): a promotion launched on Opus (tier "opus"); it launches the table's model now, here the
-    # engineer's C2 entry, Sonnet (tier "sonnet"): the tier is derived from the model's name as before
+    assert launched["promotion"] is None and launched["criticality"] == "C2", "the launch promoted or lost the class"
     assert t.measured(record, "tier") == "sonnet", f"the tier of {model} is not 'sonnet'"
     t.copied(record, "criticality", "C2")
-    promotion = t.measured(record, "promotion")
-    assert promotion in (launched["promotion"], launched["promotion"]["reason"]), (
-        f"the record's promotion {promotion!r} is not the launch record's {launched['promotion']!r} or its reason")
+    t.copied(record, "promotion", None)
 
 
 def test_s11_a_launch_without_a_promotion_or_a_criticality_has_the_keys_null_and_the_tier_given(cli, launch, project):

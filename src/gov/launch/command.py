@@ -49,14 +49,29 @@ def _positive(text: str) -> float:
     return value
 
 
+_PARSER = None  # the parser add_arguments was given, for the usage line of an error found in run()
+
+
 def add_arguments(parser) -> None:
+    global _PARSER
+    _PARSER = parser
+    parse_known_args = parser.parse_known_args
+
+    def checked(args=None, namespace=None):
+        """The role is required as it always was, but for ``--table-check``, which starts no session (MR-1)."""
+        found, rest = parse_known_args(args, namespace)
+        if found.worker_role is None and found.table_check is None:
+            parser.error("the following arguments are required: <role>")
+        return found, rest
+
+    parser.parse_known_args = checked
     parser.usage = ("gov launch <role> <ticket> [--fix <line>] [--plan] [--tests-worktree] [--gate-override DEC-NNN] "
                     "[--gpu-need-mib N] [--reason <text>] [--trial <id>] [--owner-named <DEC-id>] "
                     "[--projection-usd N] [-- <CLI arguments>]\n"
                     "       gov launch <role> --chore <line> [--plan] [the options above but --tests-worktree] "
                     "[-- <CLI arguments>]")
-    parser.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
-                        "independent-auditor, research or product-spec")
+    parser.add_argument("worker_role", metavar="<role>", nargs="?", default=None, help="engineer, "
+                        "independent-test-designer, independent-auditor, research or product-spec")
     parser.add_argument("ticket", metavar="<ticket>", nargs="?", default=None,
                         help="an in_progress ticket; with --fix its owning ticket, whatever its status; none with "
                         "--chore")
@@ -71,6 +86,12 @@ def add_arguments(parser) -> None:
     # W2-60b S10 (DEC-847, DEC-963, DEC-982): the test designer's own tree, made from the ticket's worktree.
     parser.add_argument("--tests-worktree", action="store_true", help="make the ticket's tests worktree "
                         "(<tree>-tests, on <branch>-tests at HEAD), print its path and start nothing")
+    # MR-1, MR-3 (DEC-1246 (3)(b)): the role table's checks, started by no role; they start nothing
+    parser.add_argument("--table-check", metavar="[range]", nargs="?", const="", default=None, help="check the role "
+                        "table: the role files equal its rows; with a git range, the commits that change a row "
+                        "without 'Decided-by: owner'; with --scripts, the start scripts")
+    parser.add_argument("--scripts", metavar="<dir>", help="with --table-check: compare the start scripts in <dir> "
+                        "with the table")
     # W2-184 (interface 7.2a, the CTO's P-W2-184-2 (a)): RUBRIC-2's options, before "--"; the launcher judges them.
     parser.add_argument("--reason", metavar="<text>", help="why the launch chooses effort max itself (recorded)")
     parser.add_argument("--trial", metavar="<id>", help="the trial (governance/project/trials/<id>.yaml) that "
@@ -104,8 +125,24 @@ def _kind_error(ticket: str | None, fix: str | None, chore: str | None, tests_wo
     return None
 
 
+def _table_check(root: Path, args) -> int:
+    from gov.launch import role_table
+    namespace = type("Args", (), {"check": args.table_check or None, "scripts": getattr(args, "scripts", None), "roles": False,
+                                  "root": None})
+    return role_table.run(namespace, root)
+
+
 def run(root: Path, args, config: dict) -> int:
     from gov.launch import launcher
+    if getattr(args, "table_check", None) is not None:
+        return _table_check(root, args)
+    if getattr(args, "scripts", None) is not None or args.worker_role is None:
+        what = ("--scripts goes with --table-check" if args.worker_role is not None or getattr(args, "scripts", None)
+                else "the following arguments are required: <role>")
+        if _PARSER is not None:
+            _PARSER.print_usage(sys.stderr)
+        print(f"gov launch: error: {what}", file=sys.stderr)
+        return EXIT_USAGE
     ticket, fix, chore = getattr(args, "ticket", None), getattr(args, "fix", None), getattr(args, "chore", None)
     why = _kind_error(ticket, fix, chore, bool(getattr(args, "tests_worktree", False)))
     if why is not None:

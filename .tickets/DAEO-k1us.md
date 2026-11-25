@@ -35,6 +35,21 @@ allowed_paths:
 - .claude/skills/orchestration/SKILL.md
 - docs/emergency-2/audits/04-tickets-and-rubric.md
 - docs/emergency-2/briefs/NIGHT-COMMON.md
+- governance/project/role-table.yaml
+- template/governance/project/role-table.yaml
+- template/.claude/hooks/agent_model.py
+- template/.rulesync/hooks.jsonc
+- template/governance/project/path-map.yaml
+- .rulesync/permissions.jsonc
+- src/gov/adapters/**
+- src/gov/update/**
+- tests/acceptance/W2-201/**
+- tests/acceptance/W2-208/**
+- tests/acceptance/W2-184/**
+- tests/acceptance/W2-60b/**
+- tests/unit/adapters/**
+- tests/unit/update/**
+- docs/emergency-2/integration/MODELS-BY-ROLE-DISAGREEMENTS.md
 est_loc: 600
 kpis:
   success:
@@ -348,3 +363,47 @@ value, which differs from it, so a leak stays detectable (six cases). S6 (`test_
 `{"mcpServers": {}}` holds none outside the list, F1 accepts it, and a new case pins that (DEC-1232 (6)). Both commits
 by the independent test designer, each with a `Rewrite-Reason`. Green: `tests/acceptance/W2-56` (weekly),
 `tests/acceptance/W2-201`, `tests/unit/launch`, `tests/unit/optin`: 1828 passed; `gov accept W2-201` exit 0, 649 passed.
+
+## Fix: models and effort by role, from one table, held by code (MR-1, MR-2, MR-3; DEC-1246 (3)(b); INTEGRATION-PLAN rows 2-9, 2-10, 2-7; lead `models-by-role`, 2026-11-24)
+
+Found by the integration plan (T-10 (c), R-4, R-5): the model and effort of a role stand in four places that can drift (role
+files' `Launch default` lines, `LEAD_MODEL` and `LEAD_EFFORT` in the launcher, `criticality.yaml`'s `opus:` key with the
+launcher's promotion and probe, three start scripts). No value changes (DEC-1236 (3)): CTO (`orchestrator` run by its own start
+script) and `senior-engineer` Opus high; ticket, fix and chore leads Sonnet medium; `engineer`, `independent-test-designer`,
+`product-spec`, `research`, `independent-auditor`, `qa-engineer` Sonnet high; a wide audit the owner asks for Opus high
+(`independent-auditor` with `Decision: DEC-1230`); no Fable anywhere. The CTO approved the kernel text (the role files' model and
+effort lines) by naming it in the brief. Required; the ticket stays closed. Code area `src/gov/launch/**`,
+`governance/project/criticality.yaml`, `governance/project/role-table.yaml` (new), `template/governance/kernel/roles/*.md`.
+
+**MR-1 The table in one file (2-9).** `governance/project/role-table.yaml`: `version: 1`, `rows: [{role, model, effort,
+decided}]` for `orchestrator`, `senior-engineer`, `lead`, `engineer`, `independent-test-designer`, `product-spec`, `research`,
+`independent-auditor`, `qa-engineer`, `audit-wide`; each `decided: DEC-1242 R-4` (or the DEC that set it). A copy ships in the kit
+(`template/governance/project/role-table.yaml`, byte-equal). `gov launch` reads the row for the role when the file is present
+(`lead` for a ticket, fix or chore lead; `orchestrator` is the CTO's row and the launcher still gives a launched lead the `lead`
+row); the launch record names it (`model_source`/`effort_source` `role table`); with no table file the role file's `Launch default`
+line is used as before (an adopted repository not yet updated). Each role file's `Launch default` line must equal the table's row (a
+check in `gov.launch.role_table`; no role file may name another value). A table that cannot be read, repeats a role, holds a model
+that is Fable, or a model/effort the launcher does not know refuses a launch (`LAUNCH_REFUSED`, fail closed). Changing a row in a
+commit without the trailer `Decided-by: owner` is reported by `python3 -m gov.launch.role_table --check <range>` (`gov launch
+--table-check [range]`), which the basis check calls for a range that touches the file. Verify: `gov launch engineer <ticket>` on the stub CLI
+records `high` and `claude-sonnet-5-5` read from a planted table row whose values are then changed (the stub receives the changed
+values); a lead gets `medium`; a commit that edits a row with no trailer is reported with the role, old and new value, one with the
+trailer is not; each role file equals its row; a planted unreadable or Fable table refuses. Failure: a role file that says `medium` for
+the engineer while the table says `high` is reported by the check and cannot launch an effort other than the table's.
+
+**MR-2 Criticality no longer varies the model (2-10).** `governance/project/criticality.yaml` has no `opus:` key
+(`gov.launch.criticality.load` accepts `version, default, rules`; a file that still carries `opus` is refused with a message naming
+the key). The launcher's promotion (probe-record verdict) and probe (second review round on Opus) are retired: a C3 ticket launches its
+engineer on Sonnet; a planted probe record or a review round of two or more changes neither model nor effort (no `max`), and an
+explicit request for promotion or probe (`--trial` naming Opus without an exceptions entry, a caller's `--model claude-opus-*`) is refused as any other
+non-Sonnet model. Criticality still gives the class, the profile and the review depth. The hook's class limiter (`class: C3`) still reads the class.
+Verify: a planted C3 ticket launches its engineer, test designer and qa-engineer on Sonnet, high; a planted probe record with a promoting verdict and a
+ticket in review round 2 launch Sonnet, not max; `criticality.yaml` has no `opus:`; `load` refuses a file with it; a promoting `--trial` on Opus is refused.
+Failure: no launch record holds `model_source` `promotion` or `probe`.
+
+**MR-3 The start scripts match the table (2-7).** `python3 -m gov.launch.role_table --scripts <dir>` (`gov launch --table-check --scripts <dir>`) prints each of `start_lead.sh`, `start_cto.sh`,
+`start_audit.sh` with its `--model` and `--effort` beside the table's row (`lead`, `orchestrator`, `audit-wide`) and exits 0 when
+they agree, non-zero when not (a `${EFFORT:-medium}` default is read as its value; an `--effort` read from the environment counts as its default).
+`start_cto.sh` no longer calls the Fable substitution reader (the scripts are the CTO's: only that call is removed in this change). Verify: the
+real three scripts agree and exit 0; a copy of `start_cto.sh` with `--effort medium` planted exits non-zero naming it and the table's value; a copy that
+still names the substitution reader is reported. Failure: a script with no `--model` or `--effort` is reported, not skipped.

@@ -108,8 +108,10 @@ def test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir(tmp_pa
     events = support.kernel_hook_events()
     scripts = {path.name for path in support.KERNEL_HOOKS.glob("*.py")}
     reached = {name for name in scripts if any(name in command for _, command in events)}
-    assert reached == scripts and len(scripts) == 5, \
-        f"the settings' hook command lines do not reach the five kernel hooks: {sorted(scripts - reached)}"   # five since EMERGENCY-2 6.1, DAEO-gr7t
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: six kernel hooks, the kit's model hook (agent_model.py) among them (five since
+    # EMERGENCY-2 6.1, DAEO-gr7t, and agent_model.py).
+    assert reached == scripts and len(scripts) == 6 and "agent_model.py" in scripts, \
+        f"the settings' hook command lines do not reach the six kernel hooks: {sorted(scripts - reached)}"
     runs = {f"the {event} hook": tuple(support.run_hook(root, box, command, event) for root, box in pair)
             for event, command in events}
     problems = _compare(runs, pair[0][0])
