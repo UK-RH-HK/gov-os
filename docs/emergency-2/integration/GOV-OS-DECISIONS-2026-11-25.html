@@ -1,0 +1,487 @@
+<title>Gov OS decisions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding-block:10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding-block:22px 80px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0;min-width:0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+<header class="bar"><div class="bar-in">
+  <h1>Gov OS decisions, 25 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">Every decision waiting on you, gathered from the pages, reports and findings logs of 23 to 25 November: eight cards in four sections. Cards D-06 to D-08 point to decisions that sit on another page or with another CTO, so they are listed once, here. Each card gives what was found, the options with their costs, and one recommendation with its reason. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go. Only D-01 and D-02 hold Gov OS's own work; the full account of the two days is in <code>docs/emergency-2/integration/ACCOUNT-2026-11-25.md</code>.</p>
+<p class="hint" id="batchline"></p>
+
+<section class="state" aria-labelledby="how">
+  <h3 id="how">How to answer</h3>
+  <ul>
+    <li>Tap one option on a card. A card you leave alone is sent as "skip".</li>
+    <li>"Take every recommendation" fills every card with its recommended option; your notes stay.</li>
+    <li>At the end, tap "Copy the answer sheet" and paste it to your advisor, then to the CTO.</li>
+  </ul>
+</section>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. A note is sent as one line, 400 characters at most.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const BATCH="B-2026-11-25-cto";
+const SECTIONS = [
+ {
+  "title": "1. Releases",
+  "intro": "What it takes to put 0.1.7's content live on the machine, and the release suite's flakes.",
+  "qs": [
+   {
+    "id": "D-01",
+    "from": "I-31 · DEC-1248, DEC-1250",
+    "title": "The re-pin: which release carries it, and its number?",
+    "found": [
+     "0.1.6 and 0.1.7 were both cut (records and tags exist) and both machine-wide re-pins rolled back on <code>gov doctor</code>'s <code>tools</code> part.",
+     "Cause (I-31, corrected): <code>tool-registry.yaml:236</code> pins the tool <code>gov</code> at 0.1.5; the automatic re-pin switches the link without writing the new pin's entry first, so doctor reads the new gov as newly unhealthy. Your manual re-pin of 0.1.5 wrote that entry itself.",
+     "The release code burns a version that rolled back; the next re-pin needs a new number. A fix lead (W2-209, RP-1) is running.",
+     "The cut must run the fixed re-pin code (from the source tree), since the pinned 0.1.5 gov carries the old re-pin.",
+     "Meanwhile EXAMIN measures on the installed 0.1.7 pin through PATH, so nothing of its work waits on this."
+    ],
+    "opts": [
+     [
+      "a",
+      "A patch 0.1.8 with the re-pin fix, cut by code once its suite is green; the bundle becomes 0.1.9",
+      "One more release suite (about 90 min) and a cut, tonight or tomorrow morning.",
+      1
+     ],
+     [
+      "b",
+      "Re-pin 0.1.7 by your own hand, as for 0.1.5 (a script that writes the registry entry too)",
+      "About 15 minutes in your plain terminal; no new number; 0.1.7 is marked burned, so the script must step past that mark."
+     ],
+     [
+      "c",
+      "No separate patch: the re-pin ships with the bundle (then 0.1.8)",
+      "Gov OS's own sessions stay on 0.1.5 until the bundle lands (days); EXAMIN and Gov OS's measure run through the pin path meanwhile."
+     ]
+    ],
+    "reason": "It puts the approved content live by code, as the authority file intends, and proves the re-pin fix in its real use.",
+    "sources": "FINDINGS.md I-31; tool-registry.yaml:236; ~/.local/share/gov-os/repin.json; release-0.1.6/cut.json, cut-0.1.7.json; DEC-1248, DEC-1250.",
+    "stops": "Stops Gov OS's own move to 0.1.7 and its fresh 80; does not stop EXAMIN."
+   },
+   {
+    "id": "D-03",
+    "from": "I-30, I-32",
+    "title": "Timing tests that fail under the release suite's own load: how should the release gate treat them?",
+    "found": [
+     "It took six full release suites to get two green ones; each red run but one failed on a case that passes alone.",
+     "I-30 (the gate's null CPU reading) is fixed. I-32: W2-112's slot case took 7.6 s against 7 s; W2-13 and W1-19's warm-latency cases are red in every busy run.",
+     "G2 accepts only a green record of the exact commit."
+    ],
+    "opts": [
+     [
+      "a",
+      "Fix the timing cases: measure against the machine's reading (planted, or a bound scaled by observed load), in 0.1.9",
+      "A fix lead (size S to M); the release suite stays strict.",
+      1
+     ],
+     [
+      "b",
+      "Run the timing cases alone in the suite's serial phase",
+      "The suite runs a few minutes longer; no code change to the cases."
+     ],
+     [
+      "c",
+      "Let the gate accept a case that fails once and passes on an immediate re-run, recorded as flaky",
+      "Fastest; a real slow-down could pass once as a flake."
+     ]
+    ],
+    "reason": "It removes the cause; (b) can carry the next release until (a) lands.",
+    "sources": "FINDINGS.md I-30, I-32; NR records of 25 Nov in the release log; gates.py g2.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "2. Memory measures",
+  "intro": "Gov OS's own fresh 80 after the re-pin.",
+  "qs": [
+   {
+    "id": "D-02",
+    "from": "FM-5 · DEC-1249 (3)",
+    "title": "Gov OS's own fresh 80: approve the writer wall's new settings template?",
+    "found": [
+     "Gov OS's measure launches writers in walls (<code>indep_launch.py</code>); the writer check (FM-5) adds a Stop hook to the wall's <code>settings.json.tmpl</code>.",
+     "The launcher accepts only a template whose sha256 is in <code>APPROVED</code>, inside Gov OS's sets root, which no session but the measure's own may open (DEC-1249).",
+     "The new template's sha256: <code>ce9bf1009dce16aac7fc938fd59883d817ebabe51e290381cc0c3f284d37e9d2</code>.",
+     "EXAMIN measures without walls (the adopter's launch, proven in a real session)."
+    ],
+    "opts": [
+     [
+      "a",
+      "You add the sha256 line to <code>gov-os-eval/indep-walls/APPROVED</code> yourself",
+      "One minute in your terminal; the wall stays as designed.",
+      1
+     ],
+     [
+      "b",
+      "The measure's own driver session adds it, under your yes",
+      "No step of yours; a session writes an approval file."
+     ],
+     [
+      "c",
+      "Gov OS measures as EXAMIN does, without walls",
+      "No approval needed; Gov OS gives up the wall's extra isolation for this measure."
+     ]
+    ],
+    "reason": "It keeps the approval yours and the wall intact, for one line.",
+    "sources": "fix-memaudit-3 return; indep_launch.py; DEC-1249.",
+    "stops": "Stops Gov OS's own fresh 80 only."
+   }
+  ]
+ },
+ {
+  "title": "3. Usage",
+  "intro": "The wake-cost proposal you asked for today, and whether a repository needs its own plan.",
+  "qs": [
+   {
+    "id": "D-04",
+    "from": "DEC-1229 · the proposal due 25 Nov",
+    "title": "The cheapest wake pattern for the CTOs",
+    "found": [
+     "The Gov OS CTO session: 419 requests in about 28 hours, about $56; its context per request is a median 458k tokens and stands at 668k, so every wake re-reads about half a million cached tokens.",
+     "The watcher wakes the CTO on every lead end, suite end, usage threshold, load spike, and a heartbeat every 45 minutes; each wake costs a few requests, and the heartbeat is most of them.",
+     "Both lapses of the two days came from restarting the watcher after an event; the cron stall check (3 hours) caught both.",
+     "Long investigations in the CTO session itself (reading code, transcripts) cost Opus tokens a Sonnet helper would cost at half."
+    ],
+    "opts": [
+     [
+      "a",
+      "Take out the heartbeat, keep event wakes and the 3-hour stall push; send investigations of more than a few reads to a Sonnet helper",
+      "About 30 fewer wakes a day; a stalled watcher is caught by the stall push, as twice today.",
+      1
+     ],
+     [
+      "b",
+      "Heartbeat every 90 minutes instead of 45",
+      "About half the heartbeat wakes."
+     ],
+     [
+      "c",
+      "Keep as today",
+      "No change; the context keeps growing until the next handover."
+     ]
+    ],
+    "reason": "The heartbeat costs the most and guards what the stall push already guards.",
+    "sources": "the CTO session's transcript (ac51847d); cto_watch.sh; stall_check.sh; DEC-1229, DEC-1243 (4).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "D-05",
+    "from": "DEC-1246 (3)(c)",
+    "title": "Does a repository need its own plan subscription?",
+    "found": [
+     "24 Nov: about $283 in all (Gov OS $179, EXAMIN $93, ASMO OS $8); 25 Nov to 21:00: about $94 (Gov OS $61, EXAMIN $31).",
+     "The plan went from 15% to 31% in about 28 hours; at that rate it reaches about 78% at the reset (29 Nov 09:00).",
+     "<code>gov usage</code> (built, in the 0.1.9 bundle) will print this daily per repository, role and session."
+    ],
+    "opts": [
+     [
+      "a",
+      "No separate plan now; read it again at the reset with gov usage's daily figures",
+      "None now; a risk only if a heavy day comes before the reset.",
+      1
+     ],
+     [
+      "b",
+      "A separate plan for EXAMIN now",
+      "A second subscription's cost; EXAMIN's spend is about a third."
+     ],
+     [
+      "c",
+      "Cap each repository's daily share",
+      "A rule to keep; work waits when a cap is hit."
+     ]
+    ],
+    "reason": "The week ends under the limit at this rate, and next week's figures will be measured per repository by code.",
+    "sources": "the transcripts of 24-25 Nov at the leads' fitted prices; log/usage.txt.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "4. Waiting on other pages",
+  "intro": "Decisions already on a page or with another CTO: answer them there; they are listed here once so nothing is missed.",
+  "qs": [
+   {
+    "id": "D-06",
+    "from": "DEC-1245 (4) · the practice-first page",
+    "title": "The practice-first decisions page: 31 cards, unanswered since 24 Nov",
+    "found": [
+     "The six proposals (tool status list, friction from the repositories, old work under new releases, decisions, the rubrics register, data in specs) are on their own page, published 24 Nov: <a href=\"https://claude.ai/artifact/6EaYA5GiQ561qpTf7xDHRu\">https://claude.ai/artifact/6EaYA5GiQ561qpTf7xDHRu</a>.",
+     "None of them stops work; several (the findings log, the tool status list) shape how EXAMIN and ASMO OS work now."
+    ],
+    "opts": [
+     [
+      "a",
+      "I answer on that page",
+      "Nothing here."
+     ],
+     [
+      "b",
+      "Take every recommendation on that page",
+      "The CTO applies all 31 as recommended; your notes there still count.",
+      1
+     ]
+    ],
+    "reason": "Each recommendation stands on its own card there, so (b) hides no choice.",
+    "sources": "PRACTICE-FIRST-DECISIONS-2026-11-24.html; PRACTICE-FIRST-PROPOSALS.md.",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "D-07",
+    "from": "EXAMIN · its assessment and Contract draft",
+    "title": "EXAMIN's 27 decision cards (A-01 to A-23, K-01 to K-04)",
+    "found": [
+     "They are EXAMIN's: A-01 to A-23 in <code>/home/usain/gov-os-runs/W2-27/examin/docs/audits/wave0/study/ASSESSMENT.md</code> §3, K-01 to K-04 with its Contract draft 1.0 (<code>docs/specs/CONTRACT.md</code>, commit 52e96ed), on the five pages the EXAMIN CTO published.",
+     "They settle EXAMIN's Contract; its planning waits on them."
+    ],
+    "opts": [
+     [
+      "a",
+      "I answer them with the EXAMIN CTO, on its pages",
+      "Nothing here.",
+      1
+     ],
+     [
+      "b",
+      "Take every recommendation on EXAMIN's cards",
+      "The EXAMIN CTO applies them as recommended."
+     ]
+    ],
+    "reason": "They are EXAMIN's decisions, framed by its CTO.",
+    "sources": "EXAMIN ASSESSMENT.md §3; CONTRACT.md.",
+    "stops": "Stops EXAMIN's Contract and planning."
+   },
+   {
+    "id": "D-08",
+    "from": "ASMO OS · its adoption at A5",
+    "title": "ASMO OS before A6: its path map, and its spec audit's 55 gaps",
+    "found": [
+     "The ASMO OS CTO asks, in its chat: (1) is the path map approved as it stands, with the old framework's tools out of memory entirely, or should governance/memory get its own searchable group? (2) may the AS audit's 55 gaps be answered as one line (\"all kept, not built, planned in the Contract, step 3\")?",
+     "With your yes it runs A6 to A10 (the memory build and the two auditors); a change to the map re-runs MA to A5, which is cheap."
+    ],
+    "opts": [
+     [
+      "a",
+      "I answer in the ASMO OS CTO's chat",
+      "Nothing here.",
+      1
+     ],
+     [
+      "b",
+      "Approve both as it proposes",
+      "It runs A6 to A10 at once."
+     ]
+    ],
+    "reason": "The ASMO OS CTO has the map in front of it; its question names what each answer changes.",
+    "sources": "the ASMO OS CTO's report (tmux asmo-cto-1124-1725).",
+    "stops": "Stops ASMO OS's adoption at A5."
+   }
+  ]
+ }
+];
+
+const KEY="govos-decisions-"+BATCH;
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* SHA-256 in plain script, so the page needs no secure context */
+function sha256(str){
+  const msg=new TextEncoder().encode(str);
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const len=msg.length, total=((len+9+63)>>6)<<6, buf=new Uint8Array(total);
+  buf.set(msg); buf[len]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(total-8,Math.floor(len/0x20000000),false); dv.setUint32(total-4,(len<<3)>>>0,false);
+  const w=new Uint32Array(64), rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+4*i,false);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&b)^(a&c)^(b&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+function canon(v){
+  if(Array.isArray(v)) return "["+v.map(canon).join(",")+"]";
+  if(v&&typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+canon(v[k])).join(",")+"}";
+  return JSON.stringify(v);
+}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.from}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<p class="src"><b>Sources:</b> ${q.sources}</p><p class="src"><b>Stops work?</b> ${q.stops}</p>`;
+    h+=`<div class="note cto"><span class="who">Recommended</span>${q.reason}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" maxlength="400" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+/* the batch hash: SHA-256 of the batch id and the cards in page order, as JSON with sorted keys and no spaces */
+const HASH=sha256(canon({batch:BATCH,cards:all.map(q=>({id:q.id,question:q.title,found:q.found,options:q.opts.map(o=>({key:o[0],label:o[1],cost:o[2]})),recommendation:{option:(q.opts.find(o=>o[3])||[])[0]||null,reason:q.reason},sources:q.sources,blocks:q.stops}))}));
+document.getElementById("batchline").textContent=`Batch ${BATCH} · hash ${HASH.slice(0,12)} · ${all.length} cards`;
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const stamp=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  const lines=["GOV-ANSWERS 1",`batch: ${BATCH}`,`hash: sha256:${HASH}`,`answered: ${stamp}`,`count: ${all.length}`];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id}: `;
+    if(v){n++; line+=v;} else line+="skip";
+    const note=(state.notes[q.id]||"").replace(/\s*[\r\n]+\s*/g," ").trim().slice(0,400);
+    if(note) line+=` | note: ${note}`;
+    lines.push(line);
+  }
+  lines.push("END");
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+let clearArmed=null;
+document.getElementById("clear").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!clearArmed){b.textContent="Tap again to clear every answer and note"; clearArmed=setTimeout(()=>{clearArmed=null; b.textContent="Clear my answers";},4000); return;}
+  clearTimeout(clearArmed); clearArmed=null; b.textContent="Clear my answers";
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  render();
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
