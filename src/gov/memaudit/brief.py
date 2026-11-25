@@ -168,12 +168,35 @@ def refusals_section(p: dict, kind: str) -> str:
     return "\n".join(text)
 
 
+def writer_permissions(out) -> dict:
+    """What lets a writer's session write its set and nothing else (FM-5), in the wall template's own slash form."""
+    o = "//" + os.path.abspath(os.path.expanduser(str(out))).lstrip("/")  # `//` = an absolute path in a rule
+    return {"allow": [f"Write({o}/out/**)", f"Edit({o}/out/**)"],
+            "deny": [f"Edit({o}/.claude/**)", f"Edit({o}/input/**)", f"Edit({o}/brief.md)"]}
+
+
 def stop_hook(p: dict, audit: str, repo, commit: str, out: Path) -> dict:
     """The writer's ``.claude/settings.json``: a ``Stop`` hook running ``writer-check`` on ``out/set`` (FM-1)."""
     src = Path(__file__).resolve().parents[2]
     argv = ["env", f"PYTHONPATH={src}", sys.executable, "-m", "gov.memaudit", "writer-check", "--sets-root", str(p["root"]),
             "--audit", audit, "--repo", str(Path(repo).resolve()), "--commit", commit, "--folder", str(out)]
-    return {"hooks": {"Stop": [{"hooks": [{"type": "command", "command": shlex.join(argv)}]}]}}
+    return {"permissions": writer_permissions(out),
+            "hooks": {"Stop": [{"hooks": [{"type": "command", "command": shlex.join(argv)}]}]}}
+
+
+WRITER_TOOLS = "Read,Grep,Glob,Write,Edit,TodoWrite"
+WRITER_MODEL = "claude-sonnet-5-5"
+LAUNCH_NAME = "LAUNCH.txt"
+
+
+def launch_command(out: Path, repo) -> str:
+    """The one real writer launch (FM-5): the session folder's own settings (the ``Stop`` hook) load through
+    ``--setting-sources project --settings``; no ``--safe-mode`` and no ``--no-session-persistence``. Run with ``out`` as cwd."""
+    prompt = "Read brief.md in this folder and do what it says."
+    argv = ["claude", "-p", "--restricted", "--setting-sources", "project", "--settings",
+            str(out / ".claude" / "settings.json"), "--add-dir", str(Path(repo).resolve()), "--tools", WRITER_TOOLS,
+            "--strict-mcp-config", "--permission-prompts", "none", "--model", WRITER_MODEL, prompt]
+    return shlex.join(argv)
 
 
 def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, emit) -> str:
@@ -237,6 +260,10 @@ def run(sets_root, audit, *, kind, commit, repo=None, rnd=1, since=None, out, em
     digest = sha256_bytes(text)
     ledger.append(layout.make_run(p), "brief", kind=kind, round=rnd, commit=commit, brief_sha256=digest)
     emit(f"BRIEF {kind} round {rnd} {digest[:12]}")
+    if kind == "writer":
+        line = launch_command(out, repo)
+        _write(out / LAUNCH_NAME, (line + "\n").encode("utf-8"))
+        emit(f"LAUNCH writer {line}")
     return "ok"
 
 

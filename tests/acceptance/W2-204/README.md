@@ -282,3 +282,24 @@ tested by moving the checked files into `hidden/` and comparing the hook's reaso
 **Green on the base by design (guards):** `test_fm1_guard_a_clean_writer_set_is_delivered_and_passes_pre_flight_1`,
 `test_fm1_guard_the_existing_deliver_refusals_stay`, `test_fm2_guard_a_round_2_after_a_clean_pre_flight_1_has_no_such_section`,
 `test_fm1_a_checker_brief_writes_no_hook`.
+
+### Fix: the writer check in every real writer launch (FM-5)
+
+Tests in `test_w2_204_fm5_launch.py`, planted sets and a planted fake `claude` script only; no real session. The wall's settings
+are rendered through the launcher's own `--dry` run, using the unit tests' planted World (`tests/unit/orchestration/test_w2_149_indep_launch.py`
+loaded by path); the template's `permissions` and `PreToolUse` blocks are held by the sha256 of their canonical JSON as on the base.
+`writer-run` is driven with `--claude <fake>`; the fake logs argv, stdin and cwd, and copies a planted faulty set (or the fixed one)
+into `out/set`. The sets are the 40-question planted half with one PF-FORM fault (q07), as the FM-1 cases use.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-25 (FM-5 a) | `test_w2_204_fm5_launch.py::test_fm5_the_writer_brief_prints_the_launch_line_with_the_hook_loading_flags`, `test_w2_204_fm5_launch.py::test_fm5_launch_txt_holds_the_same_command`, `test_w2_204_fm5_launch.py::test_fm5_a_round_2_writer_brief_prints_the_launch_line_too`, `test_w2_204_fm5_launch.py::test_fm5_the_checker_brief_prints_no_launch_writer_line`, `test_w2_204_fm5_launch.py::test_fm5_nothing_the_brief_prints_or_writes_names_a_question` | `brief --kind writer` prints only the `BRIEF` line: no `LAUNCH writer ...` line, no `LAUNCH.txt` (the checker case is green on the base by design) |
+| success-26 (FM-5 b) | `test_w2_204_fm5_launch.py::test_fm5_the_writer_wall_settings_carry_the_stop_hook_filled_from_the_launch`, `test_w2_204_fm5_launch.py::test_fm5_the_writer_wall_keeps_its_other_settings_and_the_checker_wall_has_no_stop_hook`, `test_w2_204_fm5_launch.py::test_fm5_the_template_s_permissions_and_wall_hook_are_unchanged` | the wall's `settings.json.tmpl` has no `Stop` hook, so the rendered writer settings (the launcher's own `--dry` run) have none (the 'keeps its other settings' case is green on the base by design) |
+| success-27 (FM-5 c) | `test_w2_204_fm5_launch.py::test_fm5_writer_run_resumes_the_same_session_with_ids_and_codes_only_and_ends_pass`, `test_w2_204_fm5_launch.py::test_fm5_writer_run_without_a_session_id_keeps_one_id_for_the_start_and_the_resume`, `test_w2_204_fm5_launch.py::test_fm5_writer_run_a_clean_first_session_is_not_resumed`, `test_w2_204_fm5_launch.py::test_fm5_writer_run_a_never_fixing_writer_gets_three_returns_then_ends_limit` | `writer-run` is not a subcommand: exit 2 usage |
+| success-28 (FM-5 d) | `test_w2_204_fm5_launch.py::test_fm5_the_hook_the_launch_line_loads_blocks_a_refused_set_with_ids_and_codes_only` | no `LAUNCH writer` line to take the `--settings` path from |
+
+The real session denied the writer's Edit and Write into `out/`; the writer's own `settings.json` must grant them (allow `out/**`, deny `.claude/**`, `input/**`, `brief.md`) and the launch line must carry `--permission-prompts none`.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-29 (FM-5 e) | `test_w2_204_fm5_launch.py::test_fm5_the_writer_settings_allow_write_and_edit_into_out_only`, `test_w2_204_fm5_launch.py::test_fm5_the_writer_settings_deny_edits_to_its_own_config_input_and_brief`, `test_w2_204_fm5_launch.py::test_fm5_the_stop_hook_block_is_unchanged_beside_the_permissions`, `test_w2_204_fm5_launch.py::test_fm5_the_launch_line_asks_no_permission_prompts` | `.claude/settings.json` has no `permissions` block; the launch line has no `--permission-prompts` (the Stop-hook-unchanged case is green on the base by design) |

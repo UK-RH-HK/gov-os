@@ -2475,6 +2475,16 @@ def fill_text(text, vals, escape=False):
     return text
 
 
+def gov_src(repo):
+    """The directory holding the ``gov`` package, for the writer's Stop hook: $GOV_SRC, else this checkout's ``src``,
+    else the repository's."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    for cand in (os.environ.get("GOV_SRC"), os.path.join(here, *[".."] * 4, "src"), os.path.join(repo, "src")):
+        if cand and os.path.isdir(os.path.join(cand, "gov")):
+            return os.path.realpath(cand)
+    return os.path.realpath(os.path.join(repo, "src"))
+
+
 def choose_run(walls, kind, trees, runs_indep, set_name, rnd):
     for _ in range(5):
         rid = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + f"-{set_name}-r{rnd}"
@@ -2832,7 +2842,12 @@ def build_and_run(st, o, root, over, cwd, home):
     vals = {"@WALLS@": walls, "@WALL@": st.wall, "@TREE@": st.tree, "@REPO@": repo,
             "@WORKTREES@": os.path.join(os.path.realpath(home), "gov-os-worktrees"), "@RUNS@": runs,
             "@HOME@": os.path.realpath(home), "@SETS_ROOT@": root, "@MODEL@": model}
-    settings = fill_text(tmpl["settings.json.tmpl"].decode("utf-8"), vals, escape=True)
+    stop_text = tmpl["settings.json.tmpl"].decode("utf-8")
+    if kind == "writer":  # FM-5: the writer's Stop hook runs the pre-flight's checks on out/set (writer-check)
+        vals.update({"@SET@": set_name, "@COMMIT@": commit, "@GOVSRC@": gov_src(repo)})
+    else:  # no other kind has the hook: its block is cut out whole, the rest stays byte for byte
+        stop_text = re.sub(r'    "Stop": \[\n.*?\n    \],\n', "", stop_text, count=1, flags=re.S)
+    settings = fill_text(stop_text, vals, escape=True)
     settings = settings.replace('"@OTHER_WALLS@"', ",\n      ".join(json.dumps(x) for x in others_deny))
     cl = os.path.join(st.wall, ".claude")
     os.mkdir(cl, 0o700)

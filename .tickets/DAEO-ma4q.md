@@ -315,5 +315,17 @@ brief; `fresh.py` `half` runs the void step only when its half is reached in tur
 - **FM-4 A stop names its cause (I-19).** Every `STOPPED` line of `fresh` is preceded by `CAUSE <audit> <step> <CODE>: <reason>`; an
   `FR-*` refusal is followed by a `CAUSE` line; a usage fault prints `CAUSE fresh FR-USAGE-<NAME>: <reason>` before `ERROR: UsageError`.
   Codes, ids and counts only. Verify: one planted stop per kind (final pre-flight refusal, void, measure used-marker, bad tag).
+- **FM-5 The check runs in every real writer launch (fix-memaudit-3, 2026-11-24; gates 0.1.6).** Launch paths: (a) the adopter CTO's
+  `claude -p` in the folder `gov memaudit brief --kind writer` writes: the brief prints the exact launch line (`LAUNCH writer <command>`,
+  also `LAUNCH.txt` in the folder; `--restricted --setting-sources project --settings <out>/.claude/settings.json`, never `--safe-mode`),
+  so the Stop hook of FM-1 loads; (b) Gov OS's walled writer (`indep_launch.py`): the wall's `settings.json.tmpl` carries the same Stop
+  hook (`writer` kind only), filled from the launch's own sets root, set, commit, repository and wall; the template's sha256 is the
+  owner's to enter in `APPROVED`; (c) a launch that loads no hooks (`--safe-mode`): `gov memaudit writer-run` holds the loop by code
+  (the session started with a kept session id, `writer-check` run after it, a refusal resumed into the same session with its ids and
+  codes only, at most 3 returns, never a fresh writer). In each, a refused question goes back to that writer with its ids and codes
+  only, at most 3 returns, and the refused ids are recorded in `WRITER-CHECK.json`. Verify: unit cases for the launch line, the wall's
+  rendered settings and `writer-run` with a planted session seam; one real `claude -p` Sonnet writer, launched as the product prints,
+  on a planted 2-question set with one form fault in a temporary folder: the transcript shows the refusal returned and the fixed file
+  accepted, and `WRITER-CHECK.json` shows `returns` 1 and `ended` pass.
 
 Hidden-set protections unchanged (EMERGENCY-2 §2.7): nothing printed or logged names a hidden question's text, gold or sources.
