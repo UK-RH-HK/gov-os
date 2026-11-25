@@ -84,3 +84,12 @@ The owner's P-RERANKER-1 (a) (DEC-979 item 4, DEC-982): before the three layers.
 [DEC-1068, DEC-1087]
 
 **D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 9 of 10 (`9a02a474`, D-1); met in part: S3 (its 48-question half is not yet measured, research:173). The CTO closes it at the lift (P1-13).
+
+## Fix: timing cases that fail under the release suite's own load (I-32; DEC-1251 D-03: (b) now, then (a))
+
+Found 2026-11-25 (I-32). Kind: a fix; the ticket stays closed. Lines approved by the CTO's brief `docs/emergency-2/briefs/LEAD-timing-tests.md`. No change to `src/` and no bound raised.
+
+**Cause (found by the lead):** the red of `test_with_both_slots_held_before_any_service_...` (release run `20261125T171029Z-3d039a8fb6d3`) read 7.6 s for a search inside a test that took 4.15 s in all (JUnit, monotonic): the case timed the search with the wall clock, which this WSL2 machine steps forward (+0.7 s about every 32 s, measured 2026-11-25).
+
+- TT-1: the case, and the cases of `test_w2_112_clock.py` that run it, are listed `serial: latency` in `tests/acceptance/serial-only.txt`: the release suite (`gov.close.nightly`, whose runner `gov.close.command._run_tests` reads the list) leaves them out of its parallel run and runs each once, alone. Verify: `tests/acceptance/W2-112/test_w2_112_serial_list.py`.
+- TT-2: a search's `seconds` is taken on the monotonic clock; the 7 s bound is unchanged. A planted forward step of the wall clock no longer fails the case; a search that really takes twice its time still does. The entry of TT-1 stays: load can still lengthen a monotonic time, and serial costs seconds. Verify: `tests/acceptance/W2-112/test_w2_112_clock.py`.
