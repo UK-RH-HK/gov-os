@@ -176,8 +176,8 @@ def closed_tickets(repo: Path, commit: str) -> dict[str, set[str]]:
 
 def _history(repo: Path, n_commit: str, c: str) -> list[tuple[str, str, list[tuple[str, str]]]]:
     """Every non-merge commit N..C, oldest first, as ``(sha, message, [(status, path)])``, from one ``git log``."""
-    log = _run(repo, "-c", "log.showRoot=true", "log", "--no-merges", "--reverse", "--no-renames", "--name-status",
-               "-z", "--format=%x1e%H%x1f%B%x1f", f"{n_commit}..{c}")
+    log = _run(repo, "-c", "log.showRoot=true", "log", "--no-merges", "--reverse", "--no-show-signature", "--no-renames",
+               "--name-status", "-z", "--format=%x1e%H%x1f%B%x1f", f"{n_commit}..{c}")
     found = []
     for entry in log.split("\x1e")[1:]:
         sha, _, rest = entry.partition("\x1f")

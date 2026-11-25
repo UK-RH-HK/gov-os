@@ -407,7 +407,7 @@ def _caller(caller) -> None:
 
 
 def _patch_check(root: Path, version: str, caller=_UNSET) -> dict:
-    """``gov release <X> --patch --check``: the patch rule at HEAD, nothing read beyond git objects, nothing written."""
+    """``gov release <X> --patch --check``: the release rule at HEAD, git objects alone read, nothing written."""
     from gov.release import patch
 
     _caller(caller)

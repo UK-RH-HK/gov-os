@@ -1,5 +1,6 @@
-"""The cut of a release by code, a patch or an approved one (W2-209, RELEASE-ON-BEHALF "The cut"): the record committed on a side branch whose only
-parent is C, tagged ``v<version>`` (annotated, unsigned, local) and merged into ``w2/integrate`` with an ordinary merge.
+"""The cut of a release by code, patch or approved (W2-209, RELEASE-ON-BEHALF "The cut"): the record committed on a side
+branch whose only parent is C, tagged ``v<version>`` (annotated, unsigned, local) and merged into ``w2/integrate`` with
+an ordinary merge.
 
 The record is built by ``gov.release.build`` exactly as ``gov release`` builds it; ``kind.json``, ``gates.json``,
 ``suite.json`` and ``NOTE.md`` are added beside ``manifest.json`` and ``manifest.sha256`` (the manifest's hash

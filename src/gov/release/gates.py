@@ -1,7 +1,7 @@
-"""The five gates of a release by code, a patch or an approved one (W2-209, RELEASE-ON-BEHALF "The gates and the cut"; DEC-1223).
+"""The five gates of a release by code, patch or approved (W2-209, RELEASE-ON-BEHALF "The gates and the cut"; DEC-1223).
 
 They run in the order G0 to G4 and stop at the first red (``GateRefused``, which names the gate): G0 the owner's
-standing yes (``governance/project/release-authority.yaml``), G1 the patch rule (``gov.release.patch``), G2 the suite
+standing yes (``governance/project/release-authority.yaml``), G1 the release rule (``gov.release.patch``), G2 the suite
 on the exact commit (a nightly record), G3 the update rehearsal (``gov.release.proving``), G4 the state. A gate fails
 closed: a file that cannot be read, a record that is not a map, a check that cannot be made is a red, never a pass.
 Nothing here writes to the repository.
