@@ -122,34 +122,34 @@ const SECTIONS = [
    {
     "id": "D-01",
     "from": "I-31 · DEC-1248, DEC-1250",
-    "title": "The re-pin: which release carries it, and its number?",
+    "title": "Putting 0.1.7 live on the machine: your re-pin by hand, or a release you build",
     "found": [
-     "0.1.6 and 0.1.7 were both cut (records and tags exist) and both machine-wide re-pins rolled back on <code>gov doctor</code>'s <code>tools</code> part.",
-     "Cause (I-31, corrected): <code>tool-registry.yaml:236</code> pins the tool <code>gov</code> at 0.1.5; the automatic re-pin switches the link without writing the new pin's entry first, so doctor reads the new gov as newly unhealthy. Your manual re-pin of 0.1.5 wrote that entry itself.",
-     "The release code burns a version that rolled back; the next re-pin needs a new number. A fix lead (W2-209, RP-1) is running.",
-     "The cut must run the fixed re-pin code (from the source tree), since the pinned 0.1.5 gov carries the old re-pin.",
-     "Meanwhile EXAMIN measures on the installed 0.1.7 pin through PATH, so nothing of its work waits on this."
+     "0.1.6 and 0.1.7 were both cut (records and tags exist); both automatic re-pins rolled back on <code>gov doctor</code>'s <code>tools</code> part.",
+     "Cause (I-31, corrected): <code>tool-registry.yaml:236</code> pins the tool <code>gov</code> at 0.1.5, and the automatic re-pin never wrote the new entry before its check. The fix (RP-1, W2-209) is landed (<code>81cdd48b4</code>).",
+     "New since this page first went out: the patch rule refuses a 0.1.8 carrying RP-1 (P3: RP-1 sits under W2-209, still open), so it is a <b>bigger</b> release only you build; DEC-1235 (2)'s rule for approved bigger releases is not built (I-34). The bundle is bigger too.",
+     "Your own re-pin script never runs <code>doctor</code> and writes the registry entry itself, so I-31 cannot hit it. A 0.1.7 copy is ready: <code>docs/emergency-2/release-0.1.7/repin.sh</code>. It checks the tag and the record, uses the kept cut wheel (its sha256 equals the record's), reuses the installed 0.1.7 pin, switches the link, runs the help, launch, search and hook checks, rolls back by itself on a failure, commits the registry entry as yours, and refreshes the stores.",
+     "Meanwhile EXAMIN measures on the 0.1.7 pin through PATH."
     ],
     "opts": [
      [
       "a",
-      "A patch 0.1.8 with the re-pin fix, cut by code once its suite is green; the bundle becomes 0.1.9",
-      "One more release suite (about 90 min) and a cut, tonight or tomorrow morning.",
+      "Re-pin 0.1.7 by your hand now: in a plain terminal, <code>bash docs/emergency-2/release-0.1.7/repin.sh 2>&1 | tee -a ~/repin-rel-0.1.7.log</code>",
+      "About 15 minutes of yours; no new release; 0.1.7 goes live; RP-1 rides the next release you build.",
       1
      ],
      [
       "b",
-      "Re-pin 0.1.7 by your own hand, as for 0.1.5 (a script that writes the registry entry too)",
-      "About 15 minutes in your plain terminal; no new number; 0.1.7 is marked burned, so the script must step past that mark."
+      "Build 0.1.8 yourself (gov release 0.1.8 in a plain terminal, then its re-pin by script), its suite already running",
+      "About 30 minutes of yours, once the suite is green (about 23:00)."
      ],
      [
       "c",
-      "No separate patch: the re-pin ships with the bundle (then 0.1.8)",
-      "Gov OS's own sessions stay on 0.1.5 until the bundle lands (days); EXAMIN and Gov OS's measure run through the pin path meanwhile."
+      "Wait for the bundle (0.1.8 or 0.1.9), which you build by hand anyway",
+      "Gov OS's own sessions stay on 0.1.5 for days; Gov OS's fresh 80 runs through the pin path."
      ]
     ],
-    "reason": "It puts the approved content live by code, as the authority file intends, and proves the re-pin fix in its real use.",
-    "sources": "FINDINGS.md I-31; tool-registry.yaml:236; ~/.local/share/gov-os/repin.json; release-0.1.6/cut.json, cut-0.1.7.json; DEC-1248, DEC-1250.",
+    "reason": "It puts the approved content live tonight with the tool you already used for 0.1.5, and costs no new release.",
+    "sources": "FINDINGS.md I-31, I-34; tool-registry.yaml:236; docs/emergency-2/release-0.1.7/repin.sh; release-0.1.6/cut-0.1.7.json; DEC-1235 (2), DEC-1250.",
     "stops": "Stops Gov OS's own move to 0.1.7 and its fresh 80; does not stop EXAMIN."
    },
    {
