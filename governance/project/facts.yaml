@@ -48,6 +48,28 @@ commands:
     # the owner's Emergency 2: a worker's brief is built by gov brief
     run: 'gov brief {WORKER_ROLE} {ID}'
     check: 'gov brief --help'
+  # the CTO's own commands, as its role card names them (role-cto.md)
+  launch:
+    run: 'gov launch <role> <ticket>'
+    check: 'gov launch --help'
+  msg:
+    run: 'gov msg read <address>'
+    check: 'gov msg --help'
+  queue:
+    run: 'gov queue <ticket>=<branch> --onto w2/integrate --select'
+    check: 'gov queue --help'
+  release:
+    run: 'gov release <version> --patch'
+    check: 'gov release --help'
+  cto_watch:
+    run: 'env HEARTBEAT_S=999999 NSAMP=10 bash {TOOLS}/cto_watch.sh <seen-file>'
+    check: 'bash -n /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/cto_watch.sh'
+  start_lead:
+    run: 'bash {TOOLS}/start_lead.sh <name> <brief>'
+    check: 'bash -n /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/start_lead.sh'
+  start_cto:
+    run: 'bash {MAIN}/governance/project/orchestration/tools/start_cto.sh'
+    check: 'bash -n /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/tools/start_cto.sh'
   links:
     run: 'gov links --since {BASE}'
     check: 'gov links --help'
