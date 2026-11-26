@@ -407,3 +407,7 @@ they agree, non-zero when not (a `${EFFORT:-medium}` default is read as its valu
 `start_cto.sh` no longer calls the Fable substitution reader (the scripts are the CTO's: only that call is removed in this change). Verify: the
 real three scripts agree and exit 0; a copy of `start_cto.sh` with `--effort medium` planted exits non-zero naming it and the table's value; a copy that
 still names the substitution reader is reported. Failure: a script with no `--model` or `--effort` is reported, not skipped.
+
+## Fix: MR-3's scripts check follows the one tracked start script (batch A's red; lead `bundle-a-reds`, 2026-11-26)
+
+Cause: since DEC-1253 the scratch `start_cto.sh` only runs the tracked script, so `check_scripts` found no `--model` or `--effort`. Caught by `test_mr3_the_real_three_scripts_agree_with_this_repositorys_table`. Fix: a one-line `exec bash <path>` wrapper of the same name is followed once, anything else is a fault (`8a9684e34`). Open: merge `53808ef6da8d` changes `tests/acceptance/W2-208/README.md` itself (W1-01's DEC-253 history case stays red).
