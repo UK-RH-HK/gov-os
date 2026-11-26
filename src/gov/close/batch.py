@@ -531,7 +531,7 @@ def _targets(clone: Path, candidates: list[dict], given: list[str] | None) -> di
 
 def isolate(root: Path, base: str, given: list[str], targets: list[str] | None = None, onto: str | None = None,
             timeout: float = 3600, also=None, workers: int = 1,
-            options: list[str] | None = None) -> tuple[dict, int]:
+            options: list[str] | None = None, built: str | None = None) -> tuple[dict, int]:
     """The batch (S6): ``(result, exit code)``; a ``GovError`` for a refusal (nothing landed).
 
     ``also(commit, names)`` is called after the selection's run on each merged result (the clone checked out at
@@ -542,7 +542,10 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
     W2-206) is explained by that candidate as it is: no search runs for it.
 
     ``workers``: the parallel phase's xdist pool on each merged result (1: no pool, as before). ``options``:
-    pytest options added to the selection's own on every run (the queue's full run leaves folders out by them)."""
+    pytest options added to the selection's own on every run (the queue's full run leaves folders out by them).
+
+    ``built``: the merge of every candidate onto the base the caller already made in the warm clone (the queue's, which
+    its selection was read from): it is the one run and landed, not a second merge of another commit id."""
     from gov.close import attribution as _attribution
     from gov.close.command import _phases
 
@@ -585,7 +588,7 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
         refuse(CANDIDATE_NOT_ISOLATED, f"{name} cannot be isolated: its work shares commits past the base with "
                f"{other}, so the merged result without {name} still holds its work",
                candidate=name, shares_with=other)
-    whole = _build(clone, base_sha, candidates)
+    whole = built or _build(clone, base_sha, candidates)
     if whole is None:
         bad = next((c["name"] for n, c in enumerate(candidates) if _build(clone, base_sha, candidates[:n + 1]) is None),
                    candidates[-1]["name"])
