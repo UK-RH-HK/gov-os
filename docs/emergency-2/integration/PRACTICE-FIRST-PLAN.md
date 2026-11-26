@@ -106,6 +106,12 @@ Order inside the code: 2-11 → 2-15 → 2-16 → 2-3; 3-14 → 3-15; 5-4 (W2-21
 | C14 | The drafted register predates 25 Nov: rubric 9 says patch releases are off and bigger ones the owner's; the `approved` kind, the watcher with no heartbeat and DEC-1253 are later | proposals §5; DEC-1251 D-01, D-04; DEC-1253; I-34 | Re-read each row when writing; keep 20 rows; a genuinely new rubric goes to the owner (RG-0) |
 | C15 | "Practice from today: fill the extended table" collides with today's `check_spec.py`, which refuses any kind but `imported` and `synthetic` | proposals §6 "Rides"; `check_spec.py:145-166` | Until 2-16 lands, write `path` and `serves` as extra columns and keep to the two kinds; say "no data" or "real data" in prose, and use no real data without the owner's decision |
 
+**The CTO's rulings (2026-11-26, session cb975429; P2, reversible, inside the owner's approval DEC-1252):** C1 to C15 as recommended.
+C1: F-4 (`gov findings collect`/`sync`) joins plan §1 rule 3, its ticket carrying `approved_by: DEC-1252`. C2: one new ticket each for
+the data declaration (DS-0 to DS-4) and the release field (OW-0, OW-1), citing DEC-1252, recorded here once; TL-10 and DE-1 ride as
+owner-approved fixes. C7: no ninth column and no fifth kind (that would be the owner's). The kit-text chores of §2.1 land after the 0.1.8
+cut; the Gov OS-only chores (the 0.1.7 tool status list, the 0.1.8 draft outside its release folder, the classing pass) start now.
+
 **Not checked:** the maps of EXAMIN and ASMO OS; whether `close.schema.json` or the register accept an extra `release` key by hand; no tool was run to prove a status.
 
 **Count: 31 card rows in §1** (TL-0 to TL-11: 12; FR-0 to FR-3: 4; OW-0 to OW-3: 4; DE-0 to DE-2: 3; RG-0 to RG-2: 3; DS-0 to DS-4: 5).
