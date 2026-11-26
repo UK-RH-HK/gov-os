@@ -59,4 +59,4 @@ The owner, 2026-11-24: build the route that keeps stale and superseded documents
 ## Design (the lead's choices)
 - Namespace field `stale_class: superseded | historical | legacy` (optional). It requires `lexical_policy: not indexed` and `embedding_policy: not embedded`.
 - Retrieval drops chunks of stale-class paths from every route unless `include_stale`; `--include-stale` and a path named in the question add a `stale` list to the bundle, read from the files, each entry `stale: true`.
-- A3 refuses a name or path match without the class; a description-field match is a notice. `gov doctor` notices the same for an adopted repository.
+- A3 refuses, without the class, only a namespace stale as a whole (its name, or every one of its paths, says it). A namespace only some of whose paths say it is recorded with a notice naming those paths to move into a namespace of their own; a description-field match is a notice too. `gov doctor` notices the same for an adopted repository. One function (`gov.retrieval.stale.unclassed`) classifies for both.

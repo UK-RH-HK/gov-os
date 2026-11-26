@@ -28,8 +28,10 @@ def stale_words(*texts) -> list[str]:
 
 
 def unclassed(document) -> list[dict]:
-    """Each namespace of a parsed path map that says superseded, historical, legacy or archive in its name or paths and
-    states no ``stale_class``: ``{namespace, words, stale_class}``. Reads no file; a map that is no map gives ``[]``."""
+    """Each namespace of a parsed path map that states no ``stale_class`` and says superseded, historical, legacy or
+    archive in its name or paths. Stale as a whole (its name, or every one of its paths, says it):
+    ``{namespace, words, stale_class}``. Only some of its paths (a catch-all namespace keeps live documents):
+    ``{namespace, words, paths, move}``, ``paths`` those that say it. Reads no file; a map that is no map gives ``[]``."""
     spaces = document.get("namespaces") if isinstance(document, dict) else None
     found = []
     for name, space in (spaces.items() if isinstance(spaces, dict) else ()):
@@ -37,8 +39,17 @@ def unclassed(document) -> list[dict]:
             continue
         paths = space.get("paths") if isinstance(space.get("paths"), list) else []
         words = stale_words(name, *paths)
-        if words:
+        if not words:
+            continue
+        stale = [path for path in paths if stale_words(path)]
+        if stale_words(name) or len(stale) == len(paths):
             found.append({"namespace": name, "words": words, "stale_class": STALE_WORDS[words[0]]})
+        else:
+            found.append({"namespace": name, "words": words, "paths": stale,
+                          "move": f"if their documents are stale, move {', '.join(map(str, stale))} out of `{name}` "
+                                  f"into a namespace of their own that states stale_class {STALE_WORDS[words[0]]} with "
+                                  "lexical_policy `not indexed` and embedding_policy `not embedded`; the other paths "
+                                  "stay as they are"})
     return found
 
 

@@ -24,7 +24,7 @@ from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
 from gov.adopt import coordination as roster_key
 from gov.retrieval.semantic import EMBEDDED
-from gov.retrieval.stale import STALE_DESCRIBED, STALE_WORDS, stale_words as _stale_words
+from gov.retrieval.stale import STALE_DESCRIBED, STALE_WORDS, stale_words as _stale_words, unclassed
 from gov.tasks import tickets
 
 ACTIONS = ("KEEP", *MOVING, "RETIRE", "DELETE_FROM_ACTIVE_TREE")  # CAP-06.b
@@ -457,36 +457,39 @@ def _embedding_policies(config: dict) -> None:
 
 
 def _stale_classes(config: dict) -> list[dict]:
-    """Refuse (ADOPT_STALE_CLASS) a namespace whose name or paths say superseded, historical, legacy or archive and
-    that states no ``stale_class`` (W2-212, DEC-1227 D3); a namespace only a description field says it of gives a
-    notice, returned. The value of a class stated is the loader's (CONFIG_INVALID), not judged here."""
+    """Refuse (ADOPT_STALE_CLASS) a namespace that is stale as a whole and states no ``stale_class`` (W2-212, DEC-1227
+    D3; ``unclassed``). Returns the notices: a namespace only some of whose paths say it, and one only a description
+    field says it of. The value of a class stated is the loader's (CONFIG_INVALID), not judged here."""
     path_map = config.get("path-map.yaml")
     spaces = path_map.get("namespaces") if isinstance(path_map, dict) else None
     if not isinstance(spaces, dict):
         return []
-    faults, notices = {}, []
-    for name, space in spaces.items():
-        if not isinstance(space, dict) or "stale_class" in space:
-            continue
-        paths = space.get("paths") if isinstance(space.get("paths"), list) else []
-        words = _stale_words(name, *paths)
-        if words:
-            faults[name] = words
-        else:
-            said = _stale_words(*(space.get(field, "") for field in STALE_DESCRIBED))
-            if said:
-                notices.append({"namespace": name, "words": said,
-                                "notice": f"namespace `{name}` describes itself as {', '.join(said)} but states no "
-                                          f"stale_class: if its documents are stale, add stale_class: "
-                                          f"{STALE_WORDS[said[0]]}, lexical_policy: not indexed, embedding_policy: "
-                                          "not embedded"})
+    found = {item["namespace"]: item for item in unclassed(path_map)}
+    faults = {name: item for name, item in found.items() if "paths" not in item}
     if faults:
-        lines = [f"namespace `{name}` says {', '.join(words)} in its name or paths and states no stale_class"
-                 for name, words in faults.items()]
+        lines = [f"namespace `{name}` says {', '.join(item['words'])} in its name or paths and states no stale_class"
+                 for name, item in faults.items()]
         raise refuse("STALE_CLASS", "the path map is not recorded: " + "; ".join(lines) + "; give each stale_class: "
                      "superseded, historical or legacy (archive is historical) with lexical_policy: not indexed and "
                      "embedding_policy: not embedded, so its documents stay out of the default bundle",
-                     namespaces=list(faults), classes={name: STALE_WORDS[words[0]] for name, words in faults.items()})
+                     namespaces=list(faults), classes={name: item["stale_class"] for name, item in faults.items()})
+    notices = []
+    for name, space in spaces.items():
+        if not isinstance(space, dict) or "stale_class" in space:
+            continue
+        if name in found:
+            item = found[name]
+            notices.append({"namespace": name, "words": item["words"], "paths": item["paths"],
+                            "notice": f"namespace `{name}` says {', '.join(item['words'])} in some of its paths only "
+                                      f"and states no stale_class: {item['move']}"})
+            continue
+        said = _stale_words(*(space.get(field, "") for field in STALE_DESCRIBED))
+        if said:
+            notices.append({"namespace": name, "words": said,
+                            "notice": f"namespace `{name}` describes itself as {', '.join(said)} but states no "
+                                      f"stale_class: if its documents are stale, add stale_class: "
+                                      f"{STALE_WORDS[said[0]]}, lexical_policy: not indexed, embedding_policy: "
+                                      "not embedded"})
     return notices
 
 

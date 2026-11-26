@@ -28,6 +28,19 @@ def test_words_are_whole_word_parts_and_archive_is_historical():
         {"namespace": "a", "words": ["archive"], "stale_class": "historical"}]
 
 
+def test_a_namespace_is_stale_as_a_whole_by_its_name_or_by_every_path():
+    found = unclassed({"namespaces": {"legacy-docs": {"paths": ["docs/live/**"]},
+                                      "b": {"paths": ["docs/legacy/**", "old/archive/**"]},
+                                      "none": {"paths": []}}})
+    assert [(item["namespace"], "paths" in item) for item in found] == [("legacy-docs", False), ("b", False)]
+
+
+def test_a_namespace_only_some_of_whose_paths_say_it_gives_those_paths_to_move():
+    [item] = unclassed({"namespaces": {"harbour": {"paths": ["docs/**", "docs/legacy/**", "a/archive/**"]}}})
+    assert item["paths"] == ["docs/legacy/**", "a/archive/**"] and item["words"] == ["legacy", "archive"]
+    assert "namespace of their own" in item["move"] and "stale_class" in item["move"]
+
+
 def test_the_classifier_matches_only_classed_namespaces(tmp_path):
     (tmp_path / "governance/project").mkdir(parents=True)
     (tmp_path / "governance/project/path-map.yaml").write_text(
