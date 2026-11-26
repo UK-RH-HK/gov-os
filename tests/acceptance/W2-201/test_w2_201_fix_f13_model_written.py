@@ -17,6 +17,10 @@ import yaml
 REPO = Path(__file__).resolve().parents[3]
 HOOKS = [REPO / ".claude" / "hooks" / "agent_model.py"]
 FABLE = "claude-fable-5-2"
+BOTH_COPIES = HOOKS + [REPO / "template" / "governance" / "kernel" / "hooks" / "agent_model.py"]
+TABLE_REL = "governance/project/role-table.yaml"
+ROWS = {row["role"]: row["model"] for row in yaml.safe_load((REPO / TABLE_REL).read_text(encoding="utf-8"))["rows"]}
+AGENT_ALIASES = {"sonnet", "opus", "haiku", "fable"}   # the only values the Agent tool's `model` accepts
 
 
 @pytest.fixture
@@ -50,6 +54,19 @@ def test_a_spawn_naming_no_model_comes_back_with_sonnet_and_every_other_key(hook
     args = {"prompt": "Look at it.\nTask: DAEO-bbbb", "description": "look", "run_in_background": True,
             **({"subagent_type": kind} if kind else {})}
     new = updated(run(hook, project, dict(args), tool))
+    assert new == {**args, "model": "sonnet"}
+
+
+@pytest.mark.parametrize("hook", BOTH_COPIES, ids=lambda p: str(p.relative_to(REPO)))
+@pytest.mark.parametrize("kind", [*ROWS, "general-purpose"])
+def test_am1_the_written_model_is_an_agent_tool_alias_for_every_row_of_the_real_table(hook, project, kind):
+    """AM-1 (I-50): this repository's own role table planted in the project; the model written into a spawn that names
+    none is an alias the Agent tool accepts, and it is `sonnet` (for a Sonnet row, for a row naming another model and
+    for a type with no row: only Sonnet is ever written)."""
+    (project / TABLE_REL).write_bytes((REPO / TABLE_REL).read_bytes())
+    args = {"prompt": "Look at it.\nTask: DAEO-bbbb", "description": "look", "subagent_type": kind}
+    new = updated(run(hook, project, dict(args)))
+    assert new["model"] in AGENT_ALIASES, f"{kind} (row: {ROWS.get(kind)}): the Agent tool refuses {new['model']!r}"
     assert new == {**args, "model": "sonnet"}
 
 

@@ -4,10 +4,10 @@ every helper spawned with the Agent tool runs the model the rubric gives helpers
 
 1. A fork (`subagent_type: fork`) is refused: helper work goes to a fresh helper from a written brief (DEC-1212 (4)).
    Only an entry for `subagent_type: fork` in the exceptions file lifts it.
-2. A spawn that names no model gets a model written into it (PreToolUse `updatedInput`, every other key kept) and
-   passes: the model of the row for its subagent type in governance/project/role-table.yaml when the row exists and
-   is a Sonnet model, else "sonnet" (an unreadable table, no row or another model mean "sonnet"); a spawn that names
-   Sonnet passes unchanged.
+2. A spawn that names no model gets "sonnet" written into it (PreToolUse `updatedInput`, every other key kept) and
+   passes; a spawn that names Sonnet passes unchanged. The alias is written, never a full model id: the Agent tool's
+   `model` accepts only `sonnet`, `opus`, `haiku` and `fable`, so a full id fails the spawn (AM-1). Only Sonnet is
+   ever written, whatever the subagent type.
 3. Fable (any model whose name has `fable`) is refused for every type: no session runs it (DEC-1225 (3)), and no entry
    covers it.
 4. Any other model is refused unless governance/project/model-exceptions.yaml lists an exception for it
@@ -36,7 +36,6 @@ except ImportError:
 
 EXCEPTIONS_REL = "governance/project/model-exceptions.yaml"
 CRITICALITY_REL = "governance/project/criticality.yaml"
-TABLE_REL = "governance/project/role-table.yaml"
 CLASSES = ("C0", "C1", "C2", "C3")  # lowest first
 TASK_LINE = re.compile(r"^Task: (DAEO-[a-z0-9]+)\s*$", re.MULTILINE)
 DECISION_LINE = re.compile(r"^Decision: (DEC-[0-9]+)\s*$", re.MULTILINE)
@@ -156,41 +155,13 @@ def refuse(text: str) -> int:
     return 2
 
 
-def _own_table_model(root: str, kind: str) -> str:
-    data = _yaml(os.path.join(root, TABLE_REL), TABLE_REL)
-    for row in data["rows"]:
-        if row["role"] == kind:
-            model = row["model"]
-            return model if isinstance(model, str) and model.startswith("claude-sonnet-") else "sonnet"
-    return "sonnet"
-
-
-def table_model(root: str, kind: str) -> str:
-    """The model of the role table's row for ``kind`` when the row exists and is Sonnet; else "sonnet" (the table
-    unreadable, no row, or a row of another model). Read through the pinned gov package's reader when the interpreter
-    has it (the kit's hook line starts the pin's interpreter), else by the same rule here, so the hook runs alone."""
-    try:
-        from gov.launch import role_table
-        row = role_table.row_for(root, kind)
-        model = row["model"] if row else None
-        return model if isinstance(model, str) and model.startswith("claude-sonnet-") else "sonnet"
-    except ImportError:
-        pass
-    except Exception:
-        return "sonnet"
-    try:
-        return _own_table_model(root, kind)
-    except Exception:
-        return "sonnet"
-
-
-def write_model(args: dict, root: str = "") -> int:
-    """A spawn that names no model gets a Sonnet model written into it (PreToolUse `updatedInput`, every other key
+def write_model(args: dict) -> int:
+    """A spawn that names no model gets the alias "sonnet" written into it (PreToolUse `updatedInput`, every other key
     kept), so its model no longer depends on an environment variable the harness may not read."""
     print(json.dumps({"hookSpecificOutput": {
         "hookEventName": "PreToolUse",
         "permissionDecision": "allow",
-        "updatedInput": {**args, "model": table_model(root, str(args.get("subagent_type") or "general-purpose"))},
+        "updatedInput": {**args, "model": "sonnet"},
     }}))
     return 0
 
@@ -208,7 +179,7 @@ def judge(args: dict, root: str) -> int:
                           "helper from a written brief (a named subagent type and a brief that stands alone). Only "
                           f"an entry for 'fork' in {EXCEPTIONS_REL} lifts this.")
     if not model:
-        return write_model(args, root)
+        return write_model(args)
     if allowed(model):
         return 0
     said = (f"model rule (the owner's decision, DEC-1225): a helper runs Sonnet; '{model}' for '{kind}' is refused")

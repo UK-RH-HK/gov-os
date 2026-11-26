@@ -379,6 +379,19 @@ Extra evidence for S21 (R4), outside this folder and not in the map: `tests/unit
 | success-22 | `test_w2_201_fix_f13_model_written.py::test_a_spawn_naming_no_model_comes_back_with_sonnet_and_every_other_key` (Explore, Plan, general-purpose, engineer, no type; tools Agent and Task) | **red**: the hook prints nothing for a spawn naming no model, so no `updatedInput` carries `model` sonnet |
 | success-22 | `test_w2_201_fix_f13_model_written.py::test_an_opus_auditor_under_an_exception_keeps_its_model`, `test_fable_is_refused`, `test_a_spawn_already_naming_sonnet_passes_with_its_model`, `test_another_tool_is_left_alone` | green today (guards) |
 
+## Fix AM-1 (success-45): the written model is an alias the Agent tool accepts (I-50; owner W2-201)
+
+Written before the fix, red on the base. The KPI cell is `success-45` for fix line AM-1 (`gov accept` reads a KPI cell
+only as `success-N` / `failure-N`). This repository's real role table is planted in the project; both hook copies
+(`.claude/hooks/`, `template/governance/kernel/hooks/`) are run for each of its rows and for `general-purpose`.
+
+| KPI | Tests | expected red reason |
+|---|---|---|
+| success-45 | `test_w2_201_fix_f13_model_written.py::test_am1_the_written_model_is_an_agent_tool_alias_for_every_row_of_the_real_table` | **red** for the rows naming a Sonnet model (`lead`, `engineer`, `independent-test-designer`, `product-spec`, `research`, `independent-auditor`, `qa-engineer`): the hook writes the full id `claude-sonnet-*`, which the Agent tool refuses. Guards, green: the rows naming another model (`orchestrator`, `senior-engineer`, `audit-wide`) and `general-purpose`, written `sonnet` today |
+
+The adopted project's copy is held by W2-208's MR-4 case
+`test_w2_208_mr4_kit.py::test_mr4_the_adopted_hook_writes_the_rows_model_into_a_spawn_with_no_model`.
+
 ## Fixes of fixes-015a (F1 launch side, F14, F19)
 
 Known bugs in this closed feature; no new ticket. Written before the fix, red on the base. Map in the form `gov accept`
