@@ -6,7 +6,8 @@
   a second rebuild of the same tree waits, a rebuild of another tree does not), runs ``CMD`` and gives the slot back
   when it ends. A slot is an advisory lock on ``~/.gov-os/machine/slots/slot-<i>.lock`` held by the runner (the
   ``gov resources`` process) for the whole run, its holder in ``slot-<i>.json``. Sessions take no slot; a full set
-  never refuses a session (DEC-983, P-2).
+  never refuses a session (DEC-983, P-2). A ``test`` job has the pinned Node of its tree first on ``PATH``
+  (``gov.resources.toolpath``).
 - **The load admission (W2-199, RT-3, RT-4, RT-7):** before it takes a slot a run waits until the machine has room
   (``gov.dispatch.admission``: the 1-minute load under ``start_below``, the load plus ``workers x margin`` within the
   limit, a GPU kind within the GPU's budget), logs ``ready``, ``wait``, ``admitted``, ``started`` and ``ended`` to the
@@ -452,6 +453,9 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
     if kind in GPU_KINDS and not gpu_need_mib:
         raise GovError("RESOURCE_ARGUMENTS_INVALID", f"a {kind} job needs --gpu-need-mib <MiB>: its GPU memory")
     env = dict(os.environ if env is None else env)
+    if kind == "test":  # W2-20 SP-1: the tree's pinned Node first on PATH, a nested run's too
+        from gov.resources import toolpath
+        env = toolpath.with_node(env, tree or os.getcwd())
     job = uuid.uuid4().hex[:12]
     if os.environ.get("GOV_HEAVY_ADMITTED") or env.get("GOV_HEAVY_ADMITTED"):
         return _nested(kind, command, env, job)

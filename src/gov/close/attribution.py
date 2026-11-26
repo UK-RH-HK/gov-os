@@ -37,6 +37,7 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from gov.resources import toolpath
 from gov.util.gitenv import git_env
 
 CLONE_REL = ".gov-runtime/close/clone"
@@ -124,7 +125,7 @@ def prepare(root: Path, commit: str) -> dict:
 
 def test_env(clone: Path) -> dict:
     """The environment of a run in the clone, as the close gives its runs (DEC-500): no test-runner or interpreter
-    switch of the caller's; the clone's own ``src/`` first where it has one."""
+    switch of the caller's; the clone's own ``src/`` first where it has one, and its pinned Node first on ``PATH``."""
     from gov.close import command as _close
 
     env = {key: value for key, value in os.environ.items()
@@ -133,7 +134,7 @@ def test_env(clone: Path) -> dict:
                 or key == "PYTHONPATH")}
     if (Path(clone) / "src").is_dir():
         env["PYTHONPATH"] = str(Path(clone) / "src")
-    return env
+    return toolpath.with_node(env, clone)  # W2-20 SP-1
 
 
 def slot_configured() -> str | None:

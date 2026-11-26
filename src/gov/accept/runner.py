@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 from gov.cli.errors import GovError
+from gov.resources import toolpath
 
 KIND = r"(successes|success|failures|failure|kpis|kpi|s|f|k)"
 NAME = re.compile(KIND + r"[ \t-]*(\d+)(?!\w)", re.I)
@@ -558,6 +559,7 @@ def _run(root: Path, folder: Path, timeout: float, optins: list[str] = (),
                                                            encoding="utf-8")
             env["PYTHONPATH"] += os.pathsep + str(plugins)
             command += ["-p", LEFT_OUT_PLUGIN]
+        env = toolpath.with_node(env, root)  # W2-20 SP-1
         before, subreaper = _children(os.getpid()), _subreaper(1)  # an orphan of the run comes to gov, not to init
         process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL, start_new_session=True)
