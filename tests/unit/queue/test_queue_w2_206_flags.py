@@ -187,6 +187,20 @@ def test_the_commit_tested_is_the_one_the_selection_was_read_from_however_long_t
     assert code == 0 and result["graph_commit"] == result["tested"]
 
 
+def test_the_landing_s_run_takes_the_per_test_limit_of_the_merged_tree_s_test_map(project):
+    limit = "per_test_timeout: {}\n"
+    held = (project.root / "governance/project/test-map.yaml").read_text(encoding="utf-8")
+    assert limit.format(60) in held
+    project.commit("a short limit", files={"governance/project/test-map.yaml": held.replace(limit.format(60),
+                                                                                          limit.format(1))})
+    slow = "import time\n\nfrom pkg.other import other\n\n\ndef test_slow():\n    time.sleep(2)\n    assert other()\n"
+    project.branch("topic/a", {"governance/project/test-map.yaml": held, "tests/unit/test_slow.py": slow, **SLIP},
+                   f"Task: {TICKET}", "Role: engineer")
+    result, code = command.land(project.root, [f"{TICKET}=topic/a"])
+    assert "--timeout=60" in result["selection"]["pytest_options"]
+    assert (code, result["culprits"], result["landed"]) == (0, [], [TICKET])
+
+
 # -- the after-step ---------------------------------------------------------------------------------------------
 
 def test_after_a_landing_the_notices_are_in_the_answer_and_in_queue_json(project):

@@ -589,6 +589,8 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
                f"{other}, so the merged result without {name} still holds its work",
                candidate=name, shares_with=other)
     whole = built or _build(clone, base_sha, candidates)
+    if built:  # the clone at the merge, as _build leaves it: the run's options are read from its test map
+        _attribution.checkout(clone, built)
     if whole is None:
         bad = next((c["name"] for n, c in enumerate(candidates) if _build(clone, base_sha, candidates[:n + 1]) is None),
                    candidates[-1]["name"])
