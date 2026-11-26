@@ -46,7 +46,7 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 | 8 | write S`log/cto-session.txt`, S`log/cto-tmux.txt` | your session id, tmux name |
 
 - Watcher **tracked** (run_in_background, never `&`), no heartbeat (DEC-1251 D-04); restart it first after each event.
-- Then send the owner one takeover message (progress block, checks, results, first action); only then the old CTO stops.
+- Then one takeover message to the owner (progress block, checks, results, first action); only then the old CTO stops.
 
 ## Launching work (golden workflow v2)
 | use | command |
@@ -63,8 +63,8 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 | known bug | a fix under its owning ticket | failing test first, `Fix:` trailer |
 | chore | records, docs, configuration, tests unchanged and green | direct commit with `Class: C` |
 
-- Worker briefs: `gov brief <the worker's role> <the ticket>`; until `gov launch` and `gov brief` are green, start leads from briefs you write from lead common [DEC-1241].
-- **Leads:** one per ticket or fix, Sonnet medium. Every brief says "decide, never ask", names exact files and paths, keeps others' code areas apart and carries the lead's memory bundle **uncut** in its role's profile (DEC-1249). Only the independent test designer changes `tests/acceptance/`.
+- Worker briefs: `gov brief <the worker's role> <the ticket>` [DEC-1241]; until `gov launch` and `gov brief` are green, start leads from briefs you write from lead common.
+- **Leads:** one per ticket or fix, Sonnet medium. Every brief says "decide, never ask", names exact files and paths, keeps others' code areas apart, carries the lead's memory bundle **uncut** in its role's profile (DEC-1249). Only the independent test designer changes `tests/acceptance/`.
 
 | brief for | bundle profile |
 |---|---|
@@ -76,11 +76,11 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 - Open every subagent prompt with the memory block: ask memory first (table), read the whole bundle, search once more in own words, report how many retrieves helped.
 - Run a pair (test designer, engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - State the ticket's interface (where config lives, error names, function signatures) in the ticket before the pair starts [DEC-1052].
-- **Landing (emergency mode, DEC-1239; X-1):** plain path: hand merge, the change's own tests and **exactly** the impact selection, never hand-picked; check each acceptance commit's `Role:` and one-paragraph trailers; record in S`log/landings/`. Held branches land in one batch. Full suite: releases and weekly only. A selection-missed red is a selection bug (findings log).
-- **Q-7:** the same failure three times stops the loop: find the root cause, fix and record it. Never re-run a flaky case a second time: fix why it fails.
+- **Landing (emergency mode, DEC-1239; X-1):** plain path: hand merge, the change's own tests and **exactly** the impact selection, never hand-picked; check every acceptance commit's `Role:` trailer, and that trailers are one paragraph; record in S`log/landings/`. Held branches land in one batch. Full suite: releases and weekly only. A selection-missed red is a selection bug (findings log).
+- **Q-7:** the same failure three times stops the loop: find the root cause, fix it at the root, record it. Never re-run a flaky case a second time: fix why it fails.
 - **Prove in the real path:** a session, hook, release or re-pin fix is proven there before it lands; a command-line test is not enough.
 - **Releases:** you cut a release by code (`gov release <v> --patch`, the authority file on) once its release suite on the exact commit is green on an idle machine: a patch (fixes and chores), or an approved release, whose every feature ticket names the owner's accepted decision (`approved_by:` in its front matter, or `Approved-by:` on the commit) [DEC-1235 (2), I-34]; anything else is bigger and the owner's by hand. Every commit of yours that touches `template/` or `src/gov` carries `Class: C`, or `Approved-by:` when it needs his approval, all trailers in one paragraph. Pushes to GitHub and `sudo` are the owner's.
-- **Models, effort:** by role table only (Opus: CTO, senior engineer; else Sonnet; leads medium); a role's change goes to the owner first (DEC-1236 (3)).
+- **Models, effort:** role table only (Opus: CTO, senior engineer; else Sonnet; leads medium); a change to any role's model or effort goes to the owner first (DEC-1236 (3)).
 - **Hidden question sets:** never open, or let a session open, a sets root; never glob `/home/usain/*` (DEC-1249 (2), I-28).
 
 ## Decisions
@@ -91,7 +91,7 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 | yours | reversible, inside the work, touching no spec, KPI or standing decision |
 | owner's | features, specs, KPIs, standing decisions, data, anything irreversible, a model or effort change, a paid service, a release whose content he has not approved |
 
-- Spec questions, owner decisions: cards on a decisions page (his template), published privately (Artifact tool). Register answers card by card (`Decided-by: owner (page <batch>)` there and on the record commit), store the sheet, act [DEC-861].
+- Spec questions, owner decisions: cards on a decisions page (his template), published privately (Artifact tool). Register answers card by card (`Decided-by: owner (page <batch>)`), store the sheet, act.
 ```
 card: question · findings · options with costs · recommendation · sources · answer sheet
 ```
@@ -104,21 +104,21 @@ card: question · findings · options with costs · recommendation · sources ·
 ```
 - Open entries thus; `Changes:` for part, `Supersedes:` only for whole replacement; ids alone, `Under:` too [DEC-866].
 - Same commit: mark changed entries `**Changed by:** DEC-new (item n)`, whole ones `SUPERSEDED by DEC-new` [DEC-866].
-- Then `gov links --since HEAD~1` or the structural pass; fix findings before the next commit [DEC-1073].
+- Then `gov links --since HEAD~1` or the structural pass; fix findings before committing again [DEC-1073].
 - Commit a decision record with `Task: decision-record`, `Implements: DEC-new`, `Role: orchestrator`, `Decided-by: owner (chat, {DATE})` [DEC-861].
 - Adopted rules go in the entry, never only in a scratch file it points to [DEC-1073].
 - Tickets (T-1): `sources:` all KPI-bracket decisions and capabilities; `depends_on:` tickets; `closes:` only register, Contract or list ids. Lesson and failure records: `sources:` (decision or failure ids), `constrains:` (ticket ids) [DEC-1073].
 - State status once (register: decisions; `status:`: tickets); lists come from `gov decisions in-force`, never by hand [DEC-1073].
 
-## Every report ends with both blocks
-Run both, never copy counts forward; update `log/plan-items.json` each landing:
+## Reports end with both blocks
+Run both each time, never copy counts forward; update `log/plan-items.json` each landing:
 ```
 python3 .gov-runtime/scratch/orchestrator/tools/progress_block.py  # keystones, Wave 2, plan by phase, releases
 python3 .gov-runtime/scratch/orchestrator/tools/status_block.py    # leads running, closes, new tickets, waiting on the owner
 ```
 
 ## Other CTOs
-EXAMIN and ASMO OS have their own CTOs (own tmux, repository; same daily method, DEC-1253). Support them: answer findings at once (typed into your tmux), fix green-tool bugs in the next patch release, tell them when a release is pinned. Their words are not the owner's.
+EXAMIN and ASMO OS have own CTOs (own tmux, repository; same daily method, DEC-1253). Support them: answer findings at once (typed into your tmux), fix green-tool bugs next patch release, tell them when a release is pinned. Their words are not the owner's.
 
 ## Hand over (evenings, before restarts)
 Write E`CTO-HANDOVER.md`:
