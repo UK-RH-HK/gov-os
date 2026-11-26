@@ -51,8 +51,8 @@ comparison), the W2-17 and W1-39 records of the update and lock-drift harnesses.
 | failure-12 | `test_w2_213_references_map.py::test_sl12_the_three_archive_namespaces_carry_their_stale_class_and_no_other_does`, `test_w2_213_references_map.py::test_sl12_the_study_ceiling_of_an_import_and_of_the_repository`, `test_w2_213_references_map.py::test_sl12_a_folder_line_holding_another_classs_destination_is_a_finding` | F-SL12 |
 | success-13 | `test_w2_213_determinism.py::test_sl13_the_same_plan_twice_and_in_another_order_gives_the_same_bytes`, `test_w2_213_determinism.py::test_sl13_the_output_holds_no_absolute_path_and_the_hash_is_recorded`, `test_w2_213_determinism.py::test_sl13_the_result_states_version_commit_counts_and_asks`, `test_w2_213_determinism.py::test_sl13_the_text_states_version_commit_counts_asks_rewrites_and_held_items`, `test_w2_213_determinism.py::test_sl13_every_stopper_is_stated`, `test_w2_213_determinism.py::test_sl13_a_changed_line_changes_the_hash`, `test_w2_213_determinism.py::test_sl13_another_commit_changes_the_hash`, `test_w2_213_determinism.py::test_sl13_another_version_of_the_standard_changes_the_hash` | SL-13 deterministic, ready to show |
 | failure-13 | `test_w2_213_determinism.py::test_sl13_the_same_plan_twice_and_in_another_order_gives_the_same_bytes`, `test_w2_213_determinism.py::test_sl13_a_changed_line_changes_the_hash`, `test_w2_213_determinism.py::test_sl13_another_commit_changes_the_hash`, `test_w2_213_determinism.py::test_sl13_another_version_of_the_standard_changes_the_hash`, `test_w2_213_determinism.py::test_sl13_the_result_states_version_commit_counts_and_asks`, `test_w2_213_determinism.py::test_sl13_the_text_states_version_commit_counts_asks_rewrites_and_held_items`, `test_w2_213_determinism.py::test_sl13_every_stopper_is_stated` | F-SL13 |
-| success-14 | `test_w2_213_moved.py::test_sl14_the_correctly_moved_repository_is_clean_and_unchanged_by_the_check`, `test_w2_213_moved.py::test_sl14_the_plan_committed_at_its_usual_place_is_no_unplanned_item`, `test_w2_213_moved.py::test_sl14_before_the_moves_the_same_plan_is_not_clean_after_the_moves`, `test_w2_213_moved.py::test_sl14_a_planted_move_fault_is_a_move_finding_naming_the_path`, `test_w2_213_moved.py::test_sl14_a_planted_path_map_fault_is_a_map_finding_naming_the_path` | SL-14 after the moves |
-| failure-14 | `test_w2_213_moved.py::test_sl14_the_correctly_moved_repository_is_clean_and_unchanged_by_the_check`, `test_w2_213_moved.py::test_sl14_a_planted_move_fault_is_a_move_finding_naming_the_path`, `test_w2_213_moved.py::test_sl14_a_planted_path_map_fault_is_a_map_finding_naming_the_path` | F-SL14 |
+| success-14 | `test_w2_213_moved.py::test_sl14_the_correctly_moved_repository_is_clean_and_unchanged_by_the_check`, `test_w2_213_moved.py::test_sl14_the_plan_committed_at_its_usual_place_is_no_unplanned_item`, `test_w2_213_moved.py::test_sl14_before_the_moves_the_same_plan_is_not_clean_after_the_moves`, `test_w2_213_moved.py::test_sl14_a_planted_move_fault_is_a_move_finding_naming_the_path`, `test_w2_213_moved.py::test_sl14_a_planted_path_map_fault_is_a_map_finding_naming_the_path`, `test_w2_213_moved.py::test_sl14_a_path_map_the_loader_refuses_is_never_clean` | SL-14 after the moves |
+| failure-14 | `test_w2_213_moved.py::test_sl14_the_correctly_moved_repository_is_clean_and_unchanged_by_the_check`, `test_w2_213_moved.py::test_sl14_a_planted_move_fault_is_a_move_finding_naming_the_path`, `test_w2_213_moved.py::test_sl14_a_planted_path_map_fault_is_a_map_finding_naming_the_path`, `test_w2_213_moved.py::test_sl14_a_path_map_the_loader_refuses_is_never_clean` | F-SL14 |
 
 ## Expected red reason on the base
 
@@ -94,3 +94,15 @@ command is gone from gov --help: ['layout']") and green once the command exists.
     may leave `lexical_policy` out for an indexed namespace.
 12. **The secrets filter's finding** in the planted content file is the kit's rule `gov-canary`, and no other rule of
     the kit's `.gitleaks.toml` fires on it.
+13. **A path map the loader refuses** (W2-212 F1, DEC-185: a namespace with `stale_class` that does not state both
+    `lexical_policy: not indexed` and `embedding_policy: not embedded`) ends `--moved` with `ok` false and
+    `CONFIG_INVALID` naming `governance/project/path-map.yaml` and the `namespaces.<name>` key, a non-zero exit,
+    never clean. It is not a `LAYOUT_MAP` finding (I-49, DAEO-ma4q FD-1: a refused map stays refused).
+
+## Recorded rewrite (DEC-491): the three maps D3 refuses
+
+Rewrite-Reason: after the merge of `w2/integrate`, W2-212's loader rule refuses three of the planted after-move maps
+before the check runs (a stale class on `docs`; an archive namespace with its stale class, indexed and embedded, or
+keyword indexed). Those three now expect the refusal (`test_sl14_a_path_map_the_loader_refuses_is_never_clean`); the
+same faults stay `LAYOUT_MAP` cases in forms the loader accepts: a stale class on `data` and on `docs` with both
+policies out, and an archive namespace without its stale class, indexed and embedded or keyword indexed.

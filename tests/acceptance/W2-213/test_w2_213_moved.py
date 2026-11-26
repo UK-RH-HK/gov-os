@@ -174,12 +174,17 @@ def _in_another_class(spaces):
 
 
 MAP_FAULTS = {
-    "an-archive-namespace-indexed-and-embedded": _policy(
-        "archive-superseded", lexical_policy="indexed", embedding_policy="embedded"),
-    "an-archive-namespace-keyword-indexed": _policy("archive-legacy", lexical_policy=None),
+    # Rewrite-Reason: W2-212 F1 (DEC-185): a namespace with a stale class and not both policies out is now refused by
+    # the loader (``REFUSED_MAPS`` below); the same three faults, in forms the loader accepts, stay LAYOUT_MAP.
+    "a-stale-class-on-data-both-policies-out": _policy("data", stale_class="legacy"),
+    "a-stale-class-on-docs-both-policies-out": _policy(
+        "docs", stale_class="legacy", lexical_policy="not indexed", embedding_policy="not embedded"),
+    "an-archive-namespace-indexed-and-embedded-without-a-stale-class": _policy(
+        "archive-superseded", stale_class=None, lexical_policy="indexed", embedding_policy="embedded"),
+    "an-archive-namespace-keyword-indexed-without-a-stale-class": _policy(
+        "archive-legacy", stale_class=None, lexical_policy=None),
     "an-archive-namespace-without-its-stale-class": _policy("archive-historical", stale_class=None),
     "an-archive-namespace-with-another-stale-class": _policy("archive-historical", stale_class="legacy"),
-    "a-stale-class-outside-the-archive": _policy("docs", stale_class="legacy"),
     "docs-not-embedded": _policy("docs", embedding_policy="not embedded"),
     "records-embedded": _policy("record", embedding_policy="embedded"),
     "data-indexed": _policy("data", lexical_policy=None),
@@ -205,3 +210,37 @@ def test_sl14_a_planted_path_map_fault_is_a_map_finding_naming_the_path(moved_re
     allowed = set(paths)
     others = [f for f in found if f.get("path") not in allowed and not any(p in support.text_of(f) for p in allowed)]
     assert not others, f"paths the map places rightly are reported: {others[:10]}"
+
+
+# fault -> (the namespace the loader names, the change): a stale class without both policies out (W2-212 F1)
+REFUSED_MAPS = {
+    "a-stale-class-outside-the-archive": ("docs", _policy("docs", stale_class="legacy")),
+    "an-archive-namespace-indexed-and-embedded": (
+        "archive-superseded", _policy("archive-superseded", lexical_policy="indexed", embedding_policy="embedded")),
+    "an-archive-namespace-keyword-indexed": (
+        "archive-legacy", _policy("archive-legacy", lexical_policy=None)),
+}
+
+
+@pytest.mark.parametrize("fault", sorted(REFUSED_MAPS))
+def test_sl14_a_path_map_the_loader_refuses_is_never_clean(moved_repo, work, tmp_path, fault):
+    """Rewrite-Reason: W2-212 F1 (DEC-185; I-49, DAEO-ma4q FD-1: a path map D3 refuses stays refused): every ``gov``
+    command refuses such a map before it runs, so the check ends ``CONFIG_INVALID`` naming the file and the
+    namespace, never clean."""
+    namespace, change = REFUSED_MAPS[fault]
+    root = support.copy_repository(moved_repo, tmp_path / "meadow")
+    document = support.load_yaml(root / support.MAP_REL)
+    change(document["namespaces"])
+    support.add_commit(root, {support.MAP_REL: yaml.safe_dump(document, sort_keys=False)})
+    before = support.snapshot(root)
+    run = _moved_check(work, root)
+    assert run.returncode != 0, f"a refused path map ends as clean\n{run.describe()}"
+    data = run.envelope()
+    error = data.get("error") or {}
+    assert data.get("ok") is False and data.get("command") == "layout" and error.get("code") == "CONFIG_INVALID", (
+        f"not the refusal of the path map\n{run.describe()}")
+    details = error.get("details") or {}
+    assert details.get("file") == support.MAP_REL and str(details.get("key")).startswith(
+        f"namespaces.{namespace}."), f"the refusal does not name the map and the namespace key\n{run.describe()}"
+    assert support.MAP_REL in str(error.get("message")) and namespace in str(error.get("message")), run.describe()
+    support.assert_unchanged(before, support.snapshot(root))
