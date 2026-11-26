@@ -160,3 +160,15 @@ Now a KPI line, with `plan_check.py` in the paths [added, DEC-1088 (5)(b); DEC-1
 ## Fix: the resource gate shut on cpu: reading null when an embedding server's process tree changed
 
 Cause: `machine._sample_servers` sums an embedding server's CPU over its process tree. When the model runner child exits, the sum falls below the kept samples of the same pid; `_window_rate` keeps only samples with `cpu_seconds <= cpu`, finds none and returns None, so `embedding_cpu_now` was null and the gate shut on `cpu`. Fix: a server with no kept sample at or below its current reading (a fall is a reset) is sampled afresh like a new pid. An unreadable or absent process still reads null. Tests: `tests/unit/resources/test_w2_20_gate_null.py` (G-NULL-1). W2-184, W2-156 and W2-60a keep reading the real gate: the product null is gone.
+
+## Fix: the product's test run sets the tools' PATH itself (plan item 1-13, FINDINGS I-6)
+
+Cause: no product test run adds the registry's Node 22 to `PATH`, so from a shell without node's bin `openspec` is
+absent and nine W1-30 and W2-02 cases read red on a green base. K-lines (approved by the CTO in the lead brief
+slot-path, 2026-11-26); a fix, the ticket stays closed.
+
+- **SP-1** The product's test run (the heavy slot's `test` kind, and the runs `gov accept`, `gov queue` and `gov close`
+  make) prepends the registry's pinned Node 22 bin to `PATH` for the run, read from the tool registry of the tree under
+  test, never a fixed path in code. Verify: the nine W1-30 and W2-02 cases pass from a shell whose `PATH` has no node.
+- **SP-2** `gov doctor` names the Node prefix the slot uses (`tools.node_prefix`), and says so by name when the
+  registry's node is missing (never a silent red). Verify: planted registry without node: doctor names it.
