@@ -1,5 +1,6 @@
 """``python3 -m gov.memaudit preflight|void|declare|measure|judge|classes|pool|pool-import|run|due|baseline|status|figures``
-(Interface section 1; S1-S8, F1; W2-172 adds the last five), and W2-187's ``standing declare|run|live``, ``maintain`` and ``push``.
+(Interface section 1; S1-S8, F1; W2-172 adds the last five), W2-187's ``standing declare|run|live``, ``maintain`` and ``push``,
+and ``forbidden-reach``.
 
 A thin wrapper: each subcommand calls its module's entry point and prints, through ``say`` only, the lines it produces
 (the W2-171 subcommands print as they go, a line at a time). Exit codes: 0 ok, 1 refused, 2 void or stopped (the owner
@@ -126,7 +127,7 @@ def _adopted(sub):
     ck.add_argument("--commit", metavar="REV", help="the commit whose file and tracked paths are read (default: the "
                                                     "working tree's file, HEAD's tracked paths)")
     ck.add_argument("--sets-root", metavar="ROOT", help=argparse.SUPPRESS)
-    from gov.memaudit import brief, deliver, fresh, writercheck, writerrun
+    from gov.memaudit import brief, deliver, forbiddenreach, fresh, writercheck, writerrun
     brief.add_arguments(sub.add_parser("brief", help="a writer's or checker's brief, filled from the configuration",
                                        description=brief.DESCRIPTION))
     deliver.add_arguments(sub.add_parser("deliver", help="take a writer's set or a checker's notes into the sets root",
@@ -137,6 +138,8 @@ def _adopted(sub):
                                            description=writerrun.DESCRIPTION))
     fresh.add_arguments(sub.add_parser("fresh", help="a whole fresh pair of halves on a pinned snapshot it builds",
                                        description=fresh.DESCRIPTION))
+    forbiddenreach.add_arguments(sub.add_parser("forbidden-reach", help="cited forbidden sources now outside memory",
+                                                description=forbiddenreach.DESCRIPTION))
 
 
 def _check(args, emit) -> str:
@@ -241,7 +244,7 @@ def _run(args, emit) -> str:
         return _standing(args, emit)
     if cmd == "check":
         return _check(args, emit)
-    if cmd in ("brief", "deliver", "fresh", "writer-check", "writer-run"):
+    if cmd in ("brief", "deliver", "fresh", "writer-check", "writer-run", "forbidden-reach"):
         import importlib
         return importlib.import_module(f"gov.memaudit.{cmd.replace('-', '')}").from_args(args, emit)
     from gov.memaudit import layout
