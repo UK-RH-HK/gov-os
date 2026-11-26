@@ -64,6 +64,6 @@ def mentions(text: str, source: str, targets: dict[str, bool], *, document: bool
             continue
         found.append((path, item))
     for item in targets:  # a path with a blank or another mark no token holds
-        if not _PLAIN.match(item) and re.search(rf"(?<![\w.\-]){re.escape(item)}(?![\w\-])", text):
+        if item in text and not _PLAIN.match(item) and re.search(rf"(?<![\w.\-]){re.escape(item)}(?![\w\-])", text):
             found.append((item, item))
     return found

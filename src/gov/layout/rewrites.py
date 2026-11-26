@@ -4,6 +4,7 @@ a tool-written record is kept as it is."""
 
 from __future__ import annotations
 
+from gov.layout.checks import ancestors
 from gov.layout.plan import Line
 from gov.layout.references import links, mentions, resolve
 from gov.layout.repo import Repo
@@ -62,6 +63,12 @@ def held_items(found: list, repo: Repo, std: Standard, moving: dict[str, Line]) 
     return held
 
 
+def moved_to(moving: dict[str, Line], path: str) -> str:
+    """Where ``path`` lies once the items of ``moving`` are at their destinations."""
+    item = next((head for head in ancestors(path) if head in moving), None)
+    return path if item is None else moving[item].dest + path[len(item):]
+
+
 def judge(repo: Repo, std: Standard, lines: list[Line], covered: dict[str, list[Line]]) -> tuple[list, list, list]:
     """``(rewrites, held, kept)`` of the plan, before any move."""
     moving = {line.path: line for line in lines if line.moving}
@@ -75,13 +82,12 @@ def judge(repo: Repo, std: Standard, lines: list[Line], covered: dict[str, list[
 
     def holder(path: str) -> bool:
         """Whether ``path`` is a held item or lies in one."""
-        return any(under(path, item) for item in held)
+        return any(head in held for head in ancestors(path))
+
+    going = {item: line for item, line in moving.items() if item not in held}
 
     def new(path: str) -> str:
-        for item, line in moving.items():
-            if item not in held and under(path, item):
-                return line.dest + path[len(item):]
-        return path
+        return moved_to(going, path)
 
     rewrites, kept = set(), set()
     for path, line, mentioned, item in found:

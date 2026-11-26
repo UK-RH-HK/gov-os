@@ -9,7 +9,7 @@ from gov.layout.namespaces import policies, study_memory
 from gov.layout.plan import Line, finding
 from gov.layout.repo import Repo
 from gov.layout.references import resolve
-from gov.layout.rewrites import KEPT, REWRITE, held_items, own_links, scan, treatment
+from gov.layout.rewrites import KEPT, REWRITE, held_items, moved_to, own_links, scan, treatment
 from gov.layout.rules import under
 from gov.layout.standard import ASK, Standard
 from gov.util.parts import PATH_MAP_REL, load_yaml_unique
@@ -41,11 +41,7 @@ def check(repo: Repo, std: Standard, lines: list[Line]) -> tuple[list, list, lis
     kept = sorted({(path, mentioned) for path, line, mentioned, item in found
                    if item not in held and treatment(repo, std, line, path) == KEPT})
     return (faults, [{"path": item, "by": by} for item in sorted(held) for by in sorted(held[item])],
-            [{"path": path, "target": mentioned, "new": moving_to(moving, mentioned)} for path, mentioned in kept])
-
-
-def moving_to(moving: dict[str, Line], path: str) -> str:
-    return next((line.dest + path[len(item):] for item, line in moving.items() if under(path, item)), path)
+            [{"path": path, "target": mentioned, "new": moved_to(moving, mentioned)} for path, mentioned in kept])
 
 
 def _places(lines: list[Line]) -> dict[str, Line]:
