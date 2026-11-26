@@ -133,12 +133,7 @@ def _round2_xhigh(launch):
     return result
 
 
-def _round2_probe(launch):
-    result = launch(AUD, FULL)
-    s.assert_session(result, s.SONNET, "max", criticality="C2", model_source="by criticality", effort_source="probe",
-                     review_round=2)
-    return result
-
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: the probe is retired, so round 3 and later launch the table's setting (Sonnet high, `effort_source` by criticality), no longer Opus max; the round limit itself is not touched.
 
 def test_r1_f2_a_second_round_on_xhigh_is_accepted(full, launch):
     """Not new behaviour: the second round may be run on another effort. Red on the base for want of the keys."""
@@ -148,7 +143,7 @@ def test_r1_f2_a_second_round_on_xhigh_is_accepted(full, launch):
 
 def test_r1_f2_a_third_round_with_no_option_after_a_second_on_xhigh_is_refused_naming_the_round_and_dec_1010(
         full, launch):
-    """Fails at the current head: round 3 is the probe's Opus max, which differs from rounds 1 (high) and 2 (xhigh), so
+    """Fails at the current head: round 3 is the table's high, which repeats round 1, so
     a launcher that refuses only a repeated setting accepts it."""
     _round1(launch)
     _round2_xhigh(launch)
@@ -161,33 +156,23 @@ def test_r1_f2_a_refused_third_round_leaves_no_record_so_the_owner_named_one_is_
     _round1(launch)
     _round2_xhigh(launch)
     s.refused(launch(AUD, FULL), "round", "3", "DEC-1010")
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.SONNET, "max", criticality="C2",
-                     model_source="by criticality", effort_source="probe", owner_named="DEC-123", review_round=3)
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.SONNET, "high", criticality="C2",
+                     model_source="by criticality", effort_source="by criticality", owner_named="DEC-123", review_round=3)
 
 
 def test_r1_f2_a_third_round_the_owner_named_is_accepted_and_recorded_after_a_second_on_xhigh(full, launch):
     """Red on the base for want of the option and the keys."""
     _round1(launch)
     _round2_xhigh(launch)
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.SONNET, "max", criticality="C2",
-                     model_source="by criticality", effort_source="probe", owner_named="DEC-123", review_round=3)
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-123"), s.SONNET, "high", criticality="C2",
+                     model_source="by criticality", effort_source="by criticality", owner_named="DEC-123", review_round=3)
 
 
-def test_r1_f2_a_third_round_on_another_effort_after_the_probe_is_refused_without_the_owner(full, launch):
-    """Round 2 the probe (Opus max), round 3 on ``--effort xhigh``: a setting never used before, so only the round
-    count refuses it. Fails at the current head (accepted)."""
+def test_r1_f2_a_third_round_on_another_effort_is_refused_without_the_owner(full, launch):
+    """Round 2 on xhigh, round 3 on ``--effort low``: a setting never used before, so only the round count refuses it."""
     _round1(launch)
-    _round2_probe(launch)
-    s.refused(launch(AUD, FULL, "--effort", "xhigh"), "round", "3", "DEC-1010")
-
-
-def test_r1_f2_a_third_round_after_the_probe_at_its_max_is_still_refused_without_the_owner(full, launch):
-    """The existing rule, kept: round 3 repeating the probe's Opus max is refused (and now also names the round and
-    DEC-1010). Also covered by ``test_w2_184_s4_reviews.py::test_s4_a_third_review_repeats_the_probe_and_is_refused_without_the_owner``,
-    which names the second record's session id and the setting."""
-    _round1(launch)
-    second = _round2_probe(launch)
-    s.refused(launch(AUD, FULL), second.session_id(), s.SONNET, "max")
+    _round2_xhigh(launch)
+    s.refused(launch(AUD, FULL, "--effort", "low"), "round", "3", "DEC-1010")
 
 
 def _round3_xhigh_owner_named(launch):
@@ -212,8 +197,8 @@ def test_r1_f2_the_owner_naming_a_decision_opens_a_fourth_round_too(full, launch
     _round1(launch)
     _round2_xhigh(launch)
     _round3_xhigh_owner_named(launch)
-    s.assert_session(launch(AUD, FULL, owner_named="DEC-124"), s.SONNET, "max", criticality="C2",
-                     model_source="by criticality", effort_source="probe", owner_named="DEC-124", review_round=4)
+    s.assert_session(launch(AUD, FULL, owner_named="DEC-124"), s.SONNET, "high", criticality="C2",
+                     model_source="by criticality", effort_source="by criticality", owner_named="DEC-124", review_round=4)
 
 
 @pytest.mark.parametrize("profile", ["STANDARD", "LITE"])

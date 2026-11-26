@@ -53,6 +53,11 @@ LEXICAL_POLICIES = (INDEXED, NOT_INDEXED)
 # ``not indexed`` with ``embedding_policy: embedded`` is refused (the CTO, P2): the vectors are built from the keyword
 # index's chunks, so such a namespace would get no vectors while claiming them. The value semantic retrieval embeds.
 EMBEDDED = "embedded"
+# A namespace's stale class (W2-212, DEC-1227 D3): optional; it needs both policies that keep the files out of the keyword
+# index and the vectors, so a class that still leaves them in the default bundle is CONFIG_INVALID, never fails open.
+STALE_CLASS = "stale_class"
+STALE_CLASSES = ("superseded", "historical", "legacy")
+NOT_EMBEDDED = "not embedded"
 # The rebuild's settings (``gov.rebuild.watch`` and ``seed`` read their own keys of it). ``embed_headers``: each chunk
 # embedded with its contextual header (DEC-1067 order (5)); ``true`` or ``false``, absent false (``embed_headers``).
 REBUILD_FILE = "rebuild.yaml"
@@ -139,7 +144,14 @@ def _validate_namespace(ns_name, ns_value, rel):
 
 def lexical_policy_fault(ns_value: dict) -> str | None:
     """Why the namespace's ``lexical_policy`` is refused, or None: a value other than ``LEXICAL_POLICIES`` (absent is
-    ``indexed``), or ``not indexed`` with ``embedding_policy: embedded``."""
+    ``indexed``), or ``not indexed`` with ``embedding_policy: embedded``; a ``stale_class`` outside
+    ``STALE_CLASSES``, or one without ``not indexed`` and ``not embedded`` (W2-212)."""
+    if STALE_CLASS in ns_value:
+        if ns_value[STALE_CLASS] not in STALE_CLASSES:
+            return f"{STALE_CLASS} must be one of {STALE_CLASSES}, not {ns_value[STALE_CLASS]!r}"
+        if ns_value.get(LEXICAL_POLICY) != NOT_INDEXED or ns_value.get("embedding_policy") != NOT_EMBEDDED:
+            return (f"a namespace with {STALE_CLASS} must state {LEXICAL_POLICY}: {NOT_INDEXED} and "
+                    f"embedding_policy: {NOT_EMBEDDED}, or its files stay in the default bundle")
     if LEXICAL_POLICY not in ns_value:
         return None
     if ns_value[LEXICAL_POLICY] not in LEXICAL_POLICIES:

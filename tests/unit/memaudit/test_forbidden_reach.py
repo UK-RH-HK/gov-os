@@ -1,6 +1,6 @@
 """FR-1 (DAEO-ma4q, fix ``forbidden-reach``): who holds a cited forbidden source, in the cases beyond the K-line's Verify:
-the order of the rules, D3's classifier where the tree has it, and the flags' faults. Everything is planted under
-``tmp_path``."""
+the order of the rules, D3's classifier where the tree has it, a path map D3 refuses, and the flags' faults. Everything
+is planted under ``tmp_path``."""
 
 from __future__ import annotations
 
@@ -17,6 +17,8 @@ from gov.memaudit import __main__ as cli
 from .conftest import AUDIT
 
 OUT = {"lexical_policy": "not indexed", "embedding_policy": "not embedded"}
+LEGACY = {"stale_class": "legacy", **OUT}  # D3 (W2-212 F1): a class without both policies is CONFIG_INVALID
+HISTORICAL = {"stale_class": "historical", **OUT}
 
 
 class Reach:
@@ -66,22 +68,21 @@ def line(cited, outside, inside, holders):
     return (0, [f"FORBIDDEN-REACH {cited} cited, {outside} outside, {inside} inside; {holders}"])
 
 
-def test_a_stale_class_without_either_policy_counts_as_outside(reach, capsys):
+def test_a_stale_class_without_either_policy_is_a_refused_map_and_no_count(reach, capsys):
     reach.namespaces(old={"paths": ["old/**"], "stale_class": "legacy"})
     reach.track("old/a.md")
     reach.miss("old/a.md")
-    assert reach.run(capsys) == line(1, 1, 0, "old: 1")
+    assert reach.run(capsys) == (4, ["ERROR: GovError"])
 
 
 def test_an_untracked_file_is_held_by_untracked_also_under_an_excluding_namespace(reach, capsys):
-    reach.namespaces(old={"paths": ["old/**"], "stale_class": "legacy", **OUT})
+    reach.namespaces(old={"paths": ["old/**"], **LEGACY})
     reach.write(reach.repo / "old/a.md", "never added\n")
     reach.miss("old/a.md")
     assert reach.run(capsys) == line(1, 1, 0, "untracked: 1")
 
 
-@pytest.mark.parametrize("first, second", [({"stale_class": "legacy"}, OUT), (OUT, {"stale_class": "legacy"}),
-                                           (OUT, OUT), ({"stale_class": "legacy"}, {"stale_class": "historical"})])
+@pytest.mark.parametrize("first, second", [(LEGACY, OUT), (OUT, LEGACY), (OUT, OUT), (LEGACY, HISTORICAL)])
 def test_of_two_excluding_namespaces_the_first_in_the_map_holds_the_file_once(reach, capsys, first, second):
     reach.namespaces(zed={"paths": ["old/**"], **first}, abc={"paths": ["old/**"], **second})
     reach.track("old/a.md")

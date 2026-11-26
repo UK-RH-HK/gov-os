@@ -91,7 +91,9 @@ ROLE_NAMES = (
     "research",
 )
 
-HOOK_SCRIPTS = (   # the five kernel hooks left (EMERGENCY-2 6.1: pretooluse.py and posttooluse.py retired)
+# Rewrite-Reason: DEC-1246 (3)(b): MR-4: the kit's model hook (agent_model.py) is a kernel hook; the kit's settings run it from governance/kernel/hooks.
+HOOK_SCRIPTS = (   # the five kernel hooks left (EMERGENCY-2 6.1: pretooluse.py and posttooluse.py retired), and agent_model.py
+    "agent_model.py",
     "context_watch.py",
     "precompact.py",
     "sessionstart.py",

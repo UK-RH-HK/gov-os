@@ -84,7 +84,8 @@ def test_s1_a_criticality_file_is_read_and_recorded_for_a_role_with_only_a_defau
 # A missing, unreadable or malformed file refuses, when it is read (1.3, 1.4)
 # --------------------------------------------------------------------------
 
-GOOD = {"version": 1, "default": "C2", "opus": s.OPUS, "rules": []}
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: the file has no `opus` key; one that carries it is refused.
+GOOD = {"version": 1, "default": "C2", "rules": []}
 
 
 def _text(**changes):
@@ -112,7 +113,7 @@ BAD_FILE = {
     "default-missing": _text(default=s.MISSING),
     "opus-an-alias": _text(opus="opus"),
     "opus-not-an-opus-model": _text(opus=s.SONNET),
-    "opus-missing": _text(opus=s.MISSING),
+    "opus-an-opus-model": _text(opus=s.OPUS),
     "rules-missing": _text(rules=s.MISSING),
     "rules-not-a-list": _text(rules={}),
     "an-extra-top-level-key": _text(note="x"),
@@ -199,13 +200,14 @@ def test_s1_ticket_criticality_is_the_highest_matching_class(tmp_path, allowed, 
     assert criticality.ticket_criticality(root, ticket) == cls
 
 
-def test_s1_opus_model_is_the_file_s_and_both_functions_read_the_file_at_each_call(tmp_path):
+def test_s1_the_criticality_function_reads_the_file_at_each_call(tmp_path):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: there is no Opus model in the file to read.
     from gov.launch import criticality
     root = _tree(tmp_path)
     ticket = _front(root, "DAEO-m002")
-    assert (criticality.opus_model(root), criticality.ticket_criticality(root, ticket)) == (s.OPUS, "C0")
-    s.write_criticality(root, s.crit_text(default="C2", opus="claude-opus-9-9"))
-    assert (criticality.opus_model(root), criticality.ticket_criticality(root, ticket)) == ("claude-opus-9-9", "C2")
+    assert criticality.ticket_criticality(root, ticket) == "C0"
+    s.write_criticality(root, s.crit_text(default="C2"))
+    assert criticality.ticket_criticality(root, ticket) == "C2"
 
 
 @pytest.mark.parametrize("what", ["missing", "malformed", "a-folder"])
@@ -219,7 +221,8 @@ def test_s1_the_criticality_functions_raise_launch_refused_naming_the_file(tmp_p
     elif what == "a-folder":
         (root / s.CRITICALITY_REL).unlink()
         (root / s.CRITICALITY_REL).mkdir()
-    for call in (lambda: criticality.ticket_criticality(root, ticket), lambda: criticality.opus_model(root)):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: `opus_model` is retired with the key.
+    for call in (lambda: criticality.ticket_criticality(root, ticket),):
         with pytest.raises(GovError) as raised:
             call()
         assert raised.value.code == "LAUNCH_REFUSED" and s.CRITICALITY_REL in raised.value.message, (

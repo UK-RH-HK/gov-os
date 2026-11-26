@@ -15,7 +15,7 @@ NAMESPACE_FIELDS = (
     "export_policy", "provenance", "deletion_rebuild",
 )
 
-NAMESPACE_OPTIONAL_FIELDS = ("embedding_policy",)
+NAMESPACE_OPTIONAL_FIELDS = ("embedding_policy", "stale_class")
 
 MEMORY_CLASSES = ("governance", "product")
 

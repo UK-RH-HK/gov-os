@@ -992,6 +992,35 @@ def _check_updates(root: Path) -> dict:
                 "reason": f"{type(exc).__name__}: {exc}"}
 
 
+def _check_stale_class(root: Path) -> dict:
+    """A notice (W2-212 SR-4, DEC-1227 D3): each namespace of the path map that states no ``stale_class`` and is stale
+    as a whole, with the three lines to add, or only in some of its paths, with those paths to move (``unclassed``).
+    Status ``report`` when there is one, else ``pass``; it never makes doctor unhealthy, and a path map that cannot be
+    read gives ``pass``."""
+    import yaml
+
+    from gov.retrieval.stale import unclassed
+    try:
+        document = yaml.safe_load((root / "governance" / "project" / "path-map.yaml").read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError):
+        document = None
+    found = [item if "paths" in item else
+             {**item, "add": [f"stale_class: {item['stale_class']}", "lexical_policy: not indexed",
+                              "embedding_policy: not embedded"]} for item in unclassed(document)]
+    if not found:
+        return {"status": "pass", "namespaces": []}
+    reasons = []
+    whole = ", ".join(str(item["namespace"]) for item in found if "add" in item)
+    if whole:
+        reasons.append(f"namespace(s) {whole} say superseded, historical, legacy or archive and state no stale_class, "
+                       "so their documents are in the default bundle: add the three lines under each (see `add`)")
+    mixed = ", ".join(str(item["namespace"]) for item in found if "paths" in item)
+    if mixed:
+        reasons.append(f"namespace(s) {mixed} say it in some of their paths only: move those paths into a namespace of "
+                       "their own with the stale class (see `paths` and `move`)")
+    return {"status": "report", "namespaces": found, "reason": "; ".join(reasons)}
+
+
 def _part(name: str, check, *args) -> dict:
     """What the part ``check`` gives. An exception it raises ends doctor as a GovError naming the part, the exception
     and its text (I4 finding 5): an envelope with ok false, never a bare traceback, and never a pass."""
@@ -1022,6 +1051,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
             "templates": _part("templates", _check_templates, root),
             "updates": _part("updates", _check_updates, root),
             "connectors": _part("connectors", _check_connectors, root),
+            "stale_class": _part("stale_class", _check_stale_class, root),
         }
     finally:
         _probe_deadline = None

@@ -60,6 +60,23 @@ def test_s4_the_version_is_1_1_0_in_the_front_matter_of_each_copy():
 # count or hunk count.
 DEC_1219_OLD, DEC_1219_NEW = "Contract v4.2 brings A7 and A10 into Wave 2", "Contract v5 has A7 and A10 in Wave 2"
 
+# Rewrite-Reason: W2-212 (D3, DAEO-d3sr; commits 35a9fdf58, 1548a28f0 and c17e20484, the kernel text approved in
+# docs/emergency-2/briefs/LEAD-d3-stale-route.md) added one section on `stale_class` to the same skill, before
+# "Independent gates". The cases admit that section alone, its text read from the last commit that changed it.
+W2_212_COMMIT = "c17e20484"
+W2_212_HEADING = b"## Stale class (W2-212, DEC-1227 D3)\n"
+W2_212_NEXT_HEADING = b"## Independent gates"
+
+
+def w2_212_section(rel):
+    """The bytes of W2-212's section in `rel` as commit c17e20484 holds it: from its heading up to the next one."""
+    blob = support.git("show", f"{W2_212_COMMIT}:{rel}").stdout
+    assert blob.count(W2_212_HEADING) == 1 and blob.count(W2_212_NEXT_HEADING) == 1, (
+        f"{W2_212_COMMIT}:{rel} has not one stale class section before one `Independent gates` heading")
+    section = blob[blob.index(W2_212_HEADING):blob.index(W2_212_NEXT_HEADING)]
+    assert b"stale_class" in section and b"\n## " not in section, f"{rel}: not the one stale_class section"
+    return section
+
 
 def test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_places():
     """The case keeps its W2-188 id. Against W2-188's base, the diff has five hunks of the ticket's and the later
@@ -67,7 +84,9 @@ def test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_
     paragraph, line 74 the sources line) and W2-192's stage AS insertion between them (a pure insertion after base
     line 29, 10 lines). Besides them, exactly one hunk is DEC-1219's re-wording of the Contract's name in the
     "Independent gates" sentence (base line 41, one line replaced by one line, `Contract v4.2` out, `Contract v5`
-    in); it is set aside and counted nowhere else. Any other extra hunk, or a moved one, is red."""
+    in), and exactly one is W2-212's `stale_class` section (a pure insertion after base line 38, its lines those of
+    the section at commit c17e20484); both are set aside and counted nowhere else. Any other extra hunk, or a moved
+    one, is red."""
     bodies = support.kernel_hunk_bodies()
     renames = [(hunk, body) for hunk, body in bodies
                if hunk[:2] == (41, 1) and hunk[3] == 1 and len(body) == 2
@@ -76,8 +95,14 @@ def test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_
     assert len(renames) == 1, (
         f"the diff has no one-line hunk at base line 41 re-wording `{DEC_1219_OLD}` to `{DEC_1219_NEW}` (DEC-1219): "
         f"{[hunk for hunk, _ in bodies]}")
-    hunks = [hunk for hunk, _ in bodies if hunk != renames[0][0]]
-    assert len(hunks) == 5, f"`git diff --unified=0 <base>` of the kernel skill has {len(hunks)} hunks besides DEC-1219's, not 5: {hunks}"
+    section = ["+" + line for line in w2_212_section(support.KERNEL_REL).decode("utf-8").splitlines()]
+    stale = [hunk for hunk, body in bodies if hunk[:2] == (38, 0) and body == section]
+    assert len(stale) == 1, (
+        f"the diff has no pure insertion after base line 38 holding W2-212's stale_class section as at "
+        f"{W2_212_COMMIT}: {[hunk for hunk, _ in bodies]}")
+    hunks = [hunk for hunk, _ in bodies if hunk not in (renames[0][0], stale[0])]
+    assert len(hunks) == 5, (f"`git diff --unified=0 <base>` of the kernel skill has {len(hunks)} hunks besides "
+                             f"DEC-1219's and W2-212's, not 5: {hunks}")
     (v_old, v_len, _, _), (as_old, as_len, _, as_new), (s_old, s_len, _, _), (p_old, p_len, _, p_new), (g_old, g_len, _, _) = hunks
     assert (v_old, v_len) == (4, 1), f"hunk 1 is not the version line (base line 4): base lines {v_old}+{v_len}"
     assert (as_old, as_len, as_new) == (29, 0, 10), (
@@ -160,7 +185,8 @@ def test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_afte
     (sha256 `65d6abd9...dbc`, the ACT's regeneration after the owner's approval), or exactly the later copies ACT's
     after-bytes (sha256 `93b04fc6...c5d`, commit e64430373, W2-192's stage AS), or those bytes with the one sentence
     DEC-1219 re-worded (`Contract v4.2 brings A7 and A10 into Wave 2 in a lite form` to `Contract v5 has A7 and A10
-    in Wave 2 in a lite form`, commit d515d0430); any other bytes mean the ticket wrote it."""
+    in Wave 2 in a lite form`, commit d515d0430), or those last bytes with W2-212's `stale_class` section (as at
+    commit c17e20484) inserted before the `Independent gates` heading; any other bytes mean the ticket wrote it."""
     now = support.read_bytes(support.CLAUDE_COPY_REL)
     then = support.base_blob(support.CLAUDE_COPY_REL)
     if now == then:
@@ -171,10 +197,14 @@ def test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_afte
     w2_192 = support.git("show", f"{W2_192_COMMIT}:{support.CLAUDE_COPY_REL}").stdout
     assert support.sha256_of(w2_192) == ACT_CLAUDE_COPY_SHA256_W2_192, f"{W2_192_COMMIT}'s copy is not W2-192's bytes"
     assert w2_192.count(DEC_1219_SENTENCE[0]) == 1
-    assert now == w2_192.replace(*DEC_1219_SENTENCE), (
+    dec_1219 = w2_192.replace(*DEC_1219_SENTENCE)
+    assert dec_1219.count(W2_212_NEXT_HEADING) == 1
+    w2_212 = dec_1219.replace(W2_212_NEXT_HEADING,
+                              w2_212_section(support.CLAUDE_COPY_REL) + W2_212_NEXT_HEADING)
+    assert now in (dec_1219, w2_212), (
         f"{support.CLAUDE_COPY_REL} has sha256 {found}: neither the base's ({support.sha256_of(then)}) "
         f"nor a copies ACT's after-bytes ({ACT_CLAUDE_COPY_SHA256}, {ACT_CLAUDE_COPY_SHA256_W2_192}) "
-        f"nor W2-192's with DEC-1219's one sentence")
+        f"nor W2-192's with DEC-1219's one sentence, with or without W2-212's stale_class section")
 
 
 def test_f2_no_commit_of_the_ticket_outside_the_test_designer_or_the_copies_act_touches_claude_or_tests():

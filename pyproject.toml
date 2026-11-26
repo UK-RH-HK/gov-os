@@ -34,6 +34,7 @@ where = ["src"]
          # the standard gov layout check judges by (gov.layout.standard; W2-213)
          "_shipped/template/governance/kernel/standard.yaml",
          "_shipped/governance/project/retrieval.yaml",
+         "_shipped/governance/project/usage-prices.yaml",  # gov usage (W2-207, UR-6): the price table, found from any root
          "_shipped/governance/project/indep-walls/CLAUDE.md.tmpl",
          "_shipped/governance/project/indep-walls/README.md",
          "_shipped/governance/project/indep-walls/kinds.yaml",

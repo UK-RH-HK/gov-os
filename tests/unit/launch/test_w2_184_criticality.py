@@ -15,9 +15,10 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.cli.errors import GovError  # noqa: E402
 from gov.launch import criticality  # noqa: E402
 
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: criticality.yaml has no `opus` key and `opus_model` is retired with it; a file that carries `opus` is refused.
+
 FILE = """version: 1
 default: C2
-opus: claude-opus-5-5
 rules:
   - class: C3
     paths: [".claude/hooks/*", "src/gov/guard/*"]
@@ -92,26 +93,24 @@ def test_a_ticket_without_a_list_of_paths_has_no_path_match(tmp_path, ticket):
     assert criticality.ticket_criticality(_write(tmp_path, FILE), ticket) == "C2"
 
 
-def test_the_opus_model_is_the_file_s(tmp_path):
-    assert criticality.opus_model(_write(tmp_path, FILE)) == "claude-opus-5-5"
+def test_the_file_holds_version_default_and_rules_only(tmp_path):
+    assert set(criticality.load(_write(tmp_path, FILE))) == {"version", "default", "rules"}
 
 
 def test_the_file_is_read_at_each_call(tmp_path):
     _write(tmp_path, FILE)
-    assert criticality.opus_model(tmp_path) == "claude-opus-5-5"
-    _write(tmp_path, FILE.replace("claude-opus-5-5", "claude-opus-6-0"))
-    assert criticality.opus_model(tmp_path) == "claude-opus-6-0"
+    assert criticality.ticket_criticality(tmp_path, _ticket()) == "C2"
+    _write(tmp_path, FILE.replace("default: C2", "default: C1"))
+    assert criticality.ticket_criticality(tmp_path, _ticket()) == "C1"
 
 
 def test_a_missing_file_refuses_naming_it(tmp_path):
     with pytest.raises(GovError, match="governance/project/criticality.yaml") as caught:
         criticality.ticket_criticality(tmp_path, _ticket())
     assert caught.value.code == "LAUNCH_REFUSED"
-    with pytest.raises(GovError, match="governance/project/criticality.yaml"):
-        criticality.opus_model(tmp_path)
 
 
-GOOD = {"version": 1, "default": "C2", "opus": "claude-opus-5-5", "rules": []}
+GOOD = {"version": 1, "default": "C2", "rules": []}
 
 
 def _yaml(**change):
@@ -132,7 +131,7 @@ def _yaml(**change):
     _yaml(default="c2"),
     _yaml(opus="claude-sonnet-5-5"),
     _yaml(opus="claude-opus"),
-    _yaml(opus="Claude-Opus-5-5"),
+    _yaml(opus="claude-opus-5-5"),
     _yaml(rules=...),
     _yaml(rules={"class": "C3"}),
     _yaml(rules=["C3"]),
@@ -149,7 +148,7 @@ def _yaml(**change):
 ))
 def test_a_malformed_file_refuses(tmp_path, text):
     with pytest.raises(GovError, match="governance/project/criticality.yaml") as caught:
-        criticality.opus_model(_write(tmp_path, text))
+        criticality.load(_write(tmp_path, text))
     assert caught.value.code == "LAUNCH_REFUSED"
 
 
@@ -159,7 +158,7 @@ def test_a_file_with_no_rules_is_well_formed(tmp_path):
 
 def test_the_project_s_own_file_is_well_formed_and_places_this_ticket_at_c2():
     from gov.util.tickets import _load_ticket
-    assert criticality.opus_model(REPO).startswith("claude-opus")
+    assert "opus" not in criticality.load(REPO)
     ticket = _load_ticket(str(REPO), "DAEO-6f0s")
     if ticket is None:  # the ticket lives in the main checkout's .tickets
         ticket = {"profile": "FULL", "allowed_paths": ["src/gov/launch/launcher.py"]}

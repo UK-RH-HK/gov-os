@@ -24,6 +24,10 @@ Not the whole ``schemas/`` folder: a kernel schema the product does not read is 
 W2-195 (DAEO-d8df; DEC-1204 (5), S4 "the shipped-folder lists include it exactly"; the lead's interface item 7): the kernel skill
 ``judging-work`` ships, so ``template/governance/kernel/skills/judging-work`` is one more item (``the-judging-work-skill``), the
 ``template/`` prefix kept; both cases hold it as they hold the others. Mapped in ``tests/acceptance/W2-195/README.md``.
+
+DAEO-stdl (W2-213; SL-4, DEC-1189 (1); a recorded rewrite by the independent test designer, DEC-491): the layout standard ships, so
+``template/governance/kernel/standard.yaml`` is one more item (``the-layout-standard``), the ``template/`` prefix kept; both cases hold it
+as they hold the others.
 """
 
 from __future__ import annotations
@@ -55,6 +59,12 @@ ITEMS = {
     "the-common-schema": "template/governance/kernel/schemas/common.schema.json",
     # W2-195 (DAEO-d8df; DEC-1204 (5), S4): the judging-work kernel skill ships in the wheel.
     "the-judging-work-skill": "template/governance/kernel/skills/judging-work",
+    # DAEO-rt4s (fix UR-6; a recorded rewrite by the independent test designer, DEC-491): ``gov usage`` finds its price table from any root,
+    # so the committed table ships as a copy.
+    "the-usage-price-table": "governance/project/usage-prices.yaml",
+    # DAEO-stdl (W2-213, SL-4; DEC-1189 (1); a recorded rewrite by the independent test designer, DEC-491): ``gov layout check`` reads the
+    # standard through ``fabric.shipped``, so it ships; one file, never the whole kernel folder.
+    "the-layout-standard": "template/governance/kernel/standard.yaml",
 }
 
 

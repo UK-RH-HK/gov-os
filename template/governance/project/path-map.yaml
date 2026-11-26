@@ -6,6 +6,7 @@ namespaces:
       - governance/kernel/**
       - governance/framework.lock
       - .copier-answers.yml
+      - .claude/hooks/agent_model.py
   project:
     paths:
       - governance/project/**

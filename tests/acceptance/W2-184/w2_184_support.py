@@ -114,8 +114,12 @@ def write_role(project, role, table="own", full=None, lines=(), default=DEFAULT)
     return b.write(b.role_path(project, role), role_file(role, table, full, lines, default))
 
 
-def crit_text(default="C0", opus=OPUS, rules="own", version=1):
-    data = {"version": version, "default": default, "opus": opus, "rules": RULES if rules == "own" else rules}
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: criticality.yaml no longer has an `opus` key (a file that carries one is refused); `opus` is written
+# only when a case passes a value, to plant the refused form.
+def crit_text(default="C0", opus=None, rules="own", version=1):
+    data = {"version": version, "default": default, "rules": RULES if rules == "own" else rules}
+    if opus is not None:
+        data["opus"] = opus
     return yaml.safe_dump(data, sort_keys=False)
 
 

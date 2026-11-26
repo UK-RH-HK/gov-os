@@ -199,6 +199,10 @@
         "retention": { "$ref": "#/$defs/text" },
         "export_policy": { "$ref": "#/$defs/text" },
         "embedding_policy": { "$ref": "#/$defs/text" },
+        "stale_class": {
+          "description": "Optional (W2-212): the namespace holds superseded, historical or legacy documents, kept out of `gov retrieve`'s default bundle and found on purpose. It needs `lexical_policy: not indexed` and `embedding_policy: not embedded`.",
+          "enum": ["superseded", "historical", "legacy"]
+        },
         "provenance": { "$ref": "#/$defs/text" },
         "deletion_rebuild": { "$ref": "#/$defs/text" }
       }

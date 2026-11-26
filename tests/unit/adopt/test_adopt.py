@@ -31,7 +31,13 @@ PATHS = ("lib/**", "scripts/**", "docs/**", "audit/**", "pkg/**", "README.md", "
 
 
 def config(code_intelligence=True, paths=PATHS, policy="embedded"):
-    return {"path-map.yaml": {"namespaces": {"all": {"paths": list(paths), "embedding_policy": policy}},
+    # A path saying legacy is a namespace of its own with the stale class (W2-212: A3 refuses it in an unclassed one)
+    old = [path for path in paths if path.startswith("legacy/")]
+    spaces = {"all": {"paths": [path for path in paths if path not in old], "embedding_policy": policy}}
+    if old:
+        spaces["legacy_memory"] = {"paths": old, "stale_class": "legacy", "lexical_policy": "not indexed",
+                                   "embedding_policy": "not embedded"}
+    return {"path-map.yaml": {"namespaces": spaces,
                               "capabilities": {"code_intelligence": {"enabled": code_intelligence}}}}
 
 

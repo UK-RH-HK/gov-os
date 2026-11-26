@@ -1,12 +1,12 @@
 """A ticket's criticality (RUBRIC-2 at launch, W2-184; DEC-1120 (1), DEC-1167 (2)).
 
-``governance/project/criticality.yaml`` holds the project's rules: a default class, the Opus model a promotion and a
-FULL ticket's probe use, and a list of rules, each giving a class (C0..C3) to the tickets whose ``allowed_paths`` match
+``governance/project/criticality.yaml`` holds the project's rules: a default class and a list of rules, each giving a class (C0..C3) to the tickets whose ``allowed_paths`` match
 its globs or whose ``profile`` it names. A ticket's criticality is the highest class among the rules that match, the
 default when none does. The ticket's ``class`` key is never read: it is the ticket's kind. The file is read at each
 call; one that cannot be read or is not of the stated form refuses the launch (fail closed). A launch of a project with
 no file at all does not call here: it is as before W2-184 (interface 1.4, amended 2026-11-14; DEC-1167 (2)). Called
-directly with no file, ``ticket_criticality`` and ``opus_model`` refuse (1.3).
+directly with no file, ``ticket_criticality`` refuses (1.3). Since DEC-1246 (3)(b) (MR-2) a class picks no model: the file has
+no ``opus`` key (one that still carries it is refused, naming it), and no promotion or probe on Opus exists.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ REL = "governance/project/criticality.yaml"
 CLASSES = ("C0", "C1", "C2", "C3")  # lowest first: the position is the rank
 PROFILES = ("FULL", "STANDARD", "LITE")
 OPUS = re.compile(r"claude-opus(?:-[a-z0-9]+)+")
-_KEYS = frozenset({"version", "default", "opus", "rules"})
+_KEYS = frozenset({"version", "default", "rules"})
 _COMMENT = re.compile(r"\s+#.*$")
 
 
@@ -61,14 +61,15 @@ def load(root: Path) -> dict:
         data = load_yaml_unique((Path(root) / REL).read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, yaml.YAMLError):
         raise _refuse("cannot be read, is not YAML, or writes a key twice") from None
+    if isinstance(data, dict) and "opus" in data:
+        raise _refuse("the key 'opus' is retired (DEC-1246 (3)(b)): a class picks no model, and no promotion or probe "
+                      "runs Opus; the models are governance/project/role-table.yaml's")
     if not isinstance(data, dict) or set(data) != _KEYS:
         raise _refuse(f"must be a map with exactly the keys {', '.join(sorted(_KEYS))}")
     if data["version"] != 1 or isinstance(data["version"], bool):
         raise _refuse("version must be the integer 1")
     if data["default"] not in CLASSES:
         raise _refuse(f"default is one of {', '.join(CLASSES)}")
-    if not isinstance(data["opus"], str) or not OPUS.fullmatch(data["opus"]):
-        raise _refuse("opus must be an Opus model id (claude-opus-...)")
     if not isinstance(data["rules"], list):
         raise _refuse("rules must be a list")
     for index, rule in enumerate(data["rules"]):
@@ -97,7 +98,3 @@ def ticket_criticality(root: Path, ticket: dict) -> str:
             found.append(rule["class"])
     return max(found, key=CLASSES.index, default=data["default"])
 
-
-def opus_model(root: Path) -> str:
-    """The Opus model a promotion and a FULL ticket's probe use."""
-    return load(root)["opus"]

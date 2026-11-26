@@ -63,7 +63,7 @@ EXCUSED_UNTIL_RECORDED = ("release",)
 # Once W1-07's lines record them too, the overlap changes nothing.
 RECORDED_HERE = ("adapters", "dispatch", "session-watch", "wait",
                  "install", "msg", "update", "discover", "memory-use", "queue", "backup", "decisions", "memaudit",
-                 "spend", "layout")  # layout: W2-213 (gov layout check, DAEO-stdl; DEC-1256); EMERGENCY-2 6.1, 6.3 (W2-18, W2-17, DAEO-5rgj, W2-36, W2-197, W2-115b, W2-198; a fix, 4.2); spend: W2-156 (gov spend check/clear/sum, 50505b081; closed)
+                 "spend", "usage", "layout")  # usage: W2-207 (DEC-1246 (3)(c), approved by the CTO's brief; gov usage daily/show); layout: W2-213 (gov layout check, DAEO-stdl; DEC-1256); EMERGENCY-2 6.1, 6.3 (W2-18, W2-17, DAEO-5rgj, W2-36, W2-197, W2-115b, W2-198; a fix, 4.2); spend: W2-156 (gov spend check/clear/sum, 50505b081; closed)
 
 
 def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project, sandbox):
@@ -107,6 +107,11 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     else in the case changes, and ``RECORDED_HERE`` stays as it is.
 
     Revised for DEC-747 (W2-104): ``skilleval`` is recorded, so the recorded ``gov`` commands are ten.
+
+    Revised for DAEO-rt4s (fix UR-5 to UR-7; a recorded rewrite by the independent test designer, DEC-491): ``usage``
+    (W2-207, DEC-1246 (3)(c); recorded in ``RECORDED_GOV_COMMANDS`` of ``src/gov/check/commands.py`` and approved by the
+    CTO's brief) is recorded in ``RECORDED_HERE``, so ``gov --help`` offering it is no longer an unrecorded command;
+    the first assert's set is unchanged and the case stays exact otherwise.
 
     Revised for W2-213 slice 1 (DAEO-stdl; DEC-1256; a recorded rewrite by the test designer, DEC-491): the ticket's
     KPI SL-5 adds the command ``gov layout check``, so ``layout`` is recorded in ``RECORDED_HERE``; nothing else in the

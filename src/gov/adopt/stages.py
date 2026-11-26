@@ -19,10 +19,12 @@ from pathlib import Path, PurePosixPath
 import yaml
 
 from gov.adopt import lite_gates, project, safety, spec_audit
+from gov.adopt import verdict as lite_verdict
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
 from gov.adopt import coordination as roster_key
 from gov.retrieval.semantic import EMBEDDED
+from gov.retrieval.stale import STALE_DESCRIBED, STALE_WORDS, stale_words as _stale_words, unclassed
 from gov.tasks import tickets
 
 ACTIONS = ("KEEP", *MOVING, "RETIRE", "DELETE_FROM_ACTIVE_TREE")  # CAP-06.b
@@ -62,6 +64,9 @@ def run(root: Path, args, config: dict) -> dict:
         project.require_commit(root)
         safety.refuse_ignored(root)  # S26: before anything else, at once
         return ma(Run(root, args, config, "MA", {}, {}, {}))
+    if args.stage == "VERDICT":  # W2-210: no chain; the stage reads the owner's file, then the clean tree, itself
+        project.require_commit(root)
+        return lite_verdict.stage(Run(root, args, config, "VERDICT", {}, {}, {}))
     project.require_repository(root)
     tracked = project.tree(root)
     if args.stage in lite_gates.GATES:  # A7 and A10 are in no chain: each reads the records it stands on itself
@@ -451,6 +456,43 @@ def _embedding_policies(config: dict) -> None:
                      none_embedded=bool(none))
 
 
+def _stale_classes(config: dict) -> list[dict]:
+    """Refuse (ADOPT_STALE_CLASS) a namespace that is stale as a whole and states no ``stale_class`` (W2-212, DEC-1227
+    D3; ``unclassed``). Returns the notices: a namespace only some of whose paths say it, and one only a description
+    field says it of. The value of a class stated is the loader's (CONFIG_INVALID), not judged here."""
+    path_map = config.get("path-map.yaml")
+    spaces = path_map.get("namespaces") if isinstance(path_map, dict) else None
+    if not isinstance(spaces, dict):
+        return []
+    found = {item["namespace"]: item for item in unclassed(path_map)}
+    faults = {name: item for name, item in found.items() if "paths" not in item}
+    if faults:
+        lines = [f"namespace `{name}` says {', '.join(item['words'])} in its name or paths and states no stale_class"
+                 for name, item in faults.items()]
+        raise refuse("STALE_CLASS", "the path map is not recorded: " + "; ".join(lines) + "; give each stale_class: "
+                     "superseded, historical or legacy (archive is historical) with lexical_policy: not indexed and "
+                     "embedding_policy: not embedded, so its documents stay out of the default bundle",
+                     namespaces=list(faults), classes={name: item["stale_class"] for name, item in faults.items()})
+    notices = []
+    for name, space in spaces.items():
+        if not isinstance(space, dict) or "stale_class" in space:
+            continue
+        if name in found:
+            item = found[name]
+            notices.append({"namespace": name, "words": item["words"], "paths": item["paths"],
+                            "notice": f"namespace `{name}` says {', '.join(item['words'])} in some of its paths only "
+                                      f"and states no stale_class: {item['move']}"})
+            continue
+        said = _stale_words(*(space.get(field, "") for field in STALE_DESCRIBED))
+        if said:
+            notices.append({"namespace": name, "words": said,
+                            "notice": f"namespace `{name}` describes itself as {', '.join(said)} but states no "
+                                      f"stale_class: if its documents are stale, add stale_class: "
+                                      f"{STALE_WORDS[said[0]]}, lexical_policy: not indexed, embedding_policy: "
+                                      "not embedded"})
+    return notices
+
+
 def _assessment(run: Run) -> dict:
     """What A3's record says of the memory assessment (W2-88 R1 (b)): ``none`` without ``--assessment``; with it, the
     sha256 of its ``memory-assessment.json`` for HEAD's commit (no proposal of it is copied), else ASSESSMENT_MISSING."""
@@ -475,6 +517,7 @@ def a3(run: Run) -> dict:
     audited = spec_audit.gate(run)  # W2-192 S3: AS is recorded, stands on A2, is complete, before any other check
     cited = _assessment(run)  # before anything is recorded
     _embedding_policies(run.config)
+    notices = _stale_classes(run.config)
     proposal = _proposal(run.args.map)
     inventory = {item["path"]: item for item in run.records["A1"]["artefacts"]}
     unknown, entries, claimed, problems = project.unknown(run.config, run.tracked), {}, {}, []
@@ -504,7 +547,8 @@ def a3(run: Run) -> dict:
     artefacts = [entries.get(rel, {"path": rel, "action": "KEEP"}) for rel in inventory]
     return run.finish({"proposal_sha256": project.sha256(Path(run.args.map).read_bytes()), **cited,
                        "spec_audit": audited,
-                       "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts})
+                       "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts},
+                      **({"notices": notices} if notices else {}))
 
 
 def _plan(run: Run) -> dict:
@@ -716,4 +760,4 @@ def a8(run: Run) -> dict:
 
 
 STAGE = {"A0": a0, "A1": a1, "A2": a2, "AS": spec_audit.stage, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
-         "A9": a9, "A10": lite_gates.gate, "MA": ma}
+         "A9": a9, "A10": lite_gates.gate, "VERDICT": lite_verdict.stage, "MA": ma}

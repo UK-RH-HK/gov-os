@@ -46,6 +46,20 @@ Every namespace of the target path map states its `embedding_policy`, as one of 
 
 Stage A3 refuses a path map in which a namespace states another value or none, or in which no namespace is `embedded`; it records nothing. Outside adoption an unknown or missing value is read as `not embedded` (DEC-388), and `gov rebuild` and `gov doctor` say "no namespace is embedded" where none is.
 
+## Stale class (W2-212, DEC-1227 D3)
+
+A namespace whose documents are superseded, historical or legacy states `stale_class`, one of `superseded`, `historical` or `legacy`, never guessed from a name. With it the namespace states both policies that keep it out of default memory, or the path map is CONFIG_INVALID naming the namespace:
+
+```yaml
+stale_class: legacy
+lexical_policy: not indexed
+embedding_policy: not embedded
+```
+
+`gov retrieve` then leaves those documents out of its default bundle, on every route, even if they were indexed before the class existed; they are found on purpose with `gov retrieve --include-stale` or a question that names the file's path, listed under `stale`, each marked `stale: true` with its `stale_class`.
+
+Stage A3 refuses (`ADOPT_STALE_CLASS`), naming it and recording nothing, a namespace without `stale_class` whose name, or every path, holds the word superseded, historical, legacy or archive (archive is `historical`; whole words). If only some paths or a description field do, A3 records, with a notice under `notices`; move such paths into a classed namespace of their own, never class a catch-all. `gov doctor`'s `stale_class` part reports both, never failing.
+
 ## Independent gates (A7 and A10 lite; the rest Wave 3)
 
 Contract v5 has A7 and A10 in Wave 2 in a lite form (CAP-44.f, DEC-741). Each is recorded as its own stage: `gov adopt --lite --stage A7` (or `A10`) `--verdict <path>`, run by the session that ran the stages on the committed record of a fresh Independent Auditor session. That record states `stage`, `verdict` (only `pass` passes), an `auditor_session` that ran no stage, and `checked`: each record checked, with its sha256 at HEAD. It is committed with `Role: independent-auditor`. The gate commits its own record under `governance/adoption/`, with its conditions; a gate that fails commits a failing record.

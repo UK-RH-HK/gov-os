@@ -14,7 +14,9 @@ each reason (each reason has a stable id, and an owner's exceptions that name ev
   (the spec audit, between A2 and A3: ``AS-spec-audit.md``), and as
   ``PROVISIONAL`` names them for A7 and A10 (the names the lite gates write; built when
   ``gov.adopt.command.STAGES`` lists them; found only with ``result: pass``, the gate's own
-  word, since a gate commits its record when it fails too) and the lite verdict (not built yet);
+  word, since a gate commits its record when it fails too) and the lite verdict (built when
+  ``gov.adopt.command.STAGES`` lists ``VERDICT``; found only when well formed, W2-210 V5: ``verdict`` one of the three,
+  ``lite`` true, ``conditions`` and ``conditions_not_checked`` lists, and the verdict agreeing with the conditions);
 - the findings ``governance/adoption/findings/*.md`` (CAP-44.g, not built: provisional form);
 - the project's path map ``governance/project/path-map.yaml`` (its namespaces' ``embedding_policy``);
 - the index ``.gov-runtime/store.db`` (``lexical_chunk.path``, ``semantic_vector.chunk_id``);
@@ -70,7 +72,7 @@ LEAVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT", "RETIRE", "DELETE_FROM
 from w2_81_score import E2E_BAR  # noqa: E402 - the one bar: memory judged end to end, 95 % per repository (DEC-1221 (1))
 
 # The record names of the stages project.record_path does not name: A7 and A10 as the lite gates write them
-# (gov.adopt.lite_gates.record_path), and the lite verdict, not built yet (README, "The judge").
+# (gov.adopt.lite_gates.record_path), and the lite verdict as gov.adopt.verdict writes it (README, "The judge").
 PROVISIONAL = {"A7": f"{FOLDER}/A7-independent-migration-verification.md",
                "A10": f"{FOLDER}/A10-independent-memory-verification.md",
                "VERDICT": f"{FOLDER}/VERDICT-lite.md"}
@@ -104,7 +106,9 @@ CAPABILITIES = {
                               "(built when gov.adopt.command.STAGES lists A7)"),
     "A10": ("CAP-44.f", False, "the lite A10 gate: independent memory verification "
                                "(built when gov.adopt.command.STAGES lists A10)"),
-    "VERDICT": ("CAP-44.h", False, "the lite adoption verdict"),
+    # VERDICT: built or not as gov.adopt.command.STAGES lists it (built_today(), W2-210 V5); the flag here is not read.
+    "VERDICT": ("CAP-44.h", False, "the lite adoption verdict "
+                                   "(built when gov.adopt.command.STAGES lists VERDICT)"),
 }
 NEEDS = {"stale-spec": ("A2-content-class", "findings"),  # either one suffices
          "superseded-plan": ("A2-content-class",), "misleading-name": ("A2-content-class",),
@@ -150,14 +154,14 @@ class JudgeError(Exception):
 
 
 def built_today():
-    """Today's built capabilities. A7 and A10 count as built exactly when the adoption command's own stage list,
-    ``gov.adopt.command.STAGES`` (what ``gov adopt --lite --stage`` accepts), names them; never from
+    """Today's built capabilities. A7, A10 and VERDICT count as built exactly when the adoption command's own stage
+    list, ``gov.adopt.command.STAGES`` (what ``gov adopt --lite --stage`` accepts), names them; never from
     ``gov.adopt.project.STAGES``, which lists only the stages whose records ``project.record_path`` names (S-STAGES,
-    DEC-1197 (2))."""
+    DEC-1197 (2); VERDICT: W2-210 V5)."""
     built = {name for name, (_, is_built, _) in CAPABILITIES.items() if is_built}
     from gov.adopt import command  # the code under test (DEC-732): this worktree's src/
 
-    built |= {stage for stage in ("A7", "A10") if stage in command.STAGES}
+    built |= {stage for stage in ("A7", "A10", "VERDICT") if stage in command.STAGES}
     return built
 
 
@@ -207,6 +211,39 @@ SHAPES = {  # record -> the field that must be a list of mappings, and the strin
 }
 
 
+CONDITION_STATES = ("met", "not met", "accepted")
+
+
+def derived_verdict(states):
+    """The verdict CAP-44.h gives a list of condition states (W2-210 V2): healthy when every one is met; with accepted
+    exceptions when each is met or accepted and one is accepted; otherwise not healthy (also for no condition)."""
+    if states and all(state == "met" for state in states):
+        return "ADOPTED_HEALTHY"
+    if states and all(state in ("met", "accepted") for state in states):
+        return "ADOPTED_WITH_ACCEPTED_EXCEPTIONS"
+    return "NOT_ADOPTED_HEALTHY"
+
+
+def _verdict_flaw(data):
+    """Why a lite verdict record is not well formed (W2-210 V5), None when it is: the verdict one of the three, `lite`
+    true, `conditions` a list of mappings with a `name` and a `state`, `conditions_not_checked` a list, and the verdict
+    the one its conditions give (ADOPTED_HEALTHY only over conditions all met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS only
+    over conditions all met or accepted, one accepted; NOT_ADOPTED_HEALTHY otherwise)."""
+    if data.get("verdict") not in VERDICTS:
+        return "`verdict` is none of " + ", ".join(VERDICTS)
+    if data.get("lite") is not True:
+        return "`lite` is not true"
+    conditions = data.get("conditions")
+    if not _is_list_of_maps(conditions, ("name", "state")) or any(
+            item["state"] not in CONDITION_STATES for item in conditions):
+        return "`conditions` is not a list of mappings with a `name` and a `state` of met, not met or accepted"
+    if not isinstance(data.get("conditions_not_checked"), list):
+        return "`conditions_not_checked` is not a list"
+    if derived_verdict([item["state"] for item in conditions]) != data["verdict"]:
+        return f"`verdict` {data['verdict']} does not agree with the states of its conditions"
+    return None
+
+
 def read_record(root, rel, stage=None):
     path = Path(root) / rel
     if not path.is_file():
@@ -222,8 +259,10 @@ def read_record(root, rel, stage=None):
     if stage == "A2" and not all(item.get("class") is None or item.get("class") in CLASSES
                                  for item in data["artefacts"]):
         return Record(rel, "MALFORMED", data, raw, why="a class outside the vocabulary")
-    if stage == "VERDICT" and data.get("verdict") not in VERDICTS:
-        return Record(rel, "MALFORMED", data, raw, why="`verdict` is none of " + ", ".join(VERDICTS))
+    if stage == "VERDICT":
+        why = _verdict_flaw(data)
+        if why:
+            return Record(rel, "MALFORMED", data, raw, why=why)
     if stage in ("A7", "A10") and data.get("result") != "pass":
         # A lite gate commits its record when it fails too (`result: fail`): only its own `pass` is found (S-STAGES).
         return Record(rel, "MALFORMED", data, raw, why=f"the gate's own `result` is {data.get('result')!r}, not `pass`")
@@ -624,7 +663,7 @@ def _secret(case, view, ev, built, held, verdict):
                      "open behind the owner's gate")
             if verdict is not None and verdict != "NOT_ADOPTED_HEALTHY":
                 case.add(MISHANDLED, record_name("VERDICT"), "verdict", f"{verdict} while the secret's finding is "
-                         "open, and no owner's acceptance of it by name is read (its record is NOT_BUILT, CAP-44.h)")
+                         "open, and the judge reads no owner's acceptance of it by name (W2-81 T3)")
 
 
 def _rel(path, view):

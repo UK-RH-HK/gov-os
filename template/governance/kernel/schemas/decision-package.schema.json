@@ -2,10 +2,222 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "decision-package",
   "description": "Frontmatter of a gate or decision package: the question put to the owner, and the answer once given. Its gate state is `status` alone, one of five words (DEC-328).",
-  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/frontmatter"
+    }
+  ],
   "properties": {
-    "id": { "$ref": "common.schema.json#/$defs/record_id" },
-    "type": { "enum": ["gate", "decision-package"] },
-    "status": { "enum": ["PROPOSED", "ACCEPTED", "DECLINED", "REVOKED", "STALE"] }
+    "id": {
+      "$ref": "common.schema.json#/$defs/record_id"
+    },
+    "type": {
+      "enum": [
+        "gate",
+        "decision-package"
+      ]
+    },
+    "status": {
+      "enum": [
+        "PROPOSED",
+        "ACCEPTED",
+        "DECLINED",
+        "REVOKED",
+        "STALE"
+      ]
+    },
+    "question": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "The question, one or two sentences."
+    },
+    "found": {
+      "type": "string",
+      "maxLength": 900,
+      "description": "What was found, in plain words."
+    },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "cost",
+          "consequence"
+        ],
+        "properties": {
+          "key": {
+            "enum": [
+              "a",
+              "b",
+              "c",
+              "d",
+              "e",
+              "f"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "cost": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "consequence": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "changes": {
+            "type": [
+              "array",
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "2 to 6 options, keys a, b, c in order."
+    },
+    "recommendation": {
+      "type": "object",
+      "required": [
+        "option",
+        "reason",
+        "confidence"
+      ],
+      "properties": {
+        "option": {
+          "enum": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 400
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "string"
+      },
+      "description": "Files, decision ids and commits; each must exist."
+    },
+    "blocks": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "`nothing`, or what stops until it is answered."
+    },
+    "deadline": {
+      "type": "string"
+    },
+    "meanwhile": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "rubric": {
+      "type": "string",
+      "pattern": "^(P1\\.([1-9]|10)|P2\\.brought)$",
+      "description": "The escalation rubric line that makes it the owner's."
+    },
+    "under": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "raised": {
+      "type": "object",
+      "properties": {
+        "by": {
+          "type": "string"
+        },
+        "ticket": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        }
+      }
+    },
+    "replaces": {
+      "type": "string",
+      "description": "The package this one re-asks; the older one is withdrawn."
+    },
+    "file_only": {
+      "type": "boolean",
+      "description": "Never publish this card."
+    },
+    "touches": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "spec",
+          "kpi",
+          "standing-decision",
+          "contract",
+          "charter",
+          "shared-code",
+          "cross-stream",
+          "kernel-text",
+          "secret",
+          "paid-service",
+          "model-effort",
+          "release",
+          "own-ticket"
+        ]
+      },
+      "description": "What the decision changes (the escalation table's words)."
+    },
+    "reversible": {
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "inside": {
+      "enum": [
+        "worktree",
+        "repository",
+        "outside"
+      ]
+    },
+    "spends": {
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "rounds": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "emergency": {
+      "enum": [
+        "yes",
+        "no"
+      ]
+    },
+    "answer": {
+      "type": "object",
+      "description": "Filled by `gov decisions answer`: option, decision, batch, date."
+    }
   }
 }

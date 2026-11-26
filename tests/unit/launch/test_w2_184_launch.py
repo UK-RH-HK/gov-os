@@ -35,7 +35,8 @@ def pair(model, effort):
 # the kernel engineer's table
 # Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
 ENGINEER_TABLE = table(pair(SONNET, "high"), pair(SONNET, "high"), pair(SONNET, "high"), pair(SONNET, "low"))
-CRITICALITY = {"version": 1, "default": "C2", "opus": OPUS, "rules": [
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: criticality.yaml has no `opus` key (a file that carries one is refused).
+CRITICALITY = {"version": 1, "default": "C2", "rules": [
     {"class": "C3", "paths": ["src/guard/*"]}, {"class": "C1", "paths": ["docs/*"]},
     {"class": "C0", "paths": ["notes/*"]}, {"class": "C2", "profile": "FULL"}]}
 
@@ -566,36 +567,38 @@ CLEAN = {"kpis": [{"kpi": "S1", "verdict": "pass", "findings": [
     {"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "loses work"}]}]}
 
 
-def test_a_fail_open_finding_promotes_the_next_round_at_the_table_s_model_and_effort(project):
-    """Rewrite-Reason: DEC-1225: this pinned a promotion on Opus (C0 on Haiku, low: Opus at low). R2: a promotion keeps
-    its record and the table's effort and no longer chooses Opus: the table's model, here C0's Sonnet, at low."""
+def test_a_fail_open_finding_promotes_nothing(project):
+    """Rewrite-Reason: DEC-1246 (3)(b): MR-2: this pinned a promotion's record at the table's model and effort. The
+    promotion is retired: a probe record with a fail-open finding changes neither the launch nor its record."""
     project.ticket(allowed=["notes/a.md"])  # C0 on sonnet, low
-    rel = project.probe("T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
+    project.probe("T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
     argv = project.launch()
     assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (SONNET, "low")
     record = project.last()
     assert (record["model"], record["tier"], record["subagent_model"]) == (SONNET, "sonnet", SONNET)
-    assert (record["effort"], record["effort_source"]) == ("low", "by criticality")
-    assert record["promotion"] == {"reason": "a fail-open finding", "record": rel}
+    assert (record["effort"], record["effort_source"], record["model_source"]) == ("low", "by criticality", "by criticality")
+    assert record["promotion"] is None
 
 
-def test_two_failed_reviews_promote_and_name_the_second_failed_record(project):
+def test_two_failed_reviews_promote_nothing(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: two failed probe records no longer promote
     project.ticket()
     project.probe("T-1", "a.md", judgement="failed")
     project.probe("T-1", "sub/b.md", judgement="fail")
     project.probe("T-1", "c.md", judgement="passed")
     project.launch()
-    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-1/sub/b.md"}
-    assert project.last()["model"] == SONNET  # DEC-1225: the table's (it was Opus)
+    assert project.last()["promotion"] is None
+    assert project.last()["model"] == SONNET
 
 
-def test_a_fail_open_finding_is_checked_before_two_failed_reviews(project):
+def test_a_fail_open_finding_beside_two_failed_reviews_promotes_nothing(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no promotion, whatever the probe records hold
     project.ticket()
     project.probe("T-1", "a.md", judgement="failed")
     project.probe("T-1", "b.md", judgement="failed")
-    rel = project.probe("T-1", "z.md", judgement="pass", verdict=FAIL_OPEN)
+    project.probe("T-1", "z.md", judgement="pass", verdict=FAIL_OPEN)
     project.launch()
-    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": rel}
+    assert project.last()["promotion"] is None
 
 
 def test_one_failed_review_and_clean_records_do_not_promote(project):
@@ -640,25 +643,26 @@ def test_a_record_that_is_not_a_probe_or_has_no_front_matter_is_skipped(project)
     lambda p: p.probe("T-1", "a.md", judgement="pass", verdict={"kpis": [{"findings": ["x"]}]}),
     lambda p: p.probe("T-1", "a.md", judgement="pass", verdict=[1]),
 ))
-def test_an_unreadable_probe_record_refuses_naming_it(project, make):
+def test_an_unreadable_probe_record_is_not_read(project, make):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the launcher reads no probe record, so one that cannot be read refuses nothing
     project.ticket()
     make(project)
-    project.refused("docs/probes/T-1/a.md")
+    project.launch()
+    assert project.last()["promotion"] is None
 
 
-def test_a_promotion_refuses_a_model_after_the_double_dash_and_a_trial(project):
+def test_another_model_after_the_double_dash_is_refused_whatever_a_probe_record_holds(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: this pinned a promotion refusing a model after -- and a trial; a model that
+    # is not the table's is refused as on any launch, and a probe record changes nothing
     project.ticket()
     project.probe("T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
-    # Rewrite-Reason: DEC-1225: the promoted model was Opus (Haiku refused naming Opus, Opus accepted). It is the table's
-    # Sonnet now: another model is refused naming it, Sonnet is accepted.
     project.refused(HAIKU, SONNET, args=["--model", HAIKU])
     project.refused(OPUS, SONNET, args=["--model", OPUS])
-    project.refused("promotion", trial=project.trial())
     project.launch(args=["--model", SONNET])
-    assert project.last()["model"] == SONNET and project.last()["promotion"] is not None
+    assert project.last()["model"] == SONNET and project.last()["promotion"] is None
 
 
-def test_a_promotion_with_a_malformed_criticality_file_refuses(project):
+def test_a_malformed_criticality_file_refuses_whatever_a_probe_record_holds(project):
     project.criticality("version: 2\n")
     project.ticket()
     project.probe("T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
@@ -677,28 +681,26 @@ def full(project):
     return project
 
 
-# Rewrite-Reason: DEC-1225 / DEC-1236 (2): F19, no launch takes a model the rubric does not give
-def test_round_one_takes_the_table_and_round_two_is_the_probe_at_max(full):
-    _review(full)
+def test_round_one_takes_the_table_and_round_two_takes_it_too(full):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the probe (round 2 on Opus at max) is retired: every round is the table's
+    # setting (a setting a round already used needs the owner, DEC-1010, so round 1 runs on xhigh here)
+    _review(full, args=["--effort", "xhigh"])
     first = full.last()
-    assert (first["model"], first["effort"], first["review_round"], first["criticality"]) == (SONNET, "high", 1, "C2")
-    assert (first["model_source"], first["effort_source"]) == ("role default", "role default")
+    assert (first["model"], first["effort"], first["review_round"], first["criticality"]) == (SONNET, "xhigh", 1, "C2")
     argv = _review(full)
     second = full.last()
-    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (SONNET, "max")
-    assert (second["model"], second["effort"], second["review_round"]) == (SONNET, "max", 2)
-    assert (second["effort_source"], second["effort_reason"]) == ("probe", None)
-    assert second["model_source"] == "role default"  # the probe did not change the model
+    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (SONNET, "high")
+    assert (second["model"], second["effort"], second["review_round"]) == (SONNET, "high", 2)
+    assert (second["model_source"], second["effort_source"], second["effort_reason"]) == ("role default",) * 2 + (None,)
 
 
-def test_the_probe_no_longer_sets_the_model_when_the_table_s_is_lower(full):
-    """Rewrite-Reason: DEC-1225: round 2's probe set Opus when the table's model was lower (source ``probe``). R2: the
-    probe keeps its effort (max) and no longer chooses Opus: round 2 stays on the table's Sonnet."""
+def test_round_two_never_sets_a_model_or_a_max_effort(full):
+    """Rewrite-Reason: DEC-1246 (3)(b): MR-2: round 2 no longer sets max (the probe); it stays on the table's Sonnet."""
     full.role_file("independent-auditor", pair(SONNET, "high"))
+    _review(full, args=["--effort", "xhigh"])
     _review(full)
-    assert (full.last()["model"], full.last()["model_source"]) == (SONNET, "role default")
-    _review(full)
-    assert (full.last()["model"], full.last()["effort"], full.last()["effort_source"]) == (SONNET, "max", "probe")
+    assert (full.last()["model"], full.last()["model_source"], full.last()["effort"], full.last()["effort_source"]) == (
+        SONNET, "role default", "high", "role default")
 
 
 def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):  # 6.3, on round 2
@@ -712,23 +714,25 @@ def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):  # 6
     assert (second["review_round"], second["owner_named"], second["effort"]) == (2, "DEC-1010", "high")
 
 
-def test_round_three_after_the_probe_s_max_is_refused_by_the_round_and_accepted_with_the_owner(full):  # 6.3
-    _review(full)
+def test_round_three_is_refused_by_the_round_and_accepted_with_the_owner(full):  # 6.3
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: round 2 is the table's setting (no probe at max)
+    _review(full, args=["--effort", "xhigh"])
     _review(full)
     second = full.last()
     # both rules hold here: the round names the cap, and the repeated setting names the record it repeats
-    full.refused("review round 3", "DEC-1010", "--owner-named", second["session_id"], SONNET, "max",
+    full.refused("review round 3", "DEC-1010", "--owner-named", second["session_id"], SONNET, "high",
                  role="independent-auditor", tid="T-a")
     _review(full, owner_named="DEC-1010")
     third = full.last()
-    assert (third["review_round"], third["owner_named"], third["effort"]) == (3, "DEC-1010", "max")
+    assert (third["review_round"], third["owner_named"], third["effort"]) == (3, "DEC-1010", "high")
 
 
-def test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_dec_1010(full):  # 6.3, F2
+def test_round_three_on_a_new_setting_is_refused_naming_the_round_and_dec_1010(full):  # 6.3, F2
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: with no probe the unused setting is max with a reason
     _review(full)
     _review(full, args=["--effort", "xhigh"])
     assert (full.last()["review_round"], full.last()["effort"]) == (2, "xhigh")
-    error = full.refused("3", "DEC-1010", role="independent-auditor", tid="T-a")  # Sonnet max: neither earlier setting
+    error = full.refused("3", "DEC-1010", args=["--effort", "max"], reason="r", role="independent-auditor", tid="T-a")
     assert "--owner-named" in error.message and "repeats" not in error.message
     full.refused("3", "DEC-1010", args=["--effort", "high"], role="independent-auditor", tid="T-a")
 
@@ -738,12 +742,14 @@ def test_round_three_is_accepted_when_the_owner_named_it(full):  # 6.3, F2
     _review(full, args=["--effort", "xhigh"])
     _review(full, owner_named="DEC-1010")
     third = full.last()
-    assert (third["review_round"], third["owner_named"], third["model"], third["effort"]) == (3, "DEC-1010", SONNET, "max")
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the table's setting (round 1's repeated, the owner naming it), not max
+    assert (third["review_round"], third["owner_named"], third["model"], third["effort"]) == (3, "DEC-1010", SONNET, "high")
 
 
 def test_round_two_needs_no_owner_where_its_setting_is_new(full):  # 6.3, F2: the round cap starts at three
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: a new setting is a different effort after --, not the probe's max
     _review(full)
-    _review(full)
+    _review(full, args=["--effort", "xhigh"])
     assert (full.last()["review_round"], full.last()["owner_named"]) == (2, None)
 
 
@@ -754,15 +760,18 @@ def test_an_effort_after_the_double_dash_on_round_two_is_accepted_if_not_below_t
     assert (full.last()["effort"], full.last()["effort_source"], full.last()["review_round"]) == ("xhigh", "after --", 2)
 
 
-def test_a_max_after_the_double_dash_equal_to_the_probe_s_needs_no_reason_and_is_the_probe(full):  # interface 3.2a
+def test_a_max_after_the_double_dash_on_round_two_still_needs_a_reason(full):  # interface 3.2a
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: there is no probe whose max a launch could equal
     _review(full)
-    argv = _review(full, args=["--effort", "max"])
-    assert (full.last()["effort"], full.last()["effort_source"], full.last()["effort_reason"]) == ("max", "probe", None)
+    full.refused("--reason", args=["--effort", "max"], role="independent-auditor", tid="T-a")
+    argv = _review(full, args=["--effort", "max"], reason="the plan names it")
+    assert (full.last()["effort"], full.last()["effort_source"], full.last()["effort_reason"]) == ("max", "after --", "the plan names it")
     assert full.last()["review_round"] == 2 and argv.count("--effort") == 1
 
 
 def test_a_max_after_the_double_dash_equal_to_the_table_s_needs_no_reason_and_is_after_dashes(project):  # interface 3.2a
-    project.role_file("engineer", pair(SONNET, "max"), table(pair(OPUS, "max"), pair(SONNET, "max"), pair(SONNET, "max"), pair(HAIKU, "max")))
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the table's max in the fixture is Sonnet's (the Opus entry's model is F19's)
+    project.role_file("engineer", pair(SONNET, "max"), table(pair(SONNET, "max"), pair(SONNET, "max"), pair(SONNET, "max"), pair(SONNET, "max")))
     project.ticket()
     project.launch(args=["--effort", "max"])
     assert (project.last()["effort"], project.last()["effort_source"], project.last()["effort_reason"]) == ("max", "after --", None)
@@ -804,8 +813,9 @@ def test_a_launch_record_of_another_ticket_role_or_a_resume_is_not_counted(full)
                "model": OPUS, "effort": "max", "started_at": "2026-01-01T00:00:00Z"}
     folder = full.root / ".gov-runtime/launches"
     (folder / f"{planted['session_id']}.json").write_text(json.dumps(planted))
-    _review(full)
-    assert full.last()["review_round"] == 2 and full.last()["effort"] == "max"
+    _review(full, args=["--effort", "xhigh"])
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: round 2 is the launch's own xhigh (no probe max)
+    assert full.last()["review_round"] == 2 and full.last()["effort"] == "xhigh"
 
 
 def test_the_record_of_the_session_being_resumed_is_left_out_of_the_count(full):
@@ -890,40 +900,42 @@ def _names(project, root, tid="T-1", role="engineer", session=None, **change):
     (folder / f"{session}.json").write_text(json.dumps(data), encoding="utf-8")
 
 
-def test_f1_a_fail_open_record_under_a_root_a_launch_record_names_promotes(project):
+def test_f1_a_fail_open_record_under_a_root_a_launch_record_names_promotes_nothing(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, under any root
     project.ticket()
     other = _tree(project, "wt-ticket")
-    rel = _probe_at(other, "T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
+    _probe_at(other, "T-1", "r1.md", judgement="pass", verdict=FAIL_OPEN)
     _names(project, other, role="engineer")
     project.launch("independent-test-designer")
     record = project.last()
-    # DEC-1225 (R2): a promotion keeps its record; its model is the table's (Sonnet), not the rubric's Opus
-    assert record["model"] == SONNET
-    assert record["promotion"] == {"reason": "a fail-open finding", "record": rel}  # root-relative
+    assert record["model"] == SONNET and record["promotion"] is None
 
 
-def test_f1_two_failed_records_across_the_launch_root_and_another_root_promote(project):
+def test_f1_two_failed_records_across_the_launch_root_and_another_root_promote_nothing(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, under any root
     project.ticket()
     other = _tree(project, "wt-ticket")
     project.probe("T-1", "b.md", judgement="failed")
     _probe_at(other, "T-1", "a.md", judgement="fail")
     _names(project, other)
     project.launch()
-    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-1/b.md"}
+    assert project.last()["promotion"] is None
 
 
 @pytest.mark.parametrize("key, role", (("wbs_id", "independent-auditor"), ("id", "product-spec")))
-def test_f1_a_root_named_under_any_name_of_the_ticket_by_any_role_is_read(project, key, role):
+def test_f1_a_root_named_under_any_name_of_the_ticket_by_any_role_is_not_read(project, key, role):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, under any root
     project.ticket(tid="T-1", wbs="W9-1")
     name = "W9-1" if key == "wbs_id" else "T-1"
     other = _tree(project, "wt-ticket")
     _probe_at(other, name, "r.md", judgement="pass", verdict=FAIL_OPEN)
     _names(project, other, tid=name, role=role)
     project.launch()
-    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": f"docs/probes/{name}/r.md"}
+    assert project.last()["promotion"] is None
 
 
-def test_f1_a_named_root_that_is_missing_or_a_file_is_skipped_and_the_others_count(project):
+def test_f1_a_named_root_that_is_missing_or_a_file_is_skipped_and_the_others_promote_nothing(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, under any root
     project.ticket()
     gone = _tree(project, "wt-gone")
     _probe_at(gone, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
@@ -941,19 +953,21 @@ def test_f1_a_named_root_that_is_missing_or_a_file_is_skipped_and_the_others_cou
     _probe_at(kept, "T-1", "k2.md", judgement="failed")
     _names(project, kept, role="independent-test-designer")
     project.launch()
-    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-1/k2.md"}
+    assert project.last()["promotion"] is None
 
 
 @pytest.mark.parametrize("make", (
     lambda root: _probe_at(root, "T-1", "a.md", front="type: probe\n  bad: [\n"),
     lambda root: _probe_at(root, "T-1", "a.md", judgement="pass", verdict="not json"),
 ))
-def test_f1_an_unreadable_probe_record_only_under_another_named_root_refuses_naming_it(project, make):
+def test_f1_an_unreadable_probe_record_only_under_another_named_root_refuses_nothing(project, make):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, under any root
     project.ticket()
     other = _tree(project, "wt-ticket")
     make(other)
     _names(project, other)
-    project.refused("docs/probes/T-1/a.md", str(other / "docs/probes/T-1/a.md"))
+    project.launch()
+    assert project.last()["promotion"] is None
 
 
 def test_f1_a_launch_record_that_is_not_json_refuses_every_launch_where_the_file_is(project):
@@ -977,19 +991,21 @@ def test_f1_a_path_under_two_roots_counts_once(project):
     assert project.last()["promotion"] is None  # one failed record, not two
 
 
-def test_r3_the_other_root_s_copy_beside_the_launch_root_s_is_read_a_bad_one_refuses_a_fail_open_one_promotes(project):
+def test_r3_no_copy_of_a_probe_record_beside_the_launch_root_s_is_read(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read: a bad copy refuses nothing, a fail-open one promotes nothing
     project.ticket()
     other = _tree(project, "wt-ticket")
     project.probe("T-1", "a.md", judgement="pass", verdict=CLEAN)
-    _probe_at(other, "T-1", "a.md", judgement="pass", verdict="not json")  # read too (R3): refuses, naming the file
+    _probe_at(other, "T-1", "a.md", judgement="pass", verdict="not json")
     _names(project, other)
-    project.refused("docs/probes/T-1/a.md", str(other / "docs/probes/T-1/a.md"))
-    _probe_at(other, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)  # a stale launch-root copy, a newer one here
     project.launch()
-    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-1/a.md"}
+    _probe_at(other, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
+    project.launch()
+    assert project.last()["promotion"] is None
 
 
-def test_r3_a_path_under_two_other_roots_fails_open_when_either_copy_does_and_is_one_review(project):
+def test_r3_a_path_under_two_other_roots_promotes_nothing(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no probe record is read, under any root
     project.ticket()
     first, second = _tree(project, "wt-a"), _tree(project, "wt-b")
     _probe_at(first, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
@@ -997,26 +1013,12 @@ def test_r3_a_path_under_two_other_roots_fails_open_when_either_copy_does_and_is
     _names(project, second, role="engineer")
     _names(project, first, role="independent-test-designer")
     project.launch()
-    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-1/a.md"}
-    project.ticket("T-2", wbs="W9-2")
-    _probe_at(first, "T-2", "a.md", judgement="pass", verdict=CLEAN)
-    _probe_at(second, "T-2", "a.md", judgement="pass", verdict=FAIL_OPEN)  # the later root's copy counts as well
-    _names(project, second, tid="T-2", role="engineer")
-    _names(project, first, tid="T-2", role="independent-test-designer")
-    project.launch(tid="T-2")
-    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-2/a.md"}
-    project.ticket("T-3", wbs="W9-3")
-    _probe_at(first, "T-3", "a.md", judgement="failed", verdict=CLEAN)
-    _probe_at(second, "T-3", "a.md", judgement="fail")  # differing bytes, both failed: one path, one failed review
-    _names(project, second, tid="T-3", role="engineer")
-    _names(project, first, tid="T-3", role="independent-test-designer")
-    project.launch(tid="T-3")
     assert project.last()["promotion"] is None
-    _probe_at(second, "T-3", "b.md", judgement="failed")  # a second path that failed: two failed reviews
-    project.launch(tid="T-3")
-    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-3/b.md"}
-    _probe_at(second, "T-3", "a.md", judgement="pass", verdict="not json")  # the later root's bad copy refuses
-    project.refused("docs/probes/T-3/a.md", str(second / "docs/probes/T-3/a.md"), tid="T-3")
+    _probe_at(second, "T-1", "b.md", judgement="failed")
+    _probe_at(second, "T-1", "c.md", judgement="failed")
+    _probe_at(second, "T-1", "a.md", judgement="pass", verdict="not json")
+    project.launch()
+    assert project.last()["promotion"] is None
 
 
 def test_f1_a_root_no_launch_record_of_this_ticket_names_is_not_read(project):

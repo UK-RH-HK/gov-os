@@ -56,6 +56,8 @@ def add_arguments(parser) -> None:
     parser.add_argument("--batch-size", type=int, metavar="<N>", help="candidates in a batch")
     parser.add_argument("--bundle-budget", type=int, metavar="<N>", help="tokens the bundle may hold after expansion")
     parser.add_argument("--continue", dest="continuation", metavar="<token>", help="the token of an earlier bundle")
+    parser.add_argument("--include-stale", dest="include_stale", action="store_true",
+                        help="also list the documents of stale-class namespaces (superseded, historical, legacy), marked")
     parser.add_argument("query", metavar="<query>", help="the question")
 
 
@@ -197,7 +199,8 @@ def _search(root: Path, args) -> dict:
     try:
         bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
                           batch_size=args.batch_size, bundle_budget=args.bundle_budget,
-                          continuation=args.continuation, role=role, store=store)
+                          continuation=args.continuation, role=role, store=store,
+                          include_stale=bool(getattr(args, "include_stale", False)))
     except sqlite3.DatabaseError as error:  # no bundle was made: the store itself cannot be read (W2-M071)
         raise GovError("STORE_UNREADABLE", f"the store at {root} cannot be read: {error}",
                        {"root": str(root), "error": str(error)}) from None

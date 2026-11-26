@@ -15,7 +15,8 @@ import json
 import re
 from pathlib import Path
 
-KERNEL_HOOK = re.compile(r"governance/kernel/hooks/(\w+)\.py")
+# the kernel hook programs, and the kit's helper-model hook (MR-4), the one hook program the kit holds under .claude/hooks
+KERNEL_HOOK = re.compile(r"(?:governance/kernel|\.claude)/hooks/(\w+)\.py")
 
 
 def _program(hook) -> str | None:

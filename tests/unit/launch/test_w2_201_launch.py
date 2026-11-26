@@ -99,12 +99,16 @@ def test_an_unusable_file_refuses_another_model_and_does_not_touch_a_launch_that
     project.launch(args=["--model", SONNET])
 
 
-def test_a_promotion_still_refuses_another_model_whatever_the_file_says(project):
+def test_another_model_is_refused_whatever_probe_records_say(project):
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no promotion exists; probe records change nothing, and an entry for
+    # another model not held by the file leaves the refusal as on any launch
     tid = project.ticket()
     project.probe(tid, "p1.md", "fail")
     project.probe(tid, "p2.md", "fail")
-    exceptions(project, [{"subagent_type": "engineer", "model": HAIKU, "decided": "x"}])
-    project.refused(HAIKU, SONNET, args=["--model", HAIKU])  # DEC-1225: the promoted model is the table's Sonnet
+    exceptions(project, [{"subagent_type": "research", "model": HAIKU, "decided": "x"}])
+    project.refused(HAIKU, SONNET, args=["--model", HAIKU])  # the table's Sonnet is the only model
+    project.launch()
+    assert project.last()["promotion"] is None
 
 
 # --- S9 (DEC-1215's substitution) is gone (DEC-1225, R3) ------------------------------------------------------------
