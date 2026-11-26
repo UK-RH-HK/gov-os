@@ -19,11 +19,14 @@ role: engineer
 profile: FULL
 depends_on: []
 waits_on: [the classification rubric's yes (DEC-1255 (3)), then this ticket's specification]
-specification: null
-allowed_paths: []
+specification: docs/specs/W2-213-standard-layout.md
+allowed_paths:
+- docs/specs/W2-213-standard-layout.md
 kpis:
-  success: []
-  failure: []
+  success:
+  - 'SL-0 The specification first: after the owner''s yes on the classification rubric (DEC-1255 (3), page B-2026-11-26-rubric), `docs/specs/W2-213-standard-layout.md` is written in the nine-part form from the accepted rubric, its K-lines and allowed paths replace this line and the path above, and the ticket is then ready. Fails if: a build starts before the spec, or the spec contradicts an accepted card. Verify: the spec file exists, cites the rubric''s accepted decision id, and this ticket''s `kpis` and `allowed_paths` name its K-lines and paths'
+  failure:
+  - 'F-SL0 Work other than the spec starts on this ticket before the rubric''s yes. Verify: no commit with `Task: DAEO-stdl` touches a path outside the spec file until the spec lands'
 non_goals:
 - Restructuring Gov OS itself (it keeps its classing until restructuring pays; its tests pin its paths)
 - Restructuring an imported tool or code (it sits whole in imports/<name>/ with one class)
