@@ -5,6 +5,7 @@ here, git's own change check included, opens it."""
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -72,8 +73,7 @@ class Repo:
         ignored = ("ls-files", "-z", "--others", "--ignored", "--exclude-standard")
         for path in _names(_git(root, *ignored, "--directory", "--no-empty-directory")):
             self.items.setdefault(path.rstrip("/"), "ignored-root")
-        # hidden files below an ignored root, found by their names alone
-        self.hidden_ignored = [path for path in _names(_git(root, *ignored)) if self.hidden(path)]
+        self.hidden_ignored = self._hidden_below(ignored)
         for path in self._declared():
             if not any(under(item, path) for item in self.items):
                 self.items[path] = "declared"
@@ -101,6 +101,17 @@ class Repo:
         if not all(isinstance(glob, str) and glob for glob in hidden + visible):
             raise CannotRun(f"{PATH_MAP_REL}: an evaluation set's glob is not a text")
         return _Part(str(self.root), hidden, ""), _Part(str(self.root), visible, "")
+
+    def _hidden_below(self, listing: tuple[str, ...]) -> list[str]:
+        """The hidden files below an ignored root, found by their names alone. Only a root a hidden glob can reach is
+        listed: a package folder of many thousand files is not."""
+        heads = [re.split(r"/?[^/]*[*?\[{]", glob)[0] for glob in self._hidden.globs]
+        reached = [root for root, kind in self.items.items() if kind == "ignored-root"
+                   and any(not head or under(head, root) or under(root, head) for head in heads)]
+        if not reached:
+            return []
+        names = _names(_git(self.root, *listing, "--", *(f":(literal){root}" for root in reached)))
+        return [path for path in names if self.hidden(path)]
 
     def hidden(self, path: str) -> bool:
         return self._hidden.match(path)

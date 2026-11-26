@@ -21,7 +21,8 @@ def run(root: Path, plan: Path, *, after_moves: bool = False) -> dict:
     except (OSError, UnicodeDecodeError) as error:
         raise CannotRun(f"the plan {plan} cannot be read: {type(error).__name__}") from None
     inside = os.path.relpath(Path(plan).resolve(), root)
-    repo = Repo(root, std, None if inside.startswith("..") else Path(inside).as_posix())
+    outside = inside == ".." or inside.startswith(".." + os.sep)
+    repo = Repo(root, std, None if outside else Path(inside).as_posix())
     lines, findings, canonical = read(text, std)
     if after_moves:
         moved_findings, held, kept = moved.check(repo, std, lines)

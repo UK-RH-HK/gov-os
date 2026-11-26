@@ -126,7 +126,10 @@ def place(repo: Repo, std: Standard, lines: list[Line]) -> list[dict]:
     for name, same in imports.items():
         top = std.classes[same[0].cls]["destination"].replace("{import}", name)
         outside = [line for line in same if not under(line.path, top)] or same
-        root = _common([posixpath.dirname(line.path) if repo.is_file(line.path) else line.path for line in outside])
+        # a file stands in its folder; a folder and a submodule are folders of their own
+        root = _common([posixpath.dirname(line.path)
+                        if repo.is_file(line.path) and repo.items[line.path] != "submodule" else line.path
+                        for line in outside])
         for line in same:
             line.root = root
     found = []
