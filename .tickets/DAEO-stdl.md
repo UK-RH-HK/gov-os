@@ -114,3 +114,11 @@ slice 1 lands.
 
 ## Why
 D3's adoption check guessed staleness from words in paths (I-40, DEC-1254 E-02): every guess needs a new exception; a standard does not.
+
+## Slice 1 build note (the w2-213-slice1 lead, 2026-11-26)
+
+W2-212's loader rule, merged into `w2/integrate` during this build, refuses a path map that gives a `stale_class` without both
+policies out, for every `gov` command and before it runs (DEC-185). So `gov layout check` on such a map ends `CONFIG_INVALID`,
+exit 1, naming the file and the namespace key: never clean, but outside SL-5's exit 2 and SL-14's `LAYOUT_MAP`. The lead's call,
+as for I-49 (DAEO-ma4q FD-1): no source change; the three cases are a recorded rewrite, and `LAYOUT_MAP` keeps its cases on
+faulty maps the loader accepts. For the CTO to confirm at the landing.
