@@ -31,6 +31,8 @@ where = ["src"]
          # the ticket schema the Verify pass validates against (gov.adopt.verify_pass._validator; W2-174, DEC-1189 (1))
          "_shipped/template/governance/kernel/schemas/ticket.schema.json",
          "_shipped/template/governance/kernel/schemas/common.schema.json",
+         # the standard gov layout check judges by (gov.layout.standard; W2-213)
+         "_shipped/template/governance/kernel/standard.yaml",
          "_shipped/governance/project/retrieval.yaml",
          "_shipped/governance/project/usage-prices.yaml",  # gov usage (W2-207, UR-6): the price table, found from any root
          "_shipped/governance/project/indep-walls/CLAUDE.md.tmpl",

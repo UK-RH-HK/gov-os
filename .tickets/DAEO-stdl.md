@@ -34,6 +34,7 @@ allowed_paths:
 - tests/unit/adopt/test_w2_88_shipped.py
 - tests/acceptance/W2-213/**
 - tests/acceptance/W1-32/test_w1_32_command_set.py
+- tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py  # [added 2026-11-26 by the w2-213-slice1 lead, the DAEO-zmo4 precedent (DEC-1189 (1)): the wheel's shipped list gains the standard (SL-4); a test designer's edit]
 kpis:
   success:
   - line: 'SL-1 The kit holds one standard file with a closed list of exactly eighteen classes (code, tests, spec, research, docs, record, governance, kit, config, data, generated, archive, import-use, import-absorb, import-study, evaluation, hidden-set, secret), one entry each, giving its destination, whether it ever moves, its memory policy and ranking tier, and the signs it is told by, as the rubric''s class table states them, and holds the ask answer apart as no class.'
@@ -113,3 +114,11 @@ slice 1 lands.
 
 ## Why
 D3's adoption check guessed staleness from words in paths (I-40, DEC-1254 E-02): every guess needs a new exception; a standard does not.
+
+## Slice 1 build note (the w2-213-slice1 lead, 2026-11-26)
+
+W2-212's loader rule, merged into `w2/integrate` during this build, refuses a path map that gives a `stale_class` without both
+policies out, for every `gov` command and before it runs (DEC-185). So `gov layout check` on such a map ends `CONFIG_INVALID`,
+exit 1, naming the file and the namespace key: never clean, but outside SL-5's exit 2 and SL-14's `LAYOUT_MAP`. The lead's call,
+as for I-49 (DAEO-ma4q FD-1): no source change; the three cases are a recorded rewrite, and `LAYOUT_MAP` keeps its cases on
+faulty maps the loader accepts. For the CTO to confirm at the landing.

@@ -24,11 +24,13 @@ SCHEMAS = "template/governance/kernel/schemas"
 # Four since run 8b (item 21); nine since S29 (DEC-1189 (1)): every rel the resolver is asked for, template/ ones too;
 # eleven since W2-174: the two ticket schemas its Verify pass reads (through its own lookup, DEC-1189 (1)).
 # Twelve since W2-195 (DEC-1204 (5)): the judging-work skill folder, which A9 installs as it does the other two.
+# W2-213 (DEC-1256) adds the layout standard.
 THE_SHIPPED = (fabric.RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, "template/.gitleaks.toml",
                f"{SKILLS}/retrieval", f"{SKILLS}/discovery", f"{SKILLS}/judging-work", f"{TEMPLATES}/brief.md", f"{TEMPLATES}/role-cto.md",
                f"{SCHEMAS}/ticket.schema.json", f"{SCHEMAS}/common.schema.json",
                f"{SKILLS}/spec-writing/check_spec.py",  # W2-36: gov discover's spec check (a fix, EMERGENCY-2 4.2)
-               "governance/project/usage-prices.yaml")  # W2-207 (UR-6): gov usage's price table
+               "governance/project/usage-prices.yaml",  # W2-207 (UR-6): gov usage's price table
+               "template/governance/kernel/standard.yaml")  # W2-213: gov layout check
 
 
 def _files(base: Path, rel: str) -> dict[str, bytes]:
