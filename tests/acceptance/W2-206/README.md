@@ -195,3 +195,49 @@ forked at the green head:
    `suites` equal the union of its parts' alone.
 4. **A refused pair** exits non-zero with `CANDIDATE_NOT_ISOLATED` on stderr and no object on stdout; every ref, `HEAD`, the
    status and the tracked files are as before, and no planted test ran (the exit code is not fixed here).
+
+## Fix: the landing proves the path map's coverage, PM-1 to PM-3 (plan item 1-11 (c))
+
+Written by the independent test designer from the ticket's section "Fix: the landing proves the path map holds every path a
+change adds exactly once", before any implementation, in `test_w2_206_pathmap.py`. The lines are numbered after SEL-4's
+(failure-6: PM-1's refusals; success-9: what PM-1 lets through; success-10: PM-2; success-11: PM-3; the ids are labels of
+this table). Public interface: `python3 -m gov.cli.main queue <T>=<branch> ... [--select | --dry-run [--out <dir>]]
+[--full] --root <project>`; the answer, stderr and exit code, `queue.json`, a dry run's `select.json`, the close record,
+the planted repository's git state.
+
+**What is planted:** W2-115b's kit with a narrow path map (the kit's own maps `**`): `src`, `tests`, tickets, close
+records, checkpoints, `governance`, `README.md` and `.gitignore` are mapped; of `docs/` only `docs/mapped/**` and the one
+file `docs/mixed/placed.md` (namespace `reference-docs`); `shared-notes` holds `docs/mapped/shared-*` too. Each build
+first asks `python3 -m gov.check.pathmap`, in a scratch clone at each planted tip, for exactly the findings it plants
+(`fixture: ...` otherwise). An "invalid" map is a namespace without `paths`: the path map check refuses it, the
+configuration loader every command runs reads it.
+
+| run | project and branches | commands |
+|---|---|---|
+| main | A adds two files under `docs/newfolder/` (`topic/aa`), B a document under `docs/mapped/` (`topic/bb`), C a file under `docs/elsewhere/` (`topic/cc`); further branches of A: a root file; a file beside `docs/mixed/placed.md`; a file both namespaces hold; a rename into `docs/moved/`; the new folder with its line added to the map; the map deleted; the map made invalid | `--select` of each, and of `A B`; `A B --dry-run --out <dir>`; `C --full`; `A B` |
+| debt | the base holds `legacy/old.md` (in none) and `docs/mapped/shared-old.md` (in two); A changes both and the widget; B adds `legacy/new.md` | `--select B`; `A` |
+| unusable | the base's map is invalid; branches adding a path, changing the map, changing code only | `--select` of each |
+| no_project | no `governance/project/` at all | `A --dry-run --full --out <dir>` |
+
+| KPI id | line | tests | expected red reason |
+|---|---|---|---|
+| failure-6 | PM-1, refused | `test_w2_206_pathmap.py::test_pm1_select_refuses_an_added_path_under_no_namespace_naming_it_and_the_folder_s_line`, `test_w2_206_pathmap.py::test_pm1_a_root_file_s_line_to_add_is_the_path_itself`, `test_w2_206_pathmap.py::test_pm1_in_a_folder_holding_placed_files_the_line_to_add_is_the_path_itself`, `test_w2_206_pathmap.py::test_pm1_an_added_path_two_namespaces_hold_is_refused_naming_both_and_their_patterns`, `test_w2_206_pathmap.py::test_pm1_a_rename_into_an_unmapped_folder_is_refused`, `test_w2_206_pathmap.py::test_pm1_select_of_two_branches_names_the_ticket_that_adds_the_path_and_moves_and_runs_nothing`, `test_w2_206_pathmap.py::test_pm1_the_landing_lists_the_candidate_under_refused_with_its_code_paths_and_the_line`, `test_w2_206_pathmap.py::test_pm1_the_batch_s_clean_candidate_lands_and_the_refused_one_stays_out`, `test_w2_206_pathmap.py::test_pm1_a_dry_run_refuses_it_too_and_moves_nothing`, `test_w2_206_pathmap.py::test_pm1_with_full_the_candidate_is_refused_and_nothing_lands`, `test_w2_206_pathmap.py::test_pm1_a_branch_that_deletes_the_path_map_is_refused_path_map_missing`, `test_w2_206_pathmap.py::test_pm1_a_branch_that_makes_the_path_map_invalid_is_refused_path_map_invalid`, `test_w2_206_pathmap.py::test_pm1_under_a_map_already_unusable_a_branch_that_adds_a_path_or_changes_the_map_is_refused`, `test_w2_206_pathmap.py::test_pm1_an_added_unmapped_path_is_refused_without_naming_the_paths_already_in_none_or_two` | the base asks the path map nothing: `--select` exits 0 and prints the object ("exit 0, not 2"); the landing, the dry run and `--full` land the candidate ("exit 0, not 3") |
+| success-9 | PM-1, what it lets through | `test_w2_206_pathmap.py::test_pm1_a_branch_that_adds_the_line_with_its_path_is_selected`, `test_w2_206_pathmap.py::test_pm1_changing_paths_already_in_none_or_two_refuses_nothing_and_lands`, `test_w2_206_pathmap.py::test_pm1_under_a_map_already_unusable_a_branch_that_only_changes_code_is_not_refused`, `test_w2_206_pathmap.py::test_pm1_the_batch_s_clean_candidate_lands_and_the_refused_one_stays_out` | the batch's clean-candidate case is red as above (both land, exit 0, not 3); the other three are guards, green on the base |
+| success-10 | PM-2 | `test_w2_206_pathmap.py::test_pm2_select_of_a_record_inside_a_mapped_folder_exits_0_with_the_notice`, `test_w2_206_pathmap.py::test_pm2_the_landing_lands_the_record_inside_a_mapped_folder_with_the_notice` | none: guards, green on the base (`RECORD_PLACED` exists, DEC-1239 (2)); they must stay green |
+| success-11 | PM-3 | `test_w2_206_pathmap.py::test_pm3_the_select_object_holds_the_counts_of_the_merged_tree`, `test_w2_206_pathmap.py::test_pm3_the_landing_s_answer_and_queue_json_hold_the_counts_of_the_tested_merge`, `test_w2_206_pathmap.py::test_pm3_the_close_record_holds_the_counts`, `test_w2_206_pathmap.py::test_pm3_a_dry_run_s_answer_and_select_json_hold_the_counts`, `test_w2_206_pathmap.py::test_pm3_a_project_with_a_path_already_in_none_and_one_in_two_lands_and_counts_them`, `test_w2_206_pathmap.py::test_pm3_a_project_with_no_project_folder_has_no_path_map` | no `path_map` anywhere ("path_map None"); the dry run's case fails first on "exit 0, not 3"; the project with no `governance/project/` is a guard, green on the base |
+
+**Readings this fix's cases take.**
+
+1. **The line to add** is asserted literally in the reason (`- "docs/newfolder/**"`; `- "STRAY.md"`;
+   `- "docs/mixed/other.md"`, and then no `- "docs/mixed/**"`). The rest of the reason's words are free.
+2. **`--select`'s refusal** is `<code>: <ticket>: <reason>` on stderr, exit 2, no object on stdout; the reason is read from
+   there to the end of stderr.
+3. **A refused entry** holds `ticket`, `code`, `paths` and `reason`; `paths` is asserted for the path codes, not for the
+   map's own codes (`PATH_MAP_MISSING`, `PATH_MAP_INVALID`), whose `paths` the line does not state.
+4. **The counts** are those of the tested merge, which holds no refused candidate's paths: in the batch with one refused
+   candidate it says `0 in none, 0 in two` with the tested commit's `git ls-tree -r` number. `--select`'s are the branch
+   tip's (one branch forked at the head: the merged tree). Whether an answer of a landing that lands nothing holds
+   `path_map`, and its words under an unusable map, are not asserted.
+
+**Not tested here:** `PATH_MAP_UNREADABLE`; a candidate whose paths are some in none and some in two (which code is not
+stated); `--full`'s own answer for a candidate that lands (its counts); a branch already merged.
