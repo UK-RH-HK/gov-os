@@ -35,11 +35,12 @@ def selected(clone: Path, commit: str, why: dict[str, list[str]], folder: str | 
 def block(root: Path, clone: Path, *, base: str, head: str, changed: list[str], selected: list[dict], full: bool,
           junit: list[Path]) -> dict:
     """The block of one ticket: ``base`` the integration head the run merged onto, ``head`` the tested commit,
-    ``junit`` the JUnit files of its runs (those kept are listed, relative to ``root``)."""
+    ``junit`` the JUnit files of its runs (those that hold a test case are listed, relative to ``root``: the
+    placeholder of a phase that ran nothing is none)."""
     from gov.queue.command import _git
 
-    kept = [path for path in junit if path.is_file()]
-    read = [stated.read_junit(root, path) for path in kept]
+    found = [(path, stated.read_junit(root, path)) for path in junit]  # empty where the file is missing or broken
+    kept, read = [p for p, run in found if run["cases"]], [run for _, run in found if run["cases"]]
     skips = [s for run in read for s in run["skips"]]
     return {"scope": "full" if full else "scoped", "why_full": [{"reason": "FULL_ASKED"}] if full else [],
             "base": base, "head": head, "tree": _git(clone, "rev-parse", f"{head}^{{tree}}").strip(),

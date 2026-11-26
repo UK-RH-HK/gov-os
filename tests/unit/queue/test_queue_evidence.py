@@ -37,8 +37,10 @@ def test_the_block_holds_what_the_kept_junit_files_state(tmp_path):
     kept = repo.root / ".gov-runtime" / "queue" / "run.xml"
     kept.parent.mkdir(parents=True)
     kept.write_text(JUNIT, encoding="utf-8")
+    empty = kept.with_name("serial.xml")  # the placeholder of a phase that ran nothing
+    empty.write_text("<testsuites><testsuite tests='0'/></testsuites>", encoding="utf-8")
     block = evidence.block(repo.root, repo.root, base=repo.sha(), head=repo.sha(), changed=["src/a.py"],
-                           selected=[], full=True, junit=[kept, kept.with_name("missing.xml")])
+                           selected=[], full=True, junit=[kept, empty, kept.with_name("missing.xml")])
     assert block["scope"] == "full" and block["why_full"] == [{"reason": "FULL_ASKED"}]
     assert block["tree"] == repo.sha("HEAD^{tree}") and block["changed"] == ["src/a.py"]
     assert block["skips"] == [{"test": "tests/t.py::a", "reason": "not here"}] and block["skip_count"] == 1
