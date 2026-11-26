@@ -383,3 +383,16 @@ lead's brief (`docs/emergency-2/briefs/LEAD-forbidden-reach.md`).
   audit has three misses citing forbidden sources in two namespaces, one stale-classed `not indexed`/`not embedded` and one live:
   `3 cited, 2 outside, 1 inside` with the namespaces; after the live namespace gains the class, `3 outside`; the output holds no
   planted path, question or id.
+
+## Fix: forbidden-reach-d3, `gov memaudit forbidden-reach` with D3's classifier present (FINDINGS I-49; forbidden-reach-d3, 2026-11-26)
+
+Four unit cases printed `ERROR: GovError` once batch A was on the branch. The call is `lexical.kept_out`
+(`src/gov/memaudit/forbiddenreach.py:64`), not the classifier: it validates every namespace (`src/gov/retrieval/lexical.py:169`),
+and D3's loader rule (`src/gov/config/loader.py:150-155`, W2-212 F1) refuses a `stale_class` without `lexical_policy: not
+indexed` and `embedding_policy: not embedded`. The cases, written where D3 was absent, planted such maps. Kind: a fix under W2-204;
+the ticket stays closed. Approved by the CTO in the lead's brief (`docs/emergency-2/briefs/LEAD-forbidden-reach-d3.md`).
+
+- **FD-1** A path map D3 refuses stays refused by `forbidden-reach` (`ERROR: GovError`, no count; DEC-185, W2-212 F1: the class
+  cannot fail open). No source changes. The unit cases plant the class with both policies, and the case of a class without them
+  expects the refusal. FR-1's "outside when a namespace states a `stale_class`" holds for every map D3 accepts. Verify:
+  `tests/unit/memaudit/test_forbidden_reach.py` green.
