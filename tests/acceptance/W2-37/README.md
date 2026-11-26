@@ -354,6 +354,49 @@ Run at the commit that added the batch, in the sandbox through the heavy slot, `
 are the 4 new cases and the 2 known reds, `test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[template]`
 and `[claude-copy]`. The new file adds **5 cases**: 4 red, 1 green.
 
+## Fix: `gov impact` bounded, IM-1 and IM-2 (plan item 1-8; FINDINGS I-5)
+
+Written by the independent test designer from the ticket's section "Fix: `gov impact` bounded" and the lead's interface
+decisions, before the fix; `src/gov/impact/` was not changed by this designer. Cases in `test_w2_37_bounded.py`, built
+on the suite's fixtures (`built`, `base`, `code_base`, `box`) and its support module, which is unchanged. The two lines
+are numbered after the map's earlier ones (the ids are labels of this table): `success-5` is IM-1, `success-6` is IM-2.
+
+**The stopped index** is a stand-in `codebase-memory-mcp`, first on the case's `PATH`: it records each start in a marker
+file and sleeps 87 s without an answer. Each case's own clone has its store loaded and a built index folder planted
+(`.gov-runtime/codeintel/files/`). Every run must end within 30 s; the harness kills a run after 60 s with its process
+group, and the stand-ins at the case's end. No case needs the real tool; none is `local_only`. Kind: the 30 s bound is
+wall time (the K-lines' own), so these cases are load-sensitive.
+
+**The interface assumed** (the lead's): `graphs.code` begins `not loaded` for a record-only change (`complete: false`,
+exit 0); an id-shaped name no record holds is an `UNRESOLVED` gap; a change that needs code with the index stopped is
+refused `IMPACT_CHANGE_UNKNOWN`, the message naming the code index, and for a hung tool `error.details.graphs.code`
+begins `unavailable:` and names the code index or the tool.
+
+Red reason on the base, "waits": the command starts the stand-in for every change (its first call is
+`config set ui_enabled false`) and is still running after 60 s, when the harness kills it.
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-5 (IM-1: a decision, a specification, a ticket, a register entry) | `test_w2_37_bounded.py::test_a_record_only_change_is_answered_without_the_code_index[decision]`, `test_w2_37_bounded.py::test_a_record_only_change_is_answered_without_the_code_index[specification]`, `test_w2_37_bounded.py::test_a_record_only_change_is_answered_without_the_code_index[ticket]`, `test_w2_37_bounded.py::test_a_record_only_change_is_answered_without_the_code_index[register-entry]` | waits |
+| success-5 (IM-1: a name shaped like a record id is never looked up as a symbol) | `test_w2_37_bounded.py::test_a_name_shaped_like_a_record_id_is_a_gap_and_never_looked_up_as_a_symbol`, `test_w2_37_bounded.py::test_an_unknown_id_shaped_change_is_refused_without_the_code_index` | waits |
+| success-5 (IM-1: a record that names a symbol still joins the code graph, G-16) | `test_w2_37_bounded.py::test_a_record_that_names_a_symbol_still_loads_the_code_graph_and_ends` | waits |
+| success-6 (IM-2: a source path or a symbol name, the tool hung) | `test_w2_37_bounded.py::test_a_change_that_needs_code_with_a_hung_index_is_refused_naming_it[source-path]`, `test_w2_37_bounded.py::test_a_change_that_needs_code_with_a_hung_index_is_refused_naming_it[symbol-name]` | waits |
+| success-6 (IM-2: a source path, the tool absent) | `test_w2_37_bounded.py::test_a_source_path_with_the_code_tool_absent_is_refused_naming_the_code_index` | none: green on the base, which already refuses this naming the code index (a guard) |
+
+The success side of a change that needs code, with a working index, is held by the earlier `local_only` cases
+(`test_w2_37_code_graph.py`, the symbol cases of `test_w2_37_deletable.py` and `test_w2_37_question.py`).
+
+Readings this fix's cases take: (1) "record-only" is a change whose records reach no symbol within the depth (the
+fixture's DEC-001 names one; DEC-003, SPEC-099, PROJ-zz99 and DEC-070 reach none); (2) for a record that names a symbol,
+with the tool hung, neither a result nor a refusal is fixed: the case holds that the tool was asked, the run ends in
+time, never reads complete, and names the code index.
+
+**Rewritten for IM-1** (Rewrite-Reason: a record-only change no longer reads the code graph):
+`test_w2_37_resume_findings.py`'s fixture `indexed_split_register` asserted both graphs `ok` for a DEC-001 that named
+no code. Where the fixture has code, DEC-001 now constrains its function `w37_solo`; the case that uses it,
+`test_w2_37_resume_findings.py::test_with_a_current_code_graph_a_first_register_entry_uncommitted_is_never_complete`
+(`local_only`), is unchanged.
+
 ## Packages, and the tests that depend on each
 
 - **P-1, the change skill (outside `allowed_paths`).** The routing of the question to `gov impact` is in

@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -48,6 +50,7 @@ def root(tmp_path, monkeypatch):
         (staged / rel).parent.mkdir(parents=True, exist_ok=True)
         (staged / rel).write_bytes((tmp_path / rel).read_bytes())
     entries = lambda names: [{"name": name, "path": PATHS[name], "label": "Function"} for name in names]  # noqa: E731
+    monkeypatch.setattr(codeintel, "projects", lambda _root: [codeintel.PROJECT])
     monkeypatch.setattr(codeintel, "definitions", lambda _root, name: entries([name] if name in CALLS else []))
     monkeypatch.setattr(codeintel, "callees", lambda _root, name: entries(CALLS.get(name, [])))
     monkeypatch.setattr(codeintel, "callers", lambda _root, name: entries(
@@ -404,3 +407,80 @@ def test_a_store_with_no_stated_links_never_makes_a_decision_deletable(stated, m
     found = impact.assess(stated, ["DEC-067"], {})
     assert found["graphs"]["record"].startswith("stale") and "stated links" in found["graphs"]["record"]
     assert found["change"][0]["deletable"] is False and found["complete"] is False
+
+
+# The fix of I-5 (W2-37, IM-1 and IM-2): the code graph is loaded only when a named item needs it, and a code index that
+# does not answer never hangs the command.
+def never_asked(monkeypatch):
+    def asked(*_args):
+        raise AssertionError("the code index was asked")
+
+    for name in ("projects", "dead_code", "definitions", "callers", "callees"):
+        monkeypatch.setattr(codeintel, name, asked)
+
+
+def test_a_record_only_id_never_asks_the_code_index(root, monkeypatch):
+    never_asked(monkeypatch)
+    found = impact.assess(root, ["DEC-050"], {})
+    assert found["graphs"]["code"].startswith("not loaded") and found["complete"] is False
+    assert found["change"][0]["deletable"] is True and found["radius"] == "R0"
+    assert list(found["affected"]) == list(readings.KINDS)
+
+
+def test_a_name_shaped_like_a_record_id_is_an_unresolved_gap_and_no_symbol(root, monkeypatch):
+    (root / "DEC-070.md").write_text("---\nid: DEC-070\nstatus: ACTIVE\ntype: decision\n"
+                                     "constrains: [DEC-999, CHARTER-v5, DAEO-6n5k]\n---\n", encoding="utf-8")
+    git(root, "add", "DEC-070.md")
+    git(root, "commit", "-q", "-m", "dangling ids")
+    store.load(root)
+    never_asked(monkeypatch)
+    found = impact.assess(root, ["DEC-070"], {})
+    assert found["graphs"]["code"].startswith("not loaded") and found["complete"] is False
+    assert found["gaps"] == [{"id": item, "reason": impact.UNRESOLVED}
+                             for item in ("CHARTER-v5", "DAEO-6n5k", "DEC-999")]
+
+
+def test_an_unknown_record_id_is_refused_without_the_code_index(root, monkeypatch):
+    never_asked(monkeypatch)
+    with pytest.raises(GovError) as refused:
+        impact.assess(root, ["DEC-999"], {})
+    assert refused.value.code == "IMPACT_CHANGE_UNKNOWN" and "never looked up" in refused.value.message
+    assert "cannot be asked" not in refused.value.message
+    assert refused.value.details["graphs"]["code"].startswith("not loaded")
+
+
+@pytest.fixture()
+def hung(monkeypatch):
+    """A code index whose cheap call does not return until the test ends."""
+    release = threading.Event()
+    never_asked(monkeypatch)
+    monkeypatch.setattr(codeintel, "projects", lambda _root: release.wait(30))
+    monkeypatch.setattr(impact, "_PROBE_S", 0.2)
+    yield
+    release.set()
+
+
+@pytest.mark.parametrize("asked", ["helper", "app/flow.py"])
+def test_an_id_that_needs_code_is_refused_when_the_code_index_does_not_answer(root, hung, asked):
+    started = time.monotonic()
+    with pytest.raises(GovError) as refused:
+        impact.assess(root, [asked], {})
+    assert time.monotonic() - started < 10
+    assert refused.value.code == "IMPACT_CHANGE_UNKNOWN"
+    assert "code index (codebase-memory-mcp) did not answer within 0.2 s" in refused.value.message
+
+
+def test_a_record_that_names_a_symbol_says_the_code_index_did_not_answer(root, hung):
+    found = impact.assess(root, ["DEC-001"], {})
+    assert found["graphs"]["code"].startswith("unavailable") and "did not answer" in found["graphs"]["code"]
+    assert {"id": "apply", "reason": "CODE_GRAPH_UNAVAILABLE"} in found["gaps"] and found["complete"] is False
+
+
+def test_a_code_index_that_fails_its_cheap_call_cannot_be_read(root, monkeypatch):
+    def failed(_root):
+        raise RuntimeError("planted failure")
+
+    never_asked(monkeypatch)
+    monkeypatch.setattr(codeintel, "projects", failed)
+    state = impact.assess(root, ["DEC-001"], {})["graphs"]["code"]
+    assert state == "unavailable: the code index cannot be read (planted failure)"

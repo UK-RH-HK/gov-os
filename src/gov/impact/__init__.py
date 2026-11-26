@@ -4,11 +4,13 @@
 X?") and returns the impact assessment: the affected specifications, decisions, tickets, tests and code, each with
 the graph it came from, the radius and the depth it implies (``gov.closure.depth_of_radius``), the gaps, and the
 change-impact proposal (CIT-P) as frontmatter. The two graphs are joined by id (G-16): a record's edge to no record is
-looked up as a symbol of the code index, and a symbol reaches the records whose edges name it. ``compare(root, rel)``
-checks a change-execution record (CIT-E) against the CIT-P it names.
+looked up as a symbol of the code index, and a symbol reaches the records whose edges name it. A name shaped like a
+record id is never a symbol, and the code graph is loaded only when another name that is no record is asked.
+``compare(root, rel)`` checks a change-execution record (CIT-E) against the CIT-P it names.
 
-It only reads. It builds neither the store nor the code index, and a graph that is missing, stale or unreadable is
-said, and the report is then never complete. The readings still with the owner are in ``gov.impact.readings``.
+It only reads. It builds neither the store nor the code index, and a graph that is not loaded, missing, stale,
+unreadable or does not answer is said, and the report is then never complete. The readings still with the owner are in
+``gov.impact.readings``.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ import hashlib
 import re
 import sqlite3
 import subprocess
+import threading
 from collections import Counter
 from pathlib import Path
 
@@ -30,6 +33,9 @@ DEPTH_LIMIT, UNRESOLVED, NO_KIND = "DEPTH_LIMIT_REACHED", "UNRESOLVED", "NO_KIND
 _QUESTION = re.compile(r"\s*what(?:'s|’s|\s+is)\s+the\s+impact\s+of\s+[`'\"]?([^\s`'\"?]+)[`'\"]?\s*\??\s*",
                        re.IGNORECASE)
 _NAME = re.compile(r"[A-Za-z_][\w.:/#-]*")  # a record id or a symbol name
+_RECORD_ID = re.compile(r"[A-Z][A-Z0-9]*-[A-Za-z0-9._-]+")  # a name shaped like a record id is no symbol
+_PROBE_S = 20  # how long the code index has to answer one cheap call before it is taken as not answering
+_NOT_LOADED = "not loaded: no named item needed the code index; gov impact asked it nothing"
 
 __all__ = ["assess", "compare"]
 
@@ -133,22 +139,28 @@ def _uncommitted(root: Path, stored: set) -> list[str]:
 
 
 class _Code:
-    """The code graph of the code index, read once if it was built; ``usable`` when it was read, even stale."""
+    """The code graph of the code index, read once, at the first name that needs it; ``usable`` when it was read, even
+    stale."""
 
     def __init__(self, root: Path):
+        self.root, self.dead, self.paths, self.state = root, Counter(), {}, _NOT_LOADED
+
+    def _load(self) -> None:
         from gov import codeintel
 
-        self.root, self.dead, self.paths = root, Counter(), {}
-        staged = codeintel.home(root).parent / "files"
+        staged = codeintel.home(self.root).parent / "files"
         if not staged.is_dir():
             self.state = "missing: no code index was built here; gov impact never builds it"
             return
         try:
-            self.dead = Counter(entry["name"] for entry in codeintel.dead_code(root))
+            if not _answers(self.root):
+                self.state = f"unavailable: the code index ({codeintel.TOOL}) did not answer within {_PROBE_S} s"
+                return
+            self.dead = Counter(entry["name"] for entry in codeintel.dead_code(self.root))
         except (RuntimeError, OSError, LookupError, ValueError, TypeError) as error:
             self.state = f"unavailable: the code index cannot be read ({error})"
             return
-        self.state = _staleness(root, staged) or OK
+        self.state = _staleness(self.root, staged) or OK
 
     @property
     def usable(self) -> bool:
@@ -157,6 +169,10 @@ class _Code:
     def defined(self, name: str) -> list[str]:
         from gov import codeintel
 
+        if _RECORD_ID.fullmatch(name):
+            return []
+        if self.state == _NOT_LOADED:
+            self._load()
         if self.usable and name not in self.paths:
             self.paths[name] = sorted({entry["path"] for entry in codeintel.definitions(self.root, name)})
         return self.paths.get(name, [])
@@ -171,6 +187,27 @@ class _Code:
         from gov import codeintel
 
         return self.dead[name] > 0 and self.dead[name] >= len(codeintel.definitions(self.root, name))
+
+
+def _answers(root: Path) -> bool:
+    """Whether the code index answers one cheap call within ``_PROBE_S`` seconds; what the call raises is raised here.
+    The read of the whole graph that follows is not limited: a slow answer is not a stopped index."""
+    from gov import codeintel
+
+    failed = []
+
+    def ask() -> None:
+        try:
+            codeintel.projects(root)
+        except BaseException as error:  # carried to the caller's thread
+            failed.append(error)
+
+    asking = threading.Thread(target=ask, daemon=True)  # a call that never returns does not hold the process
+    asking.start()
+    asking.join(_PROBE_S)
+    if failed:
+        raise failed[0]
+    return not asking.is_alive()
 
 
 def _staleness(root: Path, staged: Path) -> str | None:
@@ -230,7 +267,8 @@ def _walk(graph: _Records, code: _Code, start: list[str], depth: int) -> tuple[d
                 seen[item] = CODE
                 named |= code.near(item) | graph.near.get(item, set())
             else:
-                gaps[item] = UNRESOLVED if code.usable else "CODE_GRAPH_" + code.state.split(":")[0].upper()
+                gaps[item] = UNRESOLVED if code.usable or _RECORD_ID.fullmatch(item) \
+                    else "CODE_GRAPH_" + code.state.split(":")[0].upper()
         front = named - seen.keys() - gaps.keys()
     gaps.update(dict.fromkeys(front, DEPTH_LIMIT))
     return seen, gaps
@@ -288,9 +326,13 @@ def assess(root: Path, values: list[str], config: dict, out: str | None = None) 
     graph, code = _Records(root), _Code(Path(root))
     unknown = [item for item in ids if item not in graph.by_id and not code.defined(item)]
     if unknown:
-        looked = "" if code.usable else f", and the code graph cannot be asked ({code.state})"
-        raise GovError("IMPACT_CHANGE_UNKNOWN", f"{', '.join(unknown)}: no record of the store and no symbol of the "
-                       f"code index{looked}", {"unknown": unknown, "graphs": {RECORD: graph.state, CODE: code.state}})
+        if all(_RECORD_ID.fullmatch(item) for item in unknown):
+            looked = "; a name shaped like a record id is never looked up in the code index"
+        else:
+            looked = " and no symbol of the code index" \
+                + ("" if code.usable else f", and the code graph cannot be asked ({code.state})")
+        raise GovError("IMPACT_CHANGE_UNKNOWN", f"{', '.join(unknown)}: no record of the store{looked}",
+                       {"unknown": unknown, "graphs": {RECORD: graph.state, CODE: code.state}})
     if out is not None:
         _check_out(root, out, graph)
     current = graph.state == OK
@@ -312,7 +354,7 @@ def assess(root: Path, values: list[str], config: dict, out: str | None = None) 
     affected = _grouped(graph, code, seen, ids, gaps)
     closed = [item for item in ids if item in graph.by_id and readings.closed_specification(graph.by_id[item])]
     record_id = "CITP-" + hashlib.sha256("\n".join(sorted(ids)).encode("utf-8")).hexdigest()[:8]
-    if out is not None and re.fullmatch(r"[A-Z][A-Z0-9]*-[A-Za-z0-9._-]+", Path(out).stem):
+    if out is not None and _RECORD_ID.fullmatch(Path(out).stem):
         record_id = Path(out).stem
     graphs = {RECORD: graph.state, CODE: code.state}
     complete = not gaps and all(state == OK for state in graphs.values())

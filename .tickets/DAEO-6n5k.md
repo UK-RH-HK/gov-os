@@ -69,3 +69,11 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-37), as approved (DEC-729). The list row
   - After apply or archive, the CIT-E record matches the proposal or lists the differences [W2-L319].
   - "What's the impact of X?" in plain language runs `gov impact` [CAP-33.g, DEC-167].
   - It also takes the S0b2 glue G-16 (id mapping) and G-24 (deletable-class join).
+
+## Fix: `gov impact` bounded (integration plan 1-8; FINDINGS I-5; the CTO, 2026-11-26)
+
+Cause, confirmed 2026-11-26: `_Code.__init__` (`src/gov/impact/__init__.py:147`) called `codeintel.dead_code` for every id, a record id included. That reads the whole code graph, one query per source path (`src/gov/codeintel/__init__.py:611`; 5,515 indexed files here, no per-file record yet). `gov impact DEC-1204` on this repository's index and store was killed at 170 s inside that read. It is not a wait on a daemon.
+
+- [IM-1] The code graph is built lazily: a record-only id (a decision, a specification, a ticket) never starts, asks or waits on the code index. A name shaped like a record id (`DEC-1204`, `DAEO-6n5k`, `CHARTER-v5`) is never looked up as a symbol. A record that names a symbol still joins the code graph (G-16). Verify: `gov impact DEC-1204` finishes in under 30 s with the code index stopped, prints the five groups (specifications, decisions, tickets, tests, code), the code graph reported as not loaded and `complete: false`.
+- [IM-2] An id that does need code (a source path, a symbol name) still loads the graph; with the index stopped the command says so, naming the code index, and exits non-zero, never hangs. Verify: a planted source path with the index stopped ends within 30 s with a refusal that names the code index.
+
