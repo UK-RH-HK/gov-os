@@ -587,13 +587,13 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
             for entry in refused:
                 print(f"{entry['code']}: {entry['ticket']}: {entry['reason']}", file=sys.stderr)
             return EXIT_SELECT_REFUSED
-        traced = trace.landing(clone, _commit_of(clone, "HEAD"), cands)  # on the merged tree (W2-206 fix IT-2)
         if full:
             chosen = whole.selection(clone, [f for f in (_acceptance(c["at_tip"]) or _acceptance(c["front"])
                                                          for c in cands) if f])
             suites, options, found = chosen["suites"], chosen["pytest_options"], None
         else:
             suites, options, found = _union(root, clone, cands, "")
+        traced = trace.landing(clone, _commit_of(clone, "HEAD"), cands)  # on the merged tree (W2-206 fix IT-2)
     except GovError as refused:
         if refused.code != SELECTION_REFUSED:
             raise
@@ -720,7 +720,6 @@ def land(root: Path, given: list[str], onto: str | None = None,
             return finish(EXIT_RED)
         timed("merge", began)
         began = time.monotonic()
-        traced = trace.landing(clone, _commit_of(clone, "HEAD"), left)  # a notice: it never refuses
         own = [c["folder"] for c in left if c["folder"]]  # run by the runner of gov accept: no test runs twice
         if full:  # the asked-for widening: the whole tests/, no selection computed, in a pool inside the slot
             limit = whole.cap(root)
@@ -732,6 +731,7 @@ def land(root: Path, given: list[str], onto: str | None = None,
             result["notices"] = found["notices"]
             result["selection"] = {"suites": [s for s in union if not checks._under(s, own)],
                                    "pytest_options": options}
+        traced = trace.landing(clone, _commit_of(clone, "HEAD"), left)  # a notice: it never refuses
         if dry is not None:
             dry.selection(_dry.selection_object([c["ticket"] for c in left], union,
                                                 result["selection"]["pytest_options"], found, line, traced))
