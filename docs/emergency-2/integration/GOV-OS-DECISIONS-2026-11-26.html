@@ -85,7 +85,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums}
   <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
 </div></header>
 <main>
-<p class="lead">Three decisions from the night of 25 to 26 November, in two sections. E-01 and E-02 hold batch A of the 0.1.8 bundle; E-03 is what 0.1.8 holds. Each card gives what was found, the options with their costs, and one recommendation with its reason. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
+<p class="lead">Four decisions from the night of 25 to 26 November, in three sections. E-01 and E-02 hold batch A of the 0.1.8 bundle; E-03 is what 0.1.8 holds; E-04 holds batch B (0.1.9) only. Each card gives what was found, the options with their costs, and one recommendation with its reason. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
 <p class="hint" id="batchline"></p>
 
 <section class="state" aria-labelledby="how">
@@ -215,6 +215,45 @@ const SECTIONS = [
     "reason": "EXAMIN's measure is the one thing waiting, and batch B needs no hand of yours once the rule is live.",
     "sources": "CTO-HANDOVER.md §3; INTEGRATION-PLAN.md; FINDINGS I-34, I-36; landing records of 26 Nov.",
     "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "3. Batch B (0.1.9)",
+  "intro": "The three held branches that conflicted (W2-207's runtime, eval-roots, kit-head) are merged onto batch A; nothing here holds 0.1.8.",
+  "qs": [
+   {
+    "id": "E-04",
+    "from": "W1-01 MR-3 · DEC-253, DEC-1052 Q-10",
+    "title": "Exempt six earlier lead commits on the batch B branches from W1-01's authorship check?",
+    "found": [
+     "Six commits made before tonight on the held branches carry <code>Role: orchestrator</code> and touch <code>tests/acceptance/</code>; the landing's author check refuses them:",
+     "Two merges kept both sides of a README map conflict (<code>a0cf2fb68</code> W2-204, <code>50f278cdd</code> W2-208), the kind of E-01.",
+     "Two merges settled one line of W2-153's test code by taking the newer side (<code>86a3f29b2</code>, <code>cbbbd5cf9</code>); two plain commits by W2-207's lead reshaped its README map into the form <code>gov accept</code> reads and added nine lines to its <code>conftest.py</code> (<code>3624a8d50</code>, <code>6fc0a39d9</code>).",
+     "None weakens a test: <code>gov accept</code> passes for W2-207, W2-204 and W2-208 on bundle-b's head. The merges bundle-b's own lead made are the test designer's, as DEC-253 asks.",
+     "A script adds the six entries and commits them as yours, tested on a copy: <code>docs/emergency-2/release-0.1.8/exempt-bundle-b.sh</code>."
+    ],
+    "opts": [
+     [
+      "a",
+      "Exempt all six: <code>bash /home/usain/Dynamic-Agentic-Engineering-OS/docs/emergency-2/release-0.1.8/exempt-bundle-b.sh</code>",
+      "About a minute; batch B lands as merged, as 0.1.9.",
+      1
+     ],
+     [
+      "b",
+      "Exempt the two README merges only; the test designer re-makes the W2-153 line and the W2-207 map and conftest on rebuilt branches",
+      "A few hours of leads; W2-207 and eval-roots rebuilt from before those commits, then bundle-b again."
+     ],
+     [
+      "c",
+      "Re-make all six",
+      "As (b), plus the two README merges; the longest."
+     ]
+    ],
+    "reason": "The changes are a map's form, one line taken from the newer side and a fixture, all green; rebuilding four branches buys no safer test.",
+    "sources": "bundle-b lead's return (log/leads/bundle-b.json); src/gov/queue/checks.py test_authors; path-map.yaml acceptance_exemptions.",
+    "stops": "Stops batch B's landing (0.1.9) only."
    }
   ]
  }
