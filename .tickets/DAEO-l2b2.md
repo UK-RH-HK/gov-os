@@ -130,3 +130,25 @@ second case plants no number in the path map.
   `impact`, the mapping of ticket to entry, for the candidate range on the merged tree; it runs no test and moves
   nothing; a trace that fails is the string, exit 0. Verify: planted: `--select` of the IT-1 branch prints the same
   `impact` the landing then records.
+
+## Fix: the selection's graph is the merged tree, and the landing names its commit, GB-1 and GB-2 (2026-11-26; plan item 1-0 (b); X-1, DEC-1244; approved by the CTO in the lead's brief)
+
+- **Which graph the selection reads (found 2026-11-26).** No stored graph, so no recorded commit that can be behind.
+  `gov.queue` merges the candidates in the warm clone (`src/gov/queue/command.py`, `_merged`), which is first reset and
+  cleaned to the base (`src/gov/close/attribution.py`, `checkout`; `src/gov/close/batch.py`, `_build`), and
+  `select.scoped` reads that tree on every run (`_union`): the import graph parsed from its Python files
+  (`src/gov/close/select.py`, `import_reach`, `_python_files`), the test map (`load_map`) and the tickets (`_tickets`).
+  The code index (`gov.codeintel`) is not an input of the selection (DEC-1098 (2)(a)).
+- **GB-1 Never behind.** The landing and `--select` read the selection's graph from the merged tree of that run, whatever
+  an earlier run left in the warm clone. No stored graph, so no refresh step and no `GRAPH_BEHIND` refusal is built (the
+  lead's brief: build only what is missing). Verify: planted: a warm clone left at an older commit, with an untracked
+  test file that imports the changed module: `--select` and the landing select the suites of the merged tree (a test
+  that only the branch or the base head holds is selected, the left-over file is not).
+- **GB-2 The graph's commit is said.** The landing's answer, `queue.json`, a dry run's answer and `select.json`, the
+  `--select` object and a ticket's first close record (front matter) hold `graph_commit`: the full id of the commit
+  whose tree the selection was read from (the merge in the warm clone; the integration head for a branch already
+  merged). With culprits it stays the commit the selection was read from, not the tested rest. Absent where no selection
+  is computed (`--full`; a landing that ends before the selection); a fix landing's close record stays as W2-201 X6 pins
+  it. Verify: planted: a landing with no culprit says `graph_commit` equal to the tested commit in the answer,
+  `queue.json` and the close record; `--select` says a commit of the warm clone whose parents hold the integration head
+  and the branch's tip.
