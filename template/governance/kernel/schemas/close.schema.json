@@ -4,12 +4,14 @@
   "description": "Frontmatter of a close record, as `gov close` writes it at `docs/close/<ticket>/CL-<ticket>.md`: the shared frontmatter, `task`, the ticket closed, and the evidence block of W2-66's close (DEC-890 item 1). The close packet's other fields (created, outputs, inputs, tests, commits, the governance share) follow it and are not constrained here.",
   "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
   "required": ["task"],
+  "if": { "properties": { "close": { "const": "queue" } }, "required": ["close"] },
+  "then": { "required": ["evidence"], "properties": { "evidence": { "type": "object" } } },
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/record_id" },
     "type": { "const": "close" },
     "task": { "$ref": "common.schema.json#/$defs/ticket_id" },
     "evidence": {
-      "description": "The evidence block of the close (W2-66, `gov.close.evidence`): null for a close judged on its evidence with no test run; absent from a close record written before W2-66.",
+      "description": "The evidence block of the close (W2-66, `gov.close.evidence`): null for a close judged on its evidence with no test run; absent from a close record written before W2-66. A record the landing writes (`close: queue`) holds one, never null.",
       "type": ["object", "null"],
       "$ref": "#/$defs/evidence"
     }
