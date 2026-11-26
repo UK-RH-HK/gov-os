@@ -23,18 +23,23 @@ A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (
    ``gov accept`` cannot judge by, with the runner's code. A ticket of a class judged on a record (research,
    audit, coordination, specification) is judged by the close's own gate of that record, in the clone, and needs
    no test folder; a record the gate refuses puts the ticket out of the batch with the gate's code.
-3. **The run.** The candidates left are merged onto the head in the warm clone. Before any test runs, the path
-   map's coverage check (``gov.queue.coverage``) refuses a candidate that adds or renames a path no namespace or more
-   than one holds (W2-206 fix PM-1, DEC-1244), and the rest are merged and checked again; its counts are ``path_map``
-   in the answer, ``queue.json``, the selection's object and the close record. Where there are culprits the merge
-   without them is checked again, and a refusal there lands nothing. The merged tree is traced (``gov.queue.trace``,
-   W2-206 fix IT-1: ``gov impact`` on the records each change holds, again on the tested commit where there are
-   culprits), a notice only, ``impact`` in the same places. Then the union of the rest's
+3. **The run.** The candidates left are merged onto the head in the warm clone, which is first reset and cleaned to
+   it. The selection's graph (the import graph, the test map, the tickets) is that merged tree, read fresh on every
+   run; no graph is stored, so none can be behind. Where a selection is computed, ``graph_commit`` is the commit of
+   that tree (the integration head for a branch already merged; with culprits still the one the selection was read
+   from), in the answer, ``queue.json``, the selection's object and the first close record (not a fix's). That merge
+   is the one run and landed (``batch.isolate``'s ``built``), so with no culprit it is the tested commit. Before any
+   test runs, the path map's coverage check (``gov.queue.coverage``) refuses a candidate that adds or renames a path
+   no namespace or more than one holds (W2-206 fix PM-1, DEC-1244), and the rest are merged and checked again; its
+   counts are ``path_map`` in the answer, ``queue.json``, the selection's object and the close record. Where there
+   are culprits the merge without them is checked again, and a refusal there lands nothing. The merged tree is traced
+   (``gov.queue.trace``, W2-206 fix IT-1: ``gov impact`` on the records each change holds, again on the tested commit
+   where there are culprits), a notice only, ``impact`` in the same places. Then the union of the rest's
    ``select.scoped`` selections (each branch's changed paths counted in its change), less their own acceptance
-   folders, is run once by ``gov.close.batch.isolate``, which also runs each ticket's acceptance folder through
-   the runner of ``gov accept`` (``gov.queue.acceptance``: no test of it runs twice), re-runs a red alone, finds
-   the culprit and runs the rest again. A red no candidate explains that is red at the base with the same failure
-   type is a known base red: named, not blocking.
+   folders, is run once by ``gov.close.batch.isolate``, which also runs each ticket's acceptance folder through the
+   runner of ``gov accept`` (``gov.queue.acceptance``: no test of it runs twice), re-runs a red alone, finds the
+   culprit and runs the rest again. A red no candidate explains that is red at the base with the same failure type is
+   a known base red: named, not blocking.
 4. **The land.** One close commit per landed ticket on the tested commit, in the clone (its close record, which
    holds its ``evidence`` block (``gov.queue.evidence``, W2-115b fix IT-3), notices and ``impact``; its checkpoint,
    ``tk close``); a fix landing's commit is ``fix: <ticket> ...`` instead and only appends the fix to
@@ -591,8 +596,10 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
             chosen = whole.selection(clone, [f for f in (_acceptance(c["at_tip"]) or _acceptance(c["front"])
                                                          for c in cands) if f])
             suites, options, found = chosen["suites"], chosen["pytest_options"], None
+            graph = None
         else:
             suites, options, found = _union(root, clone, cands, "")
+            graph = _commit_of(clone, "HEAD")  # the tree the selection was read from (GB-2)
         traced = trace.landing(clone, _commit_of(clone, "HEAD"), cands)  # on the merged tree (W2-206 fix IT-2)
     except GovError as refused:
         if refused.code != SELECTION_REFUSED:
@@ -601,7 +608,7 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
         return EXIT_SELECT_REFUSED
     finally:
         _back_to(clone, base)
-    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options, found, line, traced)))
+    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options, found, line, traced, graph)))
     return 0
 
 
@@ -728,13 +735,15 @@ def land(root: Path, given: list[str], onto: str | None = None,
             union, found = result["selection"]["suites"], None  # no selection is computed: no unplaced_base
         else:
             union, options, found = _union(root, clone, left)
+            result["graph_commit"] = _commit_of(clone, "HEAD")  # the tree the selection was read from (GB-2)
             result["notices"] = found["notices"]
             result["selection"] = {"suites": [s for s in union if not checks._under(s, own)],
                                    "pytest_options": options}
         traced = trace.landing(clone, _commit_of(clone, "HEAD"), left)  # a notice: it never refuses
         if dry is not None:
             dry.selection(_dry.selection_object([c["ticket"] for c in left], union,
-                                                result["selection"]["pytest_options"], found, line, traced))
+                                                result["selection"]["pytest_options"], found, line, traced,
+                                                result.get("graph_commit")))
         timed("selection", began)
         began, before = time.monotonic(), seconds["acceptance"]
         workers = limit["workers"] if limit else 1
@@ -747,7 +756,8 @@ def land(root: Path, given: list[str], onto: str | None = None,
                     done, _ = batch.isolate(root, base, [f"{c['ticket']}={c['tip']}" for c in left],
                                             targets=result["selection"]["suites"], onto=None, timeout=timeout,
                                             also=acceptance_runs, workers=workers,
-                                            options=[f"--ignore={f.strip('/')}" for f in own] if full else None)
+                                            options=[f"--ignore={f.strip('/')}" for f in own] if full else None,
+                                            built=result.get("graph_commit"))  # tested: the tree selected from
         except GovError as refused:
             run_files(refused.details)
             if full:
@@ -814,7 +824,7 @@ def land(root: Path, given: list[str], onto: str | None = None,
                      {"test": t, "verdict": "culprit", "culprits": explains.get(t, [])} for t in result["reds"]],
                   "base_reds": list(at_base), "culprits": result["culprits"], "base": base, "onto": onto,
                   "queue": result["record"],
-                  **{k: result[k] for k in ("path_map",) if k in result}}
+                  **{k: result[k] for k in ("path_map", "graph_commit") if k in result}}
         last = _close_all(root, clone, landed, record, result)
         _move(root, clone, onto, base, last, result)
         timed("close", began)
