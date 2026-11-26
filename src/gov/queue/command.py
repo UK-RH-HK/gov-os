@@ -23,7 +23,11 @@ A thin queue on the close's pieces (EMERGENCY-2 4.3 step 3; audit 1 question 1 (
    ``gov accept`` cannot judge by, with the runner's code. A ticket of a class judged on a record (research,
    audit, coordination, specification) is judged by the close's own gate of that record, in the clone, and needs
    no test folder; a record the gate refuses puts the ticket out of the batch with the gate's code.
-3. **The run.** The candidates left are merged onto the head in the warm clone; the union of their
+3. **The run.** The candidates left are merged onto the head in the warm clone. Before any test runs, the path
+   map's coverage check (``gov.queue.coverage``) refuses a candidate that adds or renames a path no namespace or more
+   than one holds (W2-206 fix PM-1, DEC-1244), and the rest are merged and checked again; its counts are ``path_map``
+   in the answer, ``queue.json``, the selection's object and the close record. Where there are culprits the merge
+   without them is checked again, and a refusal there lands nothing. Then the union of the rest's
    ``select.scoped`` selections (each branch's changed paths counted in its change), less their own acceptance
    folders, is run once by ``gov.close.batch.isolate``, which also runs each ticket's acceptance folder through
    the runner of ``gov accept`` (``gov.queue.acceptance``: no test of it runs twice), re-runs a red alone, finds
@@ -268,8 +272,8 @@ def _acceptance(front: dict) -> str | None:
     return path if isinstance(path, str) and path.strip("/") else None
 
 
-def _changed(root: Path, base: str, tip: str) -> list[str]:
-    names = _git(root, "diff", "-z", "--no-renames", "--name-only", f"{base}...{tip}")
+def _changed(root: Path, base: str, tip: str, *only: str) -> list[str]:
+    names = _git(root, "diff", "-z", "--no-renames", "--name-only", *only, f"{base}...{tip}")
     return sorted(set(filter(None, names.split("\0"))))
 
 
@@ -511,6 +515,32 @@ def _merged(clone: Path, base: str, left: list[dict], alone: dict | None) -> str
     return merged
 
 
+def _judge(root: Path, clone: Path, cands: list[dict]) -> tuple[list[dict], str | None]:
+    """The path map's coverage of the tree checked out in the clone, read against what each candidate adds."""
+    from gov.check.pathmap import PATH_MAP_REL
+    from gov.queue import coverage
+
+    return coverage.judge(clone, [(c["ticket"], _changed(root, c["since"], c["tip"], "--diff-filter=A"),
+                                   PATH_MAP_REL in _changed(root, c["since"], c["tip"])) for c in cands])
+
+
+def _covered(root: Path, clone: Path, base: str, left: list[dict], alone: dict | None) \
+        -> tuple[list[dict], list[dict], str | None]:
+    """The candidates merged (``_merged``) and those the path map refuses taken out, until the merge of the rest
+    refuses none (a refused one may have carried the map line another relied on): ``(candidates left, refused
+    entries, the last merge's count line)``."""
+    refused, line = [], None
+    while left:
+        _merged(clone, base, left, alone)
+        entries, line = _judge(root, clone, left)
+        if not entries:
+            break
+        refused += entries
+        out = {e["ticket"] for e in entries}
+        left = [c for c in left if c["ticket"] not in out]
+    return left, refused, line
+
+
 def _union(root: Path, clone: Path, left: list[dict], said: str = "; nothing lands") -> tuple[list[str], list[str], dict]:
     """The union of the candidates' ``select.scoped`` selections in the clone at the tested merge, each branch's
     changed paths counted in its change: ``(suites, pytest options, found)``, ``found``: ``unplaced_base``, ``unplaced`` (both always empty: the change is the branch's diff alone, and a
@@ -547,7 +577,11 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
     except attribution.CloneError as e:
         _refuse("CLOSE_CLONE_FAILED", f"the queue's clone cannot be made: {e}", {"base": base})
     try:
-        _merged(clone, base, cands, alone)
+        _, refused, line = _covered(root, clone, base, cands, alone)
+        if refused:
+            for entry in refused:
+                print(f"{entry['code']}: {entry['ticket']}: {entry['reason']}", file=sys.stderr)
+            return EXIT_SELECT_REFUSED
         if full:
             chosen = whole.selection(clone, [f for f in (_acceptance(c["at_tip"]) or _acceptance(c["front"])
                                                          for c in cands) if f])
@@ -561,7 +595,7 @@ def select(root: Path, given: list[str], onto: str | None = None, full: bool = F
         return EXIT_SELECT_REFUSED
     finally:
         _back_to(clone, base)
-    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options, found)))
+    print(json.dumps(dry.selection_object([c["ticket"] for c in cands], suites, options, found, line)))
     return 0
 
 
@@ -670,7 +704,13 @@ def land(root: Path, given: list[str], onto: str | None = None,
         if not left:
             attribution.checkout(clone, base)
             return finish(EXIT_RED)
-        _merged(clone, base, left, alone)
+        left, refused, line = _covered(root, clone, base, left, alone)  # before any test runs
+        result["refused"] += refused
+        if line:
+            result["path_map"] = line
+        if not left:
+            attribution.checkout(clone, base)
+            return finish(EXIT_RED)
         timed("merge", began)
         began = time.monotonic()
         own = [c["folder"] for c in left if c["folder"]]  # run by the runner of gov accept: no test runs twice
@@ -686,7 +726,7 @@ def land(root: Path, given: list[str], onto: str | None = None,
                                    "pytest_options": options}
         if dry is not None:
             dry.selection(_dry.selection_object([c["ticket"] for c in left], union,
-                                                result["selection"]["pytest_options"], found))
+                                                result["selection"]["pytest_options"], found, line))
         timed("selection", began)
         began, before = time.monotonic(), seconds["acceptance"]
         workers = limit["workers"] if limit else 1
@@ -718,6 +758,15 @@ def land(root: Path, given: list[str], onto: str | None = None,
         landed = [c for c in left if c["ticket"] in done["landed"]]
         if result["tested"] is None:
             return finish(EXIT_RED)
+        if result["culprits"]:  # the tested merge is the rest's: a culprit may have carried a map line they rely on
+            attribution.checkout(clone, result["tested"])
+            refused, line = _judge(root, clone, landed)
+            if line:
+                result["path_map"] = line
+            if refused:
+                result["refused"] += refused
+                _refuse(refused[0]["code"], "; ".join(f"{e['ticket']}: {e['reason']}" for e in refused)
+                        + " (on the merge without the culprits); nothing lands", {}, EXIT_RED)
         for cand in landed:  # never landed on an acceptance run that did not pass on the tested commit
             ran = accepted.get(cand["ticket"])
             if cand["folder"] and (ran is None or ran["outcome"] != "pass"):
@@ -741,7 +790,8 @@ def land(root: Path, given: list[str], onto: str | None = None,
                   + [{**at_base[t], "verdict": "base"} if t in at_base else
                      {"test": t, "verdict": "culprit", "culprits": explains.get(t, [])} for t in result["reds"]],
                   "base_reds": list(at_base), "culprits": result["culprits"], "base": base, "onto": onto,
-                  "queue": result["record"]}
+                  "queue": result["record"],
+                  **{k: result[k] for k in ("path_map",) if k in result}}
         last = _close_all(root, clone, landed, record, result)
         _move(root, clone, onto, base, last, result)
         timed("close", began)
