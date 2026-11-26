@@ -406,7 +406,9 @@ ADOPT_PATHS = (".gitignore", ".gitleaks.toml", "README.md", "governance/**", "do
 def adoption_namespaces(not_embedded: bool = True) -> dict:
     spaces = {"harbour": {"paths": list(ADOPT_PATHS), "embedding_policy": "embedded"}}
     if not_embedded:
-        spaces["archive"] = {"paths": ["archive/**"], "embedding_policy": "not embedded"}
+        # Not stale as a whole (no file lies under ``filed/**``): A3 would refuse that unclassed (W2-212 SR-3), and the
+        # class would take the note out of the keyword index, which the cases judge.
+        spaces["filed"] = {"paths": ["archive/**", "filed/**"], "embedding_policy": "not embedded"}
     return spaces
 
 

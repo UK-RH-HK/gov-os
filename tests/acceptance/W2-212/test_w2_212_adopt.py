@@ -1,4 +1,5 @@
-"""W2-212 SR-3: A3 refuses an unclassed stale namespace (ADOPT_STALE_CLASS), notices a described one; the skill text."""
+"""W2-212 SR-3: A3 refuses an unclassed namespace that is stale as a whole (ADOPT_STALE_CLASS: its name, or every one of
+its paths), notices one only some of whose paths say it, or only its description; the skill text."""
 from __future__ import annotations
 
 import pytest
@@ -25,6 +26,9 @@ def refused(root, conf):
     ("superseded_plans", ["docs/plans/**"]),         # a word in the name only, split on _
     ("plain", ["docs/archive/**"]),                  # a word in the path only (archive)
     ("plain", ["docs/Historical/**"]),               # case-insensitive
+    ("plain", ["docs/legacy/**", "docs/archive/**"]),  # every one of several paths
+    ("old_legacy", ["docs/plans/**", "docs/notes/**"]),  # a word in the name; no path says it
+    ("legacy-docs", ["docs/plans/**", "docs/legacy/**"]),  # a word in the name; only some paths say it
 ])
 def test_sr3_an_unclassed_namespace_saying_it_is_stale_is_refused_naming_it_and_records_nothing(
         adopt_root, name, paths):  # noqa: F811
@@ -48,6 +52,48 @@ def test_sr3_a_description_that_says_legacy_is_a_notice_not_a_refusal(adopt_root
     result = a3(adopt_root, conf)
     assert result["stage"] == "A3"
     assert "notes" in __import__("json").dumps(result["notices"])
+
+
+def the_notice(result, name):
+    """The one ``notices`` entry of ``name`` in the A3 result."""
+    found = [entry for entry in result.get("notices") or [] if entry["namespace"] == name]
+    assert len(found) == 1, result.get("notices")
+    return found[0]
+
+
+@pytest.mark.parametrize("paths, stale, words", [
+    (["docs/plans/**", "docs/legacy/**"], ["docs/legacy/**"], {"legacy"}),          # one of two
+    (["docs/legacy/**", "docs/plans/**", "docs/Historical/**", "docs/notes/**", "docs/archive/**"],
+     ["docs/legacy/**", "docs/Historical/**", "docs/archive/**"], {"legacy", "historical", "archive"}),
+])
+def test_sr3_a_namespace_only_some_of_whose_paths_say_it_is_recorded_with_a_notice_naming_those_paths(
+        adopt_root, paths, stale, words):  # noqa: F811
+    result = a3(adopt_root, adopt_config(("mixed", {"paths": paths})))
+    assert result["stage"] == "A3" and (adopt_root / project.record_path("A3")).is_file()
+    entry = the_notice(result, "mixed")
+    assert sorted(entry["paths"]) == sorted(stale)
+    assert {word.lower() for word in entry["words"]} == words
+    text = entry["notice"].lower()
+    assert "namespace" in text and "own" in text and ("stale_class" in text or "stale class" in text), entry["notice"]
+
+
+def test_sr3_a_catch_all_harbour_map_with_legacy_and_archive_paths_and_no_class_passes_a3(adopt_root):  # noqa: F811
+    """The end-to-end consequence: one namespace holds the live files and the old folders; obeying a refusal (classing it)
+    would drop every live document from memory."""
+    paths = ["lib/**", "README.md", ".gitignore", "docs/**", "legacy/**", "archive/**"]
+    conf = {"path-map.yaml": {"namespaces": {"harbour": {"paths": paths, "embedding_policy": "embedded"}},
+                              "capabilities": {"code_intelligence": {"enabled": False}}}}
+    result = a3(adopt_root, conf)
+    assert result["stage"] == "A3" and (adopt_root / project.record_path("A3")).is_file()
+    assert sorted(the_notice(result, "harbour")["paths"]) == ["archive/**", "legacy/**"]
+
+
+def test_sr3_beside_a_classed_namespace_only_the_mixed_one_gets_a_notice(adopt_root):  # noqa: F811
+    result = a3(adopt_root, adopt_config(
+        ("old-design", {"paths": ["docs/archive/**"], "stale_class": "historical", **GOOD}),
+        ("mixed", {"paths": ["docs/plans/**", "docs/legacy/**"]})))
+    assert result["stage"] == "A3"
+    assert [entry["namespace"] for entry in result.get("notices") or []] == ["mixed"]
 
 
 SKILLS = ("template/governance/kernel/skills/adopt/SKILL.md", "template/.rulesync/skills/adopt/SKILL.md")
