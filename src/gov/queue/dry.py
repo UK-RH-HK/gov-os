@@ -28,13 +28,16 @@ def out_dir(root: Path, given: list[str], out: str | None) -> Path:
 
 
 def selection_object(tickets: list[str], suites: list[str], options: list[str],
-                     found: dict | None = None) -> dict:
+                     found: dict | None = None, path_map: str | None = None) -> dict:
     """The selection as ``--select`` prints it: ``tickets``, and ``ticket`` too for one ticket (with ``suites`` and
     ``pytest_options``, ``gov close --select``'s object); ``suites``; ``pytest_options``; ``unplaced_base`` and ``unplaced``
     (always ``[]``: the change is the branch's diff, and a path of it nothing places refuses, SEL-1, SEL-3), ``deleted`` (I-1), ``records`` and ``notices`` (I-2),
-    where a selection was computed (not ``--full``): ``found``."""
+    where a selection was computed (not ``--full``): ``found``; ``path_map``, the merged tree's coverage counts, in a
+    Gov OS project (W2-206 fix PM-3)."""
     named = {"ticket": tickets[0]} if len(tickets) == 1 else {}
     more = {} if found is None else {k: list(v) for k, v in found.items()}
+    if path_map:
+        more["path_map"] = path_map
     return {**named, "tickets": list(tickets), "suites": list(suites), "pytest_options": list(options), **more}
 
 

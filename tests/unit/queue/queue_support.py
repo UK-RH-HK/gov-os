@@ -81,10 +81,15 @@ def map_text() -> str:
     return yaml.safe_dump(data, sort_keys=False)
 
 
+def path_map_text(*patterns: str) -> str:
+    return yaml.safe_dump({"namespaces": {"all": {"paths": list(patterns)}}})
+
+
 def files() -> dict:
     return {
         ".gitignore": ".gov-runtime/\n__pycache__/\n*.pyc\n",
         "governance/project/test-map.yaml": map_text(),
+        "governance/project/path-map.yaml": path_map_text("**"),
         f".tickets/{TICKET}.md": ticket_text(),
         f".tickets/{OTHER}.md": ticket_text(OTHER, OTHER_WBS, ["src/pkg/gadget.py", f"tests/acceptance/{OTHER_WBS}/**"]),
         "src/pkg/__init__.py": "",

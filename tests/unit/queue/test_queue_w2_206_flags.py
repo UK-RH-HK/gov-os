@@ -91,9 +91,11 @@ def test_select_prints_the_selection_and_runs_and_records_nothing(project, capsy
     before, base = _refs(project), project.sha("main")
     assert command.select(project.root, [f"{TICKET}=topic/a"]) == 0
     printed = json.loads(capsys.readouterr().out)
+    tracked = len(project.git("ls-tree", "-r", "--name-only", "topic/a").splitlines())
     assert printed == {"ticket": TICKET, "tickets": [TICKET], "suites": [f"tests/acceptance/{WBS}/", "tests/unit/test_other.py"],
                        "pytest_options": select.pytest_options(select.load_map(project.root)[0]),
-                       "unplaced_base": [], "unplaced": [], "deleted": [], "records": [], "notices": []}
+                       "unplaced_base": [], "unplaced": [], "deleted": [], "records": [], "notices": [],
+                       "path_map": f"path map: {tracked} tracked, 0 in none, 0 in two"}
     assert _refs(project) == before and _clone_head(project) == base
     assert not (project.root / ".gov-runtime" / "queue").exists()
     assert not list((project.root / ".gov-runtime").rglob("*.xml"))

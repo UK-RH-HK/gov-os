@@ -81,3 +81,28 @@ second case plants no number in the path map.
   sum of two ranges), `tickets` naming each, and the merge's refusal (`CANDIDATE_NOT_ISOLATED`) where the branches do not merge
   together. Held branches land in one run. Verify: two planted branches under two tickets: one object, `suites` equal to the union
   of each branch's selection alone; a planted pair that conflicts is refused as a whole, nothing run.
+
+## Fix: the landing proves the path map holds every path a change adds exactly once, PM-1 to PM-3 (2026-11-26; plan item 1-11 (c); G-8 (a), Q-1 (a), DEC-1244; approved by the CTO in the lead's brief)
+
+- **PM-1 Refused at the landing.** Before the integration branch moves, the landing (and `--dry-run`, `--full`, `--select`)
+  runs the path map's coverage check (`gov.check.pathmap.check`, reused, never copied) on the merged tree and refuses a
+  candidate that adds or renames a path held by no namespace (`PATH_NO_NAMESPACE`) or by two or more
+  (`PATH_MULTIPLE_NAMESPACES`); no switch. The reason names each such path and, for one in none, the exact line to add
+  under a namespace's `paths` (`- "<folder>/**"`; the path itself, `- "<path>"`, for a root file or where the folder
+  holds files the map already places); for one in two, the namespaces and their patterns. The landing lists it under
+  `refused` (`ticket`, `code`, `paths`, `reason`), the other candidates land (exit 3); `--select` says
+  `<code>: <ticket>: <reason>` on stderr, exit 2. A path already in none or two that the change does not add refuses
+  nothing. Where the merged tree's map cannot be used (missing, unreadable, invalid), a candidate that adds a path or
+  changes the map is refused with the check's code. Verify: a planted branch adding `docs/newfolder/x.md` under no
+  namespace is refused naming `- "docs/newfolder/**"` (the landing and `--select`); the same file under a mapped folder
+  lands; a path two namespaces hold is refused naming both; a rename into an unmapped folder is refused; a second clean
+  candidate of the batch lands.
+- **PM-2 A record inside a mapped folder.** A record-only document the branch writes inside a folder the map holds is
+  never refused: it passes, with the notice `RECORD_PLACED <path>` where nothing else places it (DEC-1239 (2)).
+  Verify: planted: `--select` exit 0 with the notice; the landing lands with it.
+- **PM-3 The counts are printed.** The landing's answer, `queue.json`, a dry run's answer and `select.json`, the
+  `--select` object and a ticket's first close record hold `path_map` (a fix landing's close record stays as W2-201 X6 pins it,
+  one fix entry and line; the CTO's call, 2026-11-26): `path map: <n> tracked, <a> in none, <b> in two` for the
+  merged tree (`in two`: in two or more). A project with no `governance/project/` has no `path_map`. Verify: planted: a
+  clean landing says `0 in none, 0 in two` with `<n>` equal to `git ls-files` of the tested merge; a project with one
+  path already in none lands and says `1 in none`.
