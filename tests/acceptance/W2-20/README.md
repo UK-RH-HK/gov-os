@@ -40,6 +40,51 @@ gains the form of the servers' samples file and how the gate finds the servers (
 from the KPI lines, round 7's interface and the review's words. The configuration format is unchanged (frozen). No
 implementation of W2-20 was read.
 
+## Fix: the product's test run sets the tools' PATH itself (SP-1, SP-2; plan item 1-13, FINDINGS I-6)
+
+A fix under this ticket (the ticket's section of the same name). `gov accept` reads **SP-1 as `success-23`** and **SP-2
+as `success-24`** (`success-22`, the ticket's secrets-switch line, keeps its number). Written on base `91bed6042`; no
+later implementation was read.
+
+**The interface (decided by the lead).** `gov.resources.toolpath`: `node_prefix(root) -> {"prefix", "version",
+"reason"}` and `with_node(env, root) -> dict`. The source is the entry named exactly `node` in
+`<root>/governance/project/tool-registry.yaml`; its folder is the `PATH=<folder>:$PATH` prefix of its install line,
+else `$HOME/.nvm/versions/node/<version as the registry writes it, e.g. v22.23.3>/bin`; a prefix is given only where
+`<folder>/node` is a file; root is the tree under test (`--tree`, default `--root`). Applied by `gov resources --slot
+test` (nested runs too; other kinds unchanged), `gov accept`'s pytest child, the runs of `gov close` and `gov queue`
+and the nightly's run alone. `gov doctor --json`: `tools.node_prefix`, a null `prefix` with a `reason` naming `node`
+(and the pin and folder where there is an entry); never a change of status by itself.
+
+**How the cases run.** `test_w2_20_tool_path.py` (the runs) and `test_w2_20_doctor_node.py` (doctor), helpers
+`w2_20_tool_path_support.py`: a planted `HOME` with a stand-in `node` and `openspec` in a Node folder of its own, a
+planted registry, a caller `PATH` without that folder (a real `/usr/bin/node` may be on it and must not answer first).
+`gov close`'s and `gov queue`'s runs are reached through `gov.close.attribution.run_alone` (a direct call) and, for
+`gov.close.command`'s test run and the nightly's run alone, through `python3 -m gov.close.nightly`. About 10 s in all.
+The nine W1-30 and W2-02 cases of SP-1's verify line are not copied here: they are run through the product's slot.
+
+| KPI | Test (node id) | On the base | Why |
+|---|---|---|---|
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_test_slot_puts_the_registrys_pinned_node_first_on_path` | red (2) | the job's `PATH` is the caller's; the pinned folder is not first |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_test_slot_takes_the_folder_of_the_node_entrys_path_prefix` | red | the same |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_test_slot_reads_the_registry_of_the_tree_under_test` | red (2) | the same |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_second_node_entry_never_answers_for_node` | red | the same |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_nested_test_run_gets_the_prefix_too` | red | the same, in a nested run |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_other_slot_kinds_keep_the_callers_path` | green (2, guards) | other kinds keep the caller's `PATH` |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_test_slot_without_a_pinned_node_runs_with_the_callers_path` | green (4, guards) | no registry or no node: the job runs, its `PATH` and exit code its own |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_gov_accept_runs_the_acceptance_tests_with_the_pinned_node_first` | red | the pytest child's `PATH` is the caller's; `openspec` is not found |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_gov_accept_passes_in_a_project_without_a_node` | green (2, guards) | such a run is not failed |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_run_alone_of_gov_close_and_gov_queue_gets_the_pinned_node` | red | the run alone's `PATH` is the caller's |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_a_run_alone_without_a_pinned_node_is_not_failed_by_it` | green (guard) | a project without a registry is not failed |
+| success-23 (SP-1) | `test_w2_20_tool_path.py::test_the_nightlys_test_run_and_its_run_alone_get_the_pinned_node` | red | the test run's `PATH` is the caller's |
+| success-24 (SP-2) | `test_w2_20_doctor_node.py::test_doctor_names_the_node_prefix_the_test_runs_use` | red (2) | the `tools` part carries no `node_prefix` |
+| success-24 (SP-2) | `test_w2_20_doctor_node.py::test_doctor_says_node_when_the_registry_has_no_node_entry` | red (2) | the same |
+| success-24 (SP-2) | `test_w2_20_doctor_node.py::test_doctor_names_node_its_version_and_the_folder_when_the_folder_holds_none` | red (2) | the same |
+| success-24 (SP-2) | `test_w2_20_doctor_node.py::test_a_missing_node_entry_does_not_change_the_tools_status` | red | the same (the status already passes) |
+
+On the base: **17 failed, 9 passed** (26 cases). Not tested: `gov doctor` in a project with no registry at all (the
+`tools` part is then `unmeasured`; the interface does not say whether it carries `node_prefix`), and a registry that
+cannot be parsed.
+
 ## Run
 
 ```sh
