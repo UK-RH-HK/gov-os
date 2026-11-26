@@ -288,3 +288,44 @@ the removed ones, and says the same on the landed head.
 **Not tested here:** the default limit of 120 s; that the code graph is never loaded (no public interface shows it without
 a code index; a source file not listed is tested); a renamed record file; `--full`'s `impact` (its close record is read
 by W2-115b's IT-3 cases only for `evidence`).
+
+## Fix: the selection's graph is the merged tree, GB-1 and GB-2 (plan item 1-0 (b); X-1, DEC-1244)
+
+Written by the independent test designer from the ticket's section "Fix: the selection's graph is the merged tree, and the
+landing names its commit, GB-1 and GB-2", before any implementation, in `test_w2_206_graph.py`. The lines are numbered
+after IT's (success-14: GB-1; success-15: GB-2's commit; failure-8: GB-2's absence; the ids are labels of this table).
+Public interface: `python3 -m gov.cli.main queue <T>=<branch> ... [--select | --dry-run --out <dir> | --full] --root
+<project>`; the answer, `queue.json`, `select.json`, the close records, the warm clone's git objects
+(`.gov-runtime/close/clone`), the planted tests' run logs.
+
+**What is planted:** W2-115b's kit. Each build checks itself (`fixture: ...`): the planted tests by plain pytest; before
+each stale run the warm clone's `HEAD` is the older commit and the left-over file is untracked there; `gov close
+--select` on a tree that does hold the left-over file selects it.
+
+| run | project and branches | commands |
+|---|---|---|
+| main | A (`topic/aa`) changes the widget and adds `tests/unit/test_branch_only.py`, B (`topic/bb`) the gadget, C is closed; after a first `--select` `main` gains `tests/unit/test_base_only.py`; before each of the first three commands the warm clone is put back at the older commit with an untracked `tests/unit/test_leftover.py` (each of these tests imports the widget) | `A --select`; `A --dry-run --out <dir>`; `A`; `B --full`; `C=fix/cc` (a `Fix:` branch) |
+| culprit | A changes the widget, B breaks the gadget, C's branch edits its own acceptance suite as the engineer | `C` (refused before the run); `A B` |
+| merged | A's branch is merged into `main` by hand, the ticket open | `A --select`; `A` |
+
+| KPI id | line | tests | expected red reason |
+|---|---|---|---|
+| success-14 | GB-1 | `test_w2_206_graph.py::test_gb1_select_over_a_stale_warm_clone_selects_the_merged_tree_s_suites`, `test_w2_206_graph.py::test_gb1_the_landing_over_a_stale_warm_clone_runs_the_merged_tree_s_suites` | none: pinning guards, green on the base (the clone is reset and cleaned before every merge, the graph parsed fresh); they must stay green |
+| success-15 | GB-2 | `test_w2_206_graph.py::test_gb2_select_names_the_warm_clone_s_merge_of_the_head_and_the_tip`, `test_w2_206_graph.py::test_gb2_a_dry_run_s_answer_and_select_json_name_the_commit_the_selection_was_read_from`, `test_w2_206_graph.py::test_gb2_a_landing_with_no_culprit_says_the_tested_commit_in_the_answer_and_queue_json`, `test_w2_206_graph.py::test_gb2_the_first_close_record_holds_the_graph_commit`, `test_w2_206_graph.py::test_gb2_with_a_culprit_it_stays_the_commit_the_selection_was_read_from_not_the_tested_rest`, `test_w2_206_graph.py::test_gb2_a_branch_already_merged_says_the_integration_head`, `test_w2_206_graph.py::test_gb2_a_fix_landing_says_it_in_the_answer_and_queue_json_and_not_in_its_close_record` | no `graph_commit` anywhere ("holds no graph_commit: None") |
+| failure-8 | GB-2, absent | `test_w2_206_graph.py::test_gb2_with_full_there_is_no_graph_commit`, `test_w2_206_graph.py::test_gb2_a_landing_that_ends_before_the_selection_has_no_graph_commit` | as success-15: each case first reads the `graph_commit` of a landing that computed a selection, so neither is green by the key never being said |
+
+**Readings this fix's cases take.**
+
+1. **GB-1's suites** are the explicit list the merged tree reaches: A's acceptance folder, `test_uses_widget.py`, the test
+   only the head holds and the test only the branch holds. For the landing, the last two told a run and the left-over file
+   never told one (the dry run before it included).
+2. **`graph_commit` of one branch** is a commit the warm clone holds whose parents include the integration head before the
+   run and the branch tip. With no culprit it equals `tested` (the dry run's too) and the first close record's `commit`.
+3. **With a culprit** it holds the head, A's tip and B's tip as ancestors, differs from `tested`, and the answer,
+   `queue.json` and the landed ticket's close record say the same one.
+4. **A fix landing** is planted on a closed ticket with no close record: the new record keeps exactly X6's keys and names
+   no `graph_commit` in any entry.
+5. **A landing that ends before the selection** is planted as a candidate refused `TEST_AUTHOR_REFUSED`, alone.
+
+**Not tested here:** several branches' merge parents; a fix landing on a ticket whose first record already holds
+`graph_commit`; a landing refused after the selection.

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import time
 
 import pytest
 import yaml
@@ -92,6 +93,9 @@ def test_select_prints_the_selection_and_runs_and_records_nothing(project, capsy
     assert command.select(project.root, [f"{TICKET}=topic/a"]) == 0
     printed = json.loads(capsys.readouterr().out)
     tracked = len(project.git("ls-tree", "-r", "--name-only", "topic/a").splitlines())
+    merge = printed.pop("graph_commit")  # GB-2: the merge in the warm clone
+    parents = project.git("-C", str(project.root / ".gov-runtime/close/clone"), "rev-list", "--parents", "-n1", merge)
+    assert {base, project.sha("topic/a")} <= set(parents.split()[1:])
     assert printed == {"ticket": TICKET, "tickets": [TICKET], "suites": [f"tests/acceptance/{WBS}/", "tests/unit/test_other.py"],
                        "pytest_options": select.pytest_options(select.load_map(project.root)[0]),
                        "unplaced_base": [], "unplaced": [], "deleted": [], "records": [], "notices": [],
@@ -155,6 +159,46 @@ def test_a_green_full_run_lands_and_the_record_s_selection_says_full(project, mo
     front = yaml.safe_load(project.git("show", f"main:docs/close/{TICKET}/CL-{TICKET}.md").split("---")[1])
     assert front["selection"]["full"] is True and front["selection"]["suites"] == ["tests"]
     assert f"--ignore=tests/acceptance/{WBS}" in front["selection"]["pytest_options"]
+
+
+def test_with_full_neither_select_nor_a_dry_run_names_a_graph_commit(project, capsys, tmp_path, monkeypatch):
+    monkeypatch.setenv("PYTEST_XDIST_AUTO_NUM_WORKERS", "2")
+    project.branch("topic/a", GREEN, f"Task: {TICKET}", "Role: engineer")
+    given, out = [f"{TICKET}=topic/a"], tmp_path / "out"
+    assert command.select(project.root, given, full=True) == 0
+    assert "graph_commit" not in json.loads(capsys.readouterr().out)
+    result, code = command.dry_run(project.root, given, out=str(out), full=True)
+    assert code == 0 and "graph_commit" not in result
+    assert "graph_commit" not in json.loads((out / "select.json").read_text(encoding="utf-8"))
+
+
+def test_the_commit_tested_is_the_one_the_selection_was_read_from_however_long_the_trace_takes(project, monkeypatch):
+    from gov.queue import trace
+
+    traced = trace.landing
+
+    def slow(*args):
+        time.sleep(1.1)  # a merge built again after this has another commit time, so another id
+        return traced(*args)
+
+    monkeypatch.setattr(trace, "landing", slow)
+    project.branch("topic/a", GREEN, f"Task: {TICKET}", "Role: engineer")
+    result, code = command.land(project.root, [f"{TICKET}=topic/a"])
+    assert code == 0 and result["graph_commit"] == result["tested"]
+
+
+def test_the_landing_s_run_takes_the_per_test_limit_of_the_merged_tree_s_test_map(project):
+    limit = "per_test_timeout: {}\n"
+    held = (project.root / "governance/project/test-map.yaml").read_text(encoding="utf-8")
+    assert limit.format(60) in held
+    project.commit("a short limit", files={"governance/project/test-map.yaml": held.replace(limit.format(60),
+                                                                                          limit.format(1))})
+    slow = "import time\n\nfrom pkg.other import other\n\n\ndef test_slow():\n    time.sleep(2)\n    assert other()\n"
+    project.branch("topic/a", {"governance/project/test-map.yaml": held, "tests/unit/test_slow.py": slow, **SLIP},
+                   f"Task: {TICKET}", "Role: engineer")
+    result, code = command.land(project.root, [f"{TICKET}=topic/a"])
+    assert "--timeout=60" in result["selection"]["pytest_options"]
+    assert (code, result["culprits"], result["landed"]) == (0, [], [TICKET])
 
 
 # -- the after-step ---------------------------------------------------------------------------------------------
