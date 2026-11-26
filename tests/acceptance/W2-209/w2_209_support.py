@@ -15,7 +15,9 @@ hook programs), ``docs/contract``, ``docs/charter``, ``docs/emergency-2/EMERGENC
 authority file and the tool registry. Its releases ``0.1.0`` and ``0.1.1`` are built with ``gov.release.build`` (the
 code on the base, unchanged by this ticket), committed and tagged ``v<X>`` (annotated) on the record commit; a decoy
 tag ``v0.1.9`` with no record sits on the first commit. From ``v0.1.1`` (N) one branch per planted change
-(``case/<name>``, ``CASES``) and the clean range (``case/clean``) each end in the version commit.
+(``case/<name>``, ``CASES``) and the clean range (``case/clean``) each end in the version commit. The ranges of
+RR-1, RR-2 and RR-4 (approved releases, ``Class: Q``) are branches of the same kind; the planted register
+(``REGISTER``) holds the decisions they name.
 
 Nothing here writes in this worktree; every repository is under pytest's ``tmp_path``.
 """
@@ -25,6 +27,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import site
 import stat
@@ -342,8 +345,20 @@ def behaviour(fail=None):
     return f'"""What the planted gov does wrong, if anything (W2-209 tests)."""\nFAIL = {fail!r}\n'
 
 
-def ticket(ident, status, wbs):
-    return f"---\nid: {ident}\nstatus: {status}\nwbs_id: {wbs}\ntype: task\n---\n# {ident}: a planted ticket\n"
+def ticket(ident, status, wbs, approved_by=None, external=None, block=False):
+    """A planted ticket; ``approved_by`` is one id (a string) or a list (written inline, or as a block with
+    ``block``); ``external`` is its ``external-ref``."""
+    lines = [f"id: {ident}", f"status: {status}", f"wbs_id: {wbs}", "type: task"]
+    if external:
+        lines.append(f"external-ref: {external}")
+    if isinstance(approved_by, str):
+        lines.append(f"approved_by: {approved_by}")
+    elif approved_by and block:
+        lines += ["approved_by:", *[f"- {one}" for one in approved_by]]
+    elif approved_by:
+        lines.append(f"approved_by: [{', '.join(approved_by)}]")
+    front = "\n".join(lines)
+    return f"---\n{front}\n---\n# {ident}: a planted ticket\n"
 
 
 def authority(state="off", decision=DECISION, bake=4):
@@ -370,6 +385,30 @@ tools:
     sha256: "2222222222222222222222222222222222222222222222222222222222222222"
 """
 
+# --------------------------------------------------------------------------
+# The planted decision register (RR-1, RR-2): two decisions the owner accepted, one the orchestrator accepted (its
+# text mentions the owner's words, which its Status does not hold), one proposed. DEC-900 is only mentioned, never
+# an entry (and is a prefix of every other id); OWNER_LATE is added by a range.
+# --------------------------------------------------------------------------
+
+REGISTER_REL = "docs/DECISION_REGISTER.md"
+OWNER_ONE, OWNER_TWO, DELEGATED, PROPOSED = "DEC-9001", "DEC-9002", "DEC-9003", "DEC-9004"
+OWNER_LATE, UNKNOWN = "DEC-9005", "DEC-900"
+
+
+def register_entry(ident, status, note="planted"):
+    return (f"### {ident} \u2014 A planted decision ({ident})\n"
+            f"- **Status:** {status} \u00b7 **Under:** MR-3\n"
+            f"- **Decision:**\n  - {note}\n\n")
+
+
+REGISTER = ("# The planted decision register\n\n"
+            + register_entry(OWNER_ONE, "ACCEPTED (owner, 2026-11-20, in the chat; recorded by the orchestrator)")
+            + register_entry(OWNER_TWO, "ACCEPTED (owner, 2026-11-21)")
+            + register_entry(DELEGATED, "ACCEPTED (orchestrator, delegated under DEC-220, 2026-11-21)",
+                             f"the owner was told; this is not ACCEPTED (owner, ...); see {UNKNOWN}")
+            + register_entry(PROPOSED, "PROPOSED (2026-11-22)", "ACCEPTED (owner, ...) is what it asks to become"))
+
 SCHEMA = '{"$schema": "https://json-schema.org/draft/2020-12/schema", "title": "%s", "type": "object"}\n'
 
 BASE_FILES = {
@@ -395,6 +434,8 @@ BASE_FILES = {
     "docs/emergency-2/proposals/NOTE.md": "# A proposal (not the owner's text)\n",
     ".tickets/PLNT-aaaa.md": ticket("PLNT-aaaa", "open", "W9-01"),
     ".tickets/PLNT-bbbb.md": ticket("PLNT-bbbb", "open", "W9-02"),
+    ".tickets/PLNT-cccc.md": ticket("PLNT-cccc", "open", "W9-03", approved_by=DELEGATED),
+    REGISTER_REL: REGISTER,
     AUTHORITY_REL: authority("off"),
     REGISTRY_REL: REGISTRY,
 }
@@ -485,16 +526,233 @@ def _build_cases(repo, n_commit):
     commit(repo, {rel: f"{'0' * 64}  manifest.json\n"}, "Break the record of 0.1.1", (("Class", "C"),))
     _version_commit(repo, X)
     cases["previous"] = Case("previous", X, None)
+
+    _build_class_q(start, repo, cases)
+    _build_approvals(start, repo, cases)
     return cases
+
+
+# --------------------------------------------------------------------------
+# RR-4: the ranges with ``Class: Q``
+# --------------------------------------------------------------------------
+
+Q_DOCS_SUBJECT = "Note a quick thought in the proposals"
+
+
+def _build_class_q(start, repo, cases):
+    start("q_src")  # the clean range, its code chore under ``Class: Q``
+    chore = fixes(repo, chore_class="Q", sha_of_chore=True)
+    cases["q_src"] = Case("q_src", X, "P3", chore[:12])
+
+    start("q_template")
+    fixes(repo)
+    sha = commit(repo, {"template/README.md": "The planted kit, quickly reworded.\n"}, "Reword the kit README",
+                 (("Class", "Q"), ("Task", "PLNT-aaaa")))
+    cases["q_template"] = Case("q_template", X, "P3", sha[:12])
+
+    start("q_fix")  # ``Class: Q`` beside a ``Fix:`` under a ticket closed at N: the fix carries it
+    fixes(repo)
+    commit(repo, {"src/gov/alpha/core.py": "COUNT = 4\n"}, "Fix alpha's count again",
+           (("Class", "Q"), ("Fix", "alpha counted wrong again"), ("Task", "PLNT-aaaa")))
+    cases["q_fix"] = Case("q_fix", X, None)
+
+    start("q_docs")  # ``Class: Q`` outside src/gov and template: P3 does not read it, and it is no chore
+    fixes(repo)
+    commit(repo, {"docs/emergency-2/proposals/QUICK.md": "# A quick thought\n"}, Q_DOCS_SUBJECT, (("Class", "Q"),))
+    cases["q_docs"] = Case("q_docs", X, None)
+
+
+# --------------------------------------------------------------------------
+# RR-1 and RR-2: the ranges that need approval
+# --------------------------------------------------------------------------
+
+@dataclass
+class Approval:
+    """A planted range that fails a rule: ``approved`` maps each item that is approved (a ticket id, or a commit's
+    first 12 characters) to the decisions that approve it; ``lacking`` maps each item that is not (an id, a sha, or
+    for a change no non-merge commit accounts for a path or name) to the id it names that does not count, or None.
+    ``failed``: the failing rules. ``kind`` is what the check answers."""
+    name: str
+    version: str
+    failed: tuple
+    approved: dict = field(default_factory=dict)
+    lacking: dict = field(default_factory=dict)
+    kind: str = "bigger"
+
+
+APPROVED = ("ok_mixed", "ok_front", "ok_trailer")
+LACKS = ("lack_none", "lack_unknown", "lack_orchestrator", "lack_proposed", "lack_one_of_two",
+         "lack_ticket_trailer_only", "lack_trailer_unknown", "lack_trailer_orchestrator", "lack_trailer_one_of_two",
+         "lack_task_ticket", "lack_decided_by", "lack_beside", "lack_contract_c", "lack_command_c",
+         "lack_command_fix", "lack_schema_c", "lack_merge_only")
+VERSIONS = {"ver_same": N_VERSION, "ver_below": "0.1.0", "ver_prerelease": "0.2.0-rc.1",
+            "ver_build": "0.2.0+build.7", "ver_short": "0.2"}
+MERGED_PATH, MERGED_COMMAND = "docs/contract/MERGED.md", "mergedprobe"
+
+
+def _command_files(name):
+    return {f"src/gov/{name}/__init__.py": "",
+            f"src/gov/{name}/command.py": f'"""gov {name} (planted)."""\nHELP = "{name}"\nCLASS = "read"\n'}
+
+
+def _approved_by(*ids):
+    return ("Approved-by", ", ".join(ids))
+
+
+def _close_feature(repo, approved_by=None, block=False, external=None, trailers=()):
+    commit(repo, {".tickets/PLNT-bbbb.md": ticket("PLNT-bbbb", "closed", "W9-02", approved_by, external, block)},
+           "Close PLNT-bbbb", (("Class", "C"), ("Task", "PLNT-bbbb"), *trailers))
+
+
+def _contract(repo, trailers, text="v3"):
+    return commit(repo, {"docs/contract/CONTRACT.md": f"# The planted Contract, {text}\n"}, f"The Contract, {text}",
+                  trailers)[:12]
+
+
+def _build_approvals(start, repo, cases):
+    # A ticket (one id in its front matter), a Contract change (its trailer), a feature commit under that ticket,
+    # beside a fix and a chore that need no approval; a minor version.
+    start("ok_mixed")
+    _close_feature(repo, OWNER_ONE)
+    contract = _contract(repo, (("Class", "C"), _approved_by(OWNER_TWO)))
+    feature = commit(repo, {"src/gov/alpha/core.py": "COUNT = 5\nFEATURE = True\n"}, "The feature of alpha",
+                     (("Class", "F"), ("Task", "PLNT-bbbb")))[:12]
+    commit(repo, {"src/gov/alpha/core.py": "COUNT = 0\nFEATURE = True\n"}, "Fix alpha's count",
+           (("Class", "F"), ("Fix", FIX_LINES[0]), ("Task", "PLNT-aaaa")))
+    commit(repo, {"src/gov/alpha/notes.py": "# notes\n"}, CHORE_SUBJECT, (("Class", "C"),))
+    _version_commit(repo, "0.2.0")
+    cases["ok_mixed"] = Approval("ok_mixed", "0.2.0", ("P1", "P2", "P3"), kind="approved", approved={
+        "PLNT-bbbb": {OWNER_ONE}, contract: {OWNER_TWO}, feature: {OWNER_ONE}})
+
+    # Front matter alone: a block list, added after the closing commit (it is read at C); each commit names the
+    # ticket by its id, its wbs_id or its external-ref and carries no trailer of approval.
+    start("ok_front")
+    both = [OWNER_ONE, OWNER_TWO]
+    _close_feature(repo, external="X9-07")
+    commit(repo, {".tickets/PLNT-bbbb.md": ticket("PLNT-bbbb", "closed", "W9-02", both, "X9-07", block=True)},
+           "PLNT-bbbb names its approving decisions", (("Class", "C"),))
+    by_id = _contract(repo, (("Class", "C"), ("Task", "PLNT-bbbb")))
+    by_wbs = commit(repo, _command_files("w2209probe"), "Add a command module", (("Class", "F"), ("Task", "W9-02")))[:12]
+    by_external = commit(repo, {f"{SCHEMAS_REL}/new.schema.json": SCHEMA % "new",
+                                f"{SCHEMAS_REL}/b.schema.json": None}, "Swap a kit schema",
+                         (("Class", "F"), ("Task", "X9-07")))[:12]
+    _version_commit(repo, X)
+    cases["ok_front"] = Approval("ok_front", X, ("P2", "P3", "P4", "P5"), kind="approved", approved={
+        token: set(both) for token in ("PLNT-bbbb", by_id, by_wbs, by_external)})
+
+    # Trailers alone: no ticket closes; a decision the register gains inside the range counts (read at C).
+    start("ok_trailer")
+    commit(repo, {REGISTER_REL: REGISTER + register_entry(OWNER_LATE, "ACCEPTED (owner, 2026-11-24)")},
+           "Record a decision", (("Class", "C"),))
+    contract = _contract(repo, (("Class", "C"), _approved_by(OWNER_LATE)))
+    feature = commit(repo, {"src/gov/alpha/core.py": "COUNT = 6\n"}, "A feature of the owner's",
+                     (("Class", "F"), _approved_by(OWNER_ONE, OWNER_TWO)))[:12]
+    command = commit(repo, _command_files("w2209probe"), "Add a command module",
+                     (("Class", "C"), _approved_by(OWNER_ONE)))[:12]
+    schema = commit(repo, {f"{SCHEMAS_REL}/b.schema.json": None}, "Remove a kit schema",
+                    (("Class", "F"), ("Fix", "a kit schema nobody read"), ("Task", "PLNT-aaaa"),
+                     _approved_by(OWNER_TWO)))[:12]
+    _version_commit(repo, X)
+    cases["ok_trailer"] = Approval("ok_trailer", X, ("P2", "P3", "P4", "P5"), kind="approved", approved={
+        contract: {OWNER_LATE}, feature: {OWNER_ONE, OWNER_TWO}, command: {OWNER_ONE}, schema: {OWNER_TWO}})
+
+    # An approved range whose release fails the search check in the new pin's environment.
+    start("ok_rollback")
+    planted = commit(repo, {"src/gov/w2209_behaviour.py": behaviour("facet")}, "Plant facet",
+                     (("Class", "F"), _approved_by(OWNER_ONE)))[:12]
+    _version_commit(repo, "0.2.0")
+    cases["ok_rollback"] = Approval("ok_rollback", "0.2.0", ("P1", "P3"), kind="approved",
+                                    approved={planted: {OWNER_ONE}})
+
+    # Each lack alone, beside an approved ticket and an approved Contract change.
+    def lacking(name, failed=("P2", "P3"), ticket_ids=(OWNER_ONE,), block=False, trailers=(), extra=None,
+                ticket_lack=False):
+        start(name)
+        _close_feature(repo, list(ticket_ids) if len(ticket_ids) > 1 else (ticket_ids[0] if ticket_ids else None),
+                       block=block, trailers=trailers)
+        approved = {_contract(repo, (("Class", "C"), _approved_by(OWNER_ONE))): {OWNER_ONE}}
+        lacks = {}
+        if ticket_lack is False:
+            approved["PLNT-bbbb"] = set(ticket_ids)
+        else:
+            lacks["PLNT-bbbb"] = ticket_lack
+        if extra:
+            lacks.update(extra())
+        _version_commit(repo, X)
+        cases[name] = Approval(name, X, failed, approved=approved, lacking=lacks)
+
+    lacking("lack_none", ticket_ids=(), ticket_lack=None)
+    lacking("lack_unknown", ticket_ids=(UNKNOWN,), ticket_lack=UNKNOWN)
+    lacking("lack_orchestrator", ticket_ids=(DELEGATED,), ticket_lack=DELEGATED)
+    lacking("lack_proposed", ticket_ids=(PROPOSED,), ticket_lack=PROPOSED)
+    lacking("lack_one_of_two", ticket_ids=(OWNER_ONE, DELEGATED), block=True, ticket_lack=DELEGATED)
+    lacking("lack_ticket_trailer_only", ticket_ids=(), trailers=(_approved_by(OWNER_ONE),), ticket_lack=None)
+
+    def code(bad, *trailers, subject="One more feature", files=None):
+        def make():
+            changed = files if files is not None else {"src/gov/alpha/core.py": "COUNT = 7\n"}
+            return {commit(repo, changed, subject, trailers)[:12]: bad}
+        return make
+
+    lacking("lack_trailer_unknown", extra=code(UNKNOWN, ("Class", "F"), _approved_by(UNKNOWN)))
+    lacking("lack_trailer_orchestrator", extra=code(DELEGATED, ("Class", "F"), _approved_by(DELEGATED)))
+    lacking("lack_trailer_one_of_two", extra=code(PROPOSED, ("Class", "F"), _approved_by(OWNER_ONE, PROPOSED)))
+    lacking("lack_task_ticket", extra=code(DELEGATED, ("Class", "F"), ("Task", "W9-03")))
+    lacking("lack_decided_by", extra=code(None, ("Class", "C"), ("Role", "orchestrator"),
+                                          ("Decided-by", f"owner (standing, {OWNER_ONE})"),
+                                          files={"docs/charter/CHARTER.md": "# The planted Charter, v2\n"}))
+    lacking("lack_beside", extra=code(None, ("Class", "F"), ("Task", "PLNT-aaaa")))
+    lacking("lack_contract_c", extra=code(None, ("Class", "C"),
+                                          files={"docs/contract/CONTRACT.md": "# The planted Contract, v4\n"}))
+    lacking("lack_command_c", ("P2", "P3", "P4"),
+            extra=code(None, ("Class", "C"), files=_command_files("w2209probe")))
+    lacking("lack_command_fix", ("P2", "P3", "P4"),
+            extra=code(None, ("Class", "F"), ("Fix", "a missing command"), ("Task", "PLNT-aaaa"),
+                       files=_command_files("w2209probe")))
+    lacking("lack_schema_c", ("P2", "P3", "P5"),
+            extra=code(None, ("Class", "C"), files={f"{SCHEMAS_REL}/b.schema.json": None}))
+
+    def merged():
+        """A Contract file and a command module that only a merge commit brings: no non-merge commit accounts."""
+        here = git(repo, "rev-parse", "--abbrev-ref", "HEAD").strip()
+        git(repo, "checkout", "-q", "-b", f"{here}-side")
+        commit(repo, {"docs/side.md": "a side note\n"}, "A side note", (("Class", "C"),))
+        git(repo, "checkout", "-q", here)
+        git(repo, "merge", "-q", "--no-ff", "--no-commit", f"{here}-side")
+        commit(repo, {MERGED_PATH: "# Brought by the merge\n", **_command_files(MERGED_COMMAND)}, "Merge the side note",
+               (("Class", "C"), _approved_by(OWNER_ONE)))
+        git(repo, "branch", "-q", "-D", f"{here}-side")
+        return {MERGED_PATH: None, MERGED_COMMAND: None}
+
+    lacking("lack_merge_only", ("P2", "P3", "P4"), extra=merged)
+
+    # Every item approved, the version at C not above N, or not a plain semantic version.
+    for name, version in VERSIONS.items():
+        start(name)
+        _close_feature(repo, OWNER_ONE)
+        contract = _contract(repo, (("Class", "C"), _approved_by(OWNER_TWO)))
+        _version_commit(repo, version)
+        cases[name] = Approval(name, version, ("P1", "P2", "P3"),
+                               approved={"PLNT-bbbb": {OWNER_ONE}, contract: {OWNER_TWO}})
+
+    # All five rules pass, whatever names a decision: a patch.
+    start("patch_with_approvals")
+    fixes(repo)
+    commit(repo, {".tickets/PLNT-aaaa.md": ticket("PLNT-aaaa", "closed", "W9-01", OWNER_ONE)},
+           "PLNT-aaaa names its approving decision", (("Class", "C"),))
+    commit(repo, {"src/gov/alpha/core.py": "COUNT = 8\n"}, "Fix alpha's count once more",
+           (("Class", "F"), ("Fix", "alpha counted wrong once more"), ("Task", "PLNT-aaaa"), _approved_by(OWNER_ONE)))
+    cases["patch_with_approvals"] = Case("patch_with_approvals", X, None)
 
 
 FIX_LINES = ("alpha counted one too many", "the kit README named the wrong folder")
 CHORE_SUBJECT = "Tidy the alpha notes"
 
 
-def fixes(repo, version=X):
+def fixes(repo, version=X, chore_class="C", sha_of_chore=False):
     """The clean range on the current branch: two ``Fix:`` commits (one merged with ``--no-ff``, whose merge commit
-    carries no trailer), a ``Class: Q`` chore, a chore under docs/emergency-2 that is not EMERGENCY-2.md, the version."""
+    carries no trailer), a code chore (``Class: C``; ``chore_class`` plants another), a chore under docs/emergency-2
+    that is not EMERGENCY-2.md, the version. Returns the version commit, or with ``sha_of_chore`` the code chore."""
     commit(repo, {"src/gov/alpha/core.py": "COUNT = 0\n"}, "Fix alpha's count",
            (("Class", "F"), ("Fix", FIX_LINES[0]), ("Task", "PLNT-aaaa")))
     here = git(repo, "rev-parse", "--abbrev-ref", "HEAD").strip()
@@ -504,10 +762,11 @@ def fixes(repo, version=X):
     git(repo, "checkout", "-q", here)
     git(repo, "merge", "-q", "--no-ff", "-m", f"Merge {here}-side", f"{here}-side")
     git(repo, "branch", "-q", "-D", f"{here}-side")
-    commit(repo, {"src/gov/alpha/notes.py": "# notes\n"}, CHORE_SUBJECT, (("Class", "Q"),))
+    chore = commit(repo, {"src/gov/alpha/notes.py": "# notes\n"}, CHORE_SUBJECT, (("Class", chore_class),))
     commit(repo, {"docs/emergency-2/proposals/NOTE.md": "# A proposal, revised\n"}, "Revise a proposal",
            (("Class", "C"),))
-    return _version_commit(repo, version)
+    head = _version_commit(repo, version)
+    return chore if sha_of_chore else head
 
 
 @dataclass
@@ -575,13 +834,62 @@ def make_case(base, destination, case, authority_on=True, integrate=True):
 
 def turn_authority_on(repo, trailers=OWNER_TRAILERS, text=None):
     return commit(repo, {AUTHORITY_REL: text if text is not None else authority("on")},
-                  "Patch releases on (the owner's standing yes)", trailers)
+                  "Releases by code on (the owner's standing yes)", trailers)
 
 
 def previous_unreadable(repo):
     """Move the tag v0.1.1 onto the commit that broke its record (the case ``previous``)."""
     broken = rev(repo, "case/previous~1")
     git(repo, "tag", "-f", "-a", "-m", "release 0.1.1 (moved by the W2-209 tests)", f"v{N_VERSION}", broken)
+
+
+# --------------------------------------------------------------------------
+# ``approvals`` (RR-1, RR-2): one ``{"item", "decisions", "ok", "lacks"}`` per item
+# --------------------------------------------------------------------------
+
+_SHA12 = re.compile(r"[0-9a-f]{12}")
+
+
+def by_item(approvals, tokens, what):
+    """``{token: [entries]}``: each entry is of exactly the item whose token (a commit's sha12 first, else a ticket
+    id, a path or a name) its ``item`` holds; every token has an entry and no entry is of anything else."""
+    assert isinstance(approvals, list) and approvals, f"{what}: no approvals list: {approvals!r}"
+    found = {token: [] for token in tokens}
+    for entry in approvals:
+        assert isinstance(entry, dict) and set(entry) == {"item", "decisions", "ok", "lacks"}, \
+            f"{what}: an approval is not {{item, decisions, ok, lacks}}: {entry!r}"
+        item = entry["item"]
+        assert isinstance(item, str) and isinstance(entry["decisions"], list) and isinstance(entry["ok"], bool), \
+            f"{what}: the types of an approval: {entry!r}"
+        held = [t for t in tokens if t in item]
+        shas = [t for t in held if _SHA12.fullmatch(t)]
+        held = shas or held
+        assert len(held) == 1, f"{what}: the item {item!r} is not exactly one expected item of {sorted(tokens)}"
+        found[held[0]].append(entry)
+    absent = sorted(token for token, entries in found.items() if not entries)
+    assert not absent, f"{what}: no approval entry for {absent}: {approvals}"
+    return found
+
+
+def assert_approvals(approvals, case):
+    """The approvals of ``case``: its approved items ok with their decisions and lacking nothing; its lacking items
+    not ok, saying what they lack (and the id they name that does not count)."""
+    found = by_item(approvals, [*case.approved, *case.lacking], case.name)
+    for token, decisions in case.approved.items():
+        for entry in found[token]:
+            assert entry["ok"] is True and entry["lacks"] is None, f"{case.name}: {token} is not approved: {entry}"
+        named = {d for entry in found[token] for d in entry["decisions"]}
+        assert named == set(decisions), f"{case.name}: {token} names {sorted(named)}, not {sorted(decisions)}"
+    for token, bad in case.lacking.items():
+        entries = found[token]
+        assert all(entry["ok"] is False for entry in entries), f"{case.name}: {token} passes: {entries}"
+        assert all(isinstance(entry["lacks"], str) and entry["lacks"].strip() for entry in entries), \
+            f"{case.name}: {token} does not say what it lacks: {entries}"
+        if bad is not None:
+            assert any(re.search(rf"{bad}(?!\d)", entry["lacks"]) for entry in entries), \
+                f"{case.name}: {token}'s lack does not name {bad}: {entries}"
+            assert any(bad in entry["decisions"] for entry in entries), \
+                f"{case.name}: {token}'s decisions lack {bad}: {entries}"
 
 
 # --------------------------------------------------------------------------

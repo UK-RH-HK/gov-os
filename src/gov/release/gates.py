@@ -1,7 +1,7 @@
-"""The five gates of a patch release (W2-209, RELEASE-ON-BEHALF "The gates and the cut"; DEC-1223).
+"""The five gates of a release by code, patch or approved (W2-209, RELEASE-ON-BEHALF "The gates and the cut"; DEC-1223).
 
 They run in the order G0 to G4 and stop at the first red (``GateRefused``, which names the gate): G0 the owner's
-standing yes (``governance/project/release-authority.yaml``), G1 the patch rule (``gov.release.patch``), G2 the suite
+standing yes (``governance/project/release-authority.yaml``), G1 the release rule (``gov.release.patch``), G2 the suite
 on the exact commit (a nightly record), G3 the update rehearsal (``gov.release.proving``), G4 the state. A gate fails
 closed: a file that cannot be read, a record that is not a map, a check that cannot be made is a red, never a pass.
 Nothing here writes to the repository.
@@ -95,16 +95,15 @@ def g0(root: Path) -> dict:
 
 
 def g1(root: Path, version: str) -> dict:
-    """The patch rule: the result of ``patch.evaluate`` at HEAD when it says patch; refused naming the first failed rule."""
+    """The release rule: the result of ``patch.evaluate`` at HEAD when it says patch or approved; refused naming the first
+    failed rule and every item that lacks the owner's approval."""
     try:
         result = patch.evaluate(root, version)
     except ReleaseError as exc:
         raise GateRefused("G1", f"the patch rule cannot be read: {exc}") from None
-    if result["kind"] != "patch":
-        rule = result["failed"][0]
-        raise GateRefused("G1", f"{rule} fails: {result['rules'][rule]['detail']}: this is a bigger release, "
-                          "which only the owner builds", rule=rule, rules=result["rules"], kind="bigger",
-                          failed=result["failed"], **{"from": result["from"], "commit": result["commit"]})
+    if result["kind"] == "bigger":
+        raise GateRefused("G1", f"this is a bigger release, which only the owner builds: {patch.bigger_reason(result)}",
+                          rule=result["failed"][0], **patch.bigger_details(result))
     return result
 
 

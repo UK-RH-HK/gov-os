@@ -8,7 +8,7 @@ child process with HOME = the scratch home, working in the scratch clone; the re
 after and must be equal. The clone's `origin` is removed, so nothing can be pushed or fetched.
 
 Cases (each writes a line of evidence):
-  A. a planted patch (a `Fix:` commit under a ticket closed at the scratch release, a `Class: Q` chore, the version commit) passes
+  A. a planted patch (a `Fix:` commit under a ticket closed at the scratch release, a `Class: C` chore, the version commit) passes
      G1: `gov release 0.9.1 --patch --check` answers patch;
   B. each planted bigger change (a docs/contract edit, EMERGENCY-2, a closed feature ticket, a new command, a new
      schema, a feature commit with no trailer) is refused by the rule's name;
@@ -163,7 +163,7 @@ def main() -> int:
     (clone / "src" / "gov" / "release" / "command.py").write_text(
         (clone / "src" / "gov" / "release" / "command.py").read_text(encoding="utf-8") + "\n# planted chore\n",
         encoding="utf-8")
-    commit(clone, "A planted chore", ["Class: Q", "Role: orchestrator"])
+    commit(clone, "A planted chore", ["Class: C", "Role: orchestrator"])
     patch_tip = git(clone, "rev-parse", "HEAD").strip()
 
     def version_commit():
@@ -219,11 +219,11 @@ def main() -> int:
         p = clone / "src" / "gov" / "accept" / "runner.py"
         p.write_text(p.read_text(encoding="utf-8") + "\n# planted feature\n", encoding="utf-8")
 
-    cases = [("docs/contract edit", plant_contract, "P2", ["Class: Q"]),
-             ("EMERGENCY-2 edit", plant_emergency, "P2", ["Class: Q"]),
-             ("a closed feature ticket", plant_ticket, "P3", ["Class: Q"]),
-             ("a new command", plant_command, "P4", ["Class: Q"]),
-             ("a new kit schema", plant_schema, "P5", ["Class: Q"]),
+    cases = [("docs/contract edit", plant_contract, "P2", ["Class: C"]),
+             ("EMERGENCY-2 edit", plant_emergency, "P2", ["Class: C"]),
+             ("a closed feature ticket", plant_ticket, "P3", ["Class: C"]),
+             ("a new command", plant_command, "P4", ["Class: C"]),
+             ("a new kit schema", plant_schema, "P5", ["Class: C"]),
              ("a feature commit with no trailer", plant_feature, "P3", ["Role: engineer"])]
     for label, plant, rule, trailers in cases:
         git(clone, "checkout", "-q", "-B", "planted-bigger", patch_tip)
@@ -321,7 +321,7 @@ def main() -> int:
     give_store(d_clone)
     hook = d_clone / "template" / "governance" / "kernel" / "hooks" / "stop.py"
     hook.write_text("import sys\nsys.exit(3)\n" + hook.read_text(encoding="utf-8"), encoding="utf-8")
-    commit(d_clone, "A planted hook that fails", ["Class: Q", "Role: orchestrator"])
+    commit(d_clone, "A planted hook that fails", ["Class: C", "Role: orchestrator"])
     d_authority = d_clone / "governance" / "project" / "release-authority.yaml"
     d_authority.write_text((WORKTREE / "governance" / "project" / "release-authority.yaml").read_text(
         encoding="utf-8").replace("patch_releases: off", "patch_releases: on"), encoding="utf-8")
