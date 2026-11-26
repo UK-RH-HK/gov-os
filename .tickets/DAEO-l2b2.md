@@ -101,7 +101,8 @@ second case plants no number in the path map.
   never refused: it passes, with the notice `RECORD_PLACED <path>` where nothing else places it (DEC-1239 (2)).
   Verify: planted: `--select` exit 0 with the notice; the landing lands with it.
 - **PM-3 The counts are printed.** The landing's answer, `queue.json`, a dry run's answer and `select.json`, the
-  `--select` object and the close record hold `path_map`: `path map: <n> tracked, <a> in none, <b> in two` for the
+  `--select` object and a ticket's first close record hold `path_map` (a fix landing's close record stays as W2-201 X6 pins it,
+  one fix entry and line; the CTO's call, 2026-11-26): `path map: <n> tracked, <a> in none, <b> in two` for the
   merged tree (`in two`: in two or more). A project with no `governance/project/` has no `path_map`. Verify: planted: a
   clean landing says `0 in none, 0 in two` with `<n>` equal to `git ls-files` of the tested merge; a project with one
   path already in none lands and says `1 in none`.
