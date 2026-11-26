@@ -1,0 +1,24 @@
+GOV-ANSWERS 1
+batch: B-2026-11-26-rubric
+hash: sha256:9eeadc23d925c51f2f162cc02da794f166a845397747842372cdc8a3a73b2d5d
+answered: 2026-11-26T12:12:57Z
+count: 17
+R-01: a
+R-02: a
+R-03: a
+R-04: a
+R-05: a
+R-06: a
+R-07: a
+R-08: a
+R-09: a
+R-10: a
+R-11: a
+R-12: a
+C-01: a
+C-02: a
+C-03: c | note: Not two passes, and no exceptions: ASMO OS restructures fully to the standard once, made safe by the standard and the checker coming first (below).
+C-04: a
+C-05: a | note: As part of EXAMIN's full restructure, not a separate chore; the forbidden-reach count confirms the three are outside default memory before the next fresh pair starts.
+END
+The owner, with the sheet: "No exceptions for EXAMIN and ASMO OS: a wrong restructure now would break every release after it. So they restructure once, to the final standard, by this rubric, and W2-213 later lands on clean repositories and confirms them. In this order: 1. W2-213's first slice, now, before anything moves: the standard frozen in the kit (standard.yaml: the folders, the classes, the memory rules, exactly as R-01 to R-07 say), and the checker: the nine-field plan line and the seven code checks of R-09, runnable on a plan before any move. Ship both to EXAMIN and ASMO OS as soon as they are green, by the next release or by hand if that is sooner. 2. Then each product's CTO classes its repository by the rubric, in parallel chunks with Sonnet helpers (R-08, R-09, R-10), merges the answers, runs the checker until it is clean, and brings me its plan for my yes (R-11): counts per class, every ask item, every rewritten reference, every held move. Code and tests stay where they are (R-05). 3. On my yes, it moves, rewrites the document references, regenerates its path map from the standard, rebuilds memory, runs its selected tests, and runs the checker again; anything red rolls back. 4. EXAMIN measures again only after its restructure and memory rebuild, with forbidden-reach first. ASMO OS's A6 is this restructure. 5. The rest of W2-213 (the generator, the moves and the rewrites by code) follows; EXAMIN and ASMO OS are its proving cases, and it must find them clean. Add the rubric to the rubrics register, write W2-213's spec in this order, and send this to the EXAMIN and ASMO OS CTOs with the rubric."

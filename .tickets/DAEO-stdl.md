@@ -1,6 +1,6 @@
 ---
 id: DAEO-stdl
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-11-26T11:30:00Z
@@ -13,12 +13,12 @@ wbs_id: W2-213
 title: "A standard repository layout and classification by rubric: the path map follows a standard, never words in paths; agents class in parallel in a fixed form, code merges and checks, the owner approves an owned repository's moves, code executes and rolls back"
 class: implementation
 kind: feature
-approved_by: DEC-1255
+approved_by: [DEC-1255, DEC-1256]
 state_class: AUTHORITATIVE
 role: engineer
 profile: FULL
 depends_on: []
-waits_on: [the classification rubric's yes (DEC-1255 (3)), then this ticket's specification]
+waits_on: []
 specification: docs/specs/W2-213-standard-layout.md
 allowed_paths:
 - docs/specs/W2-213-standard-layout.md
@@ -30,7 +30,7 @@ kpis:
 non_goals:
 - Restructuring Gov OS itself (it keeps its classing until restructuring pays; its tests pin its paths)
 - Restructuring an imported tool or code (it sits whole in imports/<name>/ with one class)
-sources: [DEC-1255, DEC-1254, DEC-1222, DEC-1228, DEC-1252]
+sources: [DEC-1256, DEC-1255, DEC-1254, DEC-1222, DEC-1228, DEC-1252, docs/emergency-2/proposals/CLASSIFICATION-RUBRIC.md]
 acceptance_tests:
   path: tests/acceptance/W2-213/
   author: independent-test-designer (MR-3); written before implementation, from the specification
