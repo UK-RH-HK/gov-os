@@ -37,7 +37,8 @@ SKILL_REL = "template/governance/kernel/skills/adopt/SKILL.md"
 
 # The harbour project split in namespaces: the papers (documents, notes, records), the old memory, the rest.
 PAPERS = ("docs/**", "notes/**", "spec/**")
-ATTIC = ("legacy/**",)
+# ``locked/**`` (no file lies there) keeps ``attic`` from being stale as a whole, which A3 refuses unclassed (W2-212 SR-3).
+ATTIC = ("legacy/**", "locked/**")
 REST = tuple(pattern for pattern in support.NAMESPACE_PATHS if pattern not in PAPERS + ATTIC)
 
 

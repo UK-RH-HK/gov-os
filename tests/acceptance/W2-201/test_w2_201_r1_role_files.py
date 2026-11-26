@@ -58,13 +58,13 @@ def test_r1_the_opus_and_haiku_model_ids_are_left_only_in_the_two_opus_roles_def
         assert found == [], f"{location}/{role}.md names Opus or Haiku (R1 leaves neither): {found}"
 
 
-def test_r1_criticality_yaml_names_opus_only_in_its_opus_key_and_never_haiku():
+def test_r1_criticality_yaml_names_no_model_id_and_has_no_opus_key():
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the `opus` key is gone (the table names the models), so no Opus or Haiku id stands in the file.
     text = (REPO / k.CRITICALITY_REL).read_text(encoding="utf-8")
-    hits = [line for line in text.splitlines() if any(model in line for model in MODEL_IDS)]
-    assert len(hits) == 1 and re.match(r"^opus:\s*claude-opus-5-5\b", hits[0]), (
-        f"{k.CRITICALITY_REL} names Opus or Haiku on {hits}, not only in its `opus` key")
-    data = yaml.safe_load(text)
-    assert data.get("opus") == "claude-opus-5-5", "the key `opus` stays, for the file's form"
+    hits = [line for line in text.splitlines() if not line.lstrip().startswith("#") and any(
+        model in line for model in MODEL_IDS)]
+    assert not hits, f"{k.CRITICALITY_REL} names Opus or Haiku on {hits}"
+    assert "opus" not in yaml.safe_load(text), "the key `opus` is still there"
 
 
 def test_r1_criticality_yaml_s_comments_say_a_class_no_longer_picks_a_model():
@@ -75,7 +75,8 @@ def test_r1_criticality_yaml_s_comments_say_a_class_no_longer_picks_a_model():
     sentences = [s for s in re.split(r"[.;]", comments) if "class" in s and "model" in s]
     assert any(re.search(r"no longer|not|never|no ", s) for s in sentences), (
         f"{k.CRITICALITY_REL}'s comments do not say a class no longer picks a model: {comments[:600]!r}")
-    assert "exception" in comments, f"{k.CRITICALITY_REL}'s comments do not tie `opus` to an exceptions entry"
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: the `opus` key is gone, so the comments tie nothing to it.
+    assert "opus" not in yaml.safe_load((REPO / k.CRITICALITY_REL).read_text(encoding="utf-8"))
 
 
 @pytest.mark.parametrize("location", FOLDERS)

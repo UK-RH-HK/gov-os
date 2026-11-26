@@ -54,8 +54,12 @@ def source_line(key):
 
 
 def test_no_guard_line_is_shipped():
+    """Rewrite-Reason: DEC-1246 (3)(b): MR-4: the kit's one PreToolUse line is the helper-model hook (matcher Agent|Task,
+    ``.claude/hooks/agent_model.py``), never a guard."""
     hooks = _load_jsonc(SOURCE)["hooks"]
-    assert "preToolUse" not in hooks and "postToolUseFailure" not in hooks, sorted(hooks)
+    assert "postToolUseFailure" not in hooks, sorted(hooks)
+    pre = [e for e in hooks.get("preToolUse", []) if e.get("type") == "command"]
+    assert len(pre) == 1 and pre[0].get("matcher") == "Agent|Task" and "hooks/agent_model.py" in pre[0]["command"], pre
     assert not source_entries("postToolUse", "posttooluse.py")
     assert "hooks" not in json.loads(SETTINGS.read_text(encoding="utf-8"))
 

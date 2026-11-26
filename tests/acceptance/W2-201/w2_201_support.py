@@ -111,7 +111,7 @@ def real_criticality(allowed, profile="STANDARD"):
 
 # A fixture rubric in the form gov.launch.criticality reads: C3 src/critical, C2 the rest of src, C1 docs, FULL >= C2.
 HOOK_RUBRIC = {
-    "version": 1, "default": "C2", "opus": OPUS,
+    "version": 1, "default": "C2",   # Rewrite-Reason: DEC-1246 (3)(b): MR-2: no `opus` key
     "rules": [{"class": "C3", "paths": ["src/critical/*"]}, {"class": "C2", "paths": ["src/*"]},
               {"class": "C1", "paths": ["docs/*"]}, {"class": "C2", "profile": "FULL"}],
 }

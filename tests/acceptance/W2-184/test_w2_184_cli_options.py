@@ -89,11 +89,13 @@ def test_cli_owner_named_admits_a_full_ticket_s_review_that_repeats_a_recorded_s
 
 
 def test_cli_owner_named_admits_a_third_review(gov, full):
-    _review(gov(AUD, full), "high", "by criticality", 1)
-    second = gov(AUD, full)
-    _review(second, "max", "probe", 2)
-    s.refused(gov(AUD, full), second.session_id(), s.SONNET, "max")
-    _review(gov(AUD, full, options=("--owner-named", OWNER)), "max", "probe", 3, owner_named=OWNER)
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-2: round 2 was the probe's Opus max; the probe is retired, so round 2 runs on
+    # xhigh here and round 3 (the table's high, repeating round 1) is the one the owner admits.
+    first = gov(AUD, full)
+    _review(first, "high", "by criticality", 1)
+    _review(gov(AUD, full, "--effort", "xhigh"), "xhigh", "after --", 2)
+    s.refused(gov(AUD, full), first.session_id(), s.SONNET, "high")
+    _review(gov(AUD, full, options=("--owner-named", OWNER)), "high", "by criticality", 3, owner_named=OWNER)
 
 
 def test_cli_a_planted_trial_admits_its_model_after_the_double_dash_and_the_record_holds_its_id(project, gov, tk):

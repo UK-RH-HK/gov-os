@@ -444,7 +444,7 @@ def kit_text_findings(root: Path) -> list[dict]:
 
 def _same_generated(path: Path, rel: str, content: bytes) -> bool:
     """The project's file is what rulesync generated: its bytes equal, or (settings) equal but for the
-    ``disableClaudeAiConnectors`` key that ``gov adapters generate`` merges in (fixes-015a F1)."""
+    ``disableClaudeAiConnectors`` key and ``permissions.defaultMode`` that ``gov adapters generate`` merges in (fixes-015a F1, MR-4)."""
     held = path.read_bytes()
     if held == content:
         return True
@@ -457,7 +457,15 @@ def _same_generated(path: Path, rel: str, content: bytes) -> bool:
     if not (isinstance(own, dict) and isinstance(generated, dict)):
         return False
     key = "disableClaudeAiConnectors"
-    return {k: v for k, v in own.items() if k != key} == {k: v for k, v in generated.items() if k != key}
+
+    def bare(settings: dict) -> dict:  # without what the merge adds: the connectors key and permissions.defaultMode (MR-4)
+        kept = {k: v for k, v in settings.items() if k != key}
+        if isinstance(kept.get("permissions"), dict):
+            permissions = {k: v for k, v in kept["permissions"].items() if k != "defaultMode"}
+            kept = {**{k: v for k, v in kept.items() if k != "permissions"}, **({"permissions": permissions} if permissions else {})}
+        return kept
+
+    return bare(own) == bare(generated)
 
 
 def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:

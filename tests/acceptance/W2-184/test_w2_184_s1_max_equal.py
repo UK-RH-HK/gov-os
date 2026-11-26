@@ -99,82 +99,13 @@ def test_s1_a_reason_given_beside_an_equal_max_is_accepted_and_recorded(project,
 
 @pytest.fixture()
 def full(project):
-    """A FULL ticket in C2: the auditor's table says Opus, high."""
+    """A FULL ticket in C2: the auditor's table says Sonnet, high."""
     return s.ticket(project, ENG, "C2", "FULL", tk=FULL)
 
 
-def _first(launch):
-    result = launch(AUD, FULL)
-    s.assert_session(result, SONNET, "high", criticality="C2", model_source="by criticality",
-                     effort_source="by criticality", review_round=1)
-    return result
-
-
-def test_s4_the_probe_launched_with_the_model_and_max_after_the_double_dash_needs_no_reason(full, launch):
-    """KPI success-4 / 3.2a: round 2 with ``--model <opus> --effort max`` after ``--``, as ``launch_worker.sh`` passes
-    it, and no ``--reason``: accepted, round 2, max, ``effort_source`` probe, no reason."""
-    _first(launch)
-    second = launch(AUD, FULL, "-p", "Review the ticket.", "--model", SONNET, "--effort", "max")
-    record = s.assert_session(second, SONNET, "max", criticality="C2", model_source=s.ANY, effort_source="probe",
-                              review_round=2)
-    assert record["effort_reason"] is None and second.values("--effort") == ["max"]
-
-
-def test_s4_the_probe_s_model_given_equal_to_the_resolved_one_is_recorded_as_after_the_double_dash(full, launch):
-    """Reading of section 8's precedence: the table's Opus is the probe's Opus, so the probe changed no model, and the
-    given model equals the resolved one: ``model_source`` is ``after --``."""
-    _first(launch)
-    s.assert_session(launch(AUD, FULL, "--model", SONNET, "--effort", "max"), SONNET, "max", criticality="C2",
-                     model_source="after --", effort_source="probe", review_round=2)
-
-
-def test_s4_the_probe_launched_with_max_alone_after_the_double_dash_needs_no_reason(full, launch):
-    _first(launch)
-    s.assert_session(launch(AUD, FULL, "--effort", "max"), SONNET, "max", criticality="C2",
-                     model_source="by criticality", effort_source="probe", review_round=2)
-
-
-def test_s4_the_probe_launched_in_the_joined_spelling_needs_no_reason(full, launch):
-    _first(launch)
-    second = launch(AUD, FULL, f"--model={SONNET}", "--effort=max")
-    s.assert_session(second, SONNET, "max", criticality="C2", model_source=s.ANY, effort_source="probe",
-                     review_round=2)
-
-
-def test_s4_the_probe_s_max_after_the_double_dash_on_the_table_s_sonnet_is_the_probe_s_own_setting(
-        project, full, launch):
-    """Rewrite-Reason: DEC-1225: the auditor's table says Sonnet for C2: round 2's probe was Opus max, and given as such
-    after ``--`` it was the probe's own setting. R2: the probe no longer changes the model; round 2 is Sonnet max and
-    ``--model <sonnet> --effort max`` after ``--`` is its own setting, while ``--model <opus>`` is refused."""
-    s.write_role(project, AUD, table={**s.TABLES[AUD], "C2": (SONNET, "high")})
-    s.assert_session(launch(AUD, FULL), SONNET, "high", criticality="C2", model_source="by criticality",
-                     effort_source="by criticality", review_round=1)
-    s.refused(launch(AUD, FULL, "--model", OPUS, "--effort", "max"), "--model", OPUS, SONNET)
-    s.assert_session(launch(AUD, FULL, "--model", SONNET, "--effort", "max"), SONNET, "max", criticality="C2",
-                     model_source=s.ANY, effort_source="probe", review_round=2)
-
-
-def test_s4_a_reason_beside_the_probe_s_max_after_the_double_dash_is_recorded(full, launch):
-    _first(launch)
-    text = "the second review, as the tool prints it"
-    s.assert_session(launch(AUD, FULL, "--model", SONNET, "--effort", "max", reason=text), SONNET, "max",
-                     criticality="C2", model_source=s.ANY, effort_source="probe", effort_reason=text, review_round=2)
-
-
-def test_s4_a_third_review_given_the_probe_s_max_after_the_double_dash_is_still_the_same_setting(full, launch):
-    """3.2a frees the reason only: a repeated setting is refused naming the second record and the setting (6.3)."""
-    _first(launch)
-    second = launch(AUD, FULL, "--model", SONNET, "--effort", "max")
-    s.assert_session(second, SONNET, "max", criticality="C2", model_source=s.ANY, effort_source="probe", review_round=2)
-    s.refused(launch(AUD, FULL, "--model", SONNET, "--effort", "max"), second.session_id(), SONNET, "max")
-
-
-def test_s4_a_third_review_the_owner_named_is_admitted_with_the_probe_s_max_after_the_double_dash(full, launch):
-    _first(launch)
-    launch(AUD, FULL, "--effort", "max")
-    s.assert_session(launch(AUD, FULL, "--effort", "max", owner_named="DEC-1010"), SONNET, "max", criticality="C2",
-                     model_source="by criticality", effort_source="probe", owner_named="DEC-1010", review_round=3)
-
+# Rewrite-Reason: DEC-1246 (3)(b): MR-2: the probe (a FULL ticket's round 2 on max, `effort_source` probe, needing no
+# `--reason`) is retired; its cases moved to test_w2_184_s4_reviews.py (every round is the table's setting). The cases
+# below keep the rule that a `max` is the launch's own choice and needs a `--reason` on every round.
 
 # --------------------------------------------------------------------------
 # Still refused: a max after -- that is the launch's own choice (failure-1 side of 3.2)

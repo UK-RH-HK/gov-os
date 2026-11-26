@@ -37,7 +37,9 @@ def _hook(command, timeout=10):
 
 
 # The project's own hook entries (none runs a kernel hook), planted before the generated ones in their events.
-OWN_PRE = {"matcher": "Agent|Task", "hooks": [_hook('python3 -I "$CLAUDE_PROJECT_DIR/.claude/hooks/agent_model.py"')]}
+# Rewrite-Reason: DEC-1246 (3)(b): MR-4: `.claude/hooks/agent_model.py` is now the kit's own hook (a sixth kernel hook with
+# a PreToolUse `Agent|Task` entry), so the project's own PreToolUse entry runs another program, under another matcher.
+OWN_PRE = {"matcher": "Read", "hooks": [_hook('python3 -I "$CLAUDE_PROJECT_DIR/.claude/hooks/own_pre.py"')]}
 OWN_POST_1 = {"matcher": "Bash", "hooks": [_hook('python3 -I "$CLAUDE_PROJECT_DIR/.claude/hooks/own_post.py"')]}
 # A look-alike: named context_watch.py, but not the kernel's program: it is the project's own and must stay.
 OWN_POST_2 = {"matcher": "Bash", "hooks": [_hook('python3 -I "$CLAUDE_PROJECT_DIR/tools/context_watch.py"')]}
@@ -91,9 +93,12 @@ def _generated_ctx(settings):
 def _plant(settings, post_groups):
     """The settings at A with the project's own hook entries and ``post_groups`` as PostToolUse."""
     planted = copy.deepcopy(settings)
-    hooks = {"PreToolUse": [copy.deepcopy(OWN_PRE)]}
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the adopted settings now hold the kit's PreToolUse entry; the own group goes
+    # before it, as the own PostToolUse and Stop groups do, instead of being overwritten by the generated groups.
+    hooks = {}
     for event, groups in planted["hooks"].items():
         hooks[event] = groups
+    hooks["PreToolUse"] = [copy.deepcopy(OWN_PRE), *hooks.get("PreToolUse", [])]
     hooks["PostToolUse"] = [copy.deepcopy(OWN_POST_1), copy.deepcopy(OWN_POST_2), *copy.deepcopy(post_groups)]
     hooks["Stop"] = [copy.deepcopy(OWN_STOP), *hooks["Stop"]]
     planted["hooks"] = hooks
@@ -215,7 +220,10 @@ def test_the_projects_own_hooks_stay_beside_the_collapsed_entry(ran):
     post = own[("PostToolUse", "Bash")]
     assert [h["command"] for h in post] == [h["command"] for h in OWN_POST_1["hooks"] + OWN_POST_2["hooks"]], (
         f"the project's own PostToolUse Bash entries changed: {post}")
-    assert own[("PreToolUse", "Agent|Task")] == OWN_PRE["hooks"]
+    assert own[("PreToolUse", "Read")] == OWN_PRE["hooks"]
+    # Rewrite-Reason: DEC-1246 (3)(b): MR-4: beside it the kit's model hook is there once (PreToolUse, Agent|Task).
+    kit = [(e, m) for e, m, h in _entries(after) if "governance/kernel/hooks/agent_model.py" in h.get("command", "")]
+    assert kit == [("PreToolUse", "Agent|Task")], f"the kit's model hook entries are {kit}"
     assert own[("Stop", None)] == OWN_STOP["hooks"]
 
 

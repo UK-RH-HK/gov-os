@@ -79,7 +79,9 @@ PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, 
             "template/governance/kernel/schemas/ticket.schema.json",
             "template/governance/kernel/schemas/common.schema.json",
             # W2-36: gov discover's spec check (``gov.discover.check``) from an installed gov, through ``shipped``
-            "template/governance/kernel/skills/spec-writing/check_spec.py")
+            "template/governance/kernel/skills/spec-writing/check_spec.py",
+            # W2-207 (UR-6): gov usage's price table, read from an installed gov by ``gov.usage.record`` in any root
+            "governance/project/usage-prices.yaml")
 
 
 def _package_copy() -> Path:

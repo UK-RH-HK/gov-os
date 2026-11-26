@@ -48,7 +48,8 @@ def project(tmp_path, monkeypatch):
                     encoding="utf-8")
     criticality = root / "governance/project/criticality.yaml"
     criticality.parent.mkdir(parents=True, exist_ok=True)
-    criticality.write_text(yaml.safe_dump({"version": 1, "default": "C2", "opus": "claude-opus-5-5", "rules": [
+    criticality.write_text(yaml.safe_dump(# Rewrite-Reason: DEC-1246 (3)(b): MR-2: criticality.yaml has no `opus` key.
+    {"version": 1, "default": "C2", "rules": [
         {"class": "C2", "profile": "FULL"}]}), encoding="utf-8")
     front = {"id": TICKET, "wbs_id": "W9-1", "status": "in_progress", "priority": 1, "role": "engineer",
              "profile": "STANDARD", "allowed_paths": ["src/x/**"], "depends_on": [], "deps": [], "needs": []}

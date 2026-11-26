@@ -1,6 +1,6 @@
 """``gov adopt --lite`` as a command module (W1-41, DEC-090, DEC-517). The convention is in ``gov.cli.main``.
 
-``gov adopt --lite --stage <A0|A1|A2|AS|A3|A4|A5|A6|A7|A8|A9|A10|MA> [--map <file>] [--verdict <path>]`` runs one stage
+``gov adopt --lite --stage <A0|A1|A2|AS|A3|A4|A5|A6|A7|A8|A9|A10|VERDICT|MA> [--map <file>] [--verdict <path>]`` runs one stage
 of the adoption of the project, which commits its evidence record under ``governance/adoption/`` and refuses without
 the record of the stage before it. ``gov adopt`` without ``--lite`` stays reserved: the full transaction is Wave 3.
 
@@ -12,6 +12,10 @@ W2-88: ``MA --out <folder>`` is the memory assessment and the refactoring plan (
 project, none in it); A3 takes ``--assessment <folder>`` and cites that assessment; ``A9 --out <folder> [--decision
 DEC-n]... [--questions <file>] [--budget-ms N]`` builds the memory fabric (A9 lite) after A8.
 
+W2-210: ``VERDICT`` is the lite adoption verdict (CAP-44.h), after A10: it computes the lite conditions by code and
+commits ``governance/adoption/VERDICT-lite.md`` (``verdict``); a NOT_ADOPTED_HEALTHY verdict is committed and refused
+(``ADOPT_NOT_ADOPTED``). It takes no argument beyond ``--session`` and reads the owner's exceptions file first.
+
 W2-174: ``--verify-list``, ``--verify-apply <answers-file>`` (with the global ``--session``) and ``--facts`` need no
 ``--lite``: the Verify pass of an adopted repository's tickets (``verify_pass``) and its facts file (``facts``).
 """
@@ -21,7 +25,7 @@ from __future__ import annotations
 from pathlib import Path
 
 ACT_PATHS = ("**",)  # A6 moves and A8 retires what the audited path map names, wherever it lies in the project
-STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "MA")
+STAGES = ("A0", "A1", "A2", "AS", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "VERDICT", "MA")
 _parser = None  # the command's own parser, kept for the usage error of --lite without --stage
 
 

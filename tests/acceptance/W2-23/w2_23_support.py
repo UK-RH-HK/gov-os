@@ -702,7 +702,10 @@ def hook_event(event, root):
     base = {"session_id": "w2-23-session", "transcript_path": str(Path(root) / ".none.jsonl"), "cwd": str(root),
             "hook_event_name": event}
     if event == "PreToolUse":
-        base.update(tool_name="Read", tool_input={"file_path": str(Path(root) / "README.md")})
+        # Rewrite-Reason: DEC-1246 (3)(b): MR-4: the one PreToolUse hook is now the kit's model hook (agent_model.py,
+        # matcher Agent|Task); it gets a spawn of a Sonnet helper, which it lets through.
+        base.update(tool_name="Agent", tool_input={"description": "a helper", "prompt": "Look around.",
+                                                   "subagent_type": "Explore", "model": "sonnet"})
     elif event in ("PostToolUse", "PostToolUseFailure"):
         base.update(tool_name="Bash", tool_input={"command": "true"},
                     tool_response={"stdout": "", "stderr": "", "interrupted": False})

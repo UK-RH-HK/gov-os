@@ -217,6 +217,7 @@ namespaces:
       - "template/governance/kernel/githooks/**"
       - "template/governance/kernel/hooks/**"
       - "template/governance/kernel/launch/**"
+      - "template/governance/kernel/assets/**"
       - "template/governance/kernel/roles/**"
       - "template/governance/kernel/schemas/**"
       - "template/governance/kernel/skills/*/*"
