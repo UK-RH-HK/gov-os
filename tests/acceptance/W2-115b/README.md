@@ -373,3 +373,44 @@ the base's paths lands) are unchanged and stay green.
    any case); its exact wording is not fixed.
 4. **SEL-2's "selects the suite"**: a selected suite equal to the named folder or file, or inside it (a narrower file target is
    accepted); a refusal naming the path is a red, a refusal that the head does not hold a target is a `fixture:` failure.
+
+## Fix: a close record that holds what happened, IT-3 (plan item 1-9; records fix 16; T-11 (a), DEC-1242; DEC-1244)
+
+Written by the independent test designer from the ticket's section "Fix: a close record that holds what happened, IT-3",
+before any implementation, in `test_w2_115b_close_evidence.py`. The line is numbered after SEL's (success-25: what the
+close record holds; failure-7: what the schema refuses and still takes; the ids are labels of this table). Public
+interfaces: `gov queue <T>=<branch> ... [--full] --json`, the close record at the landed head, the kept JUnit files,
+`gov check --structural <base>` and the product's `core-schema` check (`gov.check.schema`) run in a scratch clone.
+
+**What is planted:** W2-115b's kit with the worktree's kernel schemas under `governance/kernel/schemas/` and a
+`core-schema` declaration running the worktree's check; on the base a unit test that skips and the known red, both
+importing the widget. Each build checks them by plain pytest and that `check-jsonschema` is on `PATH` (`fixture: ...`).
+
+| run | project and branches | command |
+|---|---|---|
+| scoped | A: the widget, a specification record under `docs/x/` (outside its paths, placed by nothing) and a new ticket that is no feature; B: the gadget | `A B` |
+| full | A: the widget | `A --full` |
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| success-25 (IT-3: `evidence` and the notices) | `test_w2_115b_close_evidence.py::test_it3_the_evidence_says_scoped_and_names_the_base_the_tested_commit_and_its_tree`, `test_w2_115b_close_evidence.py::test_it3_changed_is_each_ticket_s_own_changed_paths`, `test_w2_115b_close_evidence.py::test_it3_selected_names_what_the_run_ran_for_the_ticket`, `test_w2_115b_close_evidence.py::test_it3_the_skips_the_failures_and_the_kept_junit_files_are_those_of_the_runs`, `test_w2_115b_close_evidence.py::test_it3_a_full_run_s_evidence_says_full_with_a_reason`, `test_w2_115b_close_evidence.py::test_it3_the_landed_close_records_hold_evidence_and_the_structural_pass_finds_nothing_on_them`, `test_w2_115b_close_evidence.py::test_it3_the_close_record_holds_the_landing_s_notices_path_map_and_impact` | the close record holds no `evidence` ("holds no evidence block: evidence None"); no `notices` (and no `impact`) in it |
+| failure-7 (IT-3: a `close: queue` record without `evidence` passes, or another close record stops validating) | `test_w2_115b_close_evidence.py::test_it3_the_same_record_with_evidence_removed_or_null_fails_the_close_schema`, `test_w2_115b_close_evidence.py::test_it3_other_close_records_validate_as_before` | the first (2 cases: removed, null): "no finding on the record names close.schema.json and evidence". The second (3 cases) are guards, green on the base: `gov close`'s record with `evidence: null`, a record from before W2-66, a fix landing's own form |
+
+**Readings this fix's cases take.**
+
+1. **`changed`** is each ticket's own branch diff from the integration head (`base...tip`), in any order; in a batch,
+   never the other ticket's.
+2. **`selected`** is asserted non-empty and, for A in the scoped run, to hold a target covering the unit test that imports
+   the widget. Whether it names the ticket's own acceptance folder, or in a batch the other ticket's targets, is not fixed.
+3. **The skips and failures:** the planted skip is in `skips` with its reason, `skip_count` is the length of `skips`, the
+   base red is in `failures` with a text; `junit_xml` paths resolve from the root or the warm clone, each holds a test
+   case, and together they hold the widget's unit test.
+4. **"`gov check --structural` finds nothing on it":** the pass's schema family ran, its lines name no close record path,
+   and the check itself (which lists every finding; the pass shows three) has none on it. The kit's other records have
+   findings of their own, which are not read.
+5. **`ticket_notices` and `path_notices`** in a record equal the answer's entries of that ticket; `notices` equals the
+   answer's list; `impact` equals the answer's entry of that ticket.
+
+**Not tested here:** the other fields of `evidence` the schema requires beyond what the schema check itself holds
+(`left_out`); a `close: queue` record written before this fix, which the line's rule now refuses (the line says so; this
+repository holds none).
