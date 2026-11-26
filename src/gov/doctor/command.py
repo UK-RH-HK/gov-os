@@ -498,13 +498,15 @@ def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -
 
 def _check_tools(root: Path) -> dict:
     import yaml
+    from gov.resources import toolpath
+    node = toolpath.node_prefix(root)  # W2-20 SP-2: the Node folder the test runs use; it changes no status
     registry_path = root / "governance" / "project" / "tool-registry.yaml"
     if not registry_path.is_file():
-        return {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}
+        return {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": [], "node_prefix": node}
     try:
         data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
     except Exception:
-        return {"status": "fail", "reason": "cannot read tool-registry.yaml", "tools": []}
+        return {"status": "fail", "reason": "cannot read tool-registry.yaml", "tools": [], "node_prefix": node}
     tools_list = (data.get("tools") or []) if isinstance(data, dict) else []
 
     all_prefixes: list[str] = []
@@ -602,7 +604,7 @@ def _check_tools(root: Path) -> dict:
         if registered_location:
             detail["location"] = registered_location
         results.append(detail)
-    return {"status": "pass" if all_ok else "fail", "tools": results}
+    return {"status": "pass" if all_ok else "fail", "tools": results, "node_prefix": node}
 
 
 def _check_hooks(root: Path) -> dict:

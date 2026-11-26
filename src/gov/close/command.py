@@ -39,6 +39,7 @@ from gov.close.state import (ESCALATION_AT, ESCALATION_OPTIONS as _ESCALATION_OP
                              ESCALATION_REASON as _ESCALATION_REASON, count_path as _count_path,
                              read_count as _read_count, write_count as _write_count)
 from gov.close.tool import open_repair_ticket as _open_repair_ticket, tk as _tk  # noqa: F401
+from gov.resources import toolpath
 
 DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
 DEFAULT_TIMEOUT = 120
@@ -833,11 +834,13 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     rel = test_path.relative_to(root).as_posix()
     # The run is the suite's own (DEC-487): what the caller's environment would add to the test runner
     # (options, plugins), put before the project's own code (the caller's PYTHONPATH) or switch in the
-    # interpreter (DEC-500: for one, PYTHONOPTIMIZE, which removes assertions) is not passed on.
+    # interpreter (DEC-500: for one, PYTHONOPTIMIZE, which removes assertions) is not passed on. The tree's pinned
+    # Node goes first on PATH (gov.resources.toolpath).
     env = {key: value for key, value in os.environ.items()
            if key not in _TEST_RUNNER_VARIABLES
            and (not key.startswith(_INTERPRETER_VARIABLES) or key in _INTERPRETER_PLACES)}
     env["PYTHONPATH"] = str(root / "src")
+    env = toolpath.with_node(env, root)  # W2-20 SP-1
     pytest = [sys.executable, "-m", "pytest"]
     options = ["-q", "-p", "no:cacheprovider", "--tb=line", "--no-header"]
     if test_path.is_dir():

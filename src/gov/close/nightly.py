@@ -36,6 +36,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.close import command as _close, evidence as _evidence, select as _select
 from gov.close.repo import git as _git
+from gov.resources import toolpath
 from gov.util.gitenv import git_env, runner_env
 
 COMMAND = "nightly"
@@ -77,12 +78,13 @@ def _run_limit(root: Path) -> float:
 
 
 def _pytest_env(tree: Path) -> dict:
-    """The environment of a run on ``tree``, as the close gives its runs (DEC-500)."""
+    """The environment of a run on ``tree``, as the close gives its runs (DEC-500), its pinned Node first on
+    ``PATH``."""
     env = {key: value for key, value in os.environ.items()
            if key not in _close._TEST_RUNNER_VARIABLES
            and (not key.startswith(_close._INTERPRETER_VARIABLES) or key in _close._INTERPRETER_PLACES)}
     env["PYTHONPATH"] = str(tree / "src")
-    return env
+    return toolpath.with_node(env, tree)  # W2-20 SP-1
 
 
 def _alone(tree: Path, test: str, limit: list[str], run_limit: float, env: dict) -> str:
