@@ -7,7 +7,7 @@ from pathlib import Path
 
 from gov.layout import CannotRun, checks, moved, rewrites, standard
 from gov.layout.namespaces import compile_map
-from gov.layout.plan import digest, finding, read
+from gov.layout.plan import digest, read
 from gov.layout.repo import Repo
 from gov.layout.standard import ASK
 

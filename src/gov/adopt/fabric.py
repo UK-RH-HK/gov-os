@@ -80,9 +80,8 @@ PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS, memory_sets.CRON, 
             "template/governance/kernel/schemas/common.schema.json",
             # W2-36: gov discover's spec check (``gov.discover.check``) from an installed gov, through ``shipped``
             "template/governance/kernel/skills/spec-writing/check_spec.py",
-            # W2-213: the standard gov layout check judges by, and its schema (``gov.layout.standard``), through ``shipped``
-            "template/governance/kernel/standard.yaml",
-            "template/governance/kernel/schemas/standard.schema.json")
+            # W2-213: the standard gov layout check judges by (``gov.layout.standard``), through ``shipped``
+            "template/governance/kernel/standard.yaml")
 
 
 def _package_copy() -> Path:

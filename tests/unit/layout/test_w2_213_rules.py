@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from gov.layout import rules, standard
+from gov.adopt import fabric
+from gov.layout import CannotRun, rules, standard
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -18,7 +19,7 @@ def std():
     return standard.load(REPO)
 
 
-def test_the_committed_standard_loads_by_its_schema_with_eighteen_classes(std):
+def test_the_committed_standard_loads_with_eighteen_classes(std):
     assert std.version == 1 and len(std.classes) == 18 and "ask" not in std.classes
 
 
@@ -71,3 +72,17 @@ def test_research_and_record_take_one_folder_of_the_agents_choice(std):
     assert rules.fits(expected, "docs/research/trial-1/trial.md")
     assert not rules.fits(expected, "docs/research/trial.md")
     assert not rules.fits(expected, "docs/research/a/b/trial.md")
+
+
+@pytest.mark.parametrize("old, new", [
+    ('moves: "no"', "moves: maybe"), ("memory: out", "memory: bogus"), ("version: 1", "version: one"),
+    ("record_paths:", "other_paths:"),
+])
+def test_a_standard_the_check_would_misread_cannot_run(tmp_path, monkeypatch, old, new):
+    broken = tmp_path / "standard.yaml"
+    text = (REPO / standard.REL).read_text(encoding="utf-8")
+    assert old in text
+    broken.write_text(text.replace(old, new, 1), encoding="utf-8")
+    monkeypatch.setattr(fabric, "shipped", lambda rel, root: broken)
+    with pytest.raises(CannotRun, match="standard"):
+        standard.load(tmp_path)
