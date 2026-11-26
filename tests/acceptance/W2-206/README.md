@@ -241,3 +241,50 @@ configuration loader every command runs reads it.
 
 **Not tested here:** `PATH_MAP_UNREADABLE`; a candidate whose paths are some in none and some in two (which code is not
 stated); `--full`'s own answer for a candidate that lands (its counts); a branch already merged.
+
+## Fix: the impact trace at the landing, IT-1 and IT-2 (plan item 1-9; T-11 (a), DEC-1242; DEC-1244 X-1)
+
+Written by the independent test designer from the ticket's section "Fix: the impact trace at the landing, IT-1 and IT-2",
+before any implementation, in `test_w2_206_impact.py` (support: `w2_206_impact_support.py`). The lines are numbered after
+PM's (success-12: IT-1's trace; success-13: IT-2; failure-7: a trace that fails or overruns never refuses; the ids are
+labels of this table). Public interface: `python3 -m gov.cli.main queue <T>=<branch> ... [--select | --dry-run --out
+<dir>] --root <project>`, `GOV_QUEUE_IMPACT_TIMEOUT`; the answer, `queue.json`, `select.json`, the close records, the
+planted repository's git state. **The oracle** for a record's `tickets`, `tests` and `complete` is `gov impact <id>
+--json` on a scratch clone at the landed head whose record store is loaded from that head (`gov.store.loader.load`).
+
+**What is planted:** W2-115b's kit with `decision_register: docs/DECISIONS.md` in the path map; on the base a register of
+DEC-001, DEC-003 and DEC-002, specifications SPEC-001 and SPEC-003, ticket records PROJ-rec1 to rec3 and test records
+TR-0001 and TR-0002 linking them. A's branch changes DEC-001, removes DEC-003 and adds DEC-004 (DEC-002 unchanged),
+changes SPEC-001 and PROJ-rec3, adds SPEC-002, deletes SPEC-003, changes a Markdown file with no frontmatter, one with
+frontmatter and no `id`, and the widget; B changes the gadget alone. Each build checks itself (`fixture: ...`): the
+planted tests by plain pytest; `gov impact` on a scratch merge names a ticket and a test for every present record, refuses
+the removed ones, and says the same on the landed head.
+
+| run | project and branches | commands |
+|---|---|---|
+| main | A (`topic/aa`), B (`topic/bb`) | `A B --select`; `A B --dry-run --out <dir>`; `A B` |
+| fix | A closed, no close record; a `Fix:` branch changing SPEC-001 and the widget | `A` |
+| no_register | the path map names `docs/NO_SUCH_REGISTER.md`; A changes SPEC-001 | `A B --select`; `A B` |
+| limit | as main's register; `GOV_QUEUE_IMPACT_TIMEOUT=0.001` | `A B --select`; `A B` |
+
+| KPI id | line | tests | expected red reason |
+|---|---|---|---|
+| success-12 | IT-1 | `test_w2_206_impact.py::test_it1_the_answer_and_queue_json_hold_one_entry_for_each_landed_ticket`, `test_w2_206_impact.py::test_it1_each_ticket_s_first_close_record_holds_its_entry`, `test_w2_206_impact.py::test_it1_the_records_listed_are_the_change_s_record_files_and_register_entries_and_nothing_else`, `test_w2_206_impact.py::test_it1_each_record_names_the_tickets_tests_and_completeness_gov_impact_names_on_the_landed_tree`, `test_w2_206_impact.py::test_it1_a_removed_record_and_a_removed_register_entry_are_unavailable_and_not_complete`, `test_w2_206_impact.py::test_it1_the_entry_is_complete_only_where_every_record_is_and_a_change_with_no_record_is_empty`, `test_w2_206_impact.py::test_it1_one_close_commit_per_ticket_holds_the_trace_and_nothing_follows_it`, `test_w2_206_impact.py::test_it1_a_fix_landing_holds_the_trace_in_its_answer_and_queue_json_only` | the landing traces nothing: "the answer holds no impact mapping: impact None" |
+| success-13 | IT-2 | `test_w2_206_impact.py::test_it2_select_prints_the_impact_the_landing_then_records`, `test_w2_206_impact.py::test_it2_select_with_the_trace_moves_nothing_and_runs_no_test`, `test_w2_206_impact.py::test_it2_a_dry_run_s_answer_and_select_json_hold_the_same_impact` | no `impact` in `--select`'s object or the dry run's answer ("holds no impact mapping") |
+| failure-7 | IT-1, IT-2: a trace that fails or overruns | `test_w2_206_impact.py::test_it1_a_trace_that_fails_or_overruns_lands_with_exit_0_and_says_unavailable`, `test_w2_206_impact.py::test_it2_select_with_a_trace_that_fails_or_overruns_prints_the_string_and_exits_0` | as above (2 cases each: `no_register`, `limit`): exit 0 and the landing stand on the base, but there is no `impact` |
+
+**Readings this fix's cases take.**
+
+1. **Orders** of `records`, `tickets` and `tests` are not fixed. An entry's keys are exactly `records` and `complete`; a
+   traced record's exactly `id`, `path`, `tickets`, `tests`, `complete`; an untraced one's exactly `id`, `path`,
+   `unavailable`, `complete`. `unavailable (...)` needs a reason between the brackets.
+2. **A record's `path`** is its file, or the register for an entry (a removed one too).
+3. **`complete`** is `gov impact`'s own word. On a tree with no code index it says false for every record (the code graph
+   is not loaded), so only a change with no record is complete here.
+4. **A fix landing's** close record keeps exactly X6's keys for a ticket with no record before (no `impact`).
+5. **IT-2's equality** is read between `--select` and the close records of the landing made right after, and between the
+   dry run and that landing.
+
+**Not tested here:** the default limit of 120 s; that the code graph is never loaded (no public interface shows it without
+a code index; a source file not listed is tested); a renamed record file; `--full`'s `impact` (its close record is read
+by W2-115b's IT-3 cases only for `evidence`).

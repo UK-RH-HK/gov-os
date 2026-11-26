@@ -95,7 +95,8 @@ def test_select_prints_the_selection_and_runs_and_records_nothing(project, capsy
     assert printed == {"ticket": TICKET, "tickets": [TICKET], "suites": [f"tests/acceptance/{WBS}/", "tests/unit/test_other.py"],
                        "pytest_options": select.pytest_options(select.load_map(project.root)[0]),
                        "unplaced_base": [], "unplaced": [], "deleted": [], "records": [], "notices": [],
-                       "path_map": f"path map: {tracked} tracked, 0 in none, 0 in two"}
+                       "path_map": f"path map: {tracked} tracked, 0 in none, 0 in two",
+                       "impact": {TICKET: {"records": [], "complete": True}}}
     assert _refs(project) == before and _clone_head(project) == base
     assert not (project.root / ".gov-runtime" / "queue").exists()
     assert not list((project.root / ".gov-runtime").rglob("*.xml"))

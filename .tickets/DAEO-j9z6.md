@@ -216,3 +216,18 @@ are not gitignored (stray tool folders) now refuses: intended.
   `governance/project/test-map.yaml`); a record-only document (I-2's rule, `RECORD_PLACED`) passes with its notice. Verify: a
   branch adding `src/app/unmapped_script.sh` is refused naming it and the line to add; a branch adding `docs/x/note.md` lands
   with `RECORD_PLACED docs/x/note.md`.
+
+## Fix: a close record that holds what happened, IT-3 (2026-11-26; plan item 1-9; records fix 16; T-11 (a), DEC-1242; DEC-1244; approved by the CTO in the lead's brief)
+
+- **IT-3 `evidence` and the notices.** A close record the landing writes (`close: queue`) holds `evidence`, a non-null
+  block in the form `close.schema.json` states (`$defs/evidence`: `scope` `scoped`, or `full` for a `--full` run with a
+  reason under `why_full`; `base` the integration head the run merged onto, `head` the tested commit, `tree` its tree;
+  `changed` the ticket's own changed paths; `selected` what the run ran for it; the skips and failures its runs state,
+  `skip_count`, and the kept JUnit files under `junit_xml`), and the schema refuses a `close: queue` record with no
+  `evidence` or a null one. Other close records (`gov close`'s, the records written before W2-66, a fix landing's own
+  form of W2-201 X6) validate as before. The record holds the landing's notices too, not `queue.json` alone:
+  `path_notices` and `ticket_notices` (the ticket's own, as before), `notices` (the landing's list, `RECORD_PLACED
+  <path>` among them), `path_map` and `impact` (W2-206 IT-1). Verify: planted: a landed ticket's close record validates
+  (`gov check --structural` finds nothing on it) and holds `evidence` with those fields; the same record with `evidence`
+  removed or null fails the schema, naming `close.schema.json` and `evidence`; a landing with a `RECORD_PLACED` notice,
+  a path notice and a path-map line shows each in the close record.
