@@ -29,6 +29,7 @@ allowed_paths:
 - tests/unit/close/**
 - tests/unit/update/**
 - tests/acceptance/W2-209/**
+- docs/emergency-2/proposals/RELEASE-ON-BEHALF.md
 est_loc: 600
 kpis:
   success:
