@@ -1,0 +1,332 @@
+<title>Gov OS decisions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding-block:10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding-block:22px 80px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0;min-width:0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+<header class="bar"><div class="bar-in">
+  <h1>Gov OS decisions, 26 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">Three decisions from the night of 25 to 26 November, in two sections. E-01 and E-02 hold batch A of the 0.1.8 bundle; E-03 is what 0.1.8 holds. Each card gives what was found, the options with their costs, and one recommendation with its reason. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
+<p class="hint" id="batchline"></p>
+
+<section class="state" aria-labelledby="how">
+  <h3 id="how">How to answer</h3>
+  <ul>
+    <li>Tap one option on a card. A card you leave alone is sent as "skip".</li>
+    <li>"Take every recommendation" fills every card with its recommended option; your notes stay.</li>
+    <li>At the end, tap "Copy the answer sheet" and paste it to your advisor, then to the CTO.</li>
+  </ul>
+</section>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. A note is sent as one line, 400 characters at most.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const BATCH="B-2026-11-26-cto";
+const SECTIONS = [
+ {
+  "title": "1. Landing batch A (0.1.8)",
+  "intro": "Batch A of the bundle (D1, the escalation slice, D3, usage per repository, models by role) is fixed and its landing run is going. Two things only you can settle before it lands.",
+  "qs": [
+   {
+    "id": "E-01",
+    "from": "W1-01 MR-3 · DEC-253, DEC-1052 Q-10, DEC-1123 (3)",
+    "title": "Exempt one lead's README merge from W1-01's authorship history check?",
+    "found": [
+     "Merge <code>53808ef6d</code> on <code>e2/models-by-role</code> (a lead bringing <code>w2/integrate</code> into its branch, <code>Role: orchestrator</code>) settled a conflict in <code>tests/acceptance/W2-208/README.md</code> by keeping both sections word for word. No test code changed.",
+     "W1-01's history case refuses any commit that touches <code>tests/acceptance/</code> without the test designer's role, unless the path map exempts it. Once batch A lands, it is red on every landing after.",
+     "The exemption list is frozen (DEC-1052 Q-10) and only your own commit adds to it. DEC-1123 (3) exempted four merges of exactly this kind.",
+     "The script is ready and tested on a copy: <code>docs/emergency-2/release-0.1.8/exempt-53808ef6d.sh</code> adds the one entry and commits it as yours."
+    ],
+    "opts": [
+     [
+      "a",
+      "Exempt it: in a plain WSL terminal, <code>bash /home/usain/Dynamic-Agentic-Engineering-OS/docs/emergency-2/release-0.1.8/exempt-53808ef6d.sh</code>",
+      "About a minute; batch A lands with W1-01 green.",
+      1
+     ],
+     [
+      "b",
+      "Rebuild that merge with the test designer resolving the README",
+      "2 to 4 hours of leads: models-by-role's later commits, batch A's merges and fixes, and bundle-b (built on it) are all rebuilt; 0.1.8 later."
+     ],
+     [
+      "c",
+      "Land with W1-01 red, recorded as a known red",
+      "No step of yours; W1-01 stays red on every landing and can hide a real authorship fault."
+     ]
+    ],
+    "reason": "It is the case DEC-1123 (3) already settled, the merge changed no test, and it costs one paste.",
+    "sources": "path-map.yaml acceptance_exemptions; tests/acceptance/W1-01; docs/probes/bundle-a/1.md; DEC-253, DEC-1052, DEC-1123.",
+    "stops": "Stops batch A's landing, and so 0.1.8."
+   },
+   {
+    "id": "E-02",
+    "from": "W2-212 (D3) SR-3, SR-4 · DEC-1248 (3) · I-40",
+    "title": "D3's adoption check: refuse only a namespace that is stale as a whole (the amended KPI lines SR-3 and SR-4)",
+    "found": [
+     "As built, D3's stage A3 refused any namespace with one stale word (legacy, archive, superseded, historical) in any of its paths. In batch A's run that was about 300 of the 318 reds.",
+     "Worse in real use: a catch-all namespace that also holds <code>legacy/**</code> would, once classed as told, drop all its live documents out of memory.",
+     "The fix lead amended SR-3 and SR-4: A3 refuses only a namespace stale as a whole (its name, or every one of its paths, says so); a mixed namespace is recorded with a notice naming the paths to move into a namespace of their own; <code>gov doctor</code> says the same, never failing.",
+     "Built and green: W2-212 44 of 44, W2-210 136 of 136. A repository with a wholly stale, unclassed namespace is still refused and told what to add."
+    ],
+    "opts": [
+     [
+      "a",
+      "Approve the amended SR-3 and SR-4",
+      "None; batch A lands as built.",
+      1
+     ],
+     [
+      "b",
+      "Keep the original lines: refuse any namespace with a stale path",
+      "Six suites' fixtures change; every adopter splits catch-all namespaces before A3 passes."
+     ],
+     [
+      "c",
+      "Never refuse: a notice only, for any stale namespace",
+      "A stale namespace can enter default memory unnoticed, the thing D3 exists to stop."
+     ]
+    ],
+    "reason": "It keeps D3's purpose (stale documents out of default memory) without throwing live documents out with them.",
+    "sources": ".tickets/DAEO-d3sr.md SR-3, SR-4; src/gov/adopt/stages.py; FINDINGS I-40; docs/probes/bundle-a/1.md.",
+    "stops": "Stops batch A's landing, and so 0.1.8."
+   }
+  ]
+ },
+ {
+  "title": "2. What 0.1.8 holds",
+  "intro": "Batch A will be ready hours before batch B.",
+  "qs": [
+   {
+    "id": "E-03",
+    "from": "DEC-1250, DEC-1251 D-01 · I-34, I-36",
+    "title": "0.1.8 now from batch A, or wait for batch B?",
+    "found": [
+     "Ready for 0.1.8 once batch A lands: D1 (W2-210), the escalation slice (W2-211), D3 (W2-212), usage per repository, models and effort by role; and what landed tonight: the trustworthy selection (1-0), the fresh 80's launch fixes (I-33, I-37, I-38), the timing tests (I-32), the release rule (I-34) and the CTO card.",
+     "Batch B (W2-207's runtime with its cut-over runbook and capacity assessment, eval-roots, kit-head) conflicts with batch A; its lead is merging it, then it needs its own run. Several hours more.",
+     "EXAMIN's measure failed at 86.8 % and waits on D3 and the launch fixes.",
+     "0.1.8 is yours to build by hand (two commits since 0.1.7 cannot name a decision). From 0.1.9 the new rule lets the CTO cut an approved release by code."
+    ],
+    "opts": [
+     [
+      "a",
+      "0.1.8 from batch A as soon as its release suite is green, built by your hand; batch B becomes 0.1.9, cut by code under the new rule",
+      "Two releases this week; EXAMIN measures on D3 within the day.",
+      1
+     ],
+     [
+      "b",
+      "Wait for batch B and build one 0.1.8 with all eight branches",
+      "One build of yours; EXAMIN's measure waits several hours more."
+     ]
+    ],
+    "reason": "EXAMIN's measure is the one thing waiting, and batch B needs no hand of yours once the rule is live.",
+    "sources": "CTO-HANDOVER.md §3; INTEGRATION-PLAN.md; FINDINGS I-34, I-36; landing records of 26 Nov.",
+    "stops": "Does not stop work."
+   }
+  ]
+ }
+];
+
+const KEY="govos-decisions-"+BATCH;
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* SHA-256 in plain script, so the page needs no secure context */
+function sha256(str){
+  const msg=new TextEncoder().encode(str);
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const len=msg.length, total=((len+9+63)>>6)<<6, buf=new Uint8Array(total);
+  buf.set(msg); buf[len]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(total-8,Math.floor(len/0x20000000),false); dv.setUint32(total-4,(len<<3)>>>0,false);
+  const w=new Uint32Array(64), rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+4*i,false);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&b)^(a&c)^(b&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+function canon(v){
+  if(Array.isArray(v)) return "["+v.map(canon).join(",")+"]";
+  if(v&&typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+canon(v[k])).join(",")+"}";
+  return JSON.stringify(v);
+}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.from}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<p class="src"><b>Sources:</b> ${q.sources}</p><p class="src"><b>Stops work?</b> ${q.stops}</p>`;
+    h+=`<div class="note cto"><span class="who">Recommended</span>${q.reason}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" maxlength="400" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+/* the batch hash: SHA-256 of the batch id and the cards in page order, as JSON with sorted keys and no spaces */
+const HASH=sha256(canon({batch:BATCH,cards:all.map(q=>({id:q.id,question:q.title,found:q.found,options:q.opts.map(o=>({key:o[0],label:o[1],cost:o[2]})),recommendation:{option:(q.opts.find(o=>o[3])||[])[0]||null,reason:q.reason},sources:q.sources,blocks:q.stops}))}));
+document.getElementById("batchline").textContent=`Batch ${BATCH} · hash ${HASH.slice(0,12)} · ${all.length} cards`;
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const stamp=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  const lines=["GOV-ANSWERS 1",`batch: ${BATCH}`,`hash: sha256:${HASH}`,`answered: ${stamp}`,`count: ${all.length}`];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id}: `;
+    if(v){n++; line+=v;} else line+="skip";
+    const note=(state.notes[q.id]||"").replace(/\s*[\r\n]+\s*/g," ").trim().slice(0,400);
+    if(note) line+=` | note: ${note}`;
+    lines.push(line);
+  }
+  lines.push("END");
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+let clearArmed=null;
+document.getElementById("clear").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!clearArmed){b.textContent="Tap again to clear every answer and note"; clearArmed=setTimeout(()=>{clearArmed=null; b.textContent="Clear my answers";},4000); return;}
+  clearTimeout(clearArmed); clearArmed=null; b.textContent="Clear my answers";
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  render();
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
