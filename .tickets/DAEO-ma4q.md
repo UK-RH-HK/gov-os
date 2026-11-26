@@ -357,3 +357,29 @@ the CTO in the lead's brief (`docs/emergency-2/briefs/LEAD-memaudit-launch.md`).
   written changes neither the hook's block nor the run folder's record. Verify: planted pass, refusal and limit through the hook
   command; one real `claude -p` Sonnet writer launched from a planted `LAUNCH.txt`: `<out>/WRITER-CHECK.json` exists with `ended` set.
   Failure: no record in the session folder after the hook ran, or a record holding more than counts, codes and ids.
+
+## Fix: forbidden-reach, whether the forbidden sources an audit's misses cited are now outside default memory (DEC-1254 E-02's note; forbidden-reach, 2026-11-26)
+
+The owner (DEC-1254 E-02): "confirm EXAMIN's three stale citations leave default memory under the amended rule". Which sources
+were cited sits only under the sets root, which no session but the measure's own reads (DEC-1249 (2)), and no `gov memaudit`
+command reports it: `judge.py` records `forbidden_cited` (a bool) and the attempts' citations in `reader/<id>.json`, and
+`figures.py` keeps the count alone. Kind: a fix under W2-204, no new ticket; the ticket stays closed. Approved by the CTO in the
+lead's brief (`docs/emergency-2/briefs/LEAD-forbidden-reach.md`).
+
+- **FR-1 `gov memaudit forbidden-reach --sets-root R --audit <name> [--repo D]`** reads the audit's judged rows
+  (`<R>/runs/<name>/reader/<id>.json`); for each row with `forbidden_cited` true, the cited forbidden sources are the paths of the
+  final answer's citations (the last attempt whose verdict is `answer`, `search_again` or `not_found`) that are in that question's
+  `forbidden` list (`<R>/fixtures/evaluation/<name>/hidden/<id>.yaml`), each counted once per row. Each is resolved against the
+  repository's current path map (`--repo`, default the top level; the working tree's file): **outside** default memory when a
+  namespace holding it states a `stale_class` or `lexical_policy: not indexed`, or the repository no longer tracks the file;
+  otherwise **inside** (`embedding_policy` alone does not take a file out: the keyword route still finds it). It prints one line of
+  counts only, `FORBIDDEN-REACH <c> cited, <o> outside, <i> inside; <holder>: <n>, ...`, the holder being the namespace that takes
+  the source out, else the first namespace holding it, `unmapped` for none and `untracked` for a file no longer tracked; holders in
+  name order, the `; ...` part absent when nothing is cited. Never a path, a question or an id, and every line goes through `say`.
+  Exit 0 on a readable audit (0 cited included). `REACH-NOAUDIT` (no run folder for the audit), `REACH-NOROWS` (no judged row) and
+  `REACH-NOSET` (a row with `forbidden_cited` true whose question file is missing or unreadable, or whose citations and list share
+  no path) are each printed as the only line, exit 1. It writes nothing. `gov.retrieval` (and D3's classifier,
+  `gov.retrieval.stale.classifier`, where the tree has it) is reused, never copied. Verify: a planted sets root and repository whose
+  audit has three misses citing forbidden sources in two namespaces, one stale-classed `not indexed`/`not embedded` and one live:
+  `3 cited, 2 outside, 1 inside` with the namespaces; after the live namespace gains the class, `3 outside`; the output holds no
+  planted path, question or id.
