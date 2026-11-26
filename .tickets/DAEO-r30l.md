@@ -172,3 +172,8 @@ slot-path, 2026-11-26); a fix, the ticket stays closed.
   test, never a fixed path in code. Verify: the nine W1-30 and W2-02 cases pass from a shell whose `PATH` has no node.
 - **SP-2** `gov doctor` names the Node prefix the slot uses (`tools.node_prefix`), and says so by name when the
   registry's node is missing (never a silent red). Verify: planted registry without node: doctor names it.
+
+Built (lead slot-path, 2026-11-26): `src/gov/resources/toolpath.py`; the tests `tests/acceptance/W2-20/` success-23
+(SP-1) and success-24 (SP-2), red on the base (`2cdf9d64d`), the code `f24073c60`. The bare `PATH` used held
+`/usr/bin/node` (v18) and no nvm folder; eight W1-30 and W2-02 cases were node-dependent there (I-6 says nine; a ninth
+was not found), and all eight passed through `gov resources --slot test`.
