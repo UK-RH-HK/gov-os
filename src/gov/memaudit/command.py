@@ -35,6 +35,7 @@ STEPS = {
     "fresh": "a whole fresh pair of halves on a pinned snapshot it builds",
     "writer-check": "the Stop hook of a writer's session: the pre-flight's checks on out/set, blocking the stop on a refusal",
     "writer-run": "a writer's session run with its check in the loop: a refusal resumes the same session, up to 3 returns",
+    "forbidden-reach": "whether an audit's cited forbidden sources are now outside default memory: counts only",
 }
 CLASS = "read"
 CHILD_EXIT_CODE = True
