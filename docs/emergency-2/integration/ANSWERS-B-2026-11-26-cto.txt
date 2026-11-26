@@ -1,0 +1,11 @@
+GOV-ANSWERS 1
+batch: B-2026-11-26-cto
+hash: sha256:308d30c9c7e1c553ed91ebd50749db55b423af63efe2af5899ca95ae0204301e
+answered: 2026-11-26T11:10:48Z
+count: 4
+E-01: a | note: Root fix, since this is the fourth time (I-12, DEC-1243, now E-01 and E-04): refuse by code, at commit time, any commit that touches tests/acceptance/ without the test designer's role, so it can never reach a landing again.
+E-02: a | note: As a stopgap only; the real fix is item 2 below. Also confirm EXAMIN's three stale citations leave default memory under the amended rule; if they sit in mixed namespaces, the EXAMIN CTO moves them into a namespace of their own before it measures again.
+E-03: a
+E-04: a | note: The same root fix as E-01.
+END
+The owner, with the sheet: both exemption scripts run (exempt-53808ef6d.sh committed as 66a6bae1a, exempt-bundle-b.sh as dd88e06e0); item 2, a new feature ticket approved now (a standard repository layout and classification by rubric); item 3, the classification rubric designed first by a design and audit session on the model the rubric sets for an audit he asks for, back to him as a decisions page before the ticket's spec.
