@@ -83,7 +83,7 @@ cell's S10 stands in a code span, so that gov accept reads every map row; the co
   order); the version case pins `1.2.0`; a sixth hunk is red.
   *Revised after DEC-1219 and W2-212 (D3, DAEO-d3sr):* two further hunks are admitted by what they change and set
   aside: DEC-1219's one-line re-wording at base line 41, and the pure insertion after base line 38 whose lines are
-  the `## Stale class` section as commit 1548a28f0 holds it. Any other hunk is red.
+  the `## Stale class` section as commit c17e20484 holds it. Any other hunk is red.
 - **Sources line (S4).** The ids on the line under `## Governing sources` must include DEC-1101, DEC-1125 and DEC-1179, every
   id of the base line, no repeat, and stand in numeric order (DEC ids first, then CAP ids, as the base line does).
 - **Unchanged parts (S4, F1).** A9's lines `1.` to `5.` and `7.` and the whole `## Verify clauses for adopted tickets`
@@ -134,7 +134,7 @@ cell's S10 stands in a code span, so that gov accept reads every map row; the co
   `git log --no-merges --name-only 5336a6fca..HEAD`: a commit with `Task: DAEO-zlog` whose `Role:` is not
   `independent-test-designer` (or has none) may not touch a `.claude/` or `tests/` path. This designer's commit carries
   `Role: independent-test-designer` and is exempt.
-  The copy reading (revised, P-C12-1 (a)): the copy passes when its bytes equal the base's or its sha256 is exactly `65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc` (the copies ACT ACT-CLAUDE-COPIES-12's after-bytes) or `93b04fc62be1fe6d0e125ff47a2d890367284f1970b7d34dfd0f4366c987dc5d` (W2-192's regeneration, commit e64430373); or, revised for Charter v6 / Contract v5 (DEC-1219, commit d515d0430), W2-192's bytes (read from `git show e64430373:.claude/skills/adopt/SKILL.md`) with the one sentence DEC-1219 re-worded (`Contract v4.2 brings A7 and A10 into Wave 2 in a lite form` to `Contract v5 has A7 and A10 in Wave 2 in a lite form`); or, revised for W2-212 (D3, DAEO-d3sr), those last bytes with the `## Stale class` section (read from `git show 1548a28f0:.claude/skills/adopt/SKILL.md`) inserted before the `## Independent gates` heading; any other bytes are red, the message naming the copy's sha256 and the allowed forms.
+  The copy reading (revised, P-C12-1 (a)): the copy passes when its bytes equal the base's or its sha256 is exactly `65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc` (the copies ACT ACT-CLAUDE-COPIES-12's after-bytes) or `93b04fc62be1fe6d0e125ff47a2d890367284f1970b7d34dfd0f4366c987dc5d` (W2-192's regeneration, commit e64430373); or, revised for Charter v6 / Contract v5 (DEC-1219, commit d515d0430), W2-192's bytes (read from `git show e64430373:.claude/skills/adopt/SKILL.md`) with the one sentence DEC-1219 re-worded (`Contract v4.2 brings A7 and A10 into Wave 2 in a lite form` to `Contract v5 has A7 and A10 in Wave 2 in a lite form`); or, revised for W2-212 (D3, DAEO-d3sr), those last bytes with the `## Stale class` section (read from `git show c17e20484:.claude/skills/adopt/SKILL.md`) inserted before the `## Independent gates` heading; any other bytes are red, the message naming the copy's sha256 and the allowed forms.
   The commit reading (revised, P-C12-1 (a)): a commit whose `Role:` trailers include `owner` and whose subject holds `ACT-CLAUDE-COPIES-` may touch `.claude/` paths (its `tests/` paths still count); an owner commit with another subject, or another role's commit with that subject, stays red.
 
 ## Files

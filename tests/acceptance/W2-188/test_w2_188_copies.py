@@ -60,16 +60,16 @@ def test_s4_the_version_is_1_1_0_in_the_front_matter_of_each_copy():
 # count or hunk count.
 DEC_1219_OLD, DEC_1219_NEW = "Contract v4.2 brings A7 and A10 into Wave 2", "Contract v5 has A7 and A10 in Wave 2"
 
-# Rewrite-Reason: W2-212 (D3, DAEO-d3sr; commits 35a9fdf58 and 1548a28f0, the kernel text approved in
+# Rewrite-Reason: W2-212 (D3, DAEO-d3sr; commits 35a9fdf58, 1548a28f0 and c17e20484, the kernel text approved in
 # docs/emergency-2/briefs/LEAD-d3-stale-route.md) added one section on `stale_class` to the same skill, before
-# "Independent gates". The cases admit that section alone, its text read from the pinned fix commit.
-W2_212_COMMIT = "1548a28f0"
+# "Independent gates". The cases admit that section alone, its text read from the last commit that changed it.
+W2_212_COMMIT = "c17e20484"
 W2_212_HEADING = b"## Stale class (W2-212, DEC-1227 D3)\n"
 W2_212_NEXT_HEADING = b"## Independent gates"
 
 
 def w2_212_section(rel):
-    """The bytes of W2-212's section in `rel` as commit 1548a28f0 holds it: from its heading up to the next one."""
+    """The bytes of W2-212's section in `rel` as commit c17e20484 holds it: from its heading up to the next one."""
     blob = support.git("show", f"{W2_212_COMMIT}:{rel}").stdout
     assert blob.count(W2_212_HEADING) == 1 and blob.count(W2_212_NEXT_HEADING) == 1, (
         f"{W2_212_COMMIT}:{rel} has not one stale class section before one `Independent gates` heading")
@@ -85,7 +85,7 @@ def test_s4_the_kernel_diff_against_the_base_has_exactly_four_hunks_in_the_four_
     line 29, 10 lines). Besides them, exactly one hunk is DEC-1219's re-wording of the Contract's name in the
     "Independent gates" sentence (base line 41, one line replaced by one line, `Contract v4.2` out, `Contract v5`
     in), and exactly one is W2-212's `stale_class` section (a pure insertion after base line 38, its lines those of
-    the section at commit 1548a28f0); both are set aside and counted nowhere else. Any other extra hunk, or a moved
+    the section at commit c17e20484); both are set aside and counted nowhere else. Any other extra hunk, or a moved
     one, is red."""
     bodies = support.kernel_hunk_bodies()
     renames = [(hunk, body) for hunk, body in bodies
@@ -186,7 +186,7 @@ def test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_afte
     after-bytes (sha256 `93b04fc6...c5d`, commit e64430373, W2-192's stage AS), or those bytes with the one sentence
     DEC-1219 re-worded (`Contract v4.2 brings A7 and A10 into Wave 2 in a lite form` to `Contract v5 has A7 and A10
     in Wave 2 in a lite form`, commit d515d0430), or those last bytes with W2-212's `stale_class` section (as at
-    commit 1548a28f0) inserted before the `Independent gates` heading; any other bytes mean the ticket wrote it."""
+    commit c17e20484) inserted before the `Independent gates` heading; any other bytes mean the ticket wrote it."""
     now = support.read_bytes(support.CLAUDE_COPY_REL)
     then = support.base_blob(support.CLAUDE_COPY_REL)
     if now == then:
