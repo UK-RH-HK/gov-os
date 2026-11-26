@@ -1,0 +1,29 @@
+{
+  "branch": "rel/0.1.8-c",
+  "head": "39957ee9a45dcb1877376ed1a9a7028d7291b0f6",
+  "tree": "d39e7402d1bb5652a925b08621ea088661478770",
+  "base": "0bd2945b04fe3811caac493256a15569f1411321",
+  "scope": "full",
+  "verdict": "green",
+  "secrets_full_scan": true,
+  "optin": [
+    "weekly"
+  ],
+  "junit_xml": [
+    ".gov-runtime/nightly/20261126T141109Z-39957ee9a45d/01-acceptance-parallel.xml",
+    ".gov-runtime/nightly/20261126T141109Z-39957ee9a45d/02-acceptance-serial-afterwards.xml"
+  ],
+  "failures": [],
+  "packages": [],
+  "tests_run": {
+    "passed": 19998,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 96
+  },
+  "findings": [],
+  "per_test_timeout": 900,
+  "distribution": "load",
+  "tmp_path_retention_policy": "failed",
+  "created": "2026-11-26T15:05:01Z"
+}
