@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "standard",
+  "description": "governance/kernel/standard.yaml: the standard repository layout and its closed list of eighteen classes (W2-213; DEC-1256). The classes stand in the rubric's order.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "classes", "ask", "folders", "archive", "fixed", "rules", "secret_patterns", "generated_patterns",
+    "study_ceiling", "record_paths", "document_suffixes"
+  ],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "classes": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": false,
+      "prefixItems": [
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "code" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "tests" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "spec" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "research" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "docs" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "record" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "governance" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "kit" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "config" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "data" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "generated" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "archive" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "import-use" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "import-absorb" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "import-study" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "evaluation" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "hidden-set" } } },
+        { "$ref": "#/$defs/class", "properties": { "id": { "const": "secret" } } }
+      ]
+    },
+    "ask": {
+      "description": "The answer that is no class.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meaning"],
+      "properties": { "meaning": { "$ref": "#/$defs/text" } }
+    },
+    "folders": { "$ref": "#/$defs/texts" },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stale_classes"],
+      "properties": {
+        "stale_classes": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": { "enum": ["superseded", "historical", "legacy"] }
+        }
+      }
+    },
+    "fixed": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pattern", "class"],
+        "properties": { "pattern": { "$ref": "#/$defs/text" }, "class": { "$ref": "#/$defs/class_id" } }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["native_layout", "import_whole"],
+      "properties": {
+        "native_layout": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/class_id" } },
+        "import_whole": { "const": true }
+      }
+    },
+    "secret_patterns": { "$ref": "#/$defs/texts" },
+    "generated_patterns": { "$ref": "#/$defs/texts" },
+    "study_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["import_chunks", "repository_chunks"],
+      "properties": {
+        "import_chunks": { "type": "integer", "minimum": 0 },
+        "repository_chunks": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "record_paths": { "$ref": "#/$defs/texts" },
+    "document_suffixes": { "$ref": "#/$defs/texts" }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "texts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+    "class_id": {
+      "enum": [
+        "code", "tests", "spec", "research", "docs", "record", "governance", "kit", "config", "data", "generated",
+        "archive", "import-use", "import-absorb", "import-study", "evaluation", "hidden-set", "secret"
+      ]
+    },
+    "class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "destination", "moves", "memory", "tier", "signs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/class_id" },
+        "destination": {
+          "enum": [
+            "{path}", "docs/specs", "docs/research", "docs", "docs/records", "data", "archive/{stale_class}/{path}",
+            "imports/{import}"
+          ]
+        },
+        "moves": { "enum": ["yes", "no", "whole"] },
+        "memory": { "enum": ["embedded", "keyword", "out"] },
+        "tier": { "enum": ["governing", "middle", "reports", "reference", null] },
+        "signs": { "$ref": "#/$defs/texts" }
+      }
+    }
+  }
+}

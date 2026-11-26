@@ -1,0 +1,296 @@
+# The standard repository layout and its closed list of classes (W2-213; DEC-1255, DEC-1256).
+# A kernel file: `gov update` carries it; `gov layout check` judges a repository's plan against it alone.
+# Source: the classification rubric, docs/emergency-2/proposals/CLASSIFICATION-RUBRIC.md, sections 1 to 5, in the Gov OS
+# repository. A change here is a change of the rubric (the owner's yes) and raises `version`.
+#
+# Per class: `destination` is the place it takes ("{path}": where it is); `moves` is "yes", "no" (never) or "whole" (an
+# import's tree, with everything in it); `memory` is "embedded" (keyword index and vectors), "keyword" (keyword index
+# only) or "out" (neither); `tier` is the retrieval authority tier.
+version: 1
+
+classes:
+  - id: code
+    destination: "{path}"
+    moves: "no"
+    memory: embedded
+    tier: middle
+    signs:
+      - "Under a manifest's package root (pyproject.toml, package.json, Cargo.toml, ...)"
+      - "imported by other code"
+      - "a language the code graph reads"
+  - id: tests
+    destination: "{path}"
+    moves: "no"
+    memory: keyword
+    tier: reports
+    signs:
+      - "Under tests/"
+      - "test-runner names (test_*.py, *.spec.ts)"
+      - "tests/acceptance/<ticket>/ by the test designer"
+  - id: spec
+    destination: docs/specs
+    moves: "yes"
+    memory: embedded
+    tier: governing
+    signs:
+      - "Spec form (problem, goals, KPIs, Fails if:)"
+      - "openspec/"
+  - id: research
+    destination: docs/research
+    moves: "yes"
+    memory: embedded
+    tier: reports
+    signs:
+      - "An experiment's record, a study, a measurement, a comparison"
+      - "no decision status"
+  - id: docs
+    destination: docs
+    moves: "yes"
+    memory: embedded
+    tier: middle
+    signs:
+      - "Current, maintained"
+      - "cited as how things are now"
+  - id: record
+    destination: docs/records
+    moves: "yes"
+    memory: keyword
+    tier: reports
+    signs:
+      - "A date in its name or front matter"
+      - "written once and kept"
+      - "true as of its date"
+  - id: governance
+    destination: "{path}"
+    moves: "no"
+    memory: embedded
+    tier: middle
+    signs:
+      - "governance/project/**"
+      - ".tickets/**"
+      - "CLAUDE.md"
+      - "AGENTS.md"
+      - ".rulesync/**"
+  - id: kit
+    destination: "{path}"
+    moves: "no"
+    memory: keyword
+    tier: middle
+    signs:
+      - "governance/kernel/**"
+      - "governance/framework.lock"
+      - ".copier-answers.yml"
+  - id: config
+    destination: "{path}"
+    moves: "no"
+    memory: keyword
+    tier: middle
+    signs:
+      - "Manifests and lock files"
+      - ".gitignore"
+      - ".gitleaks.toml"
+      - "lefthook.yml"
+      - ".github/**"
+      - ".claude/**"
+      - "Docker and CI files"
+  - id: data
+    destination: data
+    moves: "yes"
+    memory: out
+    tier: null
+    signs:
+      - "Data suffixes, CSV, JSON fixtures, binary data"
+      - "declared in a spec's test-data table"
+  - id: generated
+    destination: "{path}"
+    moves: "no"
+    memory: keyword
+    tier: null
+    signs:
+      - "A generator named in its header or provenance"
+      - "ignored build folders"
+  - id: archive
+    destination: "archive/{stale_class}/{path}"
+    moves: "yes"
+    memory: out
+    tier: null
+    signs:
+      - "Superseded by a named successor"
+      - "a retired system"
+      - "a plan done"
+      - "status RETIRED, SUPERSEDED"
+      - "superseded_by:"
+  - id: import-use
+    destination: "imports/{import}"
+    moves: whole
+    memory: keyword
+    tier: reference
+    signs:
+      - "Its own licence or manifest naming another project"
+      - "a submodule"
+      - "a vendored-folder sign"
+      - "a \"vendored from\" note"
+  - id: import-absorb
+    destination: "imports/{import}"
+    moves: whole
+    memory: keyword
+    tier: reference
+    signs:
+      - "As use, plus an assessment ticket"
+  - id: import-study
+    destination: "imports/{import}"
+    moves: whole
+    memory: embedded
+    tier: reference
+    signs:
+      - "A study copy"
+      - "another project's decisions or notes"
+      - "code reconstructed by a tool"
+  - id: evaluation
+    destination: "{path}"
+    moves: "no"
+    memory: out
+    tier: null
+    signs:
+      - "evaluation_sets.visible"
+      - "fixtures/evaluation/*/visible/**"
+      - "the measure's declared files"
+  - id: hidden-set
+    destination: "{path}"
+    moves: "no"
+    memory: out
+    tier: null
+    signs:
+      - "Named by the sets-root registry and sets_root_hidden only, never by reading"
+  - id: secret
+    destination: "{path}"
+    moves: "no"
+    memory: out
+    tier: null
+    signs:
+      - "By name pattern and gitleaks rule id, never by printing it"
+
+ask:
+  meaning: >-
+    Not a class: an item the agent cannot class with confidence gets "ask" with a recommended class and one question. It
+    stays where it is and nothing about it moves until the owner or the CTO answers.
+
+folders:
+  - .claude
+  - .github
+  - .rulesync
+  - .tickets
+  - src
+  - tests
+  - tests/acceptance
+  - openspec
+  - docs
+  - docs/specs
+  - docs/research
+  - docs/records
+  - data
+  - governance/kernel
+  - governance/project
+  - governance/adoption
+  - imports
+  - archive
+  - archive/superseded
+  - archive/historical
+  - archive/legacy
+
+archive:
+  stale_classes: [superseded, historical, legacy]
+
+# Tool-fixed paths: a tool reads or writes each where it is, so it never moves (L2). `**` crosses folders, `*` stays in
+# one folder; a pattern with no folder is the repository's root alone. Where two cover a path, the one with the longer
+# literal text gives the class.
+fixed:
+  - {pattern: CLAUDE.md, class: governance}
+  - {pattern: AGENTS.md, class: governance}
+  - {pattern: README.md, class: docs}
+  - {pattern: ".rulesync/**", class: governance}
+  - {pattern: ".tickets/**", class: governance}
+  - {pattern: "governance/project/**", class: governance}
+  - {pattern: "governance/kernel/**", class: kit}
+  - {pattern: governance/framework.lock, class: kit}
+  - {pattern: .copier-answers.yml, class: kit}
+  - {pattern: "governance/adoption/**", class: record}
+  - {pattern: "docs/close/**", class: record}
+  - {pattern: "docs/checkpoints/**", class: record}
+  - {pattern: "docs/probes/**", class: record}
+  - {pattern: "openspec/**", class: spec}
+  - {pattern: ".claude/**", class: config}
+  - {pattern: ".github/**", class: config}
+  - {pattern: .gitignore, class: config}
+  - {pattern: .gitattributes, class: config}
+  - {pattern: .gitmodules, class: config}
+  - {pattern: .editorconfig, class: config}
+  - {pattern: .gitleaks.toml, class: config}
+  - {pattern: lefthook.yml, class: config}
+  - {pattern: pyproject.toml, class: config}
+  - {pattern: setup.py, class: config}
+  - {pattern: setup.cfg, class: config}
+  - {pattern: package.json, class: config}
+  - {pattern: Cargo.toml, class: config}
+  - {pattern: go.mod, class: config}
+  - {pattern: go.sum, class: config}
+  - {pattern: package-lock.json, class: config}
+  - {pattern: pnpm-lock.yaml, class: config}
+  - {pattern: "*.lock", class: config}
+  - {pattern: Makefile, class: config}
+  - {pattern: Dockerfile, class: config}
+  - {pattern: .dockerignore, class: config}
+  - {pattern: "docker-compose*.yml", class: config}
+  - {pattern: compose.yaml, class: config}
+  - {pattern: .gitlab-ci.yml, class: config}
+
+rules:
+  # Code and its tests keep their native layout (L3); an import moves whole with one class (L5).
+  native_layout: [code, tests]
+  import_whole: true
+
+# Names of files and ignored roots that exist to hold a credential: matched on a file's name, never by reading it. An
+# entry that starts with "!" takes a name out again.
+secret_patterns:
+  - ".env"
+  - ".env.*"
+  - "!*.example"
+  - "*.pem"
+  - "*.key"
+  - "id_rsa*"
+  - "id_ed25519*"
+  - "*.p12"
+  - "*.pfx"
+  - "*.keystore"
+  - "credentials.json"
+  - ".netrc"
+  - ".pgpass"
+  - ".git-credentials"
+
+# Ignored roots a generator rebuilds, matched on the root's own name.
+generated_patterns:
+  - "node_modules/"
+  - ".venv/"
+  - "__pycache__/"
+  - "logs/"
+  - "pids/"
+  - "dist/"
+  - "build/"
+  - "target/"
+  - "coverage/"
+  - ".pytest_cache/"
+
+# Chunks searched by meaning: at most this many for one study import and for all of a repository's, both inclusive.
+study_ceiling:
+  import_chunks: 2000
+  repository_chunks: 5000
+
+# Folders Gov OS's own tools write: a path named in them stays as it was written.
+record_paths:
+  - docs/close
+  - docs/checkpoints
+  - docs/probes
+  - governance/adoption
+
+# File kinds whose mention of a moving path is rewritten; a mention in any other file holds the move (L4).
+document_suffixes: [.md, .markdown, .mdx, .rst, .adoc]
