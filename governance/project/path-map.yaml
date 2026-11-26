@@ -492,6 +492,18 @@ acceptance_exemptions:
     decision: DEC-1243  # the stream merge into e2/fixes-015a that carries e8838fa97; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
   - commit: "53808ef6da8dbd333b207a7e86731e615b20c5d3"
     decision: DEC-1254  # item E-01; the merge settled a README conflict (W2-208) keeping both sections word for word, no test code changed (DEC-253)
+  - commit: "a0cf2fb68e0c775fa1fee3f4968f82c62c21365c"
+    decision: DEC-1254  # item E-04; a batch B lead commit under Role: orchestrator touching tests/acceptance (README maps, one W2-153 line, W2-207 conftest), suites green (DEC-253)
+  - commit: "50f278cdd5ae8aa342a2536dcb393bde4c4e2b00"
+    decision: DEC-1254  # item E-04; a batch B lead commit under Role: orchestrator touching tests/acceptance (README maps, one W2-153 line, W2-207 conftest), suites green (DEC-253)
+  - commit: "86a3f29b2e0421fd6f9791f9202540ebe0462fda"
+    decision: DEC-1254  # item E-04; a batch B lead commit under Role: orchestrator touching tests/acceptance (README maps, one W2-153 line, W2-207 conftest), suites green (DEC-253)
+  - commit: "cbbbd5cf94e2e8aa52c2923ec9f3ffd62a9f5148"
+    decision: DEC-1254  # item E-04; a batch B lead commit under Role: orchestrator touching tests/acceptance (README maps, one W2-153 line, W2-207 conftest), suites green (DEC-253)
+  - commit: "3624a8d50d6f10f71ac3df76705317c22cfbac9d"
+    decision: DEC-1254  # item E-04; a batch B lead commit under Role: orchestrator touching tests/acceptance (README maps, one W2-153 line, W2-207 conftest), suites green (DEC-253)
+  - commit: "6fc0a39d900ca5dd079ea40e2c625f4115443c38"
+    decision: DEC-1254  # item E-04; a batch B lead commit under Role: orchestrator touching tests/acceptance (README maps, one W2-153 line, W2-207 conftest), suites green (DEC-253)
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
