@@ -106,3 +106,27 @@ second case plants no number in the path map.
   merged tree (`in two`: in two or more). A project with no `governance/project/` has no `path_map`. Verify: planted: a
   clean landing says `0 in none, 0 in two` with `<n>` equal to `git ls-files` of the tested merge; a project with one
   path already in none lands and says `1 in none`.
+
+## Fix: the impact trace at the landing, IT-1 and IT-2 (2026-11-26; plan item 1-9; T-11 (a), DEC-1242; X-1, DEC-1244; approved by the CTO in the lead's brief)
+
+- **IT-1 The trace, into the close record.** For each candidate that lands, the landing traces every **record** file its
+  own change holds (a Markdown file with a frontmatter `id`: a specification, a ticket, a decision record; and each
+  entry the change adds, edits or removes in the file the path map names under `decision_register`) with `gov impact`
+  on the tested merge. A source file is not traced and the code graph is never loaded (I-42). The answer and
+  `queue.json` hold `impact`, a mapping of ticket to its entry; the ticket's first close record holds that entry under
+  its front-matter key `impact`: `{records: [{id, path, tickets: [<id>...], tests: [<id>...], complete: <bool>}...],
+  complete: <bool>}`, `tickets` and `tests` and `complete` as `gov impact <id>` says them on that tree; the entry's
+  `complete` is true only where every record's is. A record `gov impact` cannot trace (a removed one) is `{id, path,
+  unavailable: "unavailable (<reason>)", complete: false}`. A change with no record file has `{records: [], complete:
+  true}`. A trace that fails as a whole or takes longer than its limit (120 s; `GOV_QUEUE_IMPACT_TIMEOUT`, seconds)
+  never refuses the landing nor changes its exit code: the entry is the string `unavailable (<reason>)`. A fix landing's
+  close record stays as W2-201 X6 pins it; its trace is in the answer and `queue.json` only. Where it runs: after the
+  merge and before the close commit, so the one close commit holds it (the integration branch gets no commit after the
+  last close commit, A8 F1). Verify: planted: a branch changing a decision entry of the register and a specification
+  lands; the close record names, for each, the tickets and tests `gov impact` names on the landed tree; a changed source
+  file is not listed; a path map naming a register `HEAD` does not hold, and a limit of `0.001`, each land with exit 0
+  and `impact: unavailable (...)`.
+- **IT-2 `--select` carries the same trace.** The `--select` object (and a dry run's `select.json` and answer) holds
+  `impact`, the mapping of ticket to entry, for the candidate range on the merged tree; it runs no test and moves
+  nothing; a trace that fails is the string, exit 0. Verify: planted: `--select` of the IT-1 branch prints the same
+  `impact` the landing then records.
