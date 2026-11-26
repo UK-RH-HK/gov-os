@@ -165,3 +165,7 @@ branch) and the F7 regression fix among them. A later fix under this ticket is a
 patch. Slice (b) (the automatic update, K7 to K10) was never added to this ticket's lines: it is a new ticket when
 wanted (a new line on a closed feature is a new ticket).
 
+The impact selection run exactly (`gov queue DAEO-a2h5=e2/release-rule --onto w2/integrate --dry-run`, through the heavy
+slot; base `ea858330f`, branch head `153c0eb0b`, merged tree tested as `84baffe80`): parallel 1980 passed, 2 skipped; the
+serial phase held no case; acceptance W2-209 219 passed; no red, nothing landed by the dry run.
+
