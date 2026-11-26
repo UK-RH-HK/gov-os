@@ -1,0 +1,791 @@
+<title>Gov OS decisions: the classification rubric</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#18212E; --muted:#5A6576; --line:#D9DEE5;
+  --teal:#0E6B6B; --teal-soft:#E3F1F0; --amber:#9A5B00; --amber-soft:#FBF0DE; --blue:#24508F; --blue-soft:#E8EEF8;
+  --radio:#0E6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+    --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+    --radio:#5BB8B4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --surface:#18202A; --ink:#E5E9EF; --muted:#9AA4B3; --line:#2B3542;
+  --teal:#5BB8B4; --teal-soft:#16302F; --amber:#E2A851; --amber-soft:#33281A; --blue:#8FB1E6; --blue-soft:#1A2639;
+  --radio:#5BB8B4; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16.5px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:760px;margin:0 auto;padding-block:10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.05rem;font-weight:600;margin:0;letter-spacing:.01em}
+.meter{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.track{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--teal);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+main{max-width:760px;margin:0 auto;padding-block:22px 80px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.lead{font-size:1.02rem;color:var(--muted);max-width:68ch}
+h2{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-size:1.45rem;font-weight:600;margin:42px 0 6px;line-height:1.2}
+h2 + p{margin-top:4px;color:var(--muted);max-width:68ch}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.state h3{font-size:1rem;margin:0 0 6px}
+.state ul{margin:4px 0 10px;padding-left:20px}
+.state li{margin:2px 0}
+.decided{list-style:none;padding:0;margin:12px 0 0}
+.decided li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;margin:8px 0}
+.decided b{font-family:"IBM Plex Sans Condensed",sans-serif}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;margin:16px 0}
+.q.answered{border-color:var(--teal)}
+.q h3{margin:0 0 4px;font-size:1.12rem;line-height:1.3;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qid{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:.95rem;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 8px;flex:none}
+.src{font-size:.82rem;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.q .found{margin:6px 0 10px;padding-left:20px}
+.q .found li{margin:3px 0}
+.note{border-radius:7px;padding:10px 13px;margin:10px 0;font-size:.95rem}
+.note.cto{background:var(--blue-soft)}
+.note.me{background:var(--amber-soft)}
+.note .who{font-weight:600;margin-right:4px}
+fieldset{border:0;padding:0;margin:12px 0 0;min-width:0}
+legend{font-weight:600;font-size:.95rem;margin-bottom:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:7px;margin:6px 0;cursor:pointer;background:var(--surface)}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:4px;accent-color:var(--radio);width:18px;height:18px;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-soft)}
+.opt .lbl{font-weight:500}
+.opt .cost{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}
+.rec{display:inline-block;font-size:.78rem;font-weight:600;color:var(--teal);border:1px solid var(--teal);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px}
+textarea{width:100%;min-height:58px;margin-top:8px;font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;resize:vertical}
+textarea::placeholder{color:var(--muted)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:18px}
+.sheet textarea{min-height:260px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:500;border-radius:7px;padding:9px 14px;cursor:pointer;border:1px solid var(--teal);background:var(--teal);color:var(--surface)}
+button.ghost{background:transparent;color:var(--teal)}
+.hint{font-size:.88rem;color:var(--muted);margin-top:8px}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;font-size:.9rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+<header class="bar"><div class="bar-in">
+  <h1>The classification rubric, 26 November</h1>
+  <div class="meter"><div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div><span id="count">0 answered</span></div>
+</div></header>
+<main>
+<p class="lead">Seventeen choices for the classification rubric you ordered before W2-213's spec (DEC-1255 (3)), in five sections: the classes and what memory holds, the standard layout, how the classing runs, what needs your yes, and the conflicts with what stands. The rubric itself is <code>docs/emergency-2/proposals/CLASSIFICATION-RUBRIC.md</code>. Each card gives what was found, the options with their costs, and one recommendation with its reason. Pick an option, add a note if you want, and copy the answer sheet at the end. Your answers are kept on this device as you go.</p>
+<p class="hint" id="batchline"></p>
+
+<section class="state" aria-labelledby="how">
+  <h3 id="how">How to answer</h3>
+  <ul>
+    <li>Tap one option on a card. A card you leave alone is sent as "skip".</li>
+    <li>"Take every recommendation" fills every card with its recommended option; your notes stay.</li>
+    <li>At the end, tap "Copy the answer sheet" and paste it to your advisor, then to the CTO.</li>
+  </ul>
+</section>
+
+<div id="sections"></div>
+
+<h2>Your answer sheet</h2>
+<div class="sheet">
+  <div class="btns">
+    <button id="take-cto">Take every recommendation</button>
+    <button class="ghost" id="clear">Clear my answers</button>
+  </div>
+  <p class="hint">Taking the recommendations keeps any notes you've written. A note is sent as one line, 400 characters at most.</p>
+  <textarea id="answers" readonly aria-label="Answer sheet"></textarea>
+  <div class="btns"><button id="copy">Copy the answer sheet</button></div>
+  <p class="hint" id="copied" aria-live="polite"></p>
+</div>
+</main>
+
+<script>
+const BATCH="B-2026-11-26-rubric";
+const SECTIONS = [
+ {
+  "title": "1. The classes and what memory holds",
+  "intro": "Eighteen classes, each with one place and one memory rule. These three cards fix the list, the memory rules, and the hardest line to draw: a dated record or a stale one.",
+  "qs": [
+   {
+    "id": "R-01",
+    "from": "Rubric §1 · DEC-1255 (2), (3)",
+    "title": "Class every file into one of eighteen fixed classes?",
+    "found": [
+     "You fixed seven places: code, tests, specs, research, governance, one <code>archive/</code> and <code>imports/<name>/</code>. Real repositories hold more kinds: the Gov OS kit copy, tool settings, own data, generated files, dated records, evaluation sets, secrets.",
+     "Proposed list: code, tests, spec, research, docs, record, governance, kit, config, data, generated, archive, import-use, import-absorb, import-study, evaluation, hidden-set, secret. An item the agent is unsure of is \"ask\" and stays where it is.",
+     "Each class has a definition, its signs, one place, one memory rule and whether it moves (rubric §1).",
+     "Today each repository invents its own map: Gov OS has 20 namespaces, EXAMIN 18, ASMO OS 15, all different."
+    ],
+    "opts": [
+     [
+      "a",
+      "The eighteen as listed, a closed list held by code; a new class only with your yes",
+      "One list to learn; a few files sit in a near-fit class.",
+      1
+     ],
+     [
+      "b",
+      "Only your seven places; everything else under <code>docs/</code>",
+      "Simpler, but secrets, hidden sets, the kit and data then share the docs' memory rule, which leaks them into memory."
+     ],
+     [
+      "c",
+      "Each repository adds classes freely",
+      "Today's drift stays; code cannot check where things go."
+     ]
+    ],
+    "reason": "It is the smallest list that gives every real kind one place and one memory rule, and code can check it.",
+    "sources": "Rubric §0, §1; the three path maps; DEC-1255.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-02",
+    "from": "Rubric §1, §3 · DEC-1222 IM-3, IM-4 · CAP-03.a",
+    "title": "What memory holds for each class",
+    "found": [
+     "Words and meaning: code, spec, research, docs, governance. Words only: tests, records, the kit, config, tracked generated files, the text of imports you use. Meaning under the size ceiling: study imports. Out of memory: data, archive, evaluation sets, hidden sets, secrets.",
+     "Ranking: specs and accepted decisions first; research, records and tests lower; imports last and labelled, as you decided (IM-3, IM-4).",
+     "Today EXAMIN ranks its \"reference only\" research and its dated history like its rules; 3 of its 5 hidden misses cited a stale source (I-36).",
+     "Keeping secret paths out by rule (CAP-03.a) is not built: only the content scan keeps secrets out, and it can be switched off. The secret class would be kept out by the path map itself.",
+     "The path map is generated from the standard, so these rules hold in every repository."
+    ],
+    "opts": [
+     [
+      "a",
+      "As listed, the path map generated from the standard",
+      "W2-213 builds the generator; a hand edit is named as drift.",
+      1
+     ],
+     [
+      "b",
+      "As listed, but records and tests searched by meaning too",
+      "More found by meaning; more answers resting on sources that do not govern (EXAMIN's R1 miss)."
+     ],
+     [
+      "c",
+      "Each repository sets its own rules",
+      "Today's drift stays."
+     ]
+    ],
+    "reason": "What governs stays on top, history stays findable but quiet, and secrets stay out by rule rather than by a switch.",
+    "sources": "Rubric §1, §3 (M1 to M6); DEC-1222; DEC-1223 (8); DEC-1052 M-4; CAP-03.a; DEC-1045; I-36.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-03",
+    "from": "Rubric §1 (classes 6 and 12), §6",
+    "title": "Where a dated record ends and a stale one begins",
+    "found": [
+     "A record (an audit, a report, a close record, a finding) is true as of its date. Archive is what is no longer true: superseded, historical or legacy.",
+     "Records: kept, found by words, ranked below what governs. Archive: out of default memory, found only by its path or <code>--include-stale</code>.",
+     "Front matter decides by code where it exists (<code>status: SUPERSEDED</code>, <code>superseded_by</code>). Elsewhere it is the agent's call, with its sign named. Most mistakes will sit here.",
+     "EXAMIN's old register <code>docs/decisions/</code> is \"kept as history and cited by id\", yet it is searched by meaning like its rules today."
+    ],
+    "opts": [
+     [
+      "a",
+      "Records stay findable by words in a lower tier; only superseded, retired or legacy material goes to <code>archive/</code>",
+      "Two classes the agents must tell apart; the orchestrator checks this line first.",
+      1
+     ],
+     [
+      "b",
+      "Everything dated goes to <code>archive/</code>",
+      "Simple, but audits and findings vanish from default memory, and questions about what happened lose their source."
+     ],
+     [
+      "c",
+      "No record class: dated material stays as docs",
+      "Today's problem: history answers as if it were current."
+     ]
+    ],
+    "reason": "History stays answerable without speaking as the current rule.",
+    "sources": "Rubric §1, §6; EXAMIN path map; DEC-1052 M-4; I-36.",
+    "stops": "Stops W2-213's spec."
+   }
+  ]
+ },
+ {
+  "title": "2. The standard layout",
+  "intro": "Where each class lives. Code computes each destination from the class and the path, so it can be checked.",
+  "qs": [
+   {
+    "id": "R-04",
+    "from": "Rubric §2 (L1, L2) · I-25",
+    "title": "The standard layout in the kit",
+    "found": [
+     "<code>src/</code> (or the package folder the manifest names), <code>tests/</code>, <code>docs/</code> with <code>docs/specs/</code>, <code>docs/research/</code> and <code>docs/records/</code>, <code>data/</code>, <code>governance/</code>, <code>imports/<name>/</code>, and <code>archive/</code> with three sub-folders.",
+     "The kit, tool settings, CI, manifests, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.tickets/</code> and <code>openspec/</code> stay where their tools read them.",
+     "It lives in a new kit file (<code>standard.yaml</code>) that <code>gov update</code> carries; <code>gov init</code> lays it out for a new repository (I-25).",
+     "The path map is generated from it: one namespace per class, three for archive, two for study imports, one per import."
+    ],
+    "opts": [
+     [
+      "a",
+      "This layout; paths a tool reads never move",
+      "A new kit file and a generator; a few top folders added to each repository.",
+      1
+     ],
+     [
+      "b",
+      "Your seven places only; everything else stays where it is",
+      "Less to move; data, records and generated files keep scattering."
+     ],
+     [
+      "c",
+      "Everything under the standard folders, tool files included",
+      "Breaks the tools that read fixed paths (CI, manifests, agent settings)."
+     ]
+    ],
+    "reason": "It is your seven places plus what the tools force, and nothing more.",
+    "sources": "Rubric §2; kit <code>path-map.yaml</code>; I-25.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-05",
+    "from": "Rubric §2 (L3, L4), conflict X3 · CAP-44.j",
+    "title": "Code and its tests keep their own layout; what other files name is rewritten or held",
+    "found": [
+     "Adoption's A6 moves files and changes no content: a batch whose commit holds more than the moves is refused.",
+     "Moving code breaks every import, manifest and test path that names it, and the selected tests then roll the batch back every time. The Contract already keeps a healthy package layout (CAP-44.j).",
+     "EXAMIN's code is <code>product/app</code>, with <code>pyproject.toml</code> at the root: moving it is a code change, not a move.",
+     "Documents link to each other: moving one breaks the links unless they are rewritten."
+    ],
+    "opts": [
+     [
+      "a",
+      "Code and tests stay; links and paths in documents are rewritten by code in the same batch, each listed in the plan; a move that code or config names is held",
+      "W2-213 adds a rewrite step for text files only; some items stay, named in the plan.",
+      1
+     ],
+     [
+      "b",
+      "A6 as it is: anything another file names stays where it is",
+      "No new step; many documents stay put, so the standard is only partly reached."
+     ],
+     [
+      "c",
+      "Move everything, code included, and fix the breaks by hand",
+      "Red builds and rolled-back batches in every developed product."
+     ]
+    ],
+    "reason": "It reaches the standard for documents without ever breaking a build.",
+    "sources": "Rubric §2, X3; <code>src/gov/adopt/stages.py</code> (CONTENT_CHANGED); CAP-44.j; W2-190 S1.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-06",
+    "from": "Rubric §1 (class 12), §2, §3 (M2) · DEC-1227 D3",
+    "title": "How <code>archive/</code> is laid out inside",
+    "found": [
+     "D3's stale route needs a class on each archived file: superseded, historical or legacy.",
+     "Proposed: <code>archive/<class>/<original path></code>, for example <code>archive/superseded/docs/plans/roadmap.md</code>. The class comes from the folder, the old place stays readable in the path, and code computes the destination.",
+     "Today EXAMIN's <code>archive/</code> is split over two namespaces, one still searched by words; ASMO OS has four legacy namespaces; Gov OS has two archive folders."
+    ],
+    "opts": [
+     [
+      "a",
+      "<code>archive/superseded/</code>, <code>archive/historical/</code>, <code>archive/legacy/</code>, each keeping the original path",
+      "Longer paths; an existing <code>archive/</code> is re-sorted once.",
+      1
+     ],
+     [
+      "b",
+      "<code>archive/<original path></code>, all one class (historical)",
+      "Shorter; memory cannot tell superseded from legacy."
+     ],
+     [
+      "c",
+      "<code>archive/</code> free form, the agent picks sub-folders",
+      "Code cannot check where things go."
+     ]
+    ],
+    "reason": "One folder as you asked, with the class readable by code and the origin readable by people.",
+    "sources": "Rubric §1, §2, §3; DEC-1227 D3; W2-212.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-07",
+    "from": "Rubric §5, conflict X2 · DEC-1255 (2) · imports spec",
+    "title": "Imports already inside a repository we own: move them whole into <code>imports/<name>/</code>?",
+    "found": [
+     "Your rule: an import is never restructured; it sits whole in <code>imports/<name>/</code> with one class.",
+     "The imports spec you approved says the opposite for adoption: it classes and registers imports but never moves one.",
+     "Some imports cannot move: a package dependency is a manifest and a lock file that a tool reads at the root, so its \"import\" is one register line.",
+     "Example: the solar app carries <code>Cesium/</code> (387 tracked files), a vendored library."
+    ],
+    "opts": [
+     [
+      "a",
+      "Move each tracked copy whole at A6, with your yes on the plan; package dependencies stay as register lines",
+      "The imports spec is amended; one more kind of move in the plan.",
+      1
+     ],
+     [
+      "b",
+      "Leave imports where they lie, registered, as the imports spec says",
+      "No moves; imports keep scattering and the standard has exceptions."
+     ],
+     [
+      "c",
+      "Move everything, package files included",
+      "Breaks the package tools."
+     ]
+    ],
+    "reason": "Your later decision wins, and only what a tool reads at a fixed path stays.",
+    "sources": "Rubric §5, X2; <code>IMPORTS-ADOPTION-SPEC.md</code> non-goals; DEC-1222; DEC-1255 (2); CAP-44.j.",
+    "stops": "Stops W2-213's spec and the imports feature's spec."
+   }
+  ]
+ },
+ {
+  "title": "3. How the classing runs",
+  "intro": "Code classes what a rule decides alone. Up to ten Sonnet agents class the rest, in separate chunks. Code merges and checks their answers.",
+  "qs": [
+   {
+    "id": "R-08",
+    "from": "Rubric §0 (3, 8), §4 · DEC-1249 (2), I-28",
+    "title": "Class untracked material too, not only tracked files",
+    "found": [
+     "ASMO OS has four top folders (<code>ASMO-Web</code>, <code>GitHub-Harness</code>, <code>Infrastructure</code>, <code>UPIM-SPEC</code>) with no tracked file and not ignored. Its own CI note says the CI type-checks and builds ASMO-Web.",
+     "\"Every tracked file classed exactly once\" would pass with all four missing.",
+     "Proposed: every tracked file, every untracked file git does not ignore, each ignored folder as one line, each submodule, and each declared line of the import register.",
+     "Hidden sets and secrets are never shown to an agent: code removes them from the chunks first and writes their lines itself, from the registry and the scan's rule ids (I-28)."
+    ],
+    "opts": [
+     [
+      "a",
+      "All of it, with hidden sets and secrets classed by code only",
+      "More lines per repository; an ignored folder costs one line.",
+      1
+     ],
+     [
+      "b",
+      "Tracked files only, as first written",
+      "ASMO OS's web app goes unseen."
+     ],
+     [
+      "c",
+      "Everything on disk, inside ignored folders too",
+      "Thousands of library and cache files; a secret file could be opened."
+     ]
+    ],
+    "reason": "It closes the gap ASMO OS shows without opening what must stay closed.",
+    "sources": "Rubric §0, §4; ASMO OS's top-level listing; DEC-1249 (2); I-28.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-09",
+    "from": "Rubric §4 · DEC-1255 (2) · golden rule 4",
+    "title": "The line each agent writes: your four fields plus five",
+    "found": [
+     "Your four: path, class, destination, reason.",
+     "Code needs five more to check them: kind (file, folder, untracked, ignored folder, submodule, declared); the stale class for archive; the import's name for imports; the sign the reason rests on; and \"ask\" (a question and a recommended class).",
+     "A folder line covers every file below it; a file line inside it counts as a double.",
+     "Seven code checks follow: every item exactly once; valid fields; the destination where the standard puts it; one class per import and no shared destination; references found; the path map compiles; the same input gives the same plan."
+    ],
+    "opts": [
+     [
+      "a",
+      "Nine fields, one line per item, and the seven checks",
+      "A longer line per item.",
+      1
+     ],
+     [
+      "b",
+      "Your four fields only",
+      "Code cannot check one class per import or the archive sub-folder; the orchestrator checks them by reading."
+     ]
+    ],
+    "reason": "Each extra field is one code check that would otherwise be a reading.",
+    "sources": "Rubric §4; DEC-1255 (2); GOLDEN-WORKFLOW rule 4.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-10",
+    "from": "Rubric §1, §6 · DEC-1222 IM-2",
+    "title": "An item the agent is unsure of",
+    "found": [
+     "Some calls need meaning: own or brought in, current or stale, use or study, real or synthetic data.",
+     "Your rule for imports (IM-2 (a)): an unsure import is held as study until you answer; nothing is blocked."
+    ],
+    "opts": [
+     [
+      "a",
+      "Class \"ask\", with a recommended class and one question; it stays where it is until answered",
+      "Some items wait; the questions come together in the plan's review.",
+      1
+     ],
+     [
+      "b",
+      "The agent always picks its best guess",
+      "Faster; silent mistakes move files."
+     ],
+     [
+      "c",
+      "Every unsure item stops the plan",
+      "One question blocks a whole repository."
+     ]
+    ],
+    "reason": "Nothing moves on a guess, and nothing waits on one item.",
+    "sources": "Rubric §1, §6; DEC-1222 IM-2.",
+    "stops": "Stops W2-213's spec."
+   }
+  ]
+ },
+ {
+  "title": "4. What needs your yes",
+  "intro": "Who approves what, under the standard and the standing rules.",
+  "qs": [
+   {
+    "id": "R-11",
+    "from": "Rubric §5 · DEC-1255 (2) · rule 8",
+    "title": "Your yes on a repository we own: one per plan",
+    "found": [
+     "EXAMIN or ASMO OS may move hundreds of files.",
+     "Proposed: one page per plan, with counts per class (for example \"212 files to <code>archive/historical/</code>\"), every \"ask\" item by name, every rewritten reference, every held move, and 20 sample lines from the record-or-archive call.",
+     "Also yours by standing rules: removing a tracked secret, real data, taking unlicensed code into a commercial product, a paid tool, retiring a whole repository, any change to this rubric, restructuring Gov OS.",
+     "Not yours: classing an import as use or study, a tool install, archiving after adoption (a chore), a new repository, moving a hidden set (its own CTO's)."
+    ],
+    "opts": [
+     [
+      "a",
+      "One yes per plan: counts plus every judgement item by name",
+      "One page per repository; you trust code for the bulk.",
+      1
+     ],
+     [
+      "b",
+      "A yes per move",
+      "Hundreds of lines to read."
+     ],
+     [
+      "c",
+      "The CTO approves the plan; you see the counts afterwards",
+      "Changes your order in DEC-1255."
+     ]
+    ],
+    "reason": "You decide the judgement calls; code holds the bulk, and every batch can be rolled back.",
+    "sources": "Rubric §5; DEC-1255 (2); rule 8; DEC-1214 G7; DEC-1249.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "R-12",
+    "from": "Rubric §5 · DEC-1228 (2), (4) · DEC-1214 G7",
+    "title": "Testing a tool before use",
+    "found": [
+     "No decision yet says how a tool is tried before it is used for real work. The Startup Launchpad study is the one example: its own folder outside the products, REA given only to its sessions, synthetic material only.",
+     "Proposed: every trial runs in a run folder outside the products, on synthetic material. Its records come back as research (<code>docs/research/<trial>/</code>). Nothing of the tool enters a repository until it passes and is installed by its registry line."
+    ],
+    "opts": [
+     [
+      "a",
+      "As proposed; the CTO approves each trial (G7)",
+      "A run folder per trial.",
+      1
+     ],
+     [
+      "b",
+      "Try tools inside the product's worktree",
+      "Faster; a tool's setup can rewrite agent settings (REA's would have)."
+     ],
+     [
+      "c",
+      "No trial step: install and watch",
+      "A bad tool reaches real work."
+     ]
+    ],
+    "reason": "It is what the REA study already does, made the rule.",
+    "sources": "Rubric §5; DEC-1228 (2), (4); DEC-1214 G7; E2-AUDIT-3 MT-4.",
+    "stops": "Does not stop work."
+   }
+  ]
+ },
+ {
+  "title": "5. Conflicts with what stands",
+  "intro": "Where the rubric meets a standing decision, the plan or code already built.",
+  "qs": [
+   {
+    "id": "C-01",
+    "from": "Rubric §8, conflict X1 · DEC-1227 D3 · DEC-1254 E-02 · I-40",
+    "title": "D3's word-guessing once the standard exists",
+    "found": [
+     "D3's adoption check guessed staleness from words in paths. It caused about 300 of batch A's 318 reds (I-40), and it misses EXAMIN's real stale sources, which carry no stale word.",
+     "Proposed: D3's memory route stays as built (it reads the class, not words). In a repository on the standard, the stale class comes from <code>archive/</code> by place, and the word check retires.",
+     "The words become a hint shown to the classing agent, never a decision.",
+     "In repositories not yet on the standard, your amended rule (E-02) stays until they move; then it is deleted (no dead code)."
+    ],
+    "opts": [
+     [
+      "a",
+      "As proposed",
+      "The word check lives on only until EXAMIN and ASMO OS re-run.",
+      1
+     ],
+     [
+      "b",
+      "Keep the word refusal everywhere as a backstop",
+      "Every new folder name risks a new exception, as you said."
+     ],
+     [
+      "c",
+      "Delete the word check now",
+      "EXAMIN and ASMO OS lose even the stopgap before the standard exists."
+     ]
+    ],
+    "reason": "It keeps what works in D3 and drops the guess as soon as a place can decide.",
+    "sources": "Rubric §8, X1; DEC-1227 D3; DEC-1254 E-02; I-40; <code>stale.py</code> on <code>e2/bundle-a</code>.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "C-02",
+    "from": "Rubric §3 (M3), conflict X4",
+    "title": "Archived and imported records in the record graph",
+    "found": [
+     "The record graph reads every Markdown file with an id, wherever it lies. In a test, a copied project's DEC-010 demoted the repository's own DEC-010.",
+     "EXAMIN's 1,568 answered adoption packages stay records wherever they are archived.",
+     "Proposed: archived records still resolve by id, marked stale, never ranked as current and never superseding a live record. Markdown under <code>imports/</code> is never a record."
+    ],
+    "opts": [
+     [
+      "a",
+      "As proposed",
+      "One rule in the graph builder, part of W2-213.",
+      1
+     ],
+     [
+      "b",
+      "Drop <code>archive/</code> and <code>imports/</code> from the graph entirely",
+      "An old decision id no longer resolves, even as history."
+     ],
+     [
+      "c",
+      "Leave the graph as it is",
+      "A copied or archived record can still demote a live one."
+     ]
+    ],
+    "reason": "History stays traceable by id and can never overrule the present.",
+    "sources": "Rubric §3, X4; <code>IMPORTS-ADOPTION-SPEC.md</code>; EXAMIN <code>MEMORY-ASSESSMENT.md</code>.",
+    "stops": "Stops W2-213's spec."
+   },
+   {
+    "id": "C-03",
+    "from": "Rubric conflict X5 · DEC-1251 D-08",
+    "title": "ASMO OS reaches A6 before the standard exists",
+    "found": [
+     "ASMO OS is mid-adoption: its two questions before A6 were answered in its CTO's chat (D-08).",
+     "W2-213 ships at the earliest in the release after 0.1.9.",
+     "Running A6 under ASMO OS's own map now means moving twice: once now, once to the standard."
+    ],
+    "opts": [
+     [
+      "a",
+      "ASMO OS runs A6 now with only the safe moves (its legacy framework into its archive, no code), then re-runs to the standard when it ships",
+      "Two passes; its memory stays as it is until the second.",
+      1
+     ],
+     [
+      "b",
+      "ASMO OS waits at A5 for the standard",
+      "Its adoption, Contract and development wait for weeks."
+     ],
+     [
+      "c",
+      "ASMO OS restructures fully now, by hand, to the proposed standard",
+      "Moves made before code can check them."
+     ]
+    ],
+    "reason": "Its work goes on now, and nothing is moved twice that does not have to be.",
+    "sources": "Rubric X5; DEC-1251 D-08; DEC-1255 (the CTO's call: after 0.1.9); ASMO OS path map.",
+    "stops": "Stops ASMO OS's A6 until answered."
+   },
+   {
+    "id": "C-04",
+    "from": "Rubric conflict X6 · DEC-1255 (2) · DEC-1252 RG-2",
+    "title": "Gov OS keeps its classing: does new material follow the standard?",
+    "found": [
+     "Your rule: Gov OS keeps its classing until restructuring it pays, since its tests pin its paths.",
+     "New material has no place today: the REA study's records wait for the imports register, and future imports and trials need a place.",
+     "The rubrics register's kit copy carries only rows that bind every repository (RG-2)."
+    ],
+    "opts": [
+     [
+      "a",
+      "Existing paths stay; new material (imports, trials, new kinds of record) follows the standard wherever no test pins a path",
+      "Gov OS has two styles side by side for a while.",
+      1
+     ],
+     [
+      "b",
+      "Gov OS stays wholly on its own classing",
+      "New imports in Gov OS need rules of their own."
+     ],
+     [
+      "c",
+      "Restructure Gov OS now",
+      "Hundreds of tests rewritten; your rule says not yet."
+     ]
+    ],
+    "reason": "Gov OS gains the standard where it costs nothing and keeps its pinned paths.",
+    "sources": "Rubric X6; DEC-1255 (2); DEC-1252 RG-2; DEC-1228 (4).",
+    "stops": "Does not stop work."
+   },
+   {
+    "id": "C-05",
+    "from": "Rubric conflict X7 · DEC-1254 E-02 · I-36",
+    "title": "EXAMIN's three stale citations (your E-02 check)",
+    "found": [
+     "You asked to confirm that EXAMIN's three stale citations leave default memory under the amended rule.",
+     "Its fresh-80 record gives counts only, no paths, by design, so the check cannot be made from it.",
+     "EXAMIN's likely stale sources sit in namespaces searched by meaning that carry no stale word: <code>docs/decisions/</code> (\"kept as history\"), <code>docs/reports/</code> and <code>docs/audits/</code> (\"dated history\"). D3's rule cannot see them; only a class can.",
+     "The forbidden list the EXAMIN CTO declares for its measure (<code>gov memaudit declare</code> refuses a set without one, I-11) names the sources the strict rule counts stale."
+    ],
+    "opts": [
+     [
+      "a",
+      "The EXAMIN CTO checks each source on its own forbidden list against its path map, and moves the stale ones into a historical namespace of their own before it measures again",
+      "One chore in EXAMIN; no wait for W2-213.",
+      1
+     ],
+     [
+      "b",
+      "Wait for W2-213's restructure",
+      "EXAMIN's next measure meets the same misses."
+     ],
+     [
+      "c",
+      "The measure's own session names the three cited paths",
+      "It touches the hidden half's outputs."
+     ]
+    ],
+    "reason": "It fixes the measure's misses now, by class, from a list the EXAMIN CTO writes itself.",
+    "sources": "Rubric X7; DEC-1254 E-02; I-36; I-11; EXAMIN <code>FRESH80-2026-11-25.md</code> and path map.",
+    "stops": "Does not stop work; it matters for EXAMIN's next measure."
+   }
+  ]
+ }
+];
+
+const KEY="govos-decisions-"+BATCH;
+let state={answers:{},notes:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.answers) state=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* SHA-256 in plain script, so the page needs no secure context */
+function sha256(str){
+  const msg=new TextEncoder().encode(str);
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const len=msg.length, total=((len+9+63)>>6)<<6, buf=new Uint8Array(total);
+  buf.set(msg); buf[len]=0x80;
+  const dv=new DataView(buf.buffer);
+  dv.setUint32(total-8,Math.floor(len/0x20000000),false); dv.setUint32(total-4,(len<<3)>>>0,false);
+  const w=new Uint32Array(64), rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<total;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+4*i,false);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&b)^(a&c)^(b&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0; H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+function canon(v){
+  if(Array.isArray(v)) return "["+v.map(canon).join(",")+"]";
+  if(v&&typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+canon(v[k])).join(",")+"}";
+  return JSON.stringify(v);
+}
+
+const all=[];
+const root=document.getElementById("sections");
+for(const s of SECTIONS){
+  const sec=document.createElement("section");
+  let h=`<h2>${s.title}</h2><p>${s.intro}</p>`;
+  for(const q of s.qs){
+    all.push(q);
+    h+=`<article class="q" id="${q.id}"><h3><span class="qid">${q.id}</span><span>${q.title}</span></h3><p class="src">${q.from}</p>`;
+    h+=`<ul class="found">${q.found.map(f=>`<li>${f}</li>`).join("")}</ul>`;
+    h+=`<p class="src"><b>Sources:</b> ${q.sources}</p><p class="src"><b>Stops work?</b> ${q.stops}</p>`;
+    h+=`<div class="note cto"><span class="who">Recommended</span>${q.reason}</div>`;
+    h+=`<fieldset><legend>Your answer</legend>`;
+    for(const [k,label,cost,rec] of q.opts){
+      const id=`o-${q.id}-${k}`;
+      h+=`<label class="opt" for="${id}"><input type="radio" name="${q.id}" id="${id}" value="${k}"><span><span class="lbl">(${k}) ${label}</span>${rec?'<span class="rec">recommended</span>':""}${cost?`<span class="cost">${cost}</span>`:""}</span></label>`;
+    }
+    h+=`</fieldset><textarea id="n-${q.id}" maxlength="400" placeholder="Your note on ${q.id} (optional)"></textarea></article>`;
+  }
+  sec.innerHTML=h; root.appendChild(sec);
+}
+
+/* the batch hash: SHA-256 of the batch id and the cards in page order, as JSON with sorted keys and no spaces */
+const HASH=sha256(canon({batch:BATCH,cards:all.map(q=>({id:q.id,question:q.title,found:q.found,options:q.opts.map(o=>({key:o[0],label:o[1],cost:o[2]})),recommendation:{option:(q.opts.find(o=>o[3])||[])[0]||null,reason:q.reason},sources:q.sources,blocks:q.stops}))}));
+document.getElementById("batchline").textContent=`Batch ${BATCH} · hash ${HASH.slice(0,12)} · ${all.length} cards`;
+
+function apply(){
+  for(const q of all){
+    const v=state.answers[q.id];
+    document.querySelectorAll(`input[name="${q.id}"]`).forEach(i=>{i.checked=(i.value===v); i.closest(".opt").classList.toggle("sel",i.checked);});
+    document.getElementById("n-"+q.id).value=state.notes[q.id]||"";
+    document.getElementById(q.id).classList.toggle("answered",!!v);
+  }
+  render();
+}
+function render(){
+  const stamp=new Date().toISOString().replace(/\.\d+Z$/,"Z");
+  const lines=["GOV-ANSWERS 1",`batch: ${BATCH}`,`hash: sha256:${HASH}`,`answered: ${stamp}`,`count: ${all.length}`];
+  let n=0;
+  for(const q of all){
+    const v=state.answers[q.id];
+    let line=`${q.id}: `;
+    if(v){n++; line+=v;} else line+="skip";
+    const note=(state.notes[q.id]||"").replace(/\s*[\r\n]+\s*/g," ").trim().slice(0,400);
+    if(note) line+=` | note: ${note}`;
+    lines.push(line);
+  }
+  lines.push("END");
+  document.getElementById("answers").value=lines.join("\n");
+  document.getElementById("count").textContent=`${n} of ${all.length} answered`;
+  document.getElementById("fill").style.width=`${Math.round(100*n/all.length)}%`;
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="radio"]')){state.answers[e.target.name]=e.target.value; save(); apply();}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id&&e.target.id.startsWith("n-")){state.notes[e.target.id.slice(2)]=e.target.value; save(); render();}
+});
+document.getElementById("take-cto").addEventListener("click",()=>{
+  for(const q of all){const r=q.opts.find(o=>o[3]); if(r) state.answers[q.id]=r[0];}
+  save(); apply();
+});
+let clearArmed=null;
+document.getElementById("clear").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!clearArmed){b.textContent="Tap again to clear every answer and note"; clearArmed=setTimeout(()=>{clearArmed=null; b.textContent="Clear my answers";},4000); return;}
+  clearTimeout(clearArmed); clearArmed=null; b.textContent="Clear my answers";
+  state={answers:{},notes:{}}; save(); apply();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+  render();
+  const ta=document.getElementById("answers"); const msg=document.getElementById("copied");
+  try{await navigator.clipboard.writeText(ta.value); msg.textContent="Copied. Paste it to your advisor, then to the CTO.";}
+  catch(e){ta.removeAttribute("readonly"); ta.focus(); ta.select(); msg.textContent="Selected: press copy on your keyboard or phone."; ta.setAttribute("readonly","");}
+});
+apply();
+</script>
