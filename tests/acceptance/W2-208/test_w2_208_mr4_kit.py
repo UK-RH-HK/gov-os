@@ -177,11 +177,13 @@ def test_mr4_the_adopted_hook_lets_a_sonnet_helper_through_with_exit_0(adopted_a
     assert done.returncode == 0, f"exit {done.returncode}\n{done.stdout}\n{done.stderr}"
 
 
-@pytest.mark.parametrize("kind,written", [("engineer", "claude-sonnet-5-5"), ("Explore", "sonnet")],
+@pytest.mark.parametrize("kind,written", [("engineer", "sonnet"), ("Explore", "sonnet")],
                          ids=["a-type-with-a-table-row", "a-type-without-a-row"])
 def test_mr4_the_adopted_hook_writes_the_rows_model_into_a_spawn_with_no_model(adopted_at_b, kind, written):
     # Rewrite-Reason: DEC-1246 (3)(b): MR-4, ruling: the rule wins. The hook writes the table row's model for a
     # subagent_type that has a row, and `sonnet` only where there is no usable row.
+    # Rewrite-Reason: AM-1 (I-50): the Agent tool accepts only the aliases sonnet, opus, haiku, fable, so a row's full
+    # model id is written as its family's alias; `engineer`'s row (claude-sonnet-*) is written `sonnet`.
     done = _hook_run(adopted_at_b, None, kind=kind)
     assert done.returncode == 0, f"exit {done.returncode}\n{done.stderr}"
     out = json.loads(done.stdout)["hookSpecificOutput"]
