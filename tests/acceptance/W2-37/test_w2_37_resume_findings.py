@@ -126,12 +126,14 @@ SPLIT = {
 
 def register_project(root, box, register_text, namespaces=None, code=False):
     """A repository whose path map names ``records/decision-log.md`` as the register (``register_text`` at HEAD),
-    DEC-001 as a decision file, and, with ``code``, one function; committed, the store loaded."""
+    DEC-001 as a decision file, and, with ``code``, one function DEC-001 constrains by name (so a change of DEC-001
+    reads the code graph, G-16; a record-only change does not, fix IM-1); committed, the store loaded."""
     project = support.Project(root)
     project.write(".gitignore", ".gov-runtime/\n")
     project.write(support.PATH_MAP_REL, support.path_map(namespaces, code=code, register=support.REGISTER_REL))
     project.write(support.REGISTER_REL, register_text)
-    project.write("docs/adr/DEC-001.md", support.decision("DEC-001"))
+    edges = {"constrains": ["w37_solo"]} if code else {}
+    project.write("docs/adr/DEC-001.md", support.decision("DEC-001", **edges))
     if code:
         project.write(".gitleaks.toml", support.GITLEAKS_TEMPLATE.read_text(encoding="utf-8"))
         project.write("app/__init__.py", "")
