@@ -1,4 +1,4 @@
-"""The helper-model hook writes the role table's Sonnet model for a spawn that names none (MR-4 follow-up)."""
+"""The helper-model hook writes an Agent tool alias, "sonnet", into a spawn that names no model (MR-4, AM-1)."""
 from __future__ import annotations
 
 import json
@@ -8,9 +8,13 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 REPO = Path(__file__).resolve().parents[3]
 HOOK = REPO / ".claude/hooks/agent_model.py"
+ALIASES = {"sonnet", "opus", "haiku", "fable"}  # all the Agent tool's `model` accepts
+REAL_TABLE = (REPO / "governance/project/role-table.yaml").read_text()
+KINDS = [row["role"] for row in yaml.safe_load(REAL_TABLE)["rows"]] + ["general-purpose"]
 
 
 def table(*rows):
@@ -33,10 +37,11 @@ def written(done):
     return json.loads(done.stdout)["hookSpecificOutput"]["updatedInput"]
 
 
-def test_the_row_of_the_subagent_type_gives_the_model(tmp_path):
-    out = written(run(tmp_path, {"subagent_type": "research", "prompt": "p"},
-                      table(("research", "claude-sonnet-5-6"), ("engineer", "claude-sonnet-5-5"))))
-    assert out == {"subagent_type": "research", "prompt": "p", "model": "claude-sonnet-5-6"}
+@pytest.mark.parametrize("kind", KINDS)
+def test_every_row_of_the_real_table_gets_an_alias_written(tmp_path, kind):
+    out = written(run(tmp_path, {"subagent_type": kind, "prompt": "p"}, REAL_TABLE))
+    assert out["model"] in ALIASES
+    assert out == {"subagent_type": kind, "prompt": "p", "model": "sonnet"}
 
 
 @pytest.mark.parametrize("body", (None, "version: 1\nrows: [\n", table(("engineer", "claude-sonnet-5-5")),

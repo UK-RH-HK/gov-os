@@ -411,3 +411,10 @@ still names the substitution reader is reported. Failure: a script with no `--mo
 ## Fix: MR-3's scripts check follows the one tracked start script (batch A's red; lead `bundle-a-reds`, 2026-11-26)
 
 Cause: since DEC-1253 the scratch `start_cto.sh` only runs the tracked script, so `check_scripts` found no `--model` or `--effort`. Caught by `test_mr3_the_real_three_scripts_agree_with_this_repositorys_table`. Fix: a one-line `exec bash <path>` wrapper of the same name is followed once, anything else is a fault (`8a9684e34`). Open: merge `53808ef6da8d` changes `tests/acceptance/W2-208/README.md` itself (W1-01's DEC-253 history case stays red).
+
+## Fix: the hook writes a model alias the Agent tool accepts (AM-1, I-50; lead agent-model-alias, 2026-11-26)
+
+Found: a real spawn of `subagent_type: engineer` naming no model failed schema validation, because the hook wrote the role table's full id (`claude-sonnet-5-5`). No test caught it: the tests asserted the full id.
+Required (AM-1): the hook's `updatedInput.model` is always an Agent alias; only Sonnet is ever written, so it is `sonnet` for every type. The refusal rules still read both forms. Both hook copies stay byte-equal.
+Tests: `tests/unit/hooks/test_mr4_agent_model_table.py` (every row of the real role table and `general-purpose`); acceptance in W2-201 and W2-208 (`bfdacb47a`).
+Code: `.claude/hooks/agent_model.py` and `template/governance/kernel/hooks/agent_model.py` (`write_model`; the role-table readers removed).
