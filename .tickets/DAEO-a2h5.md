@@ -1,6 +1,6 @@
 ---
 id: DAEO-a2h5
-status: in_progress
+status: closed
 deps: [DAEO-49o5, DAEO-sdhj]
 links: [DAEO-sdhj, DAEO-49o5, DAEO-k1us]
 created: 2026-11-20T15:30:00Z
@@ -156,3 +156,12 @@ line without rewriting history; a commit with no such ticket (a Contract change,
 `Approved-by:` trailer. Either name counts only when the register holds it as the owner's. The code path is the one of
 slice (a) (`gov release <v> --patch`); the plain `gov release` stays the owner's (S7, F5, DEC-772). No new command, flag,
 gate or schema.
+
+## Closed (RR-3; DEC-1251 D-01), 2026-11-26
+
+Every line of this ticket is met: `gov accept W2-209` on `e2/release-rule` (tests `717e0c8e3`, code `a7fea50a1` and
+`0aafb53a5`) 219 passed, 0 failed, 0 skipped, all 14 success and 6 failure lines, RP-1 (`81cdd48b4` on the integration
+branch) and the F7 regression fix among them. A later fix under this ticket is a fix under a closed ticket and rides a
+patch. Slice (b) (the automatic update, K7 to K10) was never added to this ticket's lines: it is a new ticket when
+wanted (a new line on a closed feature is a new ticket).
+
