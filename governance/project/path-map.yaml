@@ -490,6 +490,8 @@ acceptance_exemptions:
     decision: DEC-1243  # the merge of e2/fixes-015a-sa into e2/fixes-015a that carries three of them and settled two README maps; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
   - commit: "8e0b222f0722ecd7896858ac046829055ea97612"
     decision: DEC-1243  # the stream merge into e2/fixes-015a that carries e8838fa97; reviewed and endorsed by the test designer in 0d01d006a; the freeze holds for everything else
+  - commit: "53808ef6da8dbd333b207a7e86731e615b20c5d3"
+    decision: DEC-1254  # item E-01; the merge settled a README conflict (W2-208) keeping both sections word for word, no test code changed (DEC-253)
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
