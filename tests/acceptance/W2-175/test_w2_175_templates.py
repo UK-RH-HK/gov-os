@@ -112,8 +112,9 @@ def test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s(stem):
     base, _ = s.split(t.base_text(stem))
     now, _ = s.split(t.text_of(stem))
     assert isinstance(now, dict), f"{stem}.md's front matter does not parse"
-    assert now.get("version") == "1.0.1", \
-        f"{stem}.md: version is {now.get('version')!r}, not 1.0.1 (DEC-1121's step for a template delta)"
+    expected = t.EXPECTED_VERSION[stem]
+    assert now.get("version") == expected, \
+        f"{stem}.md: version is {now.get('version')!r}, not {expected} (DEC-1121's step for a template delta)"
     others = {key for key in set(base) | set(now) if key != "version"}
     if stem in JUDGING_STEMS:
         # W2-195 (DEC-1204 (5)): a template of a judging role appends ``judging-work`` to its base's skills list

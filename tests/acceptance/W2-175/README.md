@@ -127,6 +127,10 @@ must stay green.
 
 ### Success 5: version 1.0.1, every other front matter key the base's
 
+Each template's expected `version` is `EXPECTED_VERSION` in `w2_175_support.py`: 1.0.1 for six templates; role-cto is
+**2.0.1**, its card rewritten to 2.0.0 by the owner's DEC-1253 (2026-11-25) and raised to 2.0.1 under W2-128. The
+table below states the version on the W2-175 base.
+
 | Test | On the base | Why |
 |---|---|---|
 | `test_w2_175_templates.py::test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-cto]` | red | version is 1.0.0 |

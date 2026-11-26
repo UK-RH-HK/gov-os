@@ -40,6 +40,12 @@ BASE = {
     "role-test-designer": "baa2696f713f",
 }
 
+# The version each template's front matter carries now (S5). Every template stays at W2-175's 1.0.1 except those named
+# here: role-cto's card was rewritten to 2.0.0 by the owner's DEC-1253 (2026-11-25) and is at 2.0.1. The next card
+# version is one edit here and in the README's S5 note.
+EXPECTED_VERSION = {stem: "1.0.1" for stem in SEVEN}
+EXPECTED_VERSION["role-cto"] = "2.0.1"
+
 # W2-175's landing commit: the merge "Merge w2/W2-175 (DAEO-wahn) ...". The S7 line says the record holds each
 # template's sha256 "at the ticket's head". A closed ticket's head is a fixed commit, so the case reads the
 # templates there, through git, and not in the working tree: an owner-approved template change after the close
