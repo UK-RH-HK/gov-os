@@ -7,10 +7,10 @@ an audit's cited forbidden sources are now outside default memory), which EXAMIN
 repository through the kit** (the model hook, `defaultMode`); **the fresh 80's launch lines for every kind and the writer check's record in
 the session folder** (I-33, I-37, I-38); **the trustworthy selection** (1-0, 1-8 `gov impact` bounded, 1-9 the impact trace at the landing,
 1-11 (c) the path map's exact coverage at the landing, 1-13 node on the test run's PATH); **the timing tests judged by the work under test**
-(I-32); **the release rule for approved releases** (I-34: from 0.1.9 the CTO cuts an approved release by code); the CTO's card 2.0.1.
+(I-32); **the release rule for approved releases** (I-34: from 0.1.9 the CTO cuts an approved release by code); **W2-213's first slice** (DEC-1256 (1): the standard frozen in the kit, `standard.yaml`, and `gov layout check`, which EXAMIN and ASMO OS run on their restructure plans before anything moves); **the model hook writes the alias `sonnet`** (I-50: a role-typed helper spawn no longer fails); the CTO's card 2.0.1.
 
-**The green base:** the full suite on `39957ee9a` with the weekly tier, **19,998 passed, 0 failed, 0 errors** (record
-`docs/close/nightly/NR-20261126T141109Z-39957ee9a45d.json`, committed in C). C adds only that record, this folder and the version line.
+**The green base:** the full suite on `147b6ee1c` with the weekly tier, **20,350 passed, 0 failed, 0 errors** (record
+`docs/close/nightly/NR-20261126T162755Z-147b6ee1c7c7.json`, committed in C). C adds only that record and this file to the tested commit.
 The re-pin refreshes the stores through the new link and runs the six hooks (the model hook is new) through the new pin.
 
 In a **plain terminal** (not a Claude session or a terminal started from one). About 15 minutes (the store refreshes take a few).
