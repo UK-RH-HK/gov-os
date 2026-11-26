@@ -34,6 +34,7 @@ allowed_paths:
 - tests/unit/adopt/test_w2_88_shipped.py
 - tests/acceptance/W2-213/**
 - tests/acceptance/W1-32/test_w1_32_command_set.py
+- tests/acceptance/W2-88/test_w2_88_p1_shipped_bytes.py  # [added 2026-11-26 by the w2-213-slice1 lead, the DAEO-zmo4 precedent (DEC-1189 (1)): the wheel's shipped list gains the standard (SL-4); a test designer's edit]
 kpis:
   success:
   - line: 'SL-1 The kit holds one standard file with a closed list of exactly eighteen classes (code, tests, spec, research, docs, record, governance, kit, config, data, generated, archive, import-use, import-absorb, import-study, evaluation, hidden-set, secret), one entry each, giving its destination, whether it ever moves, its memory policy and ranking tier, and the signs it is told by, as the rubric''s class table states them, and holds the ask answer apart as no class.'
