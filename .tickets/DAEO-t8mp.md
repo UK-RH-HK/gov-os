@@ -180,3 +180,23 @@ Appendix), shaped by R2's evidence (P1-PLAN P1-7), plus LINK-INTEGRITY.md §6.1'
   - the checkpoint template's example `task:` left empty (its comment says to fill it with the ticket's id), so
     `gov links` reads no unknown id in the template;
   - each changed skill one more minor up; the skills validator passes; the generated copies are the next ACT's.
+
+## Fix: the CTO role card meets the template contract and states the release rule now built (W2-128 role-cto base reds)
+
+Found 2026-11-26: the card's 2.0.0 rewrite for Emergency 2 (`7fc18d489`, DEC-1253) left seven W2-128 cases red on
+`w2/integrate`, and on the same file four W2-197 cases and four W2-175 cases (the same shape as FINDINGS I-35). Cause:
+the rewrite dropped lines that standing requirements pin, ran over the prose budget and named commands `facts.yaml`
+does not hold. A fix under W2-128. The K-lines are the lead's (brief `docs/emergency-2/briefs/LEAD-card-w2-128.md`);
+the CTO approves them and the card's change by that brief (EMERGENCY-2 §3.5).
+
+- **CW-1** The card meets every requirement that still holds: its prose within `budgets.role-cto`, LINK-INTEGRITY §5's
+  link lines, D5 rows 3, 4 and 9 each ending with a decision id, "search again once" on its Start line, every command
+  and script it names in `facts.yaml`'s commands; every rule of 2.0.0 kept; the lines the rewrite dropped that still
+  hold restored (the shared memory line and the subagent memory block, W2-197 S4; reads open with the four refusals,
+  the two-refusal stop and the decision-record commit line, W2-175 S1, S4, S3). Version 2.0.1; the two copies equal it.
+  Verify: `gov accept W2-128`; `tests/acceptance/W2-197`; `tests/acceptance/W2-175` (all but S5's role-cto version case).
+- **CW-2** No test is bent to the card and no card line to a retired rule: each of the seven W2-128 cases still states
+  a rule in force, so the card and `facts.yaml` move. W2-175 S5's role-cto case pins version 1.0.1, which DEC-1253's
+  rewrite retired; it stays red (outside this fix's paths). Verify: `git diff` shows no change under `tests/`.
+- **CW-3** The card's Releases bullet is the brief's line, word for word [DEC-1235 (2), I-34].
+  Verify: the bullet in the card equals the brief's CW-3 line.
