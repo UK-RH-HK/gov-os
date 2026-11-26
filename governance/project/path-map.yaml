@@ -72,6 +72,8 @@ namespaces:
       - "docs/research/EXP-003/w2-15a/*"
       - "docs/research/EXP-003/w2-15a/diag/**"
       - "docs/spec/**"
+      # W2-213 (DEC-1256, C-04): new specs follow the standard place
+      - "docs/specs/**"
       - "docs/assessment/2026-10/A-purpose-roadmap.md"
       - "docs/assessment/2026-10/C-decisions-to-spec.md"
       - "docs/assessment/2026-10/D-tool-staging.md"
