@@ -174,7 +174,8 @@ def test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_
 
 def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
     """One process on a fresh clone of ``tier``: the index built, the three warm-up questions, then each question
-    of ``asked`` once. ``(answers, seconds per question, peaks)``; the memory sampler runs only when ``watch``."""
+    of ``asked`` once. ``(answers, judged seconds per question, peaks)``; the memory sampler runs only when
+    ``watch``. The judged time is ``support.judged_seconds``: the wall time less the wait for a CPU."""
     name = "watched" if watch else "timed"
     root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}-{name}") / tier)
     if root is None:
@@ -190,7 +191,7 @@ def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
         f"the vectors of {tier} were not built in the {name} pass: {values[0]!r}"
     skip = 1 + len(support.WARM_UP_QUERIES)
     answers = [support.check_fused(value) for value in values[skip:]]
-    return answers, [call["seconds"] for call in outcome.calls[skip:]], outcome.peaks
+    return answers, [outcome.seconds(index) for index in range(skip, len(outcome.calls))], outcome.peaks
 
 
 @pytest.fixture(scope="module")
@@ -227,6 +228,7 @@ def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
     seconds = [value for result in measured.values() for value in result["seconds"]]
     assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
     slowest = sorted(seconds)[-3:]
+    print(f"W1-19 warm p95, judged: {support.p95(seconds):.3f} s over {len(seconds)} queries")
     assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
         f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
         f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"

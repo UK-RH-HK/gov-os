@@ -114,3 +114,9 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 **D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 8: `8550788b` (S1 to S4, F1, F2; FULL review READY), `9ed83413` (S5), `261d6415` and `27a80411` (S6); `W2-13-evidence.md`. The CTO closes it at the lift (P1-13).
 
 - **Open (D-10's red-fix list, 2026-11-10):** `test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget` is red alone with the real models: warm p95 0.543 s starting at load 2, 0.560 and 0.578 s at load 12 (budget 0.5 s, W1-19's, unchanged). Routed to the nightly by `tests/acceptance/serial-only.txt` (`89495ad15`, DEC-889 item 5); the latency itself is this ticket's to find and fix.
+
+## Fix: timing cases that fail under the release suite's own load (I-32; DEC-1251 D-03: (b) now, then (a))
+
+Found 2026-11-25 (I-32). Kind: a fix; the ticket stays closed. Lines approved by the CTO's brief `docs/emergency-2/briefs/LEAD-timing-tests.md`. No change to `src/` and no bound raised.
+
+- TT-2: both warm-latency cases judge `max(wall - run_delay, thread CPU)` per question, `run_delay` being the calling thread's wait on a run queue (`/proc/thread-self/schedstat`), clamped to `[0, wall]`; unreadable counts as 0. The floor is the thread's CPU time; the 0.5 s p95 budget is unchanged; on an idle machine the judgement is the wall time, as before. A planted 2x slow-down fails each case; a planted busy reading whose excess is all queue wait does not. The lexical case stays listed serial. Not taken out: waits inside the reranker service, Ollama or the GPU, so the real-model case stays on the nightly route and its open latency item stands. Verify: `tests/acceptance/W2-13/test_w2_13_judged_time.py`.

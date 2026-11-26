@@ -10,6 +10,10 @@ The budget is W1-19's warm-query budget: p95 at most 0.5 s (``WARM_P95_LIMIT_S``
   machine's Ollama and reranker (``needs("ollama", "reranker")``), on the tiers the session's ``real_tiers`` built
   with the real embedder; the timed process runs nothing else.
 
+Both judge each timed question by ``support.judged_seconds``: its wall time less the time the calling thread waited
+on a run queue for a CPU, and never under the thread's CPU time (an unreadable reading counts as no wait). The
+budget is unchanged.
+
 Both clone the dev tiers (``GOV_DEV_TIERS``), so both are ``local_only``; each skips where a tier or the query set
 is not on this machine.
 """
@@ -59,6 +63,7 @@ def _timed(box, roots, module, function, extra_args, kwargs, env=None):
 def _within_budget(seconds):
     assert len(seconds) >= 20, f"only {len(seconds)} questions were timed"
     slowest = [round(value, 3) for value in sorted(seconds)[-3:]]
+    print(f"W2-13 warm p95, judged: {support.p95(seconds):.3f} s over {len(seconds)} questions")
     assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
         f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} questions (limit " \
         f"{support.WARM_P95_LIMIT_S} s; the three slowest: {slowest})"

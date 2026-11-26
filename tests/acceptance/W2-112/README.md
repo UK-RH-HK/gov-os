@@ -351,3 +351,38 @@ memory-release cases, in no opt-in list, are mapped to success 6 in that section
 | F1: A search that fails, hangs, or returns another session's scores because of the service. | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
 | F2: Two services started at once, or a socket another user can open. | `test_w2_112_service.py::test_two_searches_starting_together_start_one_service`, `test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
 | F3: Answers that differ from a private reranker's on the same inputs and device. | `test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
+
+## Fix TT-1: the case that bounds a search's time runs alone (D-03 (b), I-32)
+
+`test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` is listed in
+`tests/acceptance/serial-only.txt` (`serial: latency`): the release suite (`python3 -m gov.close.nightly`, through
+`gov.close.command`'s test run) and `gov close` leave it out of their parallel run and run it afterwards, alone. No
+bound changed. The cases below are fix lines, not ticket KPI lines.
+
+| Line | Test | Expected red reason on the base |
+|---|---|---|
+| TT-1: the list names the case on the serial route | `test_w2_112_serial_list.py::test_the_list_names_the_both_slots_held_case_on_the_serial_route_as_a_latency_case` | the list holds 0 entries for the case |
+| TT-1: the release runner leaves a listed case out of the parallel run and runs it exactly once, alone (guard) | `test_w2_112_serial_list.py::test_the_release_runner_leaves_the_listed_case_out_of_its_parallel_run_and_runs_it_once_alone` | guard: green on the base (the runner already reads the list; the planted project holds the entry) |
+
+## Fix TT-2: a search's time is taken on the monotonic clock (I-32; DEC-979 item 1 D2)
+
+This machine's wall clock steps forward (WSL2: +0.7 s about every 32 s, seen 2026-11-25), and the release suite's red
+of the case above read 7.6 s for a search inside a test that took 4.15 s in all. The session now stamps the call on
+`time.monotonic()` too (`t0`, `t1`), and `Session.wait` reports `seconds = t1 - t0`; without the pair it reports the
+time from the session's launch, monotonic as well. `started`/`ended` stay wall-clock, for comparisons across
+processes (`test_a_service_killed_mid_run_leaves_every_search_answered` compares `ended` with the test's own wall
+stamp, so that one comparison can still read a step; its bound is 10 s). No bound changed.
+
+The case stays in the serial list: `seconds` takes no wait for a CPU out, and its time holds a service process's start,
+so a loaded machine still lengthens it; running it alone costs seconds.
+
+Both cases below run the slots case whole, with a `sitecustomize.py` on the session process's `PYTHONPATH`: one steps
+the process's wall clock 3.5 s forward between the two wall stamps, one makes the product's `rerank` take twice its
+time. They carry the case's own 7 s bound against about 4.1 s of real search time, so by TT-1's rule they run alone: the
+whole file is one `serial: latency` entry of `tests/acceptance/serial-only.txt`.
+
+| Line | Test | Expected red reason on the base |
+|---|---|---|
+| TT-2: a forward wall-clock step of 3.5 s during the search does not change `seconds` | `test_w2_112_clock.py::test_a_forward_step_of_the_wall_clock_during_the_search_does_not_change_its_seconds` | `seconds` is the wall difference, 7.6 s, the planted step in it |
+| TT-2: the list names the clock file on the serial route | `test_w2_112_serial_list.py::test_the_list_names_the_whole_clock_file_on_the_serial_route_as_a_latency_entry` | before the entry (head `60ac1fe94`): the list holds 0 entries for the file |
+| TT-2: a real 2x slow-down still fails the case's bound (guard) | `test_w2_112_clock.py::test_a_search_that_really_takes_twice_its_time_still_fails_the_cases_bound` | guard: green on the base |

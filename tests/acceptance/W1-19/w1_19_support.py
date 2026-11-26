@@ -193,6 +193,15 @@ def watch():
         stop.wait(0.05)
 
 
+def waited_ns():
+    """Nanoseconds this thread has waited on a run queue (schedstat's second field); None where it cannot be read."""
+    try:
+        with open("/proc/thread-self/schedstat", encoding="ascii") as handle:
+            return int(handle.read().split()[1])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
 modules = {}
 for name in request["modules"]:
     try:
@@ -215,13 +224,15 @@ for call in request["calls"]:
         sys.exit(3)
     record = {"loads_before": LOG["loads"], "passes_before": len(LOG["passes"]), "heavy_before": heavy(),
               "value": None, "error": None}
-    started = time.perf_counter()
+    before, cpu, started = waited_ns(), time.thread_time(), time.perf_counter()
     try:
         record["value"] = function(*[decode(arg) for arg in call["args"]],
                                    **{key: decode(value) for key, value in call["kwargs"].items()})
     except Exception as exc:  # reported, so a test can say "never raises"
         record["error"] = {"type": type(exc).__name__, "message": str(exc)}
     record["seconds"] = time.perf_counter() - started
+    record["cpu"], after = time.thread_time() - cpu, waited_ns()
+    record["run_delay"] = None if before is None or after is None else (after - before) / 1e9
     record["heavy_after"] = heavy()
     out["calls"].append(record)
 if watcher:
@@ -239,6 +250,14 @@ def path_arg(path):
 
 
 RERANKER = "$reranker"  # as a keyword value: the driver's stand-in loader
+
+
+def judged_seconds(wall, run_delay=None, cpu=None):
+    """The time a latency case judges: the call's wall time less the time its calling thread waited on a run queue
+    for a CPU (``run_delay``, clamped to ``[0, wall]``; None, an unreadable reading, counts as no wait), and never
+    under the thread's own CPU time: ``max(wall - run_delay, cpu)``. With no wait it is the wall time."""
+    waited = min(max(run_delay or 0.0, 0.0), wall)
+    return max(wall - waited, cpu or 0.0)
 
 
 class Outcome:
@@ -260,6 +279,11 @@ class Outcome:
 
     def values(self):
         return [self.value(index) for index in range(len(self.calls))]
+
+    def seconds(self, index=0):
+        """The call's judged time (``judged_seconds``); its wall time stays in ``calls[index]["seconds"]``."""
+        call = self.calls[index]
+        return judged_seconds(call["seconds"], call.get("run_delay"), call.get("cpu"))
 
 
 class Api:

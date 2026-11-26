@@ -68,7 +68,10 @@ if barrier:
     while not Path(f"{barrier}.go").exists() and time.monotonic() < deadline:
         time.sleep(0.005)
 
+# ``started``/``ended`` are wall-clock stamps, comparable across processes; ``t0``/``t1`` are the monotonic clock's,
+# the search's own time: the machine's wall clock steps, and a step is not the search's time.
 out["started"] = time.time()
+out["t0"] = time.monotonic()
 try:
     if request.get("mode", "rerank") == "retrieve":
         out["result"] = module.retrieve(request["root"], request["query"])
@@ -76,6 +79,7 @@ try:
         out["result"] = module.rerank(request["query"], request["candidates"])
 except BaseException as error:  # noqa: BLE001 - a search that raises is what the tests look for
     out["error"] = failure(error)
+out["t1"] = time.monotonic()
 out["ended"] = time.time()
 if request.get("mode", "rerank") != "retrieve":
     try:

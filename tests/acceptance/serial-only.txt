@@ -37,6 +37,8 @@ tests/acceptance/W1-18/test_w1_18_deadline.py::test_a_daemon_that_never_becomes_
 tests/acceptance/W1-18/test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call  # serial: latency: the time taken against the hang limit
 tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder  # serial: latency: the check on 60 small files and one large SQLite store within 15 s
 tests/acceptance/W2-13/test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget  # serial: latency: warm p95 of the lexical route, no model, over each dev tier's query set at most 0.5 s (W1-19's budget)
+tests/acceptance/W2-112/test_w2_112_slots.py::test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded  # serial: latency: one search comes back within the service's 4 s slot wait and 3 s more
+tests/acceptance/W2-112/test_w2_112_clock.py  # serial: latency: both cases run a real search against the slot case's bound of 7 s
 
 # --- race: kept serial in this run
 tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # serial: race: claims raced from separate processes
