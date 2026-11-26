@@ -159,6 +159,65 @@ def test_a_missing_script_is_reported_not_skipped(tmp_path):
     assert not ok and any("start_audit.sh" in line and "cannot be read" in line for line in lines[3:])
 
 
+def wrapped(tmp_path, command='exec bash {target} "$@"', **change):
+    """The three scripts, ``start_cto.sh`` replaced by a wrapper; the tracked script it names holds the options."""
+    root = planted(tmp_path / "root", (REPO / role_table.REL).read_text())
+    target = scripts(tmp_path / "tracked", **change) / "start_cto.sh"
+    folder = scripts(tmp_path / "s")
+    (folder / "start_cto.sh").write_text(
+        f"#!/usr/bin/env bash\n# the one start script is tracked\n\n{command.format(target=target)}\n")
+    return folder, root, target
+
+
+@pytest.mark.parametrize("command", (
+    'exec bash {target} "$@"', "exec bash {target}", 'exec bash "{target}" "$@"',
+))
+def test_a_wrapper_is_checked_by_the_script_of_its_name_that_it_runs(tmp_path, command):
+    folder, root, _ = wrapped(tmp_path, command)
+    lines, ok = role_table.check_scripts(folder, root)
+    assert ok and len(lines) == 3 and "start_cto.sh: --model claude-opus-5-5 --effort high" in lines[1], lines
+
+
+def test_a_wrapper_s_target_that_disagrees_is_reported(tmp_path):
+    folder, root, _ = wrapped(tmp_path, cto="--effort medium")
+    lines, ok = role_table.check_scripts(folder, root)
+    assert not ok and any("start_cto.sh: --effort is medium" in line for line in lines[3:]), lines
+
+
+@pytest.mark.parametrize("command, word", (
+    ('exec bash {target}.gone/start_cto.sh "$@"', "cannot be read"),
+    ('exec bash start_cto.sh "$@"', "absolute"),
+    ('exec bash "$HOME/start_cto.sh" "$@"', "absolute"),
+))
+def test_a_wrapper_whose_target_cannot_be_read_is_reported(tmp_path, command, word):
+    folder, root, _ = wrapped(tmp_path, command)
+    lines, ok = role_table.check_scripts(folder, root)
+    assert not ok and any("start_cto.sh" in line and word in line for line in lines[3:]), lines
+
+
+def test_a_wrapper_naming_a_differently_named_script_is_reported(tmp_path):
+    folder, root, target = wrapped(tmp_path, 'exec bash {target}.old "$@"')
+    Path(f"{target}.old").write_text(target.read_text())
+    lines, ok = role_table.check_scripts(folder, root)
+    assert not ok and any("start_cto.sh" in line and "start_cto.sh.old" in line for line in lines[3:]), lines
+
+
+def test_a_wrapper_is_followed_one_level_only(tmp_path):
+    folder, root, target = wrapped(tmp_path)
+    second = tmp_path / "second"
+    second.mkdir()
+    (second / "start_cto.sh").write_text(target.read_text())
+    target.write_text(f'exec bash {second / "start_cto.sh"} "$@"\n')
+    lines, ok = role_table.check_scripts(folder, root)
+    assert not ok and any("start_cto.sh: names no --model" in line for line in lines[3:]), lines
+
+
+def test_a_script_with_another_command_beside_the_exec_is_checked_itself(tmp_path):
+    folder, root, _ = wrapped(tmp_path, 'echo hello\nexec bash {target} "$@"')
+    lines, ok = role_table.check_scripts(folder, root)
+    assert not ok and any("start_cto.sh: names no --model" in line for line in lines[3:]), lines
+
+
 def test_the_module_runs_as_a_command(tmp_path):
     root = planted(tmp_path / "root", (REPO / role_table.REL).read_text())
     run = lambda *a: subprocess.run([sys.executable, "-m", "gov.launch.role_table", *a], cwd=root,  # noqa: E731

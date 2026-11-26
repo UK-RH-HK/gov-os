@@ -13,7 +13,9 @@ Three checks stand here and run as ``python3 -m gov.launch.role_table`` (``gov l
   with the role and its old and new value (``check_range``);
 * ``--scripts <dir>``: ``start_lead.sh``, ``start_cto.sh`` and ``start_audit.sh`` each print their ``--model`` and
   ``--effort`` beside the row they must equal (``check_scripts(directory, root)``); a script that calls the Fable model reader, or
-  holding no ``--model`` or no ``--effort``, is reported.
+  holding no ``--model`` or no ``--effort``, is reported. A script whose only command is
+  ``exec bash <path> ["$@"]``, ``<path>`` bearing its own name, is checked by the file it names (one level only); a
+  target that is not absolute, cannot be read or bears another name is reported.
 
 Exit 0 when nothing is reported, 1 when something is, 2 for a usage error.
 """
@@ -236,11 +238,39 @@ def _option(text: str, flag: str, variables: dict[str, str]) -> tuple[bool, str 
     return True, _resolve(found.group(1), variables)
 
 
+# a start script that only hands over to another file (comments and blank lines aside)
+_WRAPPER = re.compile(r"""exec\s+bash\s+("[^"]*"|'[^']*'|[^\s;&|<>"']+)(?:\s+"\$@")?""")
+
+
+def _script_text(path: Path) -> tuple[str | None, str]:
+    """``(text, "")`` of the script that sets ``path``'s options: its own, or, when its only command is
+    ``exec bash <path of the same name> ["$@"]``, the named file's (one level only); ``(None, reason)`` when that cannot
+    be told."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None, "cannot be read"
+    commands = [line.strip() for line in text.splitlines() if line.strip() and not line.strip().startswith("#")]
+    match = _WRAPPER.fullmatch(commands[0]) if len(commands) == 1 else None
+    if match is None:
+        return text, ""
+    named = match.group(1).strip("\"'")
+    target = Path(named)
+    if not target.is_absolute() or "$" in named:
+        return None, f"runs {named}, which is not a plain absolute path"
+    if target.name != path.name:
+        return None, f"runs {named}, a script of another name"
+    try:
+        return target.read_text(encoding="utf-8"), ""
+    except (OSError, UnicodeDecodeError):
+        return None, f"runs {named}, which cannot be read"
+
+
 def check_scripts(directory: Path | str, root: Path | str) -> tuple[list[str], bool]:
     """``(lines, ok)``: one line for each of the three start scripts in ``directory`` with its ``--model`` and
     ``--effort`` beside the row it must equal, then a line for each fault (a disagreement, a script with no ``--model``
-    or no ``--effort``, one that is missing, one that calls the Fable model reader). ``ok`` is True when no fault
-    stands. A table that cannot be read refuses."""
+    or no ``--effort``, one that is missing, one that calls the Fable model reader). A wrapper of the tracked script of
+    its own name is checked by that script. ``ok`` is True when no fault stands. A table that cannot be read refuses."""
     table = load(root)
     lines: list[str] = []
     faults: list[str] = []
@@ -248,11 +278,10 @@ def check_scripts(directory: Path | str, root: Path | str) -> tuple[list[str], b
         row = table.get(role)
         want = "no row" if row is None else f"model {row['model']}, effort {row['effort']}"
         path = Path(directory) / name
-        try:
-            text = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError):
+        text, reason = _script_text(path)
+        if text is None:
             lines.append(f"{name}: not readable; the table's row for {role}: {want}")
-            faults.append(f"{name}: cannot be read, so it cannot be checked against the row for {role}")
+            faults.append(f"{name}: {reason}, so it cannot be checked against the row for {role}")
             continue
         variables = _variables(text)
         (has_model, model), (has_effort, effort) = (_option(text, flag, variables) for flag in ("--model", "--effort"))
